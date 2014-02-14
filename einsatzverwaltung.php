@@ -3,7 +3,7 @@
 Plugin Name: Einsatzverwaltung
 Plugin URI: http://www.abrain.de/software/wordpress-plugins/einsatzverwaltung/
 Description: Verwaltung von Feuerwehreins&auml;tzen
-Version: 0.0.1
+Version: 0.1.0
 Author: Andreas Brain
 Author URI: http://www.abrain.de
 License: GPLv2
@@ -134,19 +134,13 @@ function einsatzverwaltung_display_meta_box( $post ) {
 
     echo '<table><tbody>';
 
-    echo '<tr><td><label for="einsatzverwaltung_nummer">';
-        _e("Einsatznummer", 'einsatzverwaltung' );
-    echo '</label></td>';
+    echo '<tr><td><label for="einsatzverwaltung_nummer">' . __("Einsatznummer", 'einsatzverwaltung' ) . '</label></td>';
     echo '<td><input type="text" id="einsatzverwaltung_nummer" name="einsatzverwaltung_nummer" value="'.esc_attr($nummer).'" size="10" /></td></tr>';
     
-    echo '<tr><td><label for="einsatzverwaltung_alarmzeit">';
-        _e("Alarmzeit", 'einsatzverwaltung' );
-    echo '</label></td>';
+    echo '<tr><td><label for="einsatzverwaltung_alarmzeit">'. __("Alarmzeit", 'einsatzverwaltung' ) . '</label></td>';
     echo '<td><input type="text" id="einsatzverwaltung_alarmzeit" name="einsatzverwaltung_alarmzeit" value="'.esc_attr($alarmzeit).'" size="20" /> (YYYY-MM-DD hh:mm)</td></tr>';
 
-    echo '<tr><td><label for="einsatzverwaltung_einsatzende">';
-        _e("Einsatzende", 'einsatzverwaltung' );
-    echo '</label></td>';
+    echo '<tr><td><label for="einsatzverwaltung_einsatzende">'. __("Einsatzende", 'einsatzverwaltung' ) . '</label></td>';
     echo '<td><input type="text" id="einsatzverwaltung_einsatzende" name="einsatzverwaltung_einsatzende" value="'.esc_attr($einsatzende).'" size="20" /> (YYYY-MM-DD hh:mm)</td></tr>';
     
     echo '</tbody></table>';
@@ -167,12 +161,7 @@ function einsatzverwaltung_save_postdata( $post_id ) {
 
   
     // Check permissions
-    if ( 'page' == $_POST['post_type'] ) 
-    {
-        if ( !current_user_can( 'edit_page', $post_id ) )
-            return;
-    }
-    else
+    if ( 'einsatz' == $_POST['post_type'] ) 
     {
         if ( !current_user_can( 'edit_post', $post_id ) )
             return;
@@ -329,8 +318,6 @@ add_filter( 'the_excerpt', 'einsatzverwaltung_einsatz_excerpt');
 
 
 
-add_filter( 'manage_edit-einsatz_columns', 'einsatzverwaltung_edit_einsatz_columns' ) ;
-
 function einsatzverwaltung_edit_einsatz_columns( $columns ) {
 
 	$columns = array(
@@ -345,9 +332,8 @@ function einsatzverwaltung_edit_einsatz_columns( $columns ) {
 
 	return $columns;
 }
+add_filter( 'manage_edit-einsatz_columns', 'einsatzverwaltung_edit_einsatz_columns' ) ;
 
-
-add_action( 'manage_einsatz_posts_custom_column', 'einsatzverwaltung_manage_einsatz_columns', 10, 2 );
 
 function einsatzverwaltung_manage_einsatz_columns( $column, $post_id ) {
 	global $post;
@@ -436,9 +422,9 @@ function einsatzverwaltung_manage_einsatz_columns( $column, $post_id ) {
 			break;
 	}
 }
+add_action( 'manage_einsatz_posts_custom_column', 'einsatzverwaltung_manage_einsatz_columns', 10, 2 );
 
 
-add_shortcode( 'einsatzliste', 'einsatzverwaltung_print_einsatzliste' );
 function einsatzverwaltung_print_einsatzliste( $atts )
 {
     extract( shortcode_atts( array('jahr' => date('Y') ), $atts ) );
@@ -496,8 +482,8 @@ function einsatzverwaltung_print_einsatzliste( $atts )
     
     return $string;
 }
+add_shortcode( 'einsatzliste', 'einsatzverwaltung_print_einsatzliste' );
 
-add_shortcode( 'einsatzjahre', 'einsatzverwaltung_print_einsatzjahre' );
 function einsatzverwaltung_print_einsatzjahre( $atts )
 {
     global $year;
@@ -515,14 +501,19 @@ function einsatzverwaltung_print_einsatzjahre( $atts )
             $string .= " | ";
         }
         $string .= "<a href=\"../../einsaetze/".$jahr."\">";
-        if($year == $jahr || empty($year) && $jahr == date("Y")) $string .= "<strong>";
+        if($year == $jahr || empty($year) && $jahr == date("Y")) {
+            $string .= "<strong>";
+        }
         $string .= $jahr;
-        if($year == $jahr || empty($year) && $jahr == date("Y")) $string .= "</strong>";
+        if($year == $jahr || empty($year) && $jahr == date("Y")) {
+            $string .= "</strong>";
+        }
         $string .= "</a>";
     }
     
     return $string;
 }
+add_shortcode( 'einsatzjahre', 'einsatzverwaltung_print_einsatzjahre' );
 
 
 ##############################
@@ -557,10 +548,13 @@ class Einsatzverwaltung_Widget extends WP_Widget {
 		$zeigeDatum = $instance['zeigeDatum'];
 		$zeigeZeit = $instance['zeigeZeit'];
 		
-		if ( empty( $title ) )
+		if ( empty( $title ) ) {
 		  $title = "Letzte Eins&auml;tze";
-		if ( !isset($anzahl) || empty ($anzahl) || !is_numeric($anzahl) || $anzahl < 1)
+		}
+		
+		if ( !isset($anzahl) || empty ($anzahl) || !is_numeric($anzahl) || $anzahl < 1) {
 		  $anzahl = 3;
+		}
 
         $letzteEinsaetze = "";
 		$query = new WP_Query( '&post_type=einsatz&post_status=publish&posts_per_page='.$anzahl );
@@ -610,10 +604,11 @@ class Einsatzverwaltung_Widget extends WP_Widget {
 		$instance['title'] = strip_tags( $new_instance['title'] );
 		
 		$anzahl = $new_instance['anzahl'];
-        if ( empty ($anzahl) || !is_numeric($anzahl) || $anzahl < 1)
+        if ( empty ($anzahl) || !is_numeric($anzahl) || $anzahl < 1) {
             $instance['anzahl'] = $old_instance['anzahl'];
-        else
+        } else {
             $instance['anzahl'] = $new_instance['anzahl'];
+        }
         
         $instance['zeigeDatum'] = $new_instance['zeigeDatum'];
         $instance['zeigeZeit'] = $new_instance['zeigeZeit'];
@@ -646,25 +641,17 @@ class Einsatzverwaltung_Widget extends WP_Widget {
 		$zeigeDatum = $instance[ 'zeigeDatum' ];
 		$zeigeZeit = $instance[ 'zeigeZeit' ];
 		
-		echo "<p><label for=\"".$this->get_field_id( 'title' )."\">";
-		_e( 'Titel:' , 'einsatzverwaltung');
-		echo "</label>";
-		echo "<input class=\"widefat\" id=\"".$this->get_field_id( 'title' )."\" name=\"".$this->get_field_name( 'title' )."\" type=\"text\" value=\"".esc_attr( $title )."\" /></p>";
+		echo '<p><label for="'.$this->get_field_id( 'title' ).'">' . __( 'Titel:' , 'einsatzverwaltung') . '</label>';
+		echo '<input class="widefat" id="' . $this->get_field_id( 'title' ) . '" name="' . $this->get_field_name( 'title' ) . '" type="text" value="' . esc_attr( $title ).'" /></p>';
 		
-		echo "<p><label for=\"".$this->get_field_id( 'anzahl' )."\">";
-		_e( 'Anzahl:' , 'einsatzverwaltung');
-		echo "</label>";
-		echo "<input id=\"".$this->get_field_id( 'anzahl' )."\" name=\"".$this->get_field_name( 'anzahl' )."\" type=\"text\" value=\"".$anzahl."\" size=\"3\" /></p>";
+		echo '<p><label for="'.$this->get_field_id( 'anzahl' ).'">' . __( 'Anzahl:' , 'einsatzverwaltung') . '</label>';
+		echo '<input id="'.$this->get_field_id( 'anzahl' ).'" name="'.$this->get_field_name( 'anzahl' ).'" type="text" value="'.$anzahl.'" size="3" /></p>';
 
-		echo "<p><input id=\"".$this->get_field_id( 'zeigeDatum' )."\" name=\"".$this->get_field_name( 'zeigeDatum' )."\" type=\"checkbox\" ".($zeigeDatum ? "checked=\"checked\" " : "")."/>";
-		echo "&nbsp;<label for=\"".$this->get_field_id( 'zeigeDatum' )."\">";
-		_e( 'Datum anzeigen' , 'einsatzverwaltung');
-		echo "</label></p>";
+		echo '<p><input id="'.$this->get_field_id( 'zeigeDatum' ).'" name="'.$this->get_field_name( 'zeigeDatum' ).'" type="checkbox" '.($zeigeDatum ? 'checked="checked" ' : '').'/>';
+		echo '&nbsp;<label for="'.$this->get_field_id( 'zeigeDatum' ).'">' . __( 'Datum anzeigen' , 'einsatzverwaltung') . '</label></p>';
 
-		echo "<p>&nbsp;&nbsp;<input id=\"".$this->get_field_id( 'zeigeZeit' )."\" name=\"".$this->get_field_name( 'zeigeZeit' )."\" type=\"checkbox\" ".($zeigeZeit ? "checked=\"checked\" " : "")."/>";
-		echo "&nbsp;<label for=\"".$this->get_field_id( 'zeigeZeit' )."\">";
-		echo "Zeit anzeigen (nur in Kombination mit Datum)";
-		echo "</label></p>";
+		echo '<p style="text-indent:1em;"><input id="'.$this->get_field_id( 'zeigeZeit' ).'" name="'.$this->get_field_name( 'zeigeZeit' ).'" type="checkbox" '.($zeigeZeit ? 'checked="checked" ' : '').'/>';
+		echo '&nbsp;<label for="'.$this->get_field_id( 'zeigeZeit' ).'">' . __('Zeit anzeigen (nur in Kombination mit Datum)' , 'einsatzverwaltung') . '</label></p>';
 	}
 }
 

@@ -121,7 +121,7 @@ function einsatzverwaltung_display_meta_box( $post ) {
     // Use get_post_meta to retrieve an existing value from the database and use the value for the form
     $nummer = get_post_meta( $post->ID, $key = 'einsatz_nummer', $single = true );
     $alarmzeit = get_post_meta( $post->ID, $key = 'einsatz_alarmzeit', $single = true );
-    $dauer = get_post_meta( $post->ID, $key = 'einsatz_dauer', $single = true );
+    $einsatzende = get_post_meta( $post->ID, $key = 'einsatz_einsatzende', $single = true );
     
     if(empty($nummer)) {
         
@@ -142,12 +142,12 @@ function einsatzverwaltung_display_meta_box( $post ) {
     echo '<tr><td><label for="einsatzverwaltung_alarmzeit">';
         _e("Alarmzeit", 'einsatzverwaltung' );
     echo '</label></td>';
-    echo '<td><input type="text" id="einsatzverwaltung_alarmzeit" name="einsatzverwaltung_alarmzeit" value="'.esc_attr($alarmzeit).'" size="25" /> (YYYY-MM-DD hh:mm)</td></tr>';
+    echo '<td><input type="text" id="einsatzverwaltung_alarmzeit" name="einsatzverwaltung_alarmzeit" value="'.esc_attr($alarmzeit).'" size="20" /> (YYYY-MM-DD hh:mm)</td></tr>';
 
-    echo '<tr><td><label for="einsatzverwaltung_dauer">';
-        _e("Dauer", 'einsatzverwaltung' );
+    echo '<tr><td><label for="einsatzverwaltung_einsatzende">';
+        _e("Einsatzende", 'einsatzverwaltung' );
     echo '</label></td>';
-    echo '<td><input type="text" id="einsatzverwaltung_dauer" name="einsatzverwaltung_dauer" value="'.esc_attr($dauer).'" size="6" /> Minuten</td></tr>';
+    echo '<td><input type="text" id="einsatzverwaltung_einsatzende" name="einsatzverwaltung_einsatzende" value="'.esc_attr($einsatzende).'" size="20" /> (YYYY-MM-DD hh:mm)</td></tr>';
     
     echo '</tbody></table>';
 }
@@ -185,7 +185,7 @@ function einsatzverwaltung_save_postdata( $post_id ) {
     //sanitize user input
     $data_nummer = sanitize_text_field( $_POST['einsatzverwaltung_nummer'] );
     $data_alarmzeit = sanitize_text_field( $_POST['einsatzverwaltung_alarmzeit'] );
-    $data_dauer = sanitize_text_field( $_POST['einsatzverwaltung_dauer'] );
+    $data_einsatzende = sanitize_text_field( $_POST['einsatzverwaltung_einsatzende'] );
     
     add_post_meta($post_ID, 'einsatz_nummer', $data_nummer, true) or
     update_post_meta($post_ID, 'einsatz_nummer', $data_nummer);
@@ -193,8 +193,8 @@ function einsatzverwaltung_save_postdata( $post_id ) {
     add_post_meta($post_ID, 'einsatz_alarmzeit', $data_alarmzeit, true) or
     update_post_meta($post_ID, 'einsatz_alarmzeit', $data_alarmzeit);
     
-    add_post_meta($post_ID, 'einsatz_dauer', $data_dauer, true) or
-    update_post_meta($post_ID, 'einsatz_dauer', $data_dauer);
+    add_post_meta($post_ID, 'einsatz_einsatzende', $data_einsatzende, true) or
+    update_post_meta($post_ID, 'einsatz_einsatzende', $data_einsatzende);
     
     
     
@@ -236,22 +236,29 @@ function einsatzverwaltung_add_einsatz_daten($content) {
     if(get_post_type() == "einsatz") {
         $alarmzeit = get_post_meta($post->ID, 'einsatz_alarmzeit', true);
         
-        $dauer = get_post_meta($post->ID, 'einsatz_dauer', true);
-        if(empty($dauer) || !is_numeric($dauer)) {
-            $dauerstring = "-";
-        } else {
-            if($dauer <= 0) {
-                $dauerstring = "-";
-            } else if($dauer < 60) {
-                $dauerstring = $dauer." Minuten";
-            } else {
-                $dauer_h = intval($dauer / 60);
-                $dauer_m = $dauer % 60;
-                $dauerstring = $dauer_h." Stunde".($dauer_h > 1 ? "n" : "");
-                if($dauer_m > 0) {
-                    $dauerstring .= " ".$dauer_m." Minute".($dauer_m > 1 ? "n" : "");
+        $einsatzende = get_post_meta($post->ID, 'einsatz_einsatzende', true);
+        if(!empty($alarmzeit) && !empty($einsatzende)) {
+            $datetime1 = date_create($alarmzeit);
+            $datetime2 = date_create($einsatzende);
+            $interval = date_diff($datetime1, $datetime2);
+            
+            // nur weitermachen, wenn die Differenz nicht negativ ist
+            if($interval->format('%r') === "") {
+                $dauer_h = intval($interval->format('%h'));
+                $dauer_m = intval($interval->format('%i'));
+                if($dauer_h == 0 && $dauer_m > 0) {
+                    $dauerstring = $dauer_m." Minute".($dauer_m > 1 ? "n" : "");
+                } else if ($dauer_h > 0) {
+                    $dauerstring = $dauer_h." Stunde".($dauer_h > 1 ? "n" : "");
+                    if($dauer_m > 0) {
+                        $dauerstring .= " ".$dauer_m." Minute".($dauer_m > 1 ? "n" : "");
+                    }
                 }
+            } else {
+                $dauerstring = "-";
             }
+        } else {
+            $dauerstring = "-";
         }
         
         $einsatzarten = get_the_terms( $post->ID, 'einsatzart' );
@@ -342,8 +349,8 @@ function einsatzverwaltung_edit_einsatz_columns( $columns ) {
 		'cb' => '<input type="checkbox" />',
 		'title' => __( 'Einsatzbericht', 'einsatzverwaltung' ),
 		'e_nummer' => __( 'Nummer', 'einsatzverwaltung' ),
-		'e_datum' => __( 'Datum', 'einsatzverwaltung' ),
-		'e_dauer' => __( 'Dauer', 'einsatzverwaltung' ),
+		'e_alarmzeit' => __( 'Alarmzeit', 'einsatzverwaltung' ),
+		'e_einsatzende' => __( 'Einsatzende', 'einsatzverwaltung' ),
 		'e_art' => __( 'Art', 'einsatzverwaltung' ),
 		'e_fzg' => __( 'Fahrzeuge', 'einsatzverwaltung' )
 	);
@@ -369,24 +376,27 @@ function einsatzverwaltung_manage_einsatz_columns( $column, $post_id ) {
 
 			break;
 
-        case 'e_dauer' :
-            $einsatz_dauer = get_post_meta( $post_id, 'einsatz_dauer', true );
+        case 'e_einsatzende' :
+            $einsatz_einsatzende = get_post_meta( $post_id, 'einsatz_einsatzende', true );
 
-			if ( empty( $einsatz_dauer ) )
+			if ( empty( $einsatz_einsatzende ) ) {
 				echo '-';
-			else
-				printf( __( '%s Minuten' , 'einsatzverwaltung'), $einsatz_dauer );
+			} else {
+				$timestamp = strtotime($einsatz_einsatzende);
+				echo date("d.m.Y", $timestamp)."<br>".date("H:i", $timestamp);
+			}
 
 			break;
 			
-        case 'e_datum' :
-            $einsatz_datum = get_post_meta( $post_id, 'einsatz_alarmzeit', true );
-            $timestamp = strtotime($einsatz_datum);
+        case 'e_alarmzeit' :
+            $einsatz_alarmzeit = get_post_meta( $post_id, 'einsatz_alarmzeit', true );
 
-			if ( empty( $einsatz_datum ) )
+			if ( empty( $einsatz_alarmzeit ) ) {
 				echo '-';
-			else
+			} else {
+    			$timestamp = strtotime($einsatz_alarmzeit);
     			echo date("d.m.Y", $timestamp)."<br>".date("H:i", $timestamp);
+			}
 
 			break;
 			

@@ -447,7 +447,7 @@ function einsatzverwaltung_print_einsatzliste( $atts )
     
     if (strlen($jahr)!=4 || !is_numeric($jahr)) {
         $aktuelles_jahr = date('Y');
-        $string .= "INFO: Jahreszahl \"".$jahr."\" ung&uuml;ltig, verwende ".$aktuelles_jahr."<br>";
+        $string .= '<p>' . sprintf('INFO: Jahreszahl %s ung&uuml;ltig, verwende %s', $jahr, $aktuelles_jahr) . '</p>';
         $jahr = $aktuelles_jahr;
     }
 
@@ -491,7 +491,7 @@ function einsatzverwaltung_print_einsatzliste( $atts )
         $string .= "</tbody>";
         $string .= "</table>";
     } else {
-        $string .= "Keine Eins&auml;tze";
+        $string .= sprintf("Keine Eins&auml;tze im Jahr %s", $jahr);
     }
     
     return $string;

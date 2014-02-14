@@ -2,7 +2,7 @@
 /*
 Plugin Name: Einsatzverwaltung
 Plugin URI: http://www.abrain.de
-Description: Verwaltung von Feuerwehreinsätzen
+Description: Verwaltung von Feuerwehreins&auml;tzen
 Version: 0.0.1
 Author: Andreas Brain
 Author URI: http://www.abrain.de
@@ -50,12 +50,12 @@ function create_post_type() {
 	       'view_item' => 'Einsatzart ansehen',
 	       'update_item' => 'Einsatzart aktualisieren',
 	       'add_new_item' => 'Neue Einsatzart',
-	       'new_item_name' => 'Einsatzart hinzufügen',
+	       'new_item_name' => 'Einsatzart hinzuf&uuml;gen',
 	       'search_items' => 'Einsatzarten suchen',
-	       'popular_items' => 'Häufige Einsatzarten',
+	       'popular_items' => 'H&auml;ufige Einsatzarten',
 	       'separate_items_with_commas' => 'Einsatzarten mit Kommata trennen',
-	       'add_or_remove_items' => 'Einsatzarten hinzufügen oder entfernen',
-	       'choose_from_most_used' => 'Aus häufigen Einsatzarten wählen'),
+	       'add_or_remove_items' => 'Einsatzarten hinzuf&uuml;gen oder entfernen',
+	       'choose_from_most_used' => 'Aus h&auml;ufigen Einsatzarten w&auml;hlen'),
        'public' => true,
        'show_in_nav_menus' => false);
 	register_taxonomy( 'einsatzart', 'einsatz', $args_einsatzart );
@@ -71,12 +71,12 @@ function create_post_type() {
 	       'view_item' => 'Fahrzeug ansehen',
 	       'update_item' => 'Fahrzeug aktualisieren',
 	       'add_new_item' => 'Neues Fahrzeug',
-	       'new_item_name' => 'Fahrzeug hinzufügen',
+	       'new_item_name' => 'Fahrzeug hinzuf&uuml;gen',
 	       'search_items' => 'Fahrzeuge suchen',
 	       'popular_items' => 'Oft eingesetzte Fahrzeuge',
 	       'separate_items_with_commas' => 'Fahrzeuge mit Kommata trennen',
-	       'add_or_remove_items' => 'Fahrzeuge hinzufügen oder entfernen',
-	       'choose_from_most_used' => 'Aus häufig eingesetzten Fahrzeugen wählen'),
+	       'add_or_remove_items' => 'Fahrzeuge hinzuf&uuml;gen oder entfernen',
+	       'choose_from_most_used' => 'Aus h&auml;ufig eingesetzten Fahrzeugen w&auml;hlen'),
        'public' => true,
        'show_in_nav_menus' => false);
 	register_taxonomy( 'fahrzeug', 'einsatz', $args_fahrzeug );
@@ -538,8 +538,8 @@ class Einsatz_Widget extends WP_Widget {
 	public function __construct() {
 		parent::__construct(
 	 		'einsatz_widget', // Base ID
-			'Letzte Einsätze', // Name
-			array( 'description' => __( 'Zeigt die neuesten Einsätze an', 'text_domain' ), ) // Args
+			'Letzte Eins&auml;tze', // Name
+			array( 'description' => __( 'Zeigt die neuesten Eins&auml;tze an', 'text_domain' ), ) // Args
 		);
 	}
 
@@ -559,7 +559,7 @@ class Einsatz_Widget extends WP_Widget {
 		$zeigeZeit = $instance['zeigeZeit'];
 		
 		if ( empty( $title ) )
-		  $title = "Letzte Einsätze";
+		  $title = "Letzte Eins&auml;tze";
 		if ( !isset($anzahl) || empty ($anzahl) || !is_numeric($anzahl) || $anzahl < 1)
 		  $anzahl = 3;
 
@@ -592,7 +592,7 @@ class Einsatz_Widget extends WP_Widget {
 
 		echo $before_widget;
 		echo $before_title . $title . $after_title;
-        echo ( empty($letzteEinsaetze) ? "Keine Einsätze" : "<ul>".$letzteEinsaetze."</ul>");
+        echo ( empty($letzteEinsaetze) ? "Keine Eins&auml;tze" : "<ul>".$letzteEinsaetze."</ul>");
 		echo $after_widget;
 	}
 
@@ -634,7 +634,7 @@ class Einsatz_Widget extends WP_Widget {
 			$title = $instance[ 'title' ];
 		}
 		else {
-			$title = __( 'Letzte Einsätze', 'text_domain' );
+			$title = __( 'Letzte Eins&auml;tze', 'text_domain' );
 		}
 		
 		if ( isset( $instance[ 'anzahl' ] ) ) {

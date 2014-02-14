@@ -10,9 +10,9 @@ License: GPLv2
 Text Domain: einsatzverwaltung
 */
 
-add_action( 'init', 'create_post_type' );
+add_action( 'init', 'einsatzverwaltung_create_post_type' );
 
-function create_post_type() {
+function einsatzverwaltung_create_post_type() {
 	$args_einsatz = array(
 		'labels' => array(
    			'name' => 'Einsatzberichte',
@@ -87,33 +87,33 @@ function create_post_type() {
 }
 
 
-function my_rewrite_flush() {
+function einsatzverwaltung_rewrite_flush() {
     // First, we "add" the custom post type via the above written function.
     // Note: "add" is written with quotes, as CPTs don't get added to the DB,
     // They are only referenced in the post_type column with a post entry, 
     // when you add a post of this CPT.
-    create_post_type();
+    einsatzverwaltung_create_post_type();
 
     // ATTENTION: This is *only* done during plugin activation hook in this example!
     // You should *NEVER EVER* do this on every page load!!
     flush_rewrite_rules();
 }
-register_activation_hook( __FILE__, 'my_rewrite_flush' );
+register_activation_hook( __FILE__, 'einsatzverwaltung_rewrite_flush' );
 
 
-add_action( 'admin_init', 'einsatz_admin' );
+add_action( 'admin_init', 'einsatzverwaltung_admin' );
 
-function einsatz_admin() {
-	add_meta_box( 'einsatz_meta_box',
+function einsatzverwaltung_admin() {
+	add_meta_box( 'einsatzverwaltung_meta_box',
 		'Einsatzdetails',
-		'display_einsatz_meta_box',
+		'einsatzverwaltung_display_meta_box',
 		'einsatz', 'normal', 'high'
 	);
 }
 
 
 /* Prints the box content */
-function display_einsatz_meta_box( $post ) {
+function einsatzverwaltung_display_meta_box( $post ) {
     // Use nonce for verification
     wp_nonce_field( plugin_basename( __FILE__ ), 'einsatzverwaltung_nonce' );
 
@@ -230,7 +230,7 @@ function einsatzverwaltung_save_postdata( $post_id ) {
 add_action( 'save_post', 'einsatzverwaltung_save_postdata' );
 
 
-function add_einsatz_daten($content) {
+function einsatzverwaltung_add_einsatz_daten($content) {
     global $post;
     
     if(get_post_type() == "einsatz") {
@@ -298,10 +298,10 @@ function add_einsatz_daten($content) {
     
     return $content;
 }
-add_filter( 'the_content', 'add_einsatz_daten');
+add_filter( 'the_content', 'einsatzverwaltung_add_einsatz_daten');
 
 
-function einsatz_excerpt($excerpt)
+function einsatzverwaltung_einsatz_excerpt($excerpt)
 {
     global $post;
     if(get_post_type() == "einsatz") {
@@ -311,10 +311,10 @@ function einsatz_excerpt($excerpt)
         return $excerpt;
     }
 }
-add_filter( 'the_excerpt', 'einsatz_excerpt');
+add_filter( 'the_excerpt', 'einsatzverwaltung_einsatz_excerpt');
 
 
-function replace_post_date_with_einsatz_date($time, $format)
+function einsatzverwaltung_replace_post_date_with_einsatz_date($time, $format)
 {
     global $post;
     if(get_post_type() == "einsatz") {
@@ -328,15 +328,15 @@ function replace_post_date_with_einsatz_date($time, $format)
     }
     return $time;
 }
-add_filter('the_time', 'replace_post_date_with_einsatz_date', 10, 2);
+add_filter('the_time', 'einsatzverwaltung_replace_post_date_with_einsatz_date', 10, 2);
 
 
 
 
 
-add_filter( 'manage_edit-einsatz_columns', 'my_edit_einsatz_columns' ) ;
+add_filter( 'manage_edit-einsatz_columns', 'einsatzverwaltung_edit_einsatz_columns' ) ;
 
-function my_edit_einsatz_columns( $columns ) {
+function einsatzverwaltung_edit_einsatz_columns( $columns ) {
 
 	$columns = array(
 		'cb' => '<input type="checkbox" />',
@@ -352,9 +352,9 @@ function my_edit_einsatz_columns( $columns ) {
 }
 
 
-add_action( 'manage_einsatz_posts_custom_column', 'my_manage_einsatz_columns', 10, 2 );
+add_action( 'manage_einsatz_posts_custom_column', 'einsatzverwaltung_manage_einsatz_columns', 10, 2 );
 
-function my_manage_einsatz_columns( $column, $post_id ) {
+function einsatzverwaltung_manage_einsatz_columns( $column, $post_id ) {
 	global $post;
 
 	switch( $column ) {
@@ -440,8 +440,8 @@ function my_manage_einsatz_columns( $column, $post_id ) {
 }
 
 
-add_shortcode( 'einsatzliste', 'print_einsatzliste' );
-function print_einsatzliste( $atts )
+add_shortcode( 'einsatzliste', 'einsatzverwaltung_print_einsatzliste' );
+function einsatzverwaltung_print_einsatzliste( $atts )
 {
     extract( shortcode_atts( array('jahr' => date('Y') ), $atts ) );
 
@@ -499,8 +499,8 @@ function print_einsatzliste( $atts )
     return $string;
 }
 
-add_shortcode( 'einsatzjahre', 'print_einsatzjahre' );
-function print_einsatzjahre( $atts )
+add_shortcode( 'einsatzjahre', 'einsatzverwaltung_print_einsatzjahre' );
+function einsatzverwaltung_print_einsatzjahre( $atts )
 {
     global $year;
     $jahre = array();
@@ -531,14 +531,14 @@ function print_einsatzjahre( $atts )
 #           WIDGET           #
 ##############################
 
-class Einsatz_Widget extends WP_Widget {
+class Einsatzverwaltung_Widget extends WP_Widget {
 
 	/**
 	 * Register widget with WordPress.
 	 */
 	public function __construct() {
 		parent::__construct(
-	 		'einsatz_widget', // Base ID
+	 		'einsatzverwaltung_widget', // Base ID
 			'Letzte Eins&auml;tze', // Name
 			array( 'description' => __( 'Zeigt die neuesten Eins&auml;tze an', 'einsatzverwaltung'), ) // Args
 		);
@@ -671,15 +671,17 @@ class Einsatz_Widget extends WP_Widget {
 }
 
 // register Einsatz_Widget widget
-add_action( 'widgets_init', create_function( '', 'register_widget( "einsatz_widget" );' ) );
+add_action( 'widgets_init', create_function( '', 'register_widget( "einsatzverwaltung_widget" );' ) );
 
 
-function remove_einsatz_menu( ) {
-    $einsatz_authors = array(2,7);
-	if ( !current_user_can( 'manage_options' ) && !in_array(get_current_user_id(), $einsatz_authors)  ) {
+/*
+ * Einsatzberichte-Menü vor Nicht-Administratoren verstecken
+ */
+function einsatzverwaltung_remove_einsatz_menu( ) {
+	if ( !current_user_can( 'manage_options' ) ) {
 		remove_menu_page( 'edit.php?post_type=einsatz' );
 	}
 }
-add_action( 'admin_menu', 'remove_einsatz_menu', 999 );
+add_action( 'admin_menu', 'einsatzverwaltung_remove_einsatz_menu', 999 );
 
 ?>

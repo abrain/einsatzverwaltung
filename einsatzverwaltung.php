@@ -7,6 +7,7 @@ Version: 0.0.1
 Author: Andreas Brain
 Author URI: http://www.abrain.de
 License: GPLv2
+Text Domain: einsatzverwaltung
 */
 
 add_action( 'init', 'create_post_type' );
@@ -134,17 +135,17 @@ function display_einsatz_meta_box( $post ) {
     echo '<table><tbody>';
 
     echo '<tr><td><label for="einsatzverwaltung_nummer">';
-        _e("Einsatznummer", 'einsatzverwaltung_textdomain' );
+        _e("Einsatznummer", 'einsatzverwaltung' );
     echo '</label></td>';
     echo '<td><input type="text" id="einsatzverwaltung_nummer" name="einsatzverwaltung_nummer" value="'.esc_attr($nummer).'" size="10" /></td></tr>';
     
     echo '<tr><td><label for="einsatzverwaltung_alarmzeit">';
-        _e("Alarmzeit", 'einsatzverwaltung_textdomain' );
+        _e("Alarmzeit", 'einsatzverwaltung' );
     echo '</label></td>';
     echo '<td><input type="text" id="einsatzverwaltung_alarmzeit" name="einsatzverwaltung_alarmzeit" value="'.esc_attr($alarmzeit).'" size="25" /> (YYYY-MM-DD hh:mm)</td></tr>';
 
     echo '<tr><td><label for="einsatzverwaltung_dauer">';
-        _e("Dauer", 'einsatzverwaltung_textdomain' );
+        _e("Dauer", 'einsatzverwaltung' );
     echo '</label></td>';
     echo '<td><input type="text" id="einsatzverwaltung_dauer" name="einsatzverwaltung_dauer" value="'.esc_attr($dauer).'" size="6" /> Minuten</td></tr>';
     
@@ -339,12 +340,12 @@ function my_edit_einsatz_columns( $columns ) {
 
 	$columns = array(
 		'cb' => '<input type="checkbox" />',
-		'title' => __( 'Einsatzbericht' ),
-		'e_nummer' => __( 'Nummer' ),
-		'e_datum' => __( 'Datum' ),
-		'e_dauer' => __( 'Dauer' ),
-		'e_art' => __( 'Art' ),
-		'e_fzg' => __( 'Fahrzeuge' )
+		'title' => __( 'Einsatzbericht', 'einsatzverwaltung' ),
+		'e_nummer' => __( 'Nummer', 'einsatzverwaltung' ),
+		'e_datum' => __( 'Datum', 'einsatzverwaltung' ),
+		'e_dauer' => __( 'Dauer', 'einsatzverwaltung' ),
+		'e_art' => __( 'Art', 'einsatzverwaltung' ),
+		'e_fzg' => __( 'Fahrzeuge', 'einsatzverwaltung' )
 	);
 
 	return $columns;
@@ -362,9 +363,9 @@ function my_manage_einsatz_columns( $column, $post_id ) {
             $einsatz_nummer = get_post_meta( $post_id, 'einsatz_nummer', true );
 
 			if ( empty( $einsatz_nummer ) )
-				echo __( '-' );
+				echo '-';
 			else
-				echo __( $einsatz_nummer );
+				echo $einsatz_nummer;
 
 			break;
 
@@ -372,9 +373,9 @@ function my_manage_einsatz_columns( $column, $post_id ) {
             $einsatz_dauer = get_post_meta( $post_id, 'einsatz_dauer', true );
 
 			if ( empty( $einsatz_dauer ) )
-				echo __( '-' );
+				echo '-';
 			else
-				printf( __( '%s Minuten' ), $einsatz_dauer );
+				printf( __( '%s Minuten' , 'einsatzverwaltung'), $einsatz_dauer );
 
 			break;
 			
@@ -383,9 +384,9 @@ function my_manage_einsatz_columns( $column, $post_id ) {
             $timestamp = strtotime($einsatz_datum);
 
 			if ( empty( $einsatz_datum ) )
-				echo __( '-' );
+				echo '-';
 			else
-    			echo __( date("d.m.Y", $timestamp)."<br>".date("H:i", $timestamp) );
+    			echo date("d.m.Y", $timestamp)."<br>".date("H:i", $timestamp);
 
 			break;
 			
@@ -406,7 +407,7 @@ function my_manage_einsatz_columns( $column, $post_id ) {
 			}
 
 			else {
-				_e( '-' );
+				echo '-';
 			}
 
 			break;
@@ -428,7 +429,7 @@ function my_manage_einsatz_columns( $column, $post_id ) {
 			}
 
 			else {
-				_e( '-' );
+				echo '-';
 			}
 
 			break;
@@ -539,7 +540,7 @@ class Einsatz_Widget extends WP_Widget {
 		parent::__construct(
 	 		'einsatz_widget', // Base ID
 			'Letzte Eins&auml;tze', // Name
-			array( 'description' => __( 'Zeigt die neuesten Eins&auml;tze an', 'text_domain' ), ) // Args
+			array( 'description' => __( 'Zeigt die neuesten Eins&auml;tze an', 'einsatzverwaltung'), ) // Args
 		);
 	}
 
@@ -634,7 +635,7 @@ class Einsatz_Widget extends WP_Widget {
 			$title = $instance[ 'title' ];
 		}
 		else {
-			$title = __( 'Letzte Eins&auml;tze', 'text_domain' );
+			$title = __( 'Letzte Eins&auml;tze', 'einsatzverwaltung');
 		}
 		
 		if ( isset( $instance[ 'anzahl' ] ) ) {
@@ -648,18 +649,18 @@ class Einsatz_Widget extends WP_Widget {
 		$zeigeZeit = $instance[ 'zeigeZeit' ];
 		
 		echo "<p><label for=\"".$this->get_field_id( 'title' )."\">";
-		_e( 'Title:' );
+		_e( 'Titel:' , 'einsatzverwaltung');
 		echo "</label>";
 		echo "<input class=\"widefat\" id=\"".$this->get_field_id( 'title' )."\" name=\"".$this->get_field_name( 'title' )."\" type=\"text\" value=\"".esc_attr( $title )."\" /></p>";
 		
 		echo "<p><label for=\"".$this->get_field_id( 'anzahl' )."\">";
-		_e( 'Anzahl:' );
+		_e( 'Anzahl:' , 'einsatzverwaltung');
 		echo "</label>";
 		echo "<input id=\"".$this->get_field_id( 'anzahl' )."\" name=\"".$this->get_field_name( 'anzahl' )."\" type=\"text\" value=\"".$anzahl."\" size=\"3\" /></p>";
 
 		echo "<p><input id=\"".$this->get_field_id( 'zeigeDatum' )."\" name=\"".$this->get_field_name( 'zeigeDatum' )."\" type=\"checkbox\" ".($zeigeDatum ? "checked=\"checked\" " : "")."/>";
 		echo "&nbsp;<label for=\"".$this->get_field_id( 'zeigeDatum' )."\">";
-		_e( 'Datum anzeigen' );
+		_e( 'Datum anzeigen' , 'einsatzverwaltung');
 		echo "</label></p>";
 
 		echo "<p>&nbsp;&nbsp;<input id=\"".$this->get_field_id( 'zeigeZeit' )."\" name=\"".$this->get_field_name( 'zeigeZeit' )."\" type=\"checkbox\" ".($zeigeZeit ? "checked=\"checked\" " : "")."/>";

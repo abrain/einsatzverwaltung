@@ -229,11 +229,8 @@ function einsatzverwaltung_save_postdata( $post_id ) {
 
 add_action( 'save_post', 'einsatzverwaltung_save_postdata' );
 
-
-function einsatzverwaltung_add_einsatz_daten($content) {
-    global $post;
-    
-    if(get_post_type() == "einsatz") {
+function einsatzverwaltung_get_einsatzbericht_header($post) {
+    if(get_post_type($post) == "einsatz") {
         $alarmzeit = get_post_meta($post->ID, 'einsatz_alarmzeit', true);
         
         $einsatzende = get_post_meta($post->ID, 'einsatz_einsatzende', true);
@@ -286,21 +283,31 @@ function einsatzverwaltung_add_einsatz_daten($content) {
         $alarm_timestamp = strtotime($alarmzeit);
         $einsatz_datum = ($alarm_timestamp ? date("d.m.Y", $alarm_timestamp) : "-");
         $einsatz_zeit = ($alarm_timestamp ? date("H:i", $alarm_timestamp)." Uhr" : "-");
-        $daten = "<strong>Datum:</strong> ".$einsatz_datum."<br>";
-        $daten .= "<strong>Alarmzeit:</strong> ".$einsatz_zeit."<br>";
-        $daten .= "<strong>Dauer:</strong> ".$dauerstring."<br>";
-        $daten .= "<strong>Art:</strong> ".$art."<br>";
-        $daten .= "<strong>Fahrzeuge:</strong> ".$fzg_string."<br>";
         
-        $daten .= "<hr>";
+        $headerstring = "<strong>Datum:</strong> ".$einsatz_datum."<br>";
+        $headerstring .= "<strong>Alarmzeit:</strong> ".$einsatz_zeit."<br>";
+        $headerstring .= "<strong>Dauer:</strong> ".$dauerstring."<br>";
+        $headerstring .= "<strong>Art:</strong> ".$art."<br>";
+        $headerstring .= "<strong>Fahrzeuge:</strong> ".$fzg_string."<br>";
+        
+        return $headerstring;
+    }
+    return "";
+}
+
+function einsatzverwaltung_add_einsatz_daten($content) {
+    global $post;
+    if(get_post_type() == "einsatz") {
+        $header = einsatzverwaltung_get_einsatzbericht_header($post);
+        $header .= "<hr>";
         
         if(strlen($content) > 0) {
-            $daten .= "<h3>Einsatzbericht:</h3>";
+            $header .= "<h3>Einsatzbericht:</h3>";
         } else {
-            $daten .= "Kein Einsatzbericht vorhanden";
+            $header .= "Kein Einsatzbericht vorhanden";
         }
         
-        $content = $daten.$content;
+        $content = $header.$content;
     }
     
     return $content;
@@ -312,32 +319,13 @@ function einsatzverwaltung_einsatz_excerpt($excerpt)
 {
     global $post;
     if(get_post_type() == "einsatz") {
-        return "excerpt";
+        return einsatzverwaltung_get_einsatzbericht_header($post);
     }
     else {
         return $excerpt;
     }
 }
 add_filter( 'the_excerpt', 'einsatzverwaltung_einsatz_excerpt');
-
-
-function einsatzverwaltung_replace_post_date_with_einsatz_date($time, $format)
-{
-    global $post;
-    if(get_post_type() == "einsatz") {
-        if($format == "j" || $format == "M") {
-            $alarmzeit = get_post_meta($post->ID, 'einsatz_alarmzeit', true);
-            $timestamp = strtotime($alarmzeit);
-            return date($format, $timestamp);
-        } else {
-            return "??";
-        }
-    }
-    return $time;
-}
-add_filter('the_time', 'einsatzverwaltung_replace_post_date_with_einsatz_date', 10, 2);
-
-
 
 
 

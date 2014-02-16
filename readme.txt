@@ -37,6 +37,9 @@ Die Aufgaben f&uuml;r die kommenden Versionen werden auf [GitHub](https://github
 
 == Changelog ==
 
+= 0.1.2 =
+* Kompatibilität mit PHP < 5.3.0 wiederhergestellt
+
 = 0.1.1 =
 * Hinweis auf Entwicklungszustand eingef&uuml;gt
 
@@ -48,6 +51,9 @@ Die Aufgaben f&uuml;r die kommenden Versionen werden auf [GitHub](https://github
 * Widget zeigt die aktuellsten X Eins&auml;tze
 
 == Upgrade Notice ==
+
+= 0.1.2 =
+Kompatibilität mit PHP < 5.3.0 wiederhergestellt
 
 = 0.1.1 =
 Hinweis auf Entwicklungszustand eingef&uuml;gt

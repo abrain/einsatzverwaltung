@@ -3,7 +3,7 @@
 Plugin Name: Einsatzverwaltung
 Plugin URI: https://github.com/abrain/einsatzverwaltung
 Description: Verwaltung von Feuerwehreins&auml;tzen
-Version: 0.2.0-dev
+Version: 0.1.2
 Author: Andreas Brain
 Author URI: http://www.abrain.de
 License: GPLv2
@@ -225,27 +225,30 @@ add_action( 'save_post', 'einsatzverwaltung_save_postdata' );
 function einsatzverwaltung_get_einsatzbericht_header($post) {
     if(get_post_type($post) == "einsatz") {
         $alarmzeit = get_post_meta($post->ID, 'einsatz_alarmzeit', true);
-        
         $einsatzende = get_post_meta($post->ID, 'einsatz_einsatzende', true);
+        
+        $dauerstring = "?";
         if(!empty($alarmzeit) && !empty($einsatzende)) {
-            $datetime1 = date_create($alarmzeit);
-            $datetime2 = date_create($einsatzende);
-            $interval = date_diff($datetime1, $datetime2);
+            $timestamp1 = strtotime($alarmzeit);
+            $timestamp2 = strtotime($einsatzende);
+            $differenz = $timestamp2 - $timestamp1;
+            $dauer = intval($differenz / 60);
             
-            // nur weitermachen, wenn die Differenz nicht negativ ist
-            if($interval->format('%r') === "") {
-                $dauer_h = intval($interval->format('%h'));
-                $dauer_m = intval($interval->format('%i'));
-                if($dauer_h == 0 && $dauer_m > 0) {
-                    $dauerstring = $dauer_m." Minute".($dauer_m > 1 ? "n" : "");
-                } else if ($dauer_h > 0) {
+            if(empty($dauer) || !is_numeric($dauer)) {
+                $dauerstring = "-";
+            } else {
+                if($dauer <= 0) {
+                    $dauerstring = "-";
+                } else if($dauer < 60) {
+                    $dauerstring = $dauer." Minuten";
+                } else {
+                    $dauer_h = intval($dauer / 60);
+                    $dauer_m = $dauer % 60;
                     $dauerstring = $dauer_h." Stunde".($dauer_h > 1 ? "n" : "");
                     if($dauer_m > 0) {
                         $dauerstring .= " ".$dauer_m." Minute".($dauer_m > 1 ? "n" : "");
                     }
                 }
-            } else {
-                $dauerstring = "-";
             }
         } else {
             $dauerstring = "-";

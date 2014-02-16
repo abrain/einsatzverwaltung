@@ -514,7 +514,7 @@ function einsatzverwaltung_print_einsatzjahre( $atts )
         if(!empty($string)) {
             $string .= " | ";
         }
-        $string .= "<a href=\"../../einsaetze/".$jahr."\">";
+        $string .= '<a href="' . home_url('einsaetze/' . $jahr) . '">';
         if($year == $jahr || empty($year) && $jahr == date("Y")) {
             $string .= "<strong>";
         }

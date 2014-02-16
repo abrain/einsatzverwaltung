@@ -3,7 +3,7 @@
 Plugin Name: Einsatzverwaltung
 Plugin URI: https://github.com/abrain/einsatzverwaltung
 Description: Verwaltung von Feuerwehreins&auml;tzen
-Version: 0.1.2
+Version: 0.2.0-dev
 Author: Andreas Brain
 Author URI: http://www.abrain.de
 License: GPLv2
@@ -126,6 +126,7 @@ function einsatzverwaltung_display_meta_box( $post ) {
     $nummer = get_post_meta( $post->ID, $key = 'einsatz_nummer', $single = true );
     $alarmzeit = get_post_meta( $post->ID, $key = 'einsatz_alarmzeit', $single = true );
     $einsatzende = get_post_meta( $post->ID, $key = 'einsatz_einsatzende', $single = true );
+    $fehlalarm = get_post_meta( $post->ID, $key = 'einsatz_fehlalarm', $single = true );
     
     if(empty($nummer)) {
         
@@ -146,6 +147,9 @@ function einsatzverwaltung_display_meta_box( $post ) {
 
     echo '<tr><td><label for="einsatzverwaltung_einsatzende">'. __("Einsatzende", 'einsatzverwaltung' ) . '</label></td>';
     echo '<td><input type="text" id="einsatzverwaltung_einsatzende" name="einsatzverwaltung_einsatzende" value="'.esc_attr($einsatzende).'" size="20" /> (YYYY-MM-DD hh:mm)</td></tr>';
+    
+    echo '<tr><td><label for="einsatzverwaltung_fehlalarm">'. __("Fehlalarm", 'einsatzverwaltung' ) . '</label></td>';
+    echo '<td><input type="checkbox" id="einsatzverwaltung_fehlalarm" name="einsatzverwaltung_fehlalarm"' . ($fehlalarm == "on" ? 'checked="checked" ' : ' ') . '/></td></tr>';
     
     echo '</tbody></table>';
 }
@@ -179,6 +183,7 @@ function einsatzverwaltung_save_postdata( $post_id ) {
     $data_nummer = sanitize_text_field( $_POST['einsatzverwaltung_nummer'] );
     $data_alarmzeit = sanitize_text_field( $_POST['einsatzverwaltung_alarmzeit'] );
     $data_einsatzende = sanitize_text_field( $_POST['einsatzverwaltung_einsatzende'] );
+    $data_fehlalarm = (isset($_POST['einsatzverwaltung_fehlalarm']) ? "on" : "off");
     
     add_post_meta($post_ID, 'einsatz_nummer', $data_nummer, true) or
     update_post_meta($post_ID, 'einsatz_nummer', $data_nummer);
@@ -189,7 +194,8 @@ function einsatzverwaltung_save_postdata( $post_id ) {
     add_post_meta($post_ID, 'einsatz_einsatzende', $data_einsatzende, true) or
     update_post_meta($post_ID, 'einsatz_einsatzende', $data_einsatzende);
     
-    
+    add_post_meta($post_ID, 'einsatz_fehlalarm', $data_fehlalarm, true) or
+    update_post_meta($post_ID, 'einsatz_fehlalarm', $data_fehlalarm);
     
     $my_args = array();
     $my_args['ID'] = $post_id;
@@ -263,6 +269,11 @@ function einsatzverwaltung_get_einsatzbericht_header($post) {
             $art = join( ", ", $arten_namen );
         } else {
             $art = "-";
+        }
+        
+        $fehlalarm = get_post_meta( $post->ID, $key = 'einsatz_fehlalarm', $single = true );
+        if($fehlalarm == "on") {
+            $art .= " (Fehlalarm)";
         }
         
         $fahrzeuge = get_the_terms( $post->ID, 'fahrzeug' );

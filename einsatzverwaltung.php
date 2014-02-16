@@ -128,14 +128,12 @@ function einsatzverwaltung_display_meta_box( $post ) {
     $einsatzende = get_post_meta( $post->ID, $key = 'einsatz_einsatzende', $single = true );
     $fehlalarm = get_post_meta( $post->ID, $key = 'einsatz_fehlalarm', $single = true );
     
+    // Bei einem neuen Einsatz, die nächste freie Einsatznummer für das aktuelle Jahr berechnen
     if(empty($nummer)) {
-        
         $year = date('Y');
         $query = new WP_Query( 'year=' . $year .'&post_type=einsatz&post_status=publish&nopaging=true' );
-        
         $nummer = $year.str_pad(($query->found_posts + 1), 3, "0", STR_PAD_LEFT);
     }
-
 
     echo '<table><tbody>';
 
@@ -167,15 +165,12 @@ function einsatzverwaltung_save_postdata( $post_id ) {
     if ( !isset( $_POST['einsatzverwaltung_nonce'] ) || !wp_verify_nonce( $_POST['einsatzverwaltung_nonce'], plugin_basename( __FILE__ ) ) )
         return;
 
-  
-    // Check permissions
+    // Schreibrechte prüfen
     if ( 'einsatz' == $_POST['post_type'] ) 
     {
         if ( !current_user_can( 'edit_post', $post_id ) )
             return;
     }
-
-    // OK, we're authenticated: we need to find and save the data
     
     //if saving in a custom table, get post_ID
     $post_ID = $_POST['post_ID'];
@@ -201,11 +196,13 @@ function einsatzverwaltung_save_postdata( $post_id ) {
     $my_args['ID'] = $post_id;
     
     
+    // Beitragsdatum auf Alarmzeit setzen
     $alarmzeit_timestamp = strtotime($data_alarmzeit);
     if($alarmzeit_timestamp) {
         $my_args['post_date'] = date("Y-m-d H:i:s", $alarmzeit_timestamp);
     }
     
+    // Slug auf Einsatznummer setzen
     if(!empty($data_nummer) && is_numeric($data_nummer)) {
         $my_args['post_name'] = $data_nummer;
     }
@@ -225,7 +222,6 @@ function einsatzverwaltung_save_postdata( $post_id ) {
     	}
     }
 }
-
 add_action( 'save_post', 'einsatzverwaltung_save_postdata' );
 
 function einsatzverwaltung_get_einsatzbericht_header($post) {

@@ -62,7 +62,8 @@ function einsatzverwaltung_create_post_type() {
 	       'add_or_remove_items' => 'Einsatzarten hinzuf&uuml;gen oder entfernen',
 	       'choose_from_most_used' => 'Aus h&auml;ufigen Einsatzarten w&auml;hlen'),
        'public' => true,
-       'show_in_nav_menus' => false);
+       'show_in_nav_menus' => false,
+       'meta_box_cb' => 'einsatzverwaltung_display_einsatzart_metabox');
 	register_taxonomy( 'einsatzart', 'einsatz', $args_einsatzart );
 	
 	$args_fahrzeug = array(
@@ -224,6 +225,24 @@ function einsatzverwaltung_save_postdata( $post_id ) {
 }
 add_action( 'save_post', 'einsatzverwaltung_save_postdata' );
 
+/**
+ * Zeigt die Metabox für die Einsatzart
+ */
+function einsatzverwaltung_display_einsatzart_metabox( $post ) {
+    $einsatzart = einsatzverwaltung_get_einsatzart($post->ID);
+    echo '<select name="tax_input[einsatzart]">';
+    echo '<option value="">' . __('- keine -', 'einsatzverwaltung') . '</option>';
+    $terms = get_terms('einsatzart', array('hide_empty' => false));
+    foreach($terms as $term) {
+        echo '<option';
+        if($einsatzart && $einsatzart->term_id == $term->term_id) {
+             echo ' selected';
+        }
+        echo '>' . $term->name . '</option>';
+    }
+    echo '</select>';
+}
+
 function einsatzverwaltung_get_einsatzbericht_header($post) {
     if(get_post_type($post) == "einsatz") {
         $alarmzeit = get_post_meta($post->ID, 'einsatz_alarmzeit', true);
@@ -256,16 +275,8 @@ function einsatzverwaltung_get_einsatzbericht_header($post) {
             $dauerstring = "-";
         }
         
-        $einsatzarten = get_the_terms( $post->ID, 'einsatzart' );
-        if ( $einsatzarten && ! is_wp_error( $einsatzarten ) ) {
-            $arten_namen = array();
-            foreach ( $einsatzarten as $einsatzart ) {
-                $arten_namen[] = $einsatzart->name;
-            }
-            $art = join( ", ", $arten_namen );
-        } else {
-            $art = "-";
-        }
+        $einsatzart = einsatzverwaltung_get_einsatzart($post->ID);
+        $art = ($einsatzart ? $einsatzart->name : "-");
         
         $fehlalarm = get_post_meta( $post->ID, $key = 'einsatz_fehlalarm', $single = true );
         if($fehlalarm == "on") {
@@ -296,6 +307,15 @@ function einsatzverwaltung_get_einsatzbericht_header($post) {
         return $headerstring;
     }
     return "";
+}
+
+function einsatzverwaltung_get_einsatzart($id) {
+    $einsatzarten = get_the_terms( $id, 'einsatzart' );
+    if ( $einsatzarten && !is_wp_error($einsatzarten) && !empty($einsatzarten) ) {
+		return $einsatzarten[array_keys($einsatzarten)[0]];
+    } else {
+        return false;
+    }
 }
 
 function einsatzverwaltung_add_einsatz_daten($content) {
@@ -390,21 +410,13 @@ function einsatzverwaltung_manage_einsatz_columns( $column, $post_id ) {
 			
         case 'e_art' :
 
-			$terms = get_the_terms( $post_id, 'einsatzart' );
-
-			if ( !empty( $terms ) ) {
-				$out = array();
-				foreach ( $terms as $term ) {
-					$out[] = sprintf( '<a href="%s">%s</a>',
-						esc_url( add_query_arg( array( 'post_type' => $post->post_type, 'einsatzart' => $term->slug ), 'edit.php' ) ),
-						esc_html( sanitize_term_field( 'name', $term->name, $term->term_id, 'einsatzart', 'display' ) )
-					);
-				}
-
-				echo join( ', ', $out );
-			}
-
-			else {
+			$term = einsatzverwaltung_get_einsatzart($post_id);
+			if ( $term ) {
+				printf( '<a href="%s">%s</a>',
+					esc_url( add_query_arg( array( 'post_type' => $post->post_type, 'einsatzart' => $term->slug ), 'edit.php' ) ),
+					esc_html( sanitize_term_field( 'name', $term->name, $term->term_id, 'einsatzart', 'display' ) )
+				);
+			} else {
 				echo '-';
 			}
 

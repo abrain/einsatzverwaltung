@@ -17,99 +17,99 @@ require_once( EINSATZVERWALTUNG__PLUGIN_DIR . 'class.widget.php' );
 add_action( 'init', 'einsatzverwaltung_create_post_type' );
 
 function einsatzverwaltung_create_post_type() {
-	$args_einsatz = array(
-		'labels' => array(
-   			'name' => 'Einsatzberichte',
-   			'singular_name' => 'Einsatzbericht',
-   			'menu_name' => 'Einsatzberichte',
-   			'add_new' => 'Neu',
-   			'add_new_item' => 'Neuer Einsatzbericht',
-   			'edit' => 'Bearbeiten',
-   			'edit_item' => 'Einsatzbericht bearbeiten',
-   			'new_item' => 'Neuer Einsatzbericht',
-   			'view' => 'Ansehen',
-   			'view_item' => 'Einsatzbericht ansehen',
-   			'search_items' => 'Einsatzberichte suchen',
-   			'not_found' => 'Keine Einsatzberichte gefunden',
-   			'not_found_in_trash' => 'Keine Einsatzberichte im Papierkorb gefunden'
-   			),
-		'public' => true,
-		'has_archive' => true,
-		'rewrite' => array(
-		     'slug' => 'einsaetze',
-		     'feeds' => true
-		),
-		'supports' => array('title', 'editor', 'thumbnail'),
-		'show_in_nav_menus' => false,
-		'menu_position' => 5);
-	register_post_type( 'einsatz', $args_einsatz);
-	
-	$args_einsatzart = array(
-	   'label' => 'Einsatzarten',
-	   'labels' => array(
-	       'name' => 'Einsatzarten',
-	       'singular_name' => 'Einsatzart',
-	       'menu_name' => 'Einsatzarten',
-	       'all_items' => 'Alle Einsatzarten',
-	       'edit_item' => 'Einsatzart bearbeiten',
-	       'view_item' => 'Einsatzart ansehen',
-	       'update_item' => 'Einsatzart aktualisieren',
-	       'add_new_item' => 'Neue Einsatzart',
-	       'new_item_name' => 'Einsatzart hinzuf&uuml;gen',
-	       'search_items' => 'Einsatzarten suchen',
-	       'popular_items' => 'H&auml;ufige Einsatzarten',
-	       'separate_items_with_commas' => 'Einsatzarten mit Kommata trennen',
-	       'add_or_remove_items' => 'Einsatzarten hinzuf&uuml;gen oder entfernen',
-	       'choose_from_most_used' => 'Aus h&auml;ufigen Einsatzarten w&auml;hlen'),
-       'public' => true,
-       'show_in_nav_menus' => false,
-       'meta_box_cb' => 'einsatzverwaltung_display_einsatzart_metabox');
-	register_taxonomy( 'einsatzart', 'einsatz', $args_einsatzart );
-	
-	$args_fahrzeug = array(
-	   'label' => 'Fahrzeuge',
-	   'labels' => array(
-	       'name' => 'Fahrzeuge',
-	       'singular_name' => 'Fahrzeug',
-	       'menu_name' => 'Fahrzeuge',
-	       'all_items' => 'Alle Fahrzeuge',
-	       'edit_item' => 'Fahrzeug bearbeiten',
-	       'view_item' => 'Fahrzeug ansehen',
-	       'update_item' => 'Fahrzeug aktualisieren',
-	       'add_new_item' => 'Neues Fahrzeug',
-	       'new_item_name' => 'Fahrzeug hinzuf&uuml;gen',
-	       'search_items' => 'Fahrzeuge suchen',
-	       'popular_items' => 'Oft eingesetzte Fahrzeuge',
-	       'separate_items_with_commas' => 'Fahrzeuge mit Kommata trennen',
-	       'add_or_remove_items' => 'Fahrzeuge hinzuf&uuml;gen oder entfernen',
-	       'choose_from_most_used' => 'Aus h&auml;ufig eingesetzten Fahrzeugen w&auml;hlen'),
-       'public' => true,
-       'show_in_nav_menus' => false);
-	register_taxonomy( 'fahrzeug', 'einsatz', $args_fahrzeug );
-	
-	$args_exteinsatzmittel = array(
-	   'label' => 'Externe Einsatzmittel',
-	   'labels' => array(
-	       'name' => 'Externe Einsatzmittel',
-	       'singular_name' => 'Externes Einsatzmittel',
-	       'menu_name' => 'Externe Einsatzmittel',
-	       'all_items' => 'Alle externen Einsatzmittel',
-	       'edit_item' => 'Externes Einsatzmittel bearbeiten',
-	       'view_item' => 'Externes Einsatzmittel ansehen',
-	       'update_item' => 'Externes Einsatzmittel aktualisieren',
-	       'add_new_item' => 'Neues externes Einsatzmittel',
-	       'new_item_name' => 'Externes Einsatzmittel hinzuf&uuml;gen',
-	       'search_items' => 'Externe Einsatzmittel suchen',
-	       'popular_items' => 'Oft eingesetzte externe Einsatzmittel',
-	       'separate_items_with_commas' => 'Externe Einsatzmittel mit Kommata trennen',
-	       'add_or_remove_items' => 'Externe Einsatzmittel hinzuf&uuml;gen oder entfernen',
-	       'choose_from_most_used' => 'Aus h&auml;ufig eingesetzten externen Einsatzmitteln w&auml;hlen'),
-       'public' => true,
-       'show_in_nav_menus' => false);
-	register_taxonomy( 'exteinsatzmittel', 'einsatz', $args_exteinsatzmittel );
-	
-	// more rewrite rules
-	add_rewrite_rule('einsaetze/([0-9]{4})/?$', 'index.php?post_type=einsatz&year=$matches[1]', 'top');
+    $args_einsatz = array(
+        'labels' => array(
+            'name' => 'Einsatzberichte',
+            'singular_name' => 'Einsatzbericht',
+            'menu_name' => 'Einsatzberichte',
+            'add_new' => 'Neu',
+            'add_new_item' => 'Neuer Einsatzbericht',
+            'edit' => 'Bearbeiten',
+            'edit_item' => 'Einsatzbericht bearbeiten',
+            'new_item' => 'Neuer Einsatzbericht',
+            'view' => 'Ansehen',
+            'view_item' => 'Einsatzbericht ansehen',
+            'search_items' => 'Einsatzberichte suchen',
+            'not_found' => 'Keine Einsatzberichte gefunden',
+            'not_found_in_trash' => 'Keine Einsatzberichte im Papierkorb gefunden'
+            ),
+        'public' => true,
+        'has_archive' => true,
+        'rewrite' => array(
+            'slug' => 'einsaetze',
+            'feeds' => true
+        ),
+        'supports' => array('title', 'editor', 'thumbnail'),
+        'show_in_nav_menus' => false,
+        'menu_position' => 5);
+    register_post_type( 'einsatz', $args_einsatz);
+    
+    $args_einsatzart = array(
+        'label' => 'Einsatzarten',
+        'labels' => array(
+            'name' => 'Einsatzarten',
+            'singular_name' => 'Einsatzart',
+            'menu_name' => 'Einsatzarten',
+            'all_items' => 'Alle Einsatzarten',
+            'edit_item' => 'Einsatzart bearbeiten',
+            'view_item' => 'Einsatzart ansehen',
+            'update_item' => 'Einsatzart aktualisieren',
+            'add_new_item' => 'Neue Einsatzart',
+            'new_item_name' => 'Einsatzart hinzuf&uuml;gen',
+            'search_items' => 'Einsatzarten suchen',
+            'popular_items' => 'H&auml;ufige Einsatzarten',
+            'separate_items_with_commas' => 'Einsatzarten mit Kommata trennen',
+            'add_or_remove_items' => 'Einsatzarten hinzuf&uuml;gen oder entfernen',
+            'choose_from_most_used' => 'Aus h&auml;ufigen Einsatzarten w&auml;hlen'),
+        'public' => true,
+        'show_in_nav_menus' => false,
+        'meta_box_cb' => 'einsatzverwaltung_display_einsatzart_metabox');
+    register_taxonomy( 'einsatzart', 'einsatz', $args_einsatzart );
+    
+    $args_fahrzeug = array(
+        'label' => 'Fahrzeuge',
+        'labels' => array(
+            'name' => 'Fahrzeuge',
+            'singular_name' => 'Fahrzeug',
+            'menu_name' => 'Fahrzeuge',
+            'all_items' => 'Alle Fahrzeuge',
+            'edit_item' => 'Fahrzeug bearbeiten',
+            'view_item' => 'Fahrzeug ansehen',
+            'update_item' => 'Fahrzeug aktualisieren',
+            'add_new_item' => 'Neues Fahrzeug',
+            'new_item_name' => 'Fahrzeug hinzuf&uuml;gen',
+            'search_items' => 'Fahrzeuge suchen',
+            'popular_items' => 'Oft eingesetzte Fahrzeuge',
+            'separate_items_with_commas' => 'Fahrzeuge mit Kommata trennen',
+            'add_or_remove_items' => 'Fahrzeuge hinzuf&uuml;gen oder entfernen',
+            'choose_from_most_used' => 'Aus h&auml;ufig eingesetzten Fahrzeugen w&auml;hlen'),
+        'public' => true,
+        'show_in_nav_menus' => false);
+    register_taxonomy( 'fahrzeug', 'einsatz', $args_fahrzeug );
+    
+    $args_exteinsatzmittel = array(
+        'label' => 'Externe Einsatzmittel',
+        'labels' => array(
+            'name' => 'Externe Einsatzmittel',
+            'singular_name' => 'Externes Einsatzmittel',
+            'menu_name' => 'Externe Einsatzmittel',
+            'all_items' => 'Alle externen Einsatzmittel',
+            'edit_item' => 'Externes Einsatzmittel bearbeiten',
+            'view_item' => 'Externes Einsatzmittel ansehen',
+            'update_item' => 'Externes Einsatzmittel aktualisieren',
+            'add_new_item' => 'Neues externes Einsatzmittel',
+            'new_item_name' => 'Externes Einsatzmittel hinzuf&uuml;gen',
+            'search_items' => 'Externe Einsatzmittel suchen',
+            'popular_items' => 'Oft eingesetzte externe Einsatzmittel',
+            'separate_items_with_commas' => 'Externe Einsatzmittel mit Kommata trennen',
+            'add_or_remove_items' => 'Externe Einsatzmittel hinzuf&uuml;gen oder entfernen',
+            'choose_from_most_used' => 'Aus h&auml;ufig eingesetzten externen Einsatzmitteln w&auml;hlen'),
+        'public' => true,
+        'show_in_nav_menus' => false);
+    register_taxonomy( 'exteinsatzmittel', 'einsatz', $args_exteinsatzmittel );
+    
+    // more rewrite rules
+    add_rewrite_rule('einsaetze/([0-9]{4})/?$', 'index.php?post_type=einsatz&year=$matches[1]', 'top');
 }
 
 
@@ -131,11 +131,11 @@ register_activation_hook( __FILE__, 'einsatzverwaltung_rewrite_flush' );
  * Fügt die Metabox zum Bearbeiten der Einsatzdetails ein
  */
 function einsatzverwaltung_add_einsatzdetails_meta_box( $post ) {
-	add_meta_box( 'einsatzverwaltung_meta_box',
-		'Einsatzdetails',
-		'einsatzverwaltung_display_meta_box',
-		'einsatz', 'normal', 'high'
-	);
+    add_meta_box( 'einsatzverwaltung_meta_box',
+        'Einsatzdetails',
+        'einsatzverwaltung_display_meta_box',
+        'einsatz', 'normal', 'high'
+    );
 }
 add_action( 'add_meta_boxes_einsatz', 'einsatzverwaltung_add_einsatzdetails_meta_box' );
 
@@ -230,20 +230,20 @@ function einsatzverwaltung_save_postdata( $post_id ) {
     if(!empty($data_nummer) && is_numeric($data_nummer)) {
         $my_args['post_name'] = $data_nummer;
     }
-        
+    
     if(array_key_exists('post_date', $my_args) || array_key_exists('post_name', $my_args)) {
         
         if ( ! wp_is_post_revision( $post_id ) ) {
-    	
-    		// unhook this function so it doesn't loop infinitely
-    		remove_action('save_post', 'einsatzverwaltung_save_postdata');
-    	   
-    		// update the post, which calls save_post again
-    		wp_update_post( $my_args );
-    
-    		// re-hook this function
-    		add_action('save_post', 'einsatzverwaltung_save_postdata');
-    	}
+        
+            // unhook this function so it doesn't loop infinitely
+            remove_action('save_post', 'einsatzverwaltung_save_postdata');
+            
+            // update the post, which calls save_post again
+            wp_update_post( $my_args );
+            
+            // re-hook this function
+            add_action('save_post', 'einsatzverwaltung_save_postdata');
+        }
     }
 }
 add_action( 'save_post', 'einsatzverwaltung_save_postdata' );
@@ -259,7 +259,7 @@ function einsatzverwaltung_display_einsatzart_metabox( $post ) {
     foreach($terms as $term) {
         echo '<option';
         if($einsatzart && $einsatzart->term_id == $term->term_id) {
-             echo ' selected';
+            echo ' selected';
         }
         echo '>' . $term->name . '</option>';
     }
@@ -347,7 +347,7 @@ function einsatzverwaltung_get_einsatzbericht_header($post) {
 function einsatzverwaltung_get_einsatzart($id) {
     $einsatzarten = get_the_terms( $id, 'einsatzart' );
     if ( $einsatzarten && !is_wp_error($einsatzarten) && !empty($einsatzarten) ) {
-		return $einsatzarten[array_keys($einsatzarten)[0]];
+        return $einsatzarten[array_keys($einsatzarten)[0]];
     } else {
         return false;
     }
@@ -389,99 +389,99 @@ add_filter( 'the_excerpt', 'einsatzverwaltung_einsatz_excerpt');
 
 function einsatzverwaltung_edit_einsatz_columns( $columns ) {
 
-	$columns = array(
-		'cb' => '<input type="checkbox" />',
-		'title' => __( 'Einsatzbericht', 'einsatzverwaltung' ),
-		'e_nummer' => __( 'Nummer', 'einsatzverwaltung' ),
-		'e_alarmzeit' => __( 'Alarmzeit', 'einsatzverwaltung' ),
-		'e_einsatzende' => __( 'Einsatzende', 'einsatzverwaltung' ),
-		'e_art' => __( 'Art', 'einsatzverwaltung' ),
-		'e_fzg' => __( 'Fahrzeuge', 'einsatzverwaltung' )
-	);
+    $columns = array(
+        'cb' => '<input type="checkbox" />',
+        'title' => __( 'Einsatzbericht', 'einsatzverwaltung' ),
+        'e_nummer' => __( 'Nummer', 'einsatzverwaltung' ),
+        'e_alarmzeit' => __( 'Alarmzeit', 'einsatzverwaltung' ),
+        'e_einsatzende' => __( 'Einsatzende', 'einsatzverwaltung' ),
+        'e_art' => __( 'Art', 'einsatzverwaltung' ),
+        'e_fzg' => __( 'Fahrzeuge', 'einsatzverwaltung' )
+    );
 
-	return $columns;
+    return $columns;
 }
 add_filter( 'manage_edit-einsatz_columns', 'einsatzverwaltung_edit_einsatz_columns' ) ;
 
 
 function einsatzverwaltung_manage_einsatz_columns( $column, $post_id ) {
-	global $post;
+    global $post;
 
-	switch( $column ) {
+    switch( $column ) {
 
         case 'e_nummer' :
             $einsatz_nummer = get_post_meta( $post_id, 'einsatz_nummer', true );
 
-			if ( empty( $einsatz_nummer ) )
-				echo '-';
-			else
-				echo $einsatz_nummer;
+            if ( empty( $einsatz_nummer ) )
+                echo '-';
+            else
+                echo $einsatz_nummer;
 
-			break;
+            break;
 
         case 'e_einsatzende' :
             $einsatz_einsatzende = get_post_meta( $post_id, 'einsatz_einsatzende', true );
 
-			if ( empty( $einsatz_einsatzende ) ) {
-				echo '-';
-			} else {
-				$timestamp = strtotime($einsatz_einsatzende);
-				echo date("d.m.Y", $timestamp)."<br>".date("H:i", $timestamp);
-			}
+            if ( empty( $einsatz_einsatzende ) ) {
+                echo '-';
+            } else {
+                $timestamp = strtotime($einsatz_einsatzende);
+                echo date("d.m.Y", $timestamp)."<br>".date("H:i", $timestamp);
+            }
 
-			break;
-			
+            break;
+            
         case 'e_alarmzeit' :
             $einsatz_alarmzeit = get_post_meta( $post_id, 'einsatz_alarmzeit', true );
 
-			if ( empty( $einsatz_alarmzeit ) ) {
-				echo '-';
-			} else {
-    			$timestamp = strtotime($einsatz_alarmzeit);
-    			echo date("d.m.Y", $timestamp)."<br>".date("H:i", $timestamp);
-			}
+            if ( empty( $einsatz_alarmzeit ) ) {
+                echo '-';
+            } else {
+                $timestamp = strtotime($einsatz_alarmzeit);
+                echo date("d.m.Y", $timestamp)."<br>".date("H:i", $timestamp);
+            }
 
-			break;
-			
+            break;
+            
         case 'e_art' :
 
-			$term = einsatzverwaltung_get_einsatzart($post_id);
-			if ( $term ) {
-				printf( '<a href="%s">%s</a>',
-					esc_url( add_query_arg( array( 'post_type' => $post->post_type, 'einsatzart' => $term->slug ), 'edit.php' ) ),
-					esc_html( sanitize_term_field( 'name', $term->name, $term->term_id, 'einsatzart', 'display' ) )
-				);
-			} else {
-				echo '-';
-			}
+            $term = einsatzverwaltung_get_einsatzart($post_id);
+            if ( $term ) {
+                printf( '<a href="%s">%s</a>',
+                    esc_url( add_query_arg( array( 'post_type' => $post->post_type, 'einsatzart' => $term->slug ), 'edit.php' ) ),
+                    esc_html( sanitize_term_field( 'name', $term->name, $term->term_id, 'einsatzart', 'display' ) )
+                );
+            } else {
+                echo '-';
+            }
 
-			break;
+            break;
 
         case 'e_fzg' :
 
-			$terms = get_the_terms( $post_id, 'fahrzeug' );
+            $terms = get_the_terms( $post_id, 'fahrzeug' );
 
-			if ( !empty( $terms ) ) {
-				$out = array();
-				foreach ( $terms as $term ) {
-					$out[] = sprintf( '<a href="%s">%s</a>',
-						esc_url( add_query_arg( array( 'post_type' => $post->post_type, 'fahrzeug' => $term->slug ), 'edit.php' ) ),
-						esc_html( sanitize_term_field( 'name', $term->name, $term->term_id, 'fahrzeug', 'display' ) )
-					);
-				}
+            if ( !empty( $terms ) ) {
+                $out = array();
+                foreach ( $terms as $term ) {
+                    $out[] = sprintf( '<a href="%s">%s</a>',
+                        esc_url( add_query_arg( array( 'post_type' => $post->post_type, 'fahrzeug' => $term->slug ), 'edit.php' ) ),
+                        esc_html( sanitize_term_field( 'name', $term->name, $term->term_id, 'fahrzeug', 'display' ) )
+                    );
+                }
 
-				echo join( ', ', $out );
-			}
+                echo join( ', ', $out );
+            }
 
-			else {
-				echo '-';
-			}
+            else {
+                echo '-';
+            }
 
-			break;
+            break;
 
-		default :
-			break;
-	}
+        default :
+            break;
+    }
 }
 add_action( 'manage_einsatz_posts_custom_column', 'einsatzverwaltung_manage_einsatz_columns', 10, 2 );
 
@@ -581,9 +581,9 @@ add_shortcode( 'einsatzjahre', 'einsatzverwaltung_print_einsatzjahre' );
  * Einsatzberichte-Menü vor Nicht-Administratoren verstecken
  */
 function einsatzverwaltung_remove_einsatz_menu( ) {
-	if ( !current_user_can( 'manage_options' ) ) {
-		remove_menu_page( 'edit.php?post_type=einsatz' );
-	}
+    if ( !current_user_can( 'manage_options' ) ) {
+        remove_menu_page( 'edit.php?post_type=einsatz' );
+    }
 }
 add_action( 'admin_menu', 'einsatzverwaltung_remove_einsatz_menu', 999 );
 

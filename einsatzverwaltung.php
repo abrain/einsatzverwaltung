@@ -127,15 +127,17 @@ function einsatzverwaltung_rewrite_flush() {
 register_activation_hook( __FILE__, 'einsatzverwaltung_rewrite_flush' );
 
 
-add_action( 'admin_init', 'einsatzverwaltung_admin' );
-
-function einsatzverwaltung_admin() {
+/**
+ * Fügt die Metabox zum Bearbeiten der Einsatzdetails ein
+ */
+function einsatzverwaltung_add_einsatzdetails_meta_box( $post ) {
 	add_meta_box( 'einsatzverwaltung_meta_box',
 		'Einsatzdetails',
 		'einsatzverwaltung_display_meta_box',
 		'einsatz', 'normal', 'high'
 	);
 }
+add_action( 'add_meta_boxes_einsatz', 'einsatzverwaltung_add_einsatzdetails_meta_box' );
 
 
 /* Prints the box content */

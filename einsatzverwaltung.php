@@ -103,7 +103,7 @@ function einsatzverwaltung_create_post_type() {
 	       'popular_items' => 'Oft eingesetzte externe Einsatzmittel',
 	       'separate_items_with_commas' => 'Externe Einsatzmittel mit Kommata trennen',
 	       'add_or_remove_items' => 'Externe Einsatzmittel hinzuf&uuml;gen oder entfernen',
-	       'choose_from_most_used' => 'Aus h&auml;ufig eingesetzten externen Einsatzmittel w&auml;hlen'),
+	       'choose_from_most_used' => 'Aus h&auml;ufig eingesetzten externen Einsatzmitteln w&auml;hlen'),
        'public' => true,
        'show_in_nav_menus' => false);
 	register_taxonomy( 'exteinsatzmittel', 'einsatz', $args_exteinsatzmittel );

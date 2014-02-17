@@ -87,6 +87,27 @@ function einsatzverwaltung_create_post_type() {
        'show_in_nav_menus' => false);
 	register_taxonomy( 'fahrzeug', 'einsatz', $args_fahrzeug );
 	
+	$args_exteinsatzmittel = array(
+	   'label' => 'Externe Einsatzmittel',
+	   'labels' => array(
+	       'name' => 'Externe Einsatzmittel',
+	       'singular_name' => 'Externes Einsatzmittel',
+	       'menu_name' => 'Externe Einsatzmittel',
+	       'all_items' => 'Alle externen Einsatzmittel',
+	       'edit_item' => 'Externes Einsatzmittel bearbeiten',
+	       'view_item' => 'Externes Einsatzmittel ansehen',
+	       'update_item' => 'Externes Einsatzmittel aktualisieren',
+	       'add_new_item' => 'Neues externes Einsatzmittel',
+	       'new_item_name' => 'Externes Einsatzmittel hinzuf&uuml;gen',
+	       'search_items' => 'Externe Einsatzmittel suchen',
+	       'popular_items' => 'Oft eingesetzte externe Einsatzmittel',
+	       'separate_items_with_commas' => 'Externe Einsatzmittel mit Kommata trennen',
+	       'add_or_remove_items' => 'Externe Einsatzmittel hinzuf&uuml;gen oder entfernen',
+	       'choose_from_most_used' => 'Aus h&auml;ufig eingesetzten externen Einsatzmittel w&auml;hlen'),
+       'public' => true,
+       'show_in_nav_menus' => false);
+	register_taxonomy( 'exteinsatzmittel', 'einsatz', $args_exteinsatzmittel );
+	
 	// more rewrite rules
 	add_rewrite_rule('einsaetze/([0-9]{4})/?$', 'index.php?post_type=einsatz&year=$matches[1]', 'top');
 }
@@ -294,6 +315,17 @@ function einsatzverwaltung_get_einsatzbericht_header($post) {
             $fzg_string = "-";
         }
         
+        $exteinsatzmittel = get_the_terms( $post->ID, 'exteinsatzmittel' );
+        if ( $exteinsatzmittel && ! is_wp_error( $exteinsatzmittel ) ) {
+            $ext_namen = array();
+            foreach ( $exteinsatzmittel as $ext ) {
+                $ext_namen[] = $ext->name;
+            }
+            $ext_string = join( ", ", $ext_namen );
+        } else {
+            $ext_string = "-";
+        }
+        
         $alarm_timestamp = strtotime($alarmzeit);
         $einsatz_datum = ($alarm_timestamp ? date("d.m.Y", $alarm_timestamp) : "-");
         $einsatz_zeit = ($alarm_timestamp ? date("H:i", $alarm_timestamp)." Uhr" : "-");
@@ -303,6 +335,7 @@ function einsatzverwaltung_get_einsatzbericht_header($post) {
         $headerstring .= "<strong>Dauer:</strong> ".$dauerstring."<br>";
         $headerstring .= "<strong>Art:</strong> ".$art."<br>";
         $headerstring .= "<strong>Fahrzeuge:</strong> ".$fzg_string."<br>";
+        $headerstring .= "<strong>Weitere Kr&auml;fte:</strong> ".$ext_string."<br>";
         
         return $headerstring;
     }

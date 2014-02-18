@@ -17,8 +17,10 @@ define( 'EINSATZVERWALTUNG__STYLE_URL', EINSATZVERWALTUNG__PLUGIN_URL . 'css/' )
 
 require_once( EINSATZVERWALTUNG__PLUGIN_DIR . 'class.widget.php' );
 
-add_action( 'init', 'einsatzverwaltung_create_post_type' );
 
+/**
+ * Erzeugt den neuen Beitragstyp Einsatzbericht und die zugehörigen Taxonomien
+ */
 function einsatzverwaltung_create_post_type() {
     $args_einsatz = array(
         'labels' => array(
@@ -114,20 +116,20 @@ function einsatzverwaltung_create_post_type() {
     // more rewrite rules
     add_rewrite_rule('einsaetze/([0-9]{4})/?$', 'index.php?post_type=einsatz&year=$matches[1]', 'top');
 }
+add_action( 'init', 'einsatzverwaltung_create_post_type' );
 
 
-function einsatzverwaltung_rewrite_flush() {
-    // First, we "add" the custom post type via the above written function.
-    // Note: "add" is written with quotes, as CPTs don't get added to the DB,
-    // They are only referenced in the post_type column with a post entry, 
-    // when you add a post of this CPT.
+/**
+ * Wird beim Aktivieren des Plugins aufgerufen
+ */
+function einsatzverwaltung_aktivierung() {
+    // Posttypen registrieren
     einsatzverwaltung_create_post_type();
 
-    // ATTENTION: This is *only* done during plugin activation hook in this example!
-    // You should *NEVER EVER* do this on every page load!!
+    // Permalinks aktualisieren
     flush_rewrite_rules();
 }
-register_activation_hook( __FILE__, 'einsatzverwaltung_rewrite_flush' );
+register_activation_hook( __FILE__, 'einsatzverwaltung_aktivierung' );
 
 
 /**
@@ -143,17 +145,22 @@ function einsatzverwaltung_add_einsatzdetails_meta_box( $post ) {
 add_action( 'add_meta_boxes_einsatz', 'einsatzverwaltung_add_einsatzdetails_meta_box' );
 
 
+/**
+ * Zusätzliche Skripte im Admin-Bereich einbinden
+ */
 function einsatzverwaltung_enqueue_admin_scripts($hook) {
-    if( 'post.php' != $hook ) {
-        return;
+    if( 'post.php' == $hook ) {
+        // Nur auf der Bearbeitungsseite anzeigen
+        wp_enqueue_script('einsatzverwaltung-edit-script', EINSATZVERWALTUNG__SCRIPT_URL . 'einsatzverwaltung-edit.js', array('jquery'));
+        wp_enqueue_style('einsatzverwaltung-edit', EINSATZVERWALTUNG__STYLE_URL . 'style-edit.css');
     }
-    wp_enqueue_script('einsatzverwaltung-edit-script', EINSATZVERWALTUNG__SCRIPT_URL . 'einsatzverwaltung-edit.js', array('jquery'));
-    wp_enqueue_style('einsatzverwaltung-edit', EINSATZVERWALTUNG__STYLE_URL . 'style-edit.css');
 }
 add_action( 'admin_enqueue_scripts', 'einsatzverwaltung_enqueue_admin_scripts' );
 
 
-/* Prints the box content */
+/**
+ * Inhalt der Metabox zum Bearbeiten der Einsatzdetails
+ */
 function einsatzverwaltung_display_meta_box( $post ) {
     // Use nonce for verification
     wp_nonce_field( plugin_basename( __FILE__ ), 'einsatzverwaltung_nonce' );
@@ -181,6 +188,8 @@ function einsatzverwaltung_display_meta_box( $post ) {
     
     echo '</tbody></table>';
 }
+
+
 /**
  * Berechnet die nächste freie Einsatznummer für das gegebene Jahr
  */
@@ -189,7 +198,10 @@ function einsatzverwaltung_get_next_einsatznummer($jahr) {
     return $jahr.str_pad(($query->found_posts + 1), 3, "0", STR_PAD_LEFT);
 }
 
-/* When the post is saved, saves our custom data */
+
+/**
+ * Zusätzliche Metadaten des Einsatzberichts speichern
+ */
 function einsatzverwaltung_save_postdata( $post_id ) {
 
     // verify if this is an auto save routine. 
@@ -266,6 +278,7 @@ function einsatzverwaltung_save_postdata( $post_id ) {
 }
 add_action( 'save_post', 'einsatzverwaltung_save_postdata' );
 
+
 /**
  * Zeigt die Metabox für die Einsatzart
  */
@@ -284,6 +297,10 @@ function einsatzverwaltung_display_einsatzart_metabox( $post ) {
     echo '</select>';
 }
 
+
+/**
+ * Erzeugt den Kopf eines Einsatzberichts
+ */
 function einsatzverwaltung_get_einsatzbericht_header($post) {
     if(get_post_type($post) == "einsatz") {
         $alarmzeit = get_post_meta($post->ID, 'einsatz_alarmzeit', true);
@@ -362,6 +379,11 @@ function einsatzverwaltung_get_einsatzbericht_header($post) {
     return "";
 }
 
+
+/**
+ * Bestimmt die Einsatzart eines bestimmten Einsatzes. Ist nötig, weil die Taxonomie
+ * 'einsatzart' mehrere Werte speichern kann, aber nur einer genutzt werden soll
+ */
 function einsatzverwaltung_get_einsatzart($id) {
     $einsatzarten = get_the_terms( $id, 'einsatzart' );
     if ( $einsatzarten && !is_wp_error($einsatzarten) && !empty($einsatzarten) ) {
@@ -371,6 +393,10 @@ function einsatzverwaltung_get_einsatzart($id) {
     }
 }
 
+
+/**
+ * Beim Aufrufen eines Einsatzberichts vor den Text den Kopf mit den Details einbauen
+ */
 function einsatzverwaltung_add_einsatz_daten($content) {
     global $post;
     if(get_post_type() == "einsatz") {
@@ -391,6 +417,10 @@ function einsatzverwaltung_add_einsatz_daten($content) {
 add_filter( 'the_content', 'einsatzverwaltung_add_einsatz_daten');
 
 
+/**
+ * Stellt den Auszug (Exzerpt) zur Verfügung, im Fall von Einsatzberichten wird
+ * hier der Berichtskopf mit den Details zurückgegeben
+ */
 function einsatzverwaltung_einsatz_excerpt($excerpt)
 {
     global $post;
@@ -404,7 +434,10 @@ function einsatzverwaltung_einsatz_excerpt($excerpt)
 add_filter( 'the_excerpt', 'einsatzverwaltung_einsatz_excerpt');
 
 
-
+/**
+ * Legt fest, welche Spalten bei der Übersicht der Einsatzberichte im
+ * Adminbereich angezeigt werden
+ */
 function einsatzverwaltung_edit_einsatz_columns( $columns ) {
 
     $columns = array(
@@ -422,6 +455,10 @@ function einsatzverwaltung_edit_einsatz_columns( $columns ) {
 add_filter( 'manage_edit-einsatz_columns', 'einsatzverwaltung_edit_einsatz_columns' ) ;
 
 
+/**
+ * Liefert den Inhalt für die jeweiligen Spalten bei der Übersicht der
+ * Einsatzberichte im Adminbereich
+ */
 function einsatzverwaltung_manage_einsatz_columns( $column, $post_id ) {
     global $post;
 
@@ -504,6 +541,9 @@ function einsatzverwaltung_manage_einsatz_columns( $column, $post_id ) {
 add_action( 'manage_einsatz_posts_custom_column', 'einsatzverwaltung_manage_einsatz_columns', 10, 2 );
 
 
+/**
+ * Gibt eine Tabelle mit Einsätzen aus dem gegebenen Jahr zurück
+ */
 function einsatzverwaltung_print_einsatzliste( $atts )
 {
     extract( shortcode_atts( array('jahr' => date('Y') ), $atts ) );
@@ -563,6 +603,10 @@ function einsatzverwaltung_print_einsatzliste( $atts )
 }
 add_shortcode( 'einsatzliste', 'einsatzverwaltung_print_einsatzliste' );
 
+
+/**
+ * Gibt Links zu den Archivseiten der Jahre, in denen Einsatzberichte existieren, zurück
+ */
 function einsatzverwaltung_print_einsatzjahre( $atts )
 {
     global $year;

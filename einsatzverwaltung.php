@@ -151,18 +151,11 @@ function einsatzverwaltung_display_meta_box( $post ) {
     $alarmzeit = get_post_meta( $post->ID, $key = 'einsatz_alarmzeit', $single = true );
     $einsatzende = get_post_meta( $post->ID, $key = 'einsatz_einsatzende', $single = true );
     $fehlalarm = get_post_meta( $post->ID, $key = 'einsatz_fehlalarm', $single = true );
-    
-    // Bei einem neuen Einsatz, die nächste freie Einsatznummer für das aktuelle Jahr berechnen
-    if(empty($nummer)) {
-        $year = date('Y');
-        $query = new WP_Query( 'year=' . $year .'&post_type=einsatz&post_status=publish&nopaging=true' );
-        $nummer = $year.str_pad(($query->found_posts + 1), 3, "0", STR_PAD_LEFT);
-    }
 
     echo '<table><tbody>';
 
     echo '<tr><td><label for="einsatzverwaltung_nummer">' . __("Einsatznummer", 'einsatzverwaltung' ) . '</label></td>';
-    echo '<td><input type="text" id="einsatzverwaltung_nummer" name="einsatzverwaltung_nummer" value="'.esc_attr($nummer).'" size="10" /></td></tr>';
+    echo '<td><input type="text" id="einsatzverwaltung_nummer" name="einsatzverwaltung_nummer" value="'.esc_attr($nummer).'" size="10" placeholder="'.einsatzverwaltung_get_next_einsatznummer(date('Y')).'" /></td></tr>';
     
     echo '<tr><td><label for="einsatzverwaltung_alarmzeit">'. __("Alarmzeit", 'einsatzverwaltung' ) . '</label></td>';
     echo '<td><input type="text" id="einsatzverwaltung_alarmzeit" name="einsatzverwaltung_alarmzeit" value="'.esc_attr($alarmzeit).'" size="20" placeholder="JJJJ-MM-TT hh:mm" /></td></tr>';
@@ -175,6 +168,13 @@ function einsatzverwaltung_display_meta_box( $post ) {
     
     echo '</tbody></table>';
 }
+/**
+ * Berechnet die nächste freie Einsatznummer für das gegebene Jahr
+ */
+function einsatzverwaltung_get_next_einsatznummer($jahr) {
+    $query = new WP_Query( 'year=' . $jahr .'&post_type=einsatz&post_status=publish&nopaging=true' );
+    return $jahr.str_pad(($query->found_posts + 1), 3, "0", STR_PAD_LEFT);
+}
 
 /* When the post is saved, saves our custom data */
 function einsatzverwaltung_save_postdata( $post_id ) {
@@ -184,65 +184,70 @@ function einsatzverwaltung_save_postdata( $post_id ) {
     if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) 
         return;
 
-    // verify this came from the our screen and with proper authorization,
-    // because save_post can be triggered at other times
-    if ( !isset( $_POST['einsatzverwaltung_nonce'] ) || !wp_verify_nonce( $_POST['einsatzverwaltung_nonce'], plugin_basename( __FILE__ ) ) )
-        return;
-
-    // Schreibrechte prüfen
-    if ( 'einsatz' == $_POST['post_type'] ) 
-    {
-        if ( !current_user_can( 'edit_post', $post_id ) )
+    if ( array_key_exists('post_type', $_POST) && 'einsatz' == $_POST['post_type'] ) {
+        
+        // Prüfen, ob Aufruf über das Formular erfolgt ist
+        if ( !isset( $_POST['einsatzverwaltung_nonce'] ) || !wp_verify_nonce( $_POST['einsatzverwaltung_nonce'], plugin_basename( __FILE__ ) ) ) {
             return;
-    }
-    
-    //if saving in a custom table, get post_ID
-    $post_ID = $_POST['post_ID'];
-    //sanitize user input
-    $data_nummer = sanitize_text_field( $_POST['einsatzverwaltung_nummer'] );
-    $data_alarmzeit = sanitize_text_field( $_POST['einsatzverwaltung_alarmzeit'] );
-    $data_einsatzende = sanitize_text_field( $_POST['einsatzverwaltung_einsatzende'] );
-    $data_fehlalarm = (isset($_POST['einsatzverwaltung_fehlalarm']) ? "on" : "off");
-    
-    add_post_meta($post_ID, 'einsatz_nummer', $data_nummer, true) or
-    update_post_meta($post_ID, 'einsatz_nummer', $data_nummer);
+        }
+        
+        // Schreibrechte prüfen
+        if ( !current_user_can( 'edit_post', $post_id ) ) {
+            return;
+        }
+        
+        $update_args = array();
+        
+        // Alarmzeit validieren
+        $input_alarmzeit = sanitize_text_field( $_POST['einsatzverwaltung_alarmzeit'] );
+        if(!empty($input_alarmzeit)) {
+            $alarmzeit = date_create($input_alarmzeit);
+        }
+        if(empty($alarmzeit)) {
+            $alarmzeit = date_create(get_post_field( 'post_date', $post_id, 'raw' ));
+        } else {
+            $update_args['post_date'] = date_format($alarmzeit, 'Y-m-d H:i:s');
+        }
 
-    add_post_meta($post_ID, 'einsatz_alarmzeit', $data_alarmzeit, true) or
-    update_post_meta($post_ID, 'einsatz_alarmzeit', $data_alarmzeit);
-    
-    add_post_meta($post_ID, 'einsatz_einsatzende', $data_einsatzende, true) or
-    update_post_meta($post_ID, 'einsatz_einsatzende', $data_einsatzende);
-    
-    add_post_meta($post_ID, 'einsatz_fehlalarm', $data_fehlalarm, true) or
-    update_post_meta($post_ID, 'einsatz_fehlalarm', $data_fehlalarm);
-    
-    $my_args = array();
-    $my_args['ID'] = $post_id;
-    
-    
-    // Beitragsdatum auf Alarmzeit setzen
-    $alarmzeit_timestamp = strtotime($data_alarmzeit);
-    if($alarmzeit_timestamp) {
-        $my_args['post_date'] = date("Y-m-d H:i:s", $alarmzeit_timestamp);
-    }
-    
-    // Slug auf Einsatznummer setzen
-    if(!empty($data_nummer) && is_numeric($data_nummer)) {
-        $my_args['post_name'] = $data_nummer;
-    }
-    
-    if(array_key_exists('post_date', $my_args) || array_key_exists('post_name', $my_args)) {
+        // Einsatznummer validieren
+        $einsatznummer_fallback = einsatzverwaltung_get_next_einsatznummer(date_format($alarmzeit, 'Y'));
+        $einsatznummer = sanitize_title( $_POST['einsatzverwaltung_nummer'], $einsatznummer_fallback, 'save' );
+        if(!empty($einsatznummer)) {
+            $update_args['post_name'] = $einsatznummer; // Slug setzen
+        }
+
+        // Einsatzende validieren
+        $input_einsatzende = sanitize_text_field( $_POST['einsatzverwaltung_einsatzende'] );
+        if(!empty($input_einsatzende)) {
+            $einsatzende = date_create($input_einsatzende);
+        }
+        if(empty($einsatzende)) {
+            $einsatzende = "";
+        }
         
-        if ( ! wp_is_post_revision( $post_id ) ) {
+        // Fehlalarm validieren
+        $fehlalarm = (isset($_POST['einsatzverwaltung_fehlalarm']) ? "on" : "off");
+        $mist;
         
-            // unhook this function so it doesn't loop infinitely
-            remove_action('save_post', 'einsatzverwaltung_save_postdata');
+        // Metadaten schreiben
+        update_post_meta($post_id, 'einsatz_nummer', $einsatznummer);
+        update_post_meta($post_id, 'einsatz_alarmzeit', date_format($alarmzeit, 'Y-m-d H:i'));
+        update_post_meta($post_id, 'einsatz_einsatzende', $einsatzende);
+        update_post_meta($post_id, 'einsatz_fehlalarm', $fehlalarm);
+        
+        if(!empty($update_args)) {
+            if ( ! wp_is_post_revision( $post_id ) ) {
+                $update_args['ID'] = $post_id;
             
-            // update the post, which calls save_post again
-            wp_update_post( $my_args );
-            
-            // re-hook this function
-            add_action('save_post', 'einsatzverwaltung_save_postdata');
+                // unhook this function so it doesn't loop infinitely
+                remove_action('save_post', 'einsatzverwaltung_save_postdata');
+                
+                // update the post, which calls save_post again
+                wp_update_post( $update_args );
+                
+                // re-hook this function
+                add_action('save_post', 'einsatzverwaltung_save_postdata');
+            }
         }
     }
 }

@@ -245,7 +245,7 @@ function einsatzverwaltung_save_postdata( $post_id ) {
         // Metadaten schreiben
         update_post_meta($post_id, 'einsatz_nummer', $einsatznummer);
         update_post_meta($post_id, 'einsatz_alarmzeit', date_format($alarmzeit, 'Y-m-d H:i'));
-        update_post_meta($post_id, 'einsatz_einsatzende', $einsatzende);
+        update_post_meta($post_id, 'einsatz_einsatzende', ($einsatzende == "" ? "" : date_format($einsatzende, 'Y-m-d H:i')));
         update_post_meta($post_id, 'einsatz_fehlalarm', $fehlalarm);
         
         if(!empty($update_args)) {

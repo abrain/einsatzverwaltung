@@ -4,7 +4,7 @@ Donate link: https://flattr.com/t/2638688
 Tags: feuerwehr, einsatz
 Requires at least: 3.1.0
 Tested up to: 3.8.1
-Stable tag: 0.2.0
+Stable tag: 0.2.1
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -37,6 +37,9 @@ Die Aufgaben f&uuml;r die kommenden Versionen werden auf [GitHub](https://github
 
 == Changelog ==
 
+= 0.2.1 =
+* Fehlerbehebung: Einsatzende wurde falsch abgespeichert
+
 = 0.2.0 =
 * Neu: Einsatzberichte k&ouml;nnen als Fehlalarm markiert werden
 * Neu: Pro Einsatzbericht ist nur noch eine Einsatzart ausw&auml;hlbar
@@ -58,6 +61,9 @@ Die Aufgaben f&uuml;r die kommenden Versionen werden auf [GitHub](https://github
 * Widget zeigt die aktuellsten X Eins&auml;tze
 
 == Upgrade Notice ==
+
+= 0.2.1 =
+Fehlerbehebung
 
 = 0.2.0 =
 Umfangreichere Einsatzberichte und Validierung von Benutzereingaben, kleine Fehlerbehebung

@@ -4,11 +4,11 @@ Donate link: https://flattr.com/t/2638688
 Tags: feuerwehr, einsatz
 Requires at least: 3.1.0
 Tested up to: 3.8.1
-Stable tag: 0.1.2
+Stable tag: 0.2.0
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Plugin zur Verwaltung von Feuerwehreins&auml;tzen - Verwendung des Plugins auf Produktivsystemen erst ab Version 1.0 empfohlen, ab 0.2.0 m&ouml;glich
+Plugin zur Verwaltung von Feuerwehreins&auml;tzen - Verwendung des Plugins auf Produktivsystemen m&ouml;glich, aber erst ab Version 1.0 empfohlen
 
 == Description ==
 
@@ -21,7 +21,7 @@ Funktionen im &Uuml;berblick:
 * Einbinden einer Liste von Eins&auml;tzen eines Jahres per Shortcode
 * Widget zeigt die aktuellsten X Eins&auml;tze
 
-ACHTUNG: In Version 0.2 wird sich noch etwas an der Datenstruktur &auml;ndern, bitte vorher nur die Funktion testen und noch keine Unmengen an Eins&auml;tzen eintragen, die m&uuml;ssen sonst unter Umst&auml;nden sp&auml;ter von Hand ge&auml;ndert werden.
+ACHTUNG: Vor Version 1.0 kann sich noch etwas an der Datenstruktur &auml;ndern, bitte vorher nur die Funktion testen und noch keine Unmengen an Eins&auml;tzen eintragen, die m&uuml;ssen sonst unter Umst&auml;nden sp&auml;ter von Hand ge&auml;ndert werden.
 
 == Installation ==
 
@@ -37,8 +37,15 @@ Die Aufgaben f&uuml;r die kommenden Versionen werden auf [GitHub](https://github
 
 == Changelog ==
 
+= 0.2.0 =
+* Neu: Einsatzberichte k&ouml;nnen als Fehlalarm markiert werden
+* Neu: Pro Einsatzbericht ist nur noch eine Einsatzart ausw&auml;hlbar
+* Neu: Externe Einsatzmittel k&ouml;nnen ab jetzt erfasst werden
+* Neu: Validierung von Benutzereingaben
+* Fehlerbehebung: Links beim Shortcode einsatzjahre wurden vereinzelt falsch generiert
+
 = 0.1.2 =
-* Kompatibilität mit PHP < 5.3.0 wiederhergestellt
+* Kompatibilit&auml;t mit PHP < 5.3.0 wiederhergestellt
 
 = 0.1.1 =
 * Hinweis auf Entwicklungszustand eingef&uuml;gt
@@ -52,8 +59,11 @@ Die Aufgaben f&uuml;r die kommenden Versionen werden auf [GitHub](https://github
 
 == Upgrade Notice ==
 
+= 0.2.0 =
+Umfangreichere Einsatzberichte und Validierung von Benutzereingaben, kleine Fehlerbehebung
+
 = 0.1.2 =
-Kompatibilität mit PHP < 5.3.0 wiederhergestellt
+Kompatibilit&auml;t mit PHP < 5.3.0 wiederhergestellt
 
 = 0.1.1 =
 Hinweis auf Entwicklungszustand eingef&uuml;gt

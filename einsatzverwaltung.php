@@ -17,6 +17,7 @@ define( 'EINSATZVERWALTUNG__STYLE_URL', EINSATZVERWALTUNG__PLUGIN_URL . 'css/' )
 
 require_once( EINSATZVERWALTUNG__PLUGIN_DIR . 'class.widget.php' );
 require_once( EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-shortcodes.php' );
+require_once( EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-settings.php' );
 
 
 /**

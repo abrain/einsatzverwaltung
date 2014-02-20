@@ -32,7 +32,7 @@ function einsatzverwaltung_register_settings()
         'einsatzverwaltung_echo_settings_checkbox',
         EVW_SETTINGS_SLUG,
         'einsatzvw_settings_view',
-        array('einsatzvw_einsatz_hideemptydetails', 'Nicht ausgef&uuml;llte Details ausblenden (z.B. wenn keine externen Kr&auml;fte beteiligt waren)')
+        array('einsatzvw_einsatz_hideemptydetails', 'Nicht ausgef&uuml;llte Details ausblenden (z.B. wenn <em>Weitere Kr&auml;fte</em> leer ist)')
     );
     
     // Registration
@@ -58,7 +58,7 @@ function einsatzverwaltung_echo_settings_checkbox($args)
 {
     $id = $args[0];
     $text = $args[1];
-    printf('<label for="%1$s"><input type="checkbox" value="1" id="%1$s" name="%1$s" %2$s/>%3$s</label>', $id, (get_option($id) == 1 ? 'checked="checked" ' : ''), $text);
+    printf('<input type="checkbox" value="1" id="%1$s" name="%1$s" %2$s/><label for="%1$s">%3$s</label>', $id, (get_option($id) == 1 ? 'checked="checked" ' : ''), $text);
 }
 
 

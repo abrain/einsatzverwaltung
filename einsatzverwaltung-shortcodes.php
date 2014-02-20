@@ -5,18 +5,23 @@
  */
 function einsatzverwaltung_print_einsatzliste( $atts )
 {
-    extract( shortcode_atts( array('jahr' => date('Y') ), $atts ) );
-
-    $string = "";
+    extract( shortcode_atts( array('jahr' => date('Y'), 'sort' => 'ab' ), $atts ) );
     
-    if (strlen($jahr)!=4 || !is_numeric($jahr)) {
+    if (empty($jahr) || strlen($jahr)!=4 || !is_numeric($jahr)) {
         $aktuelles_jahr = date('Y');
         $string .= '<p>' . sprintf('INFO: Jahreszahl %s ung&uuml;ltig, verwende %s', $jahr, $aktuelles_jahr) . '</p>';
         $jahr = $aktuelles_jahr;
     }
 
-    $query = new WP_Query( 'year=' . $jahr .'&post_type=einsatz&post_status=publish&nopaging=true' );
+    $query = new WP_Query(array('year' => $jahr,
+        'post_type' => 'einsatz',
+        'post_status' => 'publish',
+        'orderby' => 'date',
+        'order' => ($sort == 'auf' ? 'ASC' : 'DESC'),
+        'nopaging' => true
+    ));
 
+    $string = "";
     if ( $query->have_posts() ) {
         $string .= "<table class=\"einsatzliste\">";
         $string .= "<thead><tr>";

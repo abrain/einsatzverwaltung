@@ -186,7 +186,7 @@ function einsatzverwaltung_display_meta_box( $post ) {
     echo '<td><input type="text" id="einsatzverwaltung_einsatzende" name="einsatzverwaltung_einsatzende" value="'.esc_attr($einsatzende).'" size="20" placeholder="JJJJ-MM-TT hh:mm" />&nbsp;<span class="einsatzverwaltung_hint" id="einsatzverwaltung_einsatzende_hint"></span></td></tr>';
     
     echo '<tr><td><label for="einsatzverwaltung_fehlalarm">'. __("Fehlalarm", 'einsatzverwaltung' ) . '</label></td>';
-    echo '<td><input type="checkbox" id="einsatzverwaltung_fehlalarm" name="einsatzverwaltung_fehlalarm"' . ($fehlalarm == "on" ? 'checked="checked" ' : ' ') . '/></td></tr>';
+    echo '<td><input type="checkbox" id="einsatzverwaltung_fehlalarm" name="einsatzverwaltung_fehlalarm" value="1" ' . einsatzverwaltung_checked($fehlalarm) . '/></td></tr>';
     
     echo '</tbody></table>';
 }
@@ -253,8 +253,7 @@ function einsatzverwaltung_save_postdata( $post_id ) {
         }
         
         // Fehlalarm validieren
-        $fehlalarm = (isset($_POST['einsatzverwaltung_fehlalarm']) ? "on" : "off");
-        $mist;
+        $fehlalarm = einsatzverwaltung_sanitize_checkbox(array($_POST, 'einsatzverwaltung_fehlalarm'));
         
         // Metadaten schreiben
         update_post_meta($post_id, 'einsatz_nummer', $einsatznummer);
@@ -279,6 +278,36 @@ function einsatzverwaltung_save_postdata( $post_id ) {
     }
 }
 add_action( 'save_post', 'einsatzverwaltung_save_postdata' );
+
+
+/**
+ * Bereitet den Formularwert einer Checkbox für das Speichern in der Datenbank vor
+ */
+function einsatzverwaltung_sanitize_checkbox($input)
+{
+    if(is_array($input)) {
+        $arr = $input[0];
+        $index = $input[1];
+        $value = (array_key_exists($index, $arr) ? $arr[$index] : "");
+    } else {
+        $value = $input;
+    }
+    
+    if(isset($value) && $value == "1") {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+
+/**
+ * 
+ */
+function einsatzverwaltung_checked($value)
+{
+    return ($value == 1 ? 'checked="checked" ' : '');
+}
 
 
 /**
@@ -339,7 +368,7 @@ function einsatzverwaltung_get_einsatzbericht_header($post) {
         $art = ($einsatzart ? $einsatzart->name : '');
         
         $fehlalarm = get_post_meta( $post->ID, $key = 'einsatz_fehlalarm', $single = true );
-        if($fehlalarm == "on") {
+        if($fehlalarm == 1) {
             $art = (empty($art) ? 'Fehlalarm' : $art.' (Fehlalarm)');
         }
         

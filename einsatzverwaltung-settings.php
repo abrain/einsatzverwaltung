@@ -41,16 +41,6 @@ function einsatzverwaltung_register_settings()
 add_action( 'admin_init', 'einsatzverwaltung_register_settings' );
 
 
-function einsatzverwaltung_sanitize_checkbox($input)
-{
-    if(isset($input) && $input == "1") {
-        return 1;
-    } else {
-        return 0;
-    }
-}
-
-
 /**
  *
  */
@@ -58,7 +48,7 @@ function einsatzverwaltung_echo_settings_checkbox($args)
 {
     $id = $args[0];
     $text = $args[1];
-    printf('<input type="checkbox" value="1" id="%1$s" name="%1$s" %2$s/><label for="%1$s">%3$s</label>', $id, (get_option($id) == 1 ? 'checked="checked" ' : ''), $text);
+    printf('<input type="checkbox" value="1" id="%1$s" name="%1$s" %2$s/><label for="%1$s">%3$s</label>', $id, einsatzverwaltung_checked(get_option($id)), $text);
 }
 
 

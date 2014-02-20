@@ -13,39 +13,52 @@ add_action('admin_menu', 'einsatzverwaltung_settings_menu');
 
 
 /**
- *
+ * Macht Einstellungen im System bekannt und regelt die Zugehörigkeit zu Abschnitten auf Einstellungsseiten
  */
 function einsatzverwaltung_register_settings()
 {
-    register_setting( 'my_options_group', 'my_option_name', 'intval' );
-    register_setting( 'my_options_group', 'my_option_bla', 'intval' );
-    register_setting( 'my_options_group', 'my_option_ble', 'intval' );
+    // Sections
+    add_settings_section( 'einsatzvw_settings_view',
+        'Darstellung',
+        function() {
+            echo '<p>Mit diesen Einstellungen kann das Aussehen der Einsatzberichte beeinflusst werden.</p>';
+        },
+        EVW_SETTINGS_SLUG
+    );
+    
+    // Fields
+    add_settings_field( 'einsatzvw_einsatz_hideemptydetails',
+        'Einsatzdetails',
+        'einsatzverwaltung_echo_settings_checkbox',
+        EVW_SETTINGS_SLUG,
+        'einsatzvw_settings_view',
+        array('einsatzvw_einsatz_hideemptydetails', 'Nicht ausgef&uuml;llte Details ausblenden (z.B. wenn keine externen Kr&auml;fte beteiligt waren)')
+    );
+    
+    // Registration
+    register_setting( 'einsatzvw_settings', 'einsatzvw_einsatz_hideemptydetails', 'einsatzverwaltung_sanitize_checkbox' );
 }
 add_action( 'admin_init', 'einsatzverwaltung_register_settings' );
 
 
-/**
- * Fügt die Tabs für den Wechsel zwischen den verschiedenen Einstellungskategorien ein
- */
-function einsatzverwaltung_settings_tabs($current = 'general')
+function einsatzverwaltung_sanitize_checkbox($input)
 {
-    echo '<h2 class="nav-tab-wrapper">';
-    $tabs = array(
-        'general' => 'Allgemein',
-        'view' => 'Darstellung'
-    );
-    
-    foreach ( $tabs as $tab => $name ) {
-
-        $class = ( $tab == $current ) ? ' nav-tab-active' : '';
-        $url = add_query_arg( array(
-            'page' => EVW_SETTINGS_SLUG,
-            'tab' => $tab
-        ), admin_url( 'options-general.php' ) );
-        echo '<a class="nav-tab' . esc_attr( $class ) . '" href="' . $url . '">' . esc_html( $name ) . '</a>';
-
+    if(isset($input) && $input == "1") {
+        return 1;
+    } else {
+        return 0;
     }
-    echo '</h2>';
+}
+
+
+/**
+ *
+ */
+function einsatzverwaltung_echo_settings_checkbox($args)
+{
+    $id = $args[0];
+    $text = $args[1];
+    printf('<label for="%1$s"><input type="checkbox" value="1" id="%1$s" name="%1$s" %2$s/>%3$s</label>', $id, (get_option($id) == 1 ? 'checked="checked" ' : ''), $text);
 }
 
 
@@ -60,37 +73,11 @@ function einsatzverwaltung_settings_page()
     echo '<div class="wrap">';
     echo '<h2>Einstellungen &rsaquo; Einsatzverwaltung</h2>';
     
-    $current_tab = (isset( $_GET['tab'] ) ? $_GET['tab'] : 'general');
-    einsatzverwaltung_settings_tabs($current_tab);
-    
-    switch ($current_tab) {
-        case 'general':
-            einsatzverwaltung_settings_page_general();
-            break;
-        case 'view':
-            einsatzverwaltung_settings_page_view();
-            break;
-        default:
-            einsatzverwaltung_settings_page_general();
-    }
-}
-
-
-/**
- * Gibt den Tab 'Allgemein' aus
- */
-function einsatzverwaltung_settings_page_general()
-{
-    //
-}
-
-
-/**
- * Gibt den Tab 'Darstellung' aus
- */
-function einsatzverwaltung_settings_page_view()
-{
-    //
+    echo '<form method="post" action="options.php">';
+    echo settings_fields( 'einsatzvw_settings' );
+    echo do_settings_sections( EVW_SETTINGS_SLUG );
+    submit_button();
+    echo '</form>';
 }
 
 ?>

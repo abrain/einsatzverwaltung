@@ -316,10 +316,10 @@ function einsatzverwaltung_get_einsatzbericht_header($post) {
             $dauer = intval($differenz / 60);
             
             if(empty($dauer) || !is_numeric($dauer)) {
-                $dauerstring = "-";
+                $dauerstring = '';
             } else {
                 if($dauer <= 0) {
-                    $dauerstring = "-";
+                    $dauerstring = '';
                 } else if($dauer < 60) {
                     $dauerstring = $dauer." Minuten";
                 } else {
@@ -332,15 +332,15 @@ function einsatzverwaltung_get_einsatzbericht_header($post) {
                 }
             }
         } else {
-            $dauerstring = "-";
+            $dauerstring = '';
         }
         
         $einsatzart = einsatzverwaltung_get_einsatzart($post->ID);
-        $art = ($einsatzart ? $einsatzart->name : "-");
+        $art = ($einsatzart ? $einsatzart->name : '');
         
         $fehlalarm = get_post_meta( $post->ID, $key = 'einsatz_fehlalarm', $single = true );
         if($fehlalarm == "on") {
-            $art .= " (Fehlalarm)";
+            $art = (empty($art) ? 'Fehlalarm' : $art.' (Fehlalarm)');
         }
         
         $fahrzeuge = get_the_terms( $post->ID, 'fahrzeug' );
@@ -351,7 +351,7 @@ function einsatzverwaltung_get_einsatzbericht_header($post) {
             }
             $fzg_string = join( ", ", $fzg_namen );
         } else {
-            $fzg_string = "-";
+            $fzg_string = '';
         }
         
         $exteinsatzmittel = get_the_terms( $post->ID, 'exteinsatzmittel' );
@@ -362,7 +362,7 @@ function einsatzverwaltung_get_einsatzbericht_header($post) {
             }
             $ext_string = join( ", ", $ext_namen );
         } else {
-            $ext_string = "-";
+            $ext_string = '';
         }
         
         $alarm_timestamp = strtotime($alarmzeit);
@@ -371,14 +371,25 @@ function einsatzverwaltung_get_einsatzbericht_header($post) {
         
         $headerstring = "<strong>Datum:</strong> ".$einsatz_datum."<br>";
         $headerstring .= "<strong>Alarmzeit:</strong> ".$einsatz_zeit."<br>";
-        $headerstring .= "<strong>Dauer:</strong> ".$dauerstring."<br>";
-        $headerstring .= "<strong>Art:</strong> ".$art."<br>";
-        $headerstring .= "<strong>Fahrzeuge:</strong> ".$fzg_string."<br>";
-        $headerstring .= "<strong>Weitere Kr&auml;fte:</strong> ".$ext_string."<br>";
+        $headerstring .= einsatzverwaltung_get_detail_string('Dauer:', $dauerstring);
+        $headerstring .= einsatzverwaltung_get_detail_string('Art:', $art);
+        $headerstring .= einsatzverwaltung_get_detail_string('Fahrzeuge:', $fzg_string);
+        $headerstring .= einsatzverwaltung_get_detail_string('Weitere Kr&auml;fte:', $ext_string);
         
         return $headerstring;
     }
     return "";
+}
+
+
+function einsatzverwaltung_get_detail_string($title, $value, $newline = true)
+{
+    $hide_empty_details = (get_option('einsatzvw_einsatz_hideemptydetails') == 1 ? true : false);
+    
+    if(!$hide_empty_details || $hide_empty_details && !empty($value)) {
+        return '<strong>'.$title.'</strong> '.$value.($newline ? '<br>' : '');
+    }
+    return '';
 }
 
 

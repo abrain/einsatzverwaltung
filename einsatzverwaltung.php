@@ -1,7 +1,7 @@
 <?
 /*
 Plugin Name: Einsatzverwaltung
-Plugin URI: https://github.com/abrain/einsatzverwaltung
+Plugin URI: http://www.abrain.de/software/einsatzverwaltung/
 Description: Verwaltung von Feuerwehreins&auml;tzen
 Version: 0.2.1
 Author: Andreas Brain

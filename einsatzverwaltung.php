@@ -431,7 +431,8 @@ function einsatzverwaltung_get_detail_string($title, $value, $newline = true)
 function einsatzverwaltung_get_einsatzart($id) {
     $einsatzarten = get_the_terms( $id, 'einsatzart' );
     if ( $einsatzarten && !is_wp_error($einsatzarten) && !empty($einsatzarten) ) {
-        return $einsatzarten[array_keys($einsatzarten)[0]];
+        $keys = array_keys($einsatzarten);
+        return $einsatzarten[$keys[0]];
     } else {
         return false;
     }

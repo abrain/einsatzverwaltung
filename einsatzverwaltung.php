@@ -150,14 +150,14 @@ add_action( 'add_meta_boxes_einsatz', 'einsatzverwaltung_add_einsatzdetails_meta
 /**
  * Zusätzliche Skripte im Admin-Bereich einbinden
  */
-function einsatzverwaltung_enqueue_admin_scripts($hook) {
+function einsatzverwaltung_enqueue_edit_scripts($hook) {
     if( 'post.php' == $hook ) {
         // Nur auf der Bearbeitungsseite anzeigen
         wp_enqueue_script('einsatzverwaltung-edit-script', EINSATZVERWALTUNG__SCRIPT_URL . 'einsatzverwaltung-edit.js', array('jquery'));
         wp_enqueue_style('einsatzverwaltung-edit', EINSATZVERWALTUNG__STYLE_URL . 'style-edit.css');
     }
 }
-add_action( 'admin_enqueue_scripts', 'einsatzverwaltung_enqueue_admin_scripts' );
+add_action( 'admin_enqueue_scripts', 'einsatzverwaltung_enqueue_edit_scripts' );
 
 
 /**

@@ -42,6 +42,18 @@ add_action( 'admin_init', 'einsatzverwaltung_register_settings' );
 
 
 /**
+ * Zusätzliche Skripte im Admin-Bereich einbinden
+ */
+function einsatzverwaltung_enqueue_settings_style($hook) {
+    if( 'settings_page_einsatzvw-settings' == $hook ) {
+        // Nur auf der Einstellungsseite einbinden
+        wp_enqueue_style('einsatzverwaltung-admin', EINSATZVERWALTUNG__STYLE_URL . 'style-admin.css');
+    }
+}
+add_action( 'admin_enqueue_scripts', 'einsatzverwaltung_enqueue_settings_style' );
+
+
+/**
  *
  */
 function einsatzverwaltung_echo_settings_checkbox($args)
@@ -59,6 +71,12 @@ function einsatzverwaltung_settings_page()
 {
     if ( ! current_user_can( 'manage_options' ) )
     wp_die( __( 'You do not have sufficient permissions to manage options for this site.' ) );
+    
+    echo '<div id="einsatzverwaltung_contactinfo">';
+    echo '<h3>Kontakt</h3>';
+    echo 'Twitter: <a href="https://twitter.com/DMdsW">@DMdsW</a><br>';
+    echo 'App.net: <a href="https://alpha.app.net/abrain">@abrain</a>';
+    echo '</div>';
     
     echo '<div class="wrap">';
     echo '<h2>Einstellungen &rsaquo; Einsatzverwaltung</h2>';

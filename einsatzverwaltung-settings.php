@@ -73,7 +73,7 @@ function einsatzverwaltung_settings_page()
     wp_die( __( 'You do not have sufficient permissions to manage options for this site.' ) );
     
     echo '<div id="einsatzverwaltung_contactinfo">';
-    echo '<h3>Kontakt</h3>';
+    echo '<h3>Entwicklerkontakt</h3>';
     echo 'Twitter: <a href="https://twitter.com/DMdsW">@DMdsW</a><br>';
     echo 'App.net: <a href="https://alpha.app.net/abrain">@abrain</a>';
     echo '</div>';

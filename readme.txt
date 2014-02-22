@@ -4,7 +4,7 @@ Donate link: https://flattr.com/t/2638688
 Tags: feuerwehr, einsatz
 Requires at least: 3.1.0
 Tested up to: 3.8.1
-Stable tag: 0.2.1
+Stable tag: 0.3.0
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,22 +12,31 @@ Plugin zur Verwaltung von Feuerwehreins&auml;tzen - Verwendung des Plugins auf P
 
 == Description ==
 
-Dieses Plugin f&uuml;gt dem Wordpress Blog eine neue Beitragsart "Einsatzbericht" hinzu. Dieser kann wie ein normaler Beitrag ver&ouml;ffentlicht werden und auch zus&auml;tzlichen Inhalt wie Bilder bieten. Analog zu Tags und Kategorien der bekannten Wordpress-Beitr&auml;ge kann man die Einsatzberichte mit Einsatzart und eingesetzten Fahrzeugen versehen. Jeder Bericht bekommt eine eindeutige Einsatznummer und ist mit Alarmzeit und Einsatzdauer versehen.
+Dieses Plugin f&uuml;gt WordPress eine neue Beitragsart "Einsatzbericht" hinzu. Dieser kann wie ein normaler Beitrag ver&ouml;ffentlicht werden und somit zus&auml;tzlichen Inhalt wie z.B. Bilder bieten. Analog zu Tags und Kategorien der bekannten Wordpress-Beitr&auml;ge kann man die Einsatzberichte mit Einsatzart und eingesetzten Fahrzeugen versehen. Jeder Bericht bekommt eine eindeutige Einsatznummer und ist mit Alarmzeit und Einsatzdauer versehen.
 
 Funktionen im &Uuml;berblick:
 
 * Einsatzberichte als vollwertige Beitr&auml;ge ver&ouml;ffentlichen
-* Einsatzart und eingesetzte Fahrzeuge zuordnen
+* Einsatzart, eingesetzte Fahrzeuge und externe Kr&auml;fte zuordnen
 * Einbinden einer Liste von Eins&auml;tzen eines Jahres per Shortcode
 * Widget zeigt die aktuellsten X Eins&auml;tze
 
-ACHTUNG: Vor Version 1.0 kann sich noch etwas an der Datenstruktur &auml;ndern, bitte vorher nur die Funktion testen und noch keine Unmengen an Eins&auml;tzen eintragen, die m&uuml;ssen sonst unter Umst&auml;nden sp&auml;ter von Hand ge&auml;ndert werden.
+__ACHTUNG: Vor Version 1.0 kann sich noch etwas an der Datenstruktur &auml;ndern, bitte vorher nur die Funktion testen und noch keine Unmengen an Eins&auml;tzen eintragen, die m&uuml;ssen sonst unter Umst&auml;nden sp&auml;ter von Hand ge&auml;ndert werden.__
+
+Geplante Funktionen:
+
+* Archivseite für Einsatzberichte als Tabelle darstellen
+* Import aus wp-einsatz
+* Rechtemanagement
+* Statistiken
 
 == Installation ==
 
 Das Plugin kann entweder aus WordPress heraus aus dem Pluginverzeichnis installiert werden oder aber durch Hochladen der Plugindateien in das Verzeichnis `/wp-content/plugins/`.
 
 In beiden F&auml;llen muss das Plugin erst aktiviert werden, bevor es benutzt werden kann.
+
+__Es wird PHP 5.3.0 oder h&ouml;her ben&ouml;tigt__
 
 == Frequently Asked Questions ==
 
@@ -36,6 +45,12 @@ In beiden F&auml;llen muss das Plugin erst aktiviert werden, bevor es benutzt we
 Die Aufgaben f&uuml;r die kommenden Versionen werden auf [GitHub](https://github.com/abrain/einsatzverwaltung/issues) verwaltet, Feedback ist jederzeit willkommen.
 
 == Changelog ==
+
+= 0.3.0 =
+* Neu: Einstellungsseite
+* Neu: Leere Angaben können im Kopf des Einsatzberichts versteckt werden
+* Verbesserung: Shortcode _einsatzliste_ unterstützt Sortierung
+* Verbesserung: Datum und Zeit werden gam&auml;&szlig; WordPress-Einstellungen dargestellt
 
 = 0.2.1 =
 * Fehlerbehebung: Einsatzende wurde falsch abgespeichert
@@ -61,6 +76,9 @@ Die Aufgaben f&uuml;r die kommenden Versionen werden auf [GitHub](https://github
 * Widget zeigt die aktuellsten X Eins&auml;tze
 
 == Upgrade Notice ==
+
+= 0.3.0 =
+Mehr Einstellm&ouml;glichkeiten
 
 = 0.2.1 =
 Fehlerbehebung

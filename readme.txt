@@ -50,8 +50,8 @@ Die Aufgaben f&uuml;r die kommenden Versionen werden auf [GitHub](https://github
 * Neu: Einstellungsseite
 * Neu: Leere Angaben können im Kopf des Einsatzberichts versteckt werden
 * Verbesserung: Shortcode _einsatzliste_ unterstützt Sortierung
-* Verbesserung: Datum und Zeit werden gam&auml;&szlig; WordPress-Einstellungen dargestellt
-* Notiz: Fr&uuml;here Fehlalarm-Markierungen m&uuml;ssen neu gesetzt werden
+* Verbesserung: Datum und Zeit werden gem&auml;&szlig; WordPress-Einstellungen dargestellt
+* Hinweis: Fr&uuml;here Fehlalarm-Markierungen m&uuml;ssen neu gesetzt werden
 
 = 0.2.1 =
 * Fehlerbehebung: Einsatzende wurde falsch abgespeichert
@@ -79,7 +79,7 @@ Die Aufgaben f&uuml;r die kommenden Versionen werden auf [GitHub](https://github
 == Upgrade Notice ==
 
 = 0.3.0 =
-Mehr Einstellm&ouml;glichkeiten
+Dieses Update bietet mehr Einstellm&ouml;glichkeiten
 
 = 0.2.1 =
 Fehlerbehebung

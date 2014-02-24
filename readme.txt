@@ -25,10 +25,13 @@ __ACHTUNG: Vor Version 1.0 kann sich noch etwas an der Datenstruktur &auml;ndern
 
 Geplante Funktionen:
 
-* Archivseite für Einsatzberichte als Tabelle darstellen
-* Import aus wp-einsatz
-* Rechtemanagement
+* Format der Einsatznummer einstellbar (v0.4)
+* Import aus wp-einsatz (v0.5)
+* Angabe der Alarmierungsart (v0.5)
+* Archivseite für Einsatzberichte als Tabelle darstellen (v1.0)
+* Rechtemanagement (v1.0)
 * Statistiken
+* ...
 
 == Installation ==
 

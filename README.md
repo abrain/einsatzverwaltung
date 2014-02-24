@@ -1,5 +1,6 @@
 #Einsatzverwaltung
-##Plugin zur Verwaltung von Feuerwehreins&auml;tzen - Verwendung des Plugins auf Produktivsystemen m&ouml;glich, aber erst ab Version 1.0 empfohlen
+##Plugin zur Verwaltung von Feuerwehreins&auml;tzen
+__Verwendung des Plugins auf Produktivsystemen m&ouml;glich, aber erst ab Version 1.0 empfohlen__
 
 Dieses Plugin f&uuml;gt WordPress eine neue Beitragsart "Einsatzbericht" hinzu. Dieser kann wie ein normaler Beitrag ver&ouml;ffentlicht werden und somit zus&auml;tzlichen Inhalt wie z.B. Bilder bieten. Analog zu Tags und Kategorien der bekannten Wordpress-Beitr&auml;ge kann man die Einsatzberichte mit Einsatzart und eingesetzten Fahrzeugen versehen. Jeder Bericht bekommt eine eindeutige Einsatznummer und ist mit Alarmzeit und Einsatzdauer versehen.
 
@@ -24,7 +25,7 @@ __ACHTUNG: Vor Version 1.0 kann sich noch etwas an der Datenstruktur &auml;ndern
 
 ### Installation
 
-Das Plugin kann entweder aus WordPress heraus aus dem Pluginverzeichnis installiert werden oder aber durch Hochladen der Plugindateien in das Verzeichnis `/wp-content/plugins/`.
+Das Plugin kann entweder aus WordPress heraus aus dem [Pluginverzeichnis](http://wordpress.org/plugins/einsatzverwaltung/) installiert werden oder aber durch Hochladen der Plugindateien in das Verzeichnis `/wp-content/plugins/`.
 
 In beiden F&auml;llen muss das Plugin erst aktiviert werden, bevor es benutzt werden kann.
 

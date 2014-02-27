@@ -33,10 +33,13 @@ __Es wird PHP 5.3.0 oder h&ouml;her ben&ouml;tigt__
 
 ### Changelog
 
+#### 0.3.1
+* Fehlerbehebung: Bearbeiten normaler Beitr&auml;ge war beeintr&auml;chtigt
+
 #### 0.3.0
 * Neu: Einstellungsseite
-* Neu: Leere Angaben können im Kopf des Einsatzberichts versteckt werden
-* Verbesserung: Shortcode _einsatzliste_ unterstützt Sortierung
+* Neu: Leere Angaben k&ouml;nnen im Kopf des Einsatzberichts versteckt werden
+* Verbesserung: Shortcode _einsatzliste_ unterst&uuml;tzt Sortierung
 * Verbesserung: Datum und Zeit werden gem&auml;&szlig; WordPress-Einstellungen dargestellt
 * Hinweis: Fr&uuml;here Fehlalarm-Markierungen m&uuml;ssen neu gesetzt werden
 

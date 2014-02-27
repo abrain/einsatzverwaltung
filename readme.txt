@@ -4,7 +4,7 @@ Donate link: https://flattr.com/t/2638688
 Tags: feuerwehr, einsatz
 Requires at least: 3.1.0
 Tested up to: 3.8.1
-Stable tag: 0.3.0
+Stable tag: 0.3.1
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -49,10 +49,13 @@ Die Aufgaben f&uuml;r die kommenden Versionen werden auf [GitHub](https://github
 
 == Changelog ==
 
+= 0.3.1 =
+* Fehlerbehebung: Bearbeiten normaler Beitr&auml;ge war beeintr&auml;chtigt
+
 = 0.3.0 =
 * Neu: Einstellungsseite
-* Neu: Leere Angaben können im Kopf des Einsatzberichts versteckt werden
-* Verbesserung: Shortcode _einsatzliste_ unterstützt Sortierung
+* Neu: Leere Angaben k&ouml;nnen im Kopf des Einsatzberichts versteckt werden
+* Verbesserung: Shortcode _einsatzliste_ unterst&uuml;tzt Sortierung
 * Verbesserung: Datum und Zeit werden gem&auml;&szlig; WordPress-Einstellungen dargestellt
 * Hinweis: Fr&uuml;here Fehlalarm-Markierungen m&uuml;ssen neu gesetzt werden
 
@@ -80,6 +83,9 @@ Die Aufgaben f&uuml;r die kommenden Versionen werden auf [GitHub](https://github
 * Widget zeigt die aktuellsten X Eins&auml;tze
 
 == Upgrade Notice ==
+
+= 0.3.1 =
+Behebt einen Fehler, der das Erstellen normaler Beitr&auml;ge st&ouml;rte
 
 = 0.3.0 =
 Dieses Update bietet mehr Einstellm&ouml;glichkeiten

@@ -8,11 +8,13 @@ jQuery(document).ready(function() {
 function einsatzverwaltung_checkField(id, regex, msg, allowEmpty)
 {
     var field = jQuery('#' + id);
-    var val = field.val();
-    if((allowEmpty && val == "") || val.match(regex)) {
-        jQuery('#' + id + '_hint').html("");
-    } else {
-         jQuery('#' + id + '_hint').html(msg);
+    if(field.length != 0) {
+        var val = field.val();
+        if((allowEmpty && val == "") || val.match(regex)) {
+            jQuery('#' + id + '_hint').html("");
+        } else {
+             jQuery('#' + id + '_hint').html(msg);
+        }
     }
 }
 

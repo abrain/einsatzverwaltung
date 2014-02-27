@@ -14,6 +14,7 @@ define( 'EINSATZVERWALTUNG__PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'EINSATZVERWALTUNG__PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'EINSATZVERWALTUNG__SCRIPT_URL', EINSATZVERWALTUNG__PLUGIN_URL . 'js/' );
 define( 'EINSATZVERWALTUNG__STYLE_URL', EINSATZVERWALTUNG__PLUGIN_URL . 'css/' );
+define( 'EINSATZVERWALTUNG__EINSATZNR_STELLEN', 3 );
 
 require_once( EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-widget.php' );
 require_once( EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-shortcodes.php' );
@@ -135,6 +136,17 @@ register_activation_hook( __FILE__, 'einsatzverwaltung_aktivierung' );
 
 
 /**
+ *
+ */
+function einsatzverwaltung_on_plugins_loaded()
+{
+    // Sicherstellen, dass Optionen gesetzt sind
+    add_option( 'einsatzvw_einsatznummer_stellen', EINSATZVERWALTUNG__EINSATZNR_STELLEN, '', 'no' );
+}
+add_action( 'plugins_loaded', 'einsatzverwaltung_on_plugins_loaded' );
+
+
+/**
  * Fügt die Metabox zum Bearbeiten der Einsatzdetails ein
  */
 function einsatzverwaltung_add_einsatzdetails_meta_box( $post ) {
@@ -197,7 +209,8 @@ function einsatzverwaltung_display_meta_box( $post ) {
  */
 function einsatzverwaltung_get_next_einsatznummer($jahr) {
     $query = new WP_Query( 'year=' . $jahr .'&post_type=einsatz&post_status=publish&nopaging=true' );
-    return $jahr.str_pad(($query->found_posts + 1), 3, "0", STR_PAD_LEFT);
+    $stellen = get_option('einsatzvw_einsatznummer_stellen', EINSATZVERWALTUNG__EINSATZNR_STELLEN);
+    return $jahr.str_pad(($query->found_posts + 1), $stellen, "0", STR_PAD_LEFT);
 }
 
 

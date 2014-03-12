@@ -19,6 +19,7 @@ define( 'EINSATZVERWALTUNG__EINSATZNR_STELLEN', 3 );
 require_once( EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-widget.php' );
 require_once( EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-shortcodes.php' );
 require_once( EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-settings.php' );
+require_once( EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-tools.php' );
 
 
 /**
@@ -146,6 +147,23 @@ function einsatzverwaltung_on_plugins_loaded()
 add_action( 'plugins_loaded', 'einsatzverwaltung_on_plugins_loaded' );
 
 
+function einsatzverwaltung_get_einsatzberichte($kalenderjahr)
+{
+    if (empty($kalenderjahr) || strlen($kalenderjahr)!=4 || !is_numeric($kalenderjahr)) {
+        $kalenderjahr = '';
+    }
+    
+    return get_posts(array(
+        'nopaging' => true,
+        'orderby' => 'post_date',
+        'order' => 'ASC',
+        'post_type' => 'einsatz',
+        'post_status' => 'publish',
+        'year' => $kalenderjahr
+    ));
+}
+
+
 /**
  * Fügt die Metabox zum Bearbeiten der Einsatzdetails ein
  */
@@ -163,7 +181,7 @@ add_action( 'add_meta_boxes_einsatz', 'einsatzverwaltung_add_einsatzdetails_meta
  * Zusätzliche Skripte im Admin-Bereich einbinden
  */
 function einsatzverwaltung_enqueue_edit_scripts($hook) {
-    if( 'post.php' == $hook ) {
+    if( 'post.php' == $hook || 'post-new.php' == $hook ) {
         // Nur auf der Bearbeitungsseite anzeigen
         wp_enqueue_script('einsatzverwaltung-edit-script', EINSATZVERWALTUNG__SCRIPT_URL . 'einsatzverwaltung-edit.js', array('jquery'));
         wp_enqueue_style('einsatzverwaltung-edit', EINSATZVERWALTUNG__STYLE_URL . 'style-edit.css');
@@ -207,10 +225,22 @@ function einsatzverwaltung_display_meta_box( $post ) {
 /**
  * Berechnet die nächste freie Einsatznummer für das gegebene Jahr
  */
-function einsatzverwaltung_get_next_einsatznummer($jahr) {
+function einsatzverwaltung_get_next_einsatznummer($jahr, $minuseins = false) {
+    if(empty($jahr) || !is_numeric($jahr)) {
+        $jahr = date('Y');
+    }
     $query = new WP_Query( 'year=' . $jahr .'&post_type=einsatz&post_status=publish&nopaging=true' );
+    return einsatzverwaltung_format_einsatznummer($jahr, $query->found_posts + ($minuseins ? 0 : 1));
+}
+
+
+/**
+ * Formatiert die Einsatznummer
+ */
+function einsatzverwaltung_format_einsatznummer($jahr, $nummer)
+{
     $stellen = get_option('einsatzvw_einsatznummer_stellen', EINSATZVERWALTUNG__EINSATZNR_STELLEN);
-    return $jahr.str_pad(($query->found_posts + 1), $stellen, "0", STR_PAD_LEFT);
+    return $jahr.str_pad($nummer, $stellen, "0", STR_PAD_LEFT);
 }
 
 
@@ -244,13 +274,14 @@ function einsatzverwaltung_save_postdata( $post_id ) {
             $alarmzeit = date_create($input_alarmzeit);
         }
         if(empty($alarmzeit)) {
-            $alarmzeit = date_create(get_post_field( 'post_date', $post_id, 'raw' ));
+            $alarmzeit = date_create($_POST['aa'].'-'.$_POST['mm'].'-'.$_POST['jj'].' '.$_POST['hh'].':'.$_POST['mn'].':'.$_POST['ss']);
         } else {
             $update_args['post_date'] = date_format($alarmzeit, 'Y-m-d H:i:s');
         }
 
         // Einsatznummer validieren
-        $einsatznummer_fallback = einsatzverwaltung_get_next_einsatznummer(date_format($alarmzeit, 'Y'));
+        $einsatzjahr = date_format($alarmzeit, 'Y');
+        $einsatznummer_fallback = einsatzverwaltung_get_next_einsatznummer($einsatzjahr, $einsatzjahr == date('Y'));
         $einsatznummer = sanitize_title( $_POST['einsatzverwaltung_nummer'], $einsatznummer_fallback, 'save' );
         if(!empty($einsatznummer)) {
             $update_args['post_name'] = $einsatznummer; // Slug setzen
@@ -597,6 +628,22 @@ function einsatzverwaltung_manage_einsatz_columns( $column, $post_id ) {
     }
 }
 add_action( 'manage_einsatz_posts_custom_column', 'einsatzverwaltung_manage_einsatz_columns', 10, 2 );
+
+
+/**
+ * Gibt ein Array mit Jahreszahlen zurück, in denen Einsätze vorliegen
+ */
+function einsatzverwaltung_get_jahremiteinsatz()
+{
+    $jahre = array();
+    $query = new WP_Query( '&post_type=einsatz&post_status=publish&nopaging=true' );
+    while($query->have_posts()) {
+        $p = $query->next_post();
+        $timestamp = strtotime($p->post_date);
+        $jahre[date("Y", $timestamp)] = 1;
+    }
+    return array_keys($jahre);
+}
 
 
 /*

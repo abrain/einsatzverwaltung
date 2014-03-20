@@ -441,8 +441,8 @@ function einsatzverwaltung_get_einsatzbericht_header($post) {
         $alarm_timestamp = strtotime($alarmzeit);
         $datumsformat = get_option('date_format', 'd.m.Y');
         $zeitformat = get_option('time_format', 'H:i');
-        $einsatz_datum = ($alarm_timestamp ? date($datumsformat, $alarm_timestamp) : '-');
-        $einsatz_zeit = ($alarm_timestamp ? date($zeitformat, $alarm_timestamp).' Uhr' : '-');
+        $einsatz_datum = ($alarm_timestamp ? date_i18n($datumsformat, $alarm_timestamp) : '-');
+        $einsatz_zeit = ($alarm_timestamp ? date_i18n($zeitformat, $alarm_timestamp).' Uhr' : '-');
         
         $headerstring = "<strong>Datum:</strong> ".$einsatz_datum."<br>";
         $headerstring .= "<strong>Alarmzeit:</strong> ".$einsatz_zeit."<br>";

@@ -54,10 +54,10 @@ class Einsatzverwaltung_Widget extends WP_Widget {
             if($zeigeDatum) {
                 $timestamp = strtotime($p->post_date);
                 $datumsformat = get_option('date_format', 'd.m.Y');
-                $letzteEinsaetze .= "<br><span class=\"einsatzdatum\">".date($datumsformat, $timestamp)."</span>";
+                $letzteEinsaetze .= "<br><span class=\"einsatzdatum\">".date_i18n($datumsformat, $timestamp)."</span>";
                 if($zeigeZeit) {
                     $zeitformat = get_option('time_format', 'H:i');
-                    $letzteEinsaetze .= " | <span class=\"einsatzzeit\">".date($zeitformat, $timestamp)." Uhr</span>";
+                    $letzteEinsaetze .= " | <span class=\"einsatzzeit\">".date_i18n($zeitformat, $timestamp)." Uhr</span>";
                 }
             }
             $letzteEinsaetze .= "</li>";

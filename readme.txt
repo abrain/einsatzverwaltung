@@ -49,6 +49,9 @@ Die Aufgaben f&uuml;r die kommenden Versionen werden auf [GitHub](https://github
 
 == Changelog ==
 
+= 0.3.2 =
+* Fehlerbehebung: Datums- und Zeitangaben wurden in englischer Schreibweise angezeigt
+
 = 0.3.1 =
 * Fehlerbehebung: Bearbeiten normaler Beitr&auml;ge war beeintr&auml;chtigt
 
@@ -83,6 +86,9 @@ Die Aufgaben f&uuml;r die kommenden Versionen werden auf [GitHub](https://github
 * Widget zeigt die aktuellsten X Eins&auml;tze
 
 == Upgrade Notice ==
+
+= 0.3.2 =
+Behebt einen Darstellungsfehler der Datums- und Zeitangaben
 
 = 0.3.1 =
 Behebt einen Fehler, der das Erstellen normaler Beitr&auml;ge st&ouml;rte

@@ -33,6 +33,9 @@ __Es wird PHP 5.3.0 oder h&ouml;her ben&ouml;tigt__
 
 ### Changelog
 
+#### 0.3.2
+* Fehlerbehebung: Datums- und Zeitangaben wurden in englischer Schreibweise angezeigt
+
 #### 0.3.1
 * Fehlerbehebung: Bearbeiten normaler Beitr&auml;ge war beeintr&auml;chtigt
 

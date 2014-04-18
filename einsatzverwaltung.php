@@ -240,7 +240,12 @@ function einsatzverwaltung_get_next_einsatznummer($jahr, $minuseins = false) {
 function einsatzverwaltung_format_einsatznummer($jahr, $nummer)
 {
     $stellen = get_option('einsatzvw_einsatznummer_stellen', EINSATZVERWALTUNG__EINSATZNR_STELLEN);
-    return $jahr.str_pad($nummer, $stellen, "0", STR_PAD_LEFT);
+    $lfdvorne = get_option('einsatzvw_einsatznummer_lfdvorne', false);
+    if($lfdvorne) {
+        return str_pad($nummer, $stellen, "0", STR_PAD_LEFT).$jahr;
+    } else {
+        return $jahr.str_pad($nummer, $stellen, "0", STR_PAD_LEFT);
+    }
 }
 
 

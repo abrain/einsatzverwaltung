@@ -34,10 +34,9 @@ function einsatzverwaltung_register_settings()
     // Fields
     add_settings_field( 'einsatzvw_einsatznummer_stellen',
         'Format der Einsatznummer',
-        'einsatzverwaltung_echo_einsatznummer_stellen_input',
+        'einsatzverwaltung_echo_einsatznummer_format',
         EVW_SETTINGS_SLUG,
-        'einsatzvw_settings_general',
-        array('einsatzvw_einsatznummer_stellen')
+        'einsatzvw_settings_general'
     );
     add_settings_field( 'einsatzvw_einsatz_hideemptydetails',
         'Einsatzdetails',
@@ -49,6 +48,7 @@ function einsatzverwaltung_register_settings()
     
     // Registration
     register_setting( 'einsatzvw_settings', 'einsatzvw_einsatznummer_stellen', 'einsatzverwaltung_sanitize_einsatznummer_stellen' );
+    register_setting( 'einsatzvw_settings', 'einsatzvw_einsatznummer_lfdvorne', 'einsatzverwaltung_sanitize_checkbox' );
     register_setting( 'einsatzvw_settings', 'einsatzvw_einsatz_hideemptydetails', 'einsatzverwaltung_sanitize_checkbox' );
 }
 add_action( 'admin_init', 'einsatzverwaltung_register_settings' );
@@ -91,10 +91,10 @@ function einsatzverwaltung_echo_settings_input($args)
 /**
  *
  */
-function einsatzverwaltung_echo_einsatznummer_stellen_input($args)
+function einsatzverwaltung_echo_einsatznummer_format()
 {
-    $id = $args[0];
-    printf('Jahreszahl + jahresbezogene, fortlaufende Nummer mit <input type="text" value="%2$s" size="2" id="%1$s" name="%1$s" /> Stellen<p class="description">Beispiel für den fünften Einsatz in 2014:<br>bei 2 Stellen: 201405<br>bei 4 Stellen: 20140005</p>', $id, get_option($id));
+    printf('Jahreszahl + jahresbezogene, fortlaufende Nummer mit <input type="text" value="%2$s" size="2" id="%1$s" name="%1$s" /> Stellen<p class="description">Beispiel für den fünften Einsatz in 2014:<br>bei 2 Stellen: 201405<br>bei 4 Stellen: 20140005</p>', 'einsatzvw_einsatznummer_stellen', get_option('einsatzvw_einsatznummer_stellen'));
+    einsatzverwaltung_echo_settings_checkbox(array('einsatzvw_einsatznummer_lfdvorne', 'Laufende Nummer vor das Jahr stellen'));
 }
 
 

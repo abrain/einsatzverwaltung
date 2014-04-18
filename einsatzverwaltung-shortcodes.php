@@ -34,7 +34,7 @@ function einsatzverwaltung_print_einsatzliste( $atts )
         while ( $query->have_posts() ) {
             $query->next_post();
             
-            $einsatz_nummer = get_post_meta($query->post->ID, 'einsatz_nummer', true);
+            $einsatz_nummer = get_post_field('post_name', $query->post->ID);
             $alarmzeit = get_post_meta($query->post->ID, 'einsatz_alarmzeit', true);
             $einsatz_timestamp = strtotime($alarmzeit);
             

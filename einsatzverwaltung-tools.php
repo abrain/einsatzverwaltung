@@ -61,6 +61,7 @@ function einsatzverwaltung_enr_vergeben($kalenderjahr, $simulieren = false)
     $format = get_option('date_format', 'd.m.Y').' '.get_option('time_format', 'H:i');
     $jahr_alt = '';
     $aenderungen = 0;
+    $kollisionen = 0;
     foreach($einsatzberichte as $einsatzbericht) {
         // Zähler beginnt jedes Jahr von neuem
         $datum = date_create($einsatzbericht->post_date);
@@ -74,10 +75,15 @@ function einsatzverwaltung_enr_vergeben($kalenderjahr, $simulieren = false)
         $enr_neu = einsatzverwaltung_format_einsatznummer($jahr, $counter);
         if($enr != $enr_neu) {
             $aenderungen++;
-            printf('Einsatz %s (%s) erh&auml;lt die Nummer %s', '<strong>'.$enr.'</strong>', date_format($datum, $format), '<strong>'.$enr_neu.'</strong>');
+            printf('Einsatz %s (%s) erh&auml;lt die Nummer %s', '<strong>'.$enr.'</strong>', date_i18n($format, date_timestamp_get($datum)), '<strong>'.$enr_neu.'</strong>');
             if(!$simulieren) {
                 einsatzverwaltung_set_einsatznummer($einsatzbericht->ID, $enr_neu);
-                printf(' ... ge&auml;ndert zu %s', '<strong>'.get_post_meta($einsatzbericht->ID, 'einsatz_nummer', true).'</strong>');
+                $enr_neu_slug = get_post_field('post_name', $einsatzbericht->ID);
+                printf(' ... ge&auml;ndert zu %s', '<strong>'.$enr_neu_slug.'</strong>');
+                if($enr_neu_slug != $enr_neu) {
+                    $kollisionen++;
+                    print(' *');
+                }
             }
             echo '<br/>';
         }
@@ -92,6 +98,14 @@ function einsatzverwaltung_enr_vergeben($kalenderjahr, $simulieren = false)
             echo 'Keine &Auml;nderungen vorgenommen.';
         }
     }
+    
+    if($kollisionen != 0) {
+        echo '<br>* = Die vorgesehene Einsatznummer war zum Zeitpunkt des Abspeicherns noch von einem anderen Einsatzbericht belegt, deshalb wurde von WordPress automatisch eine unbelegte Nummer vergeben. Mit einem weiteren Durchlauf dieses Werkzeugs wird dieser Zustand korrigiert.';
+    } else {
+        if (!$simulieren && $aenderungen > 0) {
+            echo '<br>Die Einsatznummern wurden ohne Probleme repariert.';
+        }
+    }
 }
 
 
@@ -103,8 +117,6 @@ function einsatzverwaltung_set_einsatznummer($post_id, $einsatznummer)
     if(empty($post_id) || empty($einsatznummer)) {
         return;
     }
-    
-    update_post_meta($post_id, 'einsatz_nummer', $einsatznummer);
     
     $update_args = array();
     $update_args['post_name'] = $einsatznummer;

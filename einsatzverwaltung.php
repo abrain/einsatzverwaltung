@@ -199,7 +199,7 @@ function einsatzverwaltung_display_meta_box( $post ) {
 
     // The actual fields for data entry
     // Use get_post_meta to retrieve an existing value from the database and use the value for the form
-    $nummer = get_post_meta( $post->ID, $key = 'einsatz_nummer', $single = true );
+    $nummer = get_post_field('post_name', $post->ID);
     $alarmzeit = get_post_meta( $post->ID, $key = 'einsatz_alarmzeit', $single = true );
     $einsatzende = get_post_meta( $post->ID, $key = 'einsatz_einsatzende', $single = true );
     $fehlalarm = get_post_meta( $post->ID, $key = 'einsatz_fehlalarm', $single = true );
@@ -300,7 +300,6 @@ function einsatzverwaltung_save_postdata( $post_id ) {
         $fehlalarm = einsatzverwaltung_sanitize_checkbox(array($_POST, 'einsatzverwaltung_fehlalarm'));
         
         // Metadaten schreiben
-        update_post_meta($post_id, 'einsatz_nummer', $einsatznummer);
         update_post_meta($post_id, 'einsatz_alarmzeit', date_format($alarmzeit, 'Y-m-d H:i'));
         update_post_meta($post_id, 'einsatz_einsatzende', ($einsatzende == "" ? "" : date_format($einsatzende, 'Y-m-d H:i')));
         update_post_meta($post_id, 'einsatz_fehlalarm', $fehlalarm);
@@ -554,7 +553,7 @@ function einsatzverwaltung_manage_einsatz_columns( $column, $post_id ) {
     switch( $column ) {
 
         case 'e_nummer' :
-            $einsatz_nummer = get_post_meta( $post_id, 'einsatz_nummer', true );
+            $einsatz_nummer = get_post_field('post_name', $post_id);
 
             if ( empty( $einsatz_nummer ) )
                 echo '-';

@@ -1,10 +1,10 @@
-=== Plugin Name ===
+=== Einsatzverwaltung ===
 Contributors: abrain
 Donate link: http://www.abrain.de/software/unterstuetzen/
 Tags: feuerwehr, einsatz
 Requires at least: 3.1.0
-Tested up to: 3.8.1
-Stable tag: 0.3.2
+Tested up to: 3.9
+Stable tag: 0.4.0
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -25,7 +25,6 @@ __ACHTUNG: Vor Version 1.0 kann sich noch etwas an der Datenstruktur &auml;ndern
 
 Geplante Funktionen:
 
-* Format der Einsatznummer einstellbar (v0.4)
 * Import aus wp-einsatz (v0.5)
 * Angabe der Alarmierungsart (v0.5)
 * Archivseite für Einsatzberichte als Tabelle darstellen (v1.0)
@@ -48,6 +47,10 @@ __Es wird PHP 5.3.0 oder h&ouml;her ben&ouml;tigt__
 Die Aufgaben f&uuml;r die kommenden Versionen werden auf [GitHub](https://github.com/abrain/einsatzverwaltung/issues) verwaltet, Feedback ist jederzeit willkommen.
 
 == Changelog ==
+
+= 0.4.0 =
+* Neu: Format der Einsatznummer einstellbar
+* Neu: Werkzeug zur Reparatur/Aktualisierung von Einsatznummern
 
 = 0.3.2 =
 * Fehlerbehebung: Datums- und Zeitangaben wurden in englischer Schreibweise angezeigt
@@ -86,6 +89,9 @@ Die Aufgaben f&uuml;r die kommenden Versionen werden auf [GitHub](https://github
 * Widget zeigt die aktuellsten X Eins&auml;tze
 
 == Upgrade Notice ==
+
+= 0.4.0 =
+Neue Features rund um die Einsatznummer
 
 = 0.3.2 =
 Behebt einen Darstellungsfehler der Datums- und Zeitangaben

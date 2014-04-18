@@ -15,7 +15,6 @@ __ACHTUNG: Vor Version 1.0 kann sich noch etwas an der Datenstruktur &auml;ndern
 
 ### Geplante Funktionen:
 
-* Format der Einsatznummer einstellbar (v0.4)
 * Import aus wp-einsatz (v0.5)
 * Angabe der Alarmierungsart (v0.5)
 * Archivseite für Einsatzberichte als Tabelle darstellen (v1.0)
@@ -32,6 +31,10 @@ In beiden F&auml;llen muss das Plugin erst aktiviert werden, bevor es benutzt we
 __Es wird PHP 5.3.0 oder h&ouml;her ben&ouml;tigt__
 
 ### Changelog
+
+#### 0.4.0
+* Neu: Format der Einsatznummer einstellbar
+* Neu: Werkzeug zur Reparatur/Aktualisierung von Einsatznummern
 
 #### 0.3.2
 * Fehlerbehebung: Datums- und Zeitangaben wurden in englischer Schreibweise angezeigt

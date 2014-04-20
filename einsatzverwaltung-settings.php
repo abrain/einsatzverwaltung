@@ -13,6 +13,16 @@ add_action('admin_menu', 'einsatzverwaltung_settings_menu');
 
 
 /**
+ * Zeigt einen Link zu den Einstellungen direkt auf der Plugin-Seite an
+ */
+function einsatzverwaltung_add_action_links ( $links ) {
+    $mylinks = array('<a href="' . admin_url( 'options-general.php?page='.EVW_SETTINGS_SLUG ) . '">Einstellungen</a>');
+    return array_merge( $links, $mylinks );
+}
+add_filter( 'plugin_action_links_' . EINSATZVERWALTUNG__PLUGIN_BASE , 'einsatzverwaltung_add_action_links' );
+
+
+/**
  * Macht Einstellungen im System bekannt und regelt die Zugehörigkeit zu Abschnitten auf Einstellungsseiten
  */
 function einsatzverwaltung_register_settings()

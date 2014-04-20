@@ -134,8 +134,8 @@ function einsatzverwaltung_settings_page()
     
     echo '<div id="einsatzverwaltung_contactinfo">';
     echo '<h3>Entwicklerkontakt</h3>';
-    echo 'Twitter: <a href="https://twitter.com/DMdsW">@DMdsW</a><br>';
-    echo 'App.net: <a href="https://alpha.app.net/abrain">@abrain</a><br>';
+    echo 'Twitter: <a href="https://twitter.com/einsatzvw">@einsatzvw</a><br>';
+    echo 'App.net: <a href="https://alpha.app.net/einsatzverwaltung">@einsatzverwaltung</a><br>';
     echo 'eMail: <a href="mailto:kontakt@abrain.de">kontakt@abrain.de</a>';
     echo '</div>';
     

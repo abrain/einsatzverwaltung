@@ -203,6 +203,7 @@ function einsatzverwaltung_display_meta_box( $post ) {
     $nummer = get_post_field('post_name', $post->ID);
     $alarmzeit = get_post_meta( $post->ID, $key = 'einsatz_alarmzeit', $single = true );
     $einsatzende = get_post_meta( $post->ID, $key = 'einsatz_einsatzende', $single = true );
+    $einsatzort = get_post_meta( $post->ID, $key = 'einsatz_einsatzort', $single = true );
     $fehlalarm = get_post_meta( $post->ID, $key = 'einsatz_fehlalarm', $single = true );
 
     echo '<table><tbody>';
@@ -215,6 +216,9 @@ function einsatzverwaltung_display_meta_box( $post ) {
 
     echo '<tr><td><label for="einsatzverwaltung_einsatzende">'. __("Einsatzende", 'einsatzverwaltung' ) . '</label></td>';
     echo '<td><input type="text" id="einsatzverwaltung_einsatzende" name="einsatzverwaltung_einsatzende" value="'.esc_attr($einsatzende).'" size="20" placeholder="JJJJ-MM-TT hh:mm" />&nbsp;<span class="einsatzverwaltung_hint" id="einsatzverwaltung_einsatzende_hint"></span></td></tr>';
+    
+    echo '<tr><td><label for="einsatzverwaltung_einsatzort">'. __("Einsatzort", 'einsatzverwaltung' ) . '</label></td>';
+    echo '<td><input type="text" id="einsatzverwaltung_einsatzort" name="einsatzverwaltung_einsatzort" value="'.esc_attr($einsatzort).'" size="20" /></td></tr>';
     
     echo '<tr><td><label for="einsatzverwaltung_fehlalarm">'. __("Fehlalarm", 'einsatzverwaltung' ) . '</label></td>';
     echo '<td><input type="checkbox" id="einsatzverwaltung_fehlalarm" name="einsatzverwaltung_fehlalarm" value="1" ' . einsatzverwaltung_checked($fehlalarm) . '/></td></tr>';
@@ -302,12 +306,16 @@ function einsatzverwaltung_save_postdata( $post_id ) {
             $einsatzende = "";
         }
         
+        // Einsatzort validieren
+        $einsatzort = sanitize_text_field( $_POST['einsatzverwaltung_einsatzort'] );
+        
         // Fehlalarm validieren
         $fehlalarm = einsatzverwaltung_sanitize_checkbox(array($_POST, 'einsatzverwaltung_fehlalarm'));
         
         // Metadaten schreiben
         update_post_meta($post_id, 'einsatz_alarmzeit', date_format($alarmzeit, 'Y-m-d H:i'));
         update_post_meta($post_id, 'einsatz_einsatzende', ($einsatzende == "" ? "" : date_format($einsatzende, 'Y-m-d H:i')));
+        update_post_meta($post_id, 'einsatz_einsatzort', $einsatzort);
         update_post_meta($post_id, 'einsatz_fehlalarm', $fehlalarm);
         
         if(!empty($update_args)) {
@@ -421,6 +429,8 @@ function einsatzverwaltung_get_einsatzbericht_header($post) {
             $art = (empty($art) ? 'Fehlalarm' : $art.' (Fehlalarm)');
         }
         
+        $einsatzort = get_post_meta( $post->ID, $key = 'einsatz_einsatzort', $single = true );
+        
         $fahrzeuge = get_the_terms( $post->ID, 'fahrzeug' );
         if ( $fahrzeuge && ! is_wp_error( $fahrzeuge ) ) {
             $fzg_namen = array();
@@ -453,6 +463,7 @@ function einsatzverwaltung_get_einsatzbericht_header($post) {
         $headerstring .= "<strong>Alarmzeit:</strong> ".$einsatz_zeit."<br>";
         $headerstring .= einsatzverwaltung_get_detail_string('Dauer:', $dauerstring);
         $headerstring .= einsatzverwaltung_get_detail_string('Art:', $art);
+        $headerstring .= einsatzverwaltung_get_detail_string('Einsatzort:', $einsatzort);
         $headerstring .= einsatzverwaltung_get_detail_string('Fahrzeuge:', $fzg_string);
         $headerstring .= einsatzverwaltung_get_detail_string('Weitere Kr&auml;fte:', $ext_string);
         

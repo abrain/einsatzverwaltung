@@ -4,7 +4,7 @@ define( 'EVW_TOOL_ENR_SLUG', 'einsatzvw-tool-enr' );
 
 
 /**
- * Fügt die Einstellungsseite zum Menü hinzu
+ * Fügt das Reparaturwerkzeug zum Menü hinzu
  */
 function einsatzverwaltung_tools_menu()
 {

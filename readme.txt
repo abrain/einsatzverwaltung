@@ -42,9 +42,17 @@ __Es wird PHP 5.3.0 oder h&ouml;her ben&ouml;tigt__
 
 == Frequently Asked Questions ==
 
+= Wo finde ich die Anleitung bzw. Dokumentation? =
+
+Die Dokumentation gibt es [hier](http://www.abrain.de/software/einsatzverwaltung/einsatzverwaltung-anleitung/), wenn etwas fehlt oder missverst&auml;ndlich erkl&auml;rt ist, bitte melden.
+
 = Ich f&auml;nde es gut, wenn Funktionalit&auml;t X hinzugef&uuml;gt / verbessert werden k&ouml;nnte =
 
 Die Aufgaben f&uuml;r die kommenden Versionen werden auf [GitHub](https://github.com/abrain/einsatzverwaltung/issues) verwaltet, Feedback ist jederzeit willkommen.
+
+= Wie kann ich den Entwickler erreichen? =
+
+Entweder [per Mail](mailto:kontakt@abrain.de), auf [Twitter](https://twitter.com/einsatzvw) oder [App.net](https://alpha.app.net/einsatzverwaltung). Bugs und Verbesserungsvorschl&auml;ge gerne auch als [Issue auf GitHub](https://github.com/abrain/einsatzverwaltung/issues).
 
 == Changelog ==
 

@@ -227,6 +227,7 @@ function einsatzverwaltung_display_meta_box( $post ) {
     $einsatzort = get_post_meta( $post->ID, $key = 'einsatz_einsatzort', $single = true );
     $einsatzleiter = get_post_meta( $post->ID, $key = 'einsatz_einsatzleiter', $single = true );
     $fehlalarm = get_post_meta( $post->ID, $key = 'einsatz_fehlalarm', $single = true );
+    $mannschaftsstaerke = get_post_meta( $post->ID, $key = 'einsatz_mannschaft', $single = true );
 
     echo '<table><tbody>';
 
@@ -249,6 +250,9 @@ function einsatzverwaltung_display_meta_box( $post ) {
     
     echo '<tr><td><label for="einsatzverwaltung_einsatzleiter">'. __("Einsatzleiter", 'einsatzverwaltung' ) . '</label></td>';
     echo '<td><input type="text" id="einsatzverwaltung_einsatzleiter" name="einsatzverwaltung_einsatzleiter" value="'.esc_attr($einsatzleiter).'" size="20" /></td></tr>';
+    
+    echo '<tr><td><label for="einsatzverwaltung_mannschaft">'. __("Mannschaftsst&auml;rke", 'einsatzverwaltung' ) . '</label></td>';
+    echo '<td><input type="text" id="einsatzverwaltung_mannschaft" name="einsatzverwaltung_mannschaft" value="'.esc_attr($mannschaftsstaerke).'" size="20" /></td></tr>';
     
     echo '</tbody></table>';
 }
@@ -339,6 +343,9 @@ function einsatzverwaltung_save_postdata( $post_id ) {
         // Einsatzleiter validieren
         $einsatzleiter = sanitize_text_field( $_POST['einsatzverwaltung_einsatzleiter'] );
         
+        // Mannschaftsstärke validieren
+        $mannschaftsstaerke = einsatzverwaltung_sanitize_pos_number( $_POST['einsatzverwaltung_mannschaft'] , 0 );
+        
         // Fehlalarm validieren
         $fehlalarm = einsatzverwaltung_sanitize_checkbox(array($_POST, 'einsatzverwaltung_fehlalarm'));
         
@@ -347,6 +354,7 @@ function einsatzverwaltung_save_postdata( $post_id ) {
         update_post_meta($post_id, 'einsatz_einsatzende', ($einsatzende == "" ? "" : date_format($einsatzende, 'Y-m-d H:i')));
         update_post_meta($post_id, 'einsatz_einsatzort', $einsatzort);
         update_post_meta($post_id, 'einsatz_einsatzleiter', $einsatzleiter);
+        update_post_meta($post_id, 'einsatz_mannschaft', $mannschaftsstaerke);
         update_post_meta($post_id, 'einsatz_fehlalarm', $fehlalarm);
         
         if(!empty($update_args)) {
@@ -385,6 +393,20 @@ function einsatzverwaltung_sanitize_checkbox($input)
         return 1;
     } else {
         return 0;
+    }
+}
+
+
+/**
+ * 
+ */
+function einsatzverwaltung_sanitize_pos_number($input, $defaultvalue = 0)
+{
+    $val = intval($input);
+    if(is_numeric($val) && $val >= 0) {
+        return $val;
+    } else {
+        return $defaultvalue;
     }
 }
 
@@ -475,6 +497,8 @@ function einsatzverwaltung_get_einsatzbericht_header($post) {
         
         $einsatzleiter = get_post_meta( $post->ID, $key = 'einsatz_einsatzleiter', $single = true );
         
+        $mannschaft = get_post_meta( $post->ID, $key = 'einsatz_mannschaft', $single = true );
+        
         $fahrzeuge = get_the_terms( $post->ID, 'fahrzeug' );
         if ( $fahrzeuge && ! is_wp_error( $fahrzeuge ) ) {
             $fzg_namen = array();
@@ -510,6 +534,7 @@ function einsatzverwaltung_get_einsatzbericht_header($post) {
         $headerstring .= einsatzverwaltung_get_detail_string('Art:', $art);
         $headerstring .= einsatzverwaltung_get_detail_string('Einsatzort:', $einsatzort);
         $headerstring .= einsatzverwaltung_get_detail_string('Einsatzleiter:', $einsatzleiter);
+        $headerstring .= einsatzverwaltung_get_numeric_detail_string('Mannschaftsst&auml;rke:', $mannschaft, true);
         $headerstring .= einsatzverwaltung_get_detail_string('Fahrzeuge:', $fzg_string);
         $headerstring .= einsatzverwaltung_get_detail_string('Weitere Kr&auml;fte:', $ext_string);
         
@@ -523,7 +548,18 @@ function einsatzverwaltung_get_detail_string($title, $value, $newline = true)
 {
     $hide_empty_details = (get_option('einsatzvw_einsatz_hideemptydetails') == 1 ? true : false);
     
-    if(!$hide_empty_details || $hide_empty_details && !empty($value)) {
+    if(!$hide_empty_details || !empty($value)) {
+        return '<strong>'.$title.'</strong> '.$value.($newline ? '<br>' : '');
+    }
+    return '';
+}
+
+
+function einsatzverwaltung_get_numeric_detail_string($title, $value, $is_zero_empty = true, $newline = true)
+{
+    $hide_empty_details = (get_option('einsatzvw_einsatz_hideemptydetails') == 1 ? true : false);
+    
+    if(!($hide_empty_details && $is_zero_empty && $value == 0)) {
         return '<strong>'.$title.'</strong> '.$value.($newline ? '<br>' : '');
     }
     return '';

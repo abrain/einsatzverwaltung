@@ -31,8 +31,17 @@ function einsatzverwaltung_tool_wpe_page()
     } else {
         if(array_key_exists('submit', $_POST) && array_key_exists('aktion', $_POST) && $_POST['aktion'] == 'analyse') {
             echo "<h2>Analyse</h2>";
-            echo "Analysiere die Datenbank...<br>";
-            // TODO Datenbank analysieren
+            echo "Analysiere die Datenbank...<br><br>";
+            // Datenbank analysieren
+            foreach ( $wpdb->get_col( "DESC " . $tablename, 0 ) as $column_name ) {
+                // Unwichtiges ignorieren
+                if($column_name == 'ID' || $column_name == 'Nr_Jahr' || $column_name == 'Nr_Monat') {
+                    continue;
+                }
+                
+                echo 'Feld <strong>' . $column_name . '</strong> gefunden<br>';
+            }
+            
             // TODO Felder matchen
             // TODO Import starten
         } else {

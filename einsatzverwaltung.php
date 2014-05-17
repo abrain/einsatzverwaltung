@@ -118,6 +118,27 @@ function einsatzverwaltung_create_post_type() {
         'show_in_nav_menus' => false);
     register_taxonomy( 'exteinsatzmittel', 'einsatz', $args_exteinsatzmittel );
     
+    $args_alarmierungsart = array(
+        'label' => 'Alarmierungsart',
+        'labels' => array(
+            'name' => 'Alarmierungsarten',
+            'singular_name' => 'Alarmierungsart',
+            'menu_name' => 'Alarmierungsarten',
+            'all_items' => 'Alle Alarmierungsarten',
+            'edit_item' => 'Alarmierungsart bearbeiten',
+            'view_item' => 'Alarmierungsart ansehen',
+            'update_item' => 'Alarmierungsart aktualisieren',
+            'add_new_item' => 'Neue Alarmierungsart',
+            'new_item_name' => 'Alarmierungsart hinzuf&uuml;gen',
+            'search_items' => 'Alarmierungsart suchen',
+            'popular_items' => 'H&auml;ufige Alarmierungsarten',
+            'separate_items_with_commas' => 'Alarmierungsarten mit Kommata trennen',
+            'add_or_remove_items' => 'Alarmierungsarten hinzuf&uuml;gen oder entfernen',
+            'choose_from_most_used' => 'Aus h&auml;ufigen Alarmierungsarten w&auml;hlen'),
+        'public' => true,
+        'show_in_nav_menus' => false);
+    register_taxonomy( 'alarmierungsart', 'einsatz', $args_alarmierungsart );
+    
     // more rewrite rules
     add_rewrite_rule('einsaetze/([0-9]{4})/?$', 'index.php?post_type=einsatz&year=$matches[1]', 'top');
 }
@@ -404,6 +425,17 @@ function einsatzverwaltung_get_einsatzbericht_header($post) {
         $alarmzeit = get_post_meta($post->ID, 'einsatz_alarmzeit', true);
         $einsatzende = get_post_meta($post->ID, 'einsatz_einsatzende', true);
         
+        $alarmierungsart = get_the_terms( $post->ID, 'alarmierungsart' );
+        if ( $alarmierungsart && ! is_wp_error( $alarmierungsart ) ) {
+            $alarm_namen = array();
+            foreach ( $alarmierungsart as $alarmart ) {
+                $alarm_namen[] = $alarmart->name;
+            }
+            $alarm_string = join( ", ", $alarm_namen );
+        } else {
+            $alarm_string = '';
+        }
+        
         $dauerstring = "?";
         if(!empty($alarmzeit) && !empty($einsatzende)) {
             $timestamp1 = strtotime($alarmzeit);
@@ -473,6 +505,7 @@ function einsatzverwaltung_get_einsatzbericht_header($post) {
         
         $headerstring = "<strong>Datum:</strong> ".$einsatz_datum."<br>";
         $headerstring .= "<strong>Alarmzeit:</strong> ".$einsatz_zeit."<br>";
+        $headerstring .= einsatzverwaltung_get_detail_string('Alarmierungsart:', $alarm_string);
         $headerstring .= einsatzverwaltung_get_detail_string('Dauer:', $dauerstring);
         $headerstring .= einsatzverwaltung_get_detail_string('Art:', $art);
         $headerstring .= einsatzverwaltung_get_detail_string('Einsatzort:', $einsatzort);

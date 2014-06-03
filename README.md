@@ -2,6 +2,8 @@
 ##Plugin zur Verwaltung von Feuerwehreins&auml;tzen
 __Verwendung des Plugins auf Produktivsystemen m&ouml;glich, aber erst ab Version 1.0 empfohlen__
 
+[![Flattr](https://api.flattr.com/button/flattr-badge-large.png)](http://flattr.com/thing/2638688/abraineinsatzverwaltung-on-GitHub)
+
 Dieses Plugin f&uuml;gt WordPress eine neue Beitragsart "Einsatzbericht" hinzu. Dieser kann wie ein normaler Beitrag ver&ouml;ffentlicht werden und somit zus&auml;tzlichen Inhalt wie z.B. Bilder bieten. Analog zu Tags und Kategorien der bekannten Wordpress-Beitr&auml;ge kann man die Einsatzberichte mit Einsatzart und eingesetzten Fahrzeugen versehen. Jeder Bericht bekommt eine eindeutige Einsatznummer und ist mit Alarmzeit und Einsatzdauer versehen.
 
 ### Funktionen im &Uuml;berblick:

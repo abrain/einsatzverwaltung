@@ -30,6 +30,9 @@ __Es wird PHP 5.3.0 oder h&ouml;her ben&ouml;tigt__
 
 ### Changelog
 
+#### 0.5.1
+* Neu: Hinweis bei veralteter PHP-Version
+
 #### 0.5.0
 * Neu: Feld f&uuml;r Alarmierungsart
 * Neu: Feld f&uuml;r Einsatzort

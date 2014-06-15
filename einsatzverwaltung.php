@@ -10,6 +10,8 @@ License: GPLv2
 Text Domain: einsatzverwaltung
 */
 
+check_php_version('5.3.0');
+
 define( 'EINSATZVERWALTUNG__PLUGIN_BASE', plugin_basename(__FILE__) );
 define( 'EINSATZVERWALTUNG__PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'EINSATZVERWALTUNG__PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -753,5 +755,15 @@ function einsatzverwaltung_remove_einsatz_menu( ) {
     }
 }
 add_action( 'admin_menu', 'einsatzverwaltung_remove_einsatz_menu', 999 );
+
+/**
+ * Check the version of PHP running on the server
+ */
+function check_php_version($ver) {
+    $php_version = phpversion();
+    if (version_compare($php_version, $ver) < 0) {
+        wp_die("Das Plugin Einsatzverwaltung ben&ouml;tigt PHP Version $ver oder neuer. Bitte aktualisieren Sie PHP auf Ihrem Server!", 'Veraltete PHP-Version!', array('back_link' => true));
+    }
+}
 
 ?>

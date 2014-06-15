@@ -26,7 +26,7 @@ Das Plugin kann entweder aus WordPress heraus aus dem [Pluginverzeichnis](http:/
 
 In beiden F&auml;llen muss das Plugin erst aktiviert werden, bevor es benutzt werden kann.
 
-__Es wird PHP 5.3.0 oder h&ouml;her ben&ouml;tigt__
+__Es wird PHP 5.3.0 oder neuer ben&ouml;tigt__
 
 ### Changelog
 

@@ -1,0 +1,12 @@
+.einsatzrss:before {
+	display: inline-block;
+	-webkit-font-smoothing: antialiased;
+	font: normal 20px/1 'dashicons';
+	vertical-align: top;
+	margin-right: 5px;
+	margin-right: 0.5rem;
+}
+
+.einsatzrss:before {
+	content: "\f303";
+}

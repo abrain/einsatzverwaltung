@@ -53,7 +53,9 @@ function einsatzverwaltung_create_post_type() {
         ),
         'supports' => array('title', 'editor', 'thumbnail'),
         'show_in_nav_menus' => false,
-        'menu_position' => 5);
+        'menu_position' => 5,
+        'menu_icon' => 'dashicons-media-document'
+    );
     register_post_type( 'einsatz', $args_einsatz);
     
     $args_einsatzart = array(

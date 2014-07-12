@@ -53,9 +53,11 @@ function einsatzverwaltung_create_post_type() {
         ),
         'supports' => array('title', 'editor', 'thumbnail'),
         'show_in_nav_menus' => false,
-        'menu_position' => 5,
-        'menu_icon' => 'dashicons-media-document'
+        'menu_position' => 5
     );
+    if(einsatzverwaltung_is_min_wp_version("3.9")) {
+        $args_einsatz['menu_icon'] = 'dashicons-media-document';
+    }
     register_post_type( 'einsatz', $args_einsatz);
     
     $args_einsatzart = array(
@@ -771,6 +773,31 @@ function check_php_version($ver) {
     if (version_compare($php_version, $ver) < 0) {
         wp_die("Das Plugin Einsatzverwaltung ben&ouml;tigt PHP Version $ver oder neuer. Bitte aktualisieren Sie PHP auf Ihrem Server!", 'Veraltete PHP-Version!', array('back_link' => true));
     }
+}
+
+function einsatzverwaltung_is_min_wp_version($ver) {
+    $currentversionparts = explode(".", get_bloginfo('version'));
+    if(count($currentversionparts) < 3) {
+        $currentversionparts[2] = "0";
+    }
+    
+    $neededversionparts = explode(".", $ver);
+    if(count($neededversionparts) < 3) {
+        $neededversionparts[2] = "0";
+    }
+    
+    if(intval($neededversionparts[0]) > intval($currentversionparts[0])) {
+        return false;
+    } else if(intval($neededversionparts[0]) == intval($currentversionparts[0]) &&
+                intval($neededversionparts[1]) > intval($currentversionparts[1])) {
+        return false;
+    } else if(intval($neededversionparts[0]) == intval($currentversionparts[0]) &&
+                intval($neededversionparts[1]) == intval($currentversionparts[1]) &&
+                intval($neededversionparts[2]) > intval($currentversionparts[2])) {
+        return false;
+    }
+    
+    return true;
 }
 
 ?>

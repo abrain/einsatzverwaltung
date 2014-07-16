@@ -317,7 +317,7 @@ function einsatzverwaltung_save_postdata( $post_id ) {
         }
         
         // Schreibrechte prüfen
-        if ( !current_user_can( 'edit_post', $post_id ) ) {
+        if ( !current_user_can( 'manage_options', $post_id ) ) {
             return;
         }
         

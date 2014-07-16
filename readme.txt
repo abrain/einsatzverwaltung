@@ -4,7 +4,7 @@ Donate link: http://www.abrain.de/software/unterstuetzen/
 Tags: feuerwehr, einsatz
 Requires at least: 3.1.0
 Tested up to: 3.9.1
-Stable tag: 0.5.1
+Stable tag: 0.5.2
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -52,6 +52,14 @@ Die Aufgaben f&uuml;r die kommenden Versionen werden auf [GitHub](https://github
 Entweder [per Mail](mailto:kontakt@abrain.de), auf [Twitter](https://twitter.com/einsatzvw) oder [App.net](https://alpha.app.net/einsatzverwaltung). Bugs und Verbesserungsvorschl&auml;ge gerne auch als [Issue auf GitHub](https://github.com/abrain/einsatzverwaltung/issues).
 
 == Changelog ==
+
+= 0.5.2 =
+* Neu: Widget kann Link zu Feed anzeigen
+* Neu: Widget kann Einsatzort anzeigen
+* Neu: Widget kann Einsatzart anzeigen
+* Neu: Einsatzberichte werden im Dashboard bei "Auf einen Blick" angezeigt
+* Neu: Icon im Adminbereich (ab WP 3.9)
+* Fehlerbehebung: Schreibrechte wurden beim Speichern falsch gepr&uuml;ft
 
 = 0.5.1 =
 * Neu: Hinweis bei veralteter PHP-Version
@@ -105,6 +113,9 @@ Entweder [per Mail](mailto:kontakt@abrain.de), auf [Twitter](https://twitter.com
 * Widget zeigt die aktuellsten X Eins&auml;tze
 
 == Upgrade Notice ==
+
+= 0.5.2 =
+Mehr Einstellungen im Widget
 
 = 0.5.1 =
 Pr&uuml;fung auf veraltete PHP-Version

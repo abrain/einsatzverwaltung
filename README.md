@@ -30,6 +30,14 @@ __Es wird PHP 5.3.0 oder neuer ben&ouml;tigt__
 
 ### Changelog
 
+#### 0.5.2
+* Neu: Widget kann Link zu Feed anzeigen
+* Neu: Widget kann Einsatzort anzeigen
+* Neu: Widget kann Einsatzart anzeigen
+* Neu: Einsatzberichte werden im Dashboard bei "Auf einen Blick" angezeigt
+* Neu: Icon im Adminbereich (ab WP 3.9)
+* Fehlerbehebung: Schreibrechte wurden beim Speichern falsch gepr&uuml;ft
+
 #### 0.5.1
 * Neu: Hinweis bei veralteter PHP-Version
 

@@ -214,6 +214,8 @@ function einsatzverwaltung_enqueue_edit_scripts($hook) {
         wp_enqueue_script('einsatzverwaltung-edit-script', EINSATZVERWALTUNG__SCRIPT_URL . 'einsatzverwaltung-edit.js', array('jquery'));
         wp_enqueue_style('einsatzverwaltung-edit', EINSATZVERWALTUNG__STYLE_URL . 'style-edit.css');
     }
+    
+    wp_enqueue_style('einsatzverwaltung-admin', EINSATZVERWALTUNG__STYLE_URL . 'style-admin.css');
 }
 add_action( 'admin_enqueue_scripts', 'einsatzverwaltung_enqueue_edit_scripts' );
 
@@ -222,6 +224,7 @@ function einsatzverwaltung_enqueue_frontend_style() {
 	wp_enqueue_style( 'einsatzverwaltung-frontend', EINSATZVERWALTUNG__STYLE_URL . 'style-frontend.css' ); 
 }
 add_action( 'wp_enqueue_scripts', 'einsatzverwaltung_enqueue_frontend_style' );
+
 
 /**
  * Inhalt der Metabox zum Bearbeiten der Einsatzdetails
@@ -753,6 +756,43 @@ function einsatzverwaltung_get_jahremiteinsatz()
     }
     return array_keys($jahre);
 }
+
+
+/**
+ * Zahl der Einsatzberichte im Dashboard anzeigen
+ */
+function einsatzverwaltung_add_einsatzberichte_to_dashboard($arr) {
+    if (post_type_exists('einsatz')) {
+        $pt = 'einsatz';
+        $pt_info = get_post_type_object($pt); // get a specific CPT's details
+        $num_posts = wp_count_posts($pt); // retrieve number of posts associated with this CPT
+        $num = number_format_i18n($num_posts->publish); // number of published posts for this CPT
+        $text = _n( $pt_info->labels->singular_name, $pt_info->labels->name, intval($num_posts->publish) ); // singular/plural text label for CPT
+        echo '<li class="'.$pt_info->name.'-count page-count">';
+        echo (current_user_can('manage_options') ? '<a href="edit.php?post_type='.$pt.'">'.$num.' '.$text.'</a>' : '<span>'.$num.' '.$text.'</span>' ).'</li>';
+    }
+}
+add_action('dashboard_glance_items', 'einsatzverwaltung_add_einsatzberichte_to_dashboard'); // since WP 3.8
+
+
+/**
+ * Zahl der Einsatzberichte im Dashboard anzeigen (für WordPress 3.7 und älter)
+ */
+function einsatzverwaltung_add_einsatzberichte_to_dashboard_legacy() {
+    if (post_type_exists('einsatz')) {
+        $pt = 'einsatz';
+        $pt_info = get_post_type_object($pt); // get a specific CPT's details
+        $num_posts = wp_count_posts($pt); // retrieve number of posts associated with this CPT
+        $num = number_format_i18n($num_posts->publish); // number of published posts for this CPT
+        $text = _n( $pt_info->labels->singular_name, $pt_info->labels->name, intval($num_posts->publish) ); // singular/plural text label for CPT
+        echo '<tr><td class="first b">';
+        echo (current_user_can('manage_options') ? '<a href="edit.php?post_type='.$pt.'">'.$num.'</a>' : $num);
+        echo '</td><td class="t">';
+        echo (current_user_can('manage_options') ? '<a href="edit.php?post_type='.$pt.'">'.$text.'</a>' : $text);
+        echo '</td></tr>';
+    }
+}
+add_action('right_now_content_table_end', 'einsatzverwaltung_add_einsatzberichte_to_dashboard_legacy'); // before WP 3.8
 
 
 /*

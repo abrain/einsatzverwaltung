@@ -65,18 +65,6 @@ add_action( 'admin_init', 'einsatzverwaltung_register_settings' );
 
 
 /**
- * Zusätzliche Skripte im Admin-Bereich einbinden
- */
-function einsatzverwaltung_enqueue_settings_style($hook) {
-    if( 'settings_page_'.EVW_SETTINGS_SLUG == $hook ) {
-        // Nur auf der Einstellungsseite einbinden
-        wp_enqueue_style('einsatzverwaltung-admin', EINSATZVERWALTUNG__STYLE_URL . 'style-admin.css');
-    }
-}
-add_action( 'admin_enqueue_scripts', 'einsatzverwaltung_enqueue_settings_style' );
-
-
-/**
  *
  */
 function einsatzverwaltung_echo_settings_checkbox($args)

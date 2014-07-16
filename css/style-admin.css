@@ -7,3 +7,16 @@
     top: 30px;
     right: 30px;
 }
+
+#dashboard_right_now .einsatz-count a:before, #dashboard_right_now .einsatz-count span:before {
+	display: inline-block;
+	-webkit-font-smoothing: antialiased;
+	font: normal 20px/1 'dashicons';
+	vertical-align: top;
+	margin-right: 5px;
+	margin-right: 0.5rem;
+}
+
+#dashboard_right_now .einsatz-count a:before, #dashboard_right_now .einsatz-count span:before {
+    content: "\f497";
+}

@@ -128,17 +128,19 @@ class Einsatzverwaltung_Widget extends WP_Widget {
         echo '<p><label for="'.$this->get_field_id( 'title' ).'">' . __( 'Titel:' , 'einsatzverwaltung') . '</label>';
         echo '<input class="widefat" id="' . $this->get_field_id( 'title' ) . '" name="' . $this->get_field_name( 'title' ) . '" type="text" value="' . esc_attr( $title ).'" /></p>';
         
-        echo '<p><label for="'.$this->get_field_id( 'anzahl' ).'">' . __( 'Anzahl:' , 'einsatzverwaltung') . '</label>';
+        echo '<p><label for="'.$this->get_field_id( 'anzahl' ).'">' . __( 'Anzahl der Eins&auml;tze, die angezeigt werden:' , 'einsatzverwaltung') . '</label>&nbsp;';
         echo '<input id="'.$this->get_field_id( 'anzahl' ).'" name="'.$this->get_field_name( 'anzahl' ).'" type="text" value="'.$anzahl.'" size="3" /></p>';
+        
+        echo '<p><input id="'.$this->get_field_id( 'zeigeFeedlink' ).'" name="'.$this->get_field_name( 'zeigeFeedlink' ).'" type="checkbox" '.($zeigeFeedlink ? 'checked="checked" ' : '').'/>';
+        echo '&nbsp;<label for="'.$this->get_field_id( 'zeigeFeedlink' ).'">' . __( 'Link zum Feed anzeigen' , 'einsatzverwaltung') . '</label></p>';
+        
+        echo '<p><strong>Einsatzdaten:</strong></p>';
 
         echo '<p><input id="'.$this->get_field_id( 'zeigeDatum' ).'" name="'.$this->get_field_name( 'zeigeDatum' ).'" type="checkbox" '.($zeigeDatum ? 'checked="checked" ' : '').'/>';
         echo '&nbsp;<label for="'.$this->get_field_id( 'zeigeDatum' ).'">' . __( 'Datum anzeigen' , 'einsatzverwaltung') . '</label></p>';
 
         echo '<p style="text-indent:1em;"><input id="'.$this->get_field_id( 'zeigeZeit' ).'" name="'.$this->get_field_name( 'zeigeZeit' ).'" type="checkbox" '.($zeigeZeit ? 'checked="checked" ' : '').'/>';
         echo '&nbsp;<label for="'.$this->get_field_id( 'zeigeZeit' ).'">' . __('Zeit anzeigen (nur in Kombination mit Datum)' , 'einsatzverwaltung') . '</label></p>';
-        
-        echo '<p><input id="'.$this->get_field_id( 'zeigeFeedlink' ).'" name="'.$this->get_field_name( 'zeigeFeedlink' ).'" type="checkbox" '.($zeigeFeedlink ? 'checked="checked" ' : '').'/>';
-        echo '&nbsp;<label for="'.$this->get_field_id( 'zeigeFeedlink' ).'">' . __( 'Link zum Feed anzeigen' , 'einsatzverwaltung') . '</label></p>';
     }
 }
 

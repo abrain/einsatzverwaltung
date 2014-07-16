@@ -29,6 +29,7 @@ class Einsatzverwaltung_Widget extends WP_Widget {
         $zeigeZeit = $instance['zeigeZeit'];
         $zeigeFeedlink = (array_key_exists('zeigeFeedlink', $instance) ? $instance['zeigeFeedlink'] : NULL);
         $zeigeOrt = (array_key_exists('zeigeOrt', $instance) ? $instance['zeigeOrt'] : NULL);
+        $zeigeArt = (array_key_exists('zeigeArt', $instance) ? $instance['zeigeArt'] : NULL);
         
         if ( empty( $title ) ) {
           $title = "Letzte Eins&auml;tze";
@@ -60,6 +61,13 @@ class Einsatzverwaltung_Widget extends WP_Widget {
                 if($zeigeZeit) {
                     $zeitformat = get_option('time_format', 'H:i');
                     $letzteEinsaetze .= " | <span class=\"einsatzzeit\">".date_i18n($zeitformat, $timestamp)." Uhr</span>";
+                }
+            }
+            
+            if($zeigeArt) {
+                $einsatzart = einsatzverwaltung_get_einsatzart($p->ID);
+                if($einsatzart) {
+                    $letzteEinsaetze .= "<br><span class=\"einsatzart\">".$einsatzart->name."</span>";
                 }
             }
             
@@ -104,6 +112,7 @@ class Einsatzverwaltung_Widget extends WP_Widget {
         $instance['zeigeDatum'] = $new_instance['zeigeDatum'];
         $instance['zeigeZeit'] = $new_instance['zeigeZeit'];
         $instance['zeigeOrt'] = $new_instance['zeigeOrt'];
+        $instance['zeigeArt'] = $new_instance['zeigeArt'];
         $instance['zeigeFeedlink'] = $new_instance['zeigeFeedlink'];
 
         return $instance;
@@ -135,6 +144,7 @@ class Einsatzverwaltung_Widget extends WP_Widget {
         $zeigeZeit = $instance[ 'zeigeZeit' ];
         $zeigeFeedlink = (array_key_exists('zeigeFeedlink', $instance) ? $instance['zeigeFeedlink'] : NULL);
         $zeigeOrt = (array_key_exists('zeigeOrt', $instance) ? $instance['zeigeOrt'] : NULL);
+        $zeigeArt = (array_key_exists('zeigeArt', $instance) ? $instance['zeigeArt'] : NULL);
         
         echo '<p><label for="'.$this->get_field_id( 'title' ).'">' . __( 'Titel:' , 'einsatzverwaltung') . '</label>';
         echo '<input class="widefat" id="' . $this->get_field_id( 'title' ) . '" name="' . $this->get_field_name( 'title' ) . '" type="text" value="' . esc_attr( $title ).'" /></p>';
@@ -152,6 +162,9 @@ class Einsatzverwaltung_Widget extends WP_Widget {
 
         echo '<p style="text-indent:1em;"><input id="'.$this->get_field_id( 'zeigeZeit' ).'" name="'.$this->get_field_name( 'zeigeZeit' ).'" type="checkbox" '.($zeigeZeit ? 'checked="checked" ' : '').'/>';
         echo '&nbsp;<label for="'.$this->get_field_id( 'zeigeZeit' ).'">' . __('Zeit anzeigen (nur in Kombination mit Datum)' , 'einsatzverwaltung') . '</label></p>';
+        
+        echo '<p><input id="'.$this->get_field_id( 'zeigeArt' ).'" name="'.$this->get_field_name( 'zeigeArt' ).'" type="checkbox" '.($zeigeArt ? 'checked="checked" ' : '').'/>';
+        echo '&nbsp;<label for="'.$this->get_field_id( 'zeigeArt' ).'">' . __( 'Einsatzart anzeigen' , 'einsatzverwaltung') . '</label></p>';
         
         echo '<p><input id="'.$this->get_field_id( 'zeigeOrt' ).'" name="'.$this->get_field_name( 'zeigeOrt' ).'" type="checkbox" '.($zeigeOrt ? 'checked="checked" ' : '').'/>';
         echo '&nbsp;<label for="'.$this->get_field_id( 'zeigeOrt' ).'">' . __( 'Ort anzeigen' , 'einsatzverwaltung') . '</label></p>';

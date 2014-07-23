@@ -1,4 +1,4 @@
-<?
+<?php
 
 class Einsatzverwaltung_Widget extends WP_Widget {
 

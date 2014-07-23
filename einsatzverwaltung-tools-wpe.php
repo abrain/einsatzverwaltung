@@ -1,4 +1,4 @@
-<?
+<?php
 
 define( 'EVW_TOOL_WPE_SLUG', 'einsatzvw-tool-wpe' );
 

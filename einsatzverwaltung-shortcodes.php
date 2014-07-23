@@ -1,4 +1,4 @@
-<?
+<?php
 
 /**
  * Gibt eine Tabelle mit Einsätzen aus dem gegebenen Jahr zurück

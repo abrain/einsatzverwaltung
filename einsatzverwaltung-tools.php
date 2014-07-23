@@ -1,4 +1,4 @@
-<?
+<?php
 
 define( 'EVW_TOOL_ENR_SLUG', 'einsatzvw-tool-enr' );
 

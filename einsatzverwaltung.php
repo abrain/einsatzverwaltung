@@ -1,4 +1,4 @@
-<?
+<?php
 /*
 Plugin Name: Einsatzverwaltung
 Plugin URI: http://www.abrain.de/software/einsatzverwaltung/

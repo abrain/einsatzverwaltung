@@ -1,4 +1,4 @@
-<?
+<?php
 
 define( 'EVW_SETTINGS_SLUG', 'einsatzvw-settings' );
 

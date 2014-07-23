@@ -30,6 +30,9 @@ __Es wird PHP 5.3.0 oder neuer ben&ouml;tigt__
 
 ### Changelog
 
+#### 0.5.3
+* Fehlerbehebung: Plugin funktionierte nicht auf Servern mit PHP-Einstellung short_open_tag = false
+
 #### 0.5.2
 * Neu: Widget kann Link zu Feed anzeigen
 * Neu: Widget kann Einsatzort anzeigen

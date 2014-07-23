@@ -14,9 +14,9 @@ Dieses Plugin f&uuml;gt WordPress eine neue Beitragsart "Einsatzbericht" hinzu. 
 
 ### Geplante Funktionen:
 
-* Import aus wp-einsatz (v0.6)
-* Archivseite für Einsatzberichte als Tabelle darstellen (v1.0)
-* Rechtemanagement (v1.0)
+* Import aus wp-einsatz
+* Archivseite für Einsatzberichte als Tabelle darstellen
+* Rechtemanagement
 * Statistiken
 * ...
 

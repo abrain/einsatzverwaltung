@@ -332,6 +332,7 @@ function einsatzverwaltung_save_postdata( $post_id ) {
             $alarmzeit = date_create($_POST['aa'].'-'.$_POST['mm'].'-'.$_POST['jj'].' '.$_POST['hh'].':'.$_POST['mn'].':'.$_POST['ss']);
         } else {
             $update_args['post_date'] = date_format($alarmzeit, 'Y-m-d H:i:s');
+            $update_args['post_date_gmt'] = get_gmt_from_date( $update_args['post_date'] );
         }
 
         // Einsatznummer validieren

@@ -1,4 +1,4 @@
-.einsatzrss:before {
+.einsatzrss:before, .evw_extlink:after {
 	display: inline-block;
 	-webkit-font-smoothing: antialiased;
 	font: normal 20px/1 'dashicons';
@@ -9,4 +9,9 @@
 
 .einsatzrss:before {
 	content: "\f303";
+}
+
+.evw_extlink:after {
+	content: "\f504";
+    vertical-align: middle;
 }

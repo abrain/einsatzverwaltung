@@ -533,7 +533,16 @@ function einsatzverwaltung_get_einsatzbericht_header($post) {
         if ( $exteinsatzmittel && ! is_wp_error( $exteinsatzmittel ) ) {
             $ext_namen = array();
             foreach ( $exteinsatzmittel as $ext ) {
-                $ext_namen[] = $ext->name;
+                $url = einsatzverwaltung_get_term_field($ext->term_id, 'exteinsatzmittel', 'url');
+                if($url === false) {
+                    $ext_namen[] = $ext->name;
+                } else {
+                    if(einsatzverwaltung_is_min_wp_version("3.9")) {
+                        $ext_namen[] = $ext->name.'<a href="'.$url.'" class="evw_extlink"></a>';
+                    } else {
+                        $ext_namen[] = '<a href="'.$url.'">'.$ext->name.'</a>';
+                    }
+                }
             }
             $ext_string = join( ", ", $ext_namen );
         } else {

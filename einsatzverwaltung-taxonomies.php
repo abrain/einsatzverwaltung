@@ -22,7 +22,7 @@ add_action('exteinsatzmittel_add_form_fields', 'einsatzverwaltung_exteinsatzmitt
  * Zeigt zusätzliche Felder beim Bearbeiten eines externen Einsatzmittels an
  */
 function einsatzverwaltung_exteinsatzmittel_additional_fields_edit($tag) {
-    $exteinsatzmittel_url = get_option('evw_tax_exteinsatzmittel_'.$tag->term_id.'_url', '');
+    $exteinsatzmittel_url = get_option( einsatzverwaltung_get_term_option_key( $tag->term_id, 'exteinsatzmittel', 'url' ), '' );
     
     echo '<tr class="form-field">';
     echo '<th scope="row"><label for="url">URL</label></th>';
@@ -46,7 +46,11 @@ function einsatzverwaltung_save_term($term_id, $tt_id, $taxonomy) {
     foreach($evw_taxonomies[$taxonomy] as $field) {
         if(isset($field) && !empty($field) && isset($_POST[$field])) {
             $value = $_POST[$field];
-            update_option('evw_tax_'.$taxonomy.'_'.$term_id.'_'.$field, $value);
+            if(empty($value)) {
+                delete_option( einsatzverwaltung_get_term_option_key( $term_id, $taxonomy, $field ) );
+            } else {
+                update_option( einsatzverwaltung_get_term_option_key( $term_id, $taxonomy, $field ), $value );
+            }
         }
     }
     
@@ -71,10 +75,25 @@ function einsatzverwaltung_delete_term($term_id, $tt_id, $taxonomy, $deleted_ter
     
     foreach($evw_taxonomies[$taxonomy] as $field) {
         if(isset($field) && !empty($field)) {
-            delete_option('evw_tax_'.$taxonomy.'_'.$term_id.'_'.$field);
+            delete_option( einsatzverwaltung_get_term_option_key( $term_id, $taxonomy, $field ) );
         }
     }
 }
 add_action('delete_term', 'einsatzverwaltung_delete_term', 10, 4);
+
+
+/**
+ * Liefert den Wert eines zusätzlich angelegten Feldes zurück
+ */
+function einsatzverwaltung_get_term_field($term_id, $taxonomy, $field) {
+    return get_option( einsatzverwaltung_get_term_option_key( $term_id, $taxonomy, $field ) );
+}
+
+/**
+ * Liefert den Schlüssel eines zusätzlich angelegten Feldes zurück
+ */
+function einsatzverwaltung_get_term_option_key($term_id, $taxonomy, $field) {
+    return 'evw_tax_'.$taxonomy.'_'.$term_id.'_'.$field;
+}
 
 ?>

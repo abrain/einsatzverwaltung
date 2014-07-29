@@ -18,12 +18,15 @@ define( 'EINSATZVERWALTUNG__PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'EINSATZVERWALTUNG__SCRIPT_URL', EINSATZVERWALTUNG__PLUGIN_URL . 'js/' );
 define( 'EINSATZVERWALTUNG__STYLE_URL', EINSATZVERWALTUNG__PLUGIN_URL . 'css/' );
 define( 'EINSATZVERWALTUNG__EINSATZNR_STELLEN', 3 );
+define( 'EINSATZVERWALTUNG__DBVERSION_OPTION', 'einsatzvw_db_version');
 
 require_once( EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-widget.php' );
 require_once( EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-shortcodes.php' );
 require_once( EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-settings.php' );
 require_once( EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-tools.php' );
 
+global $evw_db_version;
+$evw_db_version = 1;
 
 /**
  * Erzeugt den neuen Beitragstyp Einsatzbericht und die zugehörigen Taxonomien
@@ -805,6 +808,50 @@ function einsatzverwaltung_remove_einsatz_menu( ) {
     }
 }
 add_action( 'admin_menu', 'einsatzverwaltung_remove_einsatz_menu', 999 );
+
+/**
+ * Reparaturen oder Anpassungen der Datenbank nach einem Update
+ */
+function einsatzverwaltung_update_db_check() {
+    global $evw_db_version;
+    $evw_installed_version = get_site_option( EINSATZVERWALTUNG__DBVERSION_OPTION );
+    
+    if($evw_installed_version === false) {
+        $evw_installed_version = 0;
+    } else if(is_numeric($evw_installed_version)) { 
+        $evw_installed_version = intval($evw_installed_version);
+    } else {
+        $evw_installed_version = 0;
+    }
+    
+    if ($evw_installed_version < $evw_db_version) {
+        global $wpdb;
+        
+        if($evw_installed_version == 0) {
+            $berichte = einsatzverwaltung_get_einsatzberichte('');
+
+            // unhook this function so it doesn't loop infinitely
+            remove_action('save_post', 'einsatzverwaltung_save_postdata');
+            
+            foreach($berichte as $bericht) {
+                $post_id = $bericht->ID;
+                if ( ! wp_is_post_revision( $post_id ) ) {
+                    $gmtdate = get_gmt_from_date( $bericht->post_date );
+                    $wpdb->query( $wpdb->prepare("UPDATE $wpdb->posts SET post_date_gmt = %s WHERE ID = %d", $gmtdate, $post_id) );
+                }
+            }
+            
+            // re-hook this function
+            add_action('save_post', 'einsatzverwaltung_save_postdata');
+            
+            $evw_installed_version = 1;
+            update_site_option( EINSATZVERWALTUNG__DBVERSION_OPTION, $evw_installed_version );
+        }
+        
+    }
+}
+add_action( 'plugins_loaded', 'einsatzverwaltung_update_db_check' );
+
 
 /**
  * Check the version of PHP running on the server

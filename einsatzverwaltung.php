@@ -17,8 +17,11 @@ define( 'EINSATZVERWALTUNG__PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'EINSATZVERWALTUNG__PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'EINSATZVERWALTUNG__SCRIPT_URL', EINSATZVERWALTUNG__PLUGIN_URL . 'js/' );
 define( 'EINSATZVERWALTUNG__STYLE_URL', EINSATZVERWALTUNG__PLUGIN_URL . 'css/' );
-define( 'EINSATZVERWALTUNG__EINSATZNR_STELLEN', 3 );
 define( 'EINSATZVERWALTUNG__DBVERSION_OPTION', 'einsatzvw_db_version');
+
+// Standardwerte
+define( 'EINSATZVERWALTUNG__EINSATZNR_STELLEN', 3 );
+define( 'EINSATZVERWALTUNG__D__SHOW_EXTEINSATZMITTEL_ARCHIVE', false );
 
 require_once( EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-widget.php' );
 require_once( EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-shortcodes.php' );
@@ -125,7 +128,11 @@ function einsatzverwaltung_create_post_type() {
             'add_or_remove_items' => 'Externe Einsatzmittel hinzuf&uuml;gen oder entfernen',
             'choose_from_most_used' => 'Aus h&auml;ufig eingesetzten externen Einsatzmitteln w&auml;hlen'),
         'public' => true,
-        'show_in_nav_menus' => false);
+        'show_in_nav_menus' => false,
+        'rewrite' => array(
+            'slug' => 'externe-einsatzmittel'
+        )
+    );
     register_taxonomy( 'exteinsatzmittel', 'einsatz', $args_exteinsatzmittel );
     
     $args_alarmierungsart = array(
@@ -534,14 +541,15 @@ function einsatzverwaltung_get_einsatzbericht_header($post) {
             $ext_namen = array();
             foreach ( $exteinsatzmittel as $ext ) {
                 $url = einsatzverwaltung_get_term_field($ext->term_id, 'exteinsatzmittel', 'url');
-                if($url === false) {
-                    $ext_namen[] = $ext->name;
-                } else {
-                    if(einsatzverwaltung_is_min_wp_version("3.9")) {
-                        $ext_namen[] = $ext->name.'<a href="'.$url.'" class="evw_extlink"></a>';
-                    } else {
-                        $ext_namen[] = '<a href="'.$url.'">'.$ext->name.'</a>';
+                if(einsatzverwaltung_is_min_wp_version("3.9")) {
+                    $link = $ext->name;
+                    if(get_option('einsatzvw_show_exteinsatzmittel_archive', EINSATZVERWALTUNG__D__SHOW_EXTEINSATZMITTEL_ARCHIVE)) {
+                        $link = '<a href="'.get_term_link($ext).'">'.$link.'</a>';
                     }
+                    $link .= ($url === false ? '' : '<a href="'.$url.'" class="evw_extlink"></a>');
+                    $ext_namen[] = $link;
+                } else {
+                    $ext_namen[] = ($url === false ? '' : '<a href="'.$url.'">') . $ext->name . ($url === false ? '' : '</a>');
                 }
             }
             $ext_string = join( ", ", $ext_namen );

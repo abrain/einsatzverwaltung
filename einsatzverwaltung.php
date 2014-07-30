@@ -22,6 +22,7 @@ define( 'EINSATZVERWALTUNG__DBVERSION_OPTION', 'einsatzvw_db_version');
 // Standardwerte
 define( 'EINSATZVERWALTUNG__EINSATZNR_STELLEN', 3 );
 define( 'EINSATZVERWALTUNG__D__SHOW_EXTEINSATZMITTEL_ARCHIVE', false );
+define( 'EINSATZVERWALTUNG__D__SHOW_EINSATZART_ARCHIVE', false );
 
 require_once( EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-widget.php' );
 require_once( EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-shortcodes.php' );
@@ -512,7 +513,14 @@ function einsatzverwaltung_get_einsatzbericht_header($post) {
         }
         
         $einsatzart = einsatzverwaltung_get_einsatzart($post->ID);
-        $art = ($einsatzart ? $einsatzart->name : '');
+        if($einsatzart) {
+            $art = $einsatzart->name;
+            if(get_option('einsatzvw_show_einsatzart_archive', EINSATZVERWALTUNG__D__SHOW_EINSATZART_ARCHIVE)) {
+                $art = '<a href="'.get_term_link($einsatzart).'">'.$art.'</a>';
+            }
+        } else {
+            $art = '';
+        }
         
         $fehlalarm = get_post_meta( $post->ID, $key = 'einsatz_fehlalarm', $single = true );
         if($fehlalarm == 1) {

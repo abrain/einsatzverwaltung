@@ -67,6 +67,7 @@ function einsatzverwaltung_register_settings()
     register_setting( 'einsatzvw_settings', 'einsatzvw_einsatznummer_lfdvorne', 'einsatzverwaltung_sanitize_checkbox' );
     register_setting( 'einsatzvw_settings', 'einsatzvw_einsatz_hideemptydetails', 'einsatzverwaltung_sanitize_checkbox' );
     register_setting( 'einsatzvw_settings', 'einsatzvw_show_exteinsatzmittel_archive', 'einsatzverwaltung_sanitize_checkbox' );
+    register_setting( 'einsatzvw_settings', 'einsatzvw_show_einsatzart_archive', 'einsatzverwaltung_sanitize_checkbox' );
 }
 add_action( 'admin_init', 'einsatzverwaltung_register_settings' );
 
@@ -125,6 +126,8 @@ function einsatzverwaltung_sanitize_einsatznummer_stellen($input)
  */
 function einsatzverwaltung_echo_settings_archive() {
     einsatzverwaltung_echo_settings_checkbox(array('einsatzvw_show_exteinsatzmittel_archive', 'Externe Einsatzkr&auml;fte', EINSATZVERWALTUNG__D__SHOW_EXTEINSATZMITTEL_ARCHIVE));
+    echo '<br>';
+    einsatzverwaltung_echo_settings_checkbox(array('einsatzvw_show_einsatzart_archive', 'Einsatzart', EINSATZVERWALTUNG__D__SHOW_EINSATZART_ARCHIVE));
     echo '<p class="description">F&uuml;r alle hier aktivierten Arten von Einsatzdetails werden im Kopfbereich des Einsatzberichts f&uuml;r alle auftretenden Werte Links zu einer gefilterten Einsatz&uuml;bersicht angezeigt. Beispielsweise kann man damit alle Eins&auml;tze unter Beteiligung einer bestimmten externen Einsatzkraft auflisten lassen.</p>';
 }
 

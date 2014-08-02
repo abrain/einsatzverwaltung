@@ -23,6 +23,7 @@ define( 'EINSATZVERWALTUNG__DBVERSION_OPTION', 'einsatzvw_db_version');
 define( 'EINSATZVERWALTUNG__EINSATZNR_STELLEN', 3 );
 define( 'EINSATZVERWALTUNG__D__SHOW_EXTEINSATZMITTEL_ARCHIVE', false );
 define( 'EINSATZVERWALTUNG__D__SHOW_EINSATZART_ARCHIVE', false );
+define( 'EINSATZVERWALTUNG__D__SHOW_FAHRZEUG_ARCHIVE', false );
 define( 'EINSATZVERWALTUNG__D__HIDE_EMPTY_DETAILS', true );
 
 require_once( EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-widget.php' );
@@ -544,7 +545,13 @@ function einsatzverwaltung_get_einsatzbericht_header($post) {
         if ( $fahrzeuge && ! is_wp_error( $fahrzeuge ) ) {
             $fzg_namen = array();
             foreach ( $fahrzeuge as $fahrzeug ) {
-                $fzg_namen[] = $fahrzeug->name;
+                $fzg_name = $fahrzeug->name;
+                
+                if(get_option('einsatzvw_show_fahrzeug_archive', EINSATZVERWALTUNG__D__SHOW_FAHRZEUG_ARCHIVE)) {
+                    $fzg_name = '<a href="'.get_term_link($fahrzeug).'" title="Eins&auml;tze unter Beteiligung von '.$fzg_name.' anzeigen">'.$fzg_name.'</a>';
+                }
+                
+                $fzg_namen[] = $fzg_name;
             }
             $fzg_string = join( ", ", $fzg_namen );
         } else {

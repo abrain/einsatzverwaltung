@@ -524,6 +524,9 @@ function einsatzverwaltung_get_einsatzbericht_header($post) {
         }
         
         $fehlalarm = get_post_meta( $post->ID, $key = 'einsatz_fehlalarm', $single = true );
+        if(empty($fehlalarm)) {
+            $fehlalarm = 0;
+        }
         if($fehlalarm == 1) {
             $art = (empty($art) ? 'Fehlalarm' : $art.' (Fehlalarm)');
         }
@@ -533,6 +536,9 @@ function einsatzverwaltung_get_einsatzbericht_header($post) {
         $einsatzleiter = get_post_meta( $post->ID, $key = 'einsatz_einsatzleiter', $single = true );
         
         $mannschaft = get_post_meta( $post->ID, $key = 'einsatz_mannschaft', $single = true );
+        if(empty($mannschaft)) {
+            $mannschaft = 0;
+        }
         
         $fahrzeuge = get_the_terms( $post->ID, 'fahrzeug' );
         if ( $fahrzeuge && ! is_wp_error( $fahrzeuge ) ) {

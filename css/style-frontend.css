@@ -14,4 +14,8 @@
 .evw_extlink:after {
 	content: "\f504";
     vertical-align: middle;
+	margin-right: 0px;
+	margin-right: 0rem;
+	margin-left: 2px;
+	margin-left: 0.2rem;
 }

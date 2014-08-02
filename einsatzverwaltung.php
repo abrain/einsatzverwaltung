@@ -555,17 +555,22 @@ function einsatzverwaltung_get_einsatzbericht_header($post) {
         if ( $exteinsatzmittel && ! is_wp_error( $exteinsatzmittel ) ) {
             $ext_namen = array();
             foreach ( $exteinsatzmittel as $ext ) {
-                $url = einsatzverwaltung_get_term_field($ext->term_id, 'exteinsatzmittel', 'url');
-                if(einsatzverwaltung_is_min_wp_version("3.9")) {
-                    $link = $ext->name;
-                    if(get_option('einsatzvw_show_exteinsatzmittel_archive', EINSATZVERWALTUNG__D__SHOW_EXTEINSATZMITTEL_ARCHIVE)) {
-                        $link = '<a href="'.get_term_link($ext).'">'.$link.'</a>';
-                    }
-                    $link .= ($url === false ? '' : '<a href="'.$url.'" class="evw_extlink"></a>');
-                    $ext_namen[] = $link;
-                } else {
-                    $ext_namen[] = ($url === false ? '' : '<a href="'.$url.'">') . $ext->name . ($url === false ? '' : '</a>');
+                $ext_name = $ext->name;
+                
+                if(get_option('einsatzvw_show_exteinsatzmittel_archive', EINSATZVERWALTUNG__D__SHOW_EXTEINSATZMITTEL_ARCHIVE)) {
+                    $ext_name = '<a href="'.get_term_link($ext).'" title="Eins&auml;tze unter Beteiligung von '.$ext_name.' anzeigen">'.$ext_name.'</a>';
                 }
+                
+                $url = einsatzverwaltung_get_term_field($ext->term_id, 'exteinsatzmittel', 'url');
+                if($url !== false) {
+                    if(einsatzverwaltung_is_min_wp_version("3.9")) {
+                        $ext_name .= '<a href="'.$url.'" class="evw_extlink" title="Mehr Informationen zu '.$ext->name.'"></a>';
+                    } else {
+                        $ext_name .= '&nbsp;<a href="'.$url.'" class="evw_extlink_uc" title="Mehr Informationen zu '.$ext->name.'">&#8599;</a>';
+                    }
+                }
+                
+                $ext_namen[] = $ext_name;
             }
             $ext_string = join( ", ", $ext_namen );
         } else {

@@ -518,7 +518,7 @@ function einsatzverwaltung_get_einsatzbericht_header($post) {
         if($einsatzart) {
             $art = $einsatzart->name;
             if(get_option('einsatzvw_show_einsatzart_archive', EINSATZVERWALTUNG__D__SHOW_EINSATZART_ARCHIVE)) {
-                $art = '<a href="'.get_term_link($einsatzart).'">'.$art.'</a>';
+                $art = '<a href="'.get_term_link($einsatzart).'" title="Alle Eins&auml;tze vom Typ '.$art.' anzeigen">'.$art.'</a>';
             }
         } else {
             $art = '';

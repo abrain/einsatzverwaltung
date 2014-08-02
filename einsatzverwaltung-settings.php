@@ -53,7 +53,7 @@ function einsatzverwaltung_register_settings()
         'einsatzverwaltung_echo_settings_checkbox',
         EVW_SETTINGS_SLUG,
         'einsatzvw_settings_view',
-        array('einsatzvw_einsatz_hideemptydetails', 'Nicht ausgef&uuml;llte Details ausblenden (z.B. wenn <em>Weitere Kr&auml;fte</em> leer ist)')
+        array('einsatzvw_einsatz_hideemptydetails', 'Nicht ausgef&uuml;llte Details ausblenden (z.B. wenn <em>Weitere Kr&auml;fte</em> leer ist)', EINSATZVERWALTUNG__D__HIDE_EMPTY_DETAILS)
     );
     add_settings_field( 'einsatzvw_settings_archivelinks',
         'Gefilterte Einsatzübersicht verlinken',

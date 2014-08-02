@@ -23,6 +23,7 @@ define( 'EINSATZVERWALTUNG__DBVERSION_OPTION', 'einsatzvw_db_version');
 define( 'EINSATZVERWALTUNG__EINSATZNR_STELLEN', 3 );
 define( 'EINSATZVERWALTUNG__D__SHOW_EXTEINSATZMITTEL_ARCHIVE', false );
 define( 'EINSATZVERWALTUNG__D__SHOW_EINSATZART_ARCHIVE', false );
+define( 'EINSATZVERWALTUNG__D__HIDE_EMPTY_DETAILS', true );
 
 require_once( EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-widget.php' );
 require_once( EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-shortcodes.php' );
@@ -590,7 +591,7 @@ function einsatzverwaltung_get_einsatzbericht_header($post) {
 
 function einsatzverwaltung_get_detail_string($title, $value, $newline = true)
 {
-    $hide_empty_details = (get_option('einsatzvw_einsatz_hideemptydetails') == 1 ? true : false);
+    $hide_empty_details = einsatzverwaltung_get_hide_empty_details();
     
     if(!$hide_empty_details || !empty($value)) {
         return '<strong>'.$title.'</strong> '.$value.($newline ? '<br>' : '');
@@ -601,12 +602,22 @@ function einsatzverwaltung_get_detail_string($title, $value, $newline = true)
 
 function einsatzverwaltung_get_numeric_detail_string($title, $value, $is_zero_empty = true, $newline = true)
 {
-    $hide_empty_details = (get_option('einsatzvw_einsatz_hideemptydetails') == 1 ? true : false);
+    $hide_empty_details = einsatzverwaltung_get_hide_empty_details();
     
     if(!($hide_empty_details && $is_zero_empty && $value == 0)) {
         return '<strong>'.$title.'</strong> '.$value.($newline ? '<br>' : '');
     }
     return '';
+}
+
+
+function einsatzverwaltung_get_hide_empty_details() {
+    $hide_empty_details = get_option('einsatzvw_einsatz_hideemptydetails');
+    if($hide_empty_details === false) {
+        return EINSATZVERWALTUNG__D__HIDE_EMPTY_DETAILS;
+    } else {
+        return ($hide_empty_details == 1 ? true : false);
+    }
 }
 
 

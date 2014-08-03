@@ -2,8 +2,10 @@
 
 global $evw_taxonomies;
 $evw_taxonomies = array(
-    'exteinsatzmittel' => array('url')
+    'exteinsatzmittel' => array('url'),
+    'fahrzeug' => array('fahrzeugpid')
 );
+
 
 /**
  * Zeigt zusätzliche Felder beim Anlegen eines externen Einsatzmittels an
@@ -31,6 +33,32 @@ function einsatzverwaltung_exteinsatzmittel_additional_fields_edit($tag) {
     echo '</tr>';
 }
 add_action('exteinsatzmittel_edit_form_fields', 'einsatzverwaltung_exteinsatzmittel_additional_fields_edit');
+
+
+/**
+ * Zeigt zusätzliche Felder beim Anlegen eines Fahrzeugs an
+ */
+function einsatzverwaltung_fahrzeug_additional_fields_add() {
+    echo '<div class="form-field">';
+    echo '<label for="tag-fahrzeugpid">Fahrzeugseite</label>';
+    wp_dropdown_pages( array ('name' => 'fahrzeugpid', 'show_option_none' => '- keine -', 'option_none_value' => '') );
+    echo '<p>Seite mit mehr Informationen &uuml;ber das Fahrzeug. Wird in Einsatzberichten mit diesem Fahrzeug verlinkt.</p></div>';
+}
+add_action('fahrzeug_add_form_fields', 'einsatzverwaltung_fahrzeug_additional_fields_add');
+
+
+/**
+ * Zeigt zusätzliche Felder beim Bearbeiten eines Fahrzeugs an
+ */
+function einsatzverwaltung_fahrzeug_additional_fields_edit($tag) {
+    $fahrzeug_pid = get_option( einsatzverwaltung_get_term_option_key( $tag->term_id, 'fahrzeug', 'fahrzeugpid' ), '' );
+    
+    echo '<tr class="form-field">';
+    echo '<th scope="row"><label for="fahrzeugpid">Fahrzeugseite</label></th><td>';
+    wp_dropdown_pages( array ('selected' => $fahrzeug_pid, 'name' => 'fahrzeugpid', 'show_option_none' => '- keine -', 'option_none_value' => '') );
+    echo '<p class="description">Seite mit mehr Informationen &uuml;ber das Fahrzeug. Wird in Einsatzberichten mit diesem Fahrzeug verlinkt.</p></td></tr>';
+}
+add_action('fahrzeug_edit_form_fields', 'einsatzverwaltung_fahrzeug_additional_fields_edit');
 
 
 /**
@@ -68,7 +96,6 @@ function einsatzverwaltung_delete_term($term_id, $tt_id, $taxonomy, $deleted_ter
     }
     
     global $evw_taxonomies;
-    $taxonomy = $_POST['taxonomy'];
     if(!array_key_exists($taxonomy, $evw_taxonomies) || !is_array($evw_taxonomies[$taxonomy])) {
         return;
     }

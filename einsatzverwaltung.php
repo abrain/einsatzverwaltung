@@ -549,6 +549,14 @@ function einsatzverwaltung_get_einsatzbericht_header($post) {
             foreach ( $fahrzeuge as $fahrzeug ) {
                 $fzg_name = $fahrzeug->name;
                 
+                $pageid = einsatzverwaltung_get_term_field($fahrzeug->term_id, 'fahrzeug', 'fahrzeugpid');
+                if($pageid !== false) {
+                    $pageurl = get_permalink($pageid);
+                    if($pageurl !== false) {
+                        $fzg_name = '<a href="'.$pageurl.'" title="Mehr Informationen zu '.$fahrzeug->name.'">'.$fahrzeug->name.'</a>';
+                    }
+                }
+                
                 if(get_option('einsatzvw_show_fahrzeug_archive', EINSATZVERWALTUNG__D__SHOW_FAHRZEUG_ARCHIVE)) {
                     $fzg_name .= '&nbsp;<a href="'.get_term_link($fahrzeug).'" class="fa fa-filter" style="text-decoration:none;" title="Eins&auml;tze unter Beteiligung von '.$fzg_name.' anzeigen"></a>';
                 }

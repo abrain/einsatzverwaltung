@@ -29,6 +29,8 @@ Geplante Funktionen:
 * Statistiken
 * ...
 
+Uses Font Awesome by Dave Gandy - http://fontawesome.io
+
 == Installation ==
 
 Das Plugin kann entweder aus WordPress heraus aus dem [Pluginverzeichnis](http://wordpress.org/plugins/einsatzverwaltung/) installiert werden oder aber durch Hochladen der Plugindateien in das Verzeichnis `/wp-content/plugins/`.

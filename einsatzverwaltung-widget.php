@@ -84,7 +84,7 @@ class Einsatzverwaltung_Widget extends WP_Widget {
         echo $before_widget;
         echo $before_title . $title . $after_title;
         echo ( empty($letzteEinsaetze) ? "Keine Eins&auml;tze" : "<ul>".$letzteEinsaetze."</ul>");
-        echo ( $zeigeFeedlink ? '<p><a class="einsatzrss" href="'.get_post_type_archive_feed_link('einsatz', $feed = '' ).'">Einsatzberichte (Feed)</a></p>' : '');
+        echo ( $zeigeFeedlink ? '<p><span class="fa fa-rss"></span>&nbsp;<a href="'.get_post_type_archive_feed_link('einsatz', $feed = '' ).'">Einsatzberichte (Feed)</a></p>' : '');
         echo $after_widget;
     }
 

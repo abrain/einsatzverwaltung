@@ -229,12 +229,14 @@ function einsatzverwaltung_enqueue_edit_scripts($hook) {
         wp_enqueue_style('einsatzverwaltung-edit', EINSATZVERWALTUNG__STYLE_URL . 'style-edit.css');
     }
     
+    wp_enqueue_style( 'einsatzverwaltung-fontawesome', EINSATZVERWALTUNG__PLUGIN_URL . 'font-awesome/css/font-awesome.min.css' );
     wp_enqueue_style('einsatzverwaltung-admin', EINSATZVERWALTUNG__STYLE_URL . 'style-admin.css');
 }
 add_action( 'admin_enqueue_scripts', 'einsatzverwaltung_enqueue_edit_scripts' );
 
 
 function einsatzverwaltung_enqueue_frontend_style() {
+    wp_enqueue_style( 'einsatzverwaltung-fontawesome', EINSATZVERWALTUNG__PLUGIN_URL . 'font-awesome/css/font-awesome.min.css' );
 	wp_enqueue_style( 'einsatzverwaltung-frontend', EINSATZVERWALTUNG__STYLE_URL . 'style-frontend.css' ); 
 }
 add_action( 'wp_enqueue_scripts', 'einsatzverwaltung_enqueue_frontend_style' );
@@ -518,7 +520,7 @@ function einsatzverwaltung_get_einsatzbericht_header($post) {
         if($einsatzart) {
             $art = $einsatzart->name;
             if(get_option('einsatzvw_show_einsatzart_archive', EINSATZVERWALTUNG__D__SHOW_EINSATZART_ARCHIVE)) {
-                $art = '<a href="'.get_term_link($einsatzart).'" title="Alle Eins&auml;tze vom Typ '.$art.' anzeigen">'.$art.'</a>';
+                $art .= '&nbsp;<a href="'.get_term_link($einsatzart).'" class="fa fa-filter" style="text-decoration:none;" title="Alle Eins&auml;tze vom Typ '.$art.' anzeigen"></a>';
             }
         } else {
             $art = '';
@@ -548,7 +550,7 @@ function einsatzverwaltung_get_einsatzbericht_header($post) {
                 $fzg_name = $fahrzeug->name;
                 
                 if(get_option('einsatzvw_show_fahrzeug_archive', EINSATZVERWALTUNG__D__SHOW_FAHRZEUG_ARCHIVE)) {
-                    $fzg_name = '<a href="'.get_term_link($fahrzeug).'" title="Eins&auml;tze unter Beteiligung von '.$fzg_name.' anzeigen">'.$fzg_name.'</a>';
+                    $fzg_name .= '&nbsp;<a href="'.get_term_link($fahrzeug).'" class="fa fa-filter" style="text-decoration:none;" title="Eins&auml;tze unter Beteiligung von '.$fzg_name.' anzeigen"></a>';
                 }
                 
                 $fzg_namen[] = $fzg_name;
@@ -564,17 +566,13 @@ function einsatzverwaltung_get_einsatzbericht_header($post) {
             foreach ( $exteinsatzmittel as $ext ) {
                 $ext_name = $ext->name;
                 
-                if(get_option('einsatzvw_show_exteinsatzmittel_archive', EINSATZVERWALTUNG__D__SHOW_EXTEINSATZMITTEL_ARCHIVE)) {
-                    $ext_name = '<a href="'.get_term_link($ext).'" title="Eins&auml;tze unter Beteiligung von '.$ext_name.' anzeigen">'.$ext_name.'</a>';
-                }
-                
                 $url = einsatzverwaltung_get_term_field($ext->term_id, 'exteinsatzmittel', 'url');
                 if($url !== false) {
-                    if(einsatzverwaltung_is_min_wp_version("3.9")) {
-                        $ext_name .= '<a href="'.$url.'" class="evw_extlink" title="Mehr Informationen zu '.$ext->name.'"></a>';
-                    } else {
-                        $ext_name .= '&nbsp;<a href="'.$url.'" class="evw_extlink_uc" title="Mehr Informationen zu '.$ext->name.'">&#8599;</a>';
-                    }
+                    $ext_name = '<a href="'.$url.'" title="Mehr Informationen zu '.$ext->name.'">'.$ext->name.'</a>';
+                }
+                
+                if(get_option('einsatzvw_show_exteinsatzmittel_archive', EINSATZVERWALTUNG__D__SHOW_EXTEINSATZMITTEL_ARCHIVE)) {
+                    $ext_name .= '&nbsp;<a href="'.get_term_link($ext).'" class="fa fa-filter" style="text-decoration:none;" title="Eins&auml;tze unter Beteiligung von '.$ext->name.' anzeigen"></a>';
                 }
                 
                 $ext_namen[] = $ext_name;

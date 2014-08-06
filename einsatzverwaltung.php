@@ -531,10 +531,18 @@ function einsatzverwaltung_get_einsatzbericht_header($post) {
         
         $einsatzart = einsatzverwaltung_get_einsatzart($post->ID);
         if($einsatzart) {
-            $art = $einsatzart->name;
-            if(get_option('einsatzvw_show_einsatzart_archive', EINSATZVERWALTUNG__D__SHOW_EINSATZART_ARCHIVE)) {
-                $art .= '&nbsp;<a href="'.get_term_link($einsatzart).'" class="fa fa-filter" style="text-decoration:none;" title="Alle Eins&auml;tze vom Typ '.$art.' anzeigen"></a>';
-            }
+            $art = '';
+            do {
+                if(!empty($art)) {
+                    $art = ' > '.$art;
+                    $einsatzart = get_term($einsatzart->parent, 'einsatzart');
+                }
+                
+                if(get_option('einsatzvw_show_einsatzart_archive', EINSATZVERWALTUNG__D__SHOW_EINSATZART_ARCHIVE)) {
+                    $art = '&nbsp;<a href="'.get_term_link($einsatzart).'" class="fa fa-filter" style="text-decoration:none;" title="Alle Eins&auml;tze vom Typ '.$einsatzart->name.' anzeigen"></a>' . $art;
+                }
+                $art = $einsatzart->name . $art;
+            } while ($einsatzart->parent != 0);
         } else {
             $art = '';
         }

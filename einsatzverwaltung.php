@@ -89,7 +89,9 @@ function einsatzverwaltung_create_post_type() {
             'choose_from_most_used' => 'Aus h&auml;ufigen Einsatzarten w&auml;hlen'),
         'public' => true,
         'show_in_nav_menus' => false,
-        'meta_box_cb' => 'einsatzverwaltung_display_einsatzart_metabox');
+        'meta_box_cb' => 'einsatzverwaltung_display_einsatzart_metabox',
+        'hierarchical' => true
+    );
     register_taxonomy( 'einsatzart', 'einsatz', $args_einsatzart );
     
     $args_fahrzeug = array(
@@ -456,17 +458,28 @@ function einsatzverwaltung_checked($value)
  */
 function einsatzverwaltung_display_einsatzart_metabox( $post ) {
     $einsatzart = einsatzverwaltung_get_einsatzart($post->ID);
-    echo '<select name="tax_input[einsatzart]">';
-    echo '<option value="">' . __('- keine -', 'einsatzverwaltung') . '</option>';
-    $terms = get_terms('einsatzart', array('hide_empty' => false));
-    foreach($terms as $term) {
-        echo '<option';
-        if($einsatzart && $einsatzart->term_id == $term->term_id) {
-            echo ' selected';
-        }
-        echo '>' . $term->name . '</option>';
-    }
-    echo '</select>';
+    einsatzverwaltung_dropdown_einsatzart($einsatzart ? $einsatzart->term_id : 0);
+}
+
+
+/**
+ * Zeigt Dropdown mit Hierarchie für die Einsatzart
+ */
+function einsatzverwaltung_dropdown_einsatzart($selected) {
+    wp_dropdown_categories(array(
+        'show_option_all'    => '',
+        'show_option_none'   => '- keine -',
+        'orderby'            => 'NAME   ', 
+        'order'              => 'ASC',
+        'show_count'         => false,
+        'hide_empty'         => false, 
+        'echo'               => true,
+        'selected'           => $selected,
+        'hierarchical'       => true,
+        'name'               => 'tax_input[einsatzart]',
+        'taxonomy'           => 'einsatzart',
+        'hide_if_empty'      => false
+    ));
 }
 
 

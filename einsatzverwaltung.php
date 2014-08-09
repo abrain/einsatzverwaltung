@@ -722,6 +722,79 @@ add_filter( 'the_excerpt', 'einsatzverwaltung_einsatz_excerpt');
 
 
 /**
+ * Gibt eine Tabelle mit Einsätzen aus dem gegebenen Jahr zurück
+ */
+function einsatzverwaltung_print_einsatzliste( $einsatzjahre = array(), $desc = true, $echo = true )
+{
+    if($desc === false) {
+        sort($einsatzjahre);
+    } else {
+        rsort($einsatzjahre);
+    }
+    
+    $string = "";
+    foreach($einsatzjahre as $einsatzjahr) {
+        $query = new WP_Query(array('year' => $einsatzjahr,
+            'post_type' => 'einsatz',
+            'post_status' => 'publish',
+            'orderby' => 'date',
+            'order' => ($desc === false ? 'ASC' : 'DESC'),
+            'nopaging' => true
+        ));
+        
+        $string .= '<h3>Eins&auml;tze '.$einsatzjahr.'</h3>';
+        if ( $query->have_posts() ) {
+            $string .= "<table class=\"einsatzliste\">";
+            $string .= "<thead><tr>";
+            $string .= "<th>Nummer</th>";
+            $string .= "<th>Datum</th>";
+            $string .= "<th>Zeit</th>";
+            $string .= "<th>Einsatzmeldung</th>";
+            $string .= "</tr></thead>";
+            $string .= "<tbody>";
+        
+            while ( $query->have_posts() ) {
+                $query->next_post();
+            
+                $einsatz_nummer = get_post_field('post_name', $query->post->ID);
+                $alarmzeit = get_post_meta($query->post->ID, 'einsatz_alarmzeit', true);
+                $einsatz_timestamp = strtotime($alarmzeit);
+            
+                $einsatz_datum = date("d.m.Y", $einsatz_timestamp);
+                $einsatz_zeit = date("H:i", $einsatz_timestamp);
+            
+                $string .= "<tr>";
+                $string .= "<td width=\"80\">".$einsatz_nummer."</td>";
+                $string .= "<td width=\"80\">".$einsatz_datum."</td>";
+                $string .= "<td width=\"50\">".$einsatz_zeit."</td>";
+                $string .= "<td>";
+            
+                $post_title = get_the_title($query->post->ID);
+                if ( !empty($post_title) ) {
+                    $string .= "<a href=\"".get_permalink($query->post->ID)."\" rel=\"bookmark\">".$post_title."</a><br>";
+                } else {
+                    $string .= "<a href=\"".get_permalink($query->post->ID)."\" rel=\"bookmark\">(kein Titel)</a><br>";
+                }
+                $string .= "</td>";
+                $string .= "</tr>";
+            }
+        
+            $string .= "</tbody>";
+            $string .= "</table>";
+        } else {
+            $string .= sprintf("Keine Eins&auml;tze im Jahr %s", $einsatzjahr);
+        }
+    }
+    
+    if($echo === true) {
+        echo $string;
+    } else {
+        return $string;
+    }
+}
+
+
+/**
  * Legt fest, welche Spalten bei der Übersicht der Einsatzberichte im
  * Adminbereich angezeigt werden
  */

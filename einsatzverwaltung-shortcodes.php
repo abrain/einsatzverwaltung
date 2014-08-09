@@ -73,22 +73,25 @@ add_shortcode( 'einsatzliste', 'einsatzverwaltung_print_einsatzliste' );
  */
 function einsatzverwaltung_print_einsatzjahre( $atts )
 {
-    global $year;
+    global $year, $wp_rewrite;
     $jahre = einsatzverwaltung_get_jahremiteinsatz();
+    $permalink_structure = get_option( 'permalink_structure' );
     
     $string = "";
     foreach ($jahre as $jahr) {
         if(!empty($string)) {
             $string .= " | ";
         }
-        $string .= '<a href="' . home_url('einsaetze/' . $jahr) . '">';
+        
+        $link = get_post_type_archive_link('einsatz') . ( empty( $permalink_structure ) ? '&year='.$jahr : $jahr );
+        $string .= '<a href="' . $link . '">';
+        
         if($year == $jahr || empty($year) && $jahr == date("Y")) {
-            $string .= "<strong>";
+            $string .= "<strong>".$jahr."</strong>";
+        } else {
+            $string .= $jahr;
         }
-        $string .= $jahr;
-        if($year == $jahr || empty($year) && $jahr == date("Y")) {
-            $string .= "</strong>";
-        }
+        
         $string .= "</a>";
     }
     

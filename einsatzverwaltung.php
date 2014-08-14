@@ -487,8 +487,10 @@ function einsatzverwaltung_dropdown_einsatzart($selected) {
 /**
  * Erzeugt den Kopf eines Einsatzberichts
  */
-function einsatzverwaltung_get_einsatzbericht_header($post) {
+function einsatzverwaltung_get_einsatzbericht_header($post, $may_contain_links = true) {
     if(get_post_type($post) == "einsatz") {
+        $make_links = $may_contain_links;
+        
         $alarmzeit = get_post_meta($post->ID, 'einsatz_alarmzeit', true);
         $einsatzende = get_post_meta($post->ID, 'einsatz_einsatzende', true);
         
@@ -539,7 +541,7 @@ function einsatzverwaltung_get_einsatzbericht_header($post) {
                     $einsatzart = get_term($einsatzart->parent, 'einsatzart');
                 }
                 
-                if(get_option('einsatzvw_show_einsatzart_archive', EINSATZVERWALTUNG__D__SHOW_EINSATZART_ARCHIVE)) {
+                if($make_links && get_option('einsatzvw_show_einsatzart_archive', EINSATZVERWALTUNG__D__SHOW_EINSATZART_ARCHIVE)) {
                     $art = '&nbsp;<a href="'.get_term_link($einsatzart).'" class="fa fa-filter" style="text-decoration:none;" title="Alle Eins&auml;tze vom Typ '.$einsatzart->name.' anzeigen"></a>' . $art;
                 }
                 $art = $einsatzart->name . $art;
@@ -571,16 +573,18 @@ function einsatzverwaltung_get_einsatzbericht_header($post) {
             foreach ( $fahrzeuge as $fahrzeug ) {
                 $fzg_name = $fahrzeug->name;
                 
-                $pageid = einsatzverwaltung_get_term_field($fahrzeug->term_id, 'fahrzeug', 'fahrzeugpid');
-                if($pageid !== false) {
-                    $pageurl = get_permalink($pageid);
-                    if($pageurl !== false) {
-                        $fzg_name = '<a href="'.$pageurl.'" title="Mehr Informationen zu '.$fahrzeug->name.'">'.$fahrzeug->name.'</a>';
+                if($make_links) {
+                    $pageid = einsatzverwaltung_get_term_field($fahrzeug->term_id, 'fahrzeug', 'fahrzeugpid');
+                    if($pageid !== false) {
+                        $pageurl = get_permalink($pageid);
+                        if($pageurl !== false) {
+                            $fzg_name = '<a href="'.$pageurl.'" title="Mehr Informationen zu '.$fahrzeug->name.'">'.$fahrzeug->name.'</a>';
+                        }
                     }
                 }
                 
-                if(get_option('einsatzvw_show_fahrzeug_archive', EINSATZVERWALTUNG__D__SHOW_FAHRZEUG_ARCHIVE)) {
-                    $fzg_name .= '&nbsp;<a href="'.get_term_link($fahrzeug).'" class="fa fa-filter" style="text-decoration:none;" title="Eins&auml;tze unter Beteiligung von '.$fzg_name.' anzeigen"></a>';
+                if($make_links && get_option('einsatzvw_show_fahrzeug_archive', EINSATZVERWALTUNG__D__SHOW_FAHRZEUG_ARCHIVE)) {
+                    $fzg_name .= '&nbsp;<a href="'.get_term_link($fahrzeug).'" class="fa fa-filter" style="text-decoration:none;" title="Eins&auml;tze unter Beteiligung von '.$fahrzeug->name.' anzeigen"></a>';
                 }
                 
                 $fzg_namen[] = $fzg_name;
@@ -596,12 +600,14 @@ function einsatzverwaltung_get_einsatzbericht_header($post) {
             foreach ( $exteinsatzmittel as $ext ) {
                 $ext_name = $ext->name;
                 
-                $url = einsatzverwaltung_get_term_field($ext->term_id, 'exteinsatzmittel', 'url');
-                if($url !== false) {
-                    $ext_name = '<a href="'.$url.'" title="Mehr Informationen zu '.$ext->name.'">'.$ext->name.'</a>';
+                if($make_links) {
+                    $url = einsatzverwaltung_get_term_field($ext->term_id, 'exteinsatzmittel', 'url');
+                    if($url !== false) {
+                        $ext_name = '<a href="'.$url.'" title="Mehr Informationen zu '.$ext->name.'">'.$ext->name.'</a>';
+                    }
                 }
                 
-                if(get_option('einsatzvw_show_exteinsatzmittel_archive', EINSATZVERWALTUNG__D__SHOW_EXTEINSATZMITTEL_ARCHIVE)) {
+                if($make_links && get_option('einsatzvw_show_exteinsatzmittel_archive', EINSATZVERWALTUNG__D__SHOW_EXTEINSATZMITTEL_ARCHIVE)) {
                     $ext_name .= '&nbsp;<a href="'.get_term_link($ext).'" class="fa fa-filter" style="text-decoration:none;" title="Eins&auml;tze unter Beteiligung von '.$ext->name.' anzeigen"></a>';
                 }
                 
@@ -720,6 +726,27 @@ function einsatzverwaltung_einsatz_excerpt($excerpt)
     }
 }
 add_filter( 'the_excerpt', 'einsatzverwaltung_einsatz_excerpt');
+
+
+/**
+ * Gibt den Auszug (Exzerpt) für den Feed zurück
+ */
+function einsatzverwaltung_einsatz_excerpt_feed($excerpt) {
+    global $post;
+    if(get_post_type() == "einsatz") {
+        // Header ohne Links holen
+        $header = einsatzverwaltung_get_einsatzbericht_header($post, false);
+        
+        // Hervorhebung entfernen
+        $header = str_replace("<strong>", "", $header);
+        $header = str_replace("</strong>", "", $header);
+        
+        return $header;
+    } else {
+        return $excerpt;
+    }
+}
+add_filter( 'the_excerpt_rss', 'einsatzverwaltung_einsatz_excerpt_feed' );
 
 
 /**

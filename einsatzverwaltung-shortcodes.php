@@ -6,13 +6,17 @@
 function einsatzverwaltung_shortcode_einsatzliste( $atts )
 {
     extract( shortcode_atts( array('jahr' => date('Y'), 'sort' => 'ab' ), $atts ) );
+    $aktuelles_jahr = date('Y');
     
     $einsatzjahre = array();
     if ($jahr == '*') {
         $einsatzjahre = einsatzverwaltung_get_jahremiteinsatz();
+    } else if (is_numeric($jahr) && $jahr < 0) {
+        for($i=0; $i < abs(intval($jahr)) && $i < $aktuelles_jahr; $i++) {
+            $einsatzjahre[] = $aktuelles_jahr - $i;
+        }
     } else if (empty($jahr) || strlen($jahr)!=4 || !is_numeric($jahr)) {
-        $aktuelles_jahr = date('Y');
-        $string .= '<p>' . sprintf('INFO: Jahreszahl %s ung&uuml;ltig, verwende %s', $jahr, $aktuelles_jahr) . '</p>';
+        echo '<p>' . sprintf('INFO: Jahreszahl %s ung&uuml;ltig, verwende %s', $jahr, $aktuelles_jahr) . '</p>';
         $einsatzjahre = array($aktuelles_jahr);
     } else {
         $einsatzjahre = array($jahr);

@@ -50,10 +50,9 @@ function einsatzverwaltung_register_settings()
     );
     add_settings_field( 'einsatzvw_einsatz_hideemptydetails',
         'Einsatzdetails',
-        'einsatzverwaltung_echo_settings_checkbox',
+        'einsatzverwaltung_echo_settings_empty_details',
         EVW_SETTINGS_SLUG,
-        'einsatzvw_settings_view',
-        array('einsatzvw_einsatz_hideemptydetails', 'Nicht ausgef&uuml;llte Details ausblenden (z.B. wenn <em>Weitere Kr&auml;fte</em> leer ist)', EINSATZVERWALTUNG__D__HIDE_EMPTY_DETAILS)
+        'einsatzvw_settings_view'
     );
     add_settings_field( 'einsatzvw_settings_archivelinks',
         'Gefilterte Einsatzübersicht verlinken',
@@ -126,6 +125,15 @@ function einsatzverwaltung_sanitize_einsatznummer_stellen($input)
     } else {
         return EINSATZVERWALTUNG__EINSATZNR_STELLEN;
     }
+}
+
+
+/**
+ * 
+ */
+function einsatzverwaltung_echo_settings_empty_details() {
+    einsatzverwaltung_echo_settings_checkbox(array('einsatzvw_einsatz_hideemptydetails', 'Nicht ausgef&uuml;llte Details ausblenden', EINSATZVERWALTUNG__D__HIDE_EMPTY_DETAILS));
+    echo '<p class="description">Ein Einsatzdetail gilt als nicht ausgef&uuml;llt, wenn das entsprechende Textfeld oder die entsprechende Liste leer ist. Bei der Mannschaftsst&auml;rke z&auml;hlt auch eine eingetragene 0 als leer.</p>';
 }
 
 

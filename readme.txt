@@ -3,8 +3,8 @@ Contributors: abrain
 Donate link: http://www.abrain.de/software/unterstuetzen/
 Tags: feuerwehr, einsatz
 Requires at least: 3.1.0
-Tested up to: 3.9.1
-Stable tag: 0.5.4
+Tested up to: 3.9.2
+Stable tag: 0.6.0
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,7 +24,6 @@ Funktionen im &Uuml;berblick:
 Geplante Funktionen:
 
 * Import aus wp-einsatz
-* Archivseite für Einsatzberichte als Tabelle darstellen
 * Rechtemanagement
 * Statistiken
 * ...
@@ -43,7 +42,7 @@ __Es wird PHP 5.3.0 oder neuer ben&ouml;tigt__
 
 = Wo finde ich die Anleitung bzw. Dokumentation? =
 
-Die Dokumentation gibt es [hier](http://www.abrain.de/software/einsatzverwaltung/einsatzverwaltung-anleitung/), wenn etwas fehlt oder missverst&auml;ndlich erkl&auml;rt ist, bitte melden.
+Die Dokumentation gibt es [hier](http://www.abrain.de/software/einsatzverwaltung/anleitung/), wenn etwas fehlt oder missverst&auml;ndlich erkl&auml;rt ist, bitte melden.
 
 = Ich f&auml;nde es gut, wenn Funktionalit&auml;t X hinzugef&uuml;gt / verbessert werden k&ouml;nnte =
 
@@ -54,6 +53,20 @@ Die Aufgaben f&uuml;r die kommenden Versionen werden auf [GitHub](https://github
 Entweder [per Mail](mailto:kontakt@abrain.de), auf [Twitter](https://twitter.com/einsatzvw) oder [App.net](https://alpha.app.net/einsatzverwaltung). Bugs und Verbesserungsvorschl&auml;ge gerne auch als [Issue auf GitHub](https://github.com/abrain/einsatzverwaltung/issues).
 
 == Changelog ==
+
+= 0.6.0 =
+* Neu: Fahrzeug kann mit Seite innerhalb Wordpress verkn&uuml;pft werden
+* Neu: Externe Kr&auml;fte k&ouml;nnen mit Link zu Webseite versehen werden
+* Neu: Gefilterte Einsatz&uuml;bersichten f&uuml;r einzelne Fahrzeuge, Einsatzarten oder ext. Kr&auml;fte
+* Verbesserung: Einsatzarten k&ouml;nnen hierarchisch gegliedert werden
+* Verbesserung: Shortcode einsatzliste kann alle Jahre anzeigen
+* Verbesserung: Shortcode einsatzliste kann die letzten X Jahre anzeigen
+* Verbesserung: Leere Einsatzdetails werden standardm&auml;&szlig;ig versteckt
+* Verbesserung: Kurzfassung im Feed jetzt mit Zeilenumbr&uuml;chen
+* Verbesserung: Icons werden mit Font Awesome dargestellt
+* Fehlerbehebung: Shortcode einsatzjahre erzeugte falsche Links bei deaktivierten Permalinks
+* Fehlerbehebung: Seitennavigation im Jahresarchiv war defekt
+* Hinweis: Die neuen Shortcode-Parameter k&ouml;nnen in der [Anleitung](http://www.abrain.de/software/einsatzverwaltung/anleitung/) nachgelesen werden
 
 = 0.5.4 =
 * Fehlerbehebung: Datum f&uuml;r Feed wurde falsch gespeichert
@@ -122,6 +135,9 @@ Entweder [per Mail](mailto:kontakt@abrain.de), auf [Twitter](https://twitter.com
 * Widget zeigt die aktuellsten X Eins&auml;tze
 
 == Upgrade Notice ==
+
+= 0.6.0 =
+Neuerungen, Verbesserungen, Fehlerbehebungen. Da ist f&uuml;r alle was dabei.
 
 = 0.5.4 =
 Korrektur des Datums im Feed, bitte Update erst nach Backup durchf&uuml;hren

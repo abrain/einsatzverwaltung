@@ -5,6 +5,8 @@
 
 Dieses Plugin f&uuml;gt WordPress eine neue Beitragsart "Einsatzbericht" hinzu. Dieser kann wie ein normaler Beitrag ver&ouml;ffentlicht werden und somit zus&auml;tzlichen Inhalt wie z.B. Bilder bieten. Analog zu Tags und Kategorien der bekannten Wordpress-Beitr&auml;ge kann man die Einsatzberichte mit Einsatzart und eingesetzten Fahrzeugen versehen. Jeder Bericht bekommt eine eindeutige Einsatznummer und ist mit Alarmzeit und Einsatzdauer versehen.
 
+[Anleitung](http://www.abrain.de/software/einsatzverwaltung/anleitung/)
+
 ### Funktionen im &Uuml;berblick:
 
 * Einsatzberichte als vollwertige Beitr&auml;ge ver&ouml;ffentlichen
@@ -15,7 +17,6 @@ Dieses Plugin f&uuml;gt WordPress eine neue Beitragsart "Einsatzbericht" hinzu. 
 ### Geplante Funktionen:
 
 * Import aus wp-einsatz
-* Archivseite für Einsatzberichte als Tabelle darstellen
 * Rechtemanagement
 * Statistiken
 * ...
@@ -31,6 +32,20 @@ In beiden F&auml;llen muss das Plugin erst aktiviert werden, bevor es benutzt we
 __Es wird PHP 5.3.0 oder neuer ben&ouml;tigt__
 
 ### Changelog
+
+#### 0.6.0
+* Neu: Fahrzeug kann mit Seite innerhalb Wordpress verkn&uuml;pft werden
+* Neu: Externe Kr&auml;fte k&ouml;nnen mit Link zu Webseite versehen werden
+* Neu: Gefilterte Einsatz&uuml;bersichten f&uuml;r einzelne Fahrzeuge, Einsatzarten oder ext. Kr&auml;fte
+* Verbesserung: Einsatzarten k&ouml;nnen hierarchisch gegliedert werden
+* Verbesserung: Shortcode einsatzliste kann alle Jahre anzeigen
+* Verbesserung: Shortcode einsatzliste kann die letzten X Jahre anzeigen
+* Verbesserung: Leere Einsatzdetails werden standardm&auml;&szlig;ig versteckt
+* Verbesserung: Kurzfassung im Feed jetzt mit Zeilenumbr&uuml;chen
+* Verbesserung: Icons werden mit Font Awesome dargestellt
+* Fehlerbehebung: Shortcode einsatzjahre erzeugte falsche Links bei deaktivierten Permalinks
+* Fehlerbehebung: Seitennavigation im Jahresarchiv war defekt
+* Hinweis: Die neuen Shortcode-Parameter k&ouml;nnen in der [Anleitung](http://www.abrain.de/software/einsatzverwaltung/anleitung/) nachgelesen werden
 
 #### 0.5.4
 * Fehlerbehebung: Datum f&uuml;r Feed wurde falsch gespeichert

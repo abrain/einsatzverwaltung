@@ -162,7 +162,8 @@ function einsatzverwaltung_create_post_type() {
     register_taxonomy( 'alarmierungsart', 'einsatz', $args_alarmierungsart );
     
     // more rewrite rules
-    add_rewrite_rule('einsaetze/([0-9]{4})/?$', 'index.php?post_type=einsatz&year=$matches[1]', 'top');
+    add_rewrite_rule($args_einsatz['rewrite']['slug'] . '/(\d{4})/page/(\d{1,})/?$', 'index.php?post_type=einsatz&year=$matches[1]&paged=$matches[2]', 'top');
+    add_rewrite_rule($args_einsatz['rewrite']['slug'] . '/(\d{4})/?$', 'index.php?post_type=einsatz&year=$matches[1]', 'top');
 }
 add_action( 'init', 'einsatzverwaltung_create_post_type' );
 

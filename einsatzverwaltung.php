@@ -25,6 +25,7 @@ define( 'EINSATZVERWALTUNG__D__SHOW_EXTEINSATZMITTEL_ARCHIVE', false );
 define( 'EINSATZVERWALTUNG__D__SHOW_EINSATZART_ARCHIVE', false );
 define( 'EINSATZVERWALTUNG__D__SHOW_FAHRZEUG_ARCHIVE', false );
 define( 'EINSATZVERWALTUNG__D__HIDE_EMPTY_DETAILS', true );
+define( 'EINSATZVERWALTUNG__D__SHOW_LINKS_IN_EXCERPT', false );
 
 require_once( EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-widget.php' );
 require_once( EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-shortcodes.php' );
@@ -719,7 +720,7 @@ function einsatzverwaltung_einsatz_excerpt($excerpt)
 {
     global $post;
     if(get_post_type() == "einsatz") {
-        return einsatzverwaltung_get_einsatzbericht_header($post);
+        return einsatzverwaltung_get_einsatzbericht_header( $post, get_option('einsatzvw_show_links_in_excerpt', EINSATZVERWALTUNG__D__SHOW_LINKS_IN_EXCERPT) );
     }
     else {
         return $excerpt;

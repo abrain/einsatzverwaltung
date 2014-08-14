@@ -61,6 +61,12 @@ function einsatzverwaltung_register_settings()
         EVW_SETTINGS_SLUG,
         'einsatzvw_settings_view'
     );
+    add_settings_field( 'einsatzvw_settings_excerpt',
+        'Auszug / Exzerpt',
+        'einsatzverwaltung_echo_settings_excerpt',
+        EVW_SETTINGS_SLUG,
+        'einsatzvw_settings_view'
+    );
     
     // Registration
     register_setting( 'einsatzvw_settings', 'einsatzvw_einsatznummer_stellen', 'einsatzverwaltung_sanitize_einsatznummer_stellen' );
@@ -69,6 +75,7 @@ function einsatzverwaltung_register_settings()
     register_setting( 'einsatzvw_settings', 'einsatzvw_show_exteinsatzmittel_archive', 'einsatzverwaltung_sanitize_checkbox' );
     register_setting( 'einsatzvw_settings', 'einsatzvw_show_einsatzart_archive', 'einsatzverwaltung_sanitize_checkbox' );
     register_setting( 'einsatzvw_settings', 'einsatzvw_show_fahrzeug_archive', 'einsatzverwaltung_sanitize_checkbox' );
+    register_setting( 'einsatzvw_settings', 'einsatzvw_show_links_in_excerpt', 'einsatzverwaltung_sanitize_checkbox' );
 }
 add_action( 'admin_init', 'einsatzverwaltung_register_settings' );
 
@@ -132,6 +139,15 @@ function einsatzverwaltung_echo_settings_archive() {
     echo '<br>';
     einsatzverwaltung_echo_settings_checkbox(array('einsatzvw_show_fahrzeug_archive', 'Fahrzeuge', EINSATZVERWALTUNG__D__SHOW_FAHRZEUG_ARCHIVE));
     echo '<p class="description">F&uuml;r alle hier aktivierten Arten von Einsatzdetails werden im Kopfbereich des Einsatzberichts f&uuml;r alle auftretenden Werte Links zu einer gefilterten Einsatz&uuml;bersicht angezeigt. Beispielsweise kann man damit alle Eins&auml;tze unter Beteiligung einer bestimmten externen Einsatzkraft auflisten lassen.</p>';
+}
+
+
+/**
+ * 
+ */
+function einsatzverwaltung_echo_settings_excerpt() {
+    einsatzverwaltung_echo_settings_checkbox(array('einsatzvw_show_links_in_excerpt', 'Auszug darf Links enthalten', EINSATZVERWALTUNG__D__SHOW_LINKS_IN_EXCERPT));
+    echo '<p class="description">Welche Links tats&auml;chlich generiert werden, h&auml;ngt von den anderen Einstellungen ab. Der Auszug im Newsfeed enth&auml;lt niemals Links.</p>';
 }
 
 

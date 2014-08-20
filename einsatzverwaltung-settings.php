@@ -168,10 +168,11 @@ function einsatzverwaltung_settings_page()
     wp_die( __( 'You do not have sufficient permissions to manage options for this site.' ) );
     
     echo '<div id="einsatzverwaltung_contactinfo">';
-    echo '<h3>Entwicklerkontakt</h3>';
+    echo '<h3>Entwicklerkontakt &amp; Social Media</h3>';
+    echo 'eMail: <a href="mailto:kontakt@abrain.de">kontakt@abrain.de</a><br>';
     echo 'Twitter: <a href="https://twitter.com/einsatzvw">@einsatzvw</a><br>';
     echo 'App.net: <a href="https://alpha.app.net/einsatzverwaltung">@einsatzverwaltung</a><br>';
-    echo 'eMail: <a href="mailto:kontakt@abrain.de">kontakt@abrain.de</a>';
+    echo 'Facebook: <a href="https://www.facebook.com/einsatzverwaltung/">Einsatzverwaltung</a>';
     echo '</div>';
     
     echo '<div class="wrap">';

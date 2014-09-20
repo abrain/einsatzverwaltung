@@ -3,7 +3,7 @@ Contributors: abrain
 Donate link: http://www.abrain.de/software/unterstuetzen/
 Tags: feuerwehr, einsatz
 Requires at least: 3.1.0
-Tested up to: 3.9.2
+Tested up to: 4.0
 Stable tag: 0.6.0
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html

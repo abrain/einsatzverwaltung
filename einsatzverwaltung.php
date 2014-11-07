@@ -241,7 +241,6 @@ add_action( 'admin_enqueue_scripts', 'einsatzverwaltung_enqueue_edit_scripts' );
 
 function einsatzverwaltung_enqueue_frontend_style() {
     wp_enqueue_style( 'einsatzverwaltung-fontawesome', EINSATZVERWALTUNG__PLUGIN_URL . 'font-awesome/css/font-awesome.min.css' );
-	wp_enqueue_style( 'einsatzverwaltung-frontend', EINSATZVERWALTUNG__STYLE_URL . 'style-frontend.css' ); 
 }
 add_action( 'wp_enqueue_scripts', 'einsatzverwaltung_enqueue_frontend_style' );
 

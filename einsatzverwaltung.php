@@ -786,7 +786,7 @@ add_filter( 'the_excerpt_rss', 'einsatzverwaltung_einsatz_excerpt_feed' );
 /**
  * Gibt eine Tabelle mit Einsätzen aus dem gegebenen Jahr zurück
  */
-function einsatzverwaltung_print_einsatzliste( $einsatzjahre = array(), $desc = true, $echo = true )
+function einsatzverwaltung_print_einsatzliste( $einsatzjahre = array(), $desc = true, $echo = true, $splitmonths = false )
 {
     if($desc === false) {
         sort($einsatzjahre);
@@ -806,15 +806,18 @@ function einsatzverwaltung_print_einsatzliste( $einsatzjahre = array(), $desc = 
         
         $string .= '<h3>Eins&auml;tze '.$einsatzjahr.'</h3>';
         if ( $query->have_posts() ) {
-            $string .= "<table class=\"einsatzliste\">";
-            $string .= "<thead><tr>";
-            $string .= "<th>Nummer</th>";
-            $string .= "<th>Datum</th>";
-            $string .= "<th>Zeit</th>";
-            $string .= "<th>Einsatzmeldung</th>";
-            $string .= "</tr></thead>";
-            $string .= "<tbody>";
-        
+            if( !$splitmonths ) {
+                $string .= "<table class=\"einsatzliste\">";
+                $string .= "<thead><tr>";
+                $string .= "<th width=\"80\">Nummer</th>";
+                $string .= "<th width=\"80\">Datum</th>";
+                $string .= "<th width=\"50\">Zeit</th>";
+                $string .= "<th>Einsatzmeldung</th>";
+                $string .= "</tr></thead>";
+                $string .= "<tbody>";
+            }
+            
+            $oldmonth = 0;
             while ( $query->have_posts() ) {
                 $query->next_post();
             
@@ -824,6 +827,24 @@ function einsatzverwaltung_print_einsatzliste( $einsatzjahre = array(), $desc = 
             
                 $einsatz_datum = date("d.m.Y", $einsatz_timestamp);
                 $einsatz_zeit = date("H:i", $einsatz_timestamp);
+                $month = date("m", $einsatz_timestamp);
+                
+                if($splitmonths && $month != $oldmonth) {
+                    if($oldmonth != 0) {
+                        // Nicht im ersten Durchlauf
+                        $string .= "</tbody>";
+                        $string .= "</table>";
+                    }
+                    $string .= '<h5>' . date_i18n('F', $einsatz_timestamp) . '</h5>';
+                    $string .= "<table class=\"einsatzliste\">";
+                    $string .= "<thead><tr>";
+                    $string .= "<th width=\"80\">Nummer</th>";
+                    $string .= "<th width=\"80\">Datum</th>";
+                    $string .= "<th width=\"50\">Zeit</th>";
+                    $string .= "<th>Einsatzmeldung</th>";
+                    $string .= "</tr></thead>";
+                    $string .= "<tbody>";
+                }
             
                 $string .= "<tr>";
                 $string .= "<td width=\"80\">".$einsatz_nummer."</td>";
@@ -839,6 +860,8 @@ function einsatzverwaltung_print_einsatzliste( $einsatzjahre = array(), $desc = 
                 }
                 $string .= "</td>";
                 $string .= "</tr>";
+                
+                $oldmonth = $month;
             }
         
             $string .= "</tbody>";

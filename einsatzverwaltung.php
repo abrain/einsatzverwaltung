@@ -36,6 +36,12 @@ require_once( EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-taxonomies.php'
 global $evw_db_version;
 $evw_db_version = 1;
 
+global $evw_caps;
+$evw_caps = array( 'edit_einsatzberichte', 'edit_private_einsatzberichte', 'edit_published_einsatzberichte',
+                    'edit_others_einsatzberichte', 'publish_einsatzberichte', 'read_private_einsatzberichte',
+                    'delete_einsatzberichte', 'delete_private_einsatzberichte', 'delete_published_einsatzberichte',
+                    'delete_others_einsatzberichte' );
+
 /**
  * Erzeugt den neuen Beitragstyp Einsatzbericht und die zugehörigen Taxonomien
  */
@@ -64,6 +70,8 @@ function einsatzverwaltung_create_post_type() {
         ),
         'supports' => array('title', 'editor', 'thumbnail'),
         'show_in_nav_menus' => false,
+        'capability_type' => array('einsatzbericht', 'einsatzberichte'),
+        'map_meta_cap' => true,
         'menu_position' => 5
     );
     if(einsatzverwaltung_is_min_wp_version("3.9")) {
@@ -91,6 +99,12 @@ function einsatzverwaltung_create_post_type() {
         'public' => true,
         'show_in_nav_menus' => false,
         'meta_box_cb' => 'einsatzverwaltung_display_einsatzart_metabox',
+        'capabilities' => array (
+            'manage_terms' => 'edit_einsatzberichte',
+        	'edit_terms' => 'edit_einsatzberichte',
+        	'delete_terms' => 'edit_einsatzberichte',
+        	'assign_terms' => 'edit_einsatzberichte'
+        ),
         'hierarchical' => true
     );
     register_taxonomy( 'einsatzart', 'einsatz', $args_einsatzart );
@@ -113,7 +127,14 @@ function einsatzverwaltung_create_post_type() {
             'add_or_remove_items' => 'Fahrzeuge hinzuf&uuml;gen oder entfernen',
             'choose_from_most_used' => 'Aus h&auml;ufig eingesetzten Fahrzeugen w&auml;hlen'),
         'public' => true,
-        'show_in_nav_menus' => false);
+        'show_in_nav_menus' => false,
+        'capabilities' => array (
+            'manage_terms' => 'edit_einsatzberichte',
+        	'edit_terms' => 'edit_einsatzberichte',
+        	'delete_terms' => 'edit_einsatzberichte',
+        	'assign_terms' => 'edit_einsatzberichte'
+        )
+    );
     register_taxonomy( 'fahrzeug', 'einsatz', $args_fahrzeug );
     
     $args_exteinsatzmittel = array(
@@ -135,6 +156,12 @@ function einsatzverwaltung_create_post_type() {
             'choose_from_most_used' => 'Aus h&auml;ufig eingesetzten externen Einsatzmitteln w&auml;hlen'),
         'public' => true,
         'show_in_nav_menus' => false,
+        'capabilities' => array (
+            'manage_terms' => 'edit_einsatzberichte',
+        	'edit_terms' => 'edit_einsatzberichte',
+        	'delete_terms' => 'edit_einsatzberichte',
+        	'assign_terms' => 'edit_einsatzberichte'
+        ),
         'rewrite' => array(
             'slug' => 'externe-einsatzmittel'
         )
@@ -159,7 +186,14 @@ function einsatzverwaltung_create_post_type() {
             'add_or_remove_items' => 'Alarmierungsarten hinzuf&uuml;gen oder entfernen',
             'choose_from_most_used' => 'Aus h&auml;ufigen Alarmierungsarten w&auml;hlen'),
         'public' => true,
-        'show_in_nav_menus' => false);
+        'show_in_nav_menus' => false,
+        'capabilities' => array (
+            'manage_terms' => 'edit_einsatzberichte',
+        	'edit_terms' => 'edit_einsatzberichte',
+        	'delete_terms' => 'edit_einsatzberichte',
+        	'assign_terms' => 'edit_einsatzberichte'
+        )
+    );
     register_taxonomy( 'alarmierungsart', 'einsatz', $args_alarmierungsart );
     
     // more rewrite rules
@@ -336,7 +370,7 @@ function einsatzverwaltung_save_postdata( $post_id ) {
         }
         
         // Schreibrechte prüfen
-        if ( !current_user_can( 'manage_options', $post_id ) ) {
+        if ( !current_user_can( 'edit_einsatzbericht', $post_id ) ) {
             return;
         }
         
@@ -956,7 +990,7 @@ function einsatzverwaltung_add_einsatzberichte_to_dashboard($arr) {
         $num = number_format_i18n($num_posts->publish); // number of published posts for this CPT
         $text = _n( $pt_info->labels->singular_name, $pt_info->labels->name, intval($num_posts->publish) ); // singular/plural text label for CPT
         echo '<li class="'.$pt_info->name.'-count page-count">';
-        echo (current_user_can('manage_options') ? '<a href="edit.php?post_type='.$pt.'">'.$num.' '.$text.'</a>' : '<span>'.$num.' '.$text.'</span>' ).'</li>';
+        echo (current_user_can('edit_einsatzberichte') ? '<a href="edit.php?post_type='.$pt.'">'.$num.' '.$text.'</a>' : '<span>'.$num.' '.$text.'</span>' ).'</li>';
     }
 }
 add_action('dashboard_glance_items', 'einsatzverwaltung_add_einsatzberichte_to_dashboard'); // since WP 3.8
@@ -973,24 +1007,14 @@ function einsatzverwaltung_add_einsatzberichte_to_dashboard_legacy() {
         $num = number_format_i18n($num_posts->publish); // number of published posts for this CPT
         $text = _n( $pt_info->labels->singular_name, $pt_info->labels->name, intval($num_posts->publish) ); // singular/plural text label for CPT
         echo '<tr><td class="first b">';
-        echo (current_user_can('manage_options') ? '<a href="edit.php?post_type='.$pt.'">'.$num.'</a>' : $num);
+        echo (current_user_can('edit_einsatzberichte') ? '<a href="edit.php?post_type='.$pt.'">'.$num.'</a>' : $num);
         echo '</td><td class="t">';
-        echo (current_user_can('manage_options') ? '<a href="edit.php?post_type='.$pt.'">'.$text.'</a>' : $text);
+        echo (current_user_can('edit_einsatzberichte') ? '<a href="edit.php?post_type='.$pt.'">'.$text.'</a>' : $text);
         echo '</td></tr>';
     }
 }
 add_action('right_now_content_table_end', 'einsatzverwaltung_add_einsatzberichte_to_dashboard_legacy'); // before WP 3.8
 
-
-/*
- * Einsatzberichte-Menü vor Nicht-Administratoren verstecken
- */
-function einsatzverwaltung_remove_einsatz_menu( ) {
-    if ( !current_user_can( 'manage_options' ) ) {
-        remove_menu_page( 'edit.php?post_type=einsatz' );
-    }
-}
-add_action( 'admin_menu', 'einsatzverwaltung_remove_einsatz_menu', 999 );
 
 /**
  * Reparaturen oder Anpassungen der Datenbank nach einem Update

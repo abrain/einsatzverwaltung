@@ -40,6 +40,13 @@ function einsatzverwaltung_register_settings()
         },
         EVW_SETTINGS_SLUG
     );
+    add_settings_section( 'einsatzvw_settings_caps',
+        'Berechtigungen',
+        function() {
+            echo '<p>Hier kann festgelegt werden, welche Benutzer die Einsatzberichte verwalten k&ouml;nnen.</p>';
+        },
+        EVW_SETTINGS_SLUG
+    );
     
     // Fields
     add_settings_field( 'einsatzvw_einsatznummer_stellen',
@@ -66,6 +73,12 @@ function einsatzverwaltung_register_settings()
         EVW_SETTINGS_SLUG,
         'einsatzvw_settings_view'
     );
+    add_settings_field( 'einsatzvw_settings_caps_roles',
+        'Rollen',
+        'einsatzverwaltung_echo_settings_caps_roles',
+        EVW_SETTINGS_SLUG,
+        'einsatzvw_settings_caps'
+    );
     
     // Registration
     register_setting( 'einsatzvw_settings', 'einsatzvw_einsatznummer_stellen', 'einsatzverwaltung_sanitize_einsatznummer_stellen' );
@@ -75,6 +88,13 @@ function einsatzverwaltung_register_settings()
     register_setting( 'einsatzvw_settings', 'einsatzvw_show_einsatzart_archive', 'einsatzverwaltung_sanitize_checkbox' );
     register_setting( 'einsatzvw_settings', 'einsatzvw_show_fahrzeug_archive', 'einsatzverwaltung_sanitize_checkbox' );
     register_setting( 'einsatzvw_settings', 'einsatzvw_show_links_in_excerpt', 'einsatzverwaltung_sanitize_checkbox' );
+    
+    $roles = get_editable_roles();
+    if(!empty($roles)) {
+        foreach($roles as $role_slug => $role) {
+            register_setting( 'einsatzvw_settings', 'einsatzvw_cap_roles_' . $role_slug, 'einsatzverwaltung_sanitize_checkbox' );
+        }
+    }
 }
 add_action( 'admin_init', 'einsatzverwaltung_register_settings' );
 
@@ -160,6 +180,23 @@ function einsatzverwaltung_echo_settings_excerpt() {
 
 
 /**
+ * 
+ */
+function einsatzverwaltung_echo_settings_caps_roles() {
+    $roles = get_editable_roles();
+    if(empty($roles)) {
+        echo "Es konnten keine Rollen gefunden werden.";
+    } else {
+        foreach($roles as $role_slug => $role) {
+            einsatzverwaltung_echo_settings_checkbox( array( 'einsatzvw_cap_roles_' . $role_slug, translate_user_role( $role['name'] ), false ) );
+            echo '<br>';
+        }
+        echo '<p class="description">Die Benutzer mit den hier ausgew&auml;hlten Rollen haben alle Rechte, um die Einsatzberichte und die zugeh&ouml;rigen Eigenschaften (z.B. Einsatzarten) zu verwalten. Zu dieser Einstellungsseite und den Werkzeugen haben in jedem Fall nur Administratoren Zugang.</p>';
+    }
+}
+
+
+/**
  * Generiert den Inhalt der Einstellungsseite
  */
 function einsatzverwaltung_settings_page()
@@ -177,6 +214,19 @@ function einsatzverwaltung_settings_page()
     
     echo '<div class="wrap">';
     echo '<h2>Einstellungen &rsaquo; Einsatzverwaltung</h2>';
+    
+    // Berechtigungen aktualisieren
+    $roles = get_editable_roles();
+    if(!empty($roles)) {
+        global $evw_caps;
+        foreach($roles as $role_slug => $role) {
+            $role_obj = get_role($role_slug);
+            $allowed = get_option( 'einsatzvw_cap_roles_' . $role_slug, false );
+            foreach($evw_caps as $cap) {
+                $role_obj->add_cap( $cap, $allowed );
+            }   
+        }
+    }
     
     echo '<form method="post" action="options.php">';
     echo settings_fields( 'einsatzvw_settings' );

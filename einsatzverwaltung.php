@@ -34,7 +34,7 @@ require_once( EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-tools.php' );
 require_once( EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-taxonomies.php' );
 
 global $evw_db_version;
-$evw_db_version = 1;
+$evw_db_version = 2;
 
 global $evw_caps;
 $evw_caps = array( 'edit_einsatzberichte', 'edit_private_einsatzberichte', 'edit_published_einsatzberichte',
@@ -1075,6 +1075,18 @@ function einsatzverwaltung_update_db_check() {
             add_action('save_post', 'einsatzverwaltung_save_postdata');
             
             $evw_installed_version = 1;
+            update_site_option( EINSATZVERWALTUNG__DBVERSION_OPTION, $evw_installed_version );
+        }
+        
+        if($evw_installed_version == 1) {
+            global $evw_caps;
+            update_option('einsatzvw_cap_roles_administrator', 1);
+            $role_obj = get_role('administrator');
+            foreach($evw_caps as $cap) {
+                $role_obj->add_cap( $cap );
+            } 
+            
+            $evw_installed_version = 2;
             update_site_option( EINSATZVERWALTUNG__DBVERSION_OPTION, $evw_installed_version );
         }
         

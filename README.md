@@ -19,7 +19,6 @@ Die prim&auml;re Zielgruppe des Plugins sind Feuerwehren im deutschsprachigen Ra
 ### Geplante Funktionen:
 
 * Import aus wp-einsatz
-* Rechtemanagement
 * Statistiken
 * ...
 

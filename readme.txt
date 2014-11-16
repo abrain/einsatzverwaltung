@@ -4,7 +4,7 @@ Donate link: http://www.abrain.de/software/unterstuetzen/
 Tags: feuerwehr, einsatz
 Requires at least: 3.1.0
 Tested up to: 4.0
-Stable tag: 0.6.0
+Stable tag: 0.7.0
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -26,7 +26,6 @@ Funktionen im &Uuml;berblick:
 Geplante Funktionen:
 
 * Import aus wp-einsatz
-* Rechtemanagement
 * Statistiken
 * ...
 
@@ -55,6 +54,12 @@ Die Aufgaben f&uuml;r die kommenden Versionen werden auf [GitHub](https://github
 Entweder [per Mail](mailto:kontakt@abrain.de), auf [Twitter](https://twitter.com/einsatzvw) oder [App.net](https://alpha.app.net/einsatzverwaltung). Bugs und Verbesserungsvorschl&auml;ge gerne auch als [Issue auf GitHub](https://github.com/abrain/einsatzverwaltung/issues).
 
 == Changelog ==
+
+= 0.7.0 =
+* Neu: Berechtigung zur Verwaltung von Einsatzberichten kann nun allen Benutzerrollen von WordPress zugeordnet werden
+* Verbesserung: Shortcode einsatzliste kann Tabelle nach Monaten getrennt darstellen
+* Hinweis: Der neue Shortcode-Parameter kann in der [Anleitung](http://www.abrain.de/software/einsatzverwaltung/anleitung/) nachgelesen werden
+* Hinweis (subtil): Es gibt mittlerweile auch eine [Facebook-Seite](https://www.facebook.com/einsatzverwaltung)
 
 = 0.6.0 =
 * Neu: Fahrzeug kann mit Seite innerhalb Wordpress verkn&uuml;pft werden
@@ -137,6 +142,9 @@ Entweder [per Mail](mailto:kontakt@abrain.de), auf [Twitter](https://twitter.com
 * Widget zeigt die aktuellsten X Eins&auml;tze
 
 == Upgrade Notice ==
+
+= 0.7.0 =
+Neue Rechteverwaltung, neue Darstellungsoption für Einsatzliste
 
 = 0.6.0 =
 Neuerungen, Verbesserungen, Fehlerbehebungen. Da ist f&uuml;r alle was dabei.

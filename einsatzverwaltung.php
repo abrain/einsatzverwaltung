@@ -37,10 +37,35 @@ global $evw_db_version;
 $evw_db_version = 2;
 
 global $evw_caps;
-$evw_caps = array( 'edit_einsatzberichte', 'edit_private_einsatzberichte', 'edit_published_einsatzberichte',
-                    'edit_others_einsatzberichte', 'publish_einsatzberichte', 'read_private_einsatzberichte',
-                    'delete_einsatzberichte', 'delete_private_einsatzberichte', 'delete_published_einsatzberichte',
-                    'delete_others_einsatzberichte' );
+$evw_caps = array(
+    'edit_einsatzberichte',
+    'edit_private_einsatzberichte',
+    'edit_published_einsatzberichte',
+    'edit_others_einsatzberichte',
+    'publish_einsatzberichte',
+    'read_private_einsatzberichte',
+    'delete_einsatzberichte',
+    'delete_private_einsatzberichte',
+    'delete_published_einsatzberichte',
+    'delete_others_einsatzberichte'
+);
+
+global $evw_meta_fields;
+$evw_meta_fields = array(
+    'einsatz_einsatzort' => 'Einsatzort',
+    'einsatz_einsatzleiter' => 'Einsatzleiter',
+    'einsatz_einsatzende' => 'Einsatzende',
+    'einsatz_fehlalarm' => 'Fehlalarm',
+    'einsatz_mannschaft' => 'Mannschaftsstärke'
+);
+
+global $evw_terms;
+$evw_terms = array(
+    'alarmierungsart' => 'Alarmierungsart',
+    'einsatzart' => 'Einsatzart',
+    'fahrzeug' => 'Fahrzeuge',
+    'exteinsatzmittel' => 'Externe Einsatzmittel'
+);
 
 /**
  * Erzeugt den neuen Beitragstyp Einsatzbericht und die zugehörigen Taxonomien
@@ -1128,6 +1153,15 @@ function einsatzverwaltung_is_min_wp_version($ver) {
     }
     
     return true;
+}
+
+
+function einsatzverwaltung_print_error($message) {
+    echo '<span class="evw_error"><i class="fa fa-exclamation-circle"></i>&nbsp;' . $message . '</span>';
+}
+
+function einsatzverwaltung_print_success($message) {
+    echo '<span class="evw_success"><i class="fa fa-check-circle"></i>&nbsp;' . $message . '</span>';
 }
 
 ?>

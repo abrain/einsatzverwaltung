@@ -20,3 +20,13 @@
 #dashboard_right_now .einsatz-count a:before, #dashboard_right_now .einsatz-count span:before {
     content: "\f497";
 }
+
+.evw_error {
+    color: red;
+    font-weight: bold;
+}
+
+.evw_success {
+    color: green;
+    font-weight: bold;
+}

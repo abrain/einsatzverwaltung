@@ -27,12 +27,12 @@ function einsatzverwaltung_tool_wpe_page()
     // Existenz der wp-einsatz Datenbank feststellen
     $tablename = $wpdb->prefix . "einsaetze";
     if($wpdb->get_var("SHOW TABLES LIKE '$tablename'") != $tablename) {
-        echo '<div class="error">Die Tabelle, in der wp-einsatz seine Daten speichert, konnte nicht gefunden werden.</div>';
+        echo '<span class="evw_error"><i class="fa fa-exclamation-circle"></i>&nbsp;Die Tabelle, in der wp-einsatz seine Daten speichert, konnte nicht gefunden werden.</span>';
     } else {
         if(array_key_exists('submit', $_POST) && array_key_exists('aktion', $_POST) && $_POST['aktion'] == 'analyse') {
-            echo "<h2>Analyse</h2>";
-            echo "Analysiere die Datenbank...<br><br>";
             // Datenbank analysieren
+            echo "<h3>Analyse</h3>";
+            echo "Die Daten von wp-einsatz werden analysiert...<br><br>";
             foreach ( $wpdb->get_col( "DESC " . $tablename, 0 ) as $column_name ) {
                 // Unwichtiges ignorieren
                 if($column_name == 'ID' || $column_name == 'Nr_Jahr' || $column_name == 'Nr_Monat') {
@@ -45,7 +45,7 @@ function einsatzverwaltung_tool_wpe_page()
             // TODO Felder matchen
             // TODO Import starten
         } else {
-            echo "Die Tabelle, in der wp-einsatz seine Daten speichert, wurde gefunden. Analyse jetzt starten?";
+            echo '<span class="evw_success"><i class="fa fa-check-circle"></i>&nbsp;Die Tabelle, in der wp-einsatz seine Daten speichert, wurde gefunden. Analyse jetzt starten?</span>';
             echo '<form method="post">';
             echo '<input type="hidden" name="aktion" value="analyse" />';
             submit_button('Analyse starten');

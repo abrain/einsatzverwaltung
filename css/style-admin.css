@@ -26,7 +26,17 @@
     font-weight: bold;
 }
 
+.evw_warning {
+    color: orange;
+    font-weight: bold;
+}
+
 .evw_success {
     color: green;
+    font-weight: bold;
+}
+
+.evw_info {
+    color: #0000D0;
     font-weight: bold;
 }

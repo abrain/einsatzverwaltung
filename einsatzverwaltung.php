@@ -1157,11 +1157,19 @@ function einsatzverwaltung_is_min_wp_version($ver) {
 
 
 function einsatzverwaltung_print_error($message) {
-    echo '<span class="evw_error"><i class="fa fa-exclamation-circle"></i>&nbsp;' . $message . '</span>';
+    echo '<p class="evw_error"><i class="fa fa-exclamation-circle"></i>&nbsp;' . $message . '</p>';
+}
+
+function einsatzverwaltung_print_warning($message) {
+    echo '<p class="evw_warning"><i class="fa fa-exclamation-triangle"></i>&nbsp;' . $message . '</p>';
 }
 
 function einsatzverwaltung_print_success($message) {
-    echo '<span class="evw_success"><i class="fa fa-check-circle"></i>&nbsp;' . $message . '</span>';
+    echo '<p class="evw_success"><i class="fa fa-check-circle"></i>&nbsp;' . $message . '</p>';
+}
+
+function einsatzverwaltung_print_info($message) {
+    echo '<p class="evw_info"><i class="fa fa-info-circle"></i>&nbsp;' . $message . '</p>';
 }
 
 ?>

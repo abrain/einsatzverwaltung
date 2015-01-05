@@ -3,8 +3,8 @@ Contributors: abrain
 Donate link: http://www.abrain.de/software/unterstuetzen/
 Tags: feuerwehr, einsatz
 Requires at least: 3.1.0
-Tested up to: 4.0
-Stable tag: 0.7.0
+Tested up to: 4.1
+Stable tag: 0.7.1
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,6 +54,10 @@ Die Aufgaben f&uuml;r die kommenden Versionen werden auf [GitHub](https://github
 Entweder [per Mail](mailto:kontakt@abrain.de), auf [Twitter](https://twitter.com/einsatzvw) oder [App.net](https://alpha.app.net/einsatzverwaltung). Bugs und Verbesserungsvorschl&auml;ge gerne auch als [Issue auf GitHub](https://github.com/abrain/einsatzverwaltung/issues).
 
 == Changelog ==
+
+= 0.7.1 =
+* Neu: Einsatzberichte k&ouml;nnen mit der Jetpack-Funktion &quot;Publizieren&quot; ver&ouml;ffentlicht werden
+* Hinweis: Einsatzverwaltung ist kompatibel mit WordPress 4.1
 
 = 0.7.0 =
 * Neu: Berechtigung zur Verwaltung von Einsatzberichten kann nun allen Benutzerrollen von WordPress zugeordnet werden
@@ -142,6 +146,9 @@ Entweder [per Mail](mailto:kontakt@abrain.de), auf [Twitter](https://twitter.com
 * Widget zeigt die aktuellsten X Eins&auml;tze
 
 == Upgrade Notice ==
+
+= 0.7.1 =
+Publizieren mit Jetpack aktiviert
 
 = 0.7.0 =
 Neue Rechteverwaltung, neue Darstellungsoption für Einsatzliste

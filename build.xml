@@ -46,6 +46,11 @@
   <mkdir dir="${basedir}/build/logs"/>
   <mkdir dir="${basedir}/build/pdepend"/>
   <mkdir dir="${basedir}/build/phpdox"/>
+  <move todir="${basedir}/src">
+      <fileset dir="${basedir}">
+          <include name="**/*.php"/>
+      </fileset>
+  </move>
   <property name="prepare.done" value="true"/>
  </target>
 
@@ -53,7 +58,7 @@
   <apply executable="php" failonerror="true">
    <arg value="-l" />
 
-   <fileset dir="${basedir}">
+   <fileset dir="${basedir}/src">
     <include name="**/*.php" />
     <modified />
    </fileset>
@@ -70,7 +75,7 @@
   <exec executable="${toolsdir}phploc">
    <arg value="--count-tests" />
    <arg path="${basedir}/src" />
-   <arg path="${basedir}/tests" />
+   <!-- <arg path="${basedir}/tests" /> -->
   </exec>
  </target>
 
@@ -84,7 +89,7 @@
    <arg value="--log-xml" />
    <arg path="${basedir}/build/logs/phploc.xml" />
    <arg path="${basedir}/src" />
-   <arg path="${basedir}/tests" />
+   <!-- <arg path="${basedir}/tests" /> -->
   </exec>
  </target>
 
@@ -127,7 +132,7 @@
    <arg value="--extensions=php" />
    <arg value="--ignore=autoload.php" />
    <arg path="${basedir}/src" />
-   <arg path="${basedir}/tests" />
+   <!-- <arg path="${basedir}/tests" /> -->
   </exec>
  </target>
 

@@ -48,7 +48,7 @@
   <mkdir dir="${basedir}/build/phpdox"/>
   <move todir="${basedir}/src">
       <fileset dir="${basedir}">
-          <include name="**/*.php"/>
+          <include name="*.php"/>
       </fileset>
   </move>
   <property name="prepare.done" value="true"/>

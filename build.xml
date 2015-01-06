@@ -46,11 +46,6 @@
   <mkdir dir="${basedir}/build/logs"/>
   <mkdir dir="${basedir}/build/pdepend"/>
   <mkdir dir="${basedir}/build/phpdox"/>
-  <move todir="${basedir}/src">
-      <fileset dir="${basedir}">
-          <include name="*.php"/>
-      </fileset>
-  </move>
   <property name="prepare.done" value="true"/>
  </target>
 
@@ -109,7 +104,7 @@
   <exec executable="${toolsdir}phpmd">
    <arg path="${basedir}/src" />
    <arg value="text" />
-   <arg path="${basedir}/build/phpmd.xml" />
+   <arg path="${basedir}/phpmd.xml" />
   </exec>
  </target>
 
@@ -119,7 +114,7 @@
   <exec executable="${toolsdir}phpmd">
    <arg path="${basedir}/src" />
    <arg value="xml" />
-   <arg path="${basedir}/build/phpmd.xml" />
+   <arg path="${basedir}/phpmd.xml" />
    <arg value="--reportfile" />
    <arg path="${basedir}/build/logs/pmd.xml" />
   </exec>
@@ -171,7 +166,7 @@
          description="Run unit tests with PHPUnit">
   <exec executable="${toolsdir}phpunit" failonerror="true">
    <arg value="--configuration"/>
-   <arg path="${basedir}/build/phpunit.xml"/>
+   <arg path="${basedir}/phpunit.xml"/>
    <arg value="--log-junit"/>
    <arg path="${basedir}/build/logs/junit.xml"/>
    <arg path="${basedir}/tests"/>

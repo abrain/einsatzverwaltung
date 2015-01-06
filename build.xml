@@ -172,6 +172,9 @@
   <exec executable="${toolsdir}phpunit" failonerror="true">
    <arg value="--configuration"/>
    <arg path="${basedir}/build/phpunit.xml"/>
+   <arg value="--log-junit"/>
+   <arg path="${basedir}/build/logs/junit.xml"/>
+   <arg path="${basedir}/tests"/>
   </exec>
  </target>
 

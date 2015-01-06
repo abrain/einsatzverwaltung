@@ -33,13 +33,20 @@ function einsatzverwaltung_register_settings()
         null,
         EVW_SETTINGS_SLUG
     );
-    add_settings_section( 'einsatzvw_settings_view',
-        'Darstellung',
+    add_settings_section( 'einsatzvw_settings_einsatzberichte',
+        'Einsatzberichte',
         function() {
             echo '<p>Mit diesen Einstellungen kann das Aussehen der Einsatzberichte beeinflusst werden.</p>';
         },
         EVW_SETTINGS_SLUG
     );
+    /*add_settings_section( 'einsatzvw_settings_einsatzliste',
+        'Einsatzliste',
+        function() {
+            echo '<p>Mit diesen Einstellungen kann das Aussehen der Einsatzlisten beeinflusst werden.</p>';
+        },
+        EVW_SETTINGS_SLUG
+    );*/
     add_settings_section( 'einsatzvw_settings_caps',
         'Berechtigungen',
         function() {
@@ -59,19 +66,19 @@ function einsatzverwaltung_register_settings()
         'Einsatzdetails',
         'einsatzverwaltung_echo_settings_empty_details',
         EVW_SETTINGS_SLUG,
-        'einsatzvw_settings_view'
+        'einsatzvw_settings_einsatzberichte'
     );
     add_settings_field( 'einsatzvw_settings_archivelinks',
         'Gefilterte Einsatzübersicht verlinken',
         'einsatzverwaltung_echo_settings_archive',
         EVW_SETTINGS_SLUG,
-        'einsatzvw_settings_view'
+        'einsatzvw_settings_einsatzberichte'
     );
     add_settings_field( 'einsatzvw_settings_excerpt',
         'Auszug / Exzerpt',
         'einsatzverwaltung_echo_settings_excerpt',
         EVW_SETTINGS_SLUG,
-        'einsatzvw_settings_view'
+        'einsatzvw_settings_einsatzberichte'
     );
     add_settings_field( 'einsatzvw_settings_caps_roles',
         'Rollen',

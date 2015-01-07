@@ -1,6 +1,6 @@
 <?php
 
-define( 'EVW_TOOL_ENR_SLUG', 'einsatzvw-tool-enr' );
+define('EVW_TOOL_ENR_SLUG', 'einsatzvw-tool-enr' );
 
 
 /**
@@ -124,6 +124,6 @@ function einsatzverwaltung_set_einsatznummer($post_id, $einsatznummer)
 
     // keine Sonderbehandlung beim Speichern
     remove_action('save_post', 'einsatzverwaltung_save_postdata');
-    wp_update_post( $update_args );
+    wp_update_post($update_args);
     add_action('save_post', 'einsatzverwaltung_save_postdata');
 }

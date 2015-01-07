@@ -17,7 +17,7 @@ add_action('admin_menu', 'einsatzverwaltung_settings_menu');
  */
 function einsatzverwaltung_add_action_links($links)
 {
-    $mylinks = array('<a href="' . admin_url('options-general.php?page='.EVW_SETTINGS_SLUG ) . '">Einstellungen</a>');
+    $mylinks = array('<a href="' . admin_url('options-general.php?page='.EVW_SETTINGS_SLUG) . '">Einstellungen</a>');
     return array_merge($links, $mylinks);
 }
 add_filter('plugin_action_links_' . EINSATZVERWALTUNG__PLUGIN_BASE , 'einsatzverwaltung_add_action_links');
@@ -104,7 +104,7 @@ function einsatzverwaltung_register_settings()
         }
     }
 }
-add_action( 'admin_init', 'einsatzverwaltung_register_settings' );
+add_action('admin_init', 'einsatzverwaltung_register_settings');
 
 
 /**
@@ -223,7 +223,7 @@ function einsatzverwaltung_echo_settings_caps_roles()
         echo "Es konnten keine Rollen gefunden werden.";
     } else {
         foreach($roles as $role_slug => $role) {
-            einsatzverwaltung_echo_settings_checkbox( array('einsatzvw_cap_roles_' . $role_slug, translate_user_role($role['name']), false ));
+            einsatzverwaltung_echo_settings_checkbox(array('einsatzvw_cap_roles_' . $role_slug, translate_user_role($role['name']), false));
             echo '<br>';
         }
         echo '<p class="description">Die Benutzer mit den hier ausgew&auml;hlten Rollen haben alle Rechte, um die Einsatzberichte und die zugeh&ouml;rigen Eigenschaften (z.B. Einsatzarten) zu verwalten. Zu dieser Einstellungsseite und den Werkzeugen haben in jedem Fall nur Administratoren Zugang.</p>';
@@ -237,7 +237,7 @@ function einsatzverwaltung_echo_settings_caps_roles()
 function einsatzverwaltung_settings_page()
 {
     if (!current_user_can('manage_options'))
-    wp_die( __( 'You do not have sufficient permissions to manage options for this site.'));
+    wp_die(__('You do not have sufficient permissions to manage options for this site.'));
     
     echo '<div id="einsatzverwaltung_contactinfo">';
     echo '<h3>Entwicklerkontakt &amp; Social Media</h3>';

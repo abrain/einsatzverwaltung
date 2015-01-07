@@ -26,7 +26,7 @@ add_action('exteinsatzmittel_add_form_fields', 'einsatzverwaltung_exteinsatzmitt
  */
 function einsatzverwaltung_exteinsatzmittel_additional_fields_edit($tag)
 {
-    $exteinsatzmittel_url = get_option( einsatzverwaltung_get_term_option_key( $tag->term_id, 'exteinsatzmittel', 'url' ), '' );
+    $exteinsatzmittel_url = get_option(einsatzverwaltung_get_term_option_key($tag->term_id, 'exteinsatzmittel', 'url' ), '' );
     
     echo '<tr class="form-field">';
     echo '<th scope="row"><label for="url">URL</label></th>';
@@ -44,7 +44,7 @@ function einsatzverwaltung_fahrzeug_additional_fields_add()
 {
     echo '<div class="form-field">';
     echo '<label for="tag-fahrzeugpid">Fahrzeugseite</label>';
-    wp_dropdown_pages( array ('name' => 'fahrzeugpid', 'show_option_none' => '- keine -', 'option_none_value' => '') );
+    wp_dropdown_pages(array ('name' => 'fahrzeugpid', 'show_option_none' => '- keine -', 'option_none_value' => '') );
     echo '<p>Seite mit mehr Informationen &uuml;ber das Fahrzeug. Wird in Einsatzberichten mit diesem Fahrzeug verlinkt.</p></div>';
 }
 add_action('fahrzeug_add_form_fields', 'einsatzverwaltung_fahrzeug_additional_fields_add');
@@ -55,11 +55,11 @@ add_action('fahrzeug_add_form_fields', 'einsatzverwaltung_fahrzeug_additional_fi
  */
 function einsatzverwaltung_fahrzeug_additional_fields_edit($tag)
 {
-    $fahrzeug_pid = get_option( einsatzverwaltung_get_term_option_key( $tag->term_id, 'fahrzeug', 'fahrzeugpid' ), '' );
+    $fahrzeug_pid = get_option(einsatzverwaltung_get_term_option_key($tag->term_id, 'fahrzeug', 'fahrzeugpid' ), '' );
     
     echo '<tr class="form-field">';
     echo '<th scope="row"><label for="fahrzeugpid">Fahrzeugseite</label></th><td>';
-    wp_dropdown_pages( array ('selected' => $fahrzeug_pid, 'name' => 'fahrzeugpid', 'show_option_none' => '- keine -', 'option_none_value' => '') );
+    wp_dropdown_pages(array ('selected' => $fahrzeug_pid, 'name' => 'fahrzeugpid', 'show_option_none' => '- keine -', 'option_none_value' => '') );
     echo '<p class="description">Seite mit mehr Informationen &uuml;ber das Fahrzeug. Wird in Einsatzberichten mit diesem Fahrzeug verlinkt.</p></td></tr>';
 }
 add_action('fahrzeug_edit_form_fields', 'einsatzverwaltung_fahrzeug_additional_fields_edit');
@@ -80,9 +80,9 @@ function einsatzverwaltung_save_term($term_id, $tt_id, $taxonomy)
         if (isset($field) && !empty($field) && isset($_POST[$field])) {
             $value = $_POST[$field];
             if (empty($value)) {
-                delete_option( einsatzverwaltung_get_term_option_key( $term_id, $taxonomy, $field ) );
+                delete_option(einsatzverwaltung_get_term_option_key($term_id, $taxonomy, $field) );
             } else {
-                update_option( einsatzverwaltung_get_term_option_key( $term_id, $taxonomy, $field ), $value );
+                update_option(einsatzverwaltung_get_term_option_key($term_id, $taxonomy, $field), $value);
             }
         }
     }
@@ -108,7 +108,7 @@ function einsatzverwaltung_delete_term($term_id, $tt_id, $taxonomy, $deleted_ter
     
     foreach($evw_taxonomies[$taxonomy] as $field) {
         if (isset($field) && !empty($field)) {
-            delete_option( einsatzverwaltung_get_term_option_key( $term_id, $taxonomy, $field ) );
+            delete_option(einsatzverwaltung_get_term_option_key($term_id, $taxonomy, $field) );
         }
     }
 }
@@ -120,7 +120,7 @@ add_action('delete_term', 'einsatzverwaltung_delete_term', 10, 4);
  */
 function einsatzverwaltung_get_term_field($term_id, $taxonomy, $field)
 {
-    return get_option( einsatzverwaltung_get_term_option_key( $term_id, $taxonomy, $field ) );
+    return get_option(einsatzverwaltung_get_term_option_key($term_id, $taxonomy, $field) );
 }
 
 /**

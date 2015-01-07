@@ -1,8 +1,8 @@
 <?php
 
-define( 'EVW_TOOL_WPE_SLUG', 'einsatzvw-tool-wpe' );
-define( 'EVW_TOOL_WPE_DATE_COLUMN', 'Datum' );
-define( 'EVW_TOOL_WPE_INPUT_NAME_PREFIX', 'evw_wpe_' );
+define('EVW_TOOL_WPE_SLUG', 'einsatzvw-tool-wpe' );
+define('EVW_TOOL_WPE_DATE_COLUMN', 'Datum' );
+define('EVW_TOOL_WPE_INPUT_NAME_PREFIX', 'evw_wpe_' );
 
 
 /**
@@ -120,7 +120,7 @@ function einsatzverwaltung_dropdown_eigenefelder($name, $echo = false)
     $string = '';
     $string .= '<select name="' . $name . '">';
     $string .= '<option value="-">nicht importieren</option>';
-    foreach ( $felder as $slug => $name ) {
+    foreach ($felder as $slug => $name) {
         $string .= '<option value="' . $slug . '">' . $name . '</option>';
     }
     $string .= '</select>';
@@ -141,7 +141,7 @@ function einsatzverwaltung_get_wpe_felder($tablename)
 {
     global $wpdb;
     $felder = array();
-    foreach ( $wpdb->get_col( "DESC " . $tablename, 0 ) as $column_name ) {
+    foreach ($wpdb->get_col("DESC " . $tablename, 0) as $column_name) {
         // Unwichtiges ignorieren
         if ($column_name == 'ID' || $column_name == 'Nr_Jahr' || $column_name == 'Nr_Monat') {
             continue;
@@ -168,6 +168,6 @@ function einsatzverwaltung_import_einsatz($einsatznummer)
 
     // keine Sonderbehandlung beim Speichern
     remove_action('save_post', 'einsatzverwaltung_save_postdata');
-    wp_update_post( $update_args );
+    wp_update_post($update_args);
     add_action('save_post', 'einsatzverwaltung_save_postdata');
 }

@@ -42,7 +42,7 @@ function einsatzverwaltung_print_einsatzjahre($atts)
             $string .= " | ";
         }
         
-        $link = get_post_type_archive_link('einsatz') . ( empty( $permalink_structure ) ? '&year='.$jahr : $jahr );
+        $link = get_post_type_archive_link('einsatz') . (empty($permalink_structure) ? '&year='.$jahr : $jahr);
         $string .= '<a href="' . $link . '">';
         
         if ($year == $jahr || empty($year) && $jahr == date("Y")) {

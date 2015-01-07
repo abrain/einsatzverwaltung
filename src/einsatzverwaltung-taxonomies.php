@@ -72,14 +72,14 @@ function einsatzverwaltung_save_term($term_id, $tt_id, $taxonomy)
 {
     global $evw_taxonomies;
     
-    if(!array_key_exists($taxonomy, $evw_taxonomies) || !is_array($evw_taxonomies[$taxonomy])) {
+    if (!array_key_exists($taxonomy, $evw_taxonomies) || !is_array($evw_taxonomies[$taxonomy])) {
         return;
     }
     
     foreach($evw_taxonomies[$taxonomy] as $field) {
-        if(isset($field) && !empty($field) && isset($_POST[$field])) {
+        if (isset($field) && !empty($field) && isset($_POST[$field])) {
             $value = $_POST[$field];
-            if(empty($value)) {
+            if (empty($value)) {
                 delete_option( einsatzverwaltung_get_term_option_key( $term_id, $taxonomy, $field ) );
             } else {
                 update_option( einsatzverwaltung_get_term_option_key( $term_id, $taxonomy, $field ), $value );
@@ -97,17 +97,17 @@ add_action('created_term', 'einsatzverwaltung_save_term', 10, 3);
  */
 function einsatzverwaltung_delete_term($term_id, $tt_id, $taxonomy, $deleted_term)
 {
-    if(!isset($taxonomy)) {
+    if (!isset($taxonomy)) {
         return;
     }
     
     global $evw_taxonomies;
-    if(!array_key_exists($taxonomy, $evw_taxonomies) || !is_array($evw_taxonomies[$taxonomy])) {
+    if (!array_key_exists($taxonomy, $evw_taxonomies) || !is_array($evw_taxonomies[$taxonomy])) {
         return;
     }
     
     foreach($evw_taxonomies[$taxonomy] as $field) {
-        if(isset($field) && !empty($field)) {
+        if (isset($field) && !empty($field)) {
             delete_option( einsatzverwaltung_get_term_option_key( $term_id, $taxonomy, $field ) );
         }
     }

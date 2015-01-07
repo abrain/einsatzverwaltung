@@ -54,26 +54,26 @@ class Einsatzverwaltung_Widget extends WP_Widget {
             }
             $letzteEinsaetze .= "</a>";
             
-            if($zeigeDatum) {
+            if ($zeigeDatum) {
                 $timestamp = strtotime($p->post_date);
                 $datumsformat = get_option('date_format', 'd.m.Y');
                 $letzteEinsaetze .= "<br><span class=\"einsatzdatum\">".date_i18n($datumsformat, $timestamp)."</span>";
-                if($zeigeZeit) {
+                if ($zeigeZeit) {
                     $zeitformat = get_option('time_format', 'H:i');
                     $letzteEinsaetze .= " | <span class=\"einsatzzeit\">".date_i18n($zeitformat, $timestamp)." Uhr</span>";
                 }
             }
             
-            if($zeigeArt) {
+            if ($zeigeArt) {
                 $einsatzart = einsatzverwaltung_get_einsatzart($p->ID);
-                if($einsatzart) {
+                if ($einsatzart) {
                     $letzteEinsaetze .= "<br><span class=\"einsatzart\">".$einsatzart->name."</span>";
                 }
             }
             
-            if($zeigeOrt) {
+            if ($zeigeOrt) {
                 $einsatzort = get_post_meta( $p->ID, $key = 'einsatz_einsatzort', $single = true );
-                if($einsatzort != "") {
+                if ($einsatzort != "") {
                     $letzteEinsaetze .= "<br><span class=\"einsatzort\">Ort:&nbsp;".$einsatzort."</span>";
                 }
             }

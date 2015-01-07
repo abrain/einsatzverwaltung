@@ -28,15 +28,15 @@ function einsatzverwaltung_tool_wpe_page()
     
     // Existenz der wp-einsatz Datenbank feststellen
     $tablename = $wpdb->prefix . "einsaetze";
-    if($wpdb->get_var("SHOW TABLES LIKE '$tablename'") != $tablename) {
+    if ($wpdb->get_var("SHOW TABLES LIKE '$tablename'") != $tablename) {
         einsatzverwaltung_print_error('Die Tabelle, in der wp-einsatz seine Daten speichert, konnte nicht gefunden werden.');
     } else {
-        if(array_key_exists('submit', $_POST) && array_key_exists('aktion', $_POST) && $_POST['aktion'] == 'analyse') {
+        if (array_key_exists('submit', $_POST) && array_key_exists('aktion', $_POST) && $_POST['aktion'] == 'analyse') {
             // Datenbank analysieren
             echo "<h3>Analyse</h3>";
             echo "<p>Die Daten von wp-einsatz werden analysiert...</p>";
             $felder = einsatzverwaltung_get_wpe_felder($tablename);
-            if(empty($felder)) {
+            if (empty($felder)) {
                 einsatzverwaltung_print_error('Es wurden keine Felder in der Tabelle gefunden');
                 return;
             }
@@ -44,7 +44,7 @@ function einsatzverwaltung_tool_wpe_page()
             einsatzverwaltung_print_success('Es wurden folgende Felder gefunden: ' . implode($felder, ', '));
             
             // Auf Pflichtfelder prüfen
-            if(!in_array(EVW_TOOL_WPE_DATE_COLUMN, $felder)) {
+            if (!in_array(EVW_TOOL_WPE_DATE_COLUMN, $felder)) {
                 echo '<br>';
                 einsatzverwaltung_print_error('Das Feld "'.EVW_TOOL_WPE_DATE_COLUMN.'" konnte nicht in der Datenbank gefunden werden!');
                 return;
@@ -58,7 +58,7 @@ function einsatzverwaltung_tool_wpe_page()
             echo '<table><tr><th>Feld in wp-einsatz</th><th>Feld in Einsatzverwaltung</th></tr><tbody>';
             foreach($felder as $feld) {
                 echo '<tr><td><strong>' . $feld . '</strong></td><td>';
-                if($feld == EVW_TOOL_WPE_DATE_COLUMN) {
+                if ($feld == EVW_TOOL_WPE_DATE_COLUMN) {
                     echo 'wird automatisch zugeordnet';
                 } else {
                     echo einsatzverwaltung_dropdown_eigenefelder(EVW_TOOL_WPE_INPUT_NAME_PREFIX . strtolower($feld));
@@ -68,28 +68,28 @@ function einsatzverwaltung_tool_wpe_page()
             echo '</tbody></table>';
             submit_button('Felder zuordnen');
             echo '</form>';
-        } else if(array_key_exists('submit', $_POST) && array_key_exists('aktion', $_POST) && $_POST['aktion'] == 'zuordnen') {
+        } elseif (array_key_exists('submit', $_POST) && array_key_exists('aktion', $_POST) && $_POST['aktion'] == 'zuordnen') {
             echo '<h3>Vorschau</h3>';
             echo '<p>Bitte kontrollieren Sie hier, ob die Daten korrekt zugeordnet sind.</p>';
             
             global $evw_meta_fields, $evw_terms;
             $felder = einsatzverwaltung_get_wpe_felder($tablename);
-            if(empty($felder)) {
+            if (empty($felder)) {
                 einsatzverwaltung_print_error('Es wurden keine Felder in der Tabelle gefunden');
                 return;
             }
             foreach($felder as $feld) {
                 $index = EVW_TOOL_WPE_INPUT_NAME_PREFIX . strtolower($feld);
-                if(array_key_exists($index, $_POST)) {
+                if (array_key_exists($index, $_POST)) {
                     $evw_feld_name = $_POST[$index];
-                    if(!empty($evw_feld_name) && is_string($evw_feld_name)) {
-                        if(array_key_exists($evw_feld_name, $evw_meta_fields)) {
+                    if (!empty($evw_feld_name) && is_string($evw_feld_name)) {
+                        if (array_key_exists($evw_feld_name, $evw_meta_fields)) {
                             einsatzverwaltung_print_info($evw_feld_name . " ist ein Metafeld");
                             // TODO
-                        } else if(array_key_exists($evw_feld_name, $evw_terms)) {
+                        } elseif (array_key_exists($evw_feld_name, $evw_terms)) {
                             einsatzverwaltung_print_info($evw_feld_name . " ist ein Termfeld");
                             // TODO
-                        } else if ($evw_feld_name == '-') {
+                        } elseif ($evw_feld_name == '-') {
                             einsatzverwaltung_print_warning('Feld \'' . $feld . '\' nicht zugeordnet');
                         } else {
                             einsatzverwaltung_print_error('Feld \'' . $evw_feld_name . '\' unbekannt');
@@ -125,7 +125,7 @@ function einsatzverwaltung_dropdown_eigenefelder($name, $echo = false)
     }
     $string .= '</select>';
         
-    if($echo === true) {
+    if ($echo === true) {
         echo $string;
     } else {
         return $string;
@@ -143,7 +143,7 @@ function einsatzverwaltung_get_wpe_felder($tablename)
     $felder = array();
     foreach ( $wpdb->get_col( "DESC " . $tablename, 0 ) as $column_name ) {
         // Unwichtiges ignorieren
-        if($column_name == 'ID' || $column_name == 'Nr_Jahr' || $column_name == 'Nr_Monat') {
+        if ($column_name == 'ID' || $column_name == 'Nr_Jahr' || $column_name == 'Nr_Monat') {
             continue;
         }
         
@@ -158,7 +158,7 @@ function einsatzverwaltung_get_wpe_felder($tablename)
  */
 function einsatzverwaltung_import_einsatz($einsatznummer)
 {
-    if(empty($post_id) || empty($einsatznummer)) {
+    if (empty($post_id) || empty($einsatznummer)) {
         return;
     }
     

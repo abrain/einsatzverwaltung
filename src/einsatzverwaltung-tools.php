@@ -38,7 +38,7 @@ function einsatzverwaltung_tool_enr_page()
     submit_button('Starten');
     echo '</form>';
     
-    if(array_key_exists('submit', $_POST) && $_POST['submit'] == 'Starten') {
+    if (array_key_exists('submit', $_POST) && $_POST['submit'] == 'Starten') {
         einsatzverwaltung_enr_vergeben($jahr, $simulieren);
     }
 }
@@ -48,7 +48,7 @@ function einsatzverwaltung_tool_enr_page()
  */
 function einsatzverwaltung_enr_vergeben($kalenderjahr, $simulieren = false)
 {
-    if($simulieren) {
+    if ($simulieren) {
         echo '<h3>Simulation</h3>';
         echo '<p>Die folgenden &Auml;nderungen w&uuml;rden bei einer Reparatur angewendet:</p>';
     } else {
@@ -66,21 +66,21 @@ function einsatzverwaltung_enr_vergeben($kalenderjahr, $simulieren = false)
         // Zähler beginnt jedes Jahr von neuem
         $datum = date_create($einsatzbericht->post_date);
         $jahr = date_format($datum, "Y");
-        if($jahr_alt != $jahr) {
+        if ($jahr_alt != $jahr) {
             $counter = 1;
         }
         
         // Den Einsatzbericht nur aktualisieren, wenn sich die Einsatznummer ändert
         $enr = $einsatzbericht->post_name;
         $enr_neu = einsatzverwaltung_format_einsatznummer($jahr, $counter);
-        if($enr != $enr_neu) {
+        if ($enr != $enr_neu) {
             $aenderungen++;
             printf('Einsatz %s (%s) erh&auml;lt die Nummer %s', '<strong>'.$enr.'</strong>', date_i18n($format, date_timestamp_get($datum)), '<strong>'.$enr_neu.'</strong>');
-            if(!$simulieren) {
+            if (!$simulieren) {
                 einsatzverwaltung_set_einsatznummer($einsatzbericht->ID, $enr_neu);
                 $enr_neu_slug = get_post_field('post_name', $einsatzbericht->ID);
                 printf(' ... ge&auml;ndert zu %s', '<strong>'.$enr_neu_slug.'</strong>');
-                if($enr_neu_slug != $enr_neu) {
+                if ($enr_neu_slug != $enr_neu) {
                     $kollisionen++;
                     print(' *');
                 }
@@ -91,15 +91,15 @@ function einsatzverwaltung_enr_vergeben($kalenderjahr, $simulieren = false)
         $counter++;
     }
     
-    if($aenderungen == 0) {
-        if($simulieren) {
+    if ($aenderungen == 0) {
+        if ($simulieren) {
             echo 'Keine &Auml;nderungen erforderlich.';
         } else {
             echo 'Keine &Auml;nderungen vorgenommen.';
         }
     }
     
-    if($kollisionen != 0) {
+    if ($kollisionen != 0) {
         echo '<br>* = Die vorgesehene Einsatznummer war zum Zeitpunkt des Abspeicherns noch von einem anderen Einsatzbericht belegt, deshalb wurde von WordPress automatisch eine unbelegte Nummer vergeben. Mit einem weiteren Durchlauf dieses Werkzeugs wird dieser Zustand korrigiert.';
     } else {
         if (!$simulieren && $aenderungen > 0) {
@@ -114,7 +114,7 @@ function einsatzverwaltung_enr_vergeben($kalenderjahr, $simulieren = false)
  */
 function einsatzverwaltung_set_einsatznummer($post_id, $einsatznummer)
 {
-    if(empty($post_id) || empty($einsatznummer)) {
+    if (empty($post_id) || empty($einsatznummer)) {
         return;
     }
     

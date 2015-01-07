@@ -15,7 +15,8 @@ add_action('admin_menu', 'einsatzverwaltung_settings_menu');
 /**
  * Zeigt einen Link zu den Einstellungen direkt auf der Plugin-Seite an
  */
-function einsatzverwaltung_add_action_links ( $links ) {
+function einsatzverwaltung_add_action_links($links)
+{
     $mylinks = array('<a href="' . admin_url( 'options-general.php?page='.EVW_SETTINGS_SLUG ) . '">Einstellungen</a>');
     return array_merge( $links, $mylinks );
 }
@@ -158,7 +159,8 @@ function einsatzverwaltung_sanitize_einsatznummer_stellen($input)
 /**
  * 
  */
-function einsatzverwaltung_echo_settings_empty_details() {
+function einsatzverwaltung_echo_settings_empty_details()
+{
     einsatzverwaltung_echo_settings_checkbox(array('einsatzvw_einsatz_hideemptydetails', 'Nicht ausgef&uuml;llte Details ausblenden', EINSATZVERWALTUNG__D__HIDE_EMPTY_DETAILS));
     echo '<p class="description">Ein Einsatzdetail gilt als nicht ausgef&uuml;llt, wenn das entsprechende Textfeld oder die entsprechende Liste leer ist. Bei der Mannschaftsst&auml;rke z&auml;hlt auch eine eingetragene 0 als leer.</p>';
 }
@@ -167,7 +169,8 @@ function einsatzverwaltung_echo_settings_empty_details() {
 /**
  * 
  */
-function einsatzverwaltung_echo_settings_archive() {
+function einsatzverwaltung_echo_settings_archive()
+{
     einsatzverwaltung_echo_settings_checkbox(array('einsatzvw_show_einsatzart_archive', 'Einsatzart', EINSATZVERWALTUNG__D__SHOW_EINSATZART_ARCHIVE));
     echo '<br>';
     einsatzverwaltung_echo_settings_checkbox(array('einsatzvw_show_exteinsatzmittel_archive', 'Externe Einsatzkr&auml;fte', EINSATZVERWALTUNG__D__SHOW_EXTEINSATZMITTEL_ARCHIVE));
@@ -180,7 +183,8 @@ function einsatzverwaltung_echo_settings_archive() {
 /**
  * 
  */
-function einsatzverwaltung_echo_settings_excerpt() {
+function einsatzverwaltung_echo_settings_excerpt()
+{
     einsatzverwaltung_echo_settings_checkbox(array('einsatzvw_show_links_in_excerpt', 'Auszug darf Links enthalten', EINSATZVERWALTUNG__D__SHOW_LINKS_IN_EXCERPT));
     echo '<p class="description">Welche Links tats&auml;chlich generiert werden, h&auml;ngt von den anderen Einstellungen ab. Der Auszug im Newsfeed enth&auml;lt niemals Links.</p>';
 }
@@ -189,7 +193,8 @@ function einsatzverwaltung_echo_settings_excerpt() {
 /**
  * 
  */
-function einsatzverwaltung_echo_settings_caps_roles() {
+function einsatzverwaltung_echo_settings_caps_roles()
+{
     $roles = get_editable_roles();
     if(empty($roles)) {
         echo "Es konnten keine Rollen gefunden werden.";
@@ -241,5 +246,3 @@ function einsatzverwaltung_settings_page()
     submit_button();
     echo '</form>';
 }
-
-?>

@@ -127,5 +127,3 @@ function einsatzverwaltung_set_einsatznummer($post_id, $einsatznummer)
     wp_update_post( $update_args );
     add_action('save_post', 'einsatzverwaltung_save_postdata');
 }
-
-?>

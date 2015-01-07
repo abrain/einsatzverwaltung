@@ -70,7 +70,8 @@ $evw_terms = array(
 /**
  * Erzeugt den neuen Beitragstyp Einsatzbericht und die zugehörigen Taxonomien
  */
-function einsatzverwaltung_create_post_type() {
+function einsatzverwaltung_create_post_type()
+{
     $args_einsatz = array(
         'labels' => array(
             'name' => 'Einsatzberichte',
@@ -231,7 +232,8 @@ add_action( 'init', 'einsatzverwaltung_create_post_type' );
 /**
  * Wird beim Aktivieren des Plugins aufgerufen
  */
-function einsatzverwaltung_aktivierung() {
+function einsatzverwaltung_aktivierung()
+{
     // Posttypen registrieren
     einsatzverwaltung_create_post_type();
 
@@ -272,7 +274,8 @@ function einsatzverwaltung_get_einsatzberichte($kalenderjahr)
 /**
  * Fügt die Metabox zum Bearbeiten der Einsatzdetails ein
  */
-function einsatzverwaltung_add_einsatzdetails_meta_box( $post ) {
+function einsatzverwaltung_add_einsatzdetails_meta_box( $post )
+{
     add_meta_box( 'einsatzverwaltung_meta_box',
         'Einsatzdetails',
         'einsatzverwaltung_display_meta_box',
@@ -285,7 +288,8 @@ add_action( 'add_meta_boxes_einsatz', 'einsatzverwaltung_add_einsatzdetails_meta
 /**
  * Zusätzliche Skripte im Admin-Bereich einbinden
  */
-function einsatzverwaltung_enqueue_edit_scripts($hook) {
+function einsatzverwaltung_enqueue_edit_scripts($hook)
+{
     if( 'post.php' == $hook || 'post-new.php' == $hook ) {
         // Nur auf der Bearbeitungsseite anzeigen
         wp_enqueue_script('einsatzverwaltung-edit-script', EINSATZVERWALTUNG__SCRIPT_URL . 'einsatzverwaltung-edit.js', array('jquery'));
@@ -298,7 +302,8 @@ function einsatzverwaltung_enqueue_edit_scripts($hook) {
 add_action( 'admin_enqueue_scripts', 'einsatzverwaltung_enqueue_edit_scripts' );
 
 
-function einsatzverwaltung_enqueue_frontend_style() {
+function einsatzverwaltung_enqueue_frontend_style()
+{
     wp_enqueue_style( 'einsatzverwaltung-fontawesome', EINSATZVERWALTUNG__PLUGIN_URL . 'font-awesome/css/font-awesome.min.css' );
 }
 add_action( 'wp_enqueue_scripts', 'einsatzverwaltung_enqueue_frontend_style' );
@@ -307,7 +312,8 @@ add_action( 'wp_enqueue_scripts', 'einsatzverwaltung_enqueue_frontend_style' );
 /**
  * Inhalt der Metabox zum Bearbeiten der Einsatzdetails
  */
-function einsatzverwaltung_display_meta_box( $post ) {
+function einsatzverwaltung_display_meta_box( $post )
+{
     // Use nonce for verification
     wp_nonce_field( plugin_basename( __FILE__ ), 'einsatzverwaltung_nonce' );
 
@@ -353,7 +359,8 @@ function einsatzverwaltung_display_meta_box( $post ) {
 /**
  * Berechnet die nächste freie Einsatznummer für das gegebene Jahr
  */
-function einsatzverwaltung_get_next_einsatznummer($jahr, $minuseins = false) {
+function einsatzverwaltung_get_next_einsatznummer($jahr, $minuseins = false)
+{
     if(empty($jahr) || !is_numeric($jahr)) {
         $jahr = date('Y');
     }
@@ -380,7 +387,8 @@ function einsatzverwaltung_format_einsatznummer($jahr, $nummer)
 /**
  * Zusätzliche Metadaten des Einsatzberichts speichern
  */
-function einsatzverwaltung_save_postdata( $post_id ) {
+function einsatzverwaltung_save_postdata( $post_id )
+{
 
     // verify if this is an auto save routine. 
     // If it is our form has not been submitted, so we dont want to do anything
@@ -516,7 +524,8 @@ function einsatzverwaltung_checked($value)
 /**
  * Zeigt die Metabox für die Einsatzart
  */
-function einsatzverwaltung_display_einsatzart_metabox( $post ) {
+function einsatzverwaltung_display_einsatzart_metabox( $post )
+{
     $einsatzart = einsatzverwaltung_get_einsatzart($post->ID);
     einsatzverwaltung_dropdown_einsatzart($einsatzart ? $einsatzart->term_id : 0);
 }
@@ -525,7 +534,8 @@ function einsatzverwaltung_display_einsatzart_metabox( $post ) {
 /**
  * Zeigt Dropdown mit Hierarchie für die Einsatzart
  */
-function einsatzverwaltung_dropdown_einsatzart($selected) {
+function einsatzverwaltung_dropdown_einsatzart($selected)
+{
     wp_dropdown_categories(array(
         'show_option_all'    => '',
         'show_option_none'   => '- keine -',
@@ -546,7 +556,8 @@ function einsatzverwaltung_dropdown_einsatzart($selected) {
 /**
  * Erzeugt den Kopf eines Einsatzberichts
  */
-function einsatzverwaltung_get_einsatzbericht_header($post, $may_contain_links = true) {
+function einsatzverwaltung_get_einsatzbericht_header($post, $may_contain_links = true)
+{
     if(get_post_type($post) == "einsatz") {
         $make_links = $may_contain_links;
         
@@ -722,7 +733,8 @@ function einsatzverwaltung_get_numeric_detail_string($title, $value, $is_zero_em
 }
 
 
-function einsatzverwaltung_get_hide_empty_details() {
+function einsatzverwaltung_get_hide_empty_details()
+{
     $hide_empty_details = get_option('einsatzvw_einsatz_hideemptydetails');
     if($hide_empty_details === false) {
         return EINSATZVERWALTUNG__D__HIDE_EMPTY_DETAILS;
@@ -736,7 +748,8 @@ function einsatzverwaltung_get_hide_empty_details() {
  * Bestimmt die Einsatzart eines bestimmten Einsatzes. Ist nötig, weil die Taxonomie
  * 'einsatzart' mehrere Werte speichern kann, aber nur einer genutzt werden soll
  */
-function einsatzverwaltung_get_einsatzart($id) {
+function einsatzverwaltung_get_einsatzart($id)
+{
     $einsatzarten = get_the_terms( $id, 'einsatzart' );
     if ( $einsatzarten && !is_wp_error($einsatzarten) && !empty($einsatzarten) ) {
         $keys = array_keys($einsatzarten);
@@ -750,7 +763,8 @@ function einsatzverwaltung_get_einsatzart($id) {
 /**
  * Beim Aufrufen eines Einsatzberichts vor den Text den Kopf mit den Details einbauen
  */
-function einsatzverwaltung_add_einsatz_daten($content) {
+function einsatzverwaltung_add_einsatz_daten($content)
+{
     global $post;
     if(get_post_type() == "einsatz") {
         $header = einsatzverwaltung_get_einsatzbericht_header($post);
@@ -790,7 +804,8 @@ add_filter( 'the_excerpt', 'einsatzverwaltung_einsatz_excerpt');
 /**
  * Gibt den Auszug (Exzerpt) für den Feed zurück
  */
-function einsatzverwaltung_einsatz_excerpt_feed($excerpt) {
+function einsatzverwaltung_einsatz_excerpt_feed($excerpt)
+{
     global $post;
     if(get_post_type() == "einsatz") {
         // Header ohne Links holen
@@ -908,7 +923,8 @@ function einsatzverwaltung_print_einsatzliste( $einsatzjahre = array(), $desc = 
  * Legt fest, welche Spalten bei der Übersicht der Einsatzberichte im
  * Adminbereich angezeigt werden
  */
-function einsatzverwaltung_edit_einsatz_columns( $columns ) {
+function einsatzverwaltung_edit_einsatz_columns( $columns )
+{
 
     $columns = array(
         'cb' => '<input type="checkbox" />',
@@ -929,7 +945,8 @@ add_filter( 'manage_edit-einsatz_columns', 'einsatzverwaltung_edit_einsatz_colum
  * Liefert den Inhalt für die jeweiligen Spalten bei der Übersicht der
  * Einsatzberichte im Adminbereich
  */
-function einsatzverwaltung_manage_einsatz_columns( $column, $post_id ) {
+function einsatzverwaltung_manage_einsatz_columns( $column, $post_id )
+{
     global $post;
 
     switch( $column ) {
@@ -1030,7 +1047,8 @@ function einsatzverwaltung_get_jahremiteinsatz()
 /**
  * Zahl der Einsatzberichte im Dashboard anzeigen
  */
-function einsatzverwaltung_add_einsatzberichte_to_dashboard($arr) {
+function einsatzverwaltung_add_einsatzberichte_to_dashboard($arr)
+{
     if (post_type_exists('einsatz')) {
         $pt = 'einsatz';
         $pt_info = get_post_type_object($pt); // get a specific CPT's details
@@ -1047,7 +1065,8 @@ add_action('dashboard_glance_items', 'einsatzverwaltung_add_einsatzberichte_to_d
 /**
  * Zahl der Einsatzberichte im Dashboard anzeigen (für WordPress 3.7 und älter)
  */
-function einsatzverwaltung_add_einsatzberichte_to_dashboard_legacy() {
+function einsatzverwaltung_add_einsatzberichte_to_dashboard_legacy()
+{
     if (post_type_exists('einsatz')) {
         $pt = 'einsatz';
         $pt_info = get_post_type_object($pt); // get a specific CPT's details
@@ -1067,7 +1086,8 @@ add_action('right_now_content_table_end', 'einsatzverwaltung_add_einsatzberichte
 /**
  * Reparaturen oder Anpassungen der Datenbank nach einem Update
  */
-function einsatzverwaltung_update_db_check() {
+function einsatzverwaltung_update_db_check()
+{
     global $evw_db_version;
     $evw_installed_version = get_site_option( EINSATZVERWALTUNG__DBVERSION_OPTION );
     
@@ -1123,14 +1143,16 @@ add_action( 'plugins_loaded', 'einsatzverwaltung_update_db_check' );
 /**
  * Check the version of PHP running on the server
  */
-function check_php_version($ver) {
+function check_php_version($ver)
+{
     $php_version = phpversion();
     if (version_compare($php_version, $ver) < 0) {
         wp_die("Das Plugin Einsatzverwaltung ben&ouml;tigt PHP Version $ver oder neuer. Bitte aktualisieren Sie PHP auf Ihrem Server!", 'Veraltete PHP-Version!', array('back_link' => true));
     }
 }
 
-function einsatzverwaltung_is_min_wp_version($ver) {
+function einsatzverwaltung_is_min_wp_version($ver)
+{
     $currentversionparts = explode(".", get_bloginfo('version'));
     if(count($currentversionparts) < 3) {
         $currentversionparts[2] = "0";
@@ -1156,20 +1178,22 @@ function einsatzverwaltung_is_min_wp_version($ver) {
 }
 
 
-function einsatzverwaltung_print_error($message) {
+function einsatzverwaltung_print_error($message)
+{
     echo '<p class="evw_error"><i class="fa fa-exclamation-circle"></i>&nbsp;' . $message . '</p>';
 }
 
-function einsatzverwaltung_print_warning($message) {
+function einsatzverwaltung_print_warning($message)
+{
     echo '<p class="evw_warning"><i class="fa fa-exclamation-triangle"></i>&nbsp;' . $message . '</p>';
 }
 
-function einsatzverwaltung_print_success($message) {
+function einsatzverwaltung_print_success($message)
+{
     echo '<p class="evw_success"><i class="fa fa-check-circle"></i>&nbsp;' . $message . '</p>';
 }
 
-function einsatzverwaltung_print_info($message) {
+function einsatzverwaltung_print_info($message)
+{
     echo '<p class="evw_info"><i class="fa fa-info-circle"></i>&nbsp;' . $message . '</p>';
 }
-
-?>

@@ -5,7 +5,7 @@
  */
 function einsatzverwaltung_shortcode_einsatzliste($atts)
 {
-    extract( shortcode_atts( array('jahr' => date('Y'), 'sort' => 'ab', 'monatetrennen' => 'nein' ), $atts ) );
+    extract(shortcode_atts(array('jahr' => date('Y'), 'sort' => 'ab', 'monatetrennen' => 'nein'), $atts));
     $aktuelles_jahr = date('Y');
     
     $einsatzjahre = array();
@@ -24,7 +24,7 @@ function einsatzverwaltung_shortcode_einsatzliste($atts)
     
     return einsatzverwaltung_print_einsatzliste($einsatzjahre, !($sort == 'auf'), false, ($monatetrennen == 'ja'));
 }
-add_shortcode( 'einsatzliste', 'einsatzverwaltung_shortcode_einsatzliste' );
+add_shortcode('einsatzliste', 'einsatzverwaltung_shortcode_einsatzliste');
 
 
 /**
@@ -34,7 +34,7 @@ function einsatzverwaltung_print_einsatzjahre($atts)
 {
     global $year, $wp_rewrite;
     $jahre = einsatzverwaltung_get_jahremiteinsatz();
-    $permalink_structure = get_option( 'permalink_structure' );
+    $permalink_structure = get_option('permalink_structure');
     
     $string = "";
     foreach ($jahre as $jahr) {
@@ -56,6 +56,4 @@ function einsatzverwaltung_print_einsatzjahre($atts)
     
     return $string;
 }
-add_shortcode( 'einsatzjahre', 'einsatzverwaltung_print_einsatzjahre' );
-
-?>
+add_shortcode('einsatzjahre', 'einsatzverwaltung_print_einsatzjahre');

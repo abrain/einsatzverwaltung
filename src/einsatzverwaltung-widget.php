@@ -27,9 +27,9 @@ class Einsatzverwaltung_Widget extends WP_Widget {
         $anzahl = $instance['anzahl'];
         $zeigeDatum = $instance['zeigeDatum'];
         $zeigeZeit = $instance['zeigeZeit'];
-        $zeigeFeedlink = (array_key_exists('zeigeFeedlink', $instance) ? $instance['zeigeFeedlink'] : NULL);
-        $zeigeOrt = (array_key_exists('zeigeOrt', $instance) ? $instance['zeigeOrt'] : NULL);
-        $zeigeArt = (array_key_exists('zeigeArt', $instance) ? $instance['zeigeArt'] : NULL);
+        $zeigeFeedlink = (array_key_exists('zeigeFeedlink', $instance) ? $instance['zeigeFeedlink'] : null);
+        $zeigeOrt = (array_key_exists('zeigeOrt', $instance) ? $instance['zeigeOrt'] : null);
+        $zeigeArt = (array_key_exists('zeigeArt', $instance) ? $instance['zeigeArt'] : null);
         
         if ( empty( $title ) ) {
           $title = "Letzte Eins&auml;tze";
@@ -142,9 +142,9 @@ class Einsatzverwaltung_Widget extends WP_Widget {
         
         $zeigeDatum = $instance[ 'zeigeDatum' ];
         $zeigeZeit = $instance[ 'zeigeZeit' ];
-        $zeigeFeedlink = (array_key_exists('zeigeFeedlink', $instance) ? $instance['zeigeFeedlink'] : NULL);
-        $zeigeOrt = (array_key_exists('zeigeOrt', $instance) ? $instance['zeigeOrt'] : NULL);
-        $zeigeArt = (array_key_exists('zeigeArt', $instance) ? $instance['zeigeArt'] : NULL);
+        $zeigeFeedlink = (array_key_exists('zeigeFeedlink', $instance) ? $instance['zeigeFeedlink'] : null);
+        $zeigeOrt = (array_key_exists('zeigeOrt', $instance) ? $instance['zeigeOrt'] : null);
+        $zeigeArt = (array_key_exists('zeigeArt', $instance) ? $instance['zeigeArt'] : null);
         
         echo '<p><label for="'.$this->get_field_id( 'title' ).'">' . __( 'Titel:' , 'einsatzverwaltung') . '</label>';
         echo '<input class="widefat" id="' . $this->get_field_id( 'title' ) . '" name="' . $this->get_field_name( 'title' ) . '" type="text" value="' . esc_attr( $title ).'" /></p>';
@@ -173,5 +173,3 @@ class Einsatzverwaltung_Widget extends WP_Widget {
 
 // register Einsatz_Widget widget
 add_action( 'widgets_init', create_function( '', 'register_widget( "einsatzverwaltung_widget" );' ) );
-
-?>

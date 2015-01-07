@@ -1,8 +1,8 @@
 <?php
 
-define('EVW_TOOL_WPE_SLUG', 'einsatzvw-tool-wpe' );
-define('EVW_TOOL_WPE_DATE_COLUMN', 'Datum' );
-define('EVW_TOOL_WPE_INPUT_NAME_PREFIX', 'evw_wpe_' );
+define('EVW_TOOL_WPE_SLUG', 'einsatzvw-tool-wpe');
+define('EVW_TOOL_WPE_DATE_COLUMN', 'Datum');
+define('EVW_TOOL_WPE_INPUT_NAME_PREFIX', 'evw_wpe_');
 
 
 /**

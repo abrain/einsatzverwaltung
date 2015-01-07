@@ -20,7 +20,7 @@ function einsatzverwaltung_add_action_links($links)
     $mylinks = array('<a href="' . admin_url('options-general.php?page='.EVW_SETTINGS_SLUG) . '">Einstellungen</a>');
     return array_merge($links, $mylinks);
 }
-add_filter('plugin_action_links_' . EINSATZVERWALTUNG__PLUGIN_BASE , 'einsatzverwaltung_add_action_links');
+add_filter('plugin_action_links_' . EINSATZVERWALTUNG__PLUGIN_BASE, 'einsatzverwaltung_add_action_links');
 
 
 /**
@@ -29,12 +29,14 @@ add_filter('plugin_action_links_' . EINSATZVERWALTUNG__PLUGIN_BASE , 'einsatzver
 function einsatzverwaltung_register_settings()
 {
     // Sections
-    add_settings_section('einsatzvw_settings_general',
+    add_settings_section(
+        'einsatzvw_settings_general',
         'Allgemein',
         null,
         EVW_SETTINGS_SLUG
     );
-    add_settings_section('einsatzvw_settings_einsatzberichte',
+    add_settings_section(
+        'einsatzvw_settings_einsatzberichte',
         'Einsatzberichte',
         function() {
             echo '<p>Mit diesen Einstellungen kann das Aussehen der Einsatzberichte beeinflusst werden.</p>';
@@ -48,7 +50,8 @@ function einsatzverwaltung_register_settings()
         },
         EVW_SETTINGS_SLUG
     );*/
-    add_settings_section('einsatzvw_settings_caps',
+    add_settings_section(
+        'einsatzvw_settings_caps',
         'Berechtigungen',
         function() {
             echo '<p>Hier kann festgelegt werden, welche Benutzer die Einsatzberichte verwalten k&ouml;nnen.</p>';
@@ -57,31 +60,36 @@ function einsatzverwaltung_register_settings()
     );
     
     // Fields
-    add_settings_field('einsatzvw_einsatznummer_stellen',
+    add_settings_field(
+        'einsatzvw_einsatznummer_stellen',
         'Format der Einsatznummer',
         'einsatzverwaltung_echo_einsatznummer_format',
         EVW_SETTINGS_SLUG,
         'einsatzvw_settings_general'
     );
-    add_settings_field('einsatzvw_einsatz_hideemptydetails',
+    add_settings_field(
+        'einsatzvw_einsatz_hideemptydetails',
         'Einsatzdetails',
         'einsatzverwaltung_echo_settings_empty_details',
         EVW_SETTINGS_SLUG,
         'einsatzvw_settings_einsatzberichte'
     );
-    add_settings_field('einsatzvw_settings_archivelinks',
+    add_settings_field(
+        'einsatzvw_settings_archivelinks',
         'Gefilterte Einsatzübersicht verlinken',
         'einsatzverwaltung_echo_settings_archive',
         EVW_SETTINGS_SLUG,
         'einsatzvw_settings_einsatzberichte'
     );
-    add_settings_field('einsatzvw_settings_excerpt',
+    add_settings_field(
+        'einsatzvw_settings_excerpt',
         'Auszug / Exzerpt',
         'einsatzverwaltung_echo_settings_excerpt',
         EVW_SETTINGS_SLUG,
         'einsatzvw_settings_einsatzberichte'
     );
-    add_settings_field('einsatzvw_settings_caps_roles',
+    add_settings_field(
+        'einsatzvw_settings_caps_roles',
         'Rollen',
         'einsatzverwaltung_echo_settings_caps_roles',
         EVW_SETTINGS_SLUG,
@@ -136,9 +144,11 @@ function einsatzverwaltung_echo_settings_input($args)
 function einsatzverwaltung_echo_einsatznummer_format()
 {
     printf('Jahreszahl + jahresbezogene, fortlaufende Nummer mit <input type="text" value="%2$s" size="2" id="%1$s" name="%1$s" /> Stellen<p class="description">Beispiel f&uuml;r den f&uuml;nften Einsatz in 2014:<br>bei 2 Stellen: 201405<br>bei 4 Stellen: 20140005</p><br>', 'einsatzvw_einsatznummer_stellen', get_option('einsatzvw_einsatznummer_stellen'));
-    einsatzverwaltung_echo_settings_checkbox(array(
-        'einsatzvw_einsatznummer_lfdvorne',
-        'Laufende Nummer vor das Jahr stellen')
+    einsatzverwaltung_echo_settings_checkbox(
+        array(
+            'einsatzvw_einsatznummer_lfdvorne',
+            'Laufende Nummer vor das Jahr stellen'
+        )
     );
     
     echo '<br><br><strong>Hinweis:</strong> Nach einer &Auml;nderung des Formats erhalten die bestehenden Einsatzberichte nicht automatisch aktualisierte Nummern. Nutzen Sie daf&uuml;r das Werkzeug <a href="'.admin_url('tools.php?page=einsatzvw-tool-enr').'">Einsatznummern reparieren</a>.';
@@ -164,10 +174,12 @@ function einsatzverwaltung_sanitize_einsatznummer_stellen($input)
  */
 function einsatzverwaltung_echo_settings_empty_details()
 {
-    einsatzverwaltung_echo_settings_checkbox(array(
-        'einsatzvw_einsatz_hideemptydetails',
-        'Nicht ausgef&uuml;llte Details ausblenden',
-        EINSATZVERWALTUNG__D__HIDE_EMPTY_DETAILS)
+    einsatzverwaltung_echo_settings_checkbox(
+        array(
+            'einsatzvw_einsatz_hideemptydetails',
+            'Nicht ausgef&uuml;llte Details ausblenden',
+            EINSATZVERWALTUNG__D__HIDE_EMPTY_DETAILS
+        )
     );
     echo '<p class="description">Ein Einsatzdetail gilt als nicht ausgef&uuml;llt, wenn das entsprechende Textfeld oder die entsprechende Liste leer ist. Bei der Mannschaftsst&auml;rke z&auml;hlt auch eine eingetragene 0 als leer.</p>';
 }
@@ -178,22 +190,28 @@ function einsatzverwaltung_echo_settings_empty_details()
  */
 function einsatzverwaltung_echo_settings_archive()
 {
-    einsatzverwaltung_echo_settings_checkbox(array(
-        'einsatzvw_show_einsatzart_archive',
-        'Einsatzart',
-        EINSATZVERWALTUNG__D__SHOW_EINSATZART_ARCHIVE)
+    einsatzverwaltung_echo_settings_checkbox(
+        array(
+            'einsatzvw_show_einsatzart_archive',
+            'Einsatzart',
+            EINSATZVERWALTUNG__D__SHOW_EINSATZART_ARCHIVE
+        )
     );
     echo '<br>';
-    einsatzverwaltung_echo_settings_checkbox(array(
-        'einsatzvw_show_exteinsatzmittel_archive',
-        'Externe Einsatzkr&auml;fte',
-        EINSATZVERWALTUNG__D__SHOW_EXTEINSATZMITTEL_ARCHIVE)
+    einsatzverwaltung_echo_settings_checkbox(
+        array(
+            'einsatzvw_show_exteinsatzmittel_archive',
+            'Externe Einsatzkr&auml;fte',
+            EINSATZVERWALTUNG__D__SHOW_EXTEINSATZMITTEL_ARCHIVE
+        )
     );
     echo '<br>';
-    einsatzverwaltung_echo_settings_checkbox(array(
-        'einsatzvw_show_fahrzeug_archive',
-        'Fahrzeuge',
-        EINSATZVERWALTUNG__D__SHOW_FAHRZEUG_ARCHIVE)
+    einsatzverwaltung_echo_settings_checkbox(
+        array(
+            'einsatzvw_show_fahrzeug_archive',
+            'Fahrzeuge',
+            EINSATZVERWALTUNG__D__SHOW_FAHRZEUG_ARCHIVE
+        )
     );
     echo '<p class="description">F&uuml;r alle hier aktivierten Arten von Einsatzdetails werden im Kopfbereich des Einsatzberichts f&uuml;r alle auftretenden Werte Links zu einer gefilterten Einsatz&uuml;bersicht angezeigt. Beispielsweise kann man damit alle Eins&auml;tze unter Beteiligung einer bestimmten externen Einsatzkraft auflisten lassen.</p>';
 }
@@ -204,10 +222,12 @@ function einsatzverwaltung_echo_settings_archive()
  */
 function einsatzverwaltung_echo_settings_excerpt()
 {
-    einsatzverwaltung_echo_settings_checkbox(array(
-        'einsatzvw_show_links_in_excerpt',
-        'Auszug darf Links enthalten',
-        EINSATZVERWALTUNG__D__SHOW_LINKS_IN_EXCERPT)
+    einsatzverwaltung_echo_settings_checkbox(
+        array(
+            'einsatzvw_show_links_in_excerpt',
+            'Auszug darf Links enthalten',
+            EINSATZVERWALTUNG__D__SHOW_LINKS_IN_EXCERPT
+        )
     );
     echo '<p class="description">Welche Links tats&auml;chlich generiert werden, h&auml;ngt von den anderen Einstellungen ab. Der Auszug im Newsfeed enth&auml;lt niemals Links.</p>';
 }

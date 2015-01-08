@@ -107,7 +107,7 @@ function einsatzverwaltung_register_settings()
     
     $roles = get_editable_roles();
     if (!empty($roles)) {
-        foreach ($roles as $role_slug => $role) {
+        foreach (array_keys($roles) as $role_slug) {
             register_setting('einsatzvw_settings', 'einsatzvw_cap_roles_' . $role_slug, 'einsatzverwaltung_sanitize_checkbox');
         }
     }
@@ -275,7 +275,7 @@ function einsatzverwaltung_settings_page()
     $roles = get_editable_roles();
     if (!empty($roles)) {
         global $evw_caps;
-        foreach ($roles as $role_slug => $role) {
+        foreach (array_keys($roles) as $role_slug) {
             $role_obj = get_role($role_slug);
             $allowed = get_option('einsatzvw_cap_roles_' . $role_slug, false);
             foreach ($evw_caps as $cap) {

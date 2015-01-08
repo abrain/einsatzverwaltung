@@ -32,7 +32,7 @@ add_shortcode('einsatzliste', 'einsatzverwaltung_shortcode_einsatzliste');
  */
 function einsatzverwaltung_print_einsatzjahre($atts)
 {
-    global $year, $wp_rewrite;
+    global $year;
     $jahre = einsatzverwaltung_get_jahremiteinsatz();
     $permalink_structure = get_option('permalink_structure');
     

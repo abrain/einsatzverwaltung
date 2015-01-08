@@ -107,7 +107,7 @@ function einsatzverwaltung_register_settings()
     
     $roles = get_editable_roles();
     if (!empty($roles)) {
-        foreach($roles as $role_slug => $role) {
+        foreach ($roles as $role_slug => $role) {
             register_setting('einsatzvw_settings', 'einsatzvw_cap_roles_' . $role_slug, 'einsatzverwaltung_sanitize_checkbox');
         }
     }
@@ -156,7 +156,7 @@ function einsatzverwaltung_echo_einsatznummer_format()
 
 
 /**
- *
+ * Stellt einen sinnvollen Wert für die Anzahl Stellen der laufenden Einsatznummer sicher
  */
 function einsatzverwaltung_sanitize_einsatznummer_stellen($input)
 {
@@ -170,7 +170,7 @@ function einsatzverwaltung_sanitize_einsatznummer_stellen($input)
 
 
 /**
- * 
+ * Gibt die Einstellmöglichkeiten für nicht ausgefüllte Einsatzdetails aus
  */
 function einsatzverwaltung_echo_settings_empty_details()
 {
@@ -186,7 +186,7 @@ function einsatzverwaltung_echo_settings_empty_details()
 
 
 /**
- * 
+ * Gibt die Einstellmöglichkeiten für gefilterte Ansichten aus
  */
 function einsatzverwaltung_echo_settings_archive()
 {
@@ -218,7 +218,7 @@ function einsatzverwaltung_echo_settings_archive()
 
 
 /**
- * 
+ * Gibt die Einstellmöglichkeiten für den Auszug aus
  */
 function einsatzverwaltung_echo_settings_excerpt()
 {
@@ -234,7 +234,7 @@ function einsatzverwaltung_echo_settings_excerpt()
 
 
 /**
- * 
+ * Gibt die Einstellmöglichkeiten für die Berechtigungen aus
  */
 function einsatzverwaltung_echo_settings_caps_roles()
 {
@@ -242,7 +242,7 @@ function einsatzverwaltung_echo_settings_caps_roles()
     if (empty($roles)) {
         echo "Es konnten keine Rollen gefunden werden.";
     } else {
-        foreach($roles as $role_slug => $role) {
+        foreach ($roles as $role_slug => $role) {
             einsatzverwaltung_echo_settings_checkbox(array('einsatzvw_cap_roles_' . $role_slug, translate_user_role($role['name']), false));
             echo '<br>';
         }
@@ -256,8 +256,9 @@ function einsatzverwaltung_echo_settings_caps_roles()
  */
 function einsatzverwaltung_settings_page()
 {
-    if (!current_user_can('manage_options'))
-    wp_die(__('You do not have sufficient permissions to manage options for this site.'));
+    if (!current_user_can('manage_options')) {
+        wp_die(__('You do not have sufficient permissions to manage options for this site.'));
+    }
     
     echo '<div id="einsatzverwaltung_contactinfo">';
     echo '<h3>Entwicklerkontakt &amp; Social Media</h3>';
@@ -274,12 +275,12 @@ function einsatzverwaltung_settings_page()
     $roles = get_editable_roles();
     if (!empty($roles)) {
         global $evw_caps;
-        foreach($roles as $role_slug => $role) {
+        foreach ($roles as $role_slug => $role) {
             $role_obj = get_role($role_slug);
             $allowed = get_option('einsatzvw_cap_roles_' . $role_slug, false);
-            foreach($evw_caps as $cap) {
+            foreach ($evw_caps as $cap) {
                 $role_obj->add_cap($cap, $allowed);
-            }   
+            }
         }
     }
     

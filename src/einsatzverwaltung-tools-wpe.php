@@ -16,7 +16,7 @@ add_action('admin_menu', 'einsatzverwaltung_tool_wpe_menu');
 
 
 /**
- * 
+ * Generiert den Inhalt der Werkzeugseiten
  */
 function einsatzverwaltung_tool_wpe_page()
 {
@@ -56,7 +56,7 @@ function einsatzverwaltung_tool_wpe_page()
             echo '<form method="post">';
             echo '<input type="hidden" name="aktion" value="zuordnen" />';
             echo '<table><tr><th>Feld in wp-einsatz</th><th>Feld in Einsatzverwaltung</th></tr><tbody>';
-            foreach($felder as $feld) {
+            foreach ($felder as $feld) {
                 echo '<tr><td><strong>' . $feld . '</strong></td><td>';
                 if ($feld == EVW_TOOL_WPE_DATE_COLUMN) {
                     echo 'wird automatisch zugeordnet';
@@ -78,7 +78,7 @@ function einsatzverwaltung_tool_wpe_page()
                 einsatzverwaltung_print_error('Es wurden keine Felder in der Tabelle gefunden');
                 return;
             }
-            foreach($felder as $feld) {
+            foreach ($felder as $feld) {
                 $index = EVW_TOOL_WPE_INPUT_NAME_PREFIX . strtolower($feld);
                 if (array_key_exists($index, $_POST)) {
                     $evw_feld_name = $_POST[$index];
@@ -110,7 +110,9 @@ function einsatzverwaltung_tool_wpe_page()
 }
 
 
-
+/**
+ * Gibt ein Auswahlfeld zur Zuordnung der Felder in Einsatzverwaltung aus
+ */
 function einsatzverwaltung_dropdown_eigenefelder($name, $echo = false)
 {
     global $evw_meta_fields, $evw_terms;
@@ -154,7 +156,7 @@ function einsatzverwaltung_get_wpe_felder($tablename)
 
 
 /**
- * 
+ * Importiert einen neuen Einsatz (nicht benutzen!)
  */
 function einsatzverwaltung_import_einsatz($einsatznummer)
 {

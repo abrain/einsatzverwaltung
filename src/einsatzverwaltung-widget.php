@@ -1,11 +1,13 @@
 <?php
 
-class Einsatzverwaltung_Widget extends WP_Widget {
+class Einsatzverwaltung_Widget extends WP_Widget
+{
 
     /**
      * Register widget with WordPress.
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct(
             'einsatzverwaltung_widget', // Base ID
             'Letzte Eins&auml;tze', // Name
@@ -21,7 +23,8 @@ class Einsatzverwaltung_Widget extends WP_Widget {
      * @param array $args     Widget arguments.
      * @param array $instance Saved values from database.
      */
-    public function widget($args, $instance) {
+    public function widget($args, $instance)
+    {
         extract($args);
         $title = apply_filters('widget_title', $instance['title']);
         $anzahl = $instance['anzahl'];
@@ -32,16 +35,16 @@ class Einsatzverwaltung_Widget extends WP_Widget {
         $zeigeArt = (array_key_exists('zeigeArt', $instance) ? $instance['zeigeArt'] : null);
         
         if (empty($title)) {
-          $title = "Letzte Eins&auml;tze";
+            $title = "Letzte Eins&auml;tze";
         }
         
         if (!isset($anzahl) || empty ($anzahl) || !is_numeric($anzahl) || $anzahl < 1) {
-          $anzahl = 3;
+            $anzahl = 3;
         }
 
         $letzteEinsaetze = "";
         $query = new WP_Query('&post_type=einsatz&post_status=publish&posts_per_page='.$anzahl);
-        while($query->have_posts()) {
+        while ($query->have_posts()) {
             $p = $query->next_post();
             $letzteEinsaetze .= "<li>";
             
@@ -98,7 +101,8 @@ class Einsatzverwaltung_Widget extends WP_Widget {
      *
      * @return array Updated safe values to be saved.
      */
-    public function update($new_instance, $old_instance) {
+    public function update($new_instance, $old_instance)
+    {
         $instance = array();
         $instance['title'] = strip_tags($new_instance['title']);
         
@@ -125,18 +129,17 @@ class Einsatzverwaltung_Widget extends WP_Widget {
      *
      * @param array $instance Previously saved values from database.
      */
-    public function form($instance) {
-        if (isset($instance[ 'title' ]) ) {
+    public function form($instance)
+    {
+        if (isset($instance[ 'title' ])) {
             $title = $instance[ 'title' ];
-        }
-        else {
+        } else {
             $title = __('Letzte Eins&auml;tze', 'einsatzverwaltung');
         }
         
-        if (isset($instance[ 'anzahl' ]) ) {
+        if (isset($instance[ 'anzahl' ])) {
             $anzahl = $instance[ 'anzahl' ];
-        }
-        else {
+        } else {
             $anzahl = 3;
         }
         

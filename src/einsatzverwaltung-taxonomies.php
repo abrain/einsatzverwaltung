@@ -76,7 +76,7 @@ function einsatzverwaltung_save_term($term_id, $tt_id, $taxonomy)
         return;
     }
     
-    foreach($evw_taxonomies[$taxonomy] as $field) {
+    foreach ($evw_taxonomies[$taxonomy] as $field) {
         if (isset($field) && !empty($field) && isset($_POST[$field])) {
             $value = $_POST[$field];
             if (empty($value)) {
@@ -106,7 +106,7 @@ function einsatzverwaltung_delete_term($term_id, $tt_id, $taxonomy, $deleted_ter
         return;
     }
     
-    foreach($evw_taxonomies[$taxonomy] as $field) {
+    foreach ($evw_taxonomies[$taxonomy] as $field) {
         if (isset($field) && !empty($field)) {
             delete_option(einsatzverwaltung_get_term_option_key($term_id, $taxonomy, $field));
         }

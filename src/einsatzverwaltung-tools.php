@@ -30,7 +30,7 @@ function einsatzverwaltung_tool_enr_page()
     echo '<label for"jahr">Einsatznummern reparieren für Jahr:</label>&nbsp;<select name="jahr">';
     echo '<option value="all">alle</option>';
     $jahre = einsatzverwaltung_get_jahremiteinsatz();
-    foreach($jahre as $j) {
+    foreach ($jahre as $j) {
         echo '<option value="'.$j.'">'.$j.'</option>';
     }
     echo '</select><br>';
@@ -62,7 +62,7 @@ function einsatzverwaltung_enr_vergeben($kalenderjahr, $simulieren = false)
     $jahr_alt = '';
     $aenderungen = 0;
     $kollisionen = 0;
-    foreach($einsatzberichte as $einsatzbericht) {
+    foreach ($einsatzberichte as $einsatzbericht) {
         // Zähler beginnt jedes Jahr von neuem
         $datum = date_create($einsatzbericht->post_date);
         $jahr = date_format($datum, "Y");
@@ -110,7 +110,7 @@ function einsatzverwaltung_enr_vergeben($kalenderjahr, $simulieren = false)
 
 
 /**
- * 
+ * Ändert die Einsatznummer eines bestehenden Einsatzes
  */
 function einsatzverwaltung_set_einsatznummer($post_id, $einsatznummer)
 {

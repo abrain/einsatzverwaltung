@@ -55,7 +55,7 @@ function einsatzverwaltung_tool_wpe_page()
             $eigenefelder = array('');
             echo '<form method="post">';
             echo '<input type="hidden" name="aktion" value="zuordnen" />';
-            echo '<table><tr><th>Feld in wp-einsatz</th><th>Feld in Einsatzverwaltung</th></tr><tbody>';
+            echo '<table class="evw_match_fields"><tr><th>Feld in wp-einsatz</th><th>Feld in Einsatzverwaltung</th></tr><tbody>';
             foreach ($felder as $feld) {
                 echo '<tr><td><strong>' . $feld . '</strong></td><td>';
                 if ($feld == EVW_TOOL_WPE_DATE_COLUMN) {

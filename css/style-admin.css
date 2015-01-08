@@ -40,3 +40,7 @@
     color: #0000D0;
     font-weight: bold;
 }
+
+.evw_match_fields td {
+    padding: 5px;
+}

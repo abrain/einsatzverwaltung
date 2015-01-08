@@ -46,6 +46,12 @@
   <mkdir dir="${basedir}/build/logs"/>
   <mkdir dir="${basedir}/build/pdepend"/>
   <mkdir dir="${basedir}/build/phpdox"/>
+  <move todir="${basedir}">
+    <fileset dir="${basedir}/src/ci-config">
+        <include name="*.xml"/>
+        <exclude name="build.xml"/>
+    </fileset>
+  </move>
   <property name="prepare.done" value="true"/>
  </target>
 

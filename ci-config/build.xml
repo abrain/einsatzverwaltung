@@ -7,7 +7,7 @@
  <!-- <property name="toolsdir" value="${workspace}/vendor/bin/"/> -->
 
  <target name="build"
-         depends="prepare,lint,phploc-ci,pdepend,phpmd-ci,phpcs-ci,phpcpd-ci,phpdox"
+         depends="prepare,lint,phploc-ci,pdepend,phpmd-ci,phpcs-ci,phpcpd-ci,phpdox,phpcompatinfo"
          description=""/>
 
  <target name="build-parallel"
@@ -49,7 +49,7 @@
   <mkdir dir="${workspace}/tests"/>
   <move todir="${workspace}">
     <fileset dir="${workspace}/src/ci-config">
-        <include name="*.xml"/>
+        <include name="*.xml,*.json"/>
         <exclude name="build.xml"/>
     </fileset>
   </move>
@@ -181,6 +181,15 @@
          depends="phploc-ci,phpcs-ci,phpmd-ci"
          description="Generate project documentation using phpDox">
   <exec executable="${toolsdir}phpdox" dir="${workspace}"/>
+ </target>
+ 
+ <target name="phpcompatinfo"
+         depends="prepare"
+         description="Find out minimum PHP version">
+  <exec executable="${toolsdir}phpcompatinfo" output="${workspace}/build/logs/phpcompatinfo.xml">
+   <arg value="analyser:run"/>
+   <arg path="src/"/>
+  </exec>
  </target>
 </project>
 

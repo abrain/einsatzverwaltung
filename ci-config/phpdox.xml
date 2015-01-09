@@ -67,7 +67,9 @@
                 <source type="build" />
 
                 <!-- add phploc output -->
-                <source type="phploc" />
+                <source type="phploc">
+                    <file name="logs/phploc.xml" />
+                </source>
 
                 <!-- add git vcs information -->
                 <source type="git">

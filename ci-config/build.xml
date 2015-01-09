@@ -188,7 +188,7 @@
          description="Find out minimum PHP version">
   <exec executable="${toolsdir}phpcompatinfo" output="${workspace}/build/logs/phpcompatinfo.xml">
    <arg value="analyser:run"/>
-   <arg path="src/"/>
+   <arg value="src/"/>
   </exec>
  </target>
 </project>

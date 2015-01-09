@@ -400,9 +400,8 @@ function einsatzverwaltung_save_postdata($post_id)
     }
 
     if (array_key_exists('post_type', $_POST) && 'einsatz' == $_POST['post_type']) {
-        
         // Prüfen, ob Aufruf über das Formular erfolgt ist
-        if (!isset($_POST['einsatzverwaltung_nonce']) || !wp_verify_nonce($_POST['einsatzverwaltung_nonce'], plugin_basename(__FILE__)) ) {
+        if (!isset($_POST['einsatzverwaltung_nonce']) || !wp_verify_nonce($_POST['einsatzverwaltung_nonce'], plugin_basename(__FILE__))) {
             return;
         }
         
@@ -543,10 +542,10 @@ function einsatzverwaltung_dropdown_einsatzart($selected)
     wp_dropdown_categories(array(
         'show_option_all'    => '',
         'show_option_none'   => '- keine -',
-        'orderby'            => 'NAME   ', 
+        'orderby'            => 'NAME',
         'order'              => 'ASC',
         'show_count'         => false,
-        'hide_empty'         => false, 
+        'hide_empty'         => false,
         'echo'               => true,
         'selected'           => $selected,
         'hierarchical'       => true,

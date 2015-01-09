@@ -175,4 +175,4 @@ class Einsatzverwaltung_Widget extends WP_Widget
 }
 
 // register Einsatz_Widget widget
-add_action('widgets_init', create_function('', 'register_widget("einsatzverwaltung_widget");') );
+add_action('widgets_init', create_function('', 'register_widget("einsatzverwaltung_widget");'));

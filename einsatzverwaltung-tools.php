@@ -14,7 +14,7 @@ add_action('admin_menu', 'einsatzverwaltung_tools_menu');
 
 
 /**
- * 
+ * Gibt die Oberfläche des Werkzeugs "Einsatznummern reparieren" aus
  */
 function einsatzverwaltung_tool_enr_page()
 {

@@ -48,8 +48,7 @@
   <mkdir dir="${workspace}/build/phpdox"/>
   <mkdir dir="${workspace}/tests"/>
   <move todir="${workspace}">
-    <fileset dir="${workspace}/src/ci-config">
-        <include name="*.xml,*.json"/>
+    <fileset dir="${workspace}/src/ci-config" includes="*.xml,*.json">
         <exclude name="build.xml"/>
     </fileset>
   </move>

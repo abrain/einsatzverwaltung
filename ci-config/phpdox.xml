@@ -67,15 +67,13 @@
                 <source type="build" />
 
                 <!-- add phploc output -->
-                <!-- <source type="phploc" /> -->
+                <source type="phploc" />
 
                 <!-- add git vcs information -->
-                <!--
                 <source type="git">
                     <git binary="/usr/bin/git" />
                     <history enabled="true" limit="15" cache="${phpDox.project.workdir}/gitlog.xml" />
                 </source>
-                -->
 
 
                 <!-- enrichment source -->
@@ -88,20 +86,18 @@
                 <!--</source> -->
 
                 <!-- enrichment source -->
-                <!--<source type="phpcs">-->
+                <source type="phpcs">
                 <!-- @type - the handler for the enrichment -->
                 <!--         known types by default are: checkstyle, pmd, clover, phpunit, phpcs -->
 
                 <!-- every enrichment source can have additional configuration nodes, most probably need a logfile -->
-                <!-- <file name="logs/phpcs.xml" /> -->
-                <!--</source> -->
+                    <file name="logs/checkstyle.xml" />
+                </source>
 
                 <!-- PHPMessDetector -->
-                <!--
                 <source type="pmd">
-                    <file name="pmd.xml" />
+                    <file name="logs/pmd.xml" />
                 </source>
-                -->
 
             </enrich>
 

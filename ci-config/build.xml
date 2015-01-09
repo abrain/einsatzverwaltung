@@ -46,6 +46,7 @@
   <mkdir dir="${workspace}/build/logs"/>
   <mkdir dir="${workspace}/build/pdepend"/>
   <mkdir dir="${workspace}/build/phpdox"/>
+  <mkdir dir="${workspace}/tests"/>
   <move todir="${workspace}">
     <fileset dir="${workspace}/src/ci-config">
         <include name="*.xml"/>
@@ -64,10 +65,10 @@
     <modified />
    </fileset>
 
-   <!-- <fileset dir="${workspace}/tests">
+   <fileset dir="${workspace}/tests">
     <include name="**/*.php" />
     <modified />
-   </fileset> -->
+   </fileset>
   </apply>
  </target>
 
@@ -76,7 +77,7 @@
   <exec executable="${toolsdir}phploc">
    <arg value="--count-tests" />
    <arg path="${workspace}/src" />
-   <!-- <arg path="${workspace}/tests" /> -->
+   <arg path="${workspace}/tests" />
   </exec>
  </target>
 
@@ -90,7 +91,7 @@
    <arg value="--log-xml" />
    <arg path="${workspace}/build/logs/phploc.xml" />
    <arg path="${workspace}/src" />
-   <!-- <arg path="${workspace}/tests" /> -->
+   <arg path="${workspace}/tests" />
   </exec>
  </target>
 
@@ -133,7 +134,7 @@
    <arg value="--extensions=php" />
    <arg value="--ignore=autoload.php" />
    <arg path="${workspace}/src" />
-   <!-- <arg path="${workspace}/tests" /> -->
+   <arg path="${workspace}/tests" />
   </exec>
  </target>
 
@@ -173,9 +174,6 @@
   <exec executable="${toolsdir}phpunit" failonerror="true">
    <arg value="--configuration"/>
    <arg path="${workspace}/phpunit.xml"/>
-   <arg value="--log-junit"/>
-   <arg path="${workspace}/build/logs/junit.xml"/>
-   <arg path="${workspace}/tests"/>
   </exec>
  </target>
 

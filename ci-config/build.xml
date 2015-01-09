@@ -7,7 +7,7 @@
  <!-- <property name="toolsdir" value="${workspace}/vendor/bin/"/> -->
 
  <target name="build"
-         depends="prepare,lint,phploc-ci,pdepend,phpmd-ci,phpcs-ci,phpcpd-ci,phpunit,phpdox"
+         depends="prepare,lint,phploc-ci,pdepend,phpmd-ci,phpcs-ci,phpcpd-ci,phpdox"
          description=""/>
 
  <target name="build-parallel"

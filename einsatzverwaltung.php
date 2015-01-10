@@ -31,6 +31,7 @@ require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-widget.php');
 require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-shortcodes.php');
 require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-settings.php');
 require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-tools.php');
+require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-tools-wpe.php');
 require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-taxonomies.php');
 
 global $evw_db_version;
@@ -65,6 +66,14 @@ $evw_terms = array(
     'einsatzart' => 'Einsatzart',
     'fahrzeug' => 'Fahrzeuge',
     'exteinsatzmittel' => 'Externe Einsatzmittel'
+);
+
+global $evw_post_fields;
+$evw_post_fields = array(
+    'post_date' => 'Alarmzeit',
+    'post_name' => 'Einsatznummer',
+    'post_content' => 'Einsatzbericht',
+    'title' => 'Einsatztitel'
 );
 
 /**
@@ -1180,6 +1189,16 @@ function einsatzverwaltung_is_min_wp_version($ver)
     return true;
 }
 
+
+/**
+ * Gibt ein Array aller Felder und deren Namen zurück,
+ * Hauptverwendungszweck ist das Mapping beim Import
+ */
+function einsatzverwaltung_get_fields()
+{
+    global $evw_meta_fields, $evw_terms, $evw_post_fields;
+    return array_merge($evw_meta_fields, $evw_terms, $evw_post_fields);
+}
 
 function einsatzverwaltung_print_error($message)
 {

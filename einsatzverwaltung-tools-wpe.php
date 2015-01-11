@@ -295,7 +295,12 @@ function einsatzverwaltung_import_wpe($tablename, $feld_mapping)
             foreach ($meta_values as $mkey => $mval) {
                 update_post_meta($post_id, $mkey, $mval);
             }
-            // TODO Einsatznummer prüfen
+            
+            // Einsatznummer prüfen
+            $gespeicherte_einsatznummer = get_post_field('post_name', $post_id);
+            if ($gespeicherte_einsatznummer != $einsatznummer) {
+                einsatzverwaltung_print_warning('WordPress hat diesem Einsatz nicht die vorgesehene Einsatznummer erteilt.<br>Verwendung des Werkzeugs <a href="'.admin_url('tools.php?page=einsatzvw-tool-enr').'">Einsatznummern reparieren</a> wird empfohlen.');
+            }
         }
     }
     

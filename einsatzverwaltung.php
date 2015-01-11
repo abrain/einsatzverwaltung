@@ -72,8 +72,8 @@ global $evw_post_fields;
 $evw_post_fields = array(
     'post_date' => 'Alarmzeit',
     'post_name' => 'Einsatznummer',
-    'post_content' => 'Einsatzbericht',
-    'title' => 'Einsatztitel'
+    'post_content' => 'Berichtstext',
+    'post_title' => 'Einsatzstichwort'
 );
 
 /**

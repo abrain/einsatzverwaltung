@@ -65,6 +65,14 @@ function einsatzverwaltung_tool_wpe_page()
                 }
             }
             
+            // Hinweise ausgeben
+            echo '<h3>Hinweise zu den Daten</h3>';
+            echo '<p>Die Felder <strong>Berichtstext, Einsatzleiter, Einsatzort</strong> und <strong>Einsatzstichwort</strong> sind Freitextfelder.</p>';
+            echo '<p>F&uuml;r die Felder <strong>Alarmierungsart, Einsatzart, Externe Einsatzmittel</strong> und <strong>Fahrzeuge</strong> wird eine kommagetrennte Liste erwartet.<br>Bisher unbekannte Eintr&auml;ge werden automatisch angelegt, die Einsatzart sollte nur ein einzelner Wert sein.</p>';
+            echo '<p>Das Feld <strong>Einsatzende</strong> erwartet eine Datums- und Zeitangabe im Format <code>JJJJ-MM-TT hh:mm:ss</code> (z.B. 2014-04-21 21:48:06). Die Sekundenangabe ist optional.</p>';
+            echo '<p>Das Feld <strong>Fehlalarm</strong> erwartet den Wert 1 (= ja) oder 0 (= nein). Es darf auch leer bleiben, was als 0 (= nein) zählt.</p>';
+            echo '<p>Das Feld <strong>Mannschaftsst&auml;rke</strong> erwartet eine Zahl größer oder gleich 0. Es darf auch leer bleiben.</p>';
+            
             // Felder matchen
             echo "<h3>Felder zuordnen</h3>";
             einsatzverwaltung_form_feldzuordnung($felder);
@@ -212,7 +220,7 @@ function einsatzverwaltung_import_wpe($tablename, $feld_mapping)
 {
     global $wpdb, $evw_meta_fields, $evw_terms, $evw_post_fields;
     
-    $query = sprintf('SELECT %s FROM %s ORDER BY %s', implode(array_keys($feld_mapping), ','), $tablename, EVW_TOOL_WPE_DATE_COLUMN);
+    $query = sprintf('SELECT ID,%s FROM %s ORDER BY %s', implode(array_keys($feld_mapping), ','), $tablename, EVW_TOOL_WPE_DATE_COLUMN);
     $wpe_einsaetze = $wpdb->get_results($query, ARRAY_A);
     
     if ($wpe_einsaetze === null) {
@@ -279,7 +287,15 @@ function einsatzverwaltung_import_wpe($tablename, $feld_mapping)
             }
         }
         
+        // Datum des Einsatzes prüfen
         $alarmzeit = date_create($einsatz_args['post_date']);
+        if ($alarmzeit === false) {
+            einsatzverwaltung_print_error(
+                sprintf('Konnte Datum vom Einsatz mit der ID %d nicht einlesen', $wpe_einsatz['ID'])
+            );
+            continue;
+        }
+        
         $einsatzjahr = date_format($alarmzeit, 'Y');
         $einsatznummer = einsatzverwaltung_get_next_einsatznummer($einsatzjahr, $einsatzjahr == date('Y'));
         $einsatz_args['post_name'] = $einsatznummer;
@@ -289,8 +305,17 @@ function einsatzverwaltung_import_wpe($tablename, $feld_mapping)
         $meta_values['einsatz_alarmzeit'] = date_format($alarmzeit, 'Y-m-d H:i');
         
         // Titel sicherstellen
-        if (!array_key_exists('post_title', $einsatz_args) || empty($einsatz_args['post_title'])) {
+        if (!array_key_exists('post_title', $einsatz_args)) {
             $einsatz_args['post_title'] = 'Einsatz';
+        }
+        $einsatz_args['post_title'] = wp_strip_all_tags($einsatz_args['post_title']);
+        if (empty($einsatz_args['post_title'])) {
+            $einsatz_args['post_title'] = 'Einsatz';
+        }
+        
+        // Mannschaftsstärke validieren
+        if (array_key_exists('einsatz_mannschaft', $meta_values)) {
+            $meta_values['einsatz_mannschaft'] = einsatzverwaltung_sanitize_pos_number($meta_values['einsatz_mannschaft']);
         }
         
         // Neuen Beitrag anlegen

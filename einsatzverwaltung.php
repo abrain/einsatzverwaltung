@@ -26,6 +26,7 @@ define('EINSATZVERWALTUNG__D__SHOW_EINSATZART_ARCHIVE', false);
 define('EINSATZVERWALTUNG__D__SHOW_FAHRZEUG_ARCHIVE', false);
 define('EINSATZVERWALTUNG__D__HIDE_EMPTY_DETAILS', true);
 define('EINSATZVERWALTUNG__D__SHOW_LINKS_IN_EXCERPT', false);
+define('EINSATZVERWALTUNG__D__SHOW_EINSATZBERICHTE_MAINLOOP', false);
 
 require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-widget.php');
 require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-shortcodes.php');
@@ -832,6 +833,25 @@ function einsatzverwaltung_einsatz_excerpt_feed($excerpt)
     }
 }
 add_filter('the_excerpt_rss', 'einsatzverwaltung_einsatz_excerpt_feed');
+
+
+/**
+ * Gibt Einsatzberichte ggf. auch zwischen den 'normalen' Blogbeiträgen aus
+ */
+function einsatzverwaltung_add_einsatzberichte_to_mainloop( $query ) {
+    if(
+        get_option('einsatzvw_show_einsatzberichte_mainloop', EINSATZVERWALTUNG__D__SHOW_EINSATZBERICHTE_MAINLOOP) &&
+        $query->is_main_query() &&
+        is_home() &&
+        empty($query->query_vars['suppress_filters'])
+    ) {
+        $post_types = isset($query->query_vars['post_type']) ? (array) $query->query_vars['post_type'] : array('post');
+        $post_types[] = 'einsatz';
+        $query->set('post_type', $post_types);
+        return $query;
+    }
+}
+add_filter('pre_get_posts', 'einsatzverwaltung_add_einsatzberichte_to_mainloop');
 
 
 /**

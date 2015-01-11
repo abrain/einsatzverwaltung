@@ -68,6 +68,13 @@ function einsatzverwaltung_register_settings()
         'einsatzvw_settings_general'
     );
     add_settings_field(
+        'einsatzvw_einsatznummer_mainloop',
+        'Einsatzbericht als Beitrag',
+        'einsatzverwaltung_echo_einsatzberichte_mainloop',
+        EVW_SETTINGS_SLUG,
+        'einsatzvw_settings_general'
+    );
+    add_settings_field(
         'einsatzvw_einsatz_hideemptydetails',
         'Einsatzdetails',
         'einsatzverwaltung_echo_settings_empty_details',
@@ -99,6 +106,7 @@ function einsatzverwaltung_register_settings()
     // Registration
     register_setting('einsatzvw_settings', 'einsatzvw_einsatznummer_stellen', 'einsatzverwaltung_sanitize_einsatznummer_stellen');
     register_setting('einsatzvw_settings', 'einsatzvw_einsatznummer_lfdvorne', 'einsatzverwaltung_sanitize_checkbox');
+    register_setting('einsatzvw_settings', 'einsatzvw_show_einsatzberichte_mainloop', 'einsatzverwaltung_sanitize_checkbox');
     register_setting('einsatzvw_settings', 'einsatzvw_einsatz_hideemptydetails', 'einsatzverwaltung_sanitize_checkbox');
     register_setting('einsatzvw_settings', 'einsatzvw_show_exteinsatzmittel_archive', 'einsatzverwaltung_sanitize_checkbox');
     register_setting('einsatzvw_settings', 'einsatzvw_show_einsatzart_archive', 'einsatzverwaltung_sanitize_checkbox');
@@ -166,6 +174,22 @@ function einsatzverwaltung_sanitize_einsatznummer_stellen($input)
     } else {
         return EINSATZVERWALTUNG__EINSATZNR_STELLEN;
     }
+}
+
+
+/**
+ *
+ */
+function einsatzverwaltung_echo_einsatzberichte_mainloop()
+{
+    einsatzverwaltung_echo_settings_checkbox(
+        array(
+            'einsatzvw_show_einsatzberichte_mainloop',
+            'Einsatzberichte wie reguläre Beitr&auml;ge anzeigen',
+            EINSATZVERWALTUNG__D__SHOW_EINSATZBERICHTE_MAINLOOP
+        )
+    );
+    echo '<p class="description">Mit dieser Option werden Einsatzberichte zwischen den anderen WordPress-Beiträgen (z.B. auf der Startseite) angezeigt.</p>';
 }
 
 

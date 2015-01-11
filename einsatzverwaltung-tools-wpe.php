@@ -10,7 +10,7 @@ define('EVW_TOOL_WPE_INPUT_NAME_PREFIX', 'evw_wpe_');
  */
 function einsatzverwaltung_tool_wpe_menu()
 {
-    add_management_page('wp-einsatz Import', 'wp-einsatz Import', 'manage_options', EVW_TOOL_WPE_SLUG, 'einsatzverwaltung_tool_wpe_page');
+    add_management_page('Import aus wp-einsatz', 'Import aus wp-einsatz', 'manage_options', EVW_TOOL_WPE_SLUG, 'einsatzverwaltung_tool_wpe_page');
 }
 add_action('admin_menu', 'einsatzverwaltung_tool_wpe_menu');
 
@@ -22,7 +22,7 @@ function einsatzverwaltung_tool_wpe_page()
 {
     global $wpdb;
     echo '<div class="wrap">';
-    echo '<h2>Import von wp-einsatz</h2>';
+    echo '<h2>Import aus wp-einsatz</h2>';
     
     echo '<p>Dieses Werkzeug importiert Einsätze aus wp-einsatz.</p>';
     
@@ -31,8 +31,10 @@ function einsatzverwaltung_tool_wpe_page()
     if ($wpdb->get_var("SHOW TABLES LIKE '$tablename'") != $tablename) {
         einsatzverwaltung_print_error('Die Tabelle, in der wp-einsatz seine Daten speichert, konnte nicht gefunden werden.');
     } else {
-        // TODO Formulareingaben mit Nonces absichern
         if (array_key_exists('submit', $_POST) && array_key_exists('aktion', $_POST) && $_POST['aktion'] == 'analyse') {
+            // Nonce überprüfen
+            check_admin_referer('evw-import-wpe-analyse');
+            
             // Datenbank analysieren
             echo "<h3>Analyse</h3>";
             echo "<p>Die Daten von wp-einsatz werden analysiert...</p>";
@@ -67,6 +69,9 @@ function einsatzverwaltung_tool_wpe_page()
             echo "<h3>Felder zuordnen</h3>";
             einsatzverwaltung_form_feldzuordnung($felder);
         } elseif (array_key_exists('submit', $_POST) && array_key_exists('aktion', $_POST) && $_POST['aktion'] == 'import_wpe') {
+            // Nonce überprüfen
+            check_admin_referer('evw-import-wpe-import');
+            
             echo '<h3>Import</h3>';
             
             $wpe_felder = einsatzverwaltung_get_wpe_felder($tablename);
@@ -110,6 +115,7 @@ function einsatzverwaltung_tool_wpe_page()
             einsatzverwaltung_print_success('Die Tabelle, in der wp-einsatz seine Daten speichert, wurde gefunden. Analyse jetzt starten?');
             echo '<form method="post">';
             echo '<input type="hidden" name="aktion" value="analyse" />';
+            wp_nonce_field('evw-import-wpe-analyse');
             submit_button('Analyse starten');
             echo '</form>';
         }
@@ -123,6 +129,7 @@ function einsatzverwaltung_tool_wpe_page()
 function einsatzverwaltung_form_feldzuordnung($felder, $mapping = array())
 {
     echo '<form method="post">';
+    wp_nonce_field('evw-import-wpe-import');
     echo '<input type="hidden" name="aktion" value="import_wpe" />';
     echo '<table class="evw_match_fields"><tr><th>Feld in wp-einsatz</th><th>Feld in Einsatzverwaltung</th></tr><tbody>';
     foreach ($felder as $feld) {

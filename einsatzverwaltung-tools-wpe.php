@@ -65,32 +65,9 @@ function einsatzverwaltung_tool_wpe_page()
             
             // Felder matchen
             echo "<h3>Felder zuordnen</h3>";
-            $eigenefelder = array('');
-            echo '<form method="post">';
-            echo '<input type="hidden" name="aktion" value="import_wpe" />';
-            echo '<table class="evw_match_fields"><tr><th>Feld in wp-einsatz</th><th>Feld in Einsatzverwaltung</th></tr><tbody>';
-            foreach ($felder as $feld) {
-                echo '<tr><td><strong>' . $feld . '</strong></td><td>';
-                if ($feld == EVW_TOOL_WPE_DATE_COLUMN) {
-                    echo 'wird automatisch zugeordnet';
-                } else {
-                    // Auf problematische Zeichen prüfen
-                    if (strpbrk($feld, 'äöüÄÖÜß/#')) {
-                        einsatzverwaltung_print_warning('Feldname enth&auml;lt Zeichen (z.B. Umlaute oder Sonderzeichen), die beim Import zu Problemen f&uuml;hren.<br>Bitte das Feld in den Einstellungen von wp-einsatz umbenennen, wenn Sie es importieren wollen.');
-                    } else {
-                        echo einsatzverwaltung_dropdown_eigenefelder(EVW_TOOL_WPE_INPUT_NAME_PREFIX . strtolower($feld));
-                    }
-                }
-                echo '</td></tr>';
-            }
-            echo '</tbody></table>';
-            submit_button('Import starten');
-            echo '</form>';
+            einsatzverwaltung_form_feldzuordnung($felder);
         } elseif (array_key_exists('submit', $_POST) && array_key_exists('aktion', $_POST) && $_POST['aktion'] == 'import_wpe') {
             echo '<h3>Import</h3>';
-            echo '<p>Die Daten werden eingelesen, das kann einen Moment dauern.</p>';
-            
-            global $evw_meta_fields, $evw_terms, $evw_post_fields;
             
             $wpe_felder = einsatzverwaltung_get_wpe_felder($tablename);
             if (empty($wpe_felder)) {
@@ -121,12 +98,13 @@ function einsatzverwaltung_tool_wpe_page()
                 if ($anzahl > 1) {
                     $evw_felder = einsatzverwaltung_get_fields();
                     einsatzverwaltung_print_error("Feld $evw_felder[$zielfeld] kann nur f&uuml;r ein wp-einsatz-Feld als Importziel angegeben werden");
-                    // TODO zeige erneut Mapping, vorbelegt mit gesendeten Werten
+                    einsatzverwaltung_form_feldzuordnung($wpe_felder, $feld_mapping);
                     return;
                 }
             }
             
             // Import starten
+            echo '<p>Die Daten werden eingelesen, das kann einen Moment dauern.</p>';
             einsatzverwaltung_import_wpe($tablename, $feld_mapping);
         } else {
             einsatzverwaltung_print_success('Die Tabelle, in der wp-einsatz seine Daten speichert, wurde gefunden. Analyse jetzt starten?');
@@ -140,9 +118,41 @@ function einsatzverwaltung_tool_wpe_page()
 
 
 /**
+ * Gibt das Formular für die Zuordnung zwischen zu importieren Feldern und denen von Einsatzverwaltung aus
+ */
+function einsatzverwaltung_form_feldzuordnung($felder, $mapping = array())
+{
+    echo '<form method="post">';
+    echo '<input type="hidden" name="aktion" value="import_wpe" />';
+    echo '<table class="evw_match_fields"><tr><th>Feld in wp-einsatz</th><th>Feld in Einsatzverwaltung</th></tr><tbody>';
+    foreach ($felder as $feld) {
+        echo '<tr><td><strong>' . $feld . '</strong></td><td>';
+        if ($feld == EVW_TOOL_WPE_DATE_COLUMN) {
+            echo 'wird automatisch zugeordnet';
+        } else {
+            // Auf problematische Zeichen prüfen
+            if (strpbrk($feld, 'äöüÄÖÜß/#')) {
+                einsatzverwaltung_print_warning('Feldname enth&auml;lt Zeichen (z.B. Umlaute oder Sonderzeichen), die beim Import zu Problemen f&uuml;hren.<br>Bitte das Feld in den Einstellungen von wp-einsatz umbenennen, wenn Sie es importieren wollen.');
+            } else {
+                $selected = '-';
+                if(!empty($mapping) && array_key_exists($feld, $mapping) && !empty($mapping[$feld])) {
+                    $selected = $mapping[$feld];
+                }
+                echo einsatzverwaltung_dropdown_eigenefelder(EVW_TOOL_WPE_INPUT_NAME_PREFIX . strtolower($feld), $selected);
+            }
+        }
+        echo '</td></tr>';
+    }
+    echo '</tbody></table>';
+    submit_button('Import starten');
+    echo '</form>';
+}
+
+
+/**
  * Gibt ein Auswahlfeld zur Zuordnung der Felder in Einsatzverwaltung aus
  */
-function einsatzverwaltung_dropdown_eigenefelder($name, $echo = false)
+function einsatzverwaltung_dropdown_eigenefelder($name, $selected = '-', $echo = false)
 {
     $felder = einsatzverwaltung_get_fields();
     
@@ -154,9 +164,9 @@ function einsatzverwaltung_dropdown_eigenefelder($name, $echo = false)
     asort($felder);
     $string = '';
     $string .= '<select name="' . $name . '">';
-    $string .= '<option value="-">nicht importieren</option>';
+    $string .= '<option value="-"' . ($selected == '-' ? ' selected="selected"' : '') . '>nicht importieren</option>';
     foreach ($felder as $slug => $name) {
-        $string .= '<option value="' . $slug . '">' . $name . '</option>';
+        $string .= '<option value="' . $slug . '"' . ($selected == $slug ? ' selected="selected"' : '') . '>' . $name . '</option>';
     }
     $string .= '</select>';
         

@@ -53,6 +53,7 @@ Entweder [per Mail](mailto:kontakt@abrain.de), auf [Twitter](https://twitter.com
 = 0.8 =
 * Neu: Import aus wp-einsatz
 * Neu: Einsatzberichte k&ouml;nnen zusammen mit den Standardbeitr&auml;gen (z.B. auf der Startseite) angezeigt werden
+* Neu: Hierarchie der Einsatzart kann im Widget angezeigt werden
 
 = 0.7.1 =
 * Neu: Einsatzberichte k&ouml;nnen mit der Jetpack-Funktion &quot;Publizieren&quot; ver&ouml;ffentlicht werden
@@ -147,7 +148,7 @@ Entweder [per Mail](mailto:kontakt@abrain.de), auf [Twitter](https://twitter.com
 == Upgrade Notice ==
 
 = 0.8 =
-Import aus wp-einsatz und Anzeige von Einsatzberichten als normale Beitr&auml;ge
+Import aus wp-einsatz, Anzeige von Einsatzberichten als normale Beitr&auml;ge und Hierarchie der Einsatzart im Widget
 
 = 0.7.1 =
 Publizieren mit Jetpack aktiviert

@@ -33,6 +33,7 @@ class Einsatzverwaltung_Widget extends WP_Widget
         $zeigeFeedlink = (array_key_exists('zeigeFeedlink', $instance) ? $instance['zeigeFeedlink'] : null);
         $zeigeOrt = (array_key_exists('zeigeOrt', $instance) ? $instance['zeigeOrt'] : null);
         $zeigeArt = (array_key_exists('zeigeArt', $instance) ? $instance['zeigeArt'] : null);
+        $zeigeArtHierarchie = (array_key_exists('zeigeArtHierarchie', $instance) ? $instance['zeigeArtHierarchie'] : null);
         
         if (empty($title)) {
             $title = "Letzte Eins&auml;tze";
@@ -70,7 +71,8 @@ class Einsatzverwaltung_Widget extends WP_Widget
             if ($zeigeArt) {
                 $einsatzart = einsatzverwaltung_get_einsatzart($p->ID);
                 if ($einsatzart) {
-                    $letzteEinsaetze .= "<br><span class=\"einsatzart\">".$einsatzart->name."</span>";
+                    $einsatzart_str = $zeigeArtHierarchie ? einsatzverwaltung_get_einsatzart_string($einsatzart, false, false) : $einsatzart->name;
+                    $letzteEinsaetze .= sprintf('<br><span class="einsatzart">%s</span>', $einsatzart_str);
                 }
             }
             
@@ -117,6 +119,7 @@ class Einsatzverwaltung_Widget extends WP_Widget
         $instance['zeigeZeit'] = $new_instance['zeigeZeit'];
         $instance['zeigeOrt'] = $new_instance['zeigeOrt'];
         $instance['zeigeArt'] = $new_instance['zeigeArt'];
+        $instance['zeigeArtHierarchie'] = $new_instance['zeigeArtHierarchie'];
         $instance['zeigeFeedlink'] = $new_instance['zeigeFeedlink'];
 
         return $instance;
@@ -148,6 +151,7 @@ class Einsatzverwaltung_Widget extends WP_Widget
         $zeigeFeedlink = (array_key_exists('zeigeFeedlink', $instance) ? $instance['zeigeFeedlink'] : null);
         $zeigeOrt = (array_key_exists('zeigeOrt', $instance) ? $instance['zeigeOrt'] : null);
         $zeigeArt = (array_key_exists('zeigeArt', $instance) ? $instance['zeigeArt'] : null);
+        $zeigeArtHierarchie = (array_key_exists('zeigeArtHierarchie', $instance) ? $instance['zeigeArtHierarchie'] : null);
         
         echo '<p><label for="'.$this->get_field_id('title').'">' . __('Titel:', 'einsatzverwaltung') . '</label>';
         echo '<input class="widefat" id="' . $this->get_field_id('title') . '" name="' . $this->get_field_name('title') . '" type="text" value="' . esc_attr($title).'" /></p>';
@@ -168,6 +172,9 @@ class Einsatzverwaltung_Widget extends WP_Widget
         
         echo '<p><input id="'.$this->get_field_id('zeigeArt').'" name="'.$this->get_field_name('zeigeArt').'" type="checkbox" '.($zeigeArt ? 'checked="checked" ' : '').'/>';
         echo '&nbsp;<label for="'.$this->get_field_id('zeigeArt').'">' . __('Einsatzart anzeigen', 'einsatzverwaltung') . '</label></p>';
+        
+        echo '<p style="text-indent:1em;"><input id="'.$this->get_field_id('zeigeArtHierarchie').'" name="'.$this->get_field_name('zeigeArtHierarchie').'" type="checkbox" '.($zeigeArtHierarchie ? 'checked="checked" ' : '').'/>';
+        echo '&nbsp;<label for="'.$this->get_field_id('zeigeArtHierarchie').'">' . __('Hierarchie der Einsatzart anzeigen', 'einsatzverwaltung') . '</label></p>';
         
         echo '<p><input id="'.$this->get_field_id('zeigeOrt').'" name="'.$this->get_field_name('zeigeOrt').'" type="checkbox" '.($zeigeOrt ? 'checked="checked" ' : '').'/>';
         echo '&nbsp;<label for="'.$this->get_field_id('zeigeOrt').'">' . __('Ort anzeigen', 'einsatzverwaltung') . '</label></p>';

@@ -617,18 +617,13 @@ function einsatzverwaltung_get_einsatzbericht_header($post, $may_contain_links =
         
         $einsatzart = einsatzverwaltung_get_einsatzart($post->ID);
         if ($einsatzart) {
-            $art = '';
-            do {
-                if (!empty($art)) {
-                    $art = ' > '.$art;
-                    $einsatzart = get_term($einsatzart->parent, 'einsatzart');
-                }
-                
-                if ($make_links && get_option('einsatzvw_show_einsatzart_archive', EINSATZVERWALTUNG__D__SHOW_EINSATZART_ARCHIVE)) {
-                    $art = '&nbsp;<a href="'.get_term_link($einsatzart).'" class="fa fa-filter" style="text-decoration:none;" title="Alle Eins&auml;tze vom Typ '.$einsatzart->name.' anzeigen"></a>' . $art;
-                }
-                $art = $einsatzart->name . $art;
-            } while ($einsatzart->parent != 0);
+            $art = einsatzverwaltung_get_einsatzart_string(
+                $einsatzart,
+                $make_links, get_option(
+                    'einsatzvw_show_einsatzart_archive',
+                    EINSATZVERWALTUNG__D__SHOW_EINSATZART_ARCHIVE
+                )
+            );
         } else {
             $art = '';
         }
@@ -770,6 +765,27 @@ function einsatzverwaltung_get_einsatzart($id)
     } else {
         return false;
     }
+}
+
+
+/**
+ * Gibt die Einsatzart als String zurück, wenn vorhanden auch mit den übergeordneten Einsatzarten
+ */
+function einsatzverwaltung_get_einsatzart_string($einsatzart, $make_links, $show_archive_links)
+{
+    $str = '';
+    do {
+        if (!empty($str)) {
+            $str = ' > '.$str;
+            $einsatzart = get_term($einsatzart->parent, 'einsatzart');
+        }
+        
+        if ($make_links && $show_archive_links) {
+            $str = sprintf('&nbsp;<a href="%s" class="fa fa-filter" style="text-decoration:none;" title="Alle Eins&auml;tze vom Typ %s anzeigen"></a>' . $str, get_term_link($einsatzart), $einsatzart->name);
+        }
+        $str = $einsatzart->name . $str;
+    } while ($einsatzart->parent != 0);
+    return $str;
 }
 
 

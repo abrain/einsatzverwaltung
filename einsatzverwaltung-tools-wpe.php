@@ -297,7 +297,7 @@ function einsatzverwaltung_import_wpe($tablename, $feld_mapping)
         }
         
         $einsatzjahr = date_format($alarmzeit, 'Y');
-        $einsatznummer = einsatzverwaltung_get_next_einsatznummer($einsatzjahr, $einsatzjahr == date('Y'));
+        $einsatznummer = einsatzverwaltung_get_next_einsatznummer($einsatzjahr);
         $einsatz_args['post_name'] = $einsatznummer;
         $einsatz_args['post_type'] = 'einsatz';
         $einsatz_args['post_status'] = 'publish';
@@ -319,6 +319,7 @@ function einsatzverwaltung_import_wpe($tablename, $feld_mapping)
         }
         
         // Neuen Beitrag anlegen
+        remove_action('save_post', 'einsatzverwaltung_save_postdata');
         $post_id = wp_insert_post($einsatz_args, true);
         if (is_wp_error($post_id)) {
             einsatzverwaltung_print_error('Konnte Einsatz nicht importieren: ' . $post_id->get_error_message());
@@ -334,6 +335,7 @@ function einsatzverwaltung_import_wpe($tablename, $feld_mapping)
                 einsatzverwaltung_print_warning('WordPress hat diesem Einsatz nicht die vorgesehene Einsatznummer erteilt.<br>Verwendung des Werkzeugs <a href="'.admin_url('tools.php?page=einsatzvw-tool-enr').'">Einsatznummern reparieren</a> wird empfohlen.');
             }
         }
+        add_action('save_post', 'einsatzverwaltung_save_postdata');
     }
     
     einsatzverwaltung_print_success('Der Import ist abgeschlossen');

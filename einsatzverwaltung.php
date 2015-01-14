@@ -895,12 +895,7 @@ function einsatzverwaltung_print_einsatzliste($einsatzjahre = array(), $desc = t
         if ($query->have_posts()) {
             if (!$splitmonths) {
                 $string .= "<table class=\"einsatzliste\">";
-                $string .= "<thead><tr>";
-                $string .= "<th width=\"80\">Nummer</th>";
-                $string .= "<th width=\"80\">Datum</th>";
-                $string .= "<th width=\"50\">Zeit</th>";
-                $string .= "<th>Einsatzmeldung</th>";
-                $string .= "</tr></thead>";
+                $string .= einsatzverwaltung_get_einsatzliste_header();
                 $string .= "<tbody>";
             }
             
@@ -924,19 +919,14 @@ function einsatzverwaltung_print_einsatzliste($einsatzjahre = array(), $desc = t
                     }
                     $string .= '<h5>' . date_i18n('F', $einsatz_timestamp) . '</h5>';
                     $string .= "<table class=\"einsatzliste\">";
-                    $string .= "<thead><tr>";
-                    $string .= "<th width=\"80\">Nummer</th>";
-                    $string .= "<th width=\"80\">Datum</th>";
-                    $string .= "<th width=\"50\">Zeit</th>";
-                    $string .= "<th>Einsatzmeldung</th>";
-                    $string .= "</tr></thead>";
+                    $string .= einsatzverwaltung_get_einsatzliste_header();
                     $string .= "<tbody>";
                 }
             
                 $string .= "<tr>";
-                $string .= "<td width=\"80\">".$einsatz_nummer."</td>";
-                $string .= "<td width=\"80\">".$einsatz_datum."</td>";
-                $string .= "<td width=\"50\">".$einsatz_zeit."</td>";
+                $string .= "<td>".$einsatz_nummer."</td>";
+                $string .= "<td>".$einsatz_datum."</td>";
+                $string .= "<td>".$einsatz_zeit."</td>";
                 $string .= "<td>";
             
                 $post_title = get_the_title($query->post->ID);
@@ -963,6 +953,18 @@ function einsatzverwaltung_print_einsatzliste($einsatzjahre = array(), $desc = t
     } else {
         return $string;
     }
+}
+
+
+function einsatzverwaltung_get_einsatzliste_header()
+{
+    $string = "<thead><tr>";
+    $string .= "<th>Nummer</th>";
+    $string .= "<th>Datum</th>";
+    $string .= "<th>Zeit</th>";
+    $string .= "<th>Einsatzmeldung</th>";
+    $string .= "</tr></thead>";
+    return $string;
 }
 
 

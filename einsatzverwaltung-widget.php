@@ -146,8 +146,8 @@ class Einsatzverwaltung_Widget extends WP_Widget
             $anzahl = 3;
         }
         
-        $zeigeDatum = $instance[ 'zeigeDatum' ];
-        $zeigeZeit = $instance[ 'zeigeZeit' ];
+        $zeigeDatum = (array_key_exists('zeigeDatum', $instance) ? $instance['zeigeDatum'] : null);
+        $zeigeZeit = (array_key_exists('zeigeZeit', $instance) ? $instance['zeigeZeit'] : null);
         $zeigeFeedlink = (array_key_exists('zeigeFeedlink', $instance) ? $instance['zeigeFeedlink'] : null);
         $zeigeOrt = (array_key_exists('zeigeOrt', $instance) ? $instance['zeigeOrt'] : null);
         $zeigeArt = (array_key_exists('zeigeArt', $instance) ? $instance['zeigeArt'] : null);

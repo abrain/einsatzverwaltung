@@ -104,7 +104,7 @@ function einsatzverwaltung_create_post_type()
             'slug' => 'einsaetze',
             'feeds' => true
         ),
-        'supports' => array('title', 'editor', 'thumbnail', 'publicize'),
+        'supports' => array('title', 'editor', 'thumbnail', 'publicize', 'author'),
         'show_in_nav_menus' => false,
         'capability_type' => array('einsatzbericht', 'einsatzberichte'),
         'map_meta_cap' => true,

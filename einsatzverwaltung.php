@@ -621,7 +621,8 @@ function einsatzverwaltung_get_einsatzbericht_header($post, $may_contain_links =
         if ($einsatzart) {
             $art = einsatzverwaltung_get_einsatzart_string(
                 $einsatzart,
-                $make_links, get_option(
+                $make_links,
+                get_option(
                     'einsatzvw_show_einsatzart_archive',
                     EINSATZVERWALTUNG__D__SHOW_EINSATZART_ARCHIVE
                 )
@@ -857,8 +858,9 @@ add_filter('the_excerpt_rss', 'einsatzverwaltung_einsatz_excerpt_feed');
 /**
  * Gibt Einsatzberichte ggf. auch zwischen den 'normalen' Blogbeiträgen aus
  */
-function einsatzverwaltung_add_einsatzberichte_to_mainloop( $query ) {
-    if(
+function einsatzverwaltung_add_einsatzberichte_to_mainloop($query)
+{
+    if (
         get_option('einsatzvw_show_einsatzberichte_mainloop', EINSATZVERWALTUNG__D__SHOW_EINSATZBERICHTE_MAINLOOP) &&
         $query->is_main_query() &&
         is_home() &&

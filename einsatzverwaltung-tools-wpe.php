@@ -150,7 +150,7 @@ function einsatzverwaltung_form_feldzuordnung($felder, $mapping = array())
                 einsatzverwaltung_print_warning('Feldname enth&auml;lt Zeichen (z.B. Umlaute oder Sonderzeichen), die beim Import zu Problemen f&uuml;hren.<br>Bitte das Feld in den Einstellungen von wp-einsatz umbenennen, wenn Sie es importieren wollen.');
             } else {
                 $selected = '-';
-                if(!empty($mapping) && array_key_exists($feld, $mapping) && !empty($mapping[$feld])) {
+                if (!empty($mapping) && array_key_exists($feld, $mapping) && !empty($mapping[$feld])) {
                     $selected = $mapping[$feld];
                 }
                 echo einsatzverwaltung_dropdown_eigenefelder(EVW_TOOL_WPE_INPUT_NAME_PREFIX . strtolower($feld), $selected);

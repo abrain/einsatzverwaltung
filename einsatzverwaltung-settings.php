@@ -89,6 +89,13 @@ function einsatzverwaltung_register_settings()
         'einsatzvw_settings_einsatzberichte'
     );
     add_settings_field(
+        'einsatzvw_settings_ext_newwindow',
+        'Links zu externen Einsatzmitteln',
+        'einsatzverwaltung_echo_settings_extnew',
+        EVW_SETTINGS_SLUG,
+        'einsatzvw_settings_einsatzberichte'
+    );
+    add_settings_field(
         'einsatzvw_settings_excerpt',
         'Auszug / Exzerpt',
         'einsatzverwaltung_echo_settings_excerpt',
@@ -111,6 +118,7 @@ function einsatzverwaltung_register_settings()
     register_setting('einsatzvw_settings', 'einsatzvw_show_exteinsatzmittel_archive', 'einsatzverwaltung_sanitize_checkbox');
     register_setting('einsatzvw_settings', 'einsatzvw_show_einsatzart_archive', 'einsatzverwaltung_sanitize_checkbox');
     register_setting('einsatzvw_settings', 'einsatzvw_show_fahrzeug_archive', 'einsatzverwaltung_sanitize_checkbox');
+    register_setting('einsatzvw_settings', 'einsatzvw_open_ext_in_new', 'einsatzverwaltung_sanitize_checkbox');
     register_setting('einsatzvw_settings', 'einsatzvw_show_links_in_excerpt', 'einsatzverwaltung_sanitize_checkbox');
     
     $roles = get_editable_roles();
@@ -238,6 +246,21 @@ function einsatzverwaltung_echo_settings_archive()
         )
     );
     echo '<p class="description">F&uuml;r alle hier aktivierten Arten von Einsatzdetails werden im Kopfbereich des Einsatzberichts f&uuml;r alle auftretenden Werte Links zu einer gefilterten Einsatz&uuml;bersicht angezeigt. Beispielsweise kann man damit alle Eins&auml;tze unter Beteiligung einer bestimmten externen Einsatzkraft auflisten lassen.</p>';
+}
+
+
+/**
+ * Gibt die Einstellmöglichkeiten aus, ob Links zu externen Einsatzmitteln in einem neuen Fenster geöffnet werden sollen
+ */
+function einsatzverwaltung_echo_settings_extnew()
+{
+    einsatzverwaltung_echo_settings_checkbox(
+        array(
+            'einsatzvw_open_ext_in_new',
+            'Links zu externen Einsatzmitteln in einem neuen Fenster öffnen',
+            EINSATZVERWALTUNG__D__OPEN_EXTEINSATZMITTEL_NEWWINDOW
+        )
+    );
 }
 
 

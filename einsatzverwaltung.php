@@ -27,6 +27,7 @@ define('EINSATZVERWALTUNG__D__SHOW_FAHRZEUG_ARCHIVE', false);
 define('EINSATZVERWALTUNG__D__HIDE_EMPTY_DETAILS', true);
 define('EINSATZVERWALTUNG__D__SHOW_LINKS_IN_EXCERPT', false);
 define('EINSATZVERWALTUNG__D__SHOW_EINSATZBERICHTE_MAINLOOP', false);
+define('EINSATZVERWALTUNG__D__OPEN_EXTEINSATZMITTEL_NEWWINDOW', false);
 
 require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-widget.php');
 require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-shortcodes.php');
@@ -682,7 +683,8 @@ function einsatzverwaltung_get_einsatzbericht_header($post, $may_contain_links =
                 if ($make_links) {
                     $url = einsatzverwaltung_get_term_field($ext->term_id, 'exteinsatzmittel', 'url');
                     if ($url !== false) {
-                        $ext_name = '<a href="'.$url.'" title="Mehr Informationen zu '.$ext->name.'">'.$ext->name.'</a>';
+                        $open_in_new_window = get_option('einsatzvw_open_ext_in_new', EINSATZVERWALTUNG__D__OPEN_EXTEINSATZMITTEL_NEWWINDOW);
+                        $ext_name = '<a href="'.$url.'" title="Mehr Informationen zu '.$ext->name.'"' . ($open_in_new_window ? ' target="_blank"' : '') . '>'.$ext->name.'</a>';
                     }
                 }
                 

@@ -1,4 +1,8 @@
 <?php
+namespace abrain\Einsatzverwaltung;
+
+use \WP_Widget;
+use \WP_Query;
 
 class Einsatzverwaltung_Widget extends WP_Widget
 {
@@ -181,5 +185,7 @@ class Einsatzverwaltung_Widget extends WP_Widget
     }
 }
 
-// register Einsatz_Widget widget
-add_action('widgets_init', create_function('', 'register_widget("einsatzverwaltung_widget");'));
+// Widget in WordPress registrieren
+add_action('widgets_init', function() {
+    register_widget('abrain\Einsatzverwaltung\Einsatzverwaltung_Widget');
+});

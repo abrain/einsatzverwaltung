@@ -77,6 +77,7 @@ $evw_post_fields = array(
     'post_title' => 'Einsatzstichwort'
 );
 
+
 /**
  * Erzeugt den neuen Beitragstyp Einsatzbericht und die zugehörigen Taxonomien
  */
@@ -931,9 +932,9 @@ function einsatzverwaltung_print_einsatzliste($einsatzjahre = array(), $desc = t
             
                 $post_title = get_the_title($query->post->ID);
                 if (!empty($post_title)) {
-                    $string .= "<a href=\"".get_permalink($query->post->ID)."\" rel=\"bookmark\">".$post_title."</a><br>";
+                    $string .= "<a href=\"".get_permalink($query->post->ID)."\" rel=\"bookmark\">".$post_title."</a>";
                 } else {
-                    $string .= "<a href=\"".get_permalink($query->post->ID)."\" rel=\"bookmark\">(kein Titel)</a><br>";
+                    $string .= "<a href=\"".get_permalink($query->post->ID)."\" rel=\"bookmark\">(kein Titel)</a>";
                 }
                 $string .= "</td>";
                 $string .= "</tr>";
@@ -956,6 +957,9 @@ function einsatzverwaltung_print_einsatzliste($einsatzjahre = array(), $desc = t
 }
 
 
+/**
+ * Gibt die Kopfzeile der Tabelle für die Einsatzübersicht zurück
+ */
 function einsatzverwaltung_get_einsatzliste_header()
 {
     $string = "<thead><tr>";
@@ -1201,6 +1205,10 @@ function check_php_version($ver)
     }
 }
 
+
+/**
+ * Prüft, ob WordPress mindestens in Version $ver läuft
+ */
 function einsatzverwaltung_is_min_wp_version($ver)
 {
     $currentversionparts = explode(".", get_bloginfo('version'));

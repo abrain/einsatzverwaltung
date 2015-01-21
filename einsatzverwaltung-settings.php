@@ -4,7 +4,7 @@ class EinsatzverwaltungSettings
 {
     const EVW_SETTINGS_SLUG = 'einsatzvw-settings';
 
-    function __construct()
+    public function __construct()
     {
         $this->addHooks();
     }
@@ -12,25 +12,25 @@ class EinsatzverwaltungSettings
 
     private function addHooks()
     {
-        add_action('admin_menu', array($this, 'einsatzverwaltung_settings_menu'));
-        add_action('admin_init', array($this, 'einsatzverwaltung_register_settings'));
-        add_filter('plugin_action_links_' . EINSATZVERWALTUNG__PLUGIN_BASE, 'einsatzverwaltung_add_action_links');
+        add_action('admin_menu', array($this, 'addToSettingsMenu'));
+        add_action('admin_init', array($this, 'registerSettings'));
+        add_filter('plugin_action_links_' . EINSATZVERWALTUNG__PLUGIN_BASE, 'addActionLinks');
     }
 
 
     /**
      * Fügt die Einstellungsseite zum Menü hinzu
      */
-    public function einsatzverwaltung_settings_menu()
+    public function addToSettingsMenu()
     {
-        add_options_page('Einstellungen', 'Einsatzverwaltung', 'manage_options', self::EVW_SETTINGS_SLUG, array($this, 'einsatzverwaltung_settings_page'));
+        add_options_page('Einstellungen', 'Einsatzverwaltung', 'manage_options', self::EVW_SETTINGS_SLUG, array($this, 'echoSettingsPage'));
     }
 
 
     /**
      * Zeigt einen Link zu den Einstellungen direkt auf der Plugin-Seite an
      */
-    public function einsatzverwaltung_add_action_links($links)
+    public function addActionLinks($links)
     {
         $mylinks = array('<a href="' . admin_url('options-general.php?page='.self::EVW_SETTINGS_SLUG) . '">Einstellungen</a>');
         return array_merge($links, $mylinks);
@@ -40,7 +40,7 @@ class EinsatzverwaltungSettings
     /**
      * Macht Einstellungen im System bekannt und regelt die Zugehörigkeit zu Abschnitten auf Einstellungsseiten
      */
-    public function einsatzverwaltung_register_settings()
+    public function registerSettings()
     {
         // Sections
         add_settings_section(
@@ -77,55 +77,55 @@ class EinsatzverwaltungSettings
         add_settings_field(
             'einsatzvw_einsatznummer_stellen',
             'Format der Einsatznummer',
-            array($this, 'einsatzverwaltung_echo_einsatznummer_format'),
+            array($this, 'echoSettingsEinsatznummerFormat'),
             self::EVW_SETTINGS_SLUG,
             'einsatzvw_settings_general'
         );
         add_settings_field(
             'einsatzvw_einsatznummer_mainloop',
             'Einsatzbericht als Beitrag',
-            array($this, 'einsatzverwaltung_echo_einsatzberichte_mainloop'),
+            array($this, 'echoEinsatzberichteMainloop'),
             self::EVW_SETTINGS_SLUG,
             'einsatzvw_settings_general'
         );
         add_settings_field(
             'einsatzvw_einsatz_hideemptydetails',
             'Einsatzdetails',
-            array($this, 'einsatzverwaltung_echo_settings_empty_details'),
+            array($this, 'echoSettingsEmptyDetails'),
             self::EVW_SETTINGS_SLUG,
             'einsatzvw_settings_einsatzberichte'
         );
         add_settings_field(
             'einsatzvw_settings_archivelinks',
             'Gefilterte Einsatzübersicht verlinken',
-            array($this, 'einsatzverwaltung_echo_settings_archive'),
+            array($this, 'echoSettingsArchive'),
             self::EVW_SETTINGS_SLUG,
             'einsatzvw_settings_einsatzberichte'
         );
         add_settings_field(
             'einsatzvw_settings_ext_newwindow',
             'Links zu externen Einsatzmitteln',
-            array($this, 'einsatzverwaltung_echo_settings_extnew'),
+            array($this, 'echoSettingsExtNew'),
             self::EVW_SETTINGS_SLUG,
             'einsatzvw_settings_einsatzberichte'
         );
         add_settings_field(
             'einsatzvw_settings_excerpt',
             'Auszug / Exzerpt',
-            array($this, 'einsatzverwaltung_echo_settings_excerpt'),
+            array($this, 'echoSettingsExcerpt'),
             self::EVW_SETTINGS_SLUG,
             'einsatzvw_settings_einsatzberichte'
         );
         add_settings_field(
             'einsatzvw_settings_caps_roles',
             'Rollen',
-            array($this, 'einsatzverwaltung_echo_settings_caps_roles'),
+            array($this, 'echoSettingsCapsRoles'),
             self::EVW_SETTINGS_SLUG,
             'einsatzvw_settings_caps'
         );
     
         // Registration
-        register_setting('einsatzvw_settings', 'einsatzvw_einsatznummer_stellen', array($this, 'einsatzverwaltung_sanitize_einsatznummer_stellen'));
+        register_setting('einsatzvw_settings', 'einsatzvw_einsatznummer_stellen', array($this, 'sanitizeEinsatznummerStellen'));
         register_setting('einsatzvw_settings', 'einsatzvw_einsatznummer_lfdvorne', 'einsatzverwaltung_sanitize_checkbox');
         register_setting('einsatzvw_settings', 'einsatzvw_show_einsatzberichte_mainloop', 'einsatzverwaltung_sanitize_checkbox');
         register_setting('einsatzvw_settings', 'einsatzvw_einsatz_hideemptydetails', 'einsatzverwaltung_sanitize_checkbox');
@@ -147,7 +147,7 @@ class EinsatzverwaltungSettings
     /**
      *
      */
-    private function einsatzverwaltung_echo_settings_checkbox($args)
+    private function echoSettingsCheckbox($args)
     {
         $id = $args[0];
         $text = $args[1];
@@ -159,7 +159,7 @@ class EinsatzverwaltungSettings
     /**
      *
      */
-    private function einsatzverwaltung_echo_settings_input($args)
+    private function echoSettingsInput($args)
     {
         $id = $args[0];
         $text = $args[1];
@@ -170,10 +170,10 @@ class EinsatzverwaltungSettings
     /**
      *
      */
-    public function einsatzverwaltung_echo_einsatznummer_format()
+    public function echoSettingsEinsatznummerFormat()
     {
         printf('Jahreszahl + jahresbezogene, fortlaufende Nummer mit <input type="text" value="%2$s" size="2" id="%1$s" name="%1$s" /> Stellen<p class="description">Beispiel f&uuml;r den f&uuml;nften Einsatz in 2014:<br>bei 2 Stellen: 201405<br>bei 4 Stellen: 20140005</p><br>', 'einsatzvw_einsatznummer_stellen', get_option('einsatzvw_einsatznummer_stellen'));
-        $this->einsatzverwaltung_echo_settings_checkbox(
+        $this->echoSettingsCheckbox(
             array(
                 'einsatzvw_einsatznummer_lfdvorne',
                 'Laufende Nummer vor das Jahr stellen'
@@ -187,7 +187,7 @@ class EinsatzverwaltungSettings
     /**
      * Stellt einen sinnvollen Wert für die Anzahl Stellen der laufenden Einsatznummer sicher
      */
-    public function einsatzverwaltung_sanitize_einsatznummer_stellen($input)
+    public function sanitizeEinsatznummerStellen($input)
     {
         $val = intval($input);
         if (is_numeric($val) && $val > 0) {
@@ -201,9 +201,9 @@ class EinsatzverwaltungSettings
     /**
      *
      */
-    public function einsatzverwaltung_echo_einsatzberichte_mainloop()
+    public function echoEinsatzberichteMainloop()
     {
-        $this->einsatzverwaltung_echo_settings_checkbox(
+        $this->echoSettingsCheckbox(
             array(
                 'einsatzvw_show_einsatzberichte_mainloop',
                 'Einsatzberichte wie reguläre Beitr&auml;ge anzeigen',
@@ -217,9 +217,9 @@ class EinsatzverwaltungSettings
     /**
      * Gibt die Einstellmöglichkeiten für nicht ausgefüllte Einsatzdetails aus
      */
-    public function einsatzverwaltung_echo_settings_empty_details()
+    public function echoSettingsEmptyDetails()
     {
-        $this->einsatzverwaltung_echo_settings_checkbox(
+        $this->echoSettingsCheckbox(
             array(
                 'einsatzvw_einsatz_hideemptydetails',
                 'Nicht ausgef&uuml;llte Details ausblenden',
@@ -233,9 +233,9 @@ class EinsatzverwaltungSettings
     /**
      * Gibt die Einstellmöglichkeiten für gefilterte Ansichten aus
      */
-    public function einsatzverwaltung_echo_settings_archive()
+    public function echoSettingsArchive()
     {
-        $this->einsatzverwaltung_echo_settings_checkbox(
+        $this->echoSettingsCheckbox(
             array(
                 'einsatzvw_show_einsatzart_archive',
                 'Einsatzart',
@@ -243,7 +243,7 @@ class EinsatzverwaltungSettings
             )
         );
         echo '<br>';
-        $this->einsatzverwaltung_echo_settings_checkbox(
+        $this->echoSettingsCheckbox(
             array(
                 'einsatzvw_show_exteinsatzmittel_archive',
                 'Externe Einsatzkr&auml;fte',
@@ -251,7 +251,7 @@ class EinsatzverwaltungSettings
             )
         );
         echo '<br>';
-        $this->einsatzverwaltung_echo_settings_checkbox(
+        $this->echoSettingsCheckbox(
             array(
                 'einsatzvw_show_fahrzeug_archive',
                 'Fahrzeuge',
@@ -265,9 +265,9 @@ class EinsatzverwaltungSettings
     /**
      * Gibt die Einstellmöglichkeiten aus, ob Links zu externen Einsatzmitteln in einem neuen Fenster geöffnet werden sollen
      */
-    public function einsatzverwaltung_echo_settings_extnew()
+    public function echoSettingsExtNew()
     {
-        $this->einsatzverwaltung_echo_settings_checkbox(
+        $this->echoSettingsCheckbox(
             array(
                 'einsatzvw_open_ext_in_new',
                 'Links zu externen Einsatzmitteln in einem neuen Fenster öffnen',
@@ -280,9 +280,9 @@ class EinsatzverwaltungSettings
     /**
      * Gibt die Einstellmöglichkeiten für den Auszug aus
      */
-    public function einsatzverwaltung_echo_settings_excerpt()
+    public function echoSettingsExcerpt()
     {
-        $this->einsatzverwaltung_echo_settings_checkbox(
+        $this->echoSettingsCheckbox(
             array(
                 'einsatzvw_show_links_in_excerpt',
                 'Auszug darf Links enthalten',
@@ -296,14 +296,14 @@ class EinsatzverwaltungSettings
     /**
      * Gibt die Einstellmöglichkeiten für die Berechtigungen aus
      */
-    public function einsatzverwaltung_echo_settings_caps_roles()
+    public function echoSettingsCapsRoles()
     {
         $roles = get_editable_roles();
         if (empty($roles)) {
             echo "Es konnten keine Rollen gefunden werden.";
         } else {
             foreach ($roles as $role_slug => $role) {
-                $this->einsatzverwaltung_echo_settings_checkbox(array('einsatzvw_cap_roles_' . $role_slug, translate_user_role($role['name']), false));
+                $this->echoSettingsCheckbox(array('einsatzvw_cap_roles_' . $role_slug, translate_user_role($role['name']), false));
                 echo '<br>';
             }
             echo '<p class="description">Die Benutzer mit den hier ausgew&auml;hlten Rollen haben alle Rechte, um die Einsatzberichte und die zugeh&ouml;rigen Eigenschaften (z.B. Einsatzarten) zu verwalten. Zu dieser Einstellungsseite und den Werkzeugen haben in jedem Fall nur Administratoren Zugang.</p>';
@@ -314,7 +314,7 @@ class EinsatzverwaltungSettings
     /**
      * Generiert den Inhalt der Einstellungsseite
      */
-    public function einsatzverwaltung_settings_page()
+    public function echoSettingsPage()
     {
         if (!current_user_can('manage_options')) {
             wp_die(__('You do not have sufficient permissions to manage options for this site.'));

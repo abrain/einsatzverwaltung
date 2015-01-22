@@ -1,6 +1,7 @@
 <?php
+namespace abrain\Einsatzverwaltung;
 
-class EinsatzverwaltungSettings
+class Settings
 {
     const EVW_SETTINGS_SLUG = 'einsatzvw-settings';
 

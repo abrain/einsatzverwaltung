@@ -4,7 +4,7 @@ Donate link: http://www.abrain.de/software/unterstuetzen/
 Tags: feuerwehr, einsatz
 Requires at least: 3.1.0
 Tested up to: 4.1
-Stable tag: 0.7.1
+Stable tag: 0.8.1
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -22,12 +22,7 @@ Funktionen im &Uuml;berblick:
 * Information &uuml;ber Einsatzart, eingesetzte Fahrzeuge, Dauer und vieles mehr
 * Shortcode zum Einbinden einer Liste von Eins&auml;tzen eines Jahres
 * Widget zeigt die aktuellsten X Eins&auml;tze
-
-Geplante Funktionen:
-
 * Import aus wp-einsatz
-* Statistiken
-* ...
 
 Uses Font Awesome by Dave Gandy - http://fontawesome.io
 
@@ -54,6 +49,17 @@ Die Aufgaben f&uuml;r die kommenden Versionen werden auf [GitHub](https://github
 Entweder [per Mail](mailto:kontakt@abrain.de), auf [Twitter](https://twitter.com/einsatzvw) oder [App.net](https://alpha.app.net/einsatzverwaltung). Bugs und Verbesserungsvorschl&auml;ge gerne auch als [Issue auf GitHub](https://github.com/abrain/einsatzverwaltung/issues).
 
 == Changelog ==
+
+= 0.8.1 =
+* Neu: Links zu externen Kr&auml;ften lassen sich optional in neuem Fenster &ouml;ffnen (neue Einstellung)
+* Verbesserung: Tabelle der Einsatz&uuml;bersicht enth&auml;lt keine festen Breitenangaben mehr
+* Verbesserung: Der Autor eines Einsatzberichtes kann eingestellt werden
+* Fehlerbehebung: (Unsichtbare) Fehlermeldungen im Widget wurden abgestellt
+
+= 0.8 =
+* Neu: Import aus wp-einsatz
+* Neu: Einsatzberichte k&ouml;nnen zusammen mit den Standardbeitr&auml;gen (z.B. auf der Startseite) angezeigt werden
+* Neu: Hierarchie der Einsatzart kann im Widget angezeigt werden
 
 = 0.7.1 =
 * Neu: Einsatzberichte k&ouml;nnen mit der Jetpack-Funktion &quot;Publizieren&quot; ver&ouml;ffentlicht werden
@@ -146,6 +152,12 @@ Entweder [per Mail](mailto:kontakt@abrain.de), auf [Twitter](https://twitter.com
 * Widget zeigt die aktuellsten X Eins&auml;tze
 
 == Upgrade Notice ==
+
+= 0.8.1 =
+Kleine Verbesserungen, siehe Changelog f&uuml;r Details
+
+= 0.8 =
+Import aus wp-einsatz, Anzeige von Einsatzberichten als normale Beitr&auml;ge und Hierarchie der Einsatzart im Widget
 
 = 0.7.1 =
 Publizieren mit Jetpack aktiviert

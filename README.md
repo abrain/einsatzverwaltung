@@ -15,12 +15,7 @@ Die prim&auml;re Zielgruppe des Plugins sind Feuerwehren im deutschsprachigen Ra
 * Information &uuml;ber Einsatzart, eingesetzte Fahrzeuge, Dauer und vieles mehr
 * Shortcode zum Einbinden einer Liste von Eins&auml;tzen eines Jahres
 * Widget zeigt die aktuellsten X Eins&auml;tze
-
-### Geplante Funktionen:
-
 * Import aus wp-einsatz
-* Statistiken
-* ...
 
 Uses Font Awesome by Dave Gandy - http://fontawesome.io
 

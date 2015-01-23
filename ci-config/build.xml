@@ -14,6 +14,10 @@
          depends="prepare,lint,tools-parallel,phpunit,phpdox"
          description=""/>
 
+ <target name="build-develop"
+         depends="prepare,lint"
+         description=""/>
+
  <target name="tools-parallel" description="Run tools in parallel">
   <parallel threadCount="2">
    <sequential>

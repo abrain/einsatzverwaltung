@@ -15,7 +15,7 @@
          description=""/>
 
  <target name="build-develop"
-         depends="prepare,lint"
+         depends="prepare,lint,phpmd-ci,phpcs-ci"
          description=""/>
 
  <target name="tools-parallel" description="Run tools in parallel">

@@ -78,6 +78,7 @@ $evw_post_fields = array(
     'post_title' => 'Einsatzstichwort'
 );
 
+new \abrain\Einsatzverwaltung\Settings;
 
 /**
  * Erzeugt den neuen Beitragstyp Einsatzbericht und die zugehörigen Taxonomien

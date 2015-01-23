@@ -15,7 +15,7 @@ class Settings
     {
         add_action('admin_menu', array($this, 'addToSettingsMenu'));
         add_action('admin_init', array($this, 'registerSettings'));
-        add_filter('plugin_action_links_' . EINSATZVERWALTUNG__PLUGIN_BASE, 'addActionLinks');
+        add_filter('plugin_action_links_' . EINSATZVERWALTUNG__PLUGIN_BASE, array($this, 'addActionLinks'));
     }
 
 
@@ -24,7 +24,13 @@ class Settings
      */
     public function addToSettingsMenu()
     {
-        add_options_page('Einstellungen', 'Einsatzverwaltung', 'manage_options', self::EVW_SETTINGS_SLUG, array($this, 'echoSettingsPage'));
+        add_options_page(
+            'Einstellungen',
+            'Einsatzverwaltung',
+            'manage_options',
+            self::EVW_SETTINGS_SLUG,
+            array($this, 'echoSettingsPage')
+        );
     }
 
 
@@ -33,8 +39,9 @@ class Settings
      */
     public function addActionLinks($links)
     {
-        $mylinks = array('<a href="' . admin_url('options-general.php?page='.self::EVW_SETTINGS_SLUG) . '">Einstellungen</a>');
-        return array_merge($links, $mylinks);
+        $settingsPage = 'options-general.php?page=' . self::EVW_SETTINGS_SLUG;
+        $actionLinks = array(sprintf('<a href="%s">Einstellungen</a>', admin_url($settingsPage)));
+        return array_merge($links, $actionLinks);
     }
 
 
@@ -44,6 +51,76 @@ class Settings
     public function registerSettings()
     {
         // Sections
+        $this->addSettingsSections();
+    
+        // Fields
+        $this->addSettingsFields();
+    
+        // Registration
+        register_setting(
+            'einsatzvw_settings',
+            'einsatzvw_einsatznummer_stellen',
+            array($this, 'sanitizeEinsatznummerStellen')
+        );
+        register_setting(
+            'einsatzvw_settings',
+            'einsatzvw_einsatznummer_lfdvorne',
+            'einsatzverwaltung_sanitize_checkbox'
+        );
+        register_setting(
+            'einsatzvw_settings',
+            'einsatzvw_show_einsatzberichte_mainloop',
+            'einsatzverwaltung_sanitize_checkbox'
+        );
+        register_setting(
+            'einsatzvw_settings',
+            'einsatzvw_einsatz_hideemptydetails',
+            'einsatzverwaltung_sanitize_checkbox'
+        );
+        register_setting(
+            'einsatzvw_settings',
+            'einsatzvw_show_exteinsatzmittel_archive',
+            'einsatzverwaltung_sanitize_checkbox'
+        );
+        register_setting(
+            'einsatzvw_settings',
+            'einsatzvw_show_einsatzart_archive',
+            'einsatzverwaltung_sanitize_checkbox'
+        );
+        register_setting(
+            'einsatzvw_settings',
+            'einsatzvw_show_fahrzeug_archive',
+            'einsatzverwaltung_sanitize_checkbox'
+        );
+        register_setting(
+            'einsatzvw_settings',
+            'einsatzvw_open_ext_in_new',
+            'einsatzverwaltung_sanitize_checkbox'
+        );
+        register_setting(
+            'einsatzvw_settings',
+            'einsatzvw_show_links_in_excerpt', 
+            'einsatzverwaltung_sanitize_checkbox'
+        );
+    
+        $roles = get_editable_roles();
+        if (!empty($roles)) {
+            foreach (array_keys($roles) as $role_slug) {
+                register_setting(
+                    'einsatzvw_settings',
+                    'einsatzvw_cap_roles_' . $role_slug,
+                    'einsatzverwaltung_sanitize_checkbox'
+                );
+            }
+        }
+    }
+    
+    
+    /**
+     * Fügt die großen Abschnitte in die Einstellungsseite ein
+     */
+    private function addSettingsSections()
+    {
         add_settings_section(
             'einsatzvw_settings_general',
             'Allgemein',
@@ -73,8 +150,14 @@ class Settings
             },
             self::EVW_SETTINGS_SLUG
         );
+    }
     
-        // Fields
+    
+    /**
+     * Namen und Ausgabemethoden der einzelnen Felder in den Abschnitten
+     */
+    private function addSettingsFields()
+    {
         add_settings_field(
             'einsatzvw_einsatznummer_stellen',
             'Format der Einsatznummer',
@@ -124,24 +207,6 @@ class Settings
             self::EVW_SETTINGS_SLUG,
             'einsatzvw_settings_caps'
         );
-    
-        // Registration
-        register_setting('einsatzvw_settings', 'einsatzvw_einsatznummer_stellen', array($this, 'sanitizeEinsatznummerStellen'));
-        register_setting('einsatzvw_settings', 'einsatzvw_einsatznummer_lfdvorne', 'einsatzverwaltung_sanitize_checkbox');
-        register_setting('einsatzvw_settings', 'einsatzvw_show_einsatzberichte_mainloop', 'einsatzverwaltung_sanitize_checkbox');
-        register_setting('einsatzvw_settings', 'einsatzvw_einsatz_hideemptydetails', 'einsatzverwaltung_sanitize_checkbox');
-        register_setting('einsatzvw_settings', 'einsatzvw_show_exteinsatzmittel_archive', 'einsatzverwaltung_sanitize_checkbox');
-        register_setting('einsatzvw_settings', 'einsatzvw_show_einsatzart_archive', 'einsatzverwaltung_sanitize_checkbox');
-        register_setting('einsatzvw_settings', 'einsatzvw_show_fahrzeug_archive', 'einsatzverwaltung_sanitize_checkbox');
-        register_setting('einsatzvw_settings', 'einsatzvw_open_ext_in_new', 'einsatzverwaltung_sanitize_checkbox');
-        register_setting('einsatzvw_settings', 'einsatzvw_show_links_in_excerpt', 'einsatzverwaltung_sanitize_checkbox');
-    
-        $roles = get_editable_roles();
-        if (!empty($roles)) {
-            foreach (array_keys($roles) as $role_slug) {
-                register_setting('einsatzvw_settings', 'einsatzvw_cap_roles_' . $role_slug, 'einsatzverwaltung_sanitize_checkbox');
-            }
-        }
     }
 
 
@@ -153,7 +218,12 @@ class Settings
         $id = $args[0];
         $text = $args[1];
         $default = (count($args) > 2 ? $args[2] : false);
-        printf('<input type="checkbox" value="1" id="%1$s" name="%1$s" %2$s/><label for="%1$s">%3$s</label>', $id, einsatzverwaltung_checked(get_option($id, $default)), $text);
+        printf(
+            '<input type="checkbox" value="1" id="%1$s" name="%1$s" %2$s/><label for="%1$s">%3$s</label>',
+            $id,
+            einsatzverwaltung_checked(get_option($id, $default)),
+            $text
+        );
     }
 
 
@@ -164,7 +234,12 @@ class Settings
     {
         $id = $args[0];
         $text = $args[1];
-        printf('<input type="text" value="%2$s" id="%1$s" name="%1$s" /><p class="description">%3$s</p>', $id, get_option($id), $text);
+        printf(
+            '<input type="text" value="%2$s" id="%1$s" name="%1$s" /><p class="description">%3$s</p>',
+            $id,
+            get_option($id),
+            $text
+        );
     }
 
 
@@ -200,7 +275,7 @@ class Settings
 
 
     /**
-     *
+     * Gibt die Einstellmöglichkeit aus, ob Einsatzberichte zusammen mit anderen Beiträgen ausgegeben werden sollen
      */
     public function echoEinsatzberichteMainloop()
     {
@@ -264,7 +339,8 @@ class Settings
 
 
     /**
-     * Gibt die Einstellmöglichkeiten aus, ob Links zu externen Einsatzmitteln in einem neuen Fenster geöffnet werden sollen
+     * Gibt die Einstellmöglichkeiten aus, ob Links zu externen Einsatzmitteln in einem neuen Fenster geöffnet werden
+     * sollen
      */
     public function echoSettingsExtNew()
     {
@@ -304,7 +380,13 @@ class Settings
             echo "Es konnten keine Rollen gefunden werden.";
         } else {
             foreach ($roles as $role_slug => $role) {
-                $this->echoSettingsCheckbox(array('einsatzvw_cap_roles_' . $role_slug, translate_user_role($role['name']), false));
+                $this->echoSettingsCheckbox(
+                    array(
+                        'einsatzvw_cap_roles_' . $role_slug,
+                        translate_user_role($role['name']),
+                        false
+                    )
+                );
                 echo '<br>';
             }
             echo '<p class="description">Die Benutzer mit den hier ausgew&auml;hlten Rollen haben alle Rechte, um die Einsatzberichte und die zugeh&ouml;rigen Eigenschaften (z.B. Einsatzarten) zu verwalten. Zu dieser Einstellungsseite und den Werkzeugen haben in jedem Fall nur Administratoren Zugang.</p>';

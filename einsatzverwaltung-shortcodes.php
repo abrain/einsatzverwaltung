@@ -5,8 +5,13 @@
  */
 function einsatzverwaltung_shortcode_einsatzliste($atts)
 {
-    extract(shortcode_atts(array('jahr' => date('Y'), 'sort' => 'ab', 'monatetrennen' => 'nein'), $atts));
     $aktuelles_jahr = date('Y');
+    
+    // Shortcodeparameter auslesen
+    $shortcodeParams = shortcode_atts(array('jahr' => date('Y'), 'sort' => 'ab', 'monatetrennen' => 'nein'), $atts);
+    $jahr = $shortcodeParams['jahr'];
+    $sort = $shortcodeParams['sort'];
+    $monateTrennen = $shortcodeParams['monatetrennen'];
     
     $einsatzjahre = array();
     if ($jahr == '*') {
@@ -22,7 +27,7 @@ function einsatzverwaltung_shortcode_einsatzliste($atts)
         $einsatzjahre = array($jahr);
     }
     
-    return einsatzverwaltung_print_einsatzliste($einsatzjahre, !($sort == 'auf'), false, ($monatetrennen == 'ja'));
+    return einsatzverwaltung_print_einsatzliste($einsatzjahre, !($sort == 'auf'), false, ($monateTrennen == 'ja'));
 }
 add_shortcode('einsatzliste', 'einsatzverwaltung_shortcode_einsatzliste');
 

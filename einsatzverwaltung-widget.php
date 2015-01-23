@@ -4,7 +4,7 @@ namespace abrain\Einsatzverwaltung;
 use \WP_Widget;
 use \WP_Query;
 
-class Einsatzverwaltung_Widget extends WP_Widget
+class WidgetLetzteEinsaetze extends WP_Widget
 {
 
     /**
@@ -29,7 +29,6 @@ class Einsatzverwaltung_Widget extends WP_Widget
      */
     public function widget($args, $instance)
     {
-        extract($args);
         $title = apply_filters('widget_title', $instance['title']);
         $anzahl = $instance['anzahl'];
         $zeigeDatum = $instance['zeigeDatum'];
@@ -81,7 +80,7 @@ class Einsatzverwaltung_Widget extends WP_Widget
             }
             
             if ($zeigeOrt) {
-                $einsatzort = get_post_meta($nextPost->ID, $key = 'einsatz_einsatzort', $single = true);
+                $einsatzort = get_post_meta($nextPost->ID, 'einsatz_einsatzort', true);
                 if ($einsatzort != "") {
                     $letzteEinsaetze .= "<br><span class=\"einsatzort\">Ort:&nbsp;".$einsatzort."</span>";
                 }
@@ -90,11 +89,11 @@ class Einsatzverwaltung_Widget extends WP_Widget
             $letzteEinsaetze .= "</li>";
         }
 
-        echo $before_widget;
-        echo $before_title . $title . $after_title;
+        echo $args['before_widget'];
+        echo $args['before_title'] . $title . $args['after_title'];
         echo (empty($letzteEinsaetze) ? "Keine Eins&auml;tze" : "<ul>".$letzteEinsaetze."</ul>");
-        echo ($zeigeFeedlink ? '<p><span class="fa fa-rss"></span>&nbsp;<a href="'.get_post_type_archive_feed_link('einsatz', $feed = '').'">Einsatzberichte (Feed)</a></p>' : '');
-        echo $after_widget;
+        echo ($zeigeFeedlink ? '<p><span class="fa fa-rss"></span>&nbsp;<a href="'.get_post_type_archive_feed_link('einsatz').'">Einsatzberichte (Feed)</a></p>' : '');
+        echo $args['after_widget'];
     }
 
     /**
@@ -187,5 +186,5 @@ class Einsatzverwaltung_Widget extends WP_Widget
 
 // Widget in WordPress registrieren
 add_action('widgets_init', function() {
-    register_widget('abrain\Einsatzverwaltung\Einsatzverwaltung_Widget');
+    register_widget('abrain\Einsatzverwaltung\WidgetLetzteEinsaetze');
 });

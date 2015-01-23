@@ -230,7 +230,7 @@ class Settings
     /**
      *
      */
-    private function echoSettingsInput($args)
+    /*private function echoSettingsInput($args)
     {
         $inputId = $args[0];
         $text = $args[1];
@@ -240,7 +240,7 @@ class Settings
             get_option($inputId),
             $text
         );
-    }
+    }*/
 
 
     /**

@@ -176,7 +176,7 @@ function einsatzverwaltung_create_post_type()
     );
     register_taxonomy('fahrzeug', 'einsatz', $args_fahrzeug);
     
-    $args_exteinsatzmittel = array(
+    $argsExteinsatzmittel = array(
         'label' => 'Externe Einsatzmittel',
         'labels' => array(
             'name' => 'Externe Einsatzmittel',
@@ -205,7 +205,7 @@ function einsatzverwaltung_create_post_type()
             'slug' => 'externe-einsatzmittel'
         )
     );
-    register_taxonomy('exteinsatzmittel', 'einsatz', $args_exteinsatzmittel);
+    register_taxonomy('exteinsatzmittel', 'einsatz', $argsExteinsatzmittel);
     
     $args_alarmierungsart = array(
         'label' => 'Alarmierungsart',
@@ -439,8 +439,8 @@ function einsatzverwaltung_save_postdata($post_id)
 
         // Einsatznummer validieren
         $einsatzjahr = date_format($alarmzeit, 'Y');
-        $einsatznummer_fallback = einsatzverwaltung_get_next_einsatznummer($einsatzjahr, $einsatzjahr == date('Y'));
-        $einsatznummer = sanitize_title($_POST['einsatzverwaltung_nummer'], $einsatznummer_fallback, 'save');
+        $einsatzNrFallback = einsatzverwaltung_get_next_einsatznummer($einsatzjahr, $einsatzjahr == date('Y'));
+        $einsatznummer = sanitize_title($_POST['einsatzverwaltung_nummer'], $einsatzNrFallback, 'save');
         if (!empty($einsatznummer)) {
             $update_args['post_name'] = $einsatznummer; // Slug setzen
         }
@@ -1148,20 +1148,20 @@ add_action('right_now_content_table_end', 'einsatzverwaltung_add_einsatzberichte
 function einsatzverwaltung_update_db_check()
 {
     global $evw_db_version;
-    $evw_installed_version = get_site_option(EINSATZVERWALTUNG__DBVERSION_OPTION);
+    $evwInstalledVersion = get_site_option(EINSATZVERWALTUNG__DBVERSION_OPTION);
     
-    if ($evw_installed_version === false) {
-        $evw_installed_version = 0;
-    } elseif (is_numeric($evw_installed_version)) {
-        $evw_installed_version = intval($evw_installed_version);
+    if ($evwInstalledVersion === false) {
+        $evwInstalledVersion = 0;
+    } elseif (is_numeric($evwInstalledVersion)) {
+        $evwInstalledVersion = intval($evwInstalledVersion);
     } else {
-        $evw_installed_version = 0;
+        $evwInstalledVersion = 0;
     }
     
-    if ($evw_installed_version < $evw_db_version) {
+    if ($evwInstalledVersion < $evw_db_version) {
         global $wpdb;
         
-        if ($evw_installed_version == 0) {
+        if ($evwInstalledVersion == 0) {
             $berichte = einsatzverwaltung_get_einsatzberichte('');
 
             // unhook this function so it doesn't loop infinitely
@@ -1178,11 +1178,11 @@ function einsatzverwaltung_update_db_check()
             // re-hook this function
             add_action('save_post', 'einsatzverwaltung_save_postdata');
             
-            $evw_installed_version = 1;
-            update_site_option(EINSATZVERWALTUNG__DBVERSION_OPTION, $evw_installed_version);
+            $evwInstalledVersion = 1;
+            update_site_option(EINSATZVERWALTUNG__DBVERSION_OPTION, $evwInstalledVersion);
         }
         
-        if ($evw_installed_version == 1) {
+        if ($evwInstalledVersion == 1) {
             global $evw_caps;
             update_option('einsatzvw_cap_roles_administrator', 1);
             $role_obj = get_role('administrator');
@@ -1190,8 +1190,8 @@ function einsatzverwaltung_update_db_check()
                 $role_obj->add_cap($cap);
             }
             
-            $evw_installed_version = 2;
-            update_site_option(EINSATZVERWALTUNG__DBVERSION_OPTION, $evw_installed_version);
+            $evwInstalledVersion = 2;
+            update_site_option(EINSATZVERWALTUNG__DBVERSION_OPTION, $evwInstalledVersion);
         }
         
     }

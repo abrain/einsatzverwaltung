@@ -99,7 +99,7 @@ class Settings
         );
         register_setting(
             'einsatzvw_settings',
-            'einsatzvw_show_links_in_excerpt', 
+            'einsatzvw_show_links_in_excerpt',
             'einsatzverwaltung_sanitize_checkbox'
         );
     

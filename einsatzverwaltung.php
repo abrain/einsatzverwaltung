@@ -761,9 +761,9 @@ function einsatzverwaltung_get_hide_empty_details()
  * Bestimmt die Einsatzart eines bestimmten Einsatzes. Ist nötig, weil die Taxonomie
  * 'einsatzart' mehrere Werte speichern kann, aber nur einer genutzt werden soll
  */
-function einsatzverwaltung_get_einsatzart($id)
+function einsatzverwaltung_get_einsatzart($postId)
 {
-    $einsatzarten = get_the_terms($id, 'einsatzart');
+    $einsatzarten = get_the_terms($postId, 'einsatzart');
     if ($einsatzarten && !is_wp_error($einsatzarten) && !empty($einsatzarten)) {
         $keys = array_keys($einsatzarten);
         return $einsatzarten[$keys[0]];
@@ -1095,8 +1095,8 @@ function einsatzverwaltung_get_jahremiteinsatz()
     $jahre = array();
     $query = new WP_Query('&post_type=einsatz&post_status=publish&nopaging=true');
     while ($query->have_posts()) {
-        $p = $query->next_post();
-        $timestamp = strtotime($p->post_date);
+        $nextPost = $query->next_post();
+        $timestamp = strtotime($nextPost->post_date);
         $jahre[date("Y", $timestamp)] = 1;
     }
     return array_keys($jahre);
@@ -1109,13 +1109,13 @@ function einsatzverwaltung_get_jahremiteinsatz()
 function einsatzverwaltung_add_einsatzberichte_to_dashboard($arr)
 {
     if (post_type_exists('einsatz')) {
-        $pt = 'einsatz';
-        $pt_info = get_post_type_object($pt); // get a specific CPT's details
-        $num_posts = wp_count_posts($pt); // retrieve number of posts associated with this CPT
+        $postType = 'einsatz';
+        $pt_info = get_post_type_object($postType); // get a specific CPT's details
+        $num_posts = wp_count_posts($postType); // retrieve number of posts associated with this CPT
         $num = number_format_i18n($num_posts->publish); // number of published posts for this CPT
         $text = _n($pt_info->labels->singular_name, $pt_info->labels->name, intval($num_posts->publish)); // singular/plural text label for CPT
         echo '<li class="'.$pt_info->name.'-count page-count">';
-        echo (current_user_can('edit_einsatzberichte') ? '<a href="edit.php?post_type='.$pt.'">'.$num.' '.$text.'</a>' : '<span>'.$num.' '.$text.'</span>').'</li>';
+        echo (current_user_can('edit_einsatzberichte') ? '<a href="edit.php?post_type='.$postType.'">'.$num.' '.$text.'</a>' : '<span>'.$num.' '.$text.'</span>').'</li>';
     }
 }
 add_action('dashboard_glance_items', 'einsatzverwaltung_add_einsatzberichte_to_dashboard'); // since WP 3.8
@@ -1127,15 +1127,15 @@ add_action('dashboard_glance_items', 'einsatzverwaltung_add_einsatzberichte_to_d
 function einsatzverwaltung_add_einsatzberichte_to_dashboard_legacy()
 {
     if (post_type_exists('einsatz')) {
-        $pt = 'einsatz';
-        $pt_info = get_post_type_object($pt); // get a specific CPT's details
-        $num_posts = wp_count_posts($pt); // retrieve number of posts associated with this CPT
+        $postType = 'einsatz';
+        $pt_info = get_post_type_object($postType); // get a specific CPT's details
+        $num_posts = wp_count_posts($postType); // retrieve number of posts associated with this CPT
         $num = number_format_i18n($num_posts->publish); // number of published posts for this CPT
         $text = _n($pt_info->labels->singular_name, $pt_info->labels->name, intval($num_posts->publish)); // singular/plural text label for CPT
         echo '<tr><td class="first b">';
-        echo (current_user_can('edit_einsatzberichte') ? '<a href="edit.php?post_type='.$pt.'">'.$num.'</a>' : $num);
+        echo (current_user_can('edit_einsatzberichte') ? '<a href="edit.php?post_type='.$postType.'">'.$num.'</a>' : $num);
         echo '</td><td class="t">';
-        echo (current_user_can('edit_einsatzberichte') ? '<a href="edit.php?post_type='.$pt.'">'.$text.'</a>' : $text);
+        echo (current_user_can('edit_einsatzberichte') ? '<a href="edit.php?post_type='.$postType.'">'.$text.'</a>' : $text);
         echo '</td></tr>';
     }
 }

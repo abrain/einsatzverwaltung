@@ -330,8 +330,8 @@ function einsatzverwaltung_import_wpe($tablename, $feld_mapping)
             }
             
             // Einsatznummer prüfen
-            $gespeicherte_einsatznummer = get_post_field('post_name', $post_id);
-            if ($gespeicherte_einsatznummer != $einsatznummer) {
+            $gespeicherteEnr = get_post_field('post_name', $post_id);
+            if ($gespeicherteEnr != $einsatznummer) {
                 einsatzverwaltung_print_warning('WordPress hat diesem Einsatz nicht die vorgesehene Einsatznummer erteilt.<br>Verwendung des Werkzeugs <a href="'.admin_url('tools.php?page=einsatzvw-tool-enr').'">Einsatznummern reparieren</a> wird empfohlen.');
             }
         }

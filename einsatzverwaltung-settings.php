@@ -215,13 +215,13 @@ class Settings
      */
     private function echoSettingsCheckbox($args)
     {
-        $id = $args[0];
+        $checkboxId = $args[0];
         $text = $args[1];
         $default = (count($args) > 2 ? $args[2] : false);
         printf(
             '<input type="checkbox" value="1" id="%1$s" name="%1$s" %2$s/><label for="%1$s">%3$s</label>',
-            $id,
-            einsatzverwaltung_checked(get_option($id, $default)),
+            $checkboxId,
+            einsatzverwaltung_checked(get_option($checkboxId, $default)),
             $text
         );
     }
@@ -232,12 +232,12 @@ class Settings
      */
     private function echoSettingsInput($args)
     {
-        $id = $args[0];
+        $inputId = $args[0];
         $text = $args[1];
         printf(
             '<input type="text" value="%2$s" id="%1$s" name="%1$s" /><p class="description">%3$s</p>',
-            $id,
-            get_option($id),
+            $inputId,
+            get_option($inputId),
             $text
         );
     }

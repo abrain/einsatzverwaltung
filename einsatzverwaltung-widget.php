@@ -50,11 +50,11 @@ class Einsatzverwaltung_Widget extends WP_Widget
         $letzteEinsaetze = "";
         $query = new WP_Query('&post_type=einsatz&post_status=publish&posts_per_page='.$anzahl);
         while ($query->have_posts()) {
-            $p = $query->next_post();
+            $nextPost = $query->next_post();
             $letzteEinsaetze .= "<li>";
             
-            $letzteEinsaetze .= "<a href=\"".get_permalink($p->ID)."\" rel=\"bookmark\" class=\"einsatzmeldung\">";
-            $meldung = get_the_title($p->ID);
+            $letzteEinsaetze .= "<a href=\"".get_permalink($nextPost->ID)."\" rel=\"bookmark\" class=\"einsatzmeldung\">";
+            $meldung = get_the_title($nextPost->ID);
             if (!empty($meldung)) {
                 $letzteEinsaetze .= $meldung;
             } else {
@@ -63,7 +63,7 @@ class Einsatzverwaltung_Widget extends WP_Widget
             $letzteEinsaetze .= "</a>";
             
             if ($zeigeDatum) {
-                $timestamp = strtotime($p->post_date);
+                $timestamp = strtotime($nextPost->post_date);
                 $datumsformat = get_option('date_format', 'd.m.Y');
                 $letzteEinsaetze .= "<br><span class=\"einsatzdatum\">".date_i18n($datumsformat, $timestamp)."</span>";
                 if ($zeigeZeit) {
@@ -73,7 +73,7 @@ class Einsatzverwaltung_Widget extends WP_Widget
             }
             
             if ($zeigeArt) {
-                $einsatzart = einsatzverwaltung_get_einsatzart($p->ID);
+                $einsatzart = einsatzverwaltung_get_einsatzart($nextPost->ID);
                 if ($einsatzart) {
                     $einsatzart_str = $zeigeArtHierarchie ? einsatzverwaltung_get_einsatzart_string($einsatzart, false, false) : $einsatzart->name;
                     $letzteEinsaetze .= sprintf('<br><span class="einsatzart">%s</span>', $einsatzart_str);
@@ -81,7 +81,7 @@ class Einsatzverwaltung_Widget extends WP_Widget
             }
             
             if ($zeigeOrt) {
-                $einsatzort = get_post_meta($p->ID, $key = 'einsatz_einsatzort', $single = true);
+                $einsatzort = get_post_meta($nextPost->ID, $key = 'einsatz_einsatzort', $single = true);
                 if ($einsatzort != "") {
                     $letzteEinsaetze .= "<br><span class=\"einsatzort\">Ort:&nbsp;".$einsatzort."</span>";
                 }

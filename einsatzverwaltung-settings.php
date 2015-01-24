@@ -102,6 +102,11 @@ class Settings
             'einsatzvw_show_links_in_excerpt',
             array('abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
         );
+        register_setting(
+            'einsatzvw_settings',
+            'einsatzvw_excerpt_type',
+            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeExcerptType')
+        );
 
         $roles = get_editable_roles();
         if (!empty($roles)) {
@@ -195,7 +200,7 @@ class Settings
         );
         add_settings_field(
             'einsatzvw_settings_excerpt',
-            'Auszug / Exzerpt',
+            'Auszug / Kurzfassung',
             array($this, 'echoSettingsExcerpt'),
             self::EVW_SETTINGS_SLUG,
             'einsatzvw_settings_einsatzberichte'
@@ -366,7 +371,18 @@ class Settings
                 EINSATZVERWALTUNG__D__SHOW_LINKS_IN_EXCERPT
             )
         );
-        echo '<p class="description">Welche Links tats&auml;chlich generiert werden, h&auml;ngt von den anderen Einstellungen ab. Der Auszug im Newsfeed enth&auml;lt niemals Links.</p>';
+        echo '<p class="description">Welche Links tats&auml;chlich generiert werden, h&auml;ngt von den anderen Einstellungen ab. Der Auszug im Newsfeed enth&auml;lt niemals Links.</p><br>';
+
+        $types = array(
+            'details' => 'Nur Einsatzdetails',
+            'text' => 'Nur der Berichtstext',
+            'full' => 'Berichtstext mit Details'
+        ); // TODO in Core auslagern
+        $currentValue = get_option('einsatzvw_excerpt_type', EINSATZVERWALTUNG__D__EXCERPT_TYPE);
+        echo '<p>Inhalt des Auszugs:&nbsp;<select name="einsatzvw_excerpt_type">';
+        foreach ($types as $value => $label) {
+            echo '<option value="' . $value . '"' . ($currentValue == $value ? ' selected="selected"' : '') . '>' . $label . '</option>';
+        }
     }
 
 

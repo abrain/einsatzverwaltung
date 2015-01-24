@@ -26,6 +26,7 @@ define('EINSATZVERWALTUNG__D__SHOW_EINSATZART_ARCHIVE', false);
 define('EINSATZVERWALTUNG__D__SHOW_FAHRZEUG_ARCHIVE', false);
 define('EINSATZVERWALTUNG__D__HIDE_EMPTY_DETAILS', true);
 define('EINSATZVERWALTUNG__D__SHOW_LINKS_IN_EXCERPT', false);
+define('EINSATZVERWALTUNG__D__EXCERPT_TYPE', 'details');
 define('EINSATZVERWALTUNG__D__SHOW_EINSATZBERICHTE_MAINLOOP', false);
 define('EINSATZVERWALTUNG__D__OPEN_EXTEINSATZMITTEL_NEWWINDOW', false);
 
@@ -837,7 +838,7 @@ function einsatzverwaltung_einsatz_excerpt($excerpt)
         return $excerpt;
     }
 
-    $excerptType = get_option('einsatzvw_excerpt_type', 'details');
+    $excerptType = get_option('einsatzvw_excerpt_type', EINSATZVERWALTUNG__D__EXCERPT_TYPE);
     $excerptMayContainLinks = get_option('einsatzvw_show_links_in_excerpt', EINSATZVERWALTUNG__D__SHOW_LINKS_IN_EXCERPT);
     switch ($excerptType) {
         case 'details':

@@ -60,7 +60,7 @@ class Settings
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_einsatznummer_stellen',
-            array($this, 'sanitizeEinsatznummerStellen')
+            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeEinsatznummerStellen')
         );
         register_setting(
             'einsatzvw_settings',
@@ -257,20 +257,6 @@ class Settings
         );
 
         echo '<br><br><strong>Hinweis:</strong> Nach einer &Auml;nderung des Formats erhalten die bestehenden Einsatzberichte nicht automatisch aktualisierte Nummern. Nutzen Sie daf&uuml;r das Werkzeug <a href="'.admin_url('tools.php?page=einsatzvw-tool-enr').'">Einsatznummern reparieren</a>.';
-    }
-
-
-    /**
-     * Stellt einen sinnvollen Wert für die Anzahl Stellen der laufenden Einsatznummer sicher
-     */
-    public function sanitizeEinsatznummerStellen($input)
-    {
-        $val = intval($input);
-        if (is_numeric($val) && $val > 0) {
-            return $val;
-        } else {
-            return EINSATZVERWALTUNG__EINSATZNR_STELLEN;
-        }
     }
 
 

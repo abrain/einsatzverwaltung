@@ -111,6 +111,20 @@ class Utilities
 
 
     /**
+     * Stellt einen sinnvollen Wert für die Anzahl Stellen der laufenden Einsatznummer sicher
+     */
+    public static function sanitizeEinsatznummerStellen($input)
+    {
+        $val = intval($input);
+        if (is_numeric($val) && $val > 0) {
+            return $val;
+        } else {
+            return EINSATZVERWALTUNG__EINSATZNR_STELLEN;
+        }
+    }
+
+
+    /**
      * Stellt sicher, dass eine Zahl positiv ist
      */
     public static function sanitizePositiveNumber($input, $defaultvalue = 0)

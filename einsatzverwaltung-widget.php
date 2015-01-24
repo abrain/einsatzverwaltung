@@ -73,7 +73,7 @@ class WidgetLetzteEinsaetze extends WP_Widget
             
             if ($zeigeArt) {
                 $einsatzart = einsatzverwaltung_get_einsatzart($nextPost->ID);
-                if ($einsatzart) {
+                if ($einsatzart !== false) {
                     $einsatzart_str = $zeigeArtHierarchie ? einsatzverwaltung_get_einsatzart_string($einsatzart, false, false) : $einsatzart->name;
                     $letzteEinsaetze .= sprintf('<br><span class="einsatzart">%s</span>', $einsatzart_str);
                 }
@@ -134,6 +134,7 @@ class WidgetLetzteEinsaetze extends WP_Widget
      * @see WP_Widget::form()
      *
      * @param array $instance Previously saved values from database.
+     * @return string|void
      */
     public function form($instance)
     {

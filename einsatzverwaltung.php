@@ -121,7 +121,7 @@ function einsatzverwaltung_create_post_type()
         $args_einsatz['menu_icon'] = 'dashicons-media-document';
     }
     register_post_type('einsatz', $args_einsatz);
-    
+
     $args_einsatzart = array(
         'label' => 'Einsatzarten',
         'labels' => array(
@@ -151,7 +151,7 @@ function einsatzverwaltung_create_post_type()
         'hierarchical' => true
     );
     register_taxonomy('einsatzart', 'einsatz', $args_einsatzart);
-    
+
     $args_fahrzeug = array(
         'label' => 'Fahrzeuge',
         'labels' => array(
@@ -179,7 +179,7 @@ function einsatzverwaltung_create_post_type()
         )
     );
     register_taxonomy('fahrzeug', 'einsatz', $args_fahrzeug);
-    
+
     $argsExteinsatzmittel = array(
         'label' => 'Externe Einsatzmittel',
         'labels' => array(
@@ -210,7 +210,7 @@ function einsatzverwaltung_create_post_type()
         )
     );
     register_taxonomy('exteinsatzmittel', 'einsatz', $argsExteinsatzmittel);
-    
+
     $args_alarmierungsart = array(
         'label' => 'Alarmierungsart',
         'labels' => array(
@@ -238,7 +238,7 @@ function einsatzverwaltung_create_post_type()
         )
     );
     register_taxonomy('alarmierungsart', 'einsatz', $args_alarmierungsart);
-    
+
     // more rewrite rules
     add_rewrite_rule($args_einsatz['rewrite']['slug'] . '/(\d{4})/page/(\d{1,})/?$', 'index.php?post_type=einsatz&year=$matches[1]&paged=$matches[2]', 'top');
     add_rewrite_rule($args_einsatz['rewrite']['slug'] . '/(\d{4})/?$', 'index.php?post_type=einsatz&year=$matches[1]', 'top');
@@ -276,7 +276,7 @@ function einsatzverwaltung_get_einsatzberichte($kalenderjahr)
     if (empty($kalenderjahr) || strlen($kalenderjahr)!=4 || !is_numeric($kalenderjahr)) {
         $kalenderjahr = '';
     }
-    
+
     return get_posts(array(
         'nopaging' => true,
         'orderby' => 'post_date',
@@ -322,7 +322,7 @@ function einsatzverwaltung_enqueue_edit_scripts($hook)
             EINSATZVERWALTUNG__STYLE_URL . 'style-edit.css'
         );
     }
-    
+
     wp_enqueue_style(
         'einsatzverwaltung-fontawesome',
         EINSATZVERWALTUNG__PLUGIN_URL . 'font-awesome/css/font-awesome.min.css'
@@ -367,27 +367,27 @@ function einsatzverwaltung_display_meta_box($post)
 
     echo '<tr><td><label for="einsatzverwaltung_nummer">' . __("Einsatznummer", 'einsatzverwaltung') . '</label></td>';
     echo '<td><input type="text" id="einsatzverwaltung_nummer" name="einsatzverwaltung_nummer" value="'.esc_attr($nummer).'" size="10" placeholder="'.einsatzverwaltung_get_next_einsatznummer(date('Y')).'" /></td></tr>';
-    
+
     echo '<tr><td><label for="einsatzverwaltung_alarmzeit">'. __("Alarmzeit", 'einsatzverwaltung') . '</label></td>';
     echo '<td><input type="text" id="einsatzverwaltung_alarmzeit" name="einsatzverwaltung_alarmzeit" value="'.esc_attr($alarmzeit).'" size="20" placeholder="JJJJ-MM-TT hh:mm" />&nbsp;<span class="einsatzverwaltung_hint" id="einsatzverwaltung_alarmzeit_hint"></span></td></tr>';
 
     echo '<tr><td><label for="einsatzverwaltung_einsatzende">'. __("Einsatzende", 'einsatzverwaltung') . '</label></td>';
     echo '<td><input type="text" id="einsatzverwaltung_einsatzende" name="einsatzverwaltung_einsatzende" value="'.esc_attr($einsatzende).'" size="20" placeholder="JJJJ-MM-TT hh:mm" />&nbsp;<span class="einsatzverwaltung_hint" id="einsatzverwaltung_einsatzende_hint"></span></td></tr>';
-    
+
     echo '<tr><td><label for="einsatzverwaltung_fehlalarm">'. __("Fehlalarm", 'einsatzverwaltung') . '</label></td>';
     echo '<td><input type="checkbox" id="einsatzverwaltung_fehlalarm" name="einsatzverwaltung_fehlalarm" value="1" ' . Utilities::checked($fehlalarm) . '/></td></tr>';
-    
+
     echo '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';
-    
+
     echo '<tr><td><label for="einsatzverwaltung_einsatzort">'. __("Einsatzort", 'einsatzverwaltung') . '</label></td>';
     echo '<td><input type="text" id="einsatzverwaltung_einsatzort" name="einsatzverwaltung_einsatzort" value="'.esc_attr($einsatzort).'" size="20" /></td></tr>';
-    
+
     echo '<tr><td><label for="einsatzverwaltung_einsatzleiter">'. __("Einsatzleiter", 'einsatzverwaltung') . '</label></td>';
     echo '<td><input type="text" id="einsatzverwaltung_einsatzleiter" name="einsatzverwaltung_einsatzleiter" value="'.esc_attr($einsatzleiter).'" size="20" /></td></tr>';
-    
+
     echo '<tr><td><label for="einsatzverwaltung_mannschaft">'. __("Mannschaftsst&auml;rke", 'einsatzverwaltung') . '</label></td>';
     echo '<td><input type="text" id="einsatzverwaltung_mannschaft" name="einsatzverwaltung_mannschaft" value="'.esc_attr($mannschaftsstaerke).'" size="20" /></td></tr>';
-    
+
     echo '</tbody></table>';
 }
 
@@ -446,14 +446,14 @@ function einsatzverwaltung_save_postdata($post_id)
         ) {
             return;
         }
-        
+
         // Schreibrechte prüfen
         if (!current_user_can('edit_einsatzbericht', $post_id)) {
             return;
         }
-        
+
         $update_args = array();
-        
+
         // Alarmzeit validieren
         $input_alarmzeit = sanitize_text_field($_POST['einsatzverwaltung_alarmzeit']);
         if (!empty($input_alarmzeit)) {
@@ -492,19 +492,19 @@ function einsatzverwaltung_save_postdata($post_id)
         if (empty($einsatzende)) {
             $einsatzende = "";
         }
-        
+
         // Einsatzort validieren
         $einsatzort = sanitize_text_field($_POST['einsatzverwaltung_einsatzort']);
-        
+
         // Einsatzleiter validieren
         $einsatzleiter = sanitize_text_field($_POST['einsatzverwaltung_einsatzleiter']);
-        
+
         // Mannschaftsstärke validieren
         $mannschaftsstaerke = Utilities::sanitizePositiveNumber($_POST['einsatzverwaltung_mannschaft'], 0);
-        
+
         // Fehlalarm validieren
         $fehlalarm = Utilities::sanitizeCheckbox(array($_POST, 'einsatzverwaltung_fehlalarm'));
-        
+
         // Metadaten schreiben
         update_post_meta($post_id, 'einsatz_alarmzeit', date_format($alarmzeit, 'Y-m-d H:i'));
         update_post_meta($post_id, 'einsatz_einsatzende', ($einsatzende == "" ? "" : date_format($einsatzende, 'Y-m-d H:i')));
@@ -512,17 +512,17 @@ function einsatzverwaltung_save_postdata($post_id)
         update_post_meta($post_id, 'einsatz_einsatzleiter', $einsatzleiter);
         update_post_meta($post_id, 'einsatz_mannschaft', $mannschaftsstaerke);
         update_post_meta($post_id, 'einsatz_fehlalarm', $fehlalarm);
-        
+
         if (!empty($update_args)) {
             if (! wp_is_post_revision($post_id)) {
                 $update_args['ID'] = $post_id;
-            
+
                 // unhook this function so it doesn't loop infinitely
                 remove_action('save_post', 'einsatzverwaltung_save_postdata');
-                
+
                 // update the post, which calls save_post again
                 wp_update_post($update_args);
-                
+
                 // re-hook this function
                 add_action('save_post', 'einsatzverwaltung_save_postdata');
             }
@@ -571,10 +571,10 @@ function einsatzverwaltung_get_einsatzbericht_header($post, $may_contain_links =
 {
     if (get_post_type($post) == "einsatz") {
         $make_links = $may_contain_links;
-        
+
         $alarmzeit = get_post_meta($post->ID, 'einsatz_alarmzeit', true);
         $einsatzende = get_post_meta($post->ID, 'einsatz_einsatzende', true);
-        
+
         $alarmierungsart = get_the_terms($post->ID, 'alarmierungsart');
         if ($alarmierungsart && ! is_wp_error($alarmierungsart)) {
             $alarm_namen = array();
@@ -585,14 +585,14 @@ function einsatzverwaltung_get_einsatzbericht_header($post, $may_contain_links =
         } else {
             $alarm_string = '';
         }
-        
+
         $dauerstring = "?";
         if (!empty($alarmzeit) && !empty($einsatzende)) {
             $timestamp1 = strtotime($alarmzeit);
             $timestamp2 = strtotime($einsatzende);
             $differenz = $timestamp2 - $timestamp1;
             $dauer = intval($differenz / 60);
-            
+
             if (empty($dauer) || !is_numeric($dauer)) {
                 $dauerstring = '';
             } else {
@@ -612,7 +612,7 @@ function einsatzverwaltung_get_einsatzbericht_header($post, $may_contain_links =
         } else {
             $dauerstring = '';
         }
-        
+
         $einsatzart = einsatzverwaltung_get_einsatzart($post->ID);
         if ($einsatzart) {
             $art = einsatzverwaltung_get_einsatzart_string(
@@ -626,7 +626,7 @@ function einsatzverwaltung_get_einsatzbericht_header($post, $may_contain_links =
         } else {
             $art = '';
         }
-        
+
         $fehlalarm = get_post_meta($post->ID, $key = 'einsatz_fehlalarm', $single = true);
         if (empty($fehlalarm)) {
             $fehlalarm = 0;
@@ -634,22 +634,22 @@ function einsatzverwaltung_get_einsatzbericht_header($post, $may_contain_links =
         if ($fehlalarm == 1) {
             $art = (empty($art) ? 'Fehlalarm' : $art.' (Fehlalarm)');
         }
-        
+
         $einsatzort = get_post_meta($post->ID, $key = 'einsatz_einsatzort', $single = true);
-        
+
         $einsatzleiter = get_post_meta($post->ID, $key = 'einsatz_einsatzleiter', $single = true);
-        
+
         $mannschaft = get_post_meta($post->ID, $key = 'einsatz_mannschaft', $single = true);
         if (empty($mannschaft)) {
             $mannschaft = 0;
         }
-        
+
         $fahrzeuge = get_the_terms($post->ID, 'fahrzeug');
         if ($fahrzeuge && ! is_wp_error($fahrzeuge)) {
             $fzg_namen = array();
             foreach ($fahrzeuge as $fahrzeug) {
                 $fzg_name = $fahrzeug->name;
-                
+
                 if ($make_links) {
                     $pageid = einsatzverwaltung_get_term_field($fahrzeug->term_id, 'fahrzeug', 'fahrzeugpid');
                     if ($pageid !== false) {
@@ -659,24 +659,24 @@ function einsatzverwaltung_get_einsatzbericht_header($post, $may_contain_links =
                         }
                     }
                 }
-                
+
                 if ($make_links && get_option('einsatzvw_show_fahrzeug_archive', EINSATZVERWALTUNG__D__SHOW_FAHRZEUG_ARCHIVE)) {
                     $fzg_name .= '&nbsp;<a href="'.get_term_link($fahrzeug).'" class="fa fa-filter" style="text-decoration:none;" title="Eins&auml;tze unter Beteiligung von '.$fahrzeug->name.' anzeigen"></a>';
                 }
-                
+
                 $fzg_namen[] = $fzg_name;
             }
             $fzg_string = join(", ", $fzg_namen);
         } else {
             $fzg_string = '';
         }
-        
+
         $exteinsatzmittel = get_the_terms($post->ID, 'exteinsatzmittel');
         if ($exteinsatzmittel && ! is_wp_error($exteinsatzmittel)) {
             $ext_namen = array();
             foreach ($exteinsatzmittel as $ext) {
                 $ext_name = $ext->name;
-                
+
                 if ($make_links) {
                     $url = einsatzverwaltung_get_term_field($ext->term_id, 'exteinsatzmittel', 'url');
                     if ($url !== false) {
@@ -684,24 +684,24 @@ function einsatzverwaltung_get_einsatzbericht_header($post, $may_contain_links =
                         $ext_name = '<a href="'.$url.'" title="Mehr Informationen zu '.$ext->name.'"' . ($open_in_new_window ? ' target="_blank"' : '') . '>'.$ext->name.'</a>';
                     }
                 }
-                
+
                 if ($make_links && get_option('einsatzvw_show_exteinsatzmittel_archive', EINSATZVERWALTUNG__D__SHOW_EXTEINSATZMITTEL_ARCHIVE)) {
                     $ext_name .= '&nbsp;<a href="'.get_term_link($ext).'" class="fa fa-filter" style="text-decoration:none;" title="Eins&auml;tze unter Beteiligung von '.$ext->name.' anzeigen"></a>';
                 }
-                
+
                 $ext_namen[] = $ext_name;
             }
             $ext_string = join(", ", $ext_namen);
         } else {
             $ext_string = '';
         }
-        
+
         $alarm_timestamp = strtotime($alarmzeit);
         $datumsformat = get_option('date_format', 'd.m.Y');
         $zeitformat = get_option('time_format', 'H:i');
         $einsatz_datum = ($alarm_timestamp ? date_i18n($datumsformat, $alarm_timestamp) : '-');
         $einsatz_zeit = ($alarm_timestamp ? date_i18n($zeitformat, $alarm_timestamp).' Uhr' : '-');
-        
+
         $headerstring = "<strong>Datum:</strong> ".$einsatz_datum."<br>";
         $headerstring .= "<strong>Alarmzeit:</strong> ".$einsatz_zeit."<br>";
         $headerstring .= einsatzverwaltung_get_detail_string('Alarmierungsart:', $alarm_string);
@@ -712,7 +712,7 @@ function einsatzverwaltung_get_einsatzbericht_header($post, $may_contain_links =
         $headerstring .= einsatzverwaltung_get_numeric_detail_string('Mannschaftsst&auml;rke:', $mannschaft, true);
         $headerstring .= einsatzverwaltung_get_detail_string('Fahrzeuge:', $fzg_string);
         $headerstring .= einsatzverwaltung_get_detail_string('Weitere Kr&auml;fte:', $ext_string);
-        
+
         return $headerstring;
     }
     return "";
@@ -722,7 +722,7 @@ function einsatzverwaltung_get_einsatzbericht_header($post, $may_contain_links =
 function einsatzverwaltung_get_detail_string($title, $value, $newline = true)
 {
     $hide_empty_details = einsatzverwaltung_get_hide_empty_details();
-    
+
     if (!$hide_empty_details || !empty($value)) {
         return '<strong>'.$title.'</strong> '.$value.($newline ? '<br>' : '');
     }
@@ -733,7 +733,7 @@ function einsatzverwaltung_get_detail_string($title, $value, $newline = true)
 function einsatzverwaltung_get_numeric_detail_string($title, $value, $is_zero_empty = true, $newline = true)
 {
     $hide_empty_details = einsatzverwaltung_get_hide_empty_details();
-    
+
     if (!($hide_empty_details && $is_zero_empty && $value == 0)) {
         return '<strong>'.$title.'</strong> '.$value.($newline ? '<br>' : '');
     }
@@ -755,6 +755,9 @@ function einsatzverwaltung_get_hide_empty_details()
 /**
  * Bestimmt die Einsatzart eines bestimmten Einsatzes. Ist nötig, weil die Taxonomie
  * 'einsatzart' mehrere Werte speichern kann, aber nur einer genutzt werden soll
+ *
+ * @param int $postId
+ * @return object|bool
  */
 function einsatzverwaltung_get_einsatzart($postId)
 {
@@ -779,7 +782,7 @@ function einsatzverwaltung_get_einsatzart_string($einsatzart, $make_links, $show
             $str = ' > '.$str;
             $einsatzart = get_term($einsatzart->parent, 'einsatzart');
         }
-        
+
         if ($make_links && $show_archive_links) {
             $str = sprintf('&nbsp;<a href="%s" class="fa fa-filter" style="text-decoration:none;" title="Alle Eins&auml;tze vom Typ %s anzeigen"></a>' . $str, get_term_link($einsatzart), $einsatzart->name);
         }
@@ -798,16 +801,16 @@ function einsatzverwaltung_add_einsatz_daten($content)
     if (get_post_type() == "einsatz") {
         $header = einsatzverwaltung_get_einsatzbericht_header($post);
         $header .= "<hr>";
-        
+
         if (strlen($content) > 0) {
             $header .= "<h3>Einsatzbericht:</h3>";
         } else {
             $header .= "Kein Einsatzbericht vorhanden";
         }
-        
+
         $content = $header.$content;
     }
-    
+
     return $content;
 }
 add_filter('the_content', 'einsatzverwaltung_add_einsatz_daten');
@@ -838,11 +841,11 @@ function einsatzverwaltung_einsatz_excerpt_feed($excerpt)
     if (get_post_type() == "einsatz") {
         // Header ohne Links holen
         $header = einsatzverwaltung_get_einsatzbericht_header($post, false);
-        
+
         // Hervorhebung entfernen
         $header = str_replace("<strong>", "", $header);
         $header = str_replace("</strong>", "", $header);
-        
+
         return $header;
     } else {
         return $excerpt;
@@ -853,6 +856,8 @@ add_filter('the_excerpt_rss', 'einsatzverwaltung_einsatz_excerpt_feed');
 
 /**
  * Gibt Einsatzberichte ggf. auch zwischen den 'normalen' Blogbeiträgen aus
+ *
+ * @param WP_Query $query
  */
 function einsatzverwaltung_add_einsatzberichte_to_mainloop($query)
 {
@@ -865,10 +870,9 @@ function einsatzverwaltung_add_einsatzberichte_to_mainloop($query)
         $post_types = isset($query->query_vars['post_type']) ? (array) $query->query_vars['post_type'] : array('post');
         $post_types[] = 'einsatz';
         $query->set('post_type', $post_types);
-        return $query;
     }
 }
-add_filter('pre_get_posts', 'einsatzverwaltung_add_einsatzberichte_to_mainloop');
+add_action('pre_get_posts', 'einsatzverwaltung_add_einsatzberichte_to_mainloop');
 
 
 /**
@@ -881,7 +885,7 @@ function einsatzverwaltung_print_einsatzliste($einsatzjahre = array(), $desc = t
     } else {
         rsort($einsatzjahre);
     }
-    
+
     $string = "";
     foreach ($einsatzjahre as $einsatzjahr) {
         $query = new WP_Query(array('year' => $einsatzjahr,
@@ -891,7 +895,7 @@ function einsatzverwaltung_print_einsatzliste($einsatzjahre = array(), $desc = t
             'order' => ($desc === false ? 'ASC' : 'DESC'),
             'nopaging' => true
         ));
-        
+
         $string .= '<h3>Eins&auml;tze '.$einsatzjahr.'</h3>';
         if ($query->have_posts()) {
             if (!$splitmonths) {
@@ -899,19 +903,19 @@ function einsatzverwaltung_print_einsatzliste($einsatzjahre = array(), $desc = t
                 $string .= einsatzverwaltung_get_einsatzliste_header();
                 $string .= "<tbody>";
             }
-            
+
             $oldmonth = 0;
             while ($query->have_posts()) {
                 $query->next_post();
-            
+
                 $einsatz_nummer = get_post_field('post_name', $query->post->ID);
                 $alarmzeit = get_post_meta($query->post->ID, 'einsatz_alarmzeit', true);
                 $einsatz_timestamp = strtotime($alarmzeit);
-            
+
                 $einsatz_datum = date("d.m.Y", $einsatz_timestamp);
                 $einsatz_zeit = date("H:i", $einsatz_timestamp);
                 $month = date("m", $einsatz_timestamp);
-                
+
                 if ($splitmonths && $month != $oldmonth) {
                     if ($oldmonth != 0) {
                         // Nicht im ersten Durchlauf
@@ -923,13 +927,13 @@ function einsatzverwaltung_print_einsatzliste($einsatzjahre = array(), $desc = t
                     $string .= einsatzverwaltung_get_einsatzliste_header();
                     $string .= "<tbody>";
                 }
-            
+
                 $string .= "<tr>";
                 $string .= "<td>".$einsatz_nummer."</td>";
                 $string .= "<td>".$einsatz_datum."</td>";
                 $string .= "<td>".$einsatz_zeit."</td>";
                 $string .= "<td>";
-            
+
                 $post_title = get_the_title($query->post->ID);
                 if (!empty($post_title)) {
                     $string .= "<a href=\"".get_permalink($query->post->ID)."\" rel=\"bookmark\">".$post_title."</a>";
@@ -938,17 +942,17 @@ function einsatzverwaltung_print_einsatzliste($einsatzjahre = array(), $desc = t
                 }
                 $string .= "</td>";
                 $string .= "</tr>";
-                
+
                 $oldmonth = $month;
             }
-        
+
             $string .= "</tbody>";
             $string .= "</table>";
         } else {
             $string .= sprintf("Keine Eins&auml;tze im Jahr %s", $einsatzjahr);
         }
     }
-    
+
     if ($echo === true) {
         echo $string;
     } else {
@@ -1026,7 +1030,7 @@ function einsatzverwaltung_manage_einsatz_columns($column, $post_id)
             }
 
             break;
-            
+
         case 'e_alarmzeit':
             $einsatz_alarmzeit = get_post_meta($post_id, 'einsatz_alarmzeit', true);
 
@@ -1038,7 +1042,7 @@ function einsatzverwaltung_manage_einsatz_columns($column, $post_id)
             }
 
             break;
-            
+
         case 'e_art':
 
             $term = einsatzverwaltung_get_einsatzart($post_id);
@@ -1157,7 +1161,7 @@ function einsatzverwaltung_update_db_check()
 {
     global $evw_db_version;
     $evwInstalledVersion = get_site_option(EINSATZVERWALTUNG__DBVERSION_OPTION);
-    
+
     if ($evwInstalledVersion === false) {
         $evwInstalledVersion = 0;
     } elseif (is_numeric($evwInstalledVersion)) {
@@ -1165,16 +1169,16 @@ function einsatzverwaltung_update_db_check()
     } else {
         $evwInstalledVersion = 0;
     }
-    
+
     if ($evwInstalledVersion < $evw_db_version) {
         global $wpdb;
-        
+
         if ($evwInstalledVersion == 0) {
             $berichte = einsatzverwaltung_get_einsatzberichte('');
 
             // unhook this function so it doesn't loop infinitely
             remove_action('save_post', 'einsatzverwaltung_save_postdata');
-            
+
             foreach ($berichte as $bericht) {
                 $post_id = $bericht->ID;
                 if (! wp_is_post_revision($post_id)) {
@@ -1184,14 +1188,14 @@ function einsatzverwaltung_update_db_check()
                     );
                 }
             }
-            
+
             // re-hook this function
             add_action('save_post', 'einsatzverwaltung_save_postdata');
-            
+
             $evwInstalledVersion = 1;
             update_site_option(EINSATZVERWALTUNG__DBVERSION_OPTION, $evwInstalledVersion);
         }
-        
+
         if ($evwInstalledVersion == 1) {
             global $evw_caps;
             update_option('einsatzvw_cap_roles_administrator', 1);
@@ -1199,11 +1203,11 @@ function einsatzverwaltung_update_db_check()
             foreach ($evw_caps as $cap) {
                 $role_obj->add_cap($cap);
             }
-            
+
             $evwInstalledVersion = 2;
             update_site_option(EINSATZVERWALTUNG__DBVERSION_OPTION, $evwInstalledVersion);
         }
-        
+
     }
 }
 add_action('plugins_loaded', 'einsatzverwaltung_update_db_check');

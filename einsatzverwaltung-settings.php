@@ -52,10 +52,10 @@ class Settings
     {
         // Sections
         $this->addSettingsSections();
-    
+
         // Fields
         $this->addSettingsFields();
-    
+
         // Registration
         register_setting(
             'einsatzvw_settings',
@@ -65,57 +65,57 @@ class Settings
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_einsatznummer_lfdvorne',
-            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_show_einsatzberichte_mainloop',
-            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_einsatz_hideemptydetails',
-            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_show_exteinsatzmittel_archive',
-            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_show_einsatzart_archive',
-            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_show_fahrzeug_archive',
-            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_open_ext_in_new',
-            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_show_links_in_excerpt',
-            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
         );
-    
+
         $roles = get_editable_roles();
         if (!empty($roles)) {
             foreach (array_keys($roles) as $role_slug) {
                 register_setting(
                     'einsatzvw_settings',
                     'einsatzvw_cap_roles_' . $role_slug,
-                    array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+                    array('abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
                 );
             }
         }
     }
-    
-    
+
+
     /**
      * Fügt die großen Abschnitte in die Einstellungsseite ein
      */
@@ -151,8 +151,8 @@ class Settings
             self::EVW_SETTINGS_SLUG
         );
     }
-    
-    
+
+
     /**
      * Namen und Ausgabemethoden der einzelnen Felder in den Abschnitten
      */
@@ -255,7 +255,7 @@ class Settings
                 'Laufende Nummer vor das Jahr stellen'
             )
         );
-    
+
         echo '<br><br><strong>Hinweis:</strong> Nach einer &Auml;nderung des Formats erhalten die bestehenden Einsatzberichte nicht automatisch aktualisierte Nummern. Nutzen Sie daf&uuml;r das Werkzeug <a href="'.admin_url('tools.php?page=einsatzvw-tool-enr').'">Einsatznummern reparieren</a>.';
     }
 
@@ -402,7 +402,7 @@ class Settings
         if (!current_user_can('manage_options')) {
             wp_die(__('You do not have sufficient permissions to manage options for this site.'));
         }
-    
+
         echo '<div id="einsatzverwaltung_contactinfo">';
         echo '<h3>Entwicklerkontakt &amp; Social Media</h3>';
         echo 'eMail: <a href="mailto:kontakt@abrain.de">kontakt@abrain.de</a><br>';
@@ -410,10 +410,10 @@ class Settings
         echo 'App.net: <a href="https://alpha.app.net/einsatzverwaltung">@einsatzverwaltung</a><br>';
         echo 'Facebook: <a href="https://www.facebook.com/einsatzverwaltung/">Einsatzverwaltung</a>';
         echo '</div>';
-    
+
         echo '<div class="wrap">';
         echo '<h2>Einstellungen &rsaquo; Einsatzverwaltung</h2>';
-    
+
         // Berechtigungen aktualisieren
         $roles = get_editable_roles();
         if (!empty($roles)) {
@@ -426,7 +426,7 @@ class Settings
                 }
             }
         }
-    
+
         echo '<form method="post" action="options.php">';
         echo settings_fields('einsatzvw_settings');
         echo do_settings_sections(self::EVW_SETTINGS_SLUG);

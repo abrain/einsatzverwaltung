@@ -10,6 +10,8 @@ class Utilities
 {
     /**
      * Hilfsfunktion für Checkboxen, übersetzt 1/0 Logik in Haken an/aus
+     *
+     * @return bool
      */
     public static function checked($value)
     {
@@ -19,6 +21,10 @@ class Utilities
 
     /**
      * Prüft, ob WordPress mindestens in Version $ver läuft
+     *
+     * @param string $ver gesuchte Version von WordPress
+     *
+     * @return bool
      */
     public static function isMinWPVersion($ver)
     {
@@ -26,12 +32,12 @@ class Utilities
         if (count($currentversionparts) < 3) {
             $currentversionparts[2] = "0";
         }
-    
+
         $neededversionparts = explode(".", $ver);
         if (count($neededversionparts) < 3) {
             $neededversionparts[2] = "0";
         }
-    
+
         if (intval($neededversionparts[0]) > intval($currentversionparts[0])) {
             return false;
         } elseif (intval($neededversionparts[0]) == intval($currentversionparts[0]) &&
@@ -42,7 +48,7 @@ class Utilities
                     intval($neededversionparts[2]) > intval($currentversionparts[2])) {
             return false;
         }
-    
+
         return true;
     }
 
@@ -81,8 +87,8 @@ class Utilities
     {
         echo '<p class="evw_info"><i class="fa fa-info-circle"></i>&nbsp;' . $message . '</p>';
     }
-    
-    
+
+
     /**
      * Bereitet den Formularwert einer Checkbox für das Speichern in der Datenbank vor
      */
@@ -95,7 +101,7 @@ class Utilities
         } else {
             $value = $input;
         }
-    
+
         if (isset($value) && $value == "1") {
             return 1;
         } else {

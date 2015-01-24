@@ -116,7 +116,7 @@ function einsatzverwaltung_create_post_type()
         'map_meta_cap' => true,
         'menu_position' => 5
     );
-    if (Utilities::is_min_wp_version("3.9")) {
+    if (Utilities::isMinWPVersion("3.9")) {
         $args_einsatz['menu_icon'] = 'dashicons-media-document';
     }
     register_post_type('einsatz', $args_einsatz);
@@ -498,10 +498,10 @@ function einsatzverwaltung_save_postdata($post_id)
         $einsatzleiter = sanitize_text_field($_POST['einsatzverwaltung_einsatzleiter']);
         
         // Mannschaftsstärke validieren
-        $mannschaftsstaerke = Utilities::sanitize_pos_number($_POST['einsatzverwaltung_mannschaft'], 0);
+        $mannschaftsstaerke = Utilities::sanitizePositiveNumber($_POST['einsatzverwaltung_mannschaft'], 0);
         
         // Fehlalarm validieren
-        $fehlalarm = Utilities::sanitize_checkbox(array($_POST, 'einsatzverwaltung_fehlalarm'));
+        $fehlalarm = Utilities::sanitizeCheckbox(array($_POST, 'einsatzverwaltung_fehlalarm'));
         
         // Metadaten schreiben
         update_post_meta($post_id, 'einsatz_alarmzeit', date_format($alarmzeit, 'Y-m-d H:i'));

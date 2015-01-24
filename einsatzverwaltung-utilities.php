@@ -1,4 +1,4 @@
-<?
+<?php
 namespace abrain\Einsatzverwaltung;
 
 /**
@@ -20,7 +20,7 @@ class Utilities
     /**
      * Prüft, ob WordPress mindestens in Version $ver läuft
      */
-    public static function is_min_wp_version($ver)
+    public static function isMinWPVersion($ver)
     {
         $currentversionparts = explode(".", get_bloginfo('version'));
         if (count($currentversionparts) < 3) {
@@ -50,7 +50,7 @@ class Utilities
     /**
      * Gibt eine Fehlermeldung aus
      */
-    public static function print_error($message)
+    public static function printError($message)
     {
         echo '<p class="evw_error"><i class="fa fa-exclamation-circle"></i>&nbsp;' . $message . '</p>';
     }
@@ -59,7 +59,7 @@ class Utilities
     /**
      * Gibt eine Warnmeldung aus
      */
-    public static function print_warning($message)
+    public static function printWarning($message)
     {
         echo '<p class="evw_warning"><i class="fa fa-exclamation-triangle"></i>&nbsp;' . $message . '</p>';
     }
@@ -68,7 +68,7 @@ class Utilities
     /**
      * Gibt eine Erfolgsmeldung aus
      */
-    public static function print_success($message)
+    public static function printSuccess($message)
     {
         echo '<p class="evw_success"><i class="fa fa-check-circle"></i>&nbsp;' . $message . '</p>';
     }
@@ -77,7 +77,7 @@ class Utilities
     /**
      * Gibt eine Information aus
      */
-    public static function print_info($message)
+    public static function printInfo($message)
     {
         echo '<p class="evw_info"><i class="fa fa-info-circle"></i>&nbsp;' . $message . '</p>';
     }
@@ -86,7 +86,7 @@ class Utilities
     /**
      * Bereitet den Formularwert einer Checkbox für das Speichern in der Datenbank vor
      */
-    public static function sanitize_checkbox($input)
+    public static function sanitizeCheckbox($input)
     {
         if (is_array($input)) {
             $arr = $input[0];
@@ -107,7 +107,7 @@ class Utilities
     /**
      * Stellt sicher, dass eine Zahl positiv ist
      */
-    public static function sanitize_pos_number($input, $defaultvalue = 0)
+    public static function sanitizePositiveNumber($input, $defaultvalue = 0)
     {
         $val = intval($input);
         if (is_numeric($val) && $val >= 0) {

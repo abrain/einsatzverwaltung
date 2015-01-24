@@ -79,9 +79,10 @@ $evw_post_fields = array(
     'post_title' => 'Einsatzstichwort'
 );
 
-use \abrain\Einsatzverwaltung\Utilities;
+use abrain\Einsatzverwaltung\Settings;
+use abrain\Einsatzverwaltung\Utilities;
 
-new \abrain\Einsatzverwaltung\Settings;
+new Settings;
 
 /**
  * Erzeugt den neuen Beitragstyp Einsatzbericht und die zugehörigen Taxonomien
@@ -393,7 +394,8 @@ function einsatzverwaltung_display_meta_box($post)
 
 /**
  * Berechnet die nächste freie Einsatznummer für das gegebene Jahr
- * 
+ *
+ * @param string $jahr
  * @param bool $minuseins Wird beim Speichern der zusätzlichen Einsatzdaten in einsatzverwaltung_save_postdata benötigt,
  * da der Einsatzbericht bereits gespeichert wurde, aber bei der Zählung für die Einsatznummer ausgelassen werden soll
  *

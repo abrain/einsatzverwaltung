@@ -1,8 +1,8 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
-use \WP_Widget;
-use \WP_Query;
+use WP_Widget;
+use WP_Query;
 
 class WidgetLetzteEinsaetze extends WP_Widget
 {

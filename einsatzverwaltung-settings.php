@@ -65,42 +65,42 @@ class Settings
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_einsatznummer_lfdvorne',
-            'einsatzverwaltung_sanitize_checkbox'
+            array('\abrain\Einsatzverwaltung\Utilities', 'sanitize_checkbox')
         );
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_show_einsatzberichte_mainloop',
-            'einsatzverwaltung_sanitize_checkbox'
+            array('\abrain\Einsatzverwaltung\Utilities', 'sanitize_checkbox')
         );
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_einsatz_hideemptydetails',
-            'einsatzverwaltung_sanitize_checkbox'
+            array('\abrain\Einsatzverwaltung\Utilities', 'sanitize_checkbox')
         );
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_show_exteinsatzmittel_archive',
-            'einsatzverwaltung_sanitize_checkbox'
+            array('\abrain\Einsatzverwaltung\Utilities', 'sanitize_checkbox')
         );
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_show_einsatzart_archive',
-            'einsatzverwaltung_sanitize_checkbox'
+            array('\abrain\Einsatzverwaltung\Utilities', 'sanitize_checkbox')
         );
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_show_fahrzeug_archive',
-            'einsatzverwaltung_sanitize_checkbox'
+            array('\abrain\Einsatzverwaltung\Utilities', 'sanitize_checkbox')
         );
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_open_ext_in_new',
-            'einsatzverwaltung_sanitize_checkbox'
+            array('\abrain\Einsatzverwaltung\Utilities', 'sanitize_checkbox')
         );
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_show_links_in_excerpt',
-            'einsatzverwaltung_sanitize_checkbox'
+            array('\abrain\Einsatzverwaltung\Utilities', 'sanitize_checkbox')
         );
     
         $roles = get_editable_roles();
@@ -109,7 +109,7 @@ class Settings
                 register_setting(
                     'einsatzvw_settings',
                     'einsatzvw_cap_roles_' . $role_slug,
-                    'einsatzverwaltung_sanitize_checkbox'
+                    array('\abrain\Einsatzverwaltung\Utilities', 'sanitize_checkbox')
                 );
             }
         }
@@ -221,7 +221,7 @@ class Settings
         printf(
             '<input type="checkbox" value="1" id="%1$s" name="%1$s" %2$s/><label for="%1$s">%3$s</label>',
             $checkboxId,
-            einsatzverwaltung_checked(get_option($checkboxId, $default)),
+            Utilities::checked(get_option($checkboxId, $default)),
             $text
         );
     }

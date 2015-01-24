@@ -1,5 +1,7 @@
 <?php
 
+use \abrain\Einsatzverwaltung\Utilities;
+
 define('EVW_TOOL_WPE_SLUG', 'einsatzvw-tool-wpe');
 define('EVW_TOOL_WPE_DATE_COLUMN', 'Datum');
 define('EVW_TOOL_WPE_INPUT_NAME_PREFIX', 'evw_wpe_');
@@ -29,7 +31,7 @@ function einsatzverwaltung_tool_wpe_page()
     // Existenz der wp-einsatz Datenbank feststellen
     $tablename = $wpdb->prefix . "einsaetze";
     if ($wpdb->get_var("SHOW TABLES LIKE '$tablename'") != $tablename) {
-        einsatzverwaltung_print_error('Die Tabelle, in der wp-einsatz seine Daten speichert, konnte nicht gefunden werden.');
+        Utilities::print_error('Die Tabelle, in der wp-einsatz seine Daten speichert, konnte nicht gefunden werden.');
     } else {
         if (array_key_exists('submit', $_POST) && array_key_exists('aktion', $_POST) && $_POST['aktion'] == 'analyse') {
             // Nonce überprüfen
@@ -40,28 +42,28 @@ function einsatzverwaltung_tool_wpe_page()
             echo "<p>Die Daten von wp-einsatz werden analysiert...</p>";
             $felder = einsatzverwaltung_get_wpe_felder($tablename);
             if (empty($felder)) {
-                einsatzverwaltung_print_error('Es wurden keine Felder in der Tabelle gefunden');
+                Utilities::print_error('Es wurden keine Felder in der Tabelle gefunden');
                 return;
             }
             
-            einsatzverwaltung_print_success('Es wurden folgende Felder gefunden: ' . implode($felder, ', '));
+            Utilities::print_success('Es wurden folgende Felder gefunden: ' . implode($felder, ', '));
             
             // Auf Pflichtfelder prüfen
             if (!in_array(EVW_TOOL_WPE_DATE_COLUMN, $felder)) {
                 echo '<br>';
-                einsatzverwaltung_print_error('Das Feld "'.EVW_TOOL_WPE_DATE_COLUMN.'" konnte nicht in der Datenbank gefunden werden!');
+                Utilities::print_error('Das Feld "'.EVW_TOOL_WPE_DATE_COLUMN.'" konnte nicht in der Datenbank gefunden werden!');
                 return;
             }
             
             // Einsätze zählen
             $anzahl_einsaetze = $wpdb->get_var("SELECT COUNT(*) FROM $tablename");
             if ($anzahl_einsaetze === null) {
-                einsatzverwaltung_print_warning('Konnte die Anzahl der Ein&auml;tze in wp-einsatz nicht abfragen. M&ouml;glicherweise gibt es ein Problem mit der Datenbank.');
+                Utilities::print_warning('Konnte die Anzahl der Ein&auml;tze in wp-einsatz nicht abfragen. M&ouml;glicherweise gibt es ein Problem mit der Datenbank.');
             } else {
                 if ($anzahl_einsaetze > 0) {
-                    einsatzverwaltung_print_success("Es wurden $anzahl_einsaetze Eins&auml;tze gefunden");
+                    Utilities::print_success("Es wurden $anzahl_einsaetze Eins&auml;tze gefunden");
                 } else {
-                    einsatzverwaltung_print_warning('Es wurden keine Eins&auml;tze gefunden.');
+                    Utilities::print_warning('Es wurden keine Eins&auml;tze gefunden.');
                 }
             }
             
@@ -84,7 +86,7 @@ function einsatzverwaltung_tool_wpe_page()
             
             $wpe_felder = einsatzverwaltung_get_wpe_felder($tablename);
             if (empty($wpe_felder)) {
-                einsatzverwaltung_print_error('Es wurden keine Felder in der Tabelle von wp-einsatz gefunden');
+                Utilities::print_error('Es wurden keine Felder in der Tabelle von wp-einsatz gefunden');
                 return;
             }
             
@@ -98,7 +100,7 @@ function einsatzverwaltung_tool_wpe_page()
                         if (array_key_exists($evw_feld_name, einsatzverwaltung_get_fields())) {
                             $feld_mapping[$wpe_feld] = $evw_feld_name;
                         } else {
-                            einsatzverwaltung_print_warning("Unbekanntes Feld: $evw_feld_name");
+                            Utilities::print_warning("Unbekanntes Feld: $evw_feld_name");
                         }
                     }
                 }
@@ -110,7 +112,7 @@ function einsatzverwaltung_tool_wpe_page()
             foreach ($value_count as $zielfeld => $anzahl) {
                 if ($anzahl > 1) {
                     $evw_felder = einsatzverwaltung_get_fields();
-                    einsatzverwaltung_print_error("Feld $evw_felder[$zielfeld] kann nur f&uuml;r ein wp-einsatz-Feld als Importziel angegeben werden");
+                    Utilities::print_error("Feld $evw_felder[$zielfeld] kann nur f&uuml;r ein wp-einsatz-Feld als Importziel angegeben werden");
                     einsatzverwaltung_form_feldzuordnung($wpe_felder, $feld_mapping);
                     return;
                 }
@@ -120,7 +122,7 @@ function einsatzverwaltung_tool_wpe_page()
             echo '<p>Die Daten werden eingelesen, das kann einen Moment dauern.</p>';
             einsatzverwaltung_import_wpe($tablename, $feld_mapping);
         } else {
-            einsatzverwaltung_print_success('Die Tabelle, in der wp-einsatz seine Daten speichert, wurde gefunden. Analyse jetzt starten?');
+            Utilities::print_success('Die Tabelle, in der wp-einsatz seine Daten speichert, wurde gefunden. Analyse jetzt starten?');
             echo '<form method="post">';
             echo '<input type="hidden" name="aktion" value="analyse" />';
             wp_nonce_field('evw-import-wpe-analyse');
@@ -147,7 +149,7 @@ function einsatzverwaltung_form_feldzuordnung($felder, $mapping = array())
         } else {
             // Auf problematische Zeichen prüfen
             if (strpbrk($feld, 'äöüÄÖÜß/#')) {
-                einsatzverwaltung_print_warning('Feldname enth&auml;lt Zeichen (z.B. Umlaute oder Sonderzeichen), die beim Import zu Problemen f&uuml;hren.<br>Bitte das Feld in den Einstellungen von wp-einsatz umbenennen, wenn Sie es importieren wollen.');
+                Utilities::print_warning('Feldname enth&auml;lt Zeichen (z.B. Umlaute oder Sonderzeichen), die beim Import zu Problemen f&uuml;hren.<br>Bitte das Feld in den Einstellungen von wp-einsatz umbenennen, wenn Sie es importieren wollen.');
             } else {
                 $selected = '-';
                 if (!empty($mapping) && array_key_exists($feld, $mapping) && !empty($mapping[$feld])) {
@@ -224,13 +226,13 @@ function einsatzverwaltung_import_wpe($tablename, $feld_mapping)
     $wpe_einsaetze = $wpdb->get_results($query, ARRAY_A);
     
     if ($wpe_einsaetze === null) {
-        einsatzverwaltung_print_error('Dieser Fehler sollte nicht auftreten, da hat der Entwickler Mist gebaut...');
+        Utilities::print_error('Dieser Fehler sollte nicht auftreten, da hat der Entwickler Mist gebaut...');
         return;
     }
     
     if (empty($wpe_einsaetze)) {
-        einsatzverwaltung_print_error('Die Datenbank lieferte keine Ergebnisse. Entweder sind in wp-einsatz keine Eins&auml;tze gespeichert oder es gab ein Problem bei der Abfrage.');
-        einsatzverwaltung_print_info('Um ein Problem bei der Abfrage zu vermeiden, entfernen Sie bitte alle Umlaute und Sonderzeichen aus den Feldnamen in wp-einsatz.');
+        Utilities::print_error('Die Datenbank lieferte keine Ergebnisse. Entweder sind in wp-einsatz keine Eins&auml;tze gespeichert oder es gab ein Problem bei der Abfrage.');
+        Utilities::print_info('Um ein Problem bei der Abfrage zu vermeiden, entfernen Sie bitte alle Umlaute und Sonderzeichen aus den Feldnamen in wp-einsatz.');
         return;
     }
     
@@ -254,7 +256,7 @@ function einsatzverwaltung_import_wpe($tablename, $feld_mapping)
                             // Term existiert in dieser Taxonomie noch nicht, neu anlegen
                             $newterm = wp_insert_term($wpe_einsatz[$wpe_feld_name], $evw_feld_name);
                             if (is_wp_error($newterm)) {
-                                einsatzverwaltung_print_error(
+                                Utilities::print_error(
                                     sprintf(
                                         "Konnte %s '%s' nicht anlegen: %s",
                                         $evw_terms[$evw_feld_name],
@@ -278,19 +280,19 @@ function einsatzverwaltung_import_wpe($tablename, $feld_mapping)
                     // Wert gehört direkt zum Post
                     $einsatz_args[$evw_feld_name] = $wpe_einsatz[$wpe_feld_name];
                 } elseif ($evw_feld_name == '-') {
-                    einsatzverwaltung_print_warning("Feld '$wpe_feld_name' nicht zugeordnet");
+                    Utilities::print_warning("Feld '$wpe_feld_name' nicht zugeordnet");
                 } else {
-                    einsatzverwaltung_print_error("Feld '$evw_feld_name' unbekannt");
+                    Utilities::print_error("Feld '$evw_feld_name' unbekannt");
                 }
             } else {
-                einsatzverwaltung_print_error("Feld '$evw_feld_name' ung&uuml;ltig");
+                Utilities::print_error("Feld '$evw_feld_name' ung&uuml;ltig");
             }
         }
         
         // Datum des Einsatzes prüfen
         $alarmzeit = date_create($einsatz_args['post_date']);
         if ($alarmzeit === false) {
-            einsatzverwaltung_print_error(
+            Utilities::print_error(
                 sprintf('Konnte Datum vom Einsatz mit der ID %d nicht einlesen', $wpe_einsatz['ID'])
             );
             continue;
@@ -315,16 +317,16 @@ function einsatzverwaltung_import_wpe($tablename, $feld_mapping)
         
         // Mannschaftsstärke validieren
         if (array_key_exists('einsatz_mannschaft', $meta_values)) {
-            $meta_values['einsatz_mannschaft'] = einsatzverwaltung_sanitize_pos_number($meta_values['einsatz_mannschaft']);
+            $meta_values['einsatz_mannschaft'] = Utilities::sanitize_pos_number($meta_values['einsatz_mannschaft']);
         }
         
         // Neuen Beitrag anlegen
         remove_action('save_post', 'einsatzverwaltung_save_postdata');
         $post_id = wp_insert_post($einsatz_args, true);
         if (is_wp_error($post_id)) {
-            einsatzverwaltung_print_error('Konnte Einsatz nicht importieren: ' . $post_id->get_error_message());
+            Utilities::print_error('Konnte Einsatz nicht importieren: ' . $post_id->get_error_message());
         } else {
-            einsatzverwaltung_print_info('Einsatz importiert, ID ' . $post_id);
+            Utilities::print_info('Einsatz importiert, ID ' . $post_id);
             foreach ($meta_values as $mkey => $mval) {
                 update_post_meta($post_id, $mkey, $mval);
             }
@@ -332,12 +334,12 @@ function einsatzverwaltung_import_wpe($tablename, $feld_mapping)
             // Einsatznummer prüfen
             $gespeicherteEnr = get_post_field('post_name', $post_id);
             if ($gespeicherteEnr != $einsatznummer) {
-                einsatzverwaltung_print_warning('WordPress hat diesem Einsatz nicht die vorgesehene Einsatznummer erteilt.<br>Verwendung des Werkzeugs <a href="'.admin_url('tools.php?page=einsatzvw-tool-enr').'">Einsatznummern reparieren</a> wird empfohlen.');
+                Utilities::print_warning('WordPress hat diesem Einsatz nicht die vorgesehene Einsatznummer erteilt.<br>Verwendung des Werkzeugs <a href="'.admin_url('tools.php?page=einsatzvw-tool-enr').'">Einsatznummern reparieren</a> wird empfohlen.');
             }
         }
         add_action('save_post', 'einsatzverwaltung_save_postdata');
     }
     
-    einsatzverwaltung_print_success('Der Import ist abgeschlossen');
+    Utilities::print_success('Der Import ist abgeschlossen');
     echo '<a href="edit.php?post_type=einsatz">Zu den Einsatzberichten</a>';
 }

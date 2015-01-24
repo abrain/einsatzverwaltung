@@ -29,6 +29,7 @@ define('EINSATZVERWALTUNG__D__SHOW_LINKS_IN_EXCERPT', false);
 define('EINSATZVERWALTUNG__D__SHOW_EINSATZBERICHTE_MAINLOOP', false);
 define('EINSATZVERWALTUNG__D__OPEN_EXTEINSATZMITTEL_NEWWINDOW', false);
 
+require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-utilities.php');
 require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-widget.php');
 require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-shortcodes.php');
 require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-settings.php');
@@ -78,6 +79,8 @@ $evw_post_fields = array(
     'post_title' => 'Einsatzstichwort'
 );
 
+use \abrain\Einsatzverwaltung\Utilities;
+
 new \abrain\Einsatzverwaltung\Settings;
 
 /**
@@ -113,7 +116,7 @@ function einsatzverwaltung_create_post_type()
         'map_meta_cap' => true,
         'menu_position' => 5
     );
-    if (einsatzverwaltung_is_min_wp_version("3.9")) {
+    if (Utilities::is_min_wp_version("3.9")) {
         $args_einsatz['menu_icon'] = 'dashicons-media-document';
     }
     register_post_type('einsatz', $args_einsatz);
@@ -371,7 +374,7 @@ function einsatzverwaltung_display_meta_box($post)
     echo '<td><input type="text" id="einsatzverwaltung_einsatzende" name="einsatzverwaltung_einsatzende" value="'.esc_attr($einsatzende).'" size="20" placeholder="JJJJ-MM-TT hh:mm" />&nbsp;<span class="einsatzverwaltung_hint" id="einsatzverwaltung_einsatzende_hint"></span></td></tr>';
     
     echo '<tr><td><label for="einsatzverwaltung_fehlalarm">'. __("Fehlalarm", 'einsatzverwaltung') . '</label></td>';
-    echo '<td><input type="checkbox" id="einsatzverwaltung_fehlalarm" name="einsatzverwaltung_fehlalarm" value="1" ' . einsatzverwaltung_checked($fehlalarm) . '/></td></tr>';
+    echo '<td><input type="checkbox" id="einsatzverwaltung_fehlalarm" name="einsatzverwaltung_fehlalarm" value="1" ' . Utilities::checked($fehlalarm) . '/></td></tr>';
     
     echo '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';
     
@@ -495,10 +498,10 @@ function einsatzverwaltung_save_postdata($post_id)
         $einsatzleiter = sanitize_text_field($_POST['einsatzverwaltung_einsatzleiter']);
         
         // Mannschaftsstärke validieren
-        $mannschaftsstaerke = einsatzverwaltung_sanitize_pos_number($_POST['einsatzverwaltung_mannschaft'], 0);
+        $mannschaftsstaerke = Utilities::sanitize_pos_number($_POST['einsatzverwaltung_mannschaft'], 0);
         
         // Fehlalarm validieren
-        $fehlalarm = einsatzverwaltung_sanitize_checkbox(array($_POST, 'einsatzverwaltung_fehlalarm'));
+        $fehlalarm = Utilities::sanitize_checkbox(array($_POST, 'einsatzverwaltung_fehlalarm'));
         
         // Metadaten schreiben
         update_post_meta($post_id, 'einsatz_alarmzeit', date_format($alarmzeit, 'Y-m-d H:i'));
@@ -525,50 +528,6 @@ function einsatzverwaltung_save_postdata($post_id)
     }
 }
 add_action('save_post', 'einsatzverwaltung_save_postdata');
-
-
-/**
- * Bereitet den Formularwert einer Checkbox für das Speichern in der Datenbank vor
- */
-function einsatzverwaltung_sanitize_checkbox($input)
-{
-    if (is_array($input)) {
-        $arr = $input[0];
-        $index = $input[1];
-        $value = (array_key_exists($index, $arr) ? $arr[$index] : "");
-    } else {
-        $value = $input;
-    }
-    
-    if (isset($value) && $value == "1") {
-        return 1;
-    } else {
-        return 0;
-    }
-}
-
-
-/**
- * Stellt sicher, dass eine Zahl positiv ist
- */
-function einsatzverwaltung_sanitize_pos_number($input, $defaultvalue = 0)
-{
-    $val = intval($input);
-    if (is_numeric($val) && $val >= 0) {
-        return $val;
-    } else {
-        return $defaultvalue;
-    }
-}
-
-
-/**
- * Hilfsfunktion für Checkboxen, übersetzt 1/0 Logik in Haken an/aus
- */
-function einsatzverwaltung_checked($value)
-{
-    return ($value == 1 ? 'checked="checked" ' : '');
-}
 
 
 /**
@@ -1265,36 +1224,6 @@ function check_php_version($ver)
 
 
 /**
- * Prüft, ob WordPress mindestens in Version $ver läuft
- */
-function einsatzverwaltung_is_min_wp_version($ver)
-{
-    $currentversionparts = explode(".", get_bloginfo('version'));
-    if (count($currentversionparts) < 3) {
-        $currentversionparts[2] = "0";
-    }
-    
-    $neededversionparts = explode(".", $ver);
-    if (count($neededversionparts) < 3) {
-        $neededversionparts[2] = "0";
-    }
-    
-    if (intval($neededversionparts[0]) > intval($currentversionparts[0])) {
-        return false;
-    } elseif (intval($neededversionparts[0]) == intval($currentversionparts[0]) &&
-                intval($neededversionparts[1]) > intval($currentversionparts[1])) {
-        return false;
-    } elseif (intval($neededversionparts[0]) == intval($currentversionparts[0]) &&
-                intval($neededversionparts[1]) == intval($currentversionparts[1]) &&
-                intval($neededversionparts[2]) > intval($currentversionparts[2])) {
-        return false;
-    }
-    
-    return true;
-}
-
-
-/**
  * Gibt ein Array aller Felder und deren Namen zurück,
  * Hauptverwendungszweck ist das Mapping beim Import
  */
@@ -1302,24 +1231,4 @@ function einsatzverwaltung_get_fields()
 {
     global $evw_meta_fields, $evw_terms, $evw_post_fields;
     return array_merge($evw_meta_fields, $evw_terms, $evw_post_fields);
-}
-
-function einsatzverwaltung_print_error($message)
-{
-    echo '<p class="evw_error"><i class="fa fa-exclamation-circle"></i>&nbsp;' . $message . '</p>';
-}
-
-function einsatzverwaltung_print_warning($message)
-{
-    echo '<p class="evw_warning"><i class="fa fa-exclamation-triangle"></i>&nbsp;' . $message . '</p>';
-}
-
-function einsatzverwaltung_print_success($message)
-{
-    echo '<p class="evw_success"><i class="fa fa-check-circle"></i>&nbsp;' . $message . '</p>';
-}
-
-function einsatzverwaltung_print_info($message)
-{
-    echo '<p class="evw_info"><i class="fa fa-info-circle"></i>&nbsp;' . $message . '</p>';
 }

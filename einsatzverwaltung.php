@@ -586,7 +586,7 @@ function einsatzverwaltung_get_einsatzbericht_header($post, $may_contain_links =
             $alarm_string = '';
         }
 
-        $dauerstring = "?";
+        $dauerstring = '';
         if (!empty($alarmzeit) && !empty($einsatzende)) {
             $timestamp1 = strtotime($alarmzeit);
             $timestamp2 = strtotime($einsatzende);
@@ -609,8 +609,6 @@ function einsatzverwaltung_get_einsatzbericht_header($post, $may_contain_links =
                     }
                 }
             }
-        } else {
-            $dauerstring = '';
         }
 
         $einsatzart = einsatzverwaltung_get_einsatzart($post->ID);
@@ -713,7 +711,7 @@ function einsatzverwaltung_get_einsatzbericht_header($post, $may_contain_links =
         $headerstring .= einsatzverwaltung_get_detail_string('Fahrzeuge:', $fzg_string);
         $headerstring .= einsatzverwaltung_get_detail_string('Weitere Kr&auml;fte:', $ext_string);
 
-        return $headerstring;
+        return "<p>$headerstring</p>";
     }
     return "";
 }
@@ -794,26 +792,38 @@ function einsatzverwaltung_get_einsatzart_string($einsatzart, $make_links, $show
 
 /**
  * Beim Aufrufen eines Einsatzberichts vor den Text den Kopf mit den Details einbauen
+ *
+ * @param string $content Der Beitragstext des Einsatzberichts
+ *
+ * @return string Mit Einsatzdetails angereicherter Beitragstext
  */
 function einsatzverwaltung_add_einsatz_daten($content)
 {
     global $post;
-    if (get_post_type() == "einsatz") {
-        $header = einsatzverwaltung_get_einsatzbericht_header($post);
-        $header .= "<hr>";
-
-        if (strlen($content) > 0) {
-            $header .= "<h3>Einsatzbericht:</h3>";
-        } else {
-            $header .= "Kein Einsatzbericht vorhanden";
-        }
-
-        $content = $header.$content;
+    if (get_post_type() !== "einsatz") {
+        return $content;
     }
 
-    return $content;
+    $header = einsatzverwaltung_get_einsatzbericht_header($post);
+    $content = einsatzverwaltung_prepare_content($content);
+
+    return $header . '<hr>' . $content;
 }
 add_filter('the_content', 'einsatzverwaltung_add_einsatz_daten');
+
+
+/**
+ * Bereitet den Beitragstext auf
+ *
+ * @param string $content Der Beitragstext des Einsatzberichts
+ *
+ * @return string Der Beitragstext mit einer vorangestellten Überschrift. Wenn der Beitragstext leer ist, wird ein
+ * Ersatztext zurückgegeben
+ */
+function einsatzverwaltung_prepare_content($content)
+{
+    return empty($content) ? '<p>Kein Einsatzbericht vorhanden</p>' : '<h3>Einsatzbericht:</h3>' . $content;
+}
 
 
 /**
@@ -823,10 +833,21 @@ add_filter('the_content', 'einsatzverwaltung_add_einsatz_daten');
 function einsatzverwaltung_einsatz_excerpt($excerpt)
 {
     global $post;
-    if (get_post_type() == "einsatz") {
-        return einsatzverwaltung_get_einsatzbericht_header($post, get_option('einsatzvw_show_links_in_excerpt', EINSATZVERWALTUNG__D__SHOW_LINKS_IN_EXCERPT));
-    } else {
+    if (get_post_type() !== 'einsatz') {
         return $excerpt;
+    }
+
+    $excerptType = get_option('einsatzvw_excerpt_type', 'details');
+    $excerptMayContainLinks = get_option('einsatzvw_show_links_in_excerpt', EINSATZVERWALTUNG__D__SHOW_LINKS_IN_EXCERPT);
+    switch ($excerptType) {
+        case 'details':
+            return einsatzverwaltung_get_einsatzbericht_header($post, $excerptMayContainLinks);
+        case 'text':
+            return einsatzverwaltung_prepare_content(get_the_content());
+        case 'full':
+            return apply_filters('the_content', get_the_content());
+        default:
+            return einsatzverwaltung_get_einsatzbericht_header($post, $excerptMayContainLinks);
     }
 }
 add_filter('the_excerpt', 'einsatzverwaltung_einsatz_excerpt');

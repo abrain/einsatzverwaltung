@@ -383,6 +383,7 @@ class Settings
         foreach ($types as $value => $label) {
             echo '<option value="' . $value . '"' . ($currentValue == $value ? ' selected="selected"' : '') . '>' . $label . '</option>';
         }
+        echo '</select>';
     }
 
 

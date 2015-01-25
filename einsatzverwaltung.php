@@ -838,8 +838,37 @@ function einsatzverwaltung_einsatz_excerpt($excerpt)
         return $excerpt;
     }
 
-    $excerptType = get_option('einsatzvw_excerpt_type', EINSATZVERWALTUNG__D__EXCERPT_TYPE);
     $excerptMayContainLinks = get_option('einsatzvw_show_links_in_excerpt', EINSATZVERWALTUNG__D__SHOW_LINKS_IN_EXCERPT);
+    return einsatzverwaltung_einsatz_get_excerpt($post, $excerptMayContainLinks);
+}
+add_filter('the_excerpt', 'einsatzverwaltung_einsatz_excerpt');
+
+
+/**
+ * Gibt den Auszug (Exzerpt) für den Feed zurück
+ */
+function einsatzverwaltung_einsatz_excerpt_feed($excerpt)
+{
+    global $post;
+    if (get_post_type() !== 'einsatz') {
+        return $excerpt;
+    }
+
+    $get_excerpt = einsatzverwaltung_einsatz_get_excerpt($post, false);
+    return strip_tags($get_excerpt, '<br>');
+}
+add_filter('the_excerpt_rss', 'einsatzverwaltung_einsatz_excerpt_feed');
+
+
+/**
+ * @param $post
+ * @param $excerptMayContainLinks
+ *
+ * @return mixed|string|void
+ */
+function einsatzverwaltung_einsatz_get_excerpt($post, $excerptMayContainLinks)
+{
+    $excerptType = get_option('einsatzvw_excerpt_type', EINSATZVERWALTUNG__D__EXCERPT_TYPE);
     switch ($excerptType) {
         case 'details':
             return einsatzverwaltung_get_einsatzbericht_header($post, $excerptMayContainLinks);
@@ -851,29 +880,6 @@ function einsatzverwaltung_einsatz_excerpt($excerpt)
             return einsatzverwaltung_get_einsatzbericht_header($post, $excerptMayContainLinks);
     }
 }
-add_filter('the_excerpt', 'einsatzverwaltung_einsatz_excerpt');
-
-
-/**
- * Gibt den Auszug (Exzerpt) für den Feed zurück
- */
-function einsatzverwaltung_einsatz_excerpt_feed($excerpt)
-{
-    global $post;
-    if (get_post_type() == "einsatz") {
-        // Header ohne Links holen
-        $header = einsatzverwaltung_get_einsatzbericht_header($post, false);
-
-        // Hervorhebung entfernen
-        $header = str_replace("<strong>", "", $header);
-        $header = str_replace("</strong>", "", $header);
-
-        return $header;
-    } else {
-        return $excerpt;
-    }
-}
-add_filter('the_excerpt_rss', 'einsatzverwaltung_einsatz_excerpt_feed');
 
 
 /**

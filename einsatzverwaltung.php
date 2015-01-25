@@ -400,7 +400,7 @@ function einsatzverwaltung_display_meta_box($post)
  * @param bool $minuseins Wird beim Speichern der zusätzlichen Einsatzdaten in einsatzverwaltung_save_postdata benötigt,
  * da der Einsatzbericht bereits gespeichert wurde, aber bei der Zählung für die Einsatznummer ausgelassen werden soll
  *
- * @return string
+ * @return string Nächste freie Einsatznummer im angegebenen Jahr
  */
 function einsatzverwaltung_get_next_einsatznummer($jahr, $minuseins = false)
 {
@@ -414,6 +414,11 @@ function einsatzverwaltung_get_next_einsatznummer($jahr, $minuseins = false)
 
 /**
  * Formatiert die Einsatznummer
+ *
+ * @param string $jahr Jahreszahl
+ * @param int $nummer Laufende Nummer des Einsatzes im angegebenen Jahr
+ *
+ * @return string Formatierte Einsatznummer
  */
 function einsatzverwaltung_format_einsatznummer($jahr, $nummer)
 {
@@ -429,6 +434,8 @@ function einsatzverwaltung_format_einsatznummer($jahr, $nummer)
 
 /**
  * Zusätzliche Metadaten des Einsatzberichts speichern
+ *
+ * @param int $post_id ID des Posts
  */
 function einsatzverwaltung_save_postdata($post_id)
 {
@@ -535,6 +542,8 @@ add_action('save_post', 'einsatzverwaltung_save_postdata');
 
 /**
  * Zeigt die Metabox für die Einsatzart
+ *
+ * @param WP_Post $post Post-Object
  */
 function einsatzverwaltung_display_einsatzart_metabox($post)
 {
@@ -545,6 +554,8 @@ function einsatzverwaltung_display_einsatzart_metabox($post)
 
 /**
  * Zeigt Dropdown mit Hierarchie für die Einsatzart
+ *
+ * @param string $selected Slug der ausgewählten Einsatzart
  */
 function einsatzverwaltung_dropdown_einsatzart($selected)
 {
@@ -567,6 +578,11 @@ function einsatzverwaltung_dropdown_einsatzart($selected)
 
 /**
  * Erzeugt den Kopf eines Einsatzberichts
+ *
+ * @param WP_Post $post Das Post-Objekt
+ * @param bool $may_contain_links True, wenn Links generiert werden dürfen
+ *
+ * @return string Auflistung der Einsatzdetails
  */
 function einsatzverwaltung_get_einsatzbericht_header($post, $may_contain_links = true)
 {
@@ -772,6 +788,12 @@ function einsatzverwaltung_get_einsatzart($postId)
 
 /**
  * Gibt die Einsatzart als String zurück, wenn vorhanden auch mit den übergeordneten Einsatzarten
+ *
+ * @param object $einsatzart
+ * @param bool $make_links
+ * @param bool $show_archive_links
+ *
+ * @return string
  */
 function einsatzverwaltung_get_einsatzart_string($einsatzart, $make_links, $show_archive_links)
 {
@@ -922,6 +944,12 @@ add_action('pre_get_posts', 'einsatzverwaltung_add_einsatzberichte_to_mainloop')
 
 /**
  * Gibt eine Tabelle mit Einsätzen aus dem gegebenen Jahr zurück
+ *
+ * @param array $einsatzjahre
+ * @param bool $desc
+ * @param bool $splitmonths
+ *
+ * @return string
  */
 function einsatzverwaltung_print_einsatzliste($einsatzjahre = array(), $desc = true, $splitmonths = false)
 {
@@ -1020,6 +1048,10 @@ function einsatzverwaltung_get_einsatzliste_header()
 /**
  * Legt fest, welche Spalten bei der Übersicht der Einsatzberichte im
  * Adminbereich angezeigt werden
+ *
+ * @param array $columns
+ *
+ * @return array
  */
 function einsatzverwaltung_edit_einsatz_columns($columns)
 {
@@ -1040,6 +1072,9 @@ add_filter('manage_edit-einsatz_columns', 'einsatzverwaltung_edit_einsatz_column
 /**
  * Liefert den Inhalt für die jeweiligen Spalten bei der Übersicht der
  * Einsatzberichte im Adminbereich
+ *
+ * @param string $column
+ * @param int $post_id
  */
 function einsatzverwaltung_manage_einsatz_columns($column, $post_id)
 {
@@ -1143,6 +1178,10 @@ function einsatzverwaltung_get_jahremiteinsatz()
 
 /**
  * Zahl der Einsatzberichte im Dashboard anzeigen
+ *
+ * @param array $items
+ *
+ * @return array
  */
 function einsatzverwaltung_add_einsatzberichte_to_dashboard($items)
 {
@@ -1212,6 +1251,7 @@ function einsatzverwaltung_update_db_check()
     }
 
     if ($evwInstalledVersion < $evw_db_version) {
+        /** @var wpdb $wpdb */
         global $wpdb;
 
         if ($evwInstalledVersion == 0) {

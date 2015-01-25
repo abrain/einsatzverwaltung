@@ -36,6 +36,10 @@ class Settings
 
     /**
      * Zeigt einen Link zu den Einstellungen direkt auf der Plugin-Seite an
+     *
+     * @param $links
+     *
+     * @return array
      */
     public function addActionLinks($links)
     {
@@ -216,7 +220,12 @@ class Settings
 
 
     /**
+     * Gibt eine Checkbox auf der Einstellungsseite aus
      *
+     * @param array $args Parameter für die Checkbox:
+     * 0: string Id der Option
+     * 1: string Beschriftung der Checkbox
+     * 2: bool Standardwert, wenn Option nicht gefunden werden kann (optional)
      */
     private function echoSettingsCheckbox($args)
     {

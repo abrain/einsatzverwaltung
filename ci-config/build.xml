@@ -15,7 +15,7 @@
          description=""/>
 
  <target name="build-develop"
-         depends="prepare,lint,phpmd-ci,phpcs-ci"
+         depends="prepare,lint,phploc-ci,phpmd-ci,phpcs-ci"
          description=""/>
 
  <target name="tools-parallel" description="Run tools in parallel">
@@ -185,7 +185,7 @@
          description="Generate project documentation using phpDox">
   <exec executable="${toolsdir}phpdox" dir="${workspace}"/>
  </target>
- 
+
  <target name="phpcompatinfo"
          depends="prepare"
          description="Find out minimum PHP version">

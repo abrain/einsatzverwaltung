@@ -125,6 +125,24 @@ class Utilities
 
 
     /**
+     * Stellt einen gültigen Wert der Exzerpttypeinstellung sicher
+     *
+     * @param string $input Eingegebener Wert
+     *
+     * @return string Der Eingabewert, wenn gültig, ansonsten ein Standardwert
+     */
+    public static function sanitizeExcerptType($input)
+    {
+        // TODO gegen künftige Liste in Core prüfen
+        if ($input === 'details' || $input === 'text' || $input === 'full') {
+            return $input;
+        } else {
+            return EINSATZVERWALTUNG__D__EXCERPT_TYPE;
+        }
+    }
+
+
+    /**
      * Stellt sicher, dass eine Zahl positiv ist
      */
     public static function sanitizePositiveNumber($input, $defaultvalue = 0)

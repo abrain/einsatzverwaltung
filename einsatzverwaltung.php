@@ -26,6 +26,7 @@ define('EINSATZVERWALTUNG__D__SHOW_EINSATZART_ARCHIVE', false);
 define('EINSATZVERWALTUNG__D__SHOW_FAHRZEUG_ARCHIVE', false);
 define('EINSATZVERWALTUNG__D__HIDE_EMPTY_DETAILS', true);
 define('EINSATZVERWALTUNG__D__SHOW_LINKS_IN_EXCERPT', false);
+define('EINSATZVERWALTUNG__D__EXCERPT_TYPE', 'details');
 define('EINSATZVERWALTUNG__D__SHOW_EINSATZBERICHTE_MAINLOOP', false);
 define('EINSATZVERWALTUNG__D__OPEN_EXTEINSATZMITTEL_NEWWINDOW', false);
 
@@ -586,7 +587,7 @@ function einsatzverwaltung_get_einsatzbericht_header($post, $may_contain_links =
             $alarm_string = '';
         }
 
-        $dauerstring = "?";
+        $dauerstring = '';
         if (!empty($alarmzeit) && !empty($einsatzende)) {
             $timestamp1 = strtotime($alarmzeit);
             $timestamp2 = strtotime($einsatzende);
@@ -609,8 +610,6 @@ function einsatzverwaltung_get_einsatzbericht_header($post, $may_contain_links =
                     }
                 }
             }
-        } else {
-            $dauerstring = '';
         }
 
         $einsatzart = einsatzverwaltung_get_einsatzart($post->ID);
@@ -713,7 +712,7 @@ function einsatzverwaltung_get_einsatzbericht_header($post, $may_contain_links =
         $headerstring .= einsatzverwaltung_get_detail_string('Fahrzeuge:', $fzg_string);
         $headerstring .= einsatzverwaltung_get_detail_string('Weitere Kr&auml;fte:', $ext_string);
 
-        return $headerstring;
+        return "<p>$headerstring</p>";
     }
     return "";
 }
@@ -793,27 +792,54 @@ function einsatzverwaltung_get_einsatzart_string($einsatzart, $make_links, $show
 
 
 /**
- * Beim Aufrufen eines Einsatzberichts vor den Text den Kopf mit den Details einbauen
+ * Fügt Beitragstext und Einsatzdetails zusammen
+ *
+ * @param $post
+ * @param $content
+ * @param bool $mayContainLinks
+ *
+ * @return string
  */
-function einsatzverwaltung_add_einsatz_daten($content)
+function einsatzverwaltung_add_einsatz_daten($post, $content, $mayContainLinks = true)
+{
+    $header = einsatzverwaltung_get_einsatzbericht_header($post, $mayContainLinks);
+    $content = einsatzverwaltung_prepare_content($content);
+
+    return $header . '<hr>' . $content;
+}
+
+
+/**
+ * Beim Aufrufen eines Einsatzberichts vor den Text den Kopf mit den Details einbauen
+ *
+ * @param string $content Der Beitragstext des Einsatzberichts
+ *
+ * @return string Mit Einsatzdetails angereicherter Beitragstext
+ */
+function einsatzverwaltung_the_content($content)
 {
     global $post;
-    if (get_post_type() == "einsatz") {
-        $header = einsatzverwaltung_get_einsatzbericht_header($post);
-        $header .= "<hr>";
-
-        if (strlen($content) > 0) {
-            $header .= "<h3>Einsatzbericht:</h3>";
-        } else {
-            $header .= "Kein Einsatzbericht vorhanden";
-        }
-
-        $content = $header.$content;
+    if (get_post_type() !== "einsatz") {
+        return $content;
     }
 
-    return $content;
+    return einsatzverwaltung_add_einsatz_daten($post, $content);
 }
-add_filter('the_content', 'einsatzverwaltung_add_einsatz_daten');
+add_filter('the_content', 'einsatzverwaltung_the_content');
+
+
+/**
+ * Bereitet den Beitragstext auf
+ *
+ * @param string $content Der Beitragstext des Einsatzberichts
+ *
+ * @return string Der Beitragstext mit einer vorangestellten Überschrift. Wenn der Beitragstext leer ist, wird ein
+ * Ersatztext zurückgegeben
+ */
+function einsatzverwaltung_prepare_content($content)
+{
+    return empty($content) ? '<p>Kein Einsatzbericht vorhanden</p>' : '<h3>Einsatzbericht:</h3>' . $content;
+}
 
 
 /**
@@ -823,11 +849,12 @@ add_filter('the_content', 'einsatzverwaltung_add_einsatz_daten');
 function einsatzverwaltung_einsatz_excerpt($excerpt)
 {
     global $post;
-    if (get_post_type() == "einsatz") {
-        return einsatzverwaltung_get_einsatzbericht_header($post, get_option('einsatzvw_show_links_in_excerpt', EINSATZVERWALTUNG__D__SHOW_LINKS_IN_EXCERPT));
-    } else {
+    if (get_post_type() !== 'einsatz') {
         return $excerpt;
     }
+
+    $excerptMayContainLinks = get_option('einsatzvw_show_links_in_excerpt', EINSATZVERWALTUNG__D__SHOW_LINKS_IN_EXCERPT);
+    return einsatzverwaltung_einsatz_get_excerpt($post, $excerptMayContainLinks);
 }
 add_filter('the_excerpt', 'einsatzverwaltung_einsatz_excerpt');
 
@@ -838,20 +865,38 @@ add_filter('the_excerpt', 'einsatzverwaltung_einsatz_excerpt');
 function einsatzverwaltung_einsatz_excerpt_feed($excerpt)
 {
     global $post;
-    if (get_post_type() == "einsatz") {
-        // Header ohne Links holen
-        $header = einsatzverwaltung_get_einsatzbericht_header($post, false);
-
-        // Hervorhebung entfernen
-        $header = str_replace("<strong>", "", $header);
-        $header = str_replace("</strong>", "", $header);
-
-        return $header;
-    } else {
+    if (get_post_type() !== 'einsatz') {
         return $excerpt;
     }
+
+    $get_excerpt = einsatzverwaltung_einsatz_get_excerpt($post, false);
+    $get_excerpt = str_replace('<strong>', '', $get_excerpt);
+    $get_excerpt = str_replace('</strong>', '', $get_excerpt);
+    return $get_excerpt;
 }
 add_filter('the_excerpt_rss', 'einsatzverwaltung_einsatz_excerpt_feed');
+
+
+/**
+ * @param $post
+ * @param $excerptMayContainLinks
+ *
+ * @return mixed|string|void
+ */
+function einsatzverwaltung_einsatz_get_excerpt($post, $excerptMayContainLinks)
+{
+    $excerptType = get_option('einsatzvw_excerpt_type', EINSATZVERWALTUNG__D__EXCERPT_TYPE);
+    switch ($excerptType) {
+        case 'details':
+            return einsatzverwaltung_get_einsatzbericht_header($post, $excerptMayContainLinks);
+        case 'text':
+            return einsatzverwaltung_prepare_content(get_the_content());
+        case 'full':
+            return einsatzverwaltung_add_einsatz_daten($post, get_the_content(), $excerptMayContainLinks);
+        default:
+            return einsatzverwaltung_get_einsatzbericht_header($post, $excerptMayContainLinks);
+    }
+}
 
 
 /**

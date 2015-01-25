@@ -384,6 +384,7 @@ class Settings
             echo '<option value="' . $value . '"' . ($currentValue == $value ? ' selected="selected"' : '') . '>' . $label . '</option>';
         }
         echo '</select>';
+        echo '<p class="description">Sollte diese Einstellung keinen Effekt auf der Webseite zeigen, nutzt ihr Theme m&ouml;glicherweise keine Kurzfassungen und zeigt immer den vollen Beitrag.</p>';
     }
 
 

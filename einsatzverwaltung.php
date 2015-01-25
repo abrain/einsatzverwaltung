@@ -792,25 +792,40 @@ function einsatzverwaltung_get_einsatzart_string($einsatzart, $make_links, $show
 
 
 /**
+ * Fügt Beitragstext und Einsatzdetails zusammen
+ *
+ * @param $post
+ * @param $content
+ * @param bool $mayContainLinks
+ *
+ * @return string
+ */
+function einsatzverwaltung_add_einsatz_daten($post, $content, $mayContainLinks = true)
+{
+    $header = einsatzverwaltung_get_einsatzbericht_header($post, $mayContainLinks);
+    $content = einsatzverwaltung_prepare_content($content);
+
+    return $header . '<hr>' . $content;
+}
+
+
+/**
  * Beim Aufrufen eines Einsatzberichts vor den Text den Kopf mit den Details einbauen
  *
  * @param string $content Der Beitragstext des Einsatzberichts
  *
  * @return string Mit Einsatzdetails angereicherter Beitragstext
  */
-function einsatzverwaltung_add_einsatz_daten($content)
+function einsatzverwaltung_the_content($content)
 {
     global $post;
     if (get_post_type() !== "einsatz") {
         return $content;
     }
 
-    $header = einsatzverwaltung_get_einsatzbericht_header($post);
-    $content = einsatzverwaltung_prepare_content($content);
-
-    return $header . '<hr>' . $content;
+    return einsatzverwaltung_add_einsatz_daten($post, $content);
 }
-add_filter('the_content', 'einsatzverwaltung_add_einsatz_daten');
+add_filter('the_content', 'einsatzverwaltung_the_content');
 
 
 /**
@@ -855,7 +870,9 @@ function einsatzverwaltung_einsatz_excerpt_feed($excerpt)
     }
 
     $get_excerpt = einsatzverwaltung_einsatz_get_excerpt($post, false);
-    return strip_tags($get_excerpt, '<br>');
+    $get_excerpt = str_replace('<strong>', '', $get_excerpt);
+    $get_excerpt = str_replace('</strong>', '', $get_excerpt);
+    return $get_excerpt;
 }
 add_filter('the_excerpt_rss', 'einsatzverwaltung_einsatz_excerpt_feed');
 
@@ -875,7 +892,7 @@ function einsatzverwaltung_einsatz_get_excerpt($post, $excerptMayContainLinks)
         case 'text':
             return einsatzverwaltung_prepare_content(get_the_content());
         case 'full':
-            return apply_filters('the_content', get_the_content());
+            return einsatzverwaltung_add_einsatz_daten($post, get_the_content(), $excerptMayContainLinks);
         default:
             return einsatzverwaltung_get_einsatzbericht_header($post, $excerptMayContainLinks);
     }

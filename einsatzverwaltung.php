@@ -923,7 +923,7 @@ add_action('pre_get_posts', 'einsatzverwaltung_add_einsatzberichte_to_mainloop')
 /**
  * Gibt eine Tabelle mit Einsätzen aus dem gegebenen Jahr zurück
  */
-function einsatzverwaltung_print_einsatzliste($einsatzjahre = array(), $desc = true, $echo = true, $splitmonths = false)
+function einsatzverwaltung_print_einsatzliste($einsatzjahre = array(), $desc = true, $splitmonths = false)
 {
     if ($desc === false) {
         sort($einsatzjahre);
@@ -998,11 +998,7 @@ function einsatzverwaltung_print_einsatzliste($einsatzjahre = array(), $desc = t
         }
     }
 
-    if ($echo === true) {
-        echo $string;
-    } else {
-        return $string;
-    }
+    return $string;
 }
 
 
@@ -1027,16 +1023,14 @@ function einsatzverwaltung_get_einsatzliste_header()
  */
 function einsatzverwaltung_edit_einsatz_columns($columns)
 {
-
-    $columns = array(
-        'cb' => '<input type="checkbox" />',
-        'title' => __('Einsatzbericht', 'einsatzverwaltung'),
-        'e_nummer' => __('Nummer', 'einsatzverwaltung'),
-        'e_alarmzeit' => __('Alarmzeit', 'einsatzverwaltung'),
-        'e_einsatzende' => __('Einsatzende', 'einsatzverwaltung'),
-        'e_art' => __('Art', 'einsatzverwaltung'),
-        'e_fzg' => __('Fahrzeuge', 'einsatzverwaltung')
-    );
+    unset($columns['author']);
+    unset($columns['date']);
+    $columns['title'] = __('Einsatzbericht', 'einsatzverwaltung');
+    $columns['e_nummer'] = __('Nummer', 'einsatzverwaltung');
+    $columns['e_alarmzeit'] = __('Alarmzeit', 'einsatzverwaltung');
+    $columns['e_einsatzende'] = __('Einsatzende', 'einsatzverwaltung');
+    $columns['e_art'] = __('Art', 'einsatzverwaltung');
+    $columns['e_fzg'] = __('Fahrzeuge', 'einsatzverwaltung');
 
     return $columns;
 }
@@ -1150,10 +1144,10 @@ function einsatzverwaltung_get_jahremiteinsatz()
 /**
  * Zahl der Einsatzberichte im Dashboard anzeigen
  */
-function einsatzverwaltung_add_einsatzberichte_to_dashboard($arr)
+function einsatzverwaltung_add_einsatzberichte_to_dashboard($items)
 {
-    if (post_type_exists('einsatz')) {
-        $postType = 'einsatz';
+    $postType = 'einsatz';
+    if (post_type_exists($postType)) {
         $pt_info = get_post_type_object($postType); // get a specific CPT's details
         $num_posts = wp_count_posts($postType); // retrieve number of posts associated with this CPT
         $num = number_format_i18n($num_posts->publish); // number of published posts for this CPT
@@ -1166,6 +1160,8 @@ function einsatzverwaltung_add_einsatzberichte_to_dashboard($arr)
         }
         echo '</li>';
     }
+
+    return $items;
 }
 add_action('dashboard_glance_items', 'einsatzverwaltung_add_einsatzberichte_to_dashboard'); // since WP 3.8
 
@@ -1185,7 +1181,7 @@ function einsatzverwaltung_add_einsatzberichte_to_dashboard_legacy()
         if (current_user_can('edit_einsatzberichte')) {
             echo '<a href="edit.php?post_type='.$postType.'">'.$num.'</a>';
         } else {
-            $num;
+            echo $num;
         }
         echo '</td><td class="t">';
         if (current_user_can('edit_einsatzberichte')) {

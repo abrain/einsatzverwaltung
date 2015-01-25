@@ -40,7 +40,7 @@ class Settings
     public function addActionLinks($links)
     {
         $settingsPage = 'options-general.php?page=' . self::EVW_SETTINGS_SLUG;
-        $actionLinks = array(sprintf('<a href="%s">Einstellungen</a>', admin_url($settingsPage)));
+        $actionLinks = array('<a href="' . admin_url($settingsPage) . '">Einstellungen</a>');
         return array_merge($links, $actionLinks);
     }
 
@@ -223,12 +223,9 @@ class Settings
         $checkboxId = $args[0];
         $text = $args[1];
         $default = (count($args) > 2 ? $args[2] : false);
-        printf(
-            '<input type="checkbox" value="1" id="%1$s" name="%1$s" %2$s/><label for="%1$s">%3$s</label>',
-            $checkboxId,
-            Utilities::checked(get_option($checkboxId, $default)),
-            $text
-        );
+        echo '<input type="checkbox" value="1" id="' . $checkboxId . '" name="' . $checkboxId . '" ';
+        echo Utilities::checked(get_option($checkboxId, $default)) . '/><label for="' . $checkboxId . '">';
+        echo $text . '</label>';
     }
 
 
@@ -432,8 +429,8 @@ class Settings
         }
 
         echo '<form method="post" action="options.php">';
-        echo settings_fields('einsatzvw_settings');
-        echo do_settings_sections(self::EVW_SETTINGS_SLUG);
+        settings_fields('einsatzvw_settings');
+        do_settings_sections(self::EVW_SETTINGS_SLUG);
         submit_button();
         echo '</form>';
     }

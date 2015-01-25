@@ -26,8 +26,8 @@ function einsatzverwaltung_shortcode_einsatzliste($atts)
     } else {
         $einsatzjahre = array($jahr);
     }
-    
-    return einsatzverwaltung_print_einsatzliste($einsatzjahre, !($sort == 'auf'), false, ($monateTrennen == 'ja'));
+
+    return einsatzverwaltung_print_einsatzliste($einsatzjahre, !($sort == 'auf'), ($monateTrennen == 'ja'));
 }
 add_shortcode('einsatzliste', 'einsatzverwaltung_shortcode_einsatzliste');
 
@@ -35,7 +35,7 @@ add_shortcode('einsatzliste', 'einsatzverwaltung_shortcode_einsatzliste');
 /**
  * Gibt Links zu den Archivseiten der Jahre, in denen Einsatzberichte existieren, zurück
  */
-function einsatzverwaltung_print_einsatzjahre($atts)
+function einsatzverwaltung_print_einsatzjahre()
 {
     global $year;
     $jahre = einsatzverwaltung_get_jahremiteinsatz();

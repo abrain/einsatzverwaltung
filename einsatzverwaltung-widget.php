@@ -4,6 +4,11 @@ namespace abrain\Einsatzverwaltung;
 use WP_Widget;
 use WP_Query;
 
+/**
+ * WordPress-Widget für die letzten X Einsätze
+ *
+ * @author Andreas Brain
+ */
 class WidgetLetzteEinsaetze extends WP_Widget
 {
 
@@ -37,11 +42,11 @@ class WidgetLetzteEinsaetze extends WP_Widget
         $zeigeOrt = (array_key_exists('zeigeOrt', $instance) ? $instance['zeigeOrt'] : null);
         $zeigeArt = (array_key_exists('zeigeArt', $instance) ? $instance['zeigeArt'] : null);
         $zeigeArtHierarchie = (array_key_exists('zeigeArtHierarchie', $instance) ? $instance['zeigeArtHierarchie'] : null);
-        
+
         if (empty($title)) {
             $title = "Letzte Eins&auml;tze";
         }
-        
+
         if (!isset($anzahl) || empty ($anzahl) || !is_numeric($anzahl) || $anzahl < 1) {
             $anzahl = 3;
         }
@@ -51,7 +56,7 @@ class WidgetLetzteEinsaetze extends WP_Widget
         while ($query->have_posts()) {
             $nextPost = $query->next_post();
             $letzteEinsaetze .= "<li>";
-            
+
             $letzteEinsaetze .= "<a href=\"".get_permalink($nextPost->ID)."\" rel=\"bookmark\" class=\"einsatzmeldung\">";
             $meldung = get_the_title($nextPost->ID);
             if (!empty($meldung)) {
@@ -60,7 +65,7 @@ class WidgetLetzteEinsaetze extends WP_Widget
                 $letzteEinsaetze .= "(kein Titel)";
             }
             $letzteEinsaetze .= "</a>";
-            
+
             if ($zeigeDatum) {
                 $timestamp = strtotime($nextPost->post_date);
                 $datumsformat = get_option('date_format', 'd.m.Y');
@@ -70,7 +75,7 @@ class WidgetLetzteEinsaetze extends WP_Widget
                     $letzteEinsaetze .= " | <span class=\"einsatzzeit\">".date_i18n($zeitformat, $timestamp)." Uhr</span>";
                 }
             }
-            
+
             if ($zeigeArt) {
                 $einsatzart = einsatzverwaltung_get_einsatzart($nextPost->ID);
                 if ($einsatzart !== false) {
@@ -78,14 +83,14 @@ class WidgetLetzteEinsaetze extends WP_Widget
                     $letzteEinsaetze .= sprintf('<br><span class="einsatzart">%s</span>', $einsatzart_str);
                 }
             }
-            
+
             if ($zeigeOrt) {
                 $einsatzort = get_post_meta($nextPost->ID, 'einsatz_einsatzort', true);
                 if ($einsatzort != "") {
                     $letzteEinsaetze .= "<br><span class=\"einsatzort\">Ort:&nbsp;".$einsatzort."</span>";
                 }
             }
-            
+
             $letzteEinsaetze .= "</li>";
         }
 
@@ -110,14 +115,14 @@ class WidgetLetzteEinsaetze extends WP_Widget
     {
         $instance = array();
         $instance['title'] = strip_tags($new_instance['title']);
-        
+
         $anzahl = $new_instance['anzahl'];
         if (empty ($anzahl) || !is_numeric($anzahl) || $anzahl < 1) {
             $instance['anzahl'] = $old_instance['anzahl'];
         } else {
             $instance['anzahl'] = $new_instance['anzahl'];
         }
-        
+
         $instance['zeigeDatum'] = $new_instance['zeigeDatum'];
         $instance['zeigeZeit'] = $new_instance['zeigeZeit'];
         $instance['zeigeOrt'] = $new_instance['zeigeOrt'];
@@ -143,29 +148,29 @@ class WidgetLetzteEinsaetze extends WP_Widget
         } else {
             $title = __('Letzte Eins&auml;tze', 'einsatzverwaltung');
         }
-        
+
         if (isset($instance[ 'anzahl' ])) {
             $anzahl = $instance[ 'anzahl' ];
         } else {
             $anzahl = 3;
         }
-        
+
         $zeigeDatum = (array_key_exists('zeigeDatum', $instance) ? $instance['zeigeDatum'] : null);
         $zeigeZeit = (array_key_exists('zeigeZeit', $instance) ? $instance['zeigeZeit'] : null);
         $zeigeFeedlink = (array_key_exists('zeigeFeedlink', $instance) ? $instance['zeigeFeedlink'] : null);
         $zeigeOrt = (array_key_exists('zeigeOrt', $instance) ? $instance['zeigeOrt'] : null);
         $zeigeArt = (array_key_exists('zeigeArt', $instance) ? $instance['zeigeArt'] : null);
         $zeigeArtHierarchie = (array_key_exists('zeigeArtHierarchie', $instance) ? $instance['zeigeArtHierarchie'] : null);
-        
+
         echo '<p><label for="'.$this->get_field_id('title').'">' . __('Titel:', 'einsatzverwaltung') . '</label>';
         echo '<input class="widefat" id="' . $this->get_field_id('title') . '" name="' . $this->get_field_name('title') . '" type="text" value="' . esc_attr($title).'" /></p>';
-        
+
         echo '<p><label for="'.$this->get_field_id('anzahl').'">' . __('Anzahl der Eins&auml;tze, die angezeigt werden:', 'einsatzverwaltung') . '</label>&nbsp;';
         echo '<input id="'.$this->get_field_id('anzahl').'" name="'.$this->get_field_name('anzahl').'" type="text" value="'.$anzahl.'" size="3" /></p>';
-        
+
         echo '<p><input id="'.$this->get_field_id('zeigeFeedlink').'" name="'.$this->get_field_name('zeigeFeedlink').'" type="checkbox" '.($zeigeFeedlink ? 'checked="checked" ' : '').'/>';
         echo '&nbsp;<label for="'.$this->get_field_id('zeigeFeedlink').'">' . __('Link zum Feed anzeigen', 'einsatzverwaltung') . '</label></p>';
-        
+
         echo '<p><strong>Einsatzdaten:</strong></p>';
 
         echo '<p><input id="'.$this->get_field_id('zeigeDatum').'" name="'.$this->get_field_name('zeigeDatum').'" type="checkbox" '.($zeigeDatum ? 'checked="checked" ' : '').'/>';
@@ -173,13 +178,13 @@ class WidgetLetzteEinsaetze extends WP_Widget
 
         echo '<p style="text-indent:1em;"><input id="'.$this->get_field_id('zeigeZeit').'" name="'.$this->get_field_name('zeigeZeit').'" type="checkbox" '.($zeigeZeit ? 'checked="checked" ' : '').'/>';
         echo '&nbsp;<label for="'.$this->get_field_id('zeigeZeit').'">' . __('Zeit anzeigen (nur in Kombination mit Datum)', 'einsatzverwaltung') . '</label></p>';
-        
+
         echo '<p><input id="'.$this->get_field_id('zeigeArt').'" name="'.$this->get_field_name('zeigeArt').'" type="checkbox" '.($zeigeArt ? 'checked="checked" ' : '').'/>';
         echo '&nbsp;<label for="'.$this->get_field_id('zeigeArt').'">' . __('Einsatzart anzeigen', 'einsatzverwaltung') . '</label></p>';
-        
+
         echo '<p style="text-indent:1em;"><input id="'.$this->get_field_id('zeigeArtHierarchie').'" name="'.$this->get_field_name('zeigeArtHierarchie').'" type="checkbox" '.($zeigeArtHierarchie ? 'checked="checked" ' : '').'/>';
         echo '&nbsp;<label for="'.$this->get_field_id('zeigeArtHierarchie').'">' . __('Hierarchie der Einsatzart anzeigen', 'einsatzverwaltung') . '</label></p>';
-        
+
         echo '<p><input id="'.$this->get_field_id('zeigeOrt').'" name="'.$this->get_field_name('zeigeOrt').'" type="checkbox" '.($zeigeOrt ? 'checked="checked" ' : '').'/>';
         echo '&nbsp;<label for="'.$this->get_field_id('zeigeOrt').'">' . __('Ort anzeigen', 'einsatzverwaltung') . '</label></p>';
     }

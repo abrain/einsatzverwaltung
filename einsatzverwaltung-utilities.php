@@ -11,7 +11,9 @@ class Utilities
     /**
      * Hilfsfunktion für Checkboxen, übersetzt 1/0 Logik in Haken an/aus
      *
-     * @return bool
+     * @param string $value Der zu überprüfende Wert
+     *
+     * @return bool Der entsprechende boolsche Wert für $value
      */
     public static function checked($value)
     {
@@ -55,6 +57,8 @@ class Utilities
 
     /**
      * Gibt eine Fehlermeldung aus
+     *
+     * @param string $message Meldung, die ausgegeben werden soll
      */
     public static function printError($message)
     {
@@ -64,6 +68,8 @@ class Utilities
 
     /**
      * Gibt eine Warnmeldung aus
+     *
+     * @param string $message Meldung, die ausgegeben werden soll
      */
     public static function printWarning($message)
     {
@@ -73,6 +79,8 @@ class Utilities
 
     /**
      * Gibt eine Erfolgsmeldung aus
+     *
+     * @param string $message Meldung, die ausgegeben werden soll
      */
     public static function printSuccess($message)
     {
@@ -82,6 +90,8 @@ class Utilities
 
     /**
      * Gibt eine Information aus
+     *
+     * @param string $message Meldung, die ausgegeben werden soll
      */
     public static function printInfo($message)
     {
@@ -91,6 +101,10 @@ class Utilities
 
     /**
      * Bereitet den Formularwert einer Checkbox für das Speichern in der Datenbank vor
+     *
+     * @param array $input Der aufzubereitende Wert
+     *
+     * @return int 0 für false, 1 für true
      */
     public static function sanitizeCheckbox($input)
     {
@@ -112,6 +126,10 @@ class Utilities
 
     /**
      * Stellt einen sinnvollen Wert für die Anzahl Stellen der laufenden Einsatznummer sicher
+     *
+     * @param mixed $input
+     *
+     * @return int
      */
     public static function sanitizeEinsatznummerStellen($input)
     {
@@ -144,6 +162,11 @@ class Utilities
 
     /**
      * Stellt sicher, dass eine Zahl positiv ist
+     *
+     * @param mixed $input
+     * @param int $defaultvalue
+     *
+     * @return int
      */
     public static function sanitizePositiveNumber($input, $defaultvalue = 0)
     {

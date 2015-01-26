@@ -4,7 +4,7 @@ use abrain\Einsatzverwaltung\Utilities;
 /**
  * Fügt die Metabox zum Bearbeiten der Einsatzdetails ein
  */
-function einsatzverwaltung_add_einsatzdetails_meta_box($post)
+function einsatzverwaltung_add_einsatzdetails_meta_box()
 {
     add_meta_box(
         'einsatzverwaltung_meta_box',
@@ -20,6 +20,8 @@ add_action('add_meta_boxes_einsatz', 'einsatzverwaltung_add_einsatzdetails_meta_
 
 /**
  * Zusätzliche Skripte im Admin-Bereich einbinden
+ *
+ * @param string $hook Name der aufgerufenen Datei
  */
 function einsatzverwaltung_enqueue_edit_scripts($hook)
 {
@@ -50,6 +52,8 @@ add_action('admin_enqueue_scripts', 'einsatzverwaltung_enqueue_edit_scripts');
 
 /**
  * Inhalt der Metabox zum Bearbeiten der Einsatzdetails
+ *
+ * @param WP_Post $post Das Post-Objekt des aktuell bearbeiteten Einsatzberichts
  */
 function einsatzverwaltung_display_meta_box($post)
 {
@@ -183,11 +187,9 @@ function einsatzverwaltung_manage_einsatz_columns($column, $post_id)
 
             $term = einsatzverwaltung_get_einsatzart($post_id);
             if ($term) {
-                printf(
-                    '<a href="%s">%s</a>',
-                    esc_url(add_query_arg(array('post_type' => $post->post_type, 'einsatzart' => $term->slug), 'edit.php')),
-                    esc_html(sanitize_term_field('name', $term->name, $term->term_id, 'einsatzart', 'display'))
-                );
+                $url = esc_url(add_query_arg(array('post_type' => $post->post_type, 'einsatzart' => $term->slug), 'edit.php'));
+                $text = esc_html(sanitize_term_field('name', $term->name, $term->term_id, 'einsatzart', 'display'));
+                echo '<a href="' . $url . '">' . $text . '</a>';
             } else {
                 echo '-';
             }
@@ -201,11 +203,9 @@ function einsatzverwaltung_manage_einsatz_columns($column, $post_id)
             if (!empty($terms)) {
                 $out = array();
                 foreach ($terms as $term) {
-                    $out[] = sprintf(
-                        '<a href="%s">%s</a>',
-                        esc_url(add_query_arg(array('post_type' => $post->post_type, 'fahrzeug' => $term->slug), 'edit.php')),
-                        esc_html(sanitize_term_field('name', $term->name, $term->term_id, 'fahrzeug', 'display'))
-                    );
+                    $url = esc_url(add_query_arg(array('post_type' => $post->post_type, 'fahrzeug' => $term->slug), 'edit.php'));
+                    $text = esc_html(sanitize_term_field('name', $term->name, $term->term_id, 'fahrzeug', 'display'));
+                    $out[] = '<a href="' . $url . '">' . $text . '</a>';
                 }
 
                 echo join(', ', $out);

@@ -370,7 +370,7 @@ function einsatzverwaltung_get_einsatzart_string($einsatzart, $make_links, $show
         }
 
         if ($make_links && $show_archive_links) {
-            $str = sprintf('&nbsp;<a href="%s" class="fa fa-filter" style="text-decoration:none;" title="Alle Eins&auml;tze vom Typ %s anzeigen"></a>' . $str, get_term_link($einsatzart), $einsatzart->name);
+            $str = '&nbsp;<a href="' . get_term_link($einsatzart) . '" class="fa fa-filter" style="text-decoration:none;" title="Alle Eins&auml;tze vom Typ '. $einsatzart->name . ' anzeigen"></a>' . $str;
         }
         $str = $einsatzart->name . $str;
     } while ($einsatzart->parent != 0);

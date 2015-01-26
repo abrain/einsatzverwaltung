@@ -1,10 +1,18 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
+/**
+ * Erzeugt die Einstellungsseite
+ *
+ * @author Andreas Brain
+ */
 class Settings
 {
     const EVW_SETTINGS_SLUG = 'einsatzvw-settings';
 
+    /**
+     * Konstruktor
+     */
     public function __construct()
     {
         $this->addHooks();

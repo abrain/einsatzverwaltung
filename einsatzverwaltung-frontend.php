@@ -215,6 +215,16 @@ function einsatzverwaltung_get_detail_string($title, $value, $newline = true)
 }
 
 
+/**
+ * Erzeugt eine Zeile für die Einsatzdetails, speziell für numerische Angaben
+ *
+ * @param string $title Bezeichnung des Einsatzdetails
+ * @param string $value Wert des Einsatzdetails
+ * @param bool $is_zero_empty Ob die 0 als leer gewertet wird
+ * @param bool $newline Zeilenumbruch hinzufügen
+ *
+ * @return string Formatiertes Einsatzdetail
+ */
 function einsatzverwaltung_get_numeric_detail_string($title, $value, $is_zero_empty = true, $newline = true)
 {
     $hide_empty_details = einsatzverwaltung_get_hide_empty_details();
@@ -278,8 +288,13 @@ function einsatzverwaltung_prepare_content($content)
 
 
 /**
- * Stellt den Auszug (Exzerpt) zur Verfügung, im Fall von Einsatzberichten wird
- * hier der Berichtskopf mit den Details zurückgegeben
+ * Stellt die Kurzfassung (Exzerpt) zur Verfügung, im Fall von Einsatzberichten wird
+ * hier wahlweise der Berichtstext, Einsatzdetails oder beides zurückgegeben
+ *
+ * @param string $excerpt Filterparameter, wird bei Einsatzberichten nicht beachtet, bei anderen Beitragstypen
+ * unverändert verwendet
+ *
+ * @return string Die Kurzfassung
  */
 function einsatzverwaltung_einsatz_excerpt($excerpt)
 {
@@ -295,7 +310,12 @@ add_filter('the_excerpt', 'einsatzverwaltung_einsatz_excerpt');
 
 
 /**
- * Gibt den Auszug (Exzerpt) für den Feed zurück
+ * Gibt die Kurzfassung (Exzerpt) für den Feed zurück
+ *
+ * @param string $excerpt Filterparameter, wird bei Einsatzberichten nicht beachtet, bei anderen Beitragstypen
+ * unverändert verwendet
+ *
+ * @return string Die Kurzfassung
  */
 function einsatzverwaltung_einsatz_excerpt_feed($excerpt)
 {

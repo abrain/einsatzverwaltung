@@ -44,3 +44,34 @@
 .evw_match_fields td {
     padding: 5px;
 }
+
+#columns-available, #columns-enabled {
+    background-color: #dddddd;
+    height: 100px;
+    margin: 5px;
+    padding: 5px;
+    display: block;
+}
+
+.evw-column {
+    border: 1px solid #bbb;
+    border-radius: 3px;
+    float: left;
+    cursor: move;
+    margin-right: 10px;
+    padding: 5px 10px 5px 5px;
+    background: none no-repeat scroll center center #f8f8f8;
+}
+
+li.evw-column span:before {
+    color: #555;
+    display: inline-block;
+    font: normal 20px/1 'dashicons';
+    height: 20px;
+    margin-right: 3px;
+    position: relative;
+    text-align: center;
+    top: 1px;
+    vertical-align: top;
+    width: 20px;
+}

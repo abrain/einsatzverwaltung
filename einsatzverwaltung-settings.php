@@ -152,13 +152,14 @@ class Settings
             },
             self::EVW_SETTINGS_SLUG
         );
-        /*add_settings_section('einsatzvw_settings_einsatzliste',
+        add_settings_section(
+            'einsatzvw_settings_einsatzliste',
             'Einsatzliste',
             function() {
                 echo '<p>Mit diesen Einstellungen kann das Aussehen der Einsatzlisten beeinflusst werden.</p>';
             },
             self::EVW_SETTINGS_SLUG
-        );*/
+        );
         add_settings_section(
             'einsatzvw_settings_caps',
             'Berechtigungen',
@@ -216,6 +217,13 @@ class Settings
             array($this, 'echoSettingsExcerpt'),
             self::EVW_SETTINGS_SLUG,
             'einsatzvw_settings_einsatzberichte'
+        );
+        add_settings_field(
+            'einsatzvw_settings_columns',
+            'Spalten',
+            array($this, 'echoEinsatzlisteColumns'),
+            self::EVW_SETTINGS_SLUG,
+            'einsatzvw_settings_einsatzliste'
         );
         add_settings_field(
             'einsatzvw_settings_caps_roles',
@@ -387,6 +395,19 @@ class Settings
         echo '<p class="description">Sollte diese Einstellung keinen Effekt auf der Webseite zeigen, nutzt ihr Theme m&ouml;glicherweise keine Kurzfassungen und zeigt immer den vollen Beitrag.</p>';
     }
 
+
+    /**
+     *
+     */
+    public function echoEinsatzlisteColumns()
+    {
+        echo '<ul id="columns-available">';
+        echo '<li id="col1" class="evw-column"><span>Spalte 1</span></li>';
+        echo '<li id="col2" class="evw-column"><span>Spalte 2</span></li>';
+        echo '</ul>';
+
+        echo '<ul id="columns-enabled"></ul>';
+    }
 
     /**
      * Gibt die Einstellmöglichkeiten für die Berechtigungen aus

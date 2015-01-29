@@ -401,12 +401,20 @@ class Settings
      */
     public function echoEinsatzlisteColumns()
     {
-        echo '<ul id="columns-available">';
-        echo '<li id="col1" class="evw-column"><span>Spalte 1</span></li>';
-        echo '<li id="col2" class="evw-column"><span>Spalte 2</span></li>';
-        echo '</ul>';
+        echo '<table id="columns-available"><tr><td style="width: 150px;">';
+        echo 'Beschreibung';
+        echo '</td><td class="columns">';
+        echo '<ul style="height: 100px;">';
+        for ($i = 0; $i < 5; $i++) {
+            echo '<li id="col'.$i.'" class="evw-column"><span>Spalte '.$i.'</span></li>';
+        }
+        echo '<li class="end-fix"></li>';
+        echo '</ul></td></tr></table>';
 
-        echo '<ul id="columns-enabled"></ul>';
+        echo '<table id="columns-enabled"><tr><td style="width: 150px;">';
+        echo 'Beschreibung';
+        echo '</td><td class="columns"><ul>';
+        echo '</ul></td></tr></table>';
     }
 
     /**

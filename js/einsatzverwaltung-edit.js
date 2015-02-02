@@ -3,6 +3,14 @@ jQuery(document).ready(function() {
     var hinweistext = 'Bitte das folgende Format einhalten: JJJJ-MM-TT hh:mm, z.B. <strong>2014-01-31 13:37</strong>';
     einsatzverwaltung_register_and_execute('keyup', 'einsatzverwaltung_alarmzeit', datumsregex, hinweistext, false);
     einsatzverwaltung_register_and_execute('keyup', 'einsatzverwaltung_einsatzende', datumsregex, hinweistext, true);
+
+    var used_values = jQuery("#einsatzleiter_used_values");
+    if (used_values != undefined) {
+        var einsatzleiter_namen = used_values.val().split(',');
+        jQuery("#einsatzverwaltung_einsatzleiter").autocomplete({
+            source: einsatzleiter_namen
+        });
+    }
 });
 
 function einsatzverwaltung_checkField(id, regex, msg, allowEmpty)

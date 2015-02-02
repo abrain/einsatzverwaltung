@@ -30,7 +30,7 @@ function einsatzverwaltung_enqueue_edit_scripts($hook)
         wp_enqueue_script(
             'einsatzverwaltung-edit-script',
             EINSATZVERWALTUNG__SCRIPT_URL . 'einsatzverwaltung-edit.js',
-            array('jquery')
+            array('jquery', 'jquery-ui-autocomplete')
         );
         wp_enqueue_style(
             'einsatzverwaltung-edit',
@@ -69,6 +69,9 @@ function einsatzverwaltung_display_meta_box($post)
     $einsatzleiter = get_post_meta($post->ID, $key = 'einsatz_einsatzleiter', $single = true);
     $fehlalarm = get_post_meta($post->ID, $key = 'einsatz_fehlalarm', $single = true);
     $mannschaftsstaerke = get_post_meta($post->ID, $key = 'einsatz_mannschaft', $single = true);
+
+    $names = einsatzverwaltung_get_einsatzleiter();
+    echo '<input type="hidden" id="einsatzleiter_used_values" value="' . implode(',', $names) . '" />';
 
     echo '<table><tbody>';
 

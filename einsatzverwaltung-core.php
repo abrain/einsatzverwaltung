@@ -379,6 +379,27 @@ function einsatzverwaltung_get_einsatzart_string($einsatzart, $make_links, $show
 
 
 /**
+ * Gibt die Namen aller bisher verwendeten Einsatzleiter zurück
+ *
+ * @return array
+ */
+function einsatzverwaltung_get_einsatzleiter()
+{
+    /** @var wpdb $wpdb */
+    global $wpdb;
+
+    $names = array();
+    $query = "SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = 'einsatz_einsatzleiter' AND meta_value <> ''";
+    $results = $wpdb->get_results($query, OBJECT);
+
+    foreach ($results as $result) {
+        $names[] = $result->meta_value;
+    }
+    return $names;
+}
+
+
+/**
  * Gibt ein Array mit Jahreszahlen zurück, in denen Einsätze vorliegen
  */
 function einsatzverwaltung_get_jahremiteinsatz()

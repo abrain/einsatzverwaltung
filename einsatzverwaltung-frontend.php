@@ -290,7 +290,8 @@ function einsatzverwaltung_einsatz_excerpt($excerpt)
         return $excerpt;
     }
 
-    return einsatzverwaltung_einsatz_get_excerpt($post, true, true);
+    $excerptType = get_option('einsatzvw_excerpt_type', EINSATZVERWALTUNG__D__EXCERPT_TYPE);
+    return einsatzverwaltung_einsatz_get_excerpt($post, $excerptType, true, true);
 }
 add_filter('the_excerpt', 'einsatzverwaltung_einsatz_excerpt');
 
@@ -310,7 +311,8 @@ function einsatzverwaltung_einsatz_excerpt_feed($excerpt)
         return $excerpt;
     }
 
-    $get_excerpt = einsatzverwaltung_einsatz_get_excerpt($post, true, false);
+    $excerptType = get_option('einsatzvw_excerpt_type_feed', EINSATZVERWALTUNG__D__EXCERPT_TYPE);
+    $get_excerpt = einsatzverwaltung_einsatz_get_excerpt($post, $excerptType, true, false);
     $get_excerpt = str_replace('<strong>', '', $get_excerpt);
     $get_excerpt = str_replace('</strong>', '', $get_excerpt);
     return $get_excerpt;
@@ -320,14 +322,14 @@ add_filter('the_excerpt_rss', 'einsatzverwaltung_einsatz_excerpt_feed');
 
 /**
  * @param WP_Post $post
+ * @param string $excerptType
  * @param bool $excerptMayContainLinks
  * @param bool $showArchiveLinks
  *
  * @return mixed|string|void
  */
-function einsatzverwaltung_einsatz_get_excerpt($post, $excerptMayContainLinks, $showArchiveLinks)
+function einsatzverwaltung_einsatz_get_excerpt($post, $excerptType, $excerptMayContainLinks, $showArchiveLinks)
 {
-    $excerptType = get_option('einsatzvw_excerpt_type', EINSATZVERWALTUNG__D__EXCERPT_TYPE);
     switch ($excerptType) {
         case 'details':
             return einsatzverwaltung_get_einsatzbericht_header($post, $excerptMayContainLinks, $showArchiveLinks);

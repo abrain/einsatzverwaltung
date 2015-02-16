@@ -114,6 +114,11 @@ class Settings
             'einsatzvw_excerpt_type',
             array('abrain\Einsatzverwaltung\Utilities', 'sanitizeExcerptType')
         );
+        register_setting(
+            'einsatzvw_settings',
+            'einsatzvw_excerpt_type_feed',
+            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeExcerptType')
+        );
 
         $roles = get_editable_roles();
         if (!empty($roles)) {
@@ -207,7 +212,7 @@ class Settings
         );
         add_settings_field(
             'einsatzvw_settings_excerpt',
-            'Auszug / Kurzfassung',
+            'Kurzfassung',
             array($this, 'echoSettingsExcerpt'),
             self::EVW_SETTINGS_SLUG,
             'einsatzvw_settings_einsatzberichte'
@@ -238,6 +243,23 @@ class Settings
         echo '<input type="checkbox" value="1" id="' . $checkboxId . '" name="' . $checkboxId . '" ';
         echo Utilities::checked(get_option($checkboxId, $default)) . '/><label for="' . $checkboxId . '">';
         echo $text . '</label>';
+    }
+
+
+    /**
+     * Generiert eine Auswahlliste
+     *
+     * @param string $name Name des Parameters
+     * @param array $options Array aus Wert/Label-Paaren
+     * @param string $selectedValue Vorselektierter Wert
+     */
+    private function echoSelect($name, $options, $selectedValue)
+    {
+        echo '<select name="' . $name . '">';
+        foreach ($options as $value => $label) {
+            echo '<option value="' . $value . '"' . ($selectedValue == $value ? ' selected="selected"' : '') . '>' . $label . '</option>';
+        }
+        echo '</select>';
     }
 
 
@@ -363,13 +385,22 @@ class Settings
             'details' => 'Nur Einsatzdetails',
             'text' => 'Nur der Berichtstext'
         ); // TODO in Core auslagern
-        $currentValue = get_option('einsatzvw_excerpt_type', EINSATZVERWALTUNG__D__EXCERPT_TYPE);
-        echo '<p>Inhalt des Auszugs:&nbsp;<select name="einsatzvw_excerpt_type">';
-        foreach ($types as $value => $label) {
-            echo '<option value="' . $value . '"' . ($currentValue == $value ? ' selected="selected"' : '') . '>' . $label . '</option>';
-        }
-        echo '</select>';
-        echo '<p class="description">Sollte diese Einstellung keinen Effekt auf der Webseite zeigen, nutzt ihr Theme m&ouml;glicherweise keine Kurzfassungen und zeigt immer den vollen Beitrag.</p>';
+
+        echo '<p>Kurzfassung auf der Webseite:&nbsp;';
+        $this->echoSelect(
+            'einsatzvw_excerpt_type',
+            $types,
+            get_option('einsatzvw_excerpt_type', EINSATZVERWALTUNG__D__EXCERPT_TYPE)
+        );
+        echo '<p class="description">Sollte diese Einstellung keinen Effekt auf der Webseite zeigen, nutzt das verwendete Theme m&ouml;glicherweise keine Kurzfassungen und zeigt immer den vollen Beitrag.</p>';
+
+        echo '<p>Kurzfassung im Feed:&nbsp;';
+        $this->echoSelect(
+            'einsatzvw_excerpt_type_feed',
+            $types,
+            get_option('einsatzvw_excerpt_type_feed', EINSATZVERWALTUNG__D__EXCERPT_TYPE)
+        );
+        echo '<p class="description">Bitte auch die Einstellung zum Umfang der Eintr&auml;ge im Feed (Einstellungen &gt; Lesen) beachten!<br/>Im Feed werden bei den Einsatzdetails aus technischen Gr&uuml;nden keine Links zu gefilterten Einsatzlisten angezeigt.</p>';
     }
 
 

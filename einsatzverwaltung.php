@@ -41,7 +41,7 @@ require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-tools-wpe.php');
 require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-taxonomies.php');
 
 global $evw_db_version;
-$evw_db_version = 2;
+$evw_db_version = 3;
 
 global $evw_caps;
 $evw_caps = array(
@@ -181,6 +181,13 @@ function einsatzverwaltung_update_db_check()
             }
 
             $evwInstalledVersion = 2;
+            update_site_option(EINSATZVERWALTUNG__DBVERSION_OPTION, $evwInstalledVersion);
+        }
+
+        if ($evwInstalledVersion == 2) {
+            delete_option('einsatzvw_show_links_in_excerpt');
+
+            $evwInstalledVersion = 3;
             update_site_option(EINSATZVERWALTUNG__DBVERSION_OPTION, $evwInstalledVersion);
         }
 

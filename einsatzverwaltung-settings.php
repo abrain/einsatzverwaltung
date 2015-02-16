@@ -375,8 +375,7 @@ class Settings
 
         $types = array(
             'details' => 'Nur Einsatzdetails',
-            'text' => 'Nur der Berichtstext',
-            'full' => 'Berichtstext mit Details'
+            'text' => 'Nur der Berichtstext'
         ); // TODO in Core auslagern
         $currentValue = get_option('einsatzvw_excerpt_type', EINSATZVERWALTUNG__D__EXCERPT_TYPE);
         echo '<p>Inhalt des Auszugs:&nbsp;<select name="einsatzvw_excerpt_type">';

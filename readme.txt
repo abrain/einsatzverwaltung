@@ -51,7 +51,7 @@ Entweder [per Mail](mailto:kontakt@abrain.de), auf [Twitter](https://twitter.com
 == Changelog ==
 
 = 0.8.2 =
-* Verbesserung: Inhalt der Kurzfassung von Einsatzberichten ist nun f&uuml; die Webseite und den Feed einstellbar
+* Verbesserung: Inhalt der Kurzfassung von Einsatzberichten ist nun f&uuml;r die Webseite und den Feed einstellbar
 * Verbesserung: Autovervollst&auml;ndigung f&uuml;r das Feld Einsatzleiter
 * Entfernt: Einstellung 'Auszug darf Links enthalten'
 

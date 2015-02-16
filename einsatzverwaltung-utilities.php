@@ -152,7 +152,7 @@ class Utilities
     public static function sanitizeExcerptType($input)
     {
         // TODO gegen künftige Liste in Core prüfen
-        if ($input === 'details' || $input === 'text' || $input === 'full') {
+        if ($input === 'details' || $input === 'text' || $input === 'none') {
             return $input;
         } else {
             return EINSATZVERWALTUNG__D__EXCERPT_TYPE;

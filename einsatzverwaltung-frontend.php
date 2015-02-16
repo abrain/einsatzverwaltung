@@ -335,6 +335,8 @@ function einsatzverwaltung_einsatz_get_excerpt($post, $excerptType, $excerptMayC
             return einsatzverwaltung_get_einsatzbericht_header($post, $excerptMayContainLinks, $showArchiveLinks);
         case 'text':
             return einsatzverwaltung_prepare_content(get_the_content());
+        case 'none':
+            return '';
         default:
             return einsatzverwaltung_get_einsatzbericht_header($post, $excerptMayContainLinks, $showArchiveLinks);
     }

@@ -382,8 +382,9 @@ class Settings
     public function echoSettingsExcerpt()
     {
         $types = array(
-            'details' => 'Nur Einsatzdetails',
-            'text' => 'Nur der Berichtstext'
+            'none' => 'Leer',
+            'details' => 'Einsatzdetails',
+            'text' => 'Berichtstext'
         ); // TODO in Core auslagern
 
         echo '<p>Kurzfassung auf der Webseite:&nbsp;';

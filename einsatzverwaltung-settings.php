@@ -1,10 +1,18 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
+/**
+ * Erzeugt die Einstellungsseite
+ *
+ * @author Andreas Brain
+ */
 class Settings
 {
     const EVW_SETTINGS_SLUG = 'einsatzvw-settings';
 
+    /**
+     * Konstruktor
+     */
     public function __construct()
     {
         $this->addHooks();
@@ -36,11 +44,15 @@ class Settings
 
     /**
      * Zeigt einen Link zu den Einstellungen direkt auf der Plugin-Seite an
+     *
+     * @param $links
+     *
+     * @return array
      */
     public function addActionLinks($links)
     {
         $settingsPage = 'options-general.php?page=' . self::EVW_SETTINGS_SLUG;
-        $actionLinks = array(sprintf('<a href="%s">Einstellungen</a>', admin_url($settingsPage)));
+        $actionLinks = array('<a href="' . admin_url($settingsPage) . '">Einstellungen</a>');
         return array_merge($links, $actionLinks);
     }
 
@@ -52,70 +64,75 @@ class Settings
     {
         // Sections
         $this->addSettingsSections();
-    
+
         // Fields
         $this->addSettingsFields();
-    
+
         // Registration
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_einsatznummer_stellen',
-            array($this, 'sanitizeEinsatznummerStellen')
+            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeEinsatznummerStellen')
         );
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_einsatznummer_lfdvorne',
-            'einsatzverwaltung_sanitize_checkbox'
+            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_show_einsatzberichte_mainloop',
-            'einsatzverwaltung_sanitize_checkbox'
+            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_einsatz_hideemptydetails',
-            'einsatzverwaltung_sanitize_checkbox'
+            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_show_exteinsatzmittel_archive',
-            'einsatzverwaltung_sanitize_checkbox'
+            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_show_einsatzart_archive',
-            'einsatzverwaltung_sanitize_checkbox'
+            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_show_fahrzeug_archive',
-            'einsatzverwaltung_sanitize_checkbox'
+            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_open_ext_in_new',
-            'einsatzverwaltung_sanitize_checkbox'
+            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings',
-            'einsatzvw_show_links_in_excerpt', 
-            'einsatzverwaltung_sanitize_checkbox'
+            'einsatzvw_excerpt_type',
+            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeExcerptType')
         );
-    
+        register_setting(
+            'einsatzvw_settings',
+            'einsatzvw_excerpt_type_feed',
+            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeExcerptType')
+        );
+
         $roles = get_editable_roles();
         if (!empty($roles)) {
             foreach (array_keys($roles) as $role_slug) {
                 register_setting(
                     'einsatzvw_settings',
                     'einsatzvw_cap_roles_' . $role_slug,
-                    'einsatzverwaltung_sanitize_checkbox'
+                    array('abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
                 );
             }
         }
     }
-    
-    
+
+
     /**
      * Fügt die großen Abschnitte in die Einstellungsseite ein
      */
@@ -151,8 +168,8 @@ class Settings
             self::EVW_SETTINGS_SLUG
         );
     }
-    
-    
+
+
     /**
      * Namen und Ausgabemethoden der einzelnen Felder in den Abschnitten
      */
@@ -195,7 +212,7 @@ class Settings
         );
         add_settings_field(
             'einsatzvw_settings_excerpt',
-            'Auszug / Exzerpt',
+            'Kurzfassung',
             array($this, 'echoSettingsExcerpt'),
             self::EVW_SETTINGS_SLUG,
             'einsatzvw_settings_einsatzberichte'
@@ -211,26 +228,45 @@ class Settings
 
 
     /**
+     * Gibt eine Checkbox auf der Einstellungsseite aus
      *
+     * @param array $args Parameter für die Checkbox:
+     * 0: string Id der Option
+     * 1: string Beschriftung der Checkbox
+     * 2: bool Standardwert, wenn Option nicht gefunden werden kann (optional)
      */
     private function echoSettingsCheckbox($args)
     {
         $checkboxId = $args[0];
         $text = $args[1];
         $default = (count($args) > 2 ? $args[2] : false);
-        printf(
-            '<input type="checkbox" value="1" id="%1$s" name="%1$s" %2$s/><label for="%1$s">%3$s</label>',
-            $checkboxId,
-            einsatzverwaltung_checked(get_option($checkboxId, $default)),
-            $text
-        );
+        echo '<input type="checkbox" value="1" id="' . $checkboxId . '" name="' . $checkboxId . '" ';
+        echo Utilities::checked(get_option($checkboxId, $default)) . '/><label for="' . $checkboxId . '">';
+        echo $text . '</label>';
+    }
+
+
+    /**
+     * Generiert eine Auswahlliste
+     *
+     * @param string $name Name des Parameters
+     * @param array $options Array aus Wert/Label-Paaren
+     * @param string $selectedValue Vorselektierter Wert
+     */
+    private function echoSelect($name, $options, $selectedValue)
+    {
+        echo '<select name="' . $name . '">';
+        foreach ($options as $value => $label) {
+            echo '<option value="' . $value . '"' . ($selectedValue == $value ? ' selected="selected"' : '') . '>' . $label . '</option>';
+        }
+        echo '</select>';
     }
 
 
     /**
      *
      */
-    private function echoSettingsInput($args)
+    /*private function echoSettingsInput($args)
     {
         $inputId = $args[0];
         $text = $args[1];
@@ -240,7 +276,7 @@ class Settings
             get_option($inputId),
             $text
         );
-    }
+    }*/
 
 
     /**
@@ -255,22 +291,8 @@ class Settings
                 'Laufende Nummer vor das Jahr stellen'
             )
         );
-    
+
         echo '<br><br><strong>Hinweis:</strong> Nach einer &Auml;nderung des Formats erhalten die bestehenden Einsatzberichte nicht automatisch aktualisierte Nummern. Nutzen Sie daf&uuml;r das Werkzeug <a href="'.admin_url('tools.php?page=einsatzvw-tool-enr').'">Einsatznummern reparieren</a>.';
-    }
-
-
-    /**
-     * Stellt einen sinnvollen Wert für die Anzahl Stellen der laufenden Einsatznummer sicher
-     */
-    public function sanitizeEinsatznummerStellen($input)
-    {
-        $val = intval($input);
-        if (is_numeric($val) && $val > 0) {
-            return $val;
-        } else {
-            return EINSATZVERWALTUNG__EINSATZNR_STELLEN;
-        }
     }
 
 
@@ -359,14 +381,27 @@ class Settings
      */
     public function echoSettingsExcerpt()
     {
-        $this->echoSettingsCheckbox(
-            array(
-                'einsatzvw_show_links_in_excerpt',
-                'Auszug darf Links enthalten',
-                EINSATZVERWALTUNG__D__SHOW_LINKS_IN_EXCERPT
-            )
+        $types = array(
+            'none' => 'Leer',
+            'details' => 'Einsatzdetails',
+            'text' => 'Berichtstext'
+        ); // TODO in Core auslagern
+
+        echo '<p>Kurzfassung auf der Webseite:&nbsp;';
+        $this->echoSelect(
+            'einsatzvw_excerpt_type',
+            $types,
+            get_option('einsatzvw_excerpt_type', EINSATZVERWALTUNG__D__EXCERPT_TYPE)
         );
-        echo '<p class="description">Welche Links tats&auml;chlich generiert werden, h&auml;ngt von den anderen Einstellungen ab. Der Auszug im Newsfeed enth&auml;lt niemals Links.</p>';
+        echo '<p class="description">Sollte diese Einstellung keinen Effekt auf der Webseite zeigen, nutzt das verwendete Theme m&ouml;glicherweise keine Kurzfassungen und zeigt immer den vollen Beitrag.</p>';
+
+        echo '<p>Kurzfassung im Feed:&nbsp;';
+        $this->echoSelect(
+            'einsatzvw_excerpt_type_feed',
+            $types,
+            get_option('einsatzvw_excerpt_type_feed', EINSATZVERWALTUNG__D__EXCERPT_TYPE)
+        );
+        echo '<p class="description">Bitte auch die Einstellung zum Umfang der Eintr&auml;ge im Feed (Einstellungen &gt; Lesen) beachten!<br/>Im Feed werden bei den Einsatzdetails aus technischen Gr&uuml;nden keine Links zu gefilterten Einsatzlisten angezeigt.</p>';
     }
 
 
@@ -402,7 +437,7 @@ class Settings
         if (!current_user_can('manage_options')) {
             wp_die(__('You do not have sufficient permissions to manage options for this site.'));
         }
-    
+
         echo '<div id="einsatzverwaltung_contactinfo">';
         echo '<h3>Entwicklerkontakt &amp; Social Media</h3>';
         echo 'eMail: <a href="mailto:kontakt@abrain.de">kontakt@abrain.de</a><br>';
@@ -410,10 +445,10 @@ class Settings
         echo 'App.net: <a href="https://alpha.app.net/einsatzverwaltung">@einsatzverwaltung</a><br>';
         echo 'Facebook: <a href="https://www.facebook.com/einsatzverwaltung/">Einsatzverwaltung</a>';
         echo '</div>';
-    
+
         echo '<div class="wrap">';
         echo '<h2>Einstellungen &rsaquo; Einsatzverwaltung</h2>';
-    
+
         // Berechtigungen aktualisieren
         $roles = get_editable_roles();
         if (!empty($roles)) {
@@ -426,10 +461,10 @@ class Settings
                 }
             }
         }
-    
+
         echo '<form method="post" action="options.php">';
-        echo settings_fields('einsatzvw_settings');
-        echo do_settings_sections(self::EVW_SETTINGS_SLUG);
+        settings_fields('einsatzvw_settings');
+        do_settings_sections(self::EVW_SETTINGS_SLUG);
         submit_button();
         echo '</form>';
     }

@@ -2,12 +2,21 @@
 
 /**
  * Gibt eine Tabelle mit Einsätzen aus dem gegebenen Jahr zurück
+ *
+ * @param array $atts Parameter des Shortcodes
+ *
+ * @return string
  */
 function einsatzverwaltung_shortcode_einsatzliste($atts)
 {
-    extract(shortcode_atts(array('jahr' => date('Y'), 'sort' => 'ab', 'monatetrennen' => 'nein'), $atts));
     $aktuelles_jahr = date('Y');
-    
+
+    // Shortcodeparameter auslesen
+    $shortcodeParams = shortcode_atts(array('jahr' => date('Y'), 'sort' => 'ab', 'monatetrennen' => 'nein'), $atts);
+    $jahr = $shortcodeParams['jahr'];
+    $sort = $shortcodeParams['sort'];
+    $monateTrennen = $shortcodeParams['monatetrennen'];
+
     $einsatzjahre = array();
     if ($jahr == '*') {
         $einsatzjahre = einsatzverwaltung_get_jahremiteinsatz();
@@ -21,8 +30,8 @@ function einsatzverwaltung_shortcode_einsatzliste($atts)
     } else {
         $einsatzjahre = array($jahr);
     }
-    
-    return einsatzverwaltung_print_einsatzliste($einsatzjahre, !($sort == 'auf'), false, ($monatetrennen == 'ja'));
+
+    return einsatzverwaltung_print_einsatzliste($einsatzjahre, !($sort == 'auf'), ($monateTrennen == 'ja'));
 }
 add_shortcode('einsatzliste', 'einsatzverwaltung_shortcode_einsatzliste');
 
@@ -30,30 +39,30 @@ add_shortcode('einsatzliste', 'einsatzverwaltung_shortcode_einsatzliste');
 /**
  * Gibt Links zu den Archivseiten der Jahre, in denen Einsatzberichte existieren, zurück
  */
-function einsatzverwaltung_print_einsatzjahre($atts)
+function einsatzverwaltung_print_einsatzjahre()
 {
     global $year;
     $jahre = einsatzverwaltung_get_jahremiteinsatz();
     $permalink_structure = get_option('permalink_structure');
-    
+
     $string = "";
     foreach ($jahre as $jahr) {
         if (!empty($string)) {
             $string .= " | ";
         }
-        
+
         $link = get_post_type_archive_link('einsatz') . (empty($permalink_structure) ? '&year='.$jahr : $jahr);
         $string .= '<a href="' . $link . '">';
-        
+
         if ($year == $jahr || empty($year) && $jahr == date("Y")) {
             $string .= "<strong>".$jahr."</strong>";
         } else {
             $string .= $jahr;
         }
-        
+
         $string .= "</a>";
     }
-    
+
     return $string;
 }
 add_shortcode('einsatzjahre', 'einsatzverwaltung_print_einsatzjahre');

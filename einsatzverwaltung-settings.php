@@ -111,11 +111,6 @@ class Settings
         );
         register_setting(
             'einsatzvw_settings',
-            'einsatzvw_show_links_in_excerpt',
-            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
-        );
-        register_setting(
-            'einsatzvw_settings',
             'einsatzvw_excerpt_type',
             array('abrain\Einsatzverwaltung\Utilities', 'sanitizeExcerptType')
         );
@@ -364,15 +359,6 @@ class Settings
      */
     public function echoSettingsExcerpt()
     {
-        $this->echoSettingsCheckbox(
-            array(
-                'einsatzvw_show_links_in_excerpt',
-                'Auszug darf Links enthalten',
-                EINSATZVERWALTUNG__D__SHOW_LINKS_IN_EXCERPT
-            )
-        );
-        echo '<p class="description">Welche Links tats&auml;chlich generiert werden, h&auml;ngt von den anderen Einstellungen ab. Der Auszug im Newsfeed enth&auml;lt niemals Links.</p><br>';
-
         $types = array(
             'details' => 'Nur Einsatzdetails',
             'text' => 'Nur der Berichtstext'

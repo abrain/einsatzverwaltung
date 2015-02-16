@@ -303,8 +303,7 @@ function einsatzverwaltung_einsatz_excerpt($excerpt)
         return $excerpt;
     }
 
-    $excerptMayContainLinks = get_option('einsatzvw_show_links_in_excerpt', EINSATZVERWALTUNG__D__SHOW_LINKS_IN_EXCERPT);
-    return einsatzverwaltung_einsatz_get_excerpt($post, $excerptMayContainLinks);
+    return einsatzverwaltung_einsatz_get_excerpt($post, true);
 }
 add_filter('the_excerpt', 'einsatzverwaltung_einsatz_excerpt');
 

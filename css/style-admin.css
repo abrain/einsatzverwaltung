@@ -58,7 +58,7 @@
 }
 
 #columns-available ul, #columns-enabled ul {
-    height: 100px;
+    height: 50px;
     margin: 5px;
     padding: 5px;
     display: block;
@@ -84,4 +84,11 @@ li.dropzone {
     margin-right: 10px;
     padding: 5px;
     height: 18px;
+}
+
+.evw-area-title {
+    display: block;
+    font-size: 15px;
+    font-weight: normal;
+    margin-bottom: 15px;
 }

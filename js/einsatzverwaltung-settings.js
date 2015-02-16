@@ -8,12 +8,16 @@ jQuery(document).ready(function() {
         placeholder: 'dropzone'
     });
 
-    jQuery("#columns-enabled").find(".columns ul").sortable({
+    var $columnsEnabled = jQuery("#columns-enabled").find(".columns ul");
+    $columnsEnabled.sortable({
         connectWith: '#columns-available .columns ul',
         forcePlaceholderSize: true,
         helper: 'clone',
         items: 'li',
         opacity: 0.8,
-        placeholder: 'dropzone'
+        placeholder: 'dropzone',
+        update: function(event, ui) {
+            jQuery("#einsatzvw_list_columns").val($columnsEnabled.sortable('toArray'));
+        }
     });
 });

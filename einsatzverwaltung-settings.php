@@ -119,6 +119,11 @@ class Settings
             'einsatzvw_excerpt_type',
             array('abrain\Einsatzverwaltung\Utilities', 'sanitizeExcerptType')
         );
+        register_setting(
+            'einsatzvw_settings',
+            'einsatzvw_list_columns',
+            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeColumns')
+        );
 
         $roles = get_editable_roles();
         if (!empty($roles)) {
@@ -401,21 +406,34 @@ class Settings
      */
     public function echoEinsatzlisteColumns()
     {
+        $columns = einsatzverwaltung_get_columns();
+        $enabledColumns = Options::getEinsatzlisteEnabledColumns();
+        $enabledColumnsArray = explode(',', $enabledColumns);
+
         echo '<table id="columns-available"><tr><td style="width: 150px;">';
         echo 'Beschreibung';
-        echo '</td><td class="columns">';
-        echo '<ul style="height: 100px;">';
-        for ($i = 0; $i < 5; $i++) {
-            echo '<li id="col'.$i.'" class="evw-column"><span>Spalte '.$i.'</span></li>';
+        echo '</td><td class="columns"><ul>';
+        foreach ($columns as $column) {
+            if (in_array($column['id'], $enabledColumnsArray)) {
+                continue;
+            }
+            echo '<li id="'.$column['id'].'" class="evw-column"><span>'.$column['name'].'</span></li>';
         }
-        echo '<li class="end-fix"></li>';
         echo '</ul></td></tr></table>';
 
         echo '<table id="columns-enabled"><tr><td style="width: 150px;">';
         echo 'Beschreibung';
         echo '</td><td class="columns"><ul>';
+        foreach ($columns as $column) {
+            if (!in_array($column['id'], $enabledColumnsArray)) {
+                continue;
+            }
+            echo '<li id="'.$column['id'].'" class="evw-column"><span>'.$column['name'].'</span></li>';
+        }
         echo '</ul></td></tr></table>';
+        echo '<input name="einsatzvw_list_columns" id="einsatzvw_list_columns" type="text" value="'.$enabledColumns.'">';
     }
+
 
     /**
      * Gibt die Einstellmöglichkeiten für die Berechtigungen aus

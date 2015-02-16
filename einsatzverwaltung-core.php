@@ -403,3 +403,31 @@ function einsatzverwaltung_get_fields()
     global $evw_meta_fields, $evw_terms, $evw_post_fields;
     return array_merge($evw_meta_fields, $evw_terms, $evw_post_fields);
 }
+
+
+/**
+ * Gibt die möglichen Spalten für die Einsatzübersicht zurück
+ *
+ * @return array
+ */
+function einsatzverwaltung_get_columns()
+{
+    return array(
+        array(
+            'id' => 'enr',
+            'name' => 'Einsatznummer'
+        ),
+        array(
+            'id' => 'datum',
+            'name' => 'Datum'
+        ),
+        array(
+            'id' => 'zeit',
+            'name' => 'Zeit'
+        ),
+        array(
+            'id' => 'titel',
+            'name' => 'Einsatzmeldung'
+        )
+    );
+}

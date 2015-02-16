@@ -177,4 +177,41 @@ class Utilities
             return $defaultvalue;
         }
     }
+
+
+    /**
+     * Stellt sicher, dass nur gültige Spalten-Ids gespeichert werden.
+     *
+     * @param string $input Kommaseparierte Spalten-Ids
+     *
+     * @return string Der Eingabestring ohne ungültige Spalten-Ids, bei Problemen werden die Standardspalten
+     * zurückgegeben
+     */
+    public static function sanitizeColumns($input)
+    {
+        if (empty($input)) {
+            return Options::DEFAULT_COLUMNS;
+        }
+
+        $columns = einsatzverwaltung_get_columns();
+        $columnIds = array();
+        foreach ($columns as $column) {
+            $columnIds[] = $column['id'];
+        }
+
+        $inputArray = explode(',', $input);
+        $validColumnIds = array();
+        foreach ($inputArray as $colId) {
+            $colId = trim($colId);
+            if (in_array($colId, $columnIds)) {
+                $validColumnIds[] = $colId;
+            }
+        }
+
+        if (empty($validColumnIds)) {
+            return Options::DEFAULT_COLUMNS;
+        }
+
+        return implode(',', $validColumnIds);
+    }
 }

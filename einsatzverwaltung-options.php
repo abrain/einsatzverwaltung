@@ -6,7 +6,7 @@ namespace abrain\Einsatzverwaltung;
  */
 class Options
 {
-    const DEFAULT_COLUMNS = 'enr,datum,zeit,titel';
+    const DEFAULT_COLUMNS = 'number,date,time,title';
 
     /**
      * @return mixed|void

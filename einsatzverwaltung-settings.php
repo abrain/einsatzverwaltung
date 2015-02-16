@@ -413,25 +413,27 @@ class Settings
         echo '<table id="columns-available"><tr><td style="width: 150px;">';
         echo 'Beschreibung';
         echo '</td><td class="columns"><ul>';
-        foreach ($columns as $column) {
-            if (in_array($column['id'], $enabledColumnsArray)) {
+        foreach ($columns as $colId => $colInfo) {
+            if (in_array($colId, $enabledColumnsArray)) {
                 continue;
             }
-            echo '<li id="'.$column['id'].'" class="evw-column"><span>'.$column['name'].'</span></li>';
+            echo '<li id="'.$colId.'" class="evw-column"><span>'.$colInfo['name'].'</span></li>';
         }
         echo '</ul></td></tr></table>';
 
         echo '<table id="columns-enabled"><tr><td style="width: 150px;">';
         echo 'Beschreibung';
         echo '</td><td class="columns"><ul>';
-        foreach ($columns as $column) {
-            if (!in_array($column['id'], $enabledColumnsArray)) {
+        foreach ($enabledColumnsArray as $colId) {
+            if (!array_key_exists($colId, $columns)) {
                 continue;
             }
-            echo '<li id="'.$column['id'].'" class="evw-column"><span>'.$column['name'].'</span></li>';
+
+            $colInfo = $columns[$colId];
+            echo '<li id="'.$colId.'" class="evw-column"><span>'.$colInfo['name'].'</span></li>';
         }
         echo '</ul></td></tr></table>';
-        echo '<input name="einsatzvw_list_columns" id="einsatzvw_list_columns" type="text" value="'.$enabledColumns.'">';
+        echo '<input name="einsatzvw_list_columns" id="einsatzvw_list_columns" type="hidden" value="'.$enabledColumns.'">';
     }
 
 

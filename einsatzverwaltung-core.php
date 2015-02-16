@@ -413,20 +413,16 @@ function einsatzverwaltung_get_fields()
 function einsatzverwaltung_get_columns()
 {
     return array(
-        array(
-            'id' => 'enr',
+        'number' => array(
             'name' => 'Einsatznummer'
         ),
-        array(
-            'id' => 'datum',
+        'date' => array(
             'name' => 'Datum'
         ),
-        array(
-            'id' => 'zeit',
+        'time' => array(
             'name' => 'Zeit'
         ),
-        array(
-            'id' => 'titel',
+        'title' => array(
             'name' => 'Einsatzmeldung'
         )
     );

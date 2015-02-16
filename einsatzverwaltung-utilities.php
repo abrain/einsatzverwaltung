@@ -194,10 +194,7 @@ class Utilities
         }
 
         $columns = einsatzverwaltung_get_columns();
-        $columnIds = array();
-        foreach ($columns as $column) {
-            $columnIds[] = $column['id'];
-        }
+        $columnIds = array_keys($columns);
 
         $inputArray = explode(',', $input);
         $validColumnIds = array();

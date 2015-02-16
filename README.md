@@ -33,6 +33,6 @@ Siehe https://github.com/abrain/einsatzverwaltung/releases
 
 ### Social Media
 
-Twitter: [@einsatzvw](https://twitter.com/einsatzvw)
-App.net: [@einsatzverwaltung](https://alpha.app.net/einsatzverwaltung)
-Facebook: [Einsatzverwaltung](https://www.facebook.com/einsatzverwaltung/)
+* Twitter: [@einsatzvw](https://twitter.com/einsatzvw)
+* App.net: [@einsatzverwaltung](https://alpha.app.net/einsatzverwaltung)
+* Facebook: [Einsatzverwaltung](https://www.facebook.com/einsatzverwaltung/)

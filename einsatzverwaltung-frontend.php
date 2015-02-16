@@ -42,10 +42,11 @@ function einsatzverwaltung_dropdown_einsatzart($selected)
  *
  * @param WP_Post $post Das Post-Objekt
  * @param bool $may_contain_links True, wenn Links generiert werden dürfen
+ * @param bool $showArchiveLinks Bestimmt, ob Links zu Archivseiten generiert werden dürfen
  *
  * @return string Auflistung der Einsatzdetails
  */
-function einsatzverwaltung_get_einsatzbericht_header($post, $may_contain_links = true)
+function einsatzverwaltung_get_einsatzbericht_header($post, $may_contain_links = true, $showArchiveLinks = true)
 {
     if (get_post_type($post) == "einsatz") {
         $make_links = $may_contain_links;
@@ -91,13 +92,14 @@ function einsatzverwaltung_get_einsatzbericht_header($post, $may_contain_links =
 
         $einsatzart = einsatzverwaltung_get_einsatzart($post->ID);
         if ($einsatzart) {
+            $showEinsatzartArchiveLink = $showArchiveLinks && get_option(
+                'einsatzvw_show_einsatzart_archive',
+                EINSATZVERWALTUNG__D__SHOW_EINSATZART_ARCHIVE
+            );
             $art = einsatzverwaltung_get_einsatzart_string(
                 $einsatzart,
                 $make_links,
-                get_option(
-                    'einsatzvw_show_einsatzart_archive',
-                    EINSATZVERWALTUNG__D__SHOW_EINSATZART_ARCHIVE
-                )
+                $showEinsatzartArchiveLink
             );
         } else {
             $art = '';
@@ -136,7 +138,7 @@ function einsatzverwaltung_get_einsatzbericht_header($post, $may_contain_links =
                     }
                 }
 
-                if ($make_links && get_option('einsatzvw_show_fahrzeug_archive', EINSATZVERWALTUNG__D__SHOW_FAHRZEUG_ARCHIVE)) {
+                if ($make_links && $showArchiveLinks && get_option('einsatzvw_show_fahrzeug_archive', EINSATZVERWALTUNG__D__SHOW_FAHRZEUG_ARCHIVE)) {
                     $fzg_name .= '&nbsp;<a href="'.get_term_link($fahrzeug).'" class="fa fa-filter" style="text-decoration:none;" title="Eins&auml;tze unter Beteiligung von '.$fahrzeug->name.' anzeigen"></a>';
                 }
 
@@ -161,7 +163,7 @@ function einsatzverwaltung_get_einsatzbericht_header($post, $may_contain_links =
                     }
                 }
 
-                if ($make_links && get_option('einsatzvw_show_exteinsatzmittel_archive', EINSATZVERWALTUNG__D__SHOW_EXTEINSATZMITTEL_ARCHIVE)) {
+                if ($make_links && $showArchiveLinks && get_option('einsatzvw_show_exteinsatzmittel_archive', EINSATZVERWALTUNG__D__SHOW_EXTEINSATZMITTEL_ARCHIVE)) {
                     $ext_name .= '&nbsp;<a href="'.get_term_link($ext).'" class="fa fa-filter" style="text-decoration:none;" title="Eins&auml;tze unter Beteiligung von '.$ext->name.' anzeigen"></a>';
                 }
 
@@ -237,24 +239,6 @@ function einsatzverwaltung_get_numeric_detail_string($title, $value, $is_zero_em
 
 
 /**
- * Fügt Beitragstext und Einsatzdetails zusammen
- *
- * @param $post
- * @param $content
- * @param bool $mayContainLinks
- *
- * @return string
- */
-function einsatzverwaltung_add_einsatz_daten($post, $content, $mayContainLinks = true)
-{
-    $header = einsatzverwaltung_get_einsatzbericht_header($post, $mayContainLinks);
-    $content = einsatzverwaltung_prepare_content($content);
-
-    return $header . '<hr>' . $content;
-}
-
-
-/**
  * Beim Aufrufen eines Einsatzberichts vor den Text den Kopf mit den Details einbauen
  *
  * @param string $content Der Beitragstext des Einsatzberichts
@@ -268,7 +252,10 @@ function einsatzverwaltung_the_content($content)
         return $content;
     }
 
-    return einsatzverwaltung_add_einsatz_daten($post, $content);
+    $header = einsatzverwaltung_get_einsatzbericht_header($post, true, true);
+    $content = einsatzverwaltung_prepare_content($content);
+
+    return $header . '<hr>' . $content;
 }
 add_filter('the_content', 'einsatzverwaltung_the_content');
 
@@ -303,7 +290,7 @@ function einsatzverwaltung_einsatz_excerpt($excerpt)
         return $excerpt;
     }
 
-    return einsatzverwaltung_einsatz_get_excerpt($post, true);
+    return einsatzverwaltung_einsatz_get_excerpt($post, true, true);
 }
 add_filter('the_excerpt', 'einsatzverwaltung_einsatz_excerpt');
 
@@ -323,7 +310,7 @@ function einsatzverwaltung_einsatz_excerpt_feed($excerpt)
         return $excerpt;
     }
 
-    $get_excerpt = einsatzverwaltung_einsatz_get_excerpt($post, false);
+    $get_excerpt = einsatzverwaltung_einsatz_get_excerpt($post, true, false);
     $get_excerpt = str_replace('<strong>', '', $get_excerpt);
     $get_excerpt = str_replace('</strong>', '', $get_excerpt);
     return $get_excerpt;
@@ -332,21 +319,22 @@ add_filter('the_excerpt_rss', 'einsatzverwaltung_einsatz_excerpt_feed');
 
 
 /**
- * @param $post
- * @param $excerptMayContainLinks
+ * @param WP_Post $post
+ * @param bool $excerptMayContainLinks
+ * @param bool $showArchiveLinks
  *
  * @return mixed|string|void
  */
-function einsatzverwaltung_einsatz_get_excerpt($post, $excerptMayContainLinks)
+function einsatzverwaltung_einsatz_get_excerpt($post, $excerptMayContainLinks, $showArchiveLinks)
 {
     $excerptType = get_option('einsatzvw_excerpt_type', EINSATZVERWALTUNG__D__EXCERPT_TYPE);
     switch ($excerptType) {
         case 'details':
-            return einsatzverwaltung_get_einsatzbericht_header($post, $excerptMayContainLinks);
+            return einsatzverwaltung_get_einsatzbericht_header($post, $excerptMayContainLinks, $showArchiveLinks);
         case 'text':
             return einsatzverwaltung_prepare_content(get_the_content());
         default:
-            return einsatzverwaltung_get_einsatzbericht_header($post, $excerptMayContainLinks);
+            return einsatzverwaltung_get_einsatzbericht_header($post, $excerptMayContainLinks, $showArchiveLinks);
     }
 }
 

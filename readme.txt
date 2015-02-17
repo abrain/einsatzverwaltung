@@ -4,7 +4,7 @@ Donate link: http://www.abrain.de/software/unterstuetzen/
 Tags: feuerwehr, einsatz
 Requires at least: 3.1.0
 Tested up to: 4.1
-Stable tag: 0.8.2
+Stable tag: 0.8.3
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -49,6 +49,9 @@ Die Aufgaben f&uuml;r die kommenden Versionen werden auf [GitHub](https://github
 Entweder [per Mail](mailto:kontakt@abrain.de), auf [Twitter](https://twitter.com/einsatzvw) oder [App.net](https://alpha.app.net/einsatzverwaltung). Bugs und Verbesserungsvorschl&auml;ge gerne auch als [Issue auf GitHub](https://github.com/abrain/einsatzverwaltung/issues).
 
 == Changelog ==
+
+= 0.8.3 =
+* Fehlerbehebung: Einsatzdetails wurden nicht abgespeichert
 
 = 0.8.2 =
 * Verbesserung: Inhalt der Kurzfassung von Einsatzberichten ist nun f&uuml; die Webseite und den Feed einstellbar
@@ -157,6 +160,9 @@ Entweder [per Mail](mailto:kontakt@abrain.de), auf [Twitter](https://twitter.com
 * Widget zeigt die aktuellsten X Eins&auml;tze
 
 == Upgrade Notice ==
+
+= 0.8.3 =
+Kritische Fehlerbehebung
 
 = 0.8.2 =
 Kleine Verbesserungen, siehe Changelog f&uuml;r Details

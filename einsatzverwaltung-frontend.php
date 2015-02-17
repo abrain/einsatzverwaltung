@@ -406,36 +406,31 @@ function einsatzverwaltung_print_einsatzliste($einsatzjahre = array(), $desc = t
         $string .= '<h3>Eins&auml;tze '.$einsatzjahr.'</h3>';
         if ($query->have_posts()) {
             if (!$splitmonths) {
-                $string .= "<table class=\"einsatzliste\">";
+                $string .= '<table class="einsatzliste">';
                 $string .= einsatzverwaltung_get_einsatzliste_header();
-                $string .= "<tbody>";
+                $string .= '<tbody>';
             }
 
             $oldmonth = 0;
             while ($query->have_posts()) {
                 $query->next_post();
 
-                $einsatz_nummer = get_post_field('post_name', $query->post->ID);
                 $alarmzeit = get_post_meta($query->post->ID, 'einsatz_alarmzeit', true);
                 $einsatz_timestamp = strtotime($alarmzeit);
-
-                $einsatz_datum = date("d.m.Y", $einsatz_timestamp);
-                $einsatz_zeit = date("H:i", $einsatz_timestamp);
-                $month = date("m", $einsatz_timestamp);
+                $month = date('m', $einsatz_timestamp);
 
                 if ($splitmonths && $month != $oldmonth) {
                     if ($oldmonth != 0) {
                         // Nicht im ersten Durchlauf
-                        $string .= "</tbody>";
-                        $string .= "</table>";
+                        $string .= '</tbody></table>';
                     }
                     $string .= '<h5>' . date_i18n('F', $einsatz_timestamp) . '</h5>';
-                    $string .= "<table class=\"einsatzliste\">";
+                    $string .= '<table class="einsatzliste">';
                     $string .= einsatzverwaltung_get_einsatzliste_header();
-                    $string .= "<tbody>";
+                    $string .= '<tbody>';
                 }
 
-                $string .= "<tr>";
+                $string .= '<tr>';
 
                 $columns = einsatzverwaltung_get_columns();
                 $enabledColumns = Options::getEinsatzlisteEnabledColumns();
@@ -450,10 +445,10 @@ function einsatzverwaltung_print_einsatzliste($einsatzjahre = array(), $desc = t
                             $string .= get_post_field('post_name', $query->post->ID);
                             break;
                         case 'date':
-                            $string .= date("d.m.Y", $einsatz_timestamp);
+                            $string .= date('d.m.Y', $einsatz_timestamp);
                             break;
                         case 'time':
-                            $string .= date("H:i", $einsatz_timestamp);
+                            $string .= date('H:i', $einsatz_timestamp);
                             break;
                         case 'title':
                             $post_title = get_the_title($query->post->ID);
@@ -463,20 +458,17 @@ function einsatzverwaltung_print_einsatzliste($einsatzjahre = array(), $desc = t
                             $string .= '<a href="' . get_permalink($query->post->ID) . '" rel="bookmark">' . $post_title . '</a>';
                             break;
                         default:
-                            $string .= '?';
+                            $string .= '&nbsp;';
                     }
                     $string .= '</td>';
                 }
 
-                $string .= "</tr>";
-
+                $string .= '</tr>';
                 $oldmonth = $month;
             }
-
-            $string .= "</tbody>";
-            $string .= "</table>";
+            $string .= '</tbody></table>';
         } else {
-            $string .= sprintf("Keine Eins&auml;tze im Jahr %s", $einsatzjahr);
+            $string .= sprintf('Keine Eins&auml;tze im Jahr %s', $einsatzjahr);
         }
     }
 

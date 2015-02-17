@@ -58,7 +58,7 @@ add_action('admin_enqueue_scripts', 'einsatzverwaltung_enqueue_edit_scripts');
 function einsatzverwaltung_display_meta_box($post)
 {
     // Use nonce for verification
-    wp_nonce_field(plugin_basename(__FILE__), 'einsatzverwaltung_nonce');
+    wp_nonce_field('save_einsatz_details', 'einsatzverwaltung_nonce');
 
     // The actual fields for data entry
     // Use get_post_meta to retrieve an existing value from the database and use the value for the form

@@ -242,7 +242,7 @@ function einsatzverwaltung_save_postdata($post_id)
         // Prüfen, ob Aufruf über das Formular erfolgt ist
         if (
             !isset($_POST['einsatzverwaltung_nonce']) ||
-            !wp_verify_nonce($_POST['einsatzverwaltung_nonce'], plugin_basename(__FILE__))
+            !wp_verify_nonce($_POST['einsatzverwaltung_nonce'], 'save_einsatz_details')
         ) {
             return;
         }

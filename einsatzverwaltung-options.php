@@ -9,10 +9,11 @@ class Options
     const DEFAULT_COLUMNS = 'number,date,time,title';
 
     /**
-     * @return mixed|void
+     * @return array
      */
     public static function getEinsatzlisteEnabledColumns()
     {
-        return get_option('einsatzvw_list_columns', self::DEFAULT_COLUMNS);
+        $enabledColumns = get_option('einsatzvw_list_columns', self::DEFAULT_COLUMNS);
+        return explode(',', $enabledColumns);
     }
 }

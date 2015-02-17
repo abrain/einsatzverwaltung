@@ -414,7 +414,7 @@ function einsatzverwaltung_get_columns()
 {
     return array(
         'number' => array(
-            'name' => 'Einsatznummer'
+            'name' => 'Nummer'
         ),
         'date' => array(
             'name' => 'Datum'

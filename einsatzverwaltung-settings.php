@@ -408,14 +408,13 @@ class Settings
     {
         $columns = einsatzverwaltung_get_columns();
         $enabledColumns = Options::getEinsatzlisteEnabledColumns();
-        $enabledColumnsArray = explode(',', $enabledColumns);
 
         echo '<table id="columns-available"><tr><td style="width: 250px;">';
         echo '<span class="evw-area-title">Verf&uuml;gbare Spalten</span>';
         echo '<p class="description">Spalten in unteres Feld ziehen, um sie auf der Seite anzuzeigen</p>';
         echo '</td><td class="columns"><ul>';
         foreach ($columns as $colId => $colInfo) {
-            if (in_array($colId, $enabledColumnsArray)) {
+            if (in_array($colId, $enabledColumns)) {
                 continue;
             }
             echo '<li id="'.$colId.'" class="evw-column"><span>'.$colInfo['name'].'</span></li>';
@@ -426,7 +425,7 @@ class Settings
         echo '<span class="evw-area-title">Aktive Spalten</span>';
         echo '<p class="description">Die Reihenfolge kann ebenfalls durch Ziehen ge&auml;ndert werden</p>';
         echo '</td><td class="columns"><ul>';
-        foreach ($enabledColumnsArray as $colId) {
+        foreach ($enabledColumns as $colId) {
             if (!array_key_exists($colId, $columns)) {
                 continue;
             }
@@ -435,7 +434,7 @@ class Settings
             echo '<li id="'.$colId.'" class="evw-column"><span>'.$colInfo['name'].'</span></li>';
         }
         echo '</ul></td></tr></table>';
-        echo '<input name="einsatzvw_list_columns" id="einsatzvw_list_columns" type="hidden" value="'.$enabledColumns.'">';
+        echo '<input name="einsatzvw_list_columns" id="einsatzvw_list_columns" type="hidden" value="'.implode(',', $enabledColumns).'">';
     }
 
 

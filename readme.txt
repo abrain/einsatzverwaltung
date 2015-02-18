@@ -4,7 +4,7 @@ Donate link: http://www.abrain.de/software/unterstuetzen/
 Tags: feuerwehr, einsatz
 Requires at least: 3.1.0
 Tested up to: 4.1
-Stable tag: 0.8.3
+Stable tag: 0.8.4
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -50,11 +50,14 @@ Entweder [per Mail](mailto:kontakt@abrain.de), auf [Twitter](https://twitter.com
 
 == Changelog ==
 
+= 0.8.4 =
+* Fehlerbehebung: Erstellen von Standard-WordPress-Beitr&auml;gen war beeintr&auml;chtigt
+
 = 0.8.3 =
 * Fehlerbehebung: Einsatzdetails wurden nicht abgespeichert
 
 = 0.8.2 =
-* Verbesserung: Inhalt der Kurzfassung von Einsatzberichten ist nun f&uuml; die Webseite und den Feed einstellbar
+* Verbesserung: Inhalt der Kurzfassung von Einsatzberichten ist nun f&uuml;r die Webseite und den Feed einstellbar
 * Verbesserung: Autovervollst&auml;ndigung f&uuml;r das Feld Einsatzleiter
 * Entfernt: Einstellung 'Auszug darf Links enthalten'
 
@@ -160,6 +163,9 @@ Entweder [per Mail](mailto:kontakt@abrain.de), auf [Twitter](https://twitter.com
 * Widget zeigt die aktuellsten X Eins&auml;tze
 
 == Upgrade Notice ==
+
+= 0.8.4 =
+Wichtige Fehlerbehebung
 
 = 0.8.3 =
 Kritische Fehlerbehebung

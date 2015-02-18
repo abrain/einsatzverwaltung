@@ -5,7 +5,7 @@ jQuery(document).ready(function() {
     einsatzverwaltung_register_and_execute('keyup', 'einsatzverwaltung_einsatzende', datumsregex, hinweistext, true);
 
     var used_values = jQuery("#einsatzleiter_used_values");
-    if (used_values != undefined) {
+    if (used_values.val() != undefined) {
         var einsatzleiter_namen = used_values.val().split(',');
         jQuery("#einsatzverwaltung_einsatzleiter").autocomplete({
             source: einsatzleiter_namen

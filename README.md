@@ -7,7 +7,7 @@ Dieses Plugin f&uuml;gt WordPress eine neue Beitragsart "Einsatzbericht" hinzu. 
 
 Die prim&auml;re Zielgruppe des Plugins sind Feuerwehren im deutschsprachigen Raum, es ist aber genauso geeignet f&uuml;r Rettungsdienste, die Wasserwacht, das THW und sonstige Hilfsorganisationen, die ihre Eins&auml;tze im Internet pr&auml;sentieren m&ouml;chten.
 
-[Anleitung](http://www.abrain.de/software/einsatzverwaltung/anleitung/)
+[Anleitung](https://www.abrain.de/software/einsatzverwaltung/anleitung/)
 
 ### Funktionen im &Uuml;berblick:
 

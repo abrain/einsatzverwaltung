@@ -1,7 +1,7 @@
 === Einsatzverwaltung ===
 Contributors: abrain
 Donate link: http://www.abrain.de/software/unterstuetzen/
-Tags: feuerwehr, einsatz
+Tags: Feuerwehr, Einsatz, Rettung, Rettungsdienst, THW, HiOrg, Wasserwacht, Bergrettung
 Requires at least: 3.1.0
 Tested up to: 4.1
 Stable tag: 0.8.4

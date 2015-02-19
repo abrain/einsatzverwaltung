@@ -1,4 +1,5 @@
 <?php
+use abrain\Einsatzverwaltung\Options;
 
 /**
  * Bindet CSS für das Frontend ein
@@ -8,6 +9,10 @@ function einsatzverwaltung_enqueue_frontend_style()
     wp_enqueue_style(
         'einsatzverwaltung-fontawesome',
         EINSATZVERWALTUNG__PLUGIN_URL . 'font-awesome/css/font-awesome.min.css'
+    );
+    wp_enqueue_style(
+        'einsatzverwaltung-frontend',
+        EINSATZVERWALTUNG__STYLE_URL . 'style-frontend.css'
     );
 }
 add_action('wp_enqueue_scripts', 'einsatzverwaltung_enqueue_frontend_style');
@@ -394,57 +399,69 @@ function einsatzverwaltung_print_einsatzliste($einsatzjahre = array(), $desc = t
         $string .= '<h3>Eins&auml;tze '.$einsatzjahr.'</h3>';
         if ($query->have_posts()) {
             if (!$splitmonths) {
-                $string .= "<table class=\"einsatzliste\">";
+                $string .= '<table class="einsatzliste">';
                 $string .= einsatzverwaltung_get_einsatzliste_header();
-                $string .= "<tbody>";
+                $string .= '<tbody>';
             }
 
             $oldmonth = 0;
             while ($query->have_posts()) {
                 $query->next_post();
 
-                $einsatz_nummer = get_post_field('post_name', $query->post->ID);
                 $alarmzeit = get_post_meta($query->post->ID, 'einsatz_alarmzeit', true);
                 $einsatz_timestamp = strtotime($alarmzeit);
-
-                $einsatz_datum = date("d.m.Y", $einsatz_timestamp);
-                $einsatz_zeit = date("H:i", $einsatz_timestamp);
-                $month = date("m", $einsatz_timestamp);
+                $month = date('m', $einsatz_timestamp);
 
                 if ($splitmonths && $month != $oldmonth) {
                     if ($oldmonth != 0) {
                         // Nicht im ersten Durchlauf
-                        $string .= "</tbody>";
-                        $string .= "</table>";
+                        $string .= '</tbody></table>';
                     }
                     $string .= '<h5>' . date_i18n('F', $einsatz_timestamp) . '</h5>';
-                    $string .= "<table class=\"einsatzliste\">";
+                    $string .= '<table class="einsatzliste">';
                     $string .= einsatzverwaltung_get_einsatzliste_header();
-                    $string .= "<tbody>";
+                    $string .= '<tbody>';
                 }
 
-                $string .= "<tr>";
-                $string .= "<td>".$einsatz_nummer."</td>";
-                $string .= "<td>".$einsatz_datum."</td>";
-                $string .= "<td>".$einsatz_zeit."</td>";
-                $string .= "<td>";
+                $string .= '<tr>';
 
-                $post_title = get_the_title($query->post->ID);
-                if (!empty($post_title)) {
-                    $string .= "<a href=\"".get_permalink($query->post->ID)."\" rel=\"bookmark\">".$post_title."</a>";
-                } else {
-                    $string .= "<a href=\"".get_permalink($query->post->ID)."\" rel=\"bookmark\">(kein Titel)</a>";
+                $columns = einsatzverwaltung_get_columns();
+                $enabledColumns = Options::getEinsatzlisteEnabledColumns();
+                foreach ($enabledColumns as $colId) {
+                    if (!array_key_exists($colId, $columns)) {
+                        continue;
+                    }
+
+                    $string .= '<td>';
+                    switch ($colId) {
+                        case 'number':
+                            $string .= get_post_field('post_name', $query->post->ID);
+                            break;
+                        case 'date':
+                            $string .= date('d.m.Y', $einsatz_timestamp);
+                            break;
+                        case 'time':
+                            $string .= date('H:i', $einsatz_timestamp);
+                            break;
+                        case 'title':
+                            $post_title = get_the_title($query->post->ID);
+                            if (empty($post_title)) {
+                                $post_title = '(kein Titel)';
+                            }
+                            $string .= '<a href="' . get_permalink($query->post->ID) . '" rel="bookmark">' . $post_title . '</a>';
+                            break;
+                        default:
+                            $string .= '&nbsp;';
+                    }
+                    $string .= '</td>';
                 }
-                $string .= "</td>";
-                $string .= "</tr>";
 
+                $string .= '</tr>';
                 $oldmonth = $month;
             }
-
-            $string .= "</tbody>";
-            $string .= "</table>";
+            $string .= '</tbody></table>';
         } else {
-            $string .= sprintf("Keine Eins&auml;tze im Jahr %s", $einsatzjahr);
+            $string .= sprintf('Keine Eins&auml;tze im Jahr %s', $einsatzjahr);
         }
     }
 
@@ -457,11 +474,19 @@ function einsatzverwaltung_print_einsatzliste($einsatzjahre = array(), $desc = t
  */
 function einsatzverwaltung_get_einsatzliste_header()
 {
+    $columns = einsatzverwaltung_get_columns();
+    $enabledColumns = Options::getEinsatzlisteEnabledColumns();
+
     $string = "<thead><tr>";
-    $string .= "<th>Nummer</th>";
-    $string .= "<th>Datum</th>";
-    $string .= "<th>Zeit</th>";
-    $string .= "<th>Einsatzmeldung</th>";
+    foreach ($enabledColumns as $colId) {
+        if (!array_key_exists($colId, $columns)) {
+            continue;
+        }
+
+        $colInfo = $columns[$colId];
+        $string .= '<th>' . $colInfo['name'] . '</th>';
+    }
     $string .= "</tr></thead>";
+
     return $string;
 }

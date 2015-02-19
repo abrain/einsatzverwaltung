@@ -44,3 +44,51 @@
 .evw_match_fields td {
     padding: 5px;
 }
+
+#columns-available, #columns-enabled {
+    width: 100%;
+    border-spacing: 0;
+    border-bottom: 2px solid #cccccc;
+    padding: 15px 0;
+}
+
+#columns-available td, #columns-enabled td {
+    padding: 0 20px;
+    vertical-align: top;
+}
+
+#columns-available ul, #columns-enabled ul {
+    height: 50px;
+    margin: 5px;
+    padding: 5px;
+    display: block;
+}
+
+body.settings_page_einsatzvw-settings .columns ul li {
+    float: left;
+    cursor: move;
+}
+
+li.evw-column {
+    border: 1px solid #bbb;
+    border-radius: 3px;
+    margin-right: 10px;
+    padding: 5px;
+    background: none no-repeat scroll center center #f8f8f8;
+}
+
+li.dropzone {
+    border: 1px dashed #999;
+    border-radius: 3px;
+    background: #e3e3e3;
+    margin-right: 10px;
+    padding: 5px;
+    height: 18px;
+}
+
+.evw-area-title {
+    display: block;
+    font-size: 15px;
+    font-weight: normal;
+    margin-bottom: 15px;
+}

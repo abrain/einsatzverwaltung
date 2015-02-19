@@ -119,6 +119,11 @@ class Settings
             'einsatzvw_excerpt_type_feed',
             array('abrain\Einsatzverwaltung\Utilities', 'sanitizeExcerptType')
         );
+        register_setting(
+            'einsatzvw_settings',
+            'einsatzvw_list_columns',
+            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeColumns')
+        );
 
         $roles = get_editable_roles();
         if (!empty($roles)) {
@@ -152,13 +157,14 @@ class Settings
             },
             self::EVW_SETTINGS_SLUG
         );
-        /*add_settings_section('einsatzvw_settings_einsatzliste',
+        add_settings_section(
+            'einsatzvw_settings_einsatzliste',
             'Einsatzliste',
             function() {
                 echo '<p>Mit diesen Einstellungen kann das Aussehen der Einsatzlisten beeinflusst werden.</p>';
             },
             self::EVW_SETTINGS_SLUG
-        );*/
+        );
         add_settings_section(
             'einsatzvw_settings_caps',
             'Berechtigungen',
@@ -216,6 +222,13 @@ class Settings
             array($this, 'echoSettingsExcerpt'),
             self::EVW_SETTINGS_SLUG,
             'einsatzvw_settings_einsatzberichte'
+        );
+        add_settings_field(
+            'einsatzvw_settings_columns',
+            'Spalten der Einsatzliste',
+            array($this, 'echoEinsatzlisteColumns'),
+            self::EVW_SETTINGS_SLUG,
+            'einsatzvw_settings_einsatzliste'
         );
         add_settings_field(
             'einsatzvw_settings_caps_roles',
@@ -402,6 +415,43 @@ class Settings
             get_option('einsatzvw_excerpt_type_feed', EINSATZVERWALTUNG__D__EXCERPT_TYPE)
         );
         echo '<p class="description">Bitte auch die Einstellung zum Umfang der Eintr&auml;ge im Feed (Einstellungen &gt; Lesen) beachten!<br/>Im Feed werden bei den Einsatzdetails aus technischen Gr&uuml;nden keine Links zu gefilterten Einsatzlisten angezeigt.</p>';
+    }
+
+
+    /**
+     *
+     */
+    public function echoEinsatzlisteColumns()
+    {
+        $columns = einsatzverwaltung_get_columns();
+        $enabledColumns = Options::getEinsatzlisteEnabledColumns();
+
+        echo '<table id="columns-available"><tr><td style="width: 250px;">';
+        echo '<span class="evw-area-title">Verf&uuml;gbare Spalten</span>';
+        echo '<p class="description">Spalten in unteres Feld ziehen, um sie auf der Seite anzuzeigen</p>';
+        echo '</td><td class="columns"><ul>';
+        foreach ($columns as $colId => $colInfo) {
+            if (in_array($colId, $enabledColumns)) {
+                continue;
+            }
+            echo '<li id="'.$colId.'" class="evw-column"><span>'.$colInfo['name'].'</span></li>';
+        }
+        echo '</ul></td></tr></table>';
+
+        echo '<table id="columns-enabled"><tr><td style="width: 250px;">';
+        echo '<span class="evw-area-title">Aktive Spalten</span>';
+        echo '<p class="description">Die Reihenfolge kann ebenfalls durch Ziehen ge&auml;ndert werden</p>';
+        echo '</td><td class="columns"><ul>';
+        foreach ($enabledColumns as $colId) {
+            if (!array_key_exists($colId, $columns)) {
+                continue;
+            }
+
+            $colInfo = $columns[$colId];
+            echo '<li id="'.$colId.'" class="evw-column"><span>'.$colInfo['name'].'</span></li>';
+        }
+        echo '</ul></td></tr></table>';
+        echo '<input name="einsatzvw_list_columns" id="einsatzvw_list_columns" type="hidden" value="'.implode(',', $enabledColumns).'">';
     }
 
 

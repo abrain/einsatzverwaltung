@@ -36,6 +36,12 @@ function einsatzverwaltung_enqueue_edit_scripts($hook)
             'einsatzverwaltung-edit',
             EINSATZVERWALTUNG__STYLE_URL . 'style-edit.css'
         );
+    } elseif ('settings_page_einsatzvw-settings' == $hook) {
+        wp_enqueue_script(
+            'einsatzverwaltung-settings-script',
+            EINSATZVERWALTUNG__SCRIPT_URL . 'einsatzverwaltung-settings.js',
+            array('jquery-ui-draggable', 'jquery-ui-droppable', 'jquery-ui-sortable')
+        );
     }
 
     wp_enqueue_style(

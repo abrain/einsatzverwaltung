@@ -34,6 +34,7 @@ require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-utilities.php');
 require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-core.php');
 require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-frontend.php');
 require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-widget.php');
+require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-options.php');
 require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-shortcodes.php');
 require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-settings.php');
 require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-tools.php');

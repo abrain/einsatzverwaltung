@@ -193,7 +193,7 @@ class Utilities
             return Options::DEFAULT_COLUMNS;
         }
 
-        $columns = einsatzverwaltung_get_columns();
+        $columns = Core::einsatzverwaltung_get_columns();
         $columnIds = array_keys($columns);
 
         $inputArray = explode(',', $input);

@@ -1,5 +1,6 @@
 <?php
 
+use abrain\Einsatzverwaltung\Core;
 use \abrain\Einsatzverwaltung\Utilities;
 
 define('EVW_TOOL_WPE_SLUG', 'einsatzvw-tool-wpe');
@@ -99,7 +100,7 @@ function einsatzverwaltung_tool_wpe_page()
                 if (array_key_exists($index, $_POST)) {
                     $evw_feld_name = $_POST[$index];
                     if (!empty($evw_feld_name) && is_string($evw_feld_name) && $evw_feld_name != '-') {
-                        if (array_key_exists($evw_feld_name, einsatzverwaltung_get_fields())) {
+                        if (array_key_exists($evw_feld_name, Core::einsatzverwaltung_get_fields())) {
                             $feld_mapping[$wpe_feld] = $evw_feld_name;
                         } else {
                             Utilities::printWarning("Unbekanntes Feld: $evw_feld_name");
@@ -113,7 +114,7 @@ function einsatzverwaltung_tool_wpe_page()
             $value_count = array_count_values($feld_mapping);
             foreach ($value_count as $zielfeld => $anzahl) {
                 if ($anzahl > 1) {
-                    $evw_felder = einsatzverwaltung_get_fields();
+                    $evw_felder = Core::einsatzverwaltung_get_fields();
                     Utilities::printError("Feld $evw_felder[$zielfeld] kann nur f&uuml;r ein wp-einsatz-Feld als Importziel angegeben werden");
                     einsatzverwaltung_form_feldzuordnung($wpe_felder, $feld_mapping);
                     return;
@@ -179,7 +180,7 @@ function einsatzverwaltung_form_feldzuordnung($felder, $mapping = array())
  */
 function einsatzverwaltung_dropdown_eigenefelder($name, $selected = '-')
 {
-    $felder = einsatzverwaltung_get_fields();
+    $felder = Core::einsatzverwaltung_get_fields();
 
     // Felder, die automatisch beschrieben werden, nicht zur Auswahl stellen
     unset($felder['post_date']);
@@ -312,7 +313,7 @@ function einsatzverwaltung_import_wpe($tablename, $feld_mapping)
         }
 
         $einsatzjahr = date_format($alarmzeit, 'Y');
-        $einsatznummer = einsatzverwaltung_get_next_einsatznummer($einsatzjahr);
+        $einsatznummer = Core::einsatzverwaltung_get_next_einsatznummer($einsatzjahr);
         $einsatz_args['post_name'] = $einsatznummer;
         $einsatz_args['post_type'] = 'einsatz';
         $einsatz_args['post_status'] = 'publish';

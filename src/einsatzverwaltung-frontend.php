@@ -118,13 +118,13 @@ class Frontend
                 }
             }
 
-            $einsatzart = einsatzverwaltung_get_einsatzart($post->ID);
+            $einsatzart = Core::einsatzverwaltung_get_einsatzart($post->ID);
             if ($einsatzart) {
                 $showEinsatzartArchiveLink = $showArchiveLinks && get_option(
                         'einsatzvw_show_einsatzart_archive',
                         EINSATZVERWALTUNG__D__SHOW_EINSATZART_ARCHIVE
                     );
-                $art = einsatzverwaltung_get_einsatzart_string(
+                $art = Core::einsatzverwaltung_get_einsatzart_string(
                     $einsatzart,
                     $make_links,
                     $showEinsatzartArchiveLink
@@ -443,7 +443,7 @@ class Frontend
 
                     $string .= '<tr>';
 
-                    $columns = einsatzverwaltung_get_columns();
+                    $columns = Core::einsatzverwaltung_get_columns();
                     $enabledColumns = Options::getEinsatzlisteEnabledColumns();
                     foreach ($enabledColumns as $colId) {
                         if (!array_key_exists($colId, $columns)) {
@@ -492,7 +492,7 @@ class Frontend
      */
     private function getEinsatzlisteHeader()
     {
-        $columns = einsatzverwaltung_get_columns();
+        $columns = Core::einsatzverwaltung_get_columns();
         $enabledColumns = Options::getEinsatzlisteEnabledColumns();
 
         $string = "<thead><tr>";

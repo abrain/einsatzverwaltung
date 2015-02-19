@@ -83,11 +83,15 @@ $evw_post_fields = array(
     'post_title' => 'Einsatzstichwort'
 );
 
+use abrain\Einsatzverwaltung\Admin;
+use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\Frontend;
 use abrain\Einsatzverwaltung\Settings;
 use abrain\Einsatzverwaltung\Shortcodes;
 use abrain\Einsatzverwaltung\Taxonomies;
 
+new Core();
+new Admin();
 $frontend = new Frontend();
 new Settings();
 new Shortcodes($frontend);
@@ -100,7 +104,7 @@ new Taxonomies();
 function einsatzverwaltung_aktivierung()
 {
     // Posttypen registrieren
-    einsatzverwaltung_create_post_type();
+    Core::einsatzverwaltung_create_post_type();
 
     // Permalinks aktualisieren
     flush_rewrite_rules();
@@ -157,7 +161,7 @@ function einsatzverwaltung_update_db_check()
         global $wpdb;
 
         if ($evwInstalledVersion == 0) {
-            $berichte = einsatzverwaltung_get_einsatzberichte('');
+            $berichte = Core::einsatzverwaltung_get_einsatzberichte('');
 
             // unhook this function so it doesn't loop infinitely
             remove_action('save_post', 'einsatzverwaltung_save_postdata');

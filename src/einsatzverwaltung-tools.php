@@ -1,5 +1,7 @@
 <?php
 
+use abrain\Einsatzverwaltung\Core;
+
 define('EVW_TOOL_ENR_SLUG', 'einsatzvw-tool-enr');
 
 
@@ -29,7 +31,7 @@ function einsatzverwaltung_tool_enr_page()
     echo '<form method="post">';
     echo '<label for"jahr">Einsatznummern reparieren für Jahr:</label>&nbsp;<select name="jahr">';
     echo '<option value="all">alle</option>';
-    $jahre = einsatzverwaltung_get_jahremiteinsatz();
+    $jahre = Core::einsatzverwaltung_get_jahremiteinsatz();
     foreach ($jahre as $j) {
         echo '<option value="'.$j.'">'.$j.'</option>';
     }
@@ -59,7 +61,7 @@ function einsatzverwaltung_enr_vergeben($kalenderjahr, $simulieren = false)
         echo '<p>Die folgenden &Auml;nderungen werden angewendet:</p>';
     }
 
-    $einsatzberichte = einsatzverwaltung_get_einsatzberichte($kalenderjahr);
+    $einsatzberichte = Core::einsatzverwaltung_get_einsatzberichte($kalenderjahr);
 
     $format = get_option('date_format', 'd.m.Y').' '.get_option('time_format', 'H:i');
     $jahr_alt = '';
@@ -76,7 +78,7 @@ function einsatzverwaltung_enr_vergeben($kalenderjahr, $simulieren = false)
 
         // Den Einsatzbericht nur aktualisieren, wenn sich die Einsatznummer ändert
         $enr = $einsatzbericht->post_name;
-        $enr_neu = einsatzverwaltung_format_einsatznummer($jahr, $counter);
+        $enr_neu = Core::einsatzverwaltung_format_einsatznummer($jahr, $counter);
         if ($enr != $enr_neu) {
             $aenderungen++;
             printf('Einsatz %s (%s) erh&auml;lt die Nummer %s', '<strong>'.$enr.'</strong>', date_i18n($format, date_timestamp_get($datum)), '<strong>'.$enr_neu.'</strong>');

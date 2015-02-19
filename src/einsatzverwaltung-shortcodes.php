@@ -44,7 +44,7 @@ class Shortcodes
 
         $einsatzjahre = array();
         if ($jahr == '*') {
-            $einsatzjahre = einsatzverwaltung_get_jahremiteinsatz();
+            $einsatzjahre = Core::einsatzverwaltung_get_jahremiteinsatz();
         } elseif (is_numeric($jahr) && $jahr < 0) {
             for ($i=0; $i < abs(intval($jahr)) && $i < $aktuelles_jahr; $i++) {
                 $einsatzjahre[] = $aktuelles_jahr - $i;
@@ -67,7 +67,7 @@ class Shortcodes
     public function einsatzjahre()
     {
         global $year;
-        $jahre = einsatzverwaltung_get_jahremiteinsatz();
+        $jahre = Core::einsatzverwaltung_get_jahremiteinsatz();
         $permalink_structure = get_option('permalink_structure');
 
         $string = "";

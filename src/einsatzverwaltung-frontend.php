@@ -1,5 +1,6 @@
 <?php
 use abrain\Einsatzverwaltung\Options;
+use abrain\Einsatzverwaltung\Taxonomies;
 
 /**
  * Bindet CSS für das Frontend ein
@@ -134,7 +135,7 @@ function einsatzverwaltung_get_einsatzbericht_header($post, $may_contain_links =
                 $fzg_name = $fahrzeug->name;
 
                 if ($make_links) {
-                    $pageid = einsatzverwaltung_get_term_field($fahrzeug->term_id, 'fahrzeug', 'fahrzeugpid');
+                    $pageid = Taxonomies::getTermField($fahrzeug->term_id, 'fahrzeug', 'fahrzeugpid');
                     if ($pageid !== false) {
                         $pageurl = get_permalink($pageid);
                         if ($pageurl !== false) {
@@ -161,7 +162,7 @@ function einsatzverwaltung_get_einsatzbericht_header($post, $may_contain_links =
                 $ext_name = $ext->name;
 
                 if ($make_links) {
-                    $url = einsatzverwaltung_get_term_field($ext->term_id, 'exteinsatzmittel', 'url');
+                    $url = Taxonomies::getTermField($ext->term_id, 'exteinsatzmittel', 'url');
                     if ($url !== false) {
                         $open_in_new_window = get_option('einsatzvw_open_ext_in_new', EINSATZVERWALTUNG__D__OPEN_EXTEINSATZMITTEL_NEWWINDOW);
                         $ext_name = '<a href="'.$url.'" title="Mehr Informationen zu '.$ext->name.'"' . ($open_in_new_window ? ' target="_blank"' : '') . '>'.$ext->name.'</a>';

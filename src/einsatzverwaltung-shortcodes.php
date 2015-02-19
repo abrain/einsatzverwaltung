@@ -6,12 +6,17 @@ namespace abrain\Einsatzverwaltung;
  */
 class Shortcodes
 {
+    private $frontend;
+
     /**
      * Constructor
+     *
+     * @param Frontend $frontend
      */
-    public function __construct()
+    public function __construct($frontend)
     {
         $this->addHooks();
+        $this->frontend = $frontend;
     }
 
     private function addHooks()
@@ -51,7 +56,7 @@ class Shortcodes
             $einsatzjahre = array($jahr);
         }
 
-        return einsatzverwaltung_print_einsatzliste($einsatzjahre, !($sort == 'auf'), ($monateTrennen == 'ja'));
+        return $this->frontend->printEinsatzliste($einsatzjahre, !($sort == 'auf'), ($monateTrennen == 'ja'));
     }
 
     /**

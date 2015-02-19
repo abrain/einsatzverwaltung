@@ -1,4 +1,5 @@
 <?php
+use abrain\Einsatzverwaltung\Frontend;
 use abrain\Einsatzverwaltung\Utilities;
 
 /**
@@ -116,7 +117,7 @@ function einsatzverwaltung_display_meta_box($post)
 function einsatzverwaltung_display_einsatzart_metabox($post)
 {
     $einsatzart = einsatzverwaltung_get_einsatzart($post->ID);
-    einsatzverwaltung_dropdown_einsatzart($einsatzart ? $einsatzart->term_id : 0);
+    Frontend::dropdownEinsatzart($einsatzart ? $einsatzart->term_id : 0);
 }
 
 

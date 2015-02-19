@@ -83,12 +83,14 @@ $evw_post_fields = array(
     'post_title' => 'Einsatzstichwort'
 );
 
+use abrain\Einsatzverwaltung\Frontend;
 use abrain\Einsatzverwaltung\Settings;
 use abrain\Einsatzverwaltung\Shortcodes;
 use abrain\Einsatzverwaltung\Taxonomies;
 
+$frontend = new Frontend();
 new Settings();
-new Shortcodes();
+new Shortcodes($frontend);
 new Taxonomies();
 
 

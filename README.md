@@ -25,6 +25,8 @@ Das Plugin kann entweder aus WordPress heraus aus dem [Pluginverzeichnis](http:/
 
 In beiden F&auml;llen muss das Plugin erst aktiviert werden, bevor es benutzt werden kann.
 
+In diesem Repository befindet sich mehr als die Plugindateien, f&uuml;r den Betrieb ist nur der Inhalt des Ordners `src` n&ouml;tig.
+
 __Es wird PHP 5.3.0 oder neuer ben&ouml;tigt__
 
 ### Changelog

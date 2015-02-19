@@ -84,8 +84,10 @@ $evw_post_fields = array(
 );
 
 use abrain\Einsatzverwaltung\Settings;
+use abrain\Einsatzverwaltung\Taxonomies;
 
-new Settings;
+new Settings();
+new Taxonomies();
 
 
 /**

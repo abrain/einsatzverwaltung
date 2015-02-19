@@ -190,5 +190,3 @@ class Taxonomies
         return self::$taxonomies;
     }
 }
-
-new Taxonomies();

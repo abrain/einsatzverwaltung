@@ -84,9 +84,11 @@ $evw_post_fields = array(
 );
 
 use abrain\Einsatzverwaltung\Settings;
+use abrain\Einsatzverwaltung\Shortcodes;
 use abrain\Einsatzverwaltung\Taxonomies;
 
 new Settings();
+new Shortcodes();
 new Taxonomies();
 
 

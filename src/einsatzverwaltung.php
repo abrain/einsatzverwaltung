@@ -104,7 +104,7 @@ new Taxonomies();
 function einsatzverwaltung_aktivierung()
 {
     // Posttypen registrieren
-    Core::einsatzverwaltung_create_post_type();
+    Core::registerTypes();
 
     // Permalinks aktualisieren
     flush_rewrite_rules();
@@ -161,7 +161,7 @@ function einsatzverwaltung_update_db_check()
         global $wpdb;
 
         if ($evwInstalledVersion == 0) {
-            $berichte = Core::einsatzverwaltung_get_einsatzberichte('');
+            $berichte = Core::getEinsatzberichte('');
 
             // unhook this function so it doesn't loop infinitely
             remove_action('save_post', 'einsatzverwaltung_save_postdata');

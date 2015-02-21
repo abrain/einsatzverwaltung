@@ -423,7 +423,7 @@ class Settings
      */
     public function echoEinsatzlisteColumns()
     {
-        $columns = Core::einsatzverwaltung_get_columns();
+        $columns = Core::getListColumns();
         $enabledColumns = Options::getEinsatzlisteEnabledColumns();
 
         echo '<table id="columns-available"><tr><td style="width: 250px;">';

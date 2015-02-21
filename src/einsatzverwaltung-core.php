@@ -19,14 +19,14 @@ class Core
 
     private function addHooks()
     {
-        add_action('init', 'abrain\Einsatzverwaltung\Core::einsatzverwaltung_create_post_type');
-        add_action('save_post', 'abrain\Einsatzverwaltung\Core::einsatzverwaltung_save_postdata');
+        add_action('init', 'abrain\Einsatzverwaltung\Core::registerTypes');
+        add_action('save_post', 'abrain\Einsatzverwaltung\Core::savePostdata');
     }
 
     /**
      * Erzeugt den neuen Beitragstyp Einsatzbericht und die zugehörigen Taxonomien
      */
-    public static function einsatzverwaltung_create_post_type()
+    public static function registerTypes()
     {
         $args_einsatz = array(
             'labels' => array(
@@ -187,7 +187,7 @@ class Core
      *
      * @return array
      */
-    public static function einsatzverwaltung_get_einsatzberichte($kalenderjahr)
+    public static function getEinsatzberichte($kalenderjahr)
     {
         if (empty($kalenderjahr) || strlen($kalenderjahr)!=4 || !is_numeric($kalenderjahr)) {
             $kalenderjahr = '';
@@ -212,13 +212,13 @@ class Core
      *
      * @return string Nächste freie Einsatznummer im angegebenen Jahr
      */
-    public static function einsatzverwaltung_get_next_einsatznummer($jahr, $minuseins = false)
+    public static function getNextEinsatznummer($jahr, $minuseins = false)
     {
         if (empty($jahr) || !is_numeric($jahr)) {
             $jahr = date('Y');
         }
         $query = new WP_Query('year=' . $jahr .'&post_type=einsatz&post_status=publish&nopaging=true');
-        return self::einsatzverwaltung_format_einsatznummer($jahr, $query->found_posts + ($minuseins ? 0 : 1));
+        return self::formatEinsatznummer($jahr, $query->found_posts + ($minuseins ? 0 : 1));
     }
 
     /**
@@ -229,7 +229,7 @@ class Core
      *
      * @return string Formatierte Einsatznummer
      */
-    public static function einsatzverwaltung_format_einsatznummer($jahr, $nummer)
+    public static function formatEinsatznummer($jahr, $nummer)
     {
         $stellen = get_option('einsatzvw_einsatznummer_stellen', EINSATZVERWALTUNG__EINSATZNR_STELLEN);
         $lfdvorne = get_option('einsatzvw_einsatznummer_lfdvorne', false);
@@ -245,7 +245,7 @@ class Core
      *
      * @param int $post_id ID des Posts
      */
-    public static function einsatzverwaltung_save_postdata($post_id)
+    public static function savePostdata($post_id)
     {
 
         // verify if this is an auto save routine.
@@ -294,7 +294,7 @@ class Core
 
             // Einsatznummer validieren
             $einsatzjahr = date_format($alarmzeit, 'Y');
-            $einsatzNrFallback = self::einsatzverwaltung_get_next_einsatznummer($einsatzjahr, $einsatzjahr == date('Y'));
+            $einsatzNrFallback = self::getNextEinsatznummer($einsatzjahr, $einsatzjahr == date('Y'));
             $einsatznummer = sanitize_title($_POST['einsatzverwaltung_nummer'], $einsatzNrFallback, 'save');
             if (!empty($einsatznummer)) {
                 $update_args['post_name'] = $einsatznummer; // Slug setzen
@@ -334,13 +334,13 @@ class Core
                     $update_args['ID'] = $post_id;
 
                     // unhook this function so it doesn't loop infinitely
-                    remove_action('save_post', 'abrain\Einsatzverwaltung\Core::einsatzverwaltung_save_postdata');
+                    remove_action('save_post', 'abrain\Einsatzverwaltung\Core::savePostdata');
 
                     // update the post, which calls save_post again
                     wp_update_post($update_args);
 
                     // re-hook this function
-                    add_action('save_post', 'abrain\Einsatzverwaltung\Core::einsatzverwaltung_save_postdata');
+                    add_action('save_post', 'abrain\Einsatzverwaltung\Core::savePostdata');
                 }
             }
         }
@@ -353,7 +353,7 @@ class Core
      * @param int $postId
      * @return object|bool
      */
-    public static function einsatzverwaltung_get_einsatzart($postId)
+    public static function getEinsatzart($postId)
     {
         $einsatzarten = get_the_terms($postId, 'einsatzart');
         if ($einsatzarten && !is_wp_error($einsatzarten) && !empty($einsatzarten)) {
@@ -373,7 +373,7 @@ class Core
      *
      * @return string
      */
-    public static function einsatzverwaltung_get_einsatzart_string($einsatzart, $make_links, $show_archive_links)
+    public static function getEinsatzartString($einsatzart, $make_links, $show_archive_links)
     {
         $str = '';
         do {
@@ -395,7 +395,7 @@ class Core
      *
      * @return array
      */
-    public static function einsatzverwaltung_get_einsatzleiter()
+    public static function getEinsatzleiter()
     {
         /** @var wpdb $wpdb */
         global $wpdb;
@@ -413,7 +413,7 @@ class Core
     /**
      * Gibt ein Array mit Jahreszahlen zurück, in denen Einsätze vorliegen
      */
-    public static function einsatzverwaltung_get_jahremiteinsatz()
+    public static function getJahreMitEinsatz()
     {
         $jahre = array();
         $query = new WP_Query('&post_type=einsatz&post_status=publish&nopaging=true');
@@ -429,7 +429,7 @@ class Core
      * Gibt ein Array aller Felder und deren Namen zurück,
      * Hauptverwendungszweck ist das Mapping beim Import
      */
-    public static function einsatzverwaltung_get_fields()
+    public static function getFields()
     {
         global $evw_meta_fields, $evw_terms, $evw_post_fields;
         return array_merge($evw_meta_fields, $evw_terms, $evw_post_fields);
@@ -440,7 +440,7 @@ class Core
      *
      * @return array
      */
-    public static function einsatzverwaltung_get_columns()
+    public static function getListColumns()
     {
         return array(
             'number' => array(

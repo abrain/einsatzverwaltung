@@ -106,13 +106,13 @@ class Admin
         $fehlalarm = get_post_meta($post->ID, $key = 'einsatz_fehlalarm', $single = true);
         $mannschaftsstaerke = get_post_meta($post->ID, $key = 'einsatz_mannschaft', $single = true);
 
-        $names = Core::einsatzverwaltung_get_einsatzleiter();
+        $names = Core::getEinsatzleiter();
         echo '<input type="hidden" id="einsatzleiter_used_values" value="' . implode(',', $names) . '" />';
 
         echo '<table><tbody>';
 
         echo '<tr><td><label for="einsatzverwaltung_nummer">' . __("Einsatznummer", 'einsatzverwaltung') . '</label></td>';
-        echo '<td><input type="text" id="einsatzverwaltung_nummer" name="einsatzverwaltung_nummer" value="'.esc_attr($nummer).'" size="10" placeholder="'.Core::einsatzverwaltung_get_next_einsatznummer(date('Y')).'" /></td></tr>';
+        echo '<td><input type="text" id="einsatzverwaltung_nummer" name="einsatzverwaltung_nummer" value="'.esc_attr($nummer).'" size="10" placeholder="'.Core::getNextEinsatznummer(date('Y')).'" /></td></tr>';
 
         echo '<tr><td><label for="einsatzverwaltung_alarmzeit">'. __("Alarmzeit", 'einsatzverwaltung') . '</label></td>';
         echo '<td><input type="text" id="einsatzverwaltung_alarmzeit" name="einsatzverwaltung_alarmzeit" value="'.esc_attr($alarmzeit).'" size="20" placeholder="JJJJ-MM-TT hh:mm" />&nbsp;<span class="einsatzverwaltung_hint" id="einsatzverwaltung_alarmzeit_hint"></span></td></tr>';
@@ -144,7 +144,7 @@ class Admin
      */
     public function displayMetaBoxEinsatzart($post)
     {
-        $einsatzart = Core::einsatzverwaltung_get_einsatzart($post->ID);
+        $einsatzart = Core::getEinsatzart($post->ID);
         Frontend::dropdownEinsatzart($einsatzart ? $einsatzart->term_id : 0);
     }
 
@@ -220,7 +220,7 @@ class Admin
 
             case 'e_art':
 
-                $term = Core::einsatzverwaltung_get_einsatzart($post_id);
+                $term = Core::getEinsatzart($post_id);
                 if ($term) {
                     $url = esc_url(add_query_arg(array('post_type' => $post->post_type, 'einsatzart' => $term->slug), 'edit.php'));
                     $text = esc_html(sanitize_term_field('name', $term->name, $term->term_id, 'einsatzart', 'display'));

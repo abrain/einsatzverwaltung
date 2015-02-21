@@ -18,7 +18,8 @@ $php_version_min = '5.3.0';
 $php_version = phpversion();
 if (version_compare($php_version, $php_version_min) < 0) {
     wp_die(
-        "Das Plugin Einsatzverwaltung ben&ouml;tigt PHP Version $php_version_min oder neuer. Bitte aktualisieren Sie PHP auf Ihrem Server!",
+        'Das Plugin Einsatzverwaltung ben&ouml;tigt PHP Version ' . $php_version_min . ' oder neuer.
+        Bitte aktualisieren Sie PHP auf Ihrem Server!',
         'Veraltete PHP-Version!',
         array('back_link' => true)
     );

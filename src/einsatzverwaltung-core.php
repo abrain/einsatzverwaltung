@@ -246,8 +246,13 @@ class Core
 
     private function addRewriteRules()
     {
-        add_rewrite_rule(self::$args_einsatz['rewrite']['slug'] . '/(\d{4})/page/(\d{1,})/?$', 'index.php?post_type=einsatz&year=$matches[1]&paged=$matches[2]', 'top');
-        add_rewrite_rule(self::$args_einsatz['rewrite']['slug'] . '/(\d{4})/?$', 'index.php?post_type=einsatz&year=$matches[1]', 'top');
+        $base = self::$args_einsatz['rewrite']['slug'];
+        add_rewrite_rule(
+            $base . '/(\d{4})/page/(\d{1,})/?$',
+            'index.php?post_type=einsatz&year=$matches[1]&paged=$matches[2]',
+            'top'
+        );
+        add_rewrite_rule($base . '/(\d{4})/?$', 'index.php?post_type=einsatz&year=$matches[1]', 'top');
     }
 
     /**
@@ -275,8 +280,9 @@ class Core
      * Berechnet die nächste freie Einsatznummer für das gegebene Jahr
      *
      * @param string $jahr
-     * @param bool $minuseins Wird beim Speichern der zusätzlichen Einsatzdaten in einsatzverwaltung_save_postdata benötigt,
-     * da der Einsatzbericht bereits gespeichert wurde, aber bei der Zählung für die Einsatznummer ausgelassen werden soll
+     * @param bool $minuseins Wird beim Speichern der zusätzlichen Einsatzdaten in einsatzverwaltung_save_postdata
+     * benötigt, da der Einsatzbericht bereits gespeichert wurde, aber bei der Zählung für die Einsatznummer
+     * ausgelassen werden soll
      *
      * @return string Nächste freie Einsatznummer im angegebenen Jahr
      */
@@ -326,8 +332,7 @@ class Core
         }
 
         // Prüfen, ob Aufruf über das Formular erfolgt ist
-        if (
-            !array_key_exists('einsatzverwaltung_nonce', $_POST) ||
+        if (!array_key_exists('einsatzverwaltung_nonce', $_POST) ||
             !wp_verify_nonce($_POST['einsatzverwaltung_nonce'], 'save_einsatz_details')
         ) {
             return;
@@ -377,6 +382,8 @@ class Core
         }
         if (empty($einsatzende)) {
             $einsatzende = "";
+        } else {
+            $einsatzende = date_format($einsatzende, 'Y-m-d H:i');
         }
 
         // Einsatzort validieren
@@ -393,7 +400,7 @@ class Core
 
         // Metadaten schreiben
         update_post_meta($post_id, 'einsatz_alarmzeit', date_format($alarmzeit, 'Y-m-d H:i'));
-        update_post_meta($post_id, 'einsatz_einsatzende', ($einsatzende == "" ? "" : date_format($einsatzende, 'Y-m-d H:i')));
+        update_post_meta($post_id, 'einsatz_einsatzende', $einsatzende);
         update_post_meta($post_id, 'einsatz_einsatzort', $einsatzort);
         update_post_meta($post_id, 'einsatz_einsatzleiter', $einsatzleiter);
         update_post_meta($post_id, 'einsatz_mannschaft', $mannschaftsstaerke);
@@ -448,7 +455,10 @@ class Core
             }
 
             if ($make_links && $show_archive_links) {
-                $str = '&nbsp;<a href="' . get_term_link($einsatzart) . '" class="fa fa-filter" style="text-decoration:none;" title="Alle Eins&auml;tze vom Typ '. $einsatzart->name . ' anzeigen"></a>' . $str;
+                $title = 'Alle Eins&auml;tze vom Typ '. $einsatzart->name . ' anzeigen';
+                $url = get_term_link($einsatzart);
+                $link = '<a href="'.$url.'" class="fa fa-filter" style="text-decoration:none;" title="'.$title.'"></a>';
+                $str = '&nbsp;' . $link . $str;
             }
             $str = $einsatzart->name . $str;
         } while ($einsatzart->parent != 0);
@@ -655,7 +665,11 @@ class Core
                         if (! wp_is_post_revision($post_id)) {
                             $gmtdate = get_gmt_from_date($bericht->post_date);
                             $wpdb->query(
-                                $wpdb->prepare("UPDATE $wpdb->posts SET post_date_gmt = %s WHERE ID = %d", $gmtdate, $post_id)
+                                $wpdb->prepare(
+                                    'UPDATE $wpdb->posts SET post_date_gmt = %s WHERE ID = %d',
+                                    $gmtdate,
+                                    $post_id
+                                )
                             );
                         }
                     }

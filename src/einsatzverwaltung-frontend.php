@@ -121,9 +121,9 @@ class Frontend
             $einsatzart = Core::einsatzverwaltung_get_einsatzart($post->ID);
             if ($einsatzart) {
                 $showEinsatzartArchiveLink = $showArchiveLinks && get_option(
-                        'einsatzvw_show_einsatzart_archive',
-                        EINSATZVERWALTUNG__D__SHOW_EINSATZART_ARCHIVE
-                    );
+                    'einsatzvw_show_einsatzart_archive',
+                    EINSATZVERWALTUNG__D__SHOW_EINSATZART_ARCHIVE
+                );
                 $art = Core::einsatzverwaltung_get_einsatzart_string(
                     $einsatzart,
                     $make_links,

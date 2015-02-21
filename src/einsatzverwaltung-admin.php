@@ -1,7 +1,6 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
-
 use WP_Post;
 
 /**
@@ -19,23 +18,23 @@ class Admin
 
     private function addHooks()
     {
-        add_action('add_meta_boxes_einsatz', array($this, 'einsatzverwaltung_add_einsatzdetails_meta_box'));
-        add_action('admin_enqueue_scripts', array($this, 'einsatzverwaltung_enqueue_edit_scripts'));
-        add_filter('manage_edit-einsatz_columns', array($this, 'einsatzverwaltung_edit_einsatz_columns'));
-        add_action('manage_einsatz_posts_custom_column', array($this, 'einsatzverwaltung_manage_einsatz_columns'), 10, 2);
-        add_action('dashboard_glance_items', array($this, 'einsatzverwaltung_add_einsatzberichte_to_dashboard')); // since WP 3.8
-        add_action('right_now_content_table_end', array($this, 'einsatzverwaltung_add_einsatzberichte_to_dashboard_legacy')); // before WP 3.8
+        add_action('add_meta_boxes_einsatz', array($this, 'addMetaBoxes'));
+        add_action('admin_enqueue_scripts', array($this, 'enqueueEditScripts'));
+        add_filter('manage_edit-einsatz_columns', array($this, 'filterColumnsEinsatz'));
+        add_action('manage_einsatz_posts_custom_column', array($this, 'filterColumnContentEinsatz'), 10, 2);
+        add_action('dashboard_glance_items', array($this, 'addEinsatzberichteToDashboard')); // since WP 3.8
+        add_action('right_now_content_table_end', array($this, 'addEinsatzberichteToDashboardLegacy')); // before WP 3.8
     }
 
     /**
      * Fügt die Metabox zum Bearbeiten der Einsatzdetails ein
      */
-    function einsatzverwaltung_add_einsatzdetails_meta_box()
+    function addMetaBoxes()
     {
         add_meta_box(
             'einsatzverwaltung_meta_box',
             'Einsatzdetails',
-            array($this, 'einsatzverwaltung_display_meta_box'),
+            array($this, 'displayMetaBoxEinsatzdetails'),
             'einsatz',
             'normal',
             'high'
@@ -47,7 +46,7 @@ class Admin
      *
      * @param string $hook Name der aufgerufenen Datei
      */
-    function einsatzverwaltung_enqueue_edit_scripts($hook)
+    function enqueueEditScripts($hook)
     {
         if ('post.php' == $hook || 'post-new.php' == $hook) {
             // Nur auf der Bearbeitungsseite anzeigen
@@ -83,7 +82,7 @@ class Admin
      *
      * @param WP_Post $post Das Post-Objekt des aktuell bearbeiteten Einsatzberichts
      */
-    function einsatzverwaltung_display_meta_box($post)
+    function displayMetaBoxEinsatzdetails($post)
     {
         // Use nonce for verification
         wp_nonce_field('save_einsatz_details', 'einsatzverwaltung_nonce');
@@ -134,7 +133,7 @@ class Admin
      *
      * @param WP_Post $post Post-Object
      */
-    public static function einsatzverwaltung_display_einsatzart_metabox($post)
+    public static function displayMetaBoxEinsatzart($post)
     {
         $einsatzart = Core::einsatzverwaltung_get_einsatzart($post->ID);
         Frontend::dropdownEinsatzart($einsatzart ? $einsatzart->term_id : 0);
@@ -148,7 +147,7 @@ class Admin
      *
      * @return array
      */
-    function einsatzverwaltung_edit_einsatz_columns($columns)
+    function filterColumnsEinsatz($columns)
     {
         unset($columns['author']);
         unset($columns['date']);
@@ -169,7 +168,7 @@ class Admin
      * @param string $column
      * @param int $post_id
      */
-    function einsatzverwaltung_manage_einsatz_columns($column, $post_id)
+    function filterColumnContentEinsatz($column, $post_id)
     {
         global $post;
 
@@ -254,7 +253,7 @@ class Admin
      *
      * @return array
      */
-    function einsatzverwaltung_add_einsatzberichte_to_dashboard($items)
+    function addEinsatzberichteToDashboard($items)
     {
         $postType = 'einsatz';
         if (post_type_exists($postType)) {
@@ -277,7 +276,7 @@ class Admin
     /**
      * Zahl der Einsatzberichte im Dashboard anzeigen (für WordPress 3.7 und älter)
      */
-    function einsatzverwaltung_add_einsatzberichte_to_dashboard_legacy()
+    function addEinsatzberichteToDashboardLegacy()
     {
         if (post_type_exists('einsatz')) {
             $postType = 'einsatz';

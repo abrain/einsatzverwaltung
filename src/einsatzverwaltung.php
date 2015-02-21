@@ -50,6 +50,7 @@ use abrain\Einsatzverwaltung\Settings;
 use abrain\Einsatzverwaltung\Shortcodes;
 use abrain\Einsatzverwaltung\Taxonomies;
 use abrain\Einsatzverwaltung\ToolEinsatznummernReparieren;
+use abrain\Einsatzverwaltung\ToolImportWpEinsatz;
 
 new Core();
 new Admin();
@@ -58,6 +59,7 @@ new Settings();
 new Shortcodes($frontend);
 new Taxonomies();
 new ToolEinsatznummernReparieren();
+new ToolImportWpEinsatz();
 
 
 /**

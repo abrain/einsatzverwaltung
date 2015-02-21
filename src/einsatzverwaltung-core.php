@@ -9,177 +9,190 @@ use wpdb;
  */
 class Core
 {
+    private static $args_einsatz = array(
+        'labels' => array(
+            'name' => 'Einsatzberichte',
+            'singular_name' => 'Einsatzbericht',
+            'menu_name' => 'Einsatzberichte',
+            'add_new' => 'Neu',
+            'add_new_item' => 'Neuer Einsatzbericht',
+            'edit' => 'Bearbeiten',
+            'edit_item' => 'Einsatzbericht bearbeiten',
+            'new_item' => 'Neuer Einsatzbericht',
+            'view' => 'Ansehen',
+            'view_item' => 'Einsatzbericht ansehen',
+            'search_items' => 'Einsatzberichte suchen',
+            'not_found' => 'Keine Einsatzberichte gefunden',
+            'not_found_in_trash' => 'Keine Einsatzberichte im Papierkorb gefunden'
+        ),
+        'public' => true,
+        'has_archive' => true,
+        'rewrite' => array(
+            'slug' => 'einsaetze',
+            'feeds' => true
+        ),
+        'supports' => array('title', 'editor', 'thumbnail', 'publicize', 'author'),
+        'show_in_nav_menus' => false,
+        'capability_type' => array('einsatzbericht', 'einsatzberichte'),
+        'map_meta_cap' => true,
+        'menu_position' => 5
+    );
+
+    private static $args_einsatzart = array(
+        'label' => 'Einsatzarten',
+        'labels' => array(
+            'name' => 'Einsatzarten',
+            'singular_name' => 'Einsatzart',
+            'menu_name' => 'Einsatzarten',
+            'all_items' => 'Alle Einsatzarten',
+            'edit_item' => 'Einsatzart bearbeiten',
+            'view_item' => 'Einsatzart ansehen',
+            'update_item' => 'Einsatzart aktualisieren',
+            'add_new_item' => 'Neue Einsatzart',
+            'new_item_name' => 'Einsatzart hinzuf&uuml;gen',
+            'search_items' => 'Einsatzarten suchen',
+            'popular_items' => 'H&auml;ufige Einsatzarten',
+            'separate_items_with_commas' => 'Einsatzarten mit Kommata trennen',
+            'add_or_remove_items' => 'Einsatzarten hinzuf&uuml;gen oder entfernen',
+            'choose_from_most_used' => 'Aus h&auml;ufigen Einsatzarten w&auml;hlen'),
+        'public' => true,
+        'show_in_nav_menus' => false,
+        'capabilities' => array (
+            'manage_terms' => 'edit_einsatzberichte',
+            'edit_terms' => 'edit_einsatzberichte',
+            'delete_terms' => 'edit_einsatzberichte',
+            'assign_terms' => 'edit_einsatzberichte'
+        ),
+        'hierarchical' => true
+    );
+
+    private static $args_fahrzeug = array(
+        'label' => 'Fahrzeuge',
+        'labels' => array(
+            'name' => 'Fahrzeuge',
+            'singular_name' => 'Fahrzeug',
+            'menu_name' => 'Fahrzeuge',
+            'all_items' => 'Alle Fahrzeuge',
+            'edit_item' => 'Fahrzeug bearbeiten',
+            'view_item' => 'Fahrzeug ansehen',
+            'update_item' => 'Fahrzeug aktualisieren',
+            'add_new_item' => 'Neues Fahrzeug',
+            'new_item_name' => 'Fahrzeug hinzuf&uuml;gen',
+            'search_items' => 'Fahrzeuge suchen',
+            'popular_items' => 'Oft eingesetzte Fahrzeuge',
+            'separate_items_with_commas' => 'Fahrzeuge mit Kommata trennen',
+            'add_or_remove_items' => 'Fahrzeuge hinzuf&uuml;gen oder entfernen',
+            'choose_from_most_used' => 'Aus h&auml;ufig eingesetzten Fahrzeugen w&auml;hlen'),
+        'public' => true,
+        'show_in_nav_menus' => false,
+        'capabilities' => array (
+            'manage_terms' => 'edit_einsatzberichte',
+            'edit_terms' => 'edit_einsatzberichte',
+            'delete_terms' => 'edit_einsatzberichte',
+            'assign_terms' => 'edit_einsatzberichte'
+        )
+    );
+
+    private static $argsExteinsatzmittel = array(
+        'label' => 'Externe Einsatzmittel',
+        'labels' => array(
+            'name' => 'Externe Einsatzmittel',
+            'singular_name' => 'Externes Einsatzmittel',
+            'menu_name' => 'Externe Einsatzmittel',
+            'all_items' => 'Alle externen Einsatzmittel',
+            'edit_item' => 'Externes Einsatzmittel bearbeiten',
+            'view_item' => 'Externes Einsatzmittel ansehen',
+            'update_item' => 'Externes Einsatzmittel aktualisieren',
+            'add_new_item' => 'Neues externes Einsatzmittel',
+            'new_item_name' => 'Externes Einsatzmittel hinzuf&uuml;gen',
+            'search_items' => 'Externe Einsatzmittel suchen',
+            'popular_items' => 'Oft eingesetzte externe Einsatzmittel',
+            'separate_items_with_commas' => 'Externe Einsatzmittel mit Kommata trennen',
+            'add_or_remove_items' => 'Externe Einsatzmittel hinzuf&uuml;gen oder entfernen',
+            'choose_from_most_used' => 'Aus h&auml;ufig eingesetzten externen Einsatzmitteln w&auml;hlen'),
+        'public' => true,
+        'show_in_nav_menus' => false,
+        'capabilities' => array (
+            'manage_terms' => 'edit_einsatzberichte',
+            'edit_terms' => 'edit_einsatzberichte',
+            'delete_terms' => 'edit_einsatzberichte',
+            'assign_terms' => 'edit_einsatzberichte'
+        ),
+        'rewrite' => array(
+            'slug' => 'externe-einsatzmittel'
+        )
+    );
+
+    private static $args_alarmierungsart = array(
+        'label' => 'Alarmierungsart',
+        'labels' => array(
+            'name' => 'Alarmierungsarten',
+            'singular_name' => 'Alarmierungsart',
+            'menu_name' => 'Alarmierungsarten',
+            'all_items' => 'Alle Alarmierungsarten',
+            'edit_item' => 'Alarmierungsart bearbeiten',
+            'view_item' => 'Alarmierungsart ansehen',
+            'update_item' => 'Alarmierungsart aktualisieren',
+            'add_new_item' => 'Neue Alarmierungsart',
+            'new_item_name' => 'Alarmierungsart hinzuf&uuml;gen',
+            'search_items' => 'Alarmierungsart suchen',
+            'popular_items' => 'H&auml;ufige Alarmierungsarten',
+            'separate_items_with_commas' => 'Alarmierungsarten mit Kommata trennen',
+            'add_or_remove_items' => 'Alarmierungsarten hinzuf&uuml;gen oder entfernen',
+            'choose_from_most_used' => 'Aus h&auml;ufigen Alarmierungsarten w&auml;hlen'),
+        'public' => true,
+        'show_in_nav_menus' => false,
+        'capabilities' => array (
+            'manage_terms' => 'edit_einsatzberichte',
+            'edit_terms' => 'edit_einsatzberichte',
+            'delete_terms' => 'edit_einsatzberichte',
+            'assign_terms' => 'edit_einsatzberichte'
+        )
+    );
+
     /**
      * Constructor
      */
     public function __construct()
     {
+        if (Utilities::isMinWPVersion("3.9")) {
+            self::$args_einsatz['menu_icon'] = 'dashicons-media-document';
+        }
+
         $this->addHooks();
     }
 
     private function addHooks()
     {
-        add_action('init', 'abrain\Einsatzverwaltung\Core::registerTypes');
+        add_action('init', 'abrain\Einsatzverwaltung\Core::onInit');
         add_action('save_post', 'abrain\Einsatzverwaltung\Core::savePostdata');
+    }
+
+    /**
+     * Plugin initialisieren
+     */
+    public static function onInit()
+    {
+        self::registerTypes();
+        self::addRewriteRules();
     }
 
     /**
      * Erzeugt den neuen Beitragstyp Einsatzbericht und die zugehörigen Taxonomien
      */
-    public static function registerTypes()
+    private static function registerTypes()
     {
-        $args_einsatz = array(
-            'labels' => array(
-                'name' => 'Einsatzberichte',
-                'singular_name' => 'Einsatzbericht',
-                'menu_name' => 'Einsatzberichte',
-                'add_new' => 'Neu',
-                'add_new_item' => 'Neuer Einsatzbericht',
-                'edit' => 'Bearbeiten',
-                'edit_item' => 'Einsatzbericht bearbeiten',
-                'new_item' => 'Neuer Einsatzbericht',
-                'view' => 'Ansehen',
-                'view_item' => 'Einsatzbericht ansehen',
-                'search_items' => 'Einsatzberichte suchen',
-                'not_found' => 'Keine Einsatzberichte gefunden',
-                'not_found_in_trash' => 'Keine Einsatzberichte im Papierkorb gefunden'
-            ),
-            'public' => true,
-            'has_archive' => true,
-            'rewrite' => array(
-                'slug' => 'einsaetze',
-                'feeds' => true
-            ),
-            'supports' => array('title', 'editor', 'thumbnail', 'publicize', 'author'),
-            'show_in_nav_menus' => false,
-            'capability_type' => array('einsatzbericht', 'einsatzberichte'),
-            'map_meta_cap' => true,
-            'menu_position' => 5
-        );
-        if (Utilities::isMinWPVersion("3.9")) {
-            $args_einsatz['menu_icon'] = 'dashicons-media-document';
-        }
-        register_post_type('einsatz', $args_einsatz);
+        register_post_type('einsatz', self::$args_einsatz);
+        register_taxonomy('einsatzart', 'einsatz', self::$args_einsatzart);
+        register_taxonomy('fahrzeug', 'einsatz', self::$args_fahrzeug);
+        register_taxonomy('exteinsatzmittel', 'einsatz', self::$argsExteinsatzmittel);
+        register_taxonomy('alarmierungsart', 'einsatz', self::$args_alarmierungsart);
+    }
 
-        $args_einsatzart = array(
-            'label' => 'Einsatzarten',
-            'labels' => array(
-                'name' => 'Einsatzarten',
-                'singular_name' => 'Einsatzart',
-                'menu_name' => 'Einsatzarten',
-                'all_items' => 'Alle Einsatzarten',
-                'edit_item' => 'Einsatzart bearbeiten',
-                'view_item' => 'Einsatzart ansehen',
-                'update_item' => 'Einsatzart aktualisieren',
-                'add_new_item' => 'Neue Einsatzart',
-                'new_item_name' => 'Einsatzart hinzuf&uuml;gen',
-                'search_items' => 'Einsatzarten suchen',
-                'popular_items' => 'H&auml;ufige Einsatzarten',
-                'separate_items_with_commas' => 'Einsatzarten mit Kommata trennen',
-                'add_or_remove_items' => 'Einsatzarten hinzuf&uuml;gen oder entfernen',
-                'choose_from_most_used' => 'Aus h&auml;ufigen Einsatzarten w&auml;hlen'),
-            'public' => true,
-            'show_in_nav_menus' => false,
-            'capabilities' => array (
-                'manage_terms' => 'edit_einsatzberichte',
-                'edit_terms' => 'edit_einsatzberichte',
-                'delete_terms' => 'edit_einsatzberichte',
-                'assign_terms' => 'edit_einsatzberichte'
-            ),
-            'hierarchical' => true
-        );
-        register_taxonomy('einsatzart', 'einsatz', $args_einsatzart);
-
-        $args_fahrzeug = array(
-            'label' => 'Fahrzeuge',
-            'labels' => array(
-                'name' => 'Fahrzeuge',
-                'singular_name' => 'Fahrzeug',
-                'menu_name' => 'Fahrzeuge',
-                'all_items' => 'Alle Fahrzeuge',
-                'edit_item' => 'Fahrzeug bearbeiten',
-                'view_item' => 'Fahrzeug ansehen',
-                'update_item' => 'Fahrzeug aktualisieren',
-                'add_new_item' => 'Neues Fahrzeug',
-                'new_item_name' => 'Fahrzeug hinzuf&uuml;gen',
-                'search_items' => 'Fahrzeuge suchen',
-                'popular_items' => 'Oft eingesetzte Fahrzeuge',
-                'separate_items_with_commas' => 'Fahrzeuge mit Kommata trennen',
-                'add_or_remove_items' => 'Fahrzeuge hinzuf&uuml;gen oder entfernen',
-                'choose_from_most_used' => 'Aus h&auml;ufig eingesetzten Fahrzeugen w&auml;hlen'),
-            'public' => true,
-            'show_in_nav_menus' => false,
-            'capabilities' => array (
-                'manage_terms' => 'edit_einsatzberichte',
-                'edit_terms' => 'edit_einsatzberichte',
-                'delete_terms' => 'edit_einsatzberichte',
-                'assign_terms' => 'edit_einsatzberichte'
-            )
-        );
-        register_taxonomy('fahrzeug', 'einsatz', $args_fahrzeug);
-
-        $argsExteinsatzmittel = array(
-            'label' => 'Externe Einsatzmittel',
-            'labels' => array(
-                'name' => 'Externe Einsatzmittel',
-                'singular_name' => 'Externes Einsatzmittel',
-                'menu_name' => 'Externe Einsatzmittel',
-                'all_items' => 'Alle externen Einsatzmittel',
-                'edit_item' => 'Externes Einsatzmittel bearbeiten',
-                'view_item' => 'Externes Einsatzmittel ansehen',
-                'update_item' => 'Externes Einsatzmittel aktualisieren',
-                'add_new_item' => 'Neues externes Einsatzmittel',
-                'new_item_name' => 'Externes Einsatzmittel hinzuf&uuml;gen',
-                'search_items' => 'Externe Einsatzmittel suchen',
-                'popular_items' => 'Oft eingesetzte externe Einsatzmittel',
-                'separate_items_with_commas' => 'Externe Einsatzmittel mit Kommata trennen',
-                'add_or_remove_items' => 'Externe Einsatzmittel hinzuf&uuml;gen oder entfernen',
-                'choose_from_most_used' => 'Aus h&auml;ufig eingesetzten externen Einsatzmitteln w&auml;hlen'),
-            'public' => true,
-            'show_in_nav_menus' => false,
-            'capabilities' => array (
-                'manage_terms' => 'edit_einsatzberichte',
-                'edit_terms' => 'edit_einsatzberichte',
-                'delete_terms' => 'edit_einsatzberichte',
-                'assign_terms' => 'edit_einsatzberichte'
-            ),
-            'rewrite' => array(
-                'slug' => 'externe-einsatzmittel'
-            )
-        );
-        register_taxonomy('exteinsatzmittel', 'einsatz', $argsExteinsatzmittel);
-
-        $args_alarmierungsart = array(
-            'label' => 'Alarmierungsart',
-            'labels' => array(
-                'name' => 'Alarmierungsarten',
-                'singular_name' => 'Alarmierungsart',
-                'menu_name' => 'Alarmierungsarten',
-                'all_items' => 'Alle Alarmierungsarten',
-                'edit_item' => 'Alarmierungsart bearbeiten',
-                'view_item' => 'Alarmierungsart ansehen',
-                'update_item' => 'Alarmierungsart aktualisieren',
-                'add_new_item' => 'Neue Alarmierungsart',
-                'new_item_name' => 'Alarmierungsart hinzuf&uuml;gen',
-                'search_items' => 'Alarmierungsart suchen',
-                'popular_items' => 'H&auml;ufige Alarmierungsarten',
-                'separate_items_with_commas' => 'Alarmierungsarten mit Kommata trennen',
-                'add_or_remove_items' => 'Alarmierungsarten hinzuf&uuml;gen oder entfernen',
-                'choose_from_most_used' => 'Aus h&auml;ufigen Alarmierungsarten w&auml;hlen'),
-            'public' => true,
-            'show_in_nav_menus' => false,
-            'capabilities' => array (
-                'manage_terms' => 'edit_einsatzberichte',
-                'edit_terms' => 'edit_einsatzberichte',
-                'delete_terms' => 'edit_einsatzberichte',
-                'assign_terms' => 'edit_einsatzberichte'
-            )
-        );
-        register_taxonomy('alarmierungsart', 'einsatz', $args_alarmierungsart);
-
-        // more rewrite rules
-        add_rewrite_rule($args_einsatz['rewrite']['slug'] . '/(\d{4})/page/(\d{1,})/?$', 'index.php?post_type=einsatz&year=$matches[1]&paged=$matches[2]', 'top');
-        add_rewrite_rule($args_einsatz['rewrite']['slug'] . '/(\d{4})/?$', 'index.php?post_type=einsatz&year=$matches[1]', 'top');
+    private static function addRewriteRules()
+    {
+        add_rewrite_rule(self::$args_einsatz['rewrite']['slug'] . '/(\d{4})/page/(\d{1,})/?$', 'index.php?post_type=einsatz&year=$matches[1]&paged=$matches[2]', 'top');
+        add_rewrite_rule(self::$args_einsatz['rewrite']['slug'] . '/(\d{4})/?$', 'index.php?post_type=einsatz&year=$matches[1]', 'top');
     }
 
     /**

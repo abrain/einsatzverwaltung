@@ -8,11 +8,16 @@ class ToolEinsatznummernReparieren
 {
     const EVW_TOOL_ENR_SLUG = 'einsatzvw-tool-enr';
 
+    private $core;
+
     /**
      * Konstruktor
+     *
+     * @param Core $core
      */
-    public function __construct()
+    public function __construct($core)
     {
+        $this->core = $core;
         $this->addHooks();
     }
 
@@ -103,7 +108,7 @@ class ToolEinsatznummernReparieren
                 $aenderungen++;
                 printf('Einsatz %s (%s) erh&auml;lt die Nummer %s', '<strong>'.$enr.'</strong>', date_i18n($format, date_timestamp_get($datum)), '<strong>'.$enr_neu.'</strong>');
                 if (!$simulieren) {
-                    Core::setEinsatznummer($einsatzbericht->ID, $enr_neu);
+                    $this->core->setEinsatznummer($einsatzbericht->ID, $enr_neu);
                     $enr_neu_slug = get_post_field('post_name', $einsatzbericht->ID);
                     printf(' ... ge&auml;ndert zu %s', '<strong>'.$enr_neu_slug.'</strong>');
                     if ($enr_neu_slug != $enr_neu) {

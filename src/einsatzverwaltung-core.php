@@ -1,6 +1,33 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
+define('EINSATZVERWALTUNG__PLUGIN_BASE', plugin_basename(__FILE__));
+define('EINSATZVERWALTUNG__PLUGIN_DIR', plugin_dir_path(__FILE__));
+define('EINSATZVERWALTUNG__PLUGIN_URL', plugin_dir_url(__FILE__));
+define('EINSATZVERWALTUNG__SCRIPT_URL', EINSATZVERWALTUNG__PLUGIN_URL . 'js/');
+define('EINSATZVERWALTUNG__STYLE_URL', EINSATZVERWALTUNG__PLUGIN_URL . 'css/');
+define('EINSATZVERWALTUNG__DBVERSION_OPTION', 'einsatzvw_db_version');
+
+require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-admin.php');
+require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-utilities.php');
+require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-frontend.php');
+require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-widget.php');
+require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-options.php');
+require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-shortcodes.php');
+require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-settings.php');
+require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-tools.php');
+require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-tools-wpe.php');
+require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-taxonomies.php');
+
+// Standardwerte
+define('EINSATZVERWALTUNG__D__SHOW_EXTEINSATZMITTEL_ARCHIVE', false);
+define('EINSATZVERWALTUNG__D__SHOW_EINSATZART_ARCHIVE', false);
+define('EINSATZVERWALTUNG__D__SHOW_FAHRZEUG_ARCHIVE', false);
+define('EINSATZVERWALTUNG__D__HIDE_EMPTY_DETAILS', true);
+define('EINSATZVERWALTUNG__D__EXCERPT_TYPE', 'details');
+define('EINSATZVERWALTUNG__D__SHOW_EINSATZBERICHTE_MAINLOOP', false);
+define('EINSATZVERWALTUNG__D__OPEN_EXTEINSATZMITTEL_NEWWINDOW', false);
+
 use WP_Query;
 use wpdb;
 
@@ -9,6 +36,8 @@ use wpdb;
  */
 class Core
 {
+    const DB_VERSION = 3;
+
     private static $args_einsatz = array(
         'labels' => array(
             'name' => 'Einsatzberichte',
@@ -159,28 +188,54 @@ class Core
             self::$args_einsatz['menu_icon'] = 'dashicons-media-document';
         }
 
+        new Admin();
+        $frontend = new Frontend();
+        new Settings();
+        new Shortcodes($frontend);
+        new Taxonomies();
+        new ToolEinsatznummernReparieren($this);
+        new ToolImportWpEinsatz();
+
         $this->addHooks();
     }
 
     private function addHooks()
     {
-        add_action('init', 'abrain\Einsatzverwaltung\Core::onInit');
-        add_action('save_post', 'abrain\Einsatzverwaltung\Core::savePostdata');
+        add_action('init', array($this, 'onInit'));
+        add_action('plugins_loaded', array($this, 'onPluginsLoaded'));
+        add_action('save_post', array($this, 'savePostdata'));
+    }
+
+    /**
+     * Wird beim Aktivieren des Plugins aufgerufen
+     */
+    public static function onActivation()
+    {
+        // Posttypen registrieren
+        self::registerTypes();
+
+        // Permalinks aktualisieren
+        flush_rewrite_rules();
     }
 
     /**
      * Plugin initialisieren
      */
-    public static function onInit()
+    public function onInit()
     {
         self::registerTypes();
-        self::addRewriteRules();
+        $this->addRewriteRules();
+    }
+
+    public function onPluginsLoaded()
+    {
+        $this->checkDatabaseVersion();
     }
 
     /**
      * Erzeugt den neuen Beitragstyp Einsatzbericht und die zugehörigen Taxonomien
      */
-    public static function registerTypes()
+    private static function registerTypes()
     {
         register_post_type('einsatz', self::$args_einsatz);
         register_taxonomy('einsatzart', 'einsatz', self::$args_einsatzart);
@@ -189,7 +244,7 @@ class Core
         register_taxonomy('alarmierungsart', 'einsatz', self::$args_alarmierungsart);
     }
 
-    private static function addRewriteRules()
+    private function addRewriteRules()
     {
         add_rewrite_rule(self::$args_einsatz['rewrite']['slug'] . '/(\d{4})/page/(\d{1,})/?$', 'index.php?post_type=einsatz&year=$matches[1]&paged=$matches[2]', 'top');
         add_rewrite_rule(self::$args_einsatz['rewrite']['slug'] . '/(\d{4})/?$', 'index.php?post_type=einsatz&year=$matches[1]', 'top');
@@ -258,7 +313,7 @@ class Core
      *
      * @param int $post_id ID des Posts
      */
-    public static function savePostdata($post_id)
+    public function savePostdata($post_id)
     {
 
         // verify if this is an auto save routine.
@@ -347,13 +402,13 @@ class Core
                     $update_args['ID'] = $post_id;
 
                     // unhook this function so it doesn't loop infinitely
-                    remove_action('save_post', 'abrain\Einsatzverwaltung\Core::savePostdata');
+                    remove_action('save_post', array($this, 'savePostdata'));
 
                     // update the post, which calls save_post again
                     wp_update_post($update_args);
 
                     // re-hook this function
-                    add_action('save_post', 'abrain\Einsatzverwaltung\Core::savePostdata');
+                    add_action('save_post', array($this, 'savePostdata'));
                 }
             }
         }
@@ -557,7 +612,7 @@ class Core
      * @param int $post_id ID des Einsatzberichts
      * @param string $einsatznummer Einsatznummer
      */
-    public static function setEinsatznummer($post_id, $einsatznummer)
+    public function setEinsatznummer($post_id, $einsatznummer)
     {
         if (empty($post_id) || empty($einsatznummer)) {
             return;
@@ -568,8 +623,73 @@ class Core
         $update_args['ID'] = $post_id;
 
         // keine Sonderbehandlung beim Speichern
-        remove_action('save_post', 'abrain\Einsatzverwaltung\Core::savePostdata');
+        remove_action('save_post', array($this, 'savePostdata'));
         wp_update_post($update_args);
-        add_action('save_post', 'abrain\Einsatzverwaltung\Core::savePostdata');
+        add_action('save_post', array($this, 'savePostdata'));
+    }
+
+    /**
+     * Reparaturen oder Anpassungen der Datenbank nach einem Update
+     */
+    private function checkDatabaseVersion()
+    {
+        $evwInstalledVersion = get_site_option(EINSATZVERWALTUNG__DBVERSION_OPTION);
+
+        if ($evwInstalledVersion === false) {
+            $evwInstalledVersion = 0;
+        } elseif (is_numeric($evwInstalledVersion)) {
+            $evwInstalledVersion = intval($evwInstalledVersion);
+        } else {
+            $evwInstalledVersion = 0;
+        }
+
+        if ($evwInstalledVersion < self::DB_VERSION) {
+            /** @var wpdb $wpdb */
+            global $wpdb;
+
+            if ($evwInstalledVersion == 0) {
+                $berichte = Core::getEinsatzberichte('');
+
+                // unhook this function so it doesn't loop infinitely
+                remove_action('save_post', array($this, 'savePostdata'));
+
+                foreach ($berichte as $bericht) {
+                    $post_id = $bericht->ID;
+                    if (! wp_is_post_revision($post_id)) {
+                        $gmtdate = get_gmt_from_date($bericht->post_date);
+                        $wpdb->query(
+                            $wpdb->prepare("UPDATE $wpdb->posts SET post_date_gmt = %s WHERE ID = %d", $gmtdate, $post_id)
+                        );
+                    }
+                }
+
+                // re-hook this function
+                add_action('save_post', array($this, 'savePostdata'));
+
+                $evwInstalledVersion = 1;
+                update_site_option(EINSATZVERWALTUNG__DBVERSION_OPTION, $evwInstalledVersion);
+            }
+
+            if ($evwInstalledVersion == 1) {
+                update_option('einsatzvw_cap_roles_administrator', 1);
+                $role_obj = get_role('administrator');
+                foreach (Core::getCapabilities() as $cap) {
+                    $role_obj->add_cap($cap);
+                }
+
+                $evwInstalledVersion = 2;
+                update_site_option(EINSATZVERWALTUNG__DBVERSION_OPTION, $evwInstalledVersion);
+            }
+
+            if ($evwInstalledVersion == 2) {
+                delete_option('einsatzvw_show_links_in_excerpt');
+
+                $evwInstalledVersion = 3;
+                update_site_option(EINSATZVERWALTUNG__DBVERSION_OPTION, $evwInstalledVersion);
+            }
+
+        }
     }
 }
+
+new Core();

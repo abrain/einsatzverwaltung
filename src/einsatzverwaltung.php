@@ -10,150 +10,20 @@ License: GPLv2
 Text Domain: einsatzverwaltung
 */
 
-check_php_version('5.3.0');
-
-define('EINSATZVERWALTUNG__PLUGIN_BASE', plugin_basename(__FILE__));
-define('EINSATZVERWALTUNG__PLUGIN_DIR', plugin_dir_path(__FILE__));
-define('EINSATZVERWALTUNG__PLUGIN_URL', plugin_dir_url(__FILE__));
-define('EINSATZVERWALTUNG__SCRIPT_URL', EINSATZVERWALTUNG__PLUGIN_URL . 'js/');
-define('EINSATZVERWALTUNG__STYLE_URL', EINSATZVERWALTUNG__PLUGIN_URL . 'css/');
-define('EINSATZVERWALTUNG__DBVERSION_OPTION', 'einsatzvw_db_version');
-
-// Standardwerte
-define('EINSATZVERWALTUNG__D__SHOW_EXTEINSATZMITTEL_ARCHIVE', false);
-define('EINSATZVERWALTUNG__D__SHOW_EINSATZART_ARCHIVE', false);
-define('EINSATZVERWALTUNG__D__SHOW_FAHRZEUG_ARCHIVE', false);
-define('EINSATZVERWALTUNG__D__HIDE_EMPTY_DETAILS', true);
-define('EINSATZVERWALTUNG__D__EXCERPT_TYPE', 'details');
-define('EINSATZVERWALTUNG__D__SHOW_EINSATZBERICHTE_MAINLOOP', false);
-define('EINSATZVERWALTUNG__D__OPEN_EXTEINSATZMITTEL_NEWWINDOW', false);
-
-require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-admin.php');
-require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-utilities.php');
-require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-core.php');
-require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-frontend.php');
-require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-widget.php');
-require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-options.php');
-require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-shortcodes.php');
-require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-settings.php');
-require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-tools.php');
-require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-tools-wpe.php');
-require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-taxonomies.php');
-
-global $evw_db_version;
-$evw_db_version = 3;
-
-use abrain\Einsatzverwaltung\Admin;
-use abrain\Einsatzverwaltung\Core;
-use abrain\Einsatzverwaltung\Frontend;
-use abrain\Einsatzverwaltung\Settings;
-use abrain\Einsatzverwaltung\Shortcodes;
-use abrain\Einsatzverwaltung\Taxonomies;
-use abrain\Einsatzverwaltung\ToolEinsatznummernReparieren;
-use abrain\Einsatzverwaltung\ToolImportWpEinsatz;
-
-new Core();
-new Admin();
-$frontend = new Frontend();
-new Settings();
-new Shortcodes($frontend);
-new Taxonomies();
-new ToolEinsatznummernReparieren();
-new ToolImportWpEinsatz();
-
+$php_version_min = '5.3.0';
 
 /**
- * Wird beim Aktivieren des Plugins aufgerufen
+ * Prüfe, ob PHP mindestens in Version $php_version_min läuft
  */
-function einsatzverwaltung_aktivierung()
-{
-    // Posttypen registrieren
-    Core::registerTypes();
-
-    // Permalinks aktualisieren
-    flush_rewrite_rules();
+$php_version = phpversion();
+if (version_compare($php_version, $php_version_min) < 0) {
+    wp_die(
+        "Das Plugin Einsatzverwaltung ben&ouml;tigt PHP Version $php_version_min oder neuer. Bitte aktualisieren Sie PHP auf Ihrem Server!",
+        'Veraltete PHP-Version!',
+        array('back_link' => true)
+    );
 }
-register_activation_hook(__FILE__, 'einsatzverwaltung_aktivierung');
 
-/**
- * Reparaturen oder Anpassungen der Datenbank nach einem Update
- */
-function einsatzverwaltung_update_db_check()
-{
-    global $evw_db_version;
-    $evwInstalledVersion = get_site_option(EINSATZVERWALTUNG__DBVERSION_OPTION);
+require_once dirname( __FILE__ ) . '/einsatzverwaltung-core.php';
 
-    if ($evwInstalledVersion === false) {
-        $evwInstalledVersion = 0;
-    } elseif (is_numeric($evwInstalledVersion)) {
-        $evwInstalledVersion = intval($evwInstalledVersion);
-    } else {
-        $evwInstalledVersion = 0;
-    }
-
-    if ($evwInstalledVersion < $evw_db_version) {
-        /** @var wpdb $wpdb */
-        global $wpdb;
-
-        if ($evwInstalledVersion == 0) {
-            $berichte = Core::getEinsatzberichte('');
-
-            // unhook this function so it doesn't loop infinitely
-            remove_action('save_post', 'abrain\Einsatzverwaltung\Core::savePostdata');
-
-            foreach ($berichte as $bericht) {
-                $post_id = $bericht->ID;
-                if (! wp_is_post_revision($post_id)) {
-                    $gmtdate = get_gmt_from_date($bericht->post_date);
-                    $wpdb->query(
-                        $wpdb->prepare("UPDATE $wpdb->posts SET post_date_gmt = %s WHERE ID = %d", $gmtdate, $post_id)
-                    );
-                }
-            }
-
-            // re-hook this function
-            add_action('save_post', 'abrain\Einsatzverwaltung\Core::savePostdata');
-
-            $evwInstalledVersion = 1;
-            update_site_option(EINSATZVERWALTUNG__DBVERSION_OPTION, $evwInstalledVersion);
-        }
-
-        if ($evwInstalledVersion == 1) {
-            update_option('einsatzvw_cap_roles_administrator', 1);
-            $role_obj = get_role('administrator');
-            foreach (Core::getCapabilities() as $cap) {
-                $role_obj->add_cap($cap);
-            }
-
-            $evwInstalledVersion = 2;
-            update_site_option(EINSATZVERWALTUNG__DBVERSION_OPTION, $evwInstalledVersion);
-        }
-
-        if ($evwInstalledVersion == 2) {
-            delete_option('einsatzvw_show_links_in_excerpt');
-
-            $evwInstalledVersion = 3;
-            update_site_option(EINSATZVERWALTUNG__DBVERSION_OPTION, $evwInstalledVersion);
-        }
-
-    }
-}
-add_action('plugins_loaded', 'einsatzverwaltung_update_db_check');
-
-
-/**
- * Check the version of PHP running on the server
- *
- * @param string $ver Versionsnummer, die mindestens vorhanden sein muss
- */
-function check_php_version($ver)
-{
-    $php_version = phpversion();
-    if (version_compare($php_version, $ver) < 0) {
-        wp_die(
-            "Das Plugin Einsatzverwaltung ben&ouml;tigt PHP Version $ver oder neuer. Bitte aktualisieren Sie PHP auf Ihrem Server!",
-            'Veraltete PHP-Version!',
-            array('back_link' => true)
-        );
-    }
-}
+register_activation_hook(__FILE__, array('abrain\Einsatzverwaltung\Core', 'onActivation'));

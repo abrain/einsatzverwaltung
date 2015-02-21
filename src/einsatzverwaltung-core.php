@@ -1,23 +1,18 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
-define('EINSATZVERWALTUNG__PLUGIN_BASE', plugin_basename(__FILE__));
-define('EINSATZVERWALTUNG__PLUGIN_DIR', plugin_dir_path(__FILE__));
-define('EINSATZVERWALTUNG__PLUGIN_URL', plugin_dir_url(__FILE__));
-define('EINSATZVERWALTUNG__SCRIPT_URL', EINSATZVERWALTUNG__PLUGIN_URL . 'js/');
-define('EINSATZVERWALTUNG__STYLE_URL', EINSATZVERWALTUNG__PLUGIN_URL . 'css/');
-define('EINSATZVERWALTUNG__DBVERSION_OPTION', 'einsatzvw_db_version');
+require_once dirname(__FILE__) . '/einsatzverwaltung-admin.php';
+require_once dirname(__FILE__) . '/einsatzverwaltung-utilities.php';
+require_once dirname(__FILE__) . '/einsatzverwaltung-frontend.php';
+require_once dirname(__FILE__) . '/einsatzverwaltung-widget.php';
+require_once dirname(__FILE__) . '/einsatzverwaltung-options.php';
+require_once dirname(__FILE__) . '/einsatzverwaltung-shortcodes.php';
+require_once dirname(__FILE__) . '/einsatzverwaltung-settings.php';
+require_once dirname(__FILE__) . '/einsatzverwaltung-tools.php';
+require_once dirname(__FILE__) . '/einsatzverwaltung-tools-wpe.php';
+require_once dirname(__FILE__) . '/einsatzverwaltung-taxonomies.php';
 
-require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-admin.php');
-require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-utilities.php');
-require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-frontend.php');
-require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-widget.php');
-require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-options.php');
-require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-shortcodes.php');
-require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-settings.php');
-require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-tools.php');
-require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-tools-wpe.php');
-require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-taxonomies.php');
+define('EINSATZVERWALTUNG__DBVERSION_OPTION', 'einsatzvw_db_version');
 
 // Standardwerte
 define('EINSATZVERWALTUNG__D__SHOW_EXTEINSATZMITTEL_ARCHIVE', false);
@@ -37,6 +32,12 @@ use wpdb;
 class Core
 {
     const DB_VERSION = 3;
+
+    //public static $pluginBase;
+    public static $pluginDir;
+    public static $pluginUrl;
+    public static $scriptUrl;
+    public static $styleUrl;
 
     private static $args_einsatz = array(
         'labels' => array(
@@ -184,6 +185,11 @@ class Core
      */
     public function __construct()
     {
+        self::$pluginDir = plugin_dir_path(__FILE__);
+        self::$pluginUrl = plugin_dir_url(__FILE__);
+        self::$scriptUrl = self::$pluginUrl . 'js/';
+        self::$styleUrl = self::$pluginUrl . 'css/';
+
         if (Utilities::isMinWPVersion("3.9")) {
             self::$args_einsatz['menu_icon'] = 'dashicons-media-document';
         }

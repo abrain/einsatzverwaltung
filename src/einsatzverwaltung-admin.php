@@ -61,28 +61,28 @@ class Admin
             // Nur auf der Bearbeitungsseite anzeigen
             wp_enqueue_script(
                 'einsatzverwaltung-edit-script',
-                EINSATZVERWALTUNG__SCRIPT_URL . 'einsatzverwaltung-edit.js',
+                Core::$scriptUrl . 'einsatzverwaltung-edit.js',
                 array('jquery', 'jquery-ui-autocomplete')
             );
             wp_enqueue_style(
                 'einsatzverwaltung-edit',
-                EINSATZVERWALTUNG__STYLE_URL . 'style-edit.css'
+                Core::$styleUrl . 'style-edit.css'
             );
         } elseif ('settings_page_einsatzvw-settings' == $hook) {
             wp_enqueue_script(
                 'einsatzverwaltung-settings-script',
-                EINSATZVERWALTUNG__SCRIPT_URL . 'einsatzverwaltung-settings.js',
+                Core::$scriptUrl . 'einsatzverwaltung-settings.js',
                 array('jquery-ui-draggable', 'jquery-ui-droppable', 'jquery-ui-sortable')
             );
         }
 
         wp_enqueue_style(
             'einsatzverwaltung-fontawesome',
-            EINSATZVERWALTUNG__PLUGIN_URL . 'font-awesome/css/font-awesome.min.css'
+            Core::$pluginUrl . 'font-awesome/css/font-awesome.min.css'
         );
         wp_enqueue_style(
             'einsatzverwaltung-admin',
-            EINSATZVERWALTUNG__STYLE_URL . 'style-admin.css'
+            Core::$styleUrl . 'style-admin.css'
         );
     }
 

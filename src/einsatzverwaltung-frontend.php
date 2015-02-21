@@ -33,11 +33,11 @@ class Frontend
     {
         wp_enqueue_style(
             'einsatzverwaltung-fontawesome',
-            EINSATZVERWALTUNG__PLUGIN_URL . 'font-awesome/css/font-awesome.min.css'
+            Core::$pluginUrl . 'font-awesome/css/font-awesome.min.css'
         );
         wp_enqueue_style(
             'einsatzverwaltung-frontend',
-            EINSATZVERWALTUNG__STYLE_URL . 'style-frontend.css'
+            Core::$styleUrl . 'style-frontend.css'
         );
     }
 

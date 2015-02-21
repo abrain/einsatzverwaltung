@@ -23,7 +23,6 @@ class Settings
     {
         add_action('admin_menu', array($this, 'addToSettingsMenu'));
         add_action('admin_init', array($this, 'registerSettings'));
-        add_filter('plugin_action_links_' . EINSATZVERWALTUNG__PLUGIN_BASE, array($this, 'addActionLinks'));
     }
 
 
@@ -49,7 +48,7 @@ class Settings
      *
      * @return array
      */
-    public function addActionLinks($links)
+    public static function addActionLinks($links)
     {
         $settingsPage = 'options-general.php?page=' . self::EVW_SETTINGS_SLUG;
         $actionLinks = array('<a href="' . admin_url($settingsPage) . '">Einstellungen</a>');

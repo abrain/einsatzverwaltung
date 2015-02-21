@@ -124,23 +124,6 @@ add_action('plugins_loaded', 'einsatzverwaltung_on_plugins_loaded');
 
 
 /**
- * Gibt die Option einsatzvw_einsatz_hideemptydetails als bool zurück
- * TODO in Settings auslagern und für alle bool-Options umschreiben
- *
- * @return bool
- */
-function einsatzverwaltung_get_hide_empty_details()
-{
-    $hide_empty_details = get_option('einsatzvw_einsatz_hideemptydetails');
-    if ($hide_empty_details === false) {
-        return EINSATZVERWALTUNG__D__HIDE_EMPTY_DETAILS;
-    } else {
-        return ($hide_empty_details == 1 ? true : false);
-    }
-}
-
-
-/**
  * Reparaturen oder Anpassungen der Datenbank nach einem Update
  */
 function einsatzverwaltung_update_db_check()

@@ -236,7 +236,7 @@ class Frontend
      */
     private function getDetailString($title, $value, $newline = true)
     {
-        $hide_empty_details = einsatzverwaltung_get_hide_empty_details();
+        $hide_empty_details = Options::isHideEmptyDetails();
 
         if (!$hide_empty_details || !empty($value)) {
             return '<strong>'.$title.'</strong> '.$value.($newline ? '<br>' : '');
@@ -257,7 +257,7 @@ class Frontend
      */
     private function getNumericDetailString($title, $value, $is_zero_empty = true, $newline = true)
     {
-        $hide_empty_details = einsatzverwaltung_get_hide_empty_details();
+        $hide_empty_details = Options::isHideEmptyDetails();
 
         if (!($hide_empty_details && $is_zero_empty && $value == 0)) {
             return '<strong>'.$title.'</strong> '.$value.($newline ? '<br>' : '');

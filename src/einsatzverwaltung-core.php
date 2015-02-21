@@ -470,4 +470,18 @@ class Core
             )
         );
     }
+
+    /**
+     * Gibt die möglichen Kurzfassungstypen zurück
+     *
+     * @return array
+     */
+    public static function getExcerptTypes()
+    {
+        return array(
+            'none' => 'Leer',
+            'details' => 'Einsatzdetails',
+            'text' => 'Berichtstext'
+        );
+    }
 }

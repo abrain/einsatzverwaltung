@@ -394,11 +394,7 @@ class Settings
      */
     public function echoSettingsExcerpt()
     {
-        $types = array(
-            'none' => 'Leer',
-            'details' => 'Einsatzdetails',
-            'text' => 'Berichtstext'
-        ); // TODO in Core auslagern
+        $types = Core::getExcerptTypes();
 
         echo '<p>Kurzfassung auf der Webseite:&nbsp;';
         $this->echoSelect(

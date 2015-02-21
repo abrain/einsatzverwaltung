@@ -315,101 +315,98 @@ class Core
      */
     public function savePostdata($post_id)
     {
-
         // verify if this is an auto save routine.
         // If it is our form has not been submitted, so we dont want to do anything
         if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
             return;
         }
 
-        if (array_key_exists('post_type', $_POST) && 'einsatz' == $_POST['post_type']) {
-            // Prüfen, ob Aufruf über das Formular erfolgt ist
-            if (
-                !isset($_POST['einsatzverwaltung_nonce']) ||
-                !wp_verify_nonce($_POST['einsatzverwaltung_nonce'], 'save_einsatz_details')
-            ) {
-                return;
-            }
+        if (!array_key_exists('post_type', $_POST) || 'einsatz' !== $_POST['post_type']) {
+            return;
+        }
 
-            // Schreibrechte prüfen
-            if (!current_user_can('edit_einsatzbericht', $post_id)) {
-                return;
-            }
+        // Prüfen, ob Aufruf über das Formular erfolgt ist
+        if (
+            !array_key_exists('einsatzverwaltung_nonce', $_POST) ||
+            !wp_verify_nonce($_POST['einsatzverwaltung_nonce'], 'save_einsatz_details')
+        ) {
+            return;
+        }
 
-            $update_args = array();
+        // Schreibrechte prüfen
+        if (!current_user_can('edit_einsatzbericht', $post_id)) {
+            return;
+        }
 
-            // Alarmzeit validieren
-            $input_alarmzeit = sanitize_text_field($_POST['einsatzverwaltung_alarmzeit']);
-            if (!empty($input_alarmzeit)) {
-                $alarmzeit = date_create($input_alarmzeit);
-            }
-            if (empty($alarmzeit)) {
-                $alarmzeit = date_create(
-                    sprintf(
-                        '%s-%s-%s %s:%s:%s',
-                        $_POST['aa'],
-                        $_POST['mm'],
-                        $_POST['jj'],
-                        $_POST['hh'],
-                        $_POST['mn'],
-                        $_POST['ss']
-                    )
-                );
-            } else {
-                $update_args['post_date'] = date_format($alarmzeit, 'Y-m-d H:i:s');
-                $update_args['post_date_gmt'] = get_gmt_from_date($update_args['post_date']);
-            }
+        $update_args = array();
 
-            // Einsatznummer validieren
-            $einsatzjahr = date_format($alarmzeit, 'Y');
-            $einsatzNrFallback = self::getNextEinsatznummer($einsatzjahr, $einsatzjahr == date('Y'));
-            $einsatznummer = sanitize_title($_POST['einsatzverwaltung_nummer'], $einsatzNrFallback, 'save');
-            if (!empty($einsatznummer)) {
-                $update_args['post_name'] = $einsatznummer; // Slug setzen
-            }
+        // Alarmzeit validieren
+        $input_alarmzeit = sanitize_text_field($_POST['einsatzverwaltung_alarmzeit']);
+        if (!empty($input_alarmzeit)) {
+            $alarmzeit = date_create($input_alarmzeit);
+        }
+        if (empty($alarmzeit)) {
+            $alarmzeit = date_create(
+                sprintf(
+                    '%s-%s-%s %s:%s:%s',
+                    $_POST['aa'],
+                    $_POST['mm'],
+                    $_POST['jj'],
+                    $_POST['hh'],
+                    $_POST['mn'],
+                    $_POST['ss']
+                )
+            );
+        } else {
+            $update_args['post_date'] = date_format($alarmzeit, 'Y-m-d H:i:s');
+            $update_args['post_date_gmt'] = get_gmt_from_date($update_args['post_date']);
+        }
 
-            // Einsatzende validieren
-            $input_einsatzende = sanitize_text_field($_POST['einsatzverwaltung_einsatzende']);
-            if (!empty($input_einsatzende)) {
-                $einsatzende = date_create($input_einsatzende);
-            }
-            if (empty($einsatzende)) {
-                $einsatzende = "";
-            }
+        // Einsatznummer validieren
+        $einsatzjahr = date_format($alarmzeit, 'Y');
+        $einsatzNrFallback = self::getNextEinsatznummer($einsatzjahr, $einsatzjahr == date('Y'));
+        $einsatznummer = sanitize_title($_POST['einsatzverwaltung_nummer'], $einsatzNrFallback, 'save');
+        if (!empty($einsatznummer)) {
+            $update_args['post_name'] = $einsatznummer; // Slug setzen
+        }
 
-            // Einsatzort validieren
-            $einsatzort = sanitize_text_field($_POST['einsatzverwaltung_einsatzort']);
+        // Einsatzende validieren
+        $input_einsatzende = sanitize_text_field($_POST['einsatzverwaltung_einsatzende']);
+        if (!empty($input_einsatzende)) {
+            $einsatzende = date_create($input_einsatzende);
+        }
+        if (empty($einsatzende)) {
+            $einsatzende = "";
+        }
 
-            // Einsatzleiter validieren
-            $einsatzleiter = sanitize_text_field($_POST['einsatzverwaltung_einsatzleiter']);
+        // Einsatzort validieren
+        $einsatzort = sanitize_text_field($_POST['einsatzverwaltung_einsatzort']);
 
-            // Mannschaftsstärke validieren
-            $mannschaftsstaerke = Utilities::sanitizePositiveNumber($_POST['einsatzverwaltung_mannschaft'], 0);
+        // Einsatzleiter validieren
+        $einsatzleiter = sanitize_text_field($_POST['einsatzverwaltung_einsatzleiter']);
 
-            // Fehlalarm validieren
-            $fehlalarm = Utilities::sanitizeCheckbox(array($_POST, 'einsatzverwaltung_fehlalarm'));
+        // Mannschaftsstärke validieren
+        $mannschaftsstaerke = Utilities::sanitizePositiveNumber($_POST['einsatzverwaltung_mannschaft'], 0);
 
-            // Metadaten schreiben
-            update_post_meta($post_id, 'einsatz_alarmzeit', date_format($alarmzeit, 'Y-m-d H:i'));
-            update_post_meta($post_id, 'einsatz_einsatzende', ($einsatzende == "" ? "" : date_format($einsatzende, 'Y-m-d H:i')));
-            update_post_meta($post_id, 'einsatz_einsatzort', $einsatzort);
-            update_post_meta($post_id, 'einsatz_einsatzleiter', $einsatzleiter);
-            update_post_meta($post_id, 'einsatz_mannschaft', $mannschaftsstaerke);
-            update_post_meta($post_id, 'einsatz_fehlalarm', $fehlalarm);
+        // Fehlalarm validieren
+        $fehlalarm = Utilities::sanitizeCheckbox(array($_POST, 'einsatzverwaltung_fehlalarm'));
 
-            if (!empty($update_args)) {
-                if (! wp_is_post_revision($post_id)) {
-                    $update_args['ID'] = $post_id;
+        // Metadaten schreiben
+        update_post_meta($post_id, 'einsatz_alarmzeit', date_format($alarmzeit, 'Y-m-d H:i'));
+        update_post_meta($post_id, 'einsatz_einsatzende', ($einsatzende == "" ? "" : date_format($einsatzende, 'Y-m-d H:i')));
+        update_post_meta($post_id, 'einsatz_einsatzort', $einsatzort);
+        update_post_meta($post_id, 'einsatz_einsatzleiter', $einsatzleiter);
+        update_post_meta($post_id, 'einsatz_mannschaft', $mannschaftsstaerke);
+        update_post_meta($post_id, 'einsatz_fehlalarm', $fehlalarm);
 
-                    // unhook this function so it doesn't loop infinitely
-                    remove_action('save_post', array($this, 'savePostdata'));
+        if (!empty($update_args)) {
+            if (! wp_is_post_revision($post_id)) {
+                $update_args['ID'] = $post_id;
 
-                    // update the post, which calls save_post again
-                    wp_update_post($update_args);
-
-                    // re-hook this function
-                    add_action('save_post', array($this, 'savePostdata'));
-                }
+                // save_post Filter kurzzeitig deaktivieren, damit keine Dauerschleife entsteht
+                remove_action('save_post', array($this, 'savePostdata'));
+                wp_update_post($update_args);
+                add_action('save_post', array($this, 'savePostdata'));
             }
         }
     }
@@ -647,47 +644,35 @@ class Core
             /** @var wpdb $wpdb */
             global $wpdb;
 
-            if ($evwInstalledVersion == 0) {
-                $berichte = Core::getEinsatzberichte('');
+            switch ($evwInstalledVersion) {
+                /** @noinspection PhpMissingBreakStatementInspection */
+                case 0:
+                    $berichte = Core::getEinsatzberichte('');
 
-                // unhook this function so it doesn't loop infinitely
-                remove_action('save_post', array($this, 'savePostdata'));
-
-                foreach ($berichte as $bericht) {
-                    $post_id = $bericht->ID;
-                    if (! wp_is_post_revision($post_id)) {
-                        $gmtdate = get_gmt_from_date($bericht->post_date);
-                        $wpdb->query(
-                            $wpdb->prepare("UPDATE $wpdb->posts SET post_date_gmt = %s WHERE ID = %d", $gmtdate, $post_id)
-                        );
+                    remove_action('save_post', array($this, 'savePostdata'));
+                    foreach ($berichte as $bericht) {
+                        $post_id = $bericht->ID;
+                        if (! wp_is_post_revision($post_id)) {
+                            $gmtdate = get_gmt_from_date($bericht->post_date);
+                            $wpdb->query(
+                                $wpdb->prepare("UPDATE $wpdb->posts SET post_date_gmt = %s WHERE ID = %d", $gmtdate, $post_id)
+                            );
+                        }
                     }
-                }
-
-                // re-hook this function
-                add_action('save_post', array($this, 'savePostdata'));
-
-                $evwInstalledVersion = 1;
-                update_site_option(EINSATZVERWALTUNG__DBVERSION_OPTION, $evwInstalledVersion);
+                    add_action('save_post', array($this, 'savePostdata'));
+                    update_site_option(EINSATZVERWALTUNG__DBVERSION_OPTION, 1);
+                /** @noinspection PhpMissingBreakStatementInspection */
+                case 1:
+                    update_option('einsatzvw_cap_roles_administrator', 1);
+                    $role_obj = get_role('administrator');
+                    foreach (Core::getCapabilities() as $cap) {
+                        $role_obj->add_cap($cap);
+                    }
+                    update_site_option(EINSATZVERWALTUNG__DBVERSION_OPTION, 2);
+                case 2:
+                    delete_option('einsatzvw_show_links_in_excerpt');
+                    update_site_option(EINSATZVERWALTUNG__DBVERSION_OPTION, 3);
             }
-
-            if ($evwInstalledVersion == 1) {
-                update_option('einsatzvw_cap_roles_administrator', 1);
-                $role_obj = get_role('administrator');
-                foreach (Core::getCapabilities() as $cap) {
-                    $role_obj->add_cap($cap);
-                }
-
-                $evwInstalledVersion = 2;
-                update_site_option(EINSATZVERWALTUNG__DBVERSION_OPTION, $evwInstalledVersion);
-            }
-
-            if ($evwInstalledVersion == 2) {
-                delete_option('einsatzvw_show_links_in_excerpt');
-
-                $evwInstalledVersion = 3;
-                update_site_option(EINSATZVERWALTUNG__DBVERSION_OPTION, $evwInstalledVersion);
-            }
-
         }
     }
 }

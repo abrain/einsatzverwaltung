@@ -550,4 +550,26 @@ class Core
             'post_title' => 'Einsatzstichwort'
         );
     }
+
+    /**
+     * Ändert die Einsatznummer eines bestehenden Einsatzes
+     *
+     * @param int $post_id ID des Einsatzberichts
+     * @param string $einsatznummer Einsatznummer
+     */
+    public static function setEinsatznummer($post_id, $einsatznummer)
+    {
+        if (empty($post_id) || empty($einsatznummer)) {
+            return;
+        }
+
+        $update_args = array();
+        $update_args['post_name'] = $einsatznummer;
+        $update_args['ID'] = $post_id;
+
+        // keine Sonderbehandlung beim Speichern
+        remove_action('save_post', 'abrain\Einsatzverwaltung\Core::savePostdata');
+        wp_update_post($update_args);
+        add_action('save_post', 'abrain\Einsatzverwaltung\Core::savePostdata');
+    }
 }

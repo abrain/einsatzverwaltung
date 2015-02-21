@@ -49,6 +49,7 @@ use abrain\Einsatzverwaltung\Frontend;
 use abrain\Einsatzverwaltung\Settings;
 use abrain\Einsatzverwaltung\Shortcodes;
 use abrain\Einsatzverwaltung\Taxonomies;
+use abrain\Einsatzverwaltung\ToolEinsatznummernReparieren;
 
 new Core();
 new Admin();
@@ -56,6 +57,7 @@ $frontend = new Frontend();
 new Settings();
 new Shortcodes($frontend);
 new Taxonomies();
+new ToolEinsatznummernReparieren();
 
 
 /**

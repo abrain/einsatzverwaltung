@@ -244,7 +244,7 @@ class Core
      */
     public static function formatEinsatznummer($jahr, $nummer)
     {
-        $stellen = get_option('einsatzvw_einsatznummer_stellen', EINSATZVERWALTUNG__EINSATZNR_STELLEN);
+        $stellen = Options::getEinsatznummerStellen();
         $lfdvorne = get_option('einsatzvw_einsatznummer_lfdvorne', false);
         if ($lfdvorne) {
             return str_pad($nummer, $stellen, "0", STR_PAD_LEFT).$jahr;
@@ -444,8 +444,7 @@ class Core
      */
     public static function getFields()
     {
-        global $evw_meta_fields, $evw_terms, $evw_post_fields;
-        return array_merge($evw_meta_fields, $evw_terms, $evw_post_fields);
+        return array_merge(self::getMetaFields(), self::getTerms(), self::getPostFields());
     }
 
     /**
@@ -482,6 +481,73 @@ class Core
             'none' => 'Leer',
             'details' => 'Einsatzdetails',
             'text' => 'Berichtstext'
+        );
+    }
+
+    /**
+     * Gibt die möglichen Berechtigungen für Einsatzberichte zurück
+     *
+     * @return array
+     */
+    public static function getCapabilities()
+    {
+        return array(
+            'edit_einsatzberichte',
+            'edit_private_einsatzberichte',
+            'edit_published_einsatzberichte',
+            'edit_others_einsatzberichte',
+            'publish_einsatzberichte',
+            'read_private_einsatzberichte',
+            'delete_einsatzberichte',
+            'delete_private_einsatzberichte',
+            'delete_published_einsatzberichte',
+            'delete_others_einsatzberichte'
+        );
+    }
+
+    /**
+     * Gibt die slugs und Namen der Metafelder zurück
+     *
+     * @return array
+     */
+    public static function getMetaFields()
+    {
+        return array(
+            'einsatz_einsatzort' => 'Einsatzort',
+            'einsatz_einsatzleiter' => 'Einsatzleiter',
+            'einsatz_einsatzende' => 'Einsatzende',
+            'einsatz_fehlalarm' => 'Fehlalarm',
+            'einsatz_mannschaft' => 'Mannschaftsstärke'
+        );
+    }
+
+    /**
+     * Gibt die slugs und Namen der Taxonomien zurück
+     *
+     * @return array
+     */
+    public static function getTerms()
+    {
+        return array(
+            'alarmierungsart' => 'Alarmierungsart',
+            'einsatzart' => 'Einsatzart',
+            'fahrzeug' => 'Fahrzeuge',
+            'exteinsatzmittel' => 'Externe Einsatzmittel'
+        );
+    }
+
+    /**
+     * Gibt slugs und Namen der Direkt dem Post zugeordneten Felder zurück
+     *
+     * @return array
+     */
+    public static function getPostFields()
+    {
+        return array(
+            'post_date' => 'Alarmzeit',
+            'post_name' => 'Einsatznummer',
+            'post_content' => 'Berichtstext',
+            'post_title' => 'Einsatzstichwort'
         );
     }
 }

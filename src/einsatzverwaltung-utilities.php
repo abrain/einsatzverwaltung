@@ -137,7 +137,7 @@ class Utilities
         if (is_numeric($val) && $val > 0) {
             return $val;
         } else {
-            return EINSATZVERWALTUNG__EINSATZNR_STELLEN;
+            return Options::DEFAULT_EINSATZNR_STELLEN;
         }
     }
 

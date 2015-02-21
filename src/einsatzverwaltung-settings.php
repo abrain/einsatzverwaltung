@@ -297,7 +297,7 @@ class Settings
      */
     public function echoSettingsEinsatznummerFormat()
     {
-        printf('Jahreszahl + jahresbezogene, fortlaufende Nummer mit <input type="text" value="%2$s" size="2" id="%1$s" name="%1$s" /> Stellen<p class="description">Beispiel f&uuml;r den f&uuml;nften Einsatz in 2014:<br>bei 2 Stellen: 201405<br>bei 4 Stellen: 20140005</p><br>', 'einsatzvw_einsatznummer_stellen', get_option('einsatzvw_einsatznummer_stellen'));
+        printf('Jahreszahl + jahresbezogene, fortlaufende Nummer mit <input type="text" value="%2$s" size="2" id="%1$s" name="%1$s" /> Stellen<p class="description">Beispiel f&uuml;r den f&uuml;nften Einsatz in 2014:<br>bei 2 Stellen: 201405<br>bei 4 Stellen: 20140005</p><br>', 'einsatzvw_einsatznummer_stellen', Options::getEinsatznummerStellen());
         $this->echoSettingsCheckbox(
             array(
                 'einsatzvw_einsatznummer_lfdvorne',
@@ -498,11 +498,10 @@ class Settings
         // Berechtigungen aktualisieren
         $roles = get_editable_roles();
         if (!empty($roles)) {
-            global $evw_caps;
             foreach (array_keys($roles) as $role_slug) {
                 $role_obj = get_role($role_slug);
                 $allowed = get_option('einsatzvw_cap_roles_' . $role_slug, false);
-                foreach ($evw_caps as $cap) {
+                foreach (Core::getCapabilities() as $cap) {
                     $role_obj->add_cap($cap, $allowed);
                 }
             }

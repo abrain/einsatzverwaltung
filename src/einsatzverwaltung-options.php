@@ -7,6 +7,7 @@ namespace abrain\Einsatzverwaltung;
 class Options
 {
     const DEFAULT_COLUMNS = 'number,date,time,title';
+    const DEFAULT_EINSATZNR_STELLEN = 3;
 
     /**
      * @return array
@@ -15,6 +16,14 @@ class Options
     {
         $enabledColumns = get_option('einsatzvw_list_columns', self::DEFAULT_COLUMNS);
         return explode(',', $enabledColumns);
+    }
+
+    /**
+     * @return int
+     */
+    public static function getEinsatznummerStellen()
+    {
+        return get_option('einsatzvw_einsatznummer_stellen', self::DEFAULT_EINSATZNR_STELLEN);
     }
 
     /**

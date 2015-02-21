@@ -20,7 +20,6 @@ define('EINSATZVERWALTUNG__STYLE_URL', EINSATZVERWALTUNG__PLUGIN_URL . 'css/');
 define('EINSATZVERWALTUNG__DBVERSION_OPTION', 'einsatzvw_db_version');
 
 // Standardwerte
-define('EINSATZVERWALTUNG__EINSATZNR_STELLEN', 3);
 define('EINSATZVERWALTUNG__D__SHOW_EXTEINSATZMITTEL_ARCHIVE', false);
 define('EINSATZVERWALTUNG__D__SHOW_EINSATZART_ARCHIVE', false);
 define('EINSATZVERWALTUNG__D__SHOW_FAHRZEUG_ARCHIVE', false);
@@ -43,45 +42,6 @@ require_once(EINSATZVERWALTUNG__PLUGIN_DIR . 'einsatzverwaltung-taxonomies.php')
 
 global $evw_db_version;
 $evw_db_version = 3;
-
-global $evw_caps;
-$evw_caps = array(
-    'edit_einsatzberichte',
-    'edit_private_einsatzberichte',
-    'edit_published_einsatzberichte',
-    'edit_others_einsatzberichte',
-    'publish_einsatzberichte',
-    'read_private_einsatzberichte',
-    'delete_einsatzberichte',
-    'delete_private_einsatzberichte',
-    'delete_published_einsatzberichte',
-    'delete_others_einsatzberichte'
-);
-
-global $evw_meta_fields;
-$evw_meta_fields = array(
-    'einsatz_einsatzort' => 'Einsatzort',
-    'einsatz_einsatzleiter' => 'Einsatzleiter',
-    'einsatz_einsatzende' => 'Einsatzende',
-    'einsatz_fehlalarm' => 'Fehlalarm',
-    'einsatz_mannschaft' => 'Mannschaftsstärke'
-);
-
-global $evw_terms;
-$evw_terms = array(
-    'alarmierungsart' => 'Alarmierungsart',
-    'einsatzart' => 'Einsatzart',
-    'fahrzeug' => 'Fahrzeuge',
-    'exteinsatzmittel' => 'Externe Einsatzmittel'
-);
-
-global $evw_post_fields;
-$evw_post_fields = array(
-    'post_date' => 'Alarmzeit',
-    'post_name' => 'Einsatznummer',
-    'post_content' => 'Berichtstext',
-    'post_title' => 'Einsatzstichwort'
-);
 
 use abrain\Einsatzverwaltung\Admin;
 use abrain\Einsatzverwaltung\Core;
@@ -110,18 +70,6 @@ function einsatzverwaltung_aktivierung()
     flush_rewrite_rules();
 }
 register_activation_hook(__FILE__, 'einsatzverwaltung_aktivierung');
-
-
-/**
- *
- */
-function einsatzverwaltung_on_plugins_loaded()
-{
-    // Sicherstellen, dass Optionen gesetzt sind
-    add_option('einsatzvw_einsatznummer_stellen', EINSATZVERWALTUNG__EINSATZNR_STELLEN, '', 'no');
-}
-add_action('plugins_loaded', 'einsatzverwaltung_on_plugins_loaded');
-
 
 /**
  * Reparaturen oder Anpassungen der Datenbank nach einem Update
@@ -167,10 +115,9 @@ function einsatzverwaltung_update_db_check()
         }
 
         if ($evwInstalledVersion == 1) {
-            global $evw_caps;
             update_option('einsatzvw_cap_roles_administrator', 1);
             $role_obj = get_role('administrator');
-            foreach ($evw_caps as $cap) {
+            foreach (Core::getCapabilities() as $cap) {
                 $role_obj->add_cap($cap);
             }
 

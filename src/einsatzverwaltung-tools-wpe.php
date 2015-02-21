@@ -234,7 +234,7 @@ function einsatzverwaltung_get_wpe_felder($tablename)
 function einsatzverwaltung_import_wpe($tablename, $feld_mapping)
 {
     /** @var wpdb $wpdb */
-    global $wpdb, $evw_meta_fields, $evw_terms, $evw_post_fields;
+    global $wpdb;
 
     $query = sprintf('SELECT ID,%s FROM %s ORDER BY %s', implode(array_keys($feld_mapping), ','), $tablename, EVW_TOOL_WPE_DATE_COLUMN);
     $wpe_einsaetze = $wpdb->get_results($query, ARRAY_A);
@@ -258,7 +258,8 @@ function einsatzverwaltung_import_wpe($tablename, $feld_mapping)
 
         foreach ($feld_mapping as $wpe_feld_name => $evw_feld_name) {
             if (!empty($evw_feld_name) && is_string($evw_feld_name)) {
-                if (array_key_exists($evw_feld_name, $evw_meta_fields)) {
+                $evw_terms = Core::getTerms();
+                if (array_key_exists($evw_feld_name, Core::getMetaFields())) {
                     // Wert gehört in ein Metafeld
                     $meta_values[$evw_feld_name] = $wpe_einsatz[$wpe_feld_name];
                 } elseif (array_key_exists($evw_feld_name, $evw_terms)) {
@@ -290,7 +291,7 @@ function einsatzverwaltung_import_wpe($tablename, $feld_mapping)
                         // Name kann direkt verwendet werden
                         $einsatz_args['tax_input'][$evw_feld_name] = $wpe_einsatz[$wpe_feld_name];
                     }
-                } elseif (array_key_exists($evw_feld_name, $evw_post_fields)) {
+                } elseif (array_key_exists($evw_feld_name, Core::getPostFields())) {
                     // Wert gehört direkt zum Post
                     $einsatz_args[$evw_feld_name] = $wpe_einsatz[$wpe_feld_name];
                 } elseif ($evw_feld_name == '-') {

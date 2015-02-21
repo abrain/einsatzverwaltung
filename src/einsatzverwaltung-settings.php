@@ -270,7 +270,8 @@ class Settings
     {
         echo '<select name="' . $name . '">';
         foreach ($options as $value => $label) {
-            echo '<option value="' . $value . '"' . ($selectedValue == $value ? ' selected="selected"' : '') . '>' . $label . '</option>';
+            echo '<option value="' . $value . '"' . ($selectedValue == $value ? ' selected="selected"' : '') . '>';
+            echo $label . '</option>';
         }
         echo '</select>';
     }

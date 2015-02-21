@@ -655,7 +655,6 @@ class Core
             global $wpdb;
 
             switch ($evwInstalledVersion) {
-                /** @noinspection PhpMissingBreakStatementInspection */
                 case 0:
                     $berichte = Core::getEinsatzberichte('');
 
@@ -675,7 +674,7 @@ class Core
                     }
                     add_action('save_post', array($this, 'savePostdata'));
                     update_site_option(EINSATZVERWALTUNG__DBVERSION_OPTION, 1);
-                /** @noinspection PhpMissingBreakStatementInspection */
+                    // no break
                 case 1:
                     update_option('einsatzvw_cap_roles_administrator', 1);
                     $role_obj = get_role('administrator');
@@ -683,9 +682,11 @@ class Core
                         $role_obj->add_cap($cap);
                     }
                     update_site_option(EINSATZVERWALTUNG__DBVERSION_OPTION, 2);
+                    // no break
                 case 2:
                     delete_option('einsatzvw_show_links_in_excerpt');
                     update_site_option(EINSATZVERWALTUNG__DBVERSION_OPTION, 3);
+                    // no break
             }
         }
     }

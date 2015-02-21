@@ -31,11 +31,13 @@ class ToolImportWpEinsatz
      */
     public function addToolToMenu()
     {
-        add_management_page('Import aus wp-einsatz',
+        add_management_page(
+            'Import aus wp-einsatz',
             'Import aus wp-einsatz',
             'manage_options',
             self::EVW_TOOL_WPE_SLUG,
-            array($this, 'renderToolPage'));
+            array($this, 'renderToolPage')
+        );
     }
 
     /**
@@ -56,7 +58,11 @@ class ToolImportWpEinsatz
         if ($wpdb->get_var("SHOW TABLES LIKE '$tablename'") != $tablename) {
             Utilities::printError('Die Tabelle, in der wp-einsatz seine Daten speichert, konnte nicht gefunden werden.');
         } else {
-            if (array_key_exists('submit', $_POST) && array_key_exists('aktion', $_POST) && $_POST['aktion'] == 'analyse') {
+            if (
+                array_key_exists('submit', $_POST) &&
+                array_key_exists('aktion', $_POST) &&
+                $_POST['aktion'] == 'analyse'
+            ) {
                 // Nonce überprüfen
                 check_admin_referer('evw-import-wpe-analyse');
 
@@ -101,7 +107,11 @@ class ToolImportWpEinsatz
                 // Felder matchen
                 echo "<h3>Felder zuordnen</h3>";
                 $this->renderMatchForm($felder);
-            } elseif (array_key_exists('submit', $_POST) && array_key_exists('aktion', $_POST) && $_POST['aktion'] == 'import_wpe') {
+            } elseif (
+                array_key_exists('submit', $_POST) &&
+                array_key_exists('aktion', $_POST) &&
+                $_POST['aktion'] == 'import_wpe'
+            ) {
                 // Nonce überprüfen
                 check_admin_referer('evw-import-wpe-import');
 
@@ -365,7 +375,7 @@ class ToolImportWpEinsatz
                 // Einsatznummer prüfen
                 $gespeicherteEnr = get_post_field('post_name', $post_id);
                 if ($gespeicherteEnr != $einsatznummer) {
-                    Utilities::printWarning('WordPress hat diesem Einsatz nicht die vorgesehene Einsatznummer erteilt.<br>Verwendung des Werkzeugs <a href="'.admin_url('tools.php?page=einsatzvw-tool-enr').'">Einsatznummern reparieren</a> wird empfohlen.');
+                    Utilities::printWarning('WordPress hat diesem Einsatz nicht die vorgesehene Einsatznummer erteilt.<br>Verwendung des Werkzeugs <a href="'.admin_url('tools.php?page='.ToolEinsatznummernReparieren::EVW_TOOL_ENR_SLUG).'">Einsatznummern reparieren</a> wird empfohlen.');
                 }
             }
             add_action('save_post', 'einsatzverwaltung_save_postdata');

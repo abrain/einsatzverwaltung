@@ -180,7 +180,7 @@ class Core
     /**
      * Erzeugt den neuen Beitragstyp Einsatzbericht und die zugehörigen Taxonomien
      */
-    private static function registerTypes()
+    public static function registerTypes()
     {
         register_post_type('einsatz', self::$args_einsatz);
         register_taxonomy('einsatzart', 'einsatz', self::$args_einsatzart);

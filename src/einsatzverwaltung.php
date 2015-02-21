@@ -164,7 +164,7 @@ function einsatzverwaltung_update_db_check()
             $berichte = Core::getEinsatzberichte('');
 
             // unhook this function so it doesn't loop infinitely
-            remove_action('save_post', 'einsatzverwaltung_save_postdata');
+            remove_action('save_post', 'abrain\Einsatzverwaltung\Core::savePostdata');
 
             foreach ($berichte as $bericht) {
                 $post_id = $bericht->ID;
@@ -177,7 +177,7 @@ function einsatzverwaltung_update_db_check()
             }
 
             // re-hook this function
-            add_action('save_post', 'einsatzverwaltung_save_postdata');
+            add_action('save_post', 'abrain\Einsatzverwaltung\Core::savePostdata');
 
             $evwInstalledVersion = 1;
             update_site_option(EINSATZVERWALTUNG__DBVERSION_OPTION, $evwInstalledVersion);

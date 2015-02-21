@@ -132,7 +132,7 @@ function einsatzverwaltung_set_einsatznummer($post_id, $einsatznummer)
     $update_args['ID'] = $post_id;
 
     // keine Sonderbehandlung beim Speichern
-    remove_action('save_post', 'einsatzverwaltung_save_postdata');
+    remove_action('save_post', 'abrain\Einsatzverwaltung\Core::savePostdata');
     wp_update_post($update_args);
-    add_action('save_post', 'einsatzverwaltung_save_postdata');
+    add_action('save_post', 'abrain\Einsatzverwaltung\Core::savePostdata');
 }

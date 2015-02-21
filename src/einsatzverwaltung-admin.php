@@ -29,7 +29,7 @@ class Admin
     /**
      * Fügt die Metabox zum Bearbeiten der Einsatzdetails ein
      */
-    function addMetaBoxes()
+    public function addMetaBoxes()
     {
         add_meta_box(
             'einsatzverwaltung_meta_box',
@@ -55,7 +55,7 @@ class Admin
      *
      * @param string $hook Name der aufgerufenen Datei
      */
-    function enqueueEditScripts($hook)
+    public function enqueueEditScripts($hook)
     {
         if ('post.php' == $hook || 'post-new.php' == $hook) {
             // Nur auf der Bearbeitungsseite anzeigen
@@ -91,7 +91,7 @@ class Admin
      *
      * @param WP_Post $post Das Post-Objekt des aktuell bearbeiteten Einsatzberichts
      */
-    function displayMetaBoxEinsatzdetails($post)
+    public function displayMetaBoxEinsatzdetails($post)
     {
         // Use nonce for verification
         wp_nonce_field('save_einsatz_details', 'einsatzverwaltung_nonce');
@@ -156,7 +156,7 @@ class Admin
      *
      * @return array
      */
-    function filterColumnsEinsatz($columns)
+    public function filterColumnsEinsatz($columns)
     {
         unset($columns['author']);
         unset($columns['date']);
@@ -177,7 +177,7 @@ class Admin
      * @param string $column
      * @param int $post_id
      */
-    function filterColumnContentEinsatz($column, $post_id)
+    public function filterColumnContentEinsatz($column, $post_id)
     {
         global $post;
 
@@ -262,7 +262,7 @@ class Admin
      *
      * @return array
      */
-    function addEinsatzberichteToDashboard($items)
+    public function addEinsatzberichteToDashboard($items)
     {
         $postType = 'einsatz';
         if (post_type_exists($postType)) {
@@ -285,7 +285,7 @@ class Admin
     /**
      * Zahl der Einsatzberichte im Dashboard anzeigen (für WordPress 3.7 und älter)
      */
-    function addEinsatzberichteToDashboardLegacy()
+    public function addEinsatzberichteToDashboardLegacy()
     {
         if (post_type_exists('einsatz')) {
             $postType = 'einsatz';

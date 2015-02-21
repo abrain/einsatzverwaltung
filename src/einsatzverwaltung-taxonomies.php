@@ -49,8 +49,7 @@ class Taxonomies
      */
     public function addFieldsExteinsatzmittelEdit($tag)
     {
-        $key = self::getTermOptionKey($tag->term_id, 'exteinsatzmittel', 'url');
-        $exteinsatzmittel_url = get_option($key, '');
+        $exteinsatzmittel_url = self::getTermField($tag->term_id, 'exteinsatzmittel', 'url', '');
 
         echo '<tr class="form-field">';
         echo '<th scope="row"><label for="url">URL</label></th>';
@@ -83,7 +82,7 @@ class Taxonomies
      */
     public function addFieldsFahrzeugEdit($tag)
     {
-        $fahrzeug_pid = get_option(self::getTermOptionKey($tag->term_id, 'fahrzeug', 'fahrzeugpid'), '');
+        $fahrzeug_pid = self::getTermField($tag->term_id, 'fahrzeug', 'fahrzeugpid', '');
 
         echo '<tr class="form-field">';
         echo '<th scope="row"><label for="fahrzeugpid">Fahrzeugseite</label></th><td>';
@@ -159,13 +158,14 @@ class Taxonomies
      * @param $term_id
      * @param $taxonomy
      * @param $field
+     * @param mixed $default
      *
      * @return mixed|void
      */
-    public static function getTermField($term_id, $taxonomy, $field)
+    public static function getTermField($term_id, $taxonomy, $field, $default = false)
     {
         $key = self::getTermOptionKey($term_id, $taxonomy, $field);
-        return get_option($key);
+        return get_option($key, $default);
     }
 
     /**

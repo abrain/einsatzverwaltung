@@ -166,15 +166,15 @@ class Admin
      * Gibt ein Eingabefeld für die Metabox aus
      *
      * @param string $label Beschriftung
-     * @param string $id Feld-ID
+     * @param string $name Feld-ID
      * @param string $value Feldwert
      * @param string $placeholder Platzhalter
      * @param int $size Größe des Eingabefelds
      */
-    private function echoInputText($label, $id, $value, $placeholder = '', $size = 20)
+    private function echoInputText($label, $name, $value, $placeholder = '', $size = 20)
     {
-        echo '<tr><td><label for="' . $id . '">' . $label . '</label></td>';
-        echo '<td><input type="text" id="' . $id . '" name="' . $id . '" value="'.$value.'" size="' . $size . '" ';
+        echo '<tr><td><label for="' . $name . '">' . $label . '</label></td>';
+        echo '<td><input type="text" id="' . $name . '" name="' . $name . '" value="'.$value.'" size="' . $size . '" ';
         if (!empty($placeholder)) {
             echo 'placeholder="'.$placeholder.'" ';
         }
@@ -185,13 +185,13 @@ class Admin
      * Gibt eine Checkbox für die Metabox aus
      *
      * @param string $label Beschriftung
-     * @param string $id Feld-ID
+     * @param string $name Feld-ID
      * @param mixed $state Zustandswert
      */
-    private function echoInputCheckbox($label, $id, $state)
+    private function echoInputCheckbox($label, $name, $state)
     {
-        echo '<tr><td><label for="' . $id . '">' . $label . '</label></td>';
-        echo '<td><input type="checkbox" id="' . $id . '" name="' . $id . '" value="1" ';
+        echo '<tr><td><label for="' . $name . '">' . $label . '</label></td>';
+        echo '<td><input type="checkbox" id="' . $name . '" name="' . $name . '" value="1" ';
         echo Utilities::checked($state) . '/></td></tr>';
     }
 

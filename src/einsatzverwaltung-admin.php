@@ -106,7 +106,7 @@ class Admin
         $fehlalarm = get_post_meta($post->ID, $key = 'einsatz_fehlalarm', $single = true);
         $mannschaftsstaerke = get_post_meta($post->ID, $key = 'einsatz_mannschaft', $single = true);
 
-        $names = Core::getEinsatzleiter();
+        $names = Data::getEinsatzleiter();
         echo '<input type="hidden" id="einsatzleiter_used_values" value="' . implode(',', $names) . '" />';
 
         echo '<table><tbody>';
@@ -144,7 +144,7 @@ class Admin
      */
     public function displayMetaBoxEinsatzart($post)
     {
-        $einsatzart = Core::getEinsatzart($post->ID);
+        $einsatzart = Data::getEinsatzart($post->ID);
         Frontend::dropdownEinsatzart($einsatzart ? $einsatzart->term_id : 0);
     }
 
@@ -220,7 +220,7 @@ class Admin
 
             case 'e_art':
 
-                $term = Core::getEinsatzart($post_id);
+                $term = Data::getEinsatzart($post_id);
                 if ($term) {
                     $url = esc_url(add_query_arg(array('post_type' => $post->post_type, 'einsatzart' => $term->slug), 'edit.php'));
                     $text = esc_html(sanitize_term_field('name', $term->name, $term->term_id, 'einsatzart', 'display'));

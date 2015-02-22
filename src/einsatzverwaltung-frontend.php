@@ -118,10 +118,10 @@ class Frontend
                 }
             }
 
-            $einsatzart = Core::getEinsatzart($post->ID);
+            $einsatzart = Data::getEinsatzart($post->ID);
             if ($einsatzart) {
                 $showEinsatzartArchiveLink = $showArchiveLinks && Options::isShowEinsatzartArchive();
-                $art = Core::getEinsatzartString(
+                $art = self::getEinsatzartString(
                     $einsatzart,
                     $make_links,
                     $showEinsatzartArchiveLink
@@ -504,5 +504,34 @@ class Frontend
         $string .= "</tr></thead>";
 
         return $string;
+    }
+
+    /**
+     * Gibt die Einsatzart als String zurück, wenn vorhanden auch mit den übergeordneten Einsatzarten
+     *
+     * @param object $einsatzart
+     * @param bool $make_links
+     * @param bool $show_archive_links
+     *
+     * @return string
+     */
+    public static function getEinsatzartString($einsatzart, $make_links, $show_archive_links)
+    {
+        $str = '';
+        do {
+            if (!empty($str)) {
+                $str = ' > '.$str;
+                $einsatzart = get_term($einsatzart->parent, 'einsatzart');
+            }
+
+            if ($make_links && $show_archive_links) {
+                $title = 'Alle Eins&auml;tze vom Typ '. $einsatzart->name . ' anzeigen';
+                $url = get_term_link($einsatzart);
+                $link = '<a href="'.$url.'" class="fa fa-filter" style="text-decoration:none;" title="'.$title.'"></a>';
+                $str = '&nbsp;' . $link . $str;
+            }
+            $str = $einsatzart->name . $str;
+        } while ($einsatzart->parent != 0);
+        return $str;
     }
 }

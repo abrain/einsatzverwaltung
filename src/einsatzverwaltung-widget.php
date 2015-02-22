@@ -77,9 +77,9 @@ class WidgetLetzteEinsaetze extends WP_Widget
             }
 
             if ($zeigeArt) {
-                $einsatzart = Core::getEinsatzart($nextPost->ID);
+                $einsatzart = Data::getEinsatzart($nextPost->ID);
                 if ($einsatzart !== false) {
-                    $einsatzart_str = $zeigeArtHierarchie ? Core::getEinsatzartString($einsatzart, false, false) : $einsatzart->name;
+                    $einsatzart_str = $zeigeArtHierarchie ? Frontend::getEinsatzartString($einsatzart, false, false) : $einsatzart->name;
                     $letzteEinsaetze .= sprintf('<br><span class="einsatzart">%s</span>', $einsatzart_str);
                 }
             }

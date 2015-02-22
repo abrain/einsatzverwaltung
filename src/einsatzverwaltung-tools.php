@@ -8,16 +8,16 @@ class ToolEinsatznummernReparieren
 {
     const EVW_TOOL_ENR_SLUG = 'einsatzvw-tool-enr';
 
-    private $core;
+    private $data;
 
     /**
      * Konstruktor
      *
-     * @param Core $core
+     * @param Data $data
      */
-    public function __construct($core)
+    public function __construct($data)
     {
-        $this->core = $core;
+        $this->data = $data;
         $this->addHooks();
     }
 
@@ -56,7 +56,7 @@ class ToolEinsatznummernReparieren
         echo '<form method="post">';
         echo '<label for"jahr">Einsatznummern reparieren für Jahr:</label>&nbsp;<select name="jahr">';
         echo '<option value="all">alle</option>';
-        $jahre = Core::getJahreMitEinsatz();
+        $jahre = Data::getJahreMitEinsatz();
         foreach ($jahre as $j) {
             echo '<option value="'.$j.'">'.$j.'</option>';
         }
@@ -86,7 +86,7 @@ class ToolEinsatznummernReparieren
             echo '<p>Die folgenden &Auml;nderungen werden angewendet:</p>';
         }
 
-        $einsatzberichte = Core::getEinsatzberichte($kalenderjahr);
+        $einsatzberichte = Data::getEinsatzberichte($kalenderjahr);
 
         $format = Options::getDateFormat().' '.Options::getTimeFormat();
         $jahr_alt = '';
@@ -108,7 +108,7 @@ class ToolEinsatznummernReparieren
                 $aenderungen++;
                 printf('Einsatz %s (%s) erh&auml;lt die Nummer %s', '<strong>'.$enr.'</strong>', date_i18n($format, date_timestamp_get($datum)), '<strong>'.$enr_neu.'</strong>');
                 if (!$simulieren) {
-                    $this->core->setEinsatznummer($einsatzbericht->ID, $enr_neu);
+                    $this->data->setEinsatznummer($einsatzbericht->ID, $enr_neu);
                     $enr_neu_slug = get_post_field('post_name', $einsatzbericht->ID);
                     printf(' ... ge&auml;ndert zu %s', '<strong>'.$enr_neu_slug.'</strong>');
                     if ($enr_neu_slug != $enr_neu) {

@@ -240,30 +240,19 @@ class Admin
         global $post;
 
         switch($column) {
-
             case 'e_nummer':
                 $einsatz_nummer = get_post_field('post_name', $post_id);
-
-                if (empty($einsatz_nummer)) {
-                    echo '-';
-                } else {
-                    echo $einsatz_nummer;
-                }
-
+                echo (empty($einsatz_nummer) ? '-' : $einsatz_nummer);
                 break;
-
             case 'e_einsatzende':
                 $einsatz_einsatzende = get_post_meta($post_id, 'einsatz_einsatzende', true);
-
                 if (empty($einsatz_einsatzende)) {
                     echo '-';
                 } else {
                     $timestamp = strtotime($einsatz_einsatzende);
                     echo date("d.m.Y", $timestamp)."<br>".date("H:i", $timestamp);
                 }
-
                 break;
-
             case 'e_alarmzeit':
                 $einsatz_alarmzeit = get_post_meta($post_id, 'einsatz_alarmzeit', true);
 
@@ -273,19 +262,13 @@ class Admin
                     $timestamp = strtotime($einsatz_alarmzeit);
                     echo date("d.m.Y", $timestamp)."<br>".date("H:i", $timestamp);
                 }
-
                 break;
-
             case 'e_art':
-
                 $term = Data::getEinsatzart($post_id);
                 if ($term) {
                     $url = esc_url(
                         add_query_arg(
-                            array(
-                                'post_type' => $post->post_type,
-                                'einsatzart' => $term->slug
-                            ),
+                            array('post_type' => $post->post_type, 'einsatzart' => $term->slug),
                             'edit.php'
                         )
                     );
@@ -294,11 +277,8 @@ class Admin
                 } else {
                     echo '-';
                 }
-
                 break;
-
             case 'e_fzg':
-
                 $terms = get_the_terms($post_id, 'fahrzeug');
 
                 if (!empty($terms)) {
@@ -306,32 +286,20 @@ class Admin
                     foreach ($terms as $term) {
                         $url = esc_url(
                             add_query_arg(
-                                array(
-                                    'post_type' => $post->post_type,
-                                    'fahrzeug' => $term->slug
-                                ),
+                                array('post_type' => $post->post_type, 'fahrzeug' => $term->slug),
                                 'edit.php'
                             )
                         );
                         $text = esc_html(
-                            sanitize_term_field(
-                                'name',
-                                $term->name,
-                                $term->term_id,
-                                'fahrzeug',
-                                'display'
-                            )
+                            sanitize_term_field('name', $term->name, $term->term_id, 'fahrzeug', 'display')
                         );
                         $out[] = '<a href="' . $url . '">' . $text . '</a>';
                     }
-
                     echo join(', ', $out);
                 } else {
                     echo '-';
                 }
-
                 break;
-
             default:
                 break;
         }

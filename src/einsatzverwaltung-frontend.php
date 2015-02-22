@@ -106,7 +106,7 @@ class Frontend
                     if ($dauer <= 0) {
                         $dauerstring = '';
                     } elseif ($dauer < 60) {
-                        $dauerstring = $dauer." Minuten";
+                        $dauerstring = $dauer." Minute".($dauer > 1 ? "n" : "");
                     } else {
                         $dauer_h = intval($dauer / 60);
                         $dauer_m = $dauer % 60;

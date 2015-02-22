@@ -10,6 +10,52 @@ use wpdb;
 class Data
 {
     /**
+     * Gibt das Term-Object der Alarmierungsart zurück
+     *
+     * @param int $postId ID des Einsatzberichts
+     *
+     * @return array|bool|\WP_Error
+     */
+    public static function getAlarmierungsart($postId)
+    {
+        return get_the_terms($postId, 'alarmierungsart');
+    }
+
+    /**
+     * Gibt Alarmdatum und -zeit zurück
+     *
+     * @param int $postId ID des Einsatzberichts
+     *
+     * @return mixed
+     */
+    public static function getAlarmzeit($postId)
+    {
+        return get_post_meta($postId, 'einsatz_alarmzeit', true);
+    }
+
+    /**
+     * Gibt die Einsatzdauer in Minuten zurück
+     *
+     * @param int $postId ID des Einsatzberichts
+     *
+     * @return bool|int Dauer in Minuten oder false, wenn Alarmzeit und/oder Einsatzende nicht verfügbar sind
+     */
+    public static function getDauer($postId)
+    {
+        $alarmzeit = self::getAlarmzeit($postId);
+        $einsatzende = self::getEinsatzende($postId);
+
+        if (empty($alarmzeit) || empty($einsatzende)) {
+            return false;
+        }
+
+        $timestamp1 = strtotime($alarmzeit);
+        $timestamp2 = strtotime($einsatzende);
+        $differenz = $timestamp2 - $timestamp1;
+        return intval($differenz / 60);
+    }
+
+    /**
      * @param $kalenderjahr
      *
      * @return array
@@ -34,7 +80,8 @@ class Data
      * Bestimmt die Einsatzart eines bestimmten Einsatzes. Ist nötig, weil die Taxonomie
      * 'einsatzart' mehrere Werte speichern kann, aber nur einer genutzt werden soll
      *
-     * @param int $postId
+     * @param int $postId ID des Einsatzberichts
+     *
      * @return object|bool
      */
     public static function getEinsatzart($postId)
@@ -49,11 +96,23 @@ class Data
     }
 
     /**
+     * Gibt Datum und Zeit des Einsatzendes zurück
+     *
+     * @param int $postId ID des Einsatzberichts
+     *
+     * @return mixed
+     */
+    public static function getEinsatzende($postId)
+    {
+        return get_post_meta($postId, 'einsatz_einsatzende', true);
+    }
+
+    /**
      * Gibt die Namen aller bisher verwendeten Einsatzleiter zurück
      *
      * @return array
      */
-    public static function getEinsatzleiter()
+    public static function getEinsatzleiterNamen()
     {
         /** @var wpdb $wpdb */
         global $wpdb;
@@ -69,6 +128,62 @@ class Data
     }
 
     /**
+     * Gibt den eingetragenen Einsatzleiter zurück
+     *
+     * @param int $postId ID des Einsatzberichts
+     *
+     * @return mixed
+     */
+    public static function getEinsatzleiter($postId)
+    {
+        return get_post_meta($postId, 'einsatz_einsatzleiter', true);
+    }
+
+    /**
+     * @param int $postId ID des Einsatzberichts
+     *
+     * @return string
+     */
+    public static function getEinsatznummer($postId)
+    {
+        return get_post_field('post_name', $postId);
+    }
+
+    /**
+     * Gibt den eingetragenen Einsatzort zurück
+     *
+     * @param int $postId ID des Einsatzberichts
+     *
+     * @return mixed
+     */
+    public static function getEinsatzort($postId)
+    {
+        return get_post_meta($postId, 'einsatz_einsatzort', true);
+    }
+
+    /**
+     * Gibt die Fahrzeuge eines Einsatzberichts aus
+     *
+     * @param int $postId ID des Einsatzberichts
+     *
+     * @return array|bool|\WP_Error
+     */
+    public static function getFahrzeuge($postId)
+    {
+        return get_the_terms($postId, 'fahrzeug');
+    }
+
+    /**
+     * @param int $postId ID des Einsatzberichts
+     *
+     * @return mixed
+     */
+    public static function getFehlalarm($postId)
+    {
+        return get_post_meta($postId, 'einsatz_fehlalarm', true);
+    }
+
+    /**
      * Gibt ein Array mit Jahreszahlen zurück, in denen Einsätze vorliegen
      */
     public static function getJahreMitEinsatz()
@@ -81,6 +196,32 @@ class Data
             $jahre[date("Y", $timestamp)] = 1;
         }
         return array_keys($jahre);
+    }
+
+    /**
+     * Gibt die eingetragene Mannschaftsstärke zurück
+     *
+     * @param int $postId ID des Einsatzberichts
+     *
+     * @return mixed
+     */
+    public static function getMannschaftsstaerke($postId)
+    {
+        $mannschaft = get_post_meta($postId, 'einsatz_mannschaft', true);
+        if (empty($mannschaft)) {
+            $mannschaft = 0;
+        }
+        return $mannschaft;
+    }
+
+    /**
+     * @param int $postId ID des Einsatzberichts
+     *
+     * @return array|bool|\WP_Error
+     */
+    public static function getWeitereKraefte($postId)
+    {
+        return get_the_terms($postId, 'exteinsatzmittel');
     }
 
     /**

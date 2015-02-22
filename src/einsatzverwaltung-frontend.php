@@ -79,58 +79,17 @@ class Frontend
         if (get_post_type($post) == "einsatz") {
             $make_links = $may_contain_links;
 
-            $alarmzeit = get_post_meta($post->ID, 'einsatz_alarmzeit', true);
-            $einsatzende = get_post_meta($post->ID, 'einsatz_einsatzende', true);
+            $alarmierungsarten = Data::getAlarmierungsart($post->ID);
+            $alarm_string = self::getAlarmierungsartString($alarmierungsarten);
 
-            $alarmierungsart = get_the_terms($post->ID, 'alarmierungsart');
-            if ($alarmierungsart && ! is_wp_error($alarmierungsart)) {
-                $alarm_namen = array();
-                foreach ($alarmierungsart as $alarmart) {
-                    $alarm_namen[] = $alarmart->name;
-                }
-                $alarm_string = join(", ", $alarm_namen);
-            } else {
-                $alarm_string = '';
-            }
-
-            $dauerstring = '';
-            if (!empty($alarmzeit) && !empty($einsatzende)) {
-                $timestamp1 = strtotime($alarmzeit);
-                $timestamp2 = strtotime($einsatzende);
-                $differenz = $timestamp2 - $timestamp1;
-                $dauer = intval($differenz / 60);
-
-                if (empty($dauer) || !is_numeric($dauer)) {
-                    $dauerstring = '';
-                } else {
-                    if ($dauer <= 0) {
-                        $dauerstring = '';
-                    } elseif ($dauer < 60) {
-                        $dauerstring = $dauer." Minute".($dauer > 1 ? "n" : "");
-                    } else {
-                        $dauer_h = intval($dauer / 60);
-                        $dauer_m = $dauer % 60;
-                        $dauerstring = $dauer_h." Stunde".($dauer_h > 1 ? "n" : "");
-                        if ($dauer_m > 0) {
-                            $dauerstring .= " ".$dauer_m." Minute".($dauer_m > 1 ? "n" : "");
-                        }
-                    }
-                }
-            }
+            $duration = Data::getDauer($post->ID);
+            $dauerstring = ($duration === false ? '' : Utilities::getDurationString($duration));
 
             $einsatzart = Data::getEinsatzart($post->ID);
-            if ($einsatzart) {
-                $showEinsatzartArchiveLink = $showArchiveLinks && Options::isShowEinsatzartArchive();
-                $art = self::getEinsatzartString(
-                    $einsatzart,
-                    $make_links,
-                    $showEinsatzartArchiveLink
-                );
-            } else {
-                $art = '';
-            }
+            $showEinsatzartArchiveLink = $showArchiveLinks && Options::isShowEinsatzartArchive();
+            $art = self::getEinsatzartString($einsatzart, $make_links, $showEinsatzartArchiveLink);
 
-            $fehlalarm = get_post_meta($post->ID, $key = 'einsatz_fehlalarm', $single = true);
+            $fehlalarm = Data::getFehlalarm($post->ID);
             if (empty($fehlalarm)) {
                 $fehlalarm = 0;
             }
@@ -138,70 +97,17 @@ class Frontend
                 $art = (empty($art) ? 'Fehlalarm' : $art.' (Fehlalarm)');
             }
 
-            $einsatzort = get_post_meta($post->ID, $key = 'einsatz_einsatzort', $single = true);
+            $einsatzort = Data::getEinsatzort($post->ID);
+            $einsatzleiter = Data::getEinsatzleiter($post->ID);
+            $mannschaft = Data::getMannschaftsstaerke($post->ID);
 
-            $einsatzleiter = get_post_meta($post->ID, $key = 'einsatz_einsatzleiter', $single = true);
+            $fahrzeuge = Data::getFahrzeuge($post->ID);
+            $fzg_string = self::getFahrzeugeString($fahrzeuge, $make_links, $showArchiveLinks);
 
-            $mannschaft = get_post_meta($post->ID, $key = 'einsatz_mannschaft', $single = true);
-            if (empty($mannschaft)) {
-                $mannschaft = 0;
-            }
+            $exteinsatzmittel = Data::getWeitereKraefte($post->ID);
+            $ext_string = self::getWeitereKraefteString($exteinsatzmittel, $make_links, $showArchiveLinks);
 
-            $fahrzeuge = get_the_terms($post->ID, 'fahrzeug');
-            if ($fahrzeuge && ! is_wp_error($fahrzeuge)) {
-                $fzg_namen = array();
-                foreach ($fahrzeuge as $fahrzeug) {
-                    $fzg_name = $fahrzeug->name;
-
-                    if ($make_links) {
-                        $pageid = Taxonomies::getTermField($fahrzeug->term_id, 'fahrzeug', 'fahrzeugpid');
-                        if ($pageid !== false) {
-                            $pageurl = get_permalink($pageid);
-                            if ($pageurl !== false) {
-                                $fzg_name = '<a href="'.$pageurl.'" title="Mehr Informationen zu '.$fahrzeug->name.'">'.$fahrzeug->name.'</a>';
-                            }
-                        }
-                    }
-
-                    if ($make_links && $showArchiveLinks && Options::isShowFahrzeugArchive()) {
-                        $fzg_name .= '&nbsp;<a href="'.get_term_link($fahrzeug).'" class="fa fa-filter" style="text-decoration:none;" title="Eins&auml;tze unter Beteiligung von '.$fahrzeug->name.' anzeigen"></a>';
-                    }
-
-                    $fzg_namen[] = $fzg_name;
-                }
-                $fzg_string = join(", ", $fzg_namen);
-            } else {
-                $fzg_string = '';
-            }
-
-            $exteinsatzmittel = get_the_terms($post->ID, 'exteinsatzmittel');
-            if ($exteinsatzmittel && ! is_wp_error($exteinsatzmittel)) {
-                $ext_namen = array();
-                foreach ($exteinsatzmittel as $ext) {
-                    $ext_name = $ext->name;
-
-                    if ($make_links) {
-                        $url = Taxonomies::getTermField($ext->term_id, 'exteinsatzmittel', 'url');
-                        if ($url !== false) {
-                            $open_in_new_window = Options::isOpenExtEinsatzmittelNewWindow();
-                            $ext_name = '<a href="'.$url.'" title="Mehr Informationen zu '.$ext->name.'"';
-                            $ext_name .= ($open_in_new_window ? ' target="_blank"' : '') . '>'.$ext->name.'</a>';
-                        }
-                    }
-
-                    if ($make_links && $showArchiveLinks && Options::isShowExtEinsatzmittelArchive()) {
-                        $title = 'Eins&auml;tze unter Beteiligung von ' . $ext->name . ' anzeigen';
-                        $ext_name .= '&nbsp;<a href="'.get_term_link($ext).'" class="fa fa-filter" ';
-                        $ext_name .= 'style="text-decoration:none;" title="' . $title . '"></a>';
-                    }
-
-                    $ext_namen[] = $ext_name;
-                }
-                $ext_string = join(", ", $ext_namen);
-            } else {
-                $ext_string = '';
-            }
-
+            $alarmzeit = Data::getAlarmzeit($post->ID);
             $alarm_timestamp = strtotime($alarmzeit);
             $datumsformat = Options::getDateFormat();
             $zeitformat = Options::getTimeFormat();
@@ -456,7 +362,7 @@ class Frontend
                         $string .= '<td>';
                         switch ($colId) {
                             case 'number':
-                                $string .= get_post_field('post_name', $query->post->ID);
+                                $string .= Data::getEinsatznummer($query->post->ID);
                                 break;
                             case 'date':
                                 $string .= date('d.m.Y', $einsatz_timestamp);
@@ -471,6 +377,38 @@ class Frontend
                                 }
                                 $url = get_permalink($query->post->ID);
                                 $string .= '<a href="' . $url . '" rel="bookmark">' . $post_title . '</a>';
+                                break;
+                            case 'incidentCommander':
+                                $string .= Data::getEinsatzleiter($query->post->ID);
+                                break;
+                            case 'location':
+                                $string .= Data::getEinsatzort($query->post->ID);
+                                break;
+                            case 'workforce':
+                                $string .= Data::getMannschaftsstaerke($query->post->ID);
+                                break;
+                            case 'duration':
+                                $minutes = Data::getDauer($query->post->ID);
+                                $string .= Utilities::getDurationString($minutes);
+                                break;
+                            case 'vehicles':
+                                $vehicles = Data::getFahrzeuge($query->post->ID);
+                                $makeFahrzeugLinks = Options::getBoolOption('einsatzvw_list_fahrzeuge_link');
+                                $string .= self::getFahrzeugeString($vehicles, $makeFahrzeugLinks, false);
+                                break;
+                            case 'alarmType':
+                                $alarmierungsarten = Data::getAlarmierungsart($query->post->ID);
+                                $string .= self::getAlarmierungsartString($alarmierungsarten);
+                                break;
+                            case 'additionalForces':
+                                $exteinsatzmittel = Data::getWeitereKraefte($query->post->ID);
+                                $makeLinks = Options::getBoolOption('einsatzvw_list_ext_link');
+                                $string .= self::getWeitereKraefteString($exteinsatzmittel, $makeLinks, false);
+                                break;
+                            case 'incidentType':
+                                $einsatzart = Data::getEinsatzart($query->post->ID);
+                                $showHierarchy = Options::getBoolOption('einsatzvw_list_art_hierarchy');
+                                $string .= self::getEinsatzartString($einsatzart, false, false, $showHierarchy);
                                 break;
                             default:
                                 $string .= '&nbsp;';
@@ -514,16 +452,41 @@ class Frontend
     }
 
     /**
+     * Gibt die Alarmierungsarten als kommaseparierten String zurück
+     *
+     * @param array $alarmierungsarten
+     *
+     * @return string
+     */
+    public function getAlarmierungsartString($alarmierungsarten)
+    {
+        if ($alarmierungsarten === false || is_wp_error($alarmierungsarten) || !is_array($alarmierungsarten)) {
+            return '';
+        }
+
+        $alarmNamen = array();
+        foreach ($alarmierungsarten as $alarmart) {
+            $alarmNamen[] = $alarmart->name;
+        }
+        return join(", ", $alarmNamen);
+    }
+
+    /**
      * Gibt die Einsatzart als String zurück, wenn vorhanden auch mit den übergeordneten Einsatzarten
      *
      * @param object $einsatzart
      * @param bool $make_links
      * @param bool $show_archive_links
+     * @param bool $showHierarchy
      *
      * @return string
      */
-    public static function getEinsatzartString($einsatzart, $make_links, $show_archive_links)
+    public static function getEinsatzartString($einsatzart, $make_links, $show_archive_links, $showHierarchy = true)
     {
+        if ($einsatzart === false || is_wp_error($einsatzart) || empty($einsatzart)) {
+            return '';
+        }
+
         $str = '';
         do {
             if (!empty($str)) {
@@ -538,7 +501,80 @@ class Frontend
                 $str = '&nbsp;' . $link . $str;
             }
             $str = $einsatzart->name . $str;
-        } while ($einsatzart->parent != 0);
+        } while ($showHierarchy && $einsatzart->parent != 0);
         return $str;
+    }
+
+    /**
+     * @param array $fahrzeuge
+     * @param bool $makeLinks Fahrzeugname als Link zur Fahrzeugseite angeben, wenn diese eingetragen wurde
+     * @param bool $showArchiveLinks Generiere zusätzlichen Link zur Archivseite des Fahrzeugs
+     *
+     * @return string
+     */
+    public static function getFahrzeugeString($fahrzeuge, $makeLinks, $showArchiveLinks)
+    {
+        if ($fahrzeuge === false || is_wp_error($fahrzeuge) || !is_array($fahrzeuge)) {
+            return '';
+        }
+
+        $fzg_namen = array();
+        foreach ($fahrzeuge as $fahrzeug) {
+            $fzg_name = $fahrzeug->name;
+
+            if ($makeLinks) {
+                $pageid = Taxonomies::getTermField($fahrzeug->term_id, 'fahrzeug', 'fahrzeugpid');
+                if ($pageid !== false) {
+                    $pageurl = get_permalink($pageid);
+                    if ($pageurl !== false) {
+                        $fzg_name = '<a href="'.$pageurl.'" title="Mehr Informationen zu '.$fahrzeug->name.'">'.$fahrzeug->name.'</a>';
+                    }
+                }
+            }
+
+            if ($makeLinks && $showArchiveLinks && Options::isShowFahrzeugArchive()) {
+                $fzg_name .= '&nbsp;<a href="'.get_term_link($fahrzeug).'" class="fa fa-filter" style="text-decoration:none;" title="Eins&auml;tze unter Beteiligung von '.$fahrzeug->name.' anzeigen"></a>';
+            }
+
+            $fzg_namen[] = $fzg_name;
+        }
+        return join(", ", $fzg_namen);
+    }
+
+    /**
+     * @param $exteinsatzmittel
+     * @param $makeLinks
+     * @param $showArchiveLinks
+     *
+     * @return string
+     */
+    public static function getWeitereKraefteString($exteinsatzmittel, $makeLinks, $showArchiveLinks)
+    {
+        if ($exteinsatzmittel === false || is_wp_error($exteinsatzmittel) || !is_array($exteinsatzmittel)) {
+            return '';
+        }
+
+        $ext_namen = array();
+        foreach ($exteinsatzmittel as $ext) {
+            $ext_name = $ext->name;
+
+            if ($makeLinks) {
+                $url = Taxonomies::getTermField($ext->term_id, 'exteinsatzmittel', 'url');
+                if ($url !== false) {
+                    $open_in_new_window = Options::isOpenExtEinsatzmittelNewWindow();
+                    $ext_name = '<a href="'.$url.'" title="Mehr Informationen zu '.$ext->name.'"';
+                    $ext_name .= ($open_in_new_window ? ' target="_blank"' : '') . '>'.$ext->name.'</a>';
+                }
+            }
+
+            if ($makeLinks && $showArchiveLinks && Options::isShowExtEinsatzmittelArchive()) {
+                $title = 'Eins&auml;tze unter Beteiligung von ' . $ext->name . ' anzeigen';
+                $ext_name .= '&nbsp;<a href="'.get_term_link($ext).'" class="fa fa-filter" ';
+                $ext_name .= 'style="text-decoration:none;" title="' . $title . '"></a>';
+            }
+
+            $ext_namen[] = $ext_name;
+        }
+        return join(", ", $ext_namen);
     }
 }

@@ -320,6 +320,30 @@ class Core
             ),
             'title' => array(
                 'name' => 'Einsatzmeldung'
+            ),
+            'incidentCommander' => array(
+                'name' => 'Einsatzleiter'
+            ),
+            'location' => array(
+                'name' => 'Einsatzort'
+            ),
+            'workforce' => array(
+                'name' => 'Mannschaftsst&auml;rke'
+            ),
+            'duration' => array(
+                'name' => 'Dauer'
+            ),
+            'vehicles' => array(
+                'name' => 'Fahrzeuge'
+            ),
+            'alarmType' => array(
+                'name' => 'Alarmierungsart'
+            ),
+            'additionalForces' => array(
+                'name' => 'Weitere Kräfte'
+            ),
+            'incidentType' => array(
+                'name' => 'Einsatzart'
             )
         );
     }

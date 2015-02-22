@@ -20,6 +20,43 @@ class Utilities
         return ($value === true || $value == 1 ? 'checked="checked" ' : '');
     }
 
+    /**
+     * @param array $array
+     * @param string $key
+     * @param mixed $default
+     *
+     * @return mixed
+     */
+    public static function getArrayValueIfKey($array, $key, $default)
+    {
+        return (array_key_exists($key, $array) ? $array[$key] : $default);
+    }
+
+    /**
+     * Gibt eine lesbare Angabe einer Dauer zurück (z.B. 2 Stunden 12 Minuten)
+     *
+     * @param int $minutes Dauer in Minuten
+     *
+     * @return string
+     */
+    public static function getDurationString($minutes)
+    {
+        if (!is_numeric($minutes) || $minutes < 0) {
+            return '';
+        }
+
+        if ($minutes < 60) {
+            $dauerstring = $minutes . ' ' . _n('Minute', 'Minuten', $minutes);
+        } else {
+            $hours = intval($minutes / 60);
+            $remainingMinutes = $minutes % 60;
+            $dauerstring = $hours . ' ' . _n('Stunde', 'Stunden', $hours);
+            if ($remainingMinutes > 0) {
+                $dauerstring .= ' ' . $remainingMinutes . ' ' . _n('Minute', 'Minuten', $remainingMinutes);
+            }
+        }
+        return $dauerstring;
+    }
 
     /**
      * Prüft, ob WordPress mindestens in Version $ver läuft

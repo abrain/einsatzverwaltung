@@ -195,6 +195,16 @@ class Data
     }
 
     /**
+     * @param int $postId ID des Einsatzberichts
+     *
+     * @return array|bool|\WP_Error
+     */
+    public static function getWeitereKraefte($postId)
+    {
+        return get_the_terms($postId, 'exteinsatzmittel');
+    }
+
+    /**
      * Zusätzliche Metadaten des Einsatzberichts speichern
      *
      * @param int $post_id ID des Posts

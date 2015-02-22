@@ -104,33 +104,8 @@ class Frontend
             $fahrzeuge = Data::getFahrzeuge($post->ID);
             $fzg_string = self::getFahrzeugeString($fahrzeuge, $make_links, $showArchiveLinks);
 
-            $exteinsatzmittel = get_the_terms($post->ID, 'exteinsatzmittel');
-            if ($exteinsatzmittel && ! is_wp_error($exteinsatzmittel)) {
-                $ext_namen = array();
-                foreach ($exteinsatzmittel as $ext) {
-                    $ext_name = $ext->name;
-
-                    if ($make_links) {
-                        $url = Taxonomies::getTermField($ext->term_id, 'exteinsatzmittel', 'url');
-                        if ($url !== false) {
-                            $open_in_new_window = Options::isOpenExtEinsatzmittelNewWindow();
-                            $ext_name = '<a href="'.$url.'" title="Mehr Informationen zu '.$ext->name.'"';
-                            $ext_name .= ($open_in_new_window ? ' target="_blank"' : '') . '>'.$ext->name.'</a>';
-                        }
-                    }
-
-                    if ($make_links && $showArchiveLinks && Options::isShowExtEinsatzmittelArchive()) {
-                        $title = 'Eins&auml;tze unter Beteiligung von ' . $ext->name . ' anzeigen';
-                        $ext_name .= '&nbsp;<a href="'.get_term_link($ext).'" class="fa fa-filter" ';
-                        $ext_name .= 'style="text-decoration:none;" title="' . $title . '"></a>';
-                    }
-
-                    $ext_namen[] = $ext_name;
-                }
-                $ext_string = join(", ", $ext_namen);
-            } else {
-                $ext_string = '';
-            }
+            $exteinsatzmittel = Data::getWeitereKraefte($post->ID);
+            $ext_string = self::getWeitereKraefteString($exteinsatzmittel, $make_links, $showArchiveLinks);
 
             $alarmzeit = Data::getAlarmzeit($post->ID);
             $alarm_timestamp = strtotime($alarmzeit);
@@ -424,6 +399,10 @@ class Frontend
                                 $alarmierungsarten = Data::getAlarmierungsart($query->post->ID);
                                 $string .= self::getAlarmierungsartString($alarmierungsarten);
                                 break;
+                            case 'additionalForces':
+                                $exteinsatzmittel = Data::getWeitereKraefte($query->post->ID);
+                                $string .= self::getWeitereKraefteString($exteinsatzmittel, false, false);
+                                break;
                             case 'incidentType':
                                 $einsatzart = Data::getEinsatzart($query->post->ID);
                                 $string .= self::getEinsatzartString($einsatzart, false, false, false);
@@ -557,5 +536,42 @@ class Frontend
             $fzg_namen[] = $fzg_name;
         }
         return join(", ", $fzg_namen);
+    }
+
+    /**
+     * @param $exteinsatzmittel
+     * @param $makeLinks
+     * @param $showArchiveLinks
+     *
+     * @return string
+     */
+    public static function getWeitereKraefteString($exteinsatzmittel, $makeLinks, $showArchiveLinks)
+    {
+        if ($exteinsatzmittel === false || is_wp_error($exteinsatzmittel) || !is_array($exteinsatzmittel)) {
+            return '';
+        }
+
+        $ext_namen = array();
+        foreach ($exteinsatzmittel as $ext) {
+            $ext_name = $ext->name;
+
+            if ($makeLinks) {
+                $url = Taxonomies::getTermField($ext->term_id, 'exteinsatzmittel', 'url');
+                if ($url !== false) {
+                    $open_in_new_window = Options::isOpenExtEinsatzmittelNewWindow();
+                    $ext_name = '<a href="'.$url.'" title="Mehr Informationen zu '.$ext->name.'"';
+                    $ext_name .= ($open_in_new_window ? ' target="_blank"' : '') . '>'.$ext->name.'</a>';
+                }
+            }
+
+            if ($makeLinks && $showArchiveLinks && Options::isShowExtEinsatzmittelArchive()) {
+                $title = 'Eins&auml;tze unter Beteiligung von ' . $ext->name . ' anzeigen';
+                $ext_name .= '&nbsp;<a href="'.get_term_link($ext).'" class="fa fa-filter" ';
+                $ext_name .= 'style="text-decoration:none;" title="' . $title . '"></a>';
+            }
+
+            $ext_namen[] = $ext_name;
+        }
+        return join(", ", $ext_namen);
     }
 }

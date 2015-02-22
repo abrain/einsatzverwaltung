@@ -339,6 +339,9 @@ class Core
             'alarmType' => array(
                 'name' => 'Alarmierungsart'
             ),
+            'additionalForces' => array(
+                'name' => 'Weitere Kräfte'
+            ),
             'incidentType' => array(
                 'name' => 'Einsatzart'
             )

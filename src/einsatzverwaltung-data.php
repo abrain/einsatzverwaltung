@@ -140,6 +140,18 @@ class Data
     }
 
     /**
+     * Gibt die Fahrzeuge eines Einsatzberichts aus
+     *
+     * @param int $postId ID des Einsatzberichts
+     *
+     * @return array|bool|\WP_Error
+     */
+    public static function getFahrzeuge($postId)
+    {
+        return get_the_terms($postId, 'fahrzeug');
+    }
+
+    /**
      * Gibt ein Array mit Jahreszahlen zurück, in denen Einsätze vorliegen
      */
     public static function getJahreMitEinsatz()

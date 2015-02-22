@@ -117,32 +117,8 @@ class Frontend
             $einsatzleiter = Data::getEinsatzleiter($post->ID);
             $mannschaft = Data::getMannschaftsstaerke($post->ID);
 
-            $fahrzeuge = get_the_terms($post->ID, 'fahrzeug');
-            if ($fahrzeuge && ! is_wp_error($fahrzeuge)) {
-                $fzg_namen = array();
-                foreach ($fahrzeuge as $fahrzeug) {
-                    $fzg_name = $fahrzeug->name;
-
-                    if ($make_links) {
-                        $pageid = Taxonomies::getTermField($fahrzeug->term_id, 'fahrzeug', 'fahrzeugpid');
-                        if ($pageid !== false) {
-                            $pageurl = get_permalink($pageid);
-                            if ($pageurl !== false) {
-                                $fzg_name = '<a href="'.$pageurl.'" title="Mehr Informationen zu '.$fahrzeug->name.'">'.$fahrzeug->name.'</a>';
-                            }
-                        }
-                    }
-
-                    if ($make_links && $showArchiveLinks && Options::isShowFahrzeugArchive()) {
-                        $fzg_name .= '&nbsp;<a href="'.get_term_link($fahrzeug).'" class="fa fa-filter" style="text-decoration:none;" title="Eins&auml;tze unter Beteiligung von '.$fahrzeug->name.' anzeigen"></a>';
-                    }
-
-                    $fzg_namen[] = $fzg_name;
-                }
-                $fzg_string = join(", ", $fzg_namen);
-            } else {
-                $fzg_string = '';
-            }
+            $fahrzeuge = Data::getFahrzeuge($post->ID);
+            $fzg_string = self::getFahrzeugeString($fahrzeuge, $make_links, $showArchiveLinks);
 
             $exteinsatzmittel = get_the_terms($post->ID, 'exteinsatzmittel');
             if ($exteinsatzmittel && ! is_wp_error($exteinsatzmittel)) {
@@ -456,6 +432,9 @@ class Frontend
                                 $minutes = Data::getDauer($query->post->ID);
                                 $string .= Utilities::getDurationString($minutes);
                                 break;
+                            case 'vehicles':
+                                $vehicles = Data::getFahrzeuge($query->post->ID);
+                                $string .= self::getFahrzeugeString($vehicles, false, false);
                             default:
                                 $string .= '&nbsp;';
                         }
@@ -524,5 +503,41 @@ class Frontend
             $str = $einsatzart->name . $str;
         } while ($einsatzart->parent != 0);
         return $str;
+    }
+
+    /**
+     * @param array $fahrzeuge
+     * @param bool $makeLinks Fahrzeugname als Link zur Fahrzeugseite angeben, wenn diese eingetragen wurde
+     * @param bool $showArchiveLinks Generiere zusätzlichen Link zur Archivseite des Fahrzeugs
+     *
+     * @return string
+     */
+    public static function getFahrzeugeString($fahrzeuge, $makeLinks, $showArchiveLinks)
+    {
+        if ($fahrzeuge === false || is_wp_error($fahrzeuge) || !is_array($fahrzeuge)) {
+            return '';
+        }
+
+        $fzg_namen = array();
+        foreach ($fahrzeuge as $fahrzeug) {
+            $fzg_name = $fahrzeug->name;
+
+            if ($makeLinks) {
+                $pageid = Taxonomies::getTermField($fahrzeug->term_id, 'fahrzeug', 'fahrzeugpid');
+                if ($pageid !== false) {
+                    $pageurl = get_permalink($pageid);
+                    if ($pageurl !== false) {
+                        $fzg_name = '<a href="'.$pageurl.'" title="Mehr Informationen zu '.$fahrzeug->name.'">'.$fahrzeug->name.'</a>';
+                    }
+                }
+            }
+
+            if ($makeLinks && $showArchiveLinks && Options::isShowFahrzeugArchive()) {
+                $fzg_name .= '&nbsp;<a href="'.get_term_link($fahrzeug).'" class="fa fa-filter" style="text-decoration:none;" title="Eins&auml;tze unter Beteiligung von '.$fahrzeug->name.' anzeigen"></a>';
+            }
+
+            $fzg_namen[] = $fzg_name;
+        }
+        return join(", ", $fzg_namen);
     }
 }

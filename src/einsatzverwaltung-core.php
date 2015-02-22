@@ -332,6 +332,9 @@ class Core
             ),
             'duration' => array(
                 'name' => 'Dauer'
+            ),
+            'vehicles' => array(
+                'name' => 'Fahrzeuge'
             )
         );
     }

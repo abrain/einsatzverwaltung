@@ -120,10 +120,7 @@ class Frontend
 
             $einsatzart = Core::getEinsatzart($post->ID);
             if ($einsatzart) {
-                $showEinsatzartArchiveLink = $showArchiveLinks && get_option(
-                    'einsatzvw_show_einsatzart_archive',
-                    EINSATZVERWALTUNG__D__SHOW_EINSATZART_ARCHIVE
-                );
+                $showEinsatzartArchiveLink = $showArchiveLinks && Options::isShowEinsatzartArchive();
                 $art = Core::getEinsatzartString(
                     $einsatzart,
                     $make_links,
@@ -166,7 +163,7 @@ class Frontend
                         }
                     }
 
-                    if ($make_links && $showArchiveLinks && get_option('einsatzvw_show_fahrzeug_archive', EINSATZVERWALTUNG__D__SHOW_FAHRZEUG_ARCHIVE)) {
+                    if ($make_links && $showArchiveLinks && Options::isShowFahrzeugArchive()) {
                         $fzg_name .= '&nbsp;<a href="'.get_term_link($fahrzeug).'" class="fa fa-filter" style="text-decoration:none;" title="Eins&auml;tze unter Beteiligung von '.$fahrzeug->name.' anzeigen"></a>';
                     }
 
@@ -186,12 +183,12 @@ class Frontend
                     if ($make_links) {
                         $url = Taxonomies::getTermField($ext->term_id, 'exteinsatzmittel', 'url');
                         if ($url !== false) {
-                            $open_in_new_window = get_option('einsatzvw_open_ext_in_new', EINSATZVERWALTUNG__D__OPEN_EXTEINSATZMITTEL_NEWWINDOW);
+                            $open_in_new_window = Options::isOpenExtEinsatzmittelNewWindow();
                             $ext_name = '<a href="'.$url.'" title="Mehr Informationen zu '.$ext->name.'"' . ($open_in_new_window ? ' target="_blank"' : '') . '>'.$ext->name.'</a>';
                         }
                     }
 
-                    if ($make_links && $showArchiveLinks && get_option('einsatzvw_show_exteinsatzmittel_archive', EINSATZVERWALTUNG__D__SHOW_EXTEINSATZMITTEL_ARCHIVE)) {
+                    if ($make_links && $showArchiveLinks && Options::isShowExtEinsatzmittelArchive()) {
                         $ext_name .= '&nbsp;<a href="'.get_term_link($ext).'" class="fa fa-filter" style="text-decoration:none;" title="Eins&auml;tze unter Beteiligung von '.$ext->name.' anzeigen"></a>';
                     }
 
@@ -203,8 +200,8 @@ class Frontend
             }
 
             $alarm_timestamp = strtotime($alarmzeit);
-            $datumsformat = get_option('date_format', 'd.m.Y');
-            $zeitformat = get_option('time_format', 'H:i');
+            $datumsformat = Options::getDateFormat();
+            $zeitformat = Options::getTimeFormat();
             $einsatz_datum = ($alarm_timestamp ? date_i18n($datumsformat, $alarm_timestamp) : '-');
             $einsatz_zeit = ($alarm_timestamp ? date_i18n($zeitformat, $alarm_timestamp).' Uhr' : '-');
 
@@ -317,7 +314,7 @@ class Frontend
             return $excerpt;
         }
 
-        $excerptType = get_option('einsatzvw_excerpt_type', EINSATZVERWALTUNG__D__EXCERPT_TYPE);
+        $excerptType = Options::getExcerptType();
         return $this->getEinsatzExcerpt($post, $excerptType, true, true);
     }
 
@@ -337,7 +334,7 @@ class Frontend
             return $excerpt;
         }
 
-        $excerptType = get_option('einsatzvw_excerpt_type_feed', EINSATZVERWALTUNG__D__EXCERPT_TYPE);
+        $excerptType = Options::getExcerptTypeFeed();
         $get_excerpt = $this->getEinsatzExcerpt($post, $excerptType, true, false);
         $get_excerpt = str_replace('<strong>', '', $get_excerpt);
         $get_excerpt = str_replace('</strong>', '', $get_excerpt);
@@ -375,7 +372,7 @@ class Frontend
     public function addEinsatzberichteToMainloop($query)
     {
         if (
-            get_option('einsatzvw_show_einsatzberichte_mainloop', EINSATZVERWALTUNG__D__SHOW_EINSATZBERICHTE_MAINLOOP) &&
+            Options::isShowEinsatzberichteInMainloop() &&
             $query->is_main_query() &&
             is_home() &&
             empty($query->query_vars['suppress_filters'])

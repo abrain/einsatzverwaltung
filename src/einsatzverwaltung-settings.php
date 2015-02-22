@@ -242,18 +242,13 @@ class Settings
     /**
      * Gibt eine Checkbox auf der Einstellungsseite aus
      *
-     * @param array $args Parameter für die Checkbox:
-     * 0: string Id der Option
-     * 1: string Beschriftung der Checkbox
-     * 2: bool Standardwert, wenn Option nicht gefunden werden kann (optional)
+     * @param string $checkboxId Id der Option
+     * @param string $text Beschriftung der Checkbox
      */
-    private function echoSettingsCheckbox($args)
+    private function echoSettingsCheckbox($checkboxId, $text)
     {
-        $checkboxId = $args[0];
-        $text = $args[1];
-        $default = (count($args) > 2 ? $args[2] : false);
         echo '<input type="checkbox" value="1" id="' . $checkboxId . '" name="' . $checkboxId . '" ';
-        echo Utilities::checked(get_option($checkboxId, $default)) . '/><label for="' . $checkboxId . '">';
+        echo Utilities::checked(Options::getOption($checkboxId)) . '/><label for="' . $checkboxId . '">';
         echo $text . '</label>';
     }
 
@@ -286,7 +281,7 @@ class Settings
         printf(
             '<input type="text" value="%2$s" id="%1$s" name="%1$s" /><p class="description">%3$s</p>',
             $inputId,
-            get_option($inputId),
+            Options::getOption($inputId),
             $text
         );
     }*/
@@ -298,12 +293,7 @@ class Settings
     public function echoSettingsEinsatznummerFormat()
     {
         printf('Jahreszahl + jahresbezogene, fortlaufende Nummer mit <input type="text" value="%2$s" size="2" id="%1$s" name="%1$s" /> Stellen<p class="description">Beispiel f&uuml;r den f&uuml;nften Einsatz in 2014:<br>bei 2 Stellen: 201405<br>bei 4 Stellen: 20140005</p><br>', 'einsatzvw_einsatznummer_stellen', Options::getEinsatznummerStellen());
-        $this->echoSettingsCheckbox(
-            array(
-                'einsatzvw_einsatznummer_lfdvorne',
-                'Laufende Nummer vor das Jahr stellen'
-            )
-        );
+        $this->echoSettingsCheckbox('einsatzvw_einsatznummer_lfdvorne', 'Laufende Nummer vor das Jahr stellen');
 
         echo '<br><br><strong>Hinweis:</strong> Nach einer &Auml;nderung des Formats erhalten die bestehenden Einsatzberichte nicht automatisch aktualisierte Nummern. Nutzen Sie daf&uuml;r das Werkzeug <a href="'.admin_url('tools.php?page=einsatzvw-tool-enr').'">Einsatznummern reparieren</a>.';
     }
@@ -315,11 +305,8 @@ class Settings
     public function echoEinsatzberichteMainloop()
     {
         $this->echoSettingsCheckbox(
-            array(
-                'einsatzvw_show_einsatzberichte_mainloop',
-                'Einsatzberichte wie reguläre Beitr&auml;ge anzeigen',
-                EINSATZVERWALTUNG__D__SHOW_EINSATZBERICHTE_MAINLOOP
-            )
+            'einsatzvw_show_einsatzberichte_mainloop',
+            'Einsatzberichte wie reguläre Beitr&auml;ge anzeigen'
         );
         echo '<p class="description">Mit dieser Option werden Einsatzberichte zwischen den anderen WordPress-Beiträgen (z.B. auf der Startseite) angezeigt.</p>';
     }
@@ -331,11 +318,8 @@ class Settings
     public function echoSettingsEmptyDetails()
     {
         $this->echoSettingsCheckbox(
-            array(
-                'einsatzvw_einsatz_hideemptydetails',
-                'Nicht ausgef&uuml;llte Details ausblenden',
-                EINSATZVERWALTUNG__D__HIDE_EMPTY_DETAILS
-            )
+            'einsatzvw_einsatz_hideemptydetails',
+            'Nicht ausgef&uuml;llte Details ausblenden'
         );
         echo '<p class="description">Ein Einsatzdetail gilt als nicht ausgef&uuml;llt, wenn das entsprechende Textfeld oder die entsprechende Liste leer ist. Bei der Mannschaftsst&auml;rke z&auml;hlt auch eine eingetragene 0 als leer.</p>';
     }
@@ -347,27 +331,18 @@ class Settings
     public function echoSettingsArchive()
     {
         $this->echoSettingsCheckbox(
-            array(
-                'einsatzvw_show_einsatzart_archive',
-                'Einsatzart',
-                EINSATZVERWALTUNG__D__SHOW_EINSATZART_ARCHIVE
-            )
+            'einsatzvw_show_einsatzart_archive',
+            'Einsatzart'
         );
         echo '<br>';
         $this->echoSettingsCheckbox(
-            array(
-                'einsatzvw_show_exteinsatzmittel_archive',
-                'Externe Einsatzkr&auml;fte',
-                EINSATZVERWALTUNG__D__SHOW_EXTEINSATZMITTEL_ARCHIVE
-            )
+            'einsatzvw_show_exteinsatzmittel_archive',
+            'Externe Einsatzkr&auml;fte'
         );
         echo '<br>';
         $this->echoSettingsCheckbox(
-            array(
-                'einsatzvw_show_fahrzeug_archive',
-                'Fahrzeuge',
-                EINSATZVERWALTUNG__D__SHOW_FAHRZEUG_ARCHIVE
-            )
+            'einsatzvw_show_fahrzeug_archive',
+            'Fahrzeuge'
         );
         echo '<p class="description">F&uuml;r alle hier aktivierten Arten von Einsatzdetails werden im Kopfbereich des Einsatzberichts f&uuml;r alle auftretenden Werte Links zu einer gefilterten Einsatz&uuml;bersicht angezeigt. Beispielsweise kann man damit alle Eins&auml;tze unter Beteiligung einer bestimmten externen Einsatzkraft auflisten lassen.</p>';
     }
@@ -380,11 +355,8 @@ class Settings
     public function echoSettingsExtNew()
     {
         $this->echoSettingsCheckbox(
-            array(
-                'einsatzvw_open_ext_in_new',
-                'Links zu externen Einsatzmitteln in einem neuen Fenster öffnen',
-                EINSATZVERWALTUNG__D__OPEN_EXTEINSATZMITTEL_NEWWINDOW
-            )
+            'einsatzvw_open_ext_in_new',
+            'Links zu externen Einsatzmitteln in einem neuen Fenster öffnen'
         );
     }
 
@@ -400,7 +372,7 @@ class Settings
         $this->echoSelect(
             'einsatzvw_excerpt_type',
             $types,
-            get_option('einsatzvw_excerpt_type', EINSATZVERWALTUNG__D__EXCERPT_TYPE)
+            Options::getExcerptType()
         );
         echo '<p class="description">Sollte diese Einstellung keinen Effekt auf der Webseite zeigen, nutzt das verwendete Theme m&ouml;glicherweise keine Kurzfassungen und zeigt immer den vollen Beitrag.</p>';
 
@@ -408,7 +380,7 @@ class Settings
         $this->echoSelect(
             'einsatzvw_excerpt_type_feed',
             $types,
-            get_option('einsatzvw_excerpt_type_feed', EINSATZVERWALTUNG__D__EXCERPT_TYPE)
+            Options::getExcerptTypeFeed()
         );
         echo '<p class="description">Bitte auch die Einstellung zum Umfang der Eintr&auml;ge im Feed (Einstellungen &gt; Lesen) beachten!<br/>Im Feed werden bei den Einsatzdetails aus technischen Gr&uuml;nden keine Links zu gefilterten Einsatzlisten angezeigt.</p>';
     }
@@ -462,11 +434,8 @@ class Settings
         } else {
             foreach ($roles as $role_slug => $role) {
                 $this->echoSettingsCheckbox(
-                    array(
-                        'einsatzvw_cap_roles_' . $role_slug,
-                        translate_user_role($role['name']),
-                        false
-                    )
+                    'einsatzvw_cap_roles_' . $role_slug,
+                    translate_user_role($role['name'])
                 );
                 echo '<br>';
             }
@@ -500,7 +469,7 @@ class Settings
         if (!empty($roles)) {
             foreach (array_keys($roles) as $role_slug) {
                 $role_obj = get_role($role_slug);
-                $allowed = get_option('einsatzvw_cap_roles_' . $role_slug, false);
+                $allowed = Options::isRoleAllowedToEdit($role_slug);
                 foreach (Core::getCapabilities() as $cap) {
                     $role_obj->add_cap($cap, $allowed);
                 }

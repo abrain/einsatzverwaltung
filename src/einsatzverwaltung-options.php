@@ -6,15 +6,73 @@ namespace abrain\Einsatzverwaltung;
  */
 class Options
 {
-    const DEFAULT_COLUMNS = 'number,date,time,title';
-    const DEFAULT_EINSATZNR_STELLEN = 3;
+    private static $defaults = array(
+        'einsatzvw_list_columns' => 'number,date,time,title',
+        'einsatzvw_einsatznummer_stellen' => 3,
+        'einsatzvw_show_einsatzart_archive' => false,
+        'einsatzvw_show_exteinsatzmittel_archive' => false,
+        'einsatzvw_show_fahrzeug_archive' => false,
+        'einsatzvw_open_ext_in_new' => false,
+        'einsatzvw_excerpt_type' => 'details',
+        'einsatzvw_excerpt_type_feed' => 'details',
+        'einsatzvw_show_einsatzberichte_mainloop' => false,
+        'einsatzvw_einsatz_hideemptydetails' => true,
+        'einsatzvw_einsatznummer_lfdvorne' => false,
+        'date_format' => 'd.m.Y',
+        'time_format' => 'H:i',
+        'einsatzvw_cap_roles_administrator' => true
+    );
+
+    /**
+     * Ruft die benannte Option aus der Datenbank ab
+     *
+     * @param string $key Schlüssel der Option
+     *
+     * @return mixed
+     */
+    public static function getOption($key)
+    {
+        if (array_key_exists($key, self::$defaults)) {
+            $defaultValue = self::$defaults[$key];
+        } else {
+            if (strpos($key, 'einsatzvw_cap_roles_') !== 0) {
+                error_log(sprintf('Kein Standardwert für %s gefunden!', $key));
+            }
+            $defaultValue = false;
+        }
+        return get_option($key, $defaultValue);
+    }
+
+    public static function getDefaultColumns()
+    {
+        return self::$defaults['einsatzvw_list_columns'];
+    }
+
+    public static function getDefaultEinsatznummerStellen()
+    {
+        return self::$defaults['einsatzvw_einsatznummer_stellen'];
+    }
+
+    public static function getDefaultExcerptType()
+    {
+        return self::$defaults['einsatzvw_excerpt_type'];
+    }
+
+    /**
+     * Gibt das Datumsformat von WordPress zurück
+     */
+    public static function getDateFormat()
+    {
+        return self::getOption('date_format');
+    }
 
     /**
      * @return array
      */
     public static function getEinsatzlisteEnabledColumns()
     {
-        $enabledColumns = get_option('einsatzvw_list_columns', self::DEFAULT_COLUMNS);
+        $enabledColumns = self::getOption('einsatzvw_list_columns');
+        $enabledColumns = Utilities::sanitizeColumns($enabledColumns);
         return explode(',', $enabledColumns);
     }
 
@@ -23,7 +81,43 @@ class Options
      */
     public static function getEinsatznummerStellen()
     {
-        return get_option('einsatzvw_einsatznummer_stellen', self::DEFAULT_EINSATZNR_STELLEN);
+        $option = self::getOption('einsatzvw_einsatznummer_stellen');
+        return Utilities::sanitizeEinsatznummerStellen($option);
+    }
+
+    /**
+     * @return string
+     */
+    public static function getExcerptType()
+    {
+        $option = self::getOption('einsatzvw_excerpt_type');
+        return Utilities::sanitizeExcerptType($option);
+    }
+
+    /**
+     * @return string
+     */
+    public static function getExcerptTypeFeed()
+    {
+        $option = self::getOption('einsatzvw_excerpt_type_feed');
+        return Utilities::sanitizeExcerptType($option);
+    }
+
+    /**
+     * @return mixed
+     */
+    public static function getTimeFormat()
+    {
+        return self::getOption('time_format');
+    }
+
+    /**
+     * @return bool
+     */
+    public static function isEinsatznummerLfdVorne()
+    {
+        $option = self::getOption('einsatzvw_einsatznummer_lfdvorne');
+        return self::toBoolean($option);
     }
 
     /**
@@ -33,11 +127,77 @@ class Options
      */
     public static function isHideEmptyDetails()
     {
-        $hide_empty_details = get_option('einsatzvw_einsatz_hideemptydetails');
-        if ($hide_empty_details === false) {
-            return EINSATZVERWALTUNG__D__HIDE_EMPTY_DETAILS;
-        } else {
-            return ($hide_empty_details == 1 ? true : false);
+        $option = self::getOption('einsatzvw_einsatz_hideemptydetails');
+        return self::toBoolean($option);
+    }
+
+    /**
+     * @return bool
+     */
+    public static function isOpenExtEinsatzmittelNewWindow()
+    {
+        $option = self::getOption('einsatzvw_open_ext_in_new');
+        return self::toBoolean($option);
+    }
+
+    /**
+     * @param $roleSlug
+     *
+     * @return bool
+     */
+    public static function isRoleAllowedToEdit($roleSlug)
+    {
+        if ($roleSlug === 'administrator') {
+            return true;
         }
+
+        $option = self::getOption('einsatzvw_cap_roles_' . $roleSlug);
+        return self::toBoolean($option);
+    }
+
+    /**
+     * @return bool
+     */
+    public static function isShowEinsatzartArchive()
+    {
+        $option = self::getOption('einsatzvw_show_einsatzart_archive');
+        return self::toBoolean($option);
+    }
+
+    /**
+     * @return bool
+     */
+    public static function isShowEinsatzberichteInMainloop()
+    {
+        $option = self::getOption('einsatzvw_show_einsatzberichte_mainloop');
+        return self::toBoolean($option);
+    }
+
+    /**
+     * @return bool
+     */
+    public static function isShowExtEinsatzmittelArchive()
+    {
+        $option = self::getOption('einsatzvw_show_exteinsatzmittel_archive');
+        return self::toBoolean($option);
+    }
+
+    /**
+     * @return bool
+     */
+    public static function isShowFahrzeugArchive()
+    {
+        $option = self::getOption('einsatzvw_show_fahrzeug_archive');
+        return self::toBoolean($option);
+    }
+
+    /**
+     * @param $value
+     *
+     * @return bool
+     */
+    private static function toBoolean($value)
+    {
+        return in_array($value, array(1, true, '1', 'yes', 'on'), true);
     }
 }

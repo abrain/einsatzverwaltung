@@ -68,10 +68,10 @@ class WidgetLetzteEinsaetze extends WP_Widget
 
             if ($zeigeDatum) {
                 $timestamp = strtotime($nextPost->post_date);
-                $datumsformat = get_option('date_format', 'd.m.Y');
+                $datumsformat = Options::getDateFormat();
                 $letzteEinsaetze .= "<br><span class=\"einsatzdatum\">".date_i18n($datumsformat, $timestamp)."</span>";
                 if ($zeigeZeit) {
-                    $zeitformat = get_option('time_format', 'H:i');
+                    $zeitformat = Options::getTimeFormat();
                     $letzteEinsaetze .= " | <span class=\"einsatzzeit\">".date_i18n($zeitformat, $timestamp)." Uhr</span>";
                 }
             }

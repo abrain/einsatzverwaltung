@@ -12,17 +12,6 @@ require_once dirname(__FILE__) . '/einsatzverwaltung-tools.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-tools-wpe.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-taxonomies.php';
 
-define('EINSATZVERWALTUNG__DBVERSION_OPTION', 'einsatzvw_db_version');
-
-// Standardwerte
-define('EINSATZVERWALTUNG__D__SHOW_EXTEINSATZMITTEL_ARCHIVE', false);
-define('EINSATZVERWALTUNG__D__SHOW_EINSATZART_ARCHIVE', false);
-define('EINSATZVERWALTUNG__D__SHOW_FAHRZEUG_ARCHIVE', false);
-define('EINSATZVERWALTUNG__D__HIDE_EMPTY_DETAILS', true);
-define('EINSATZVERWALTUNG__D__EXCERPT_TYPE', 'details');
-define('EINSATZVERWALTUNG__D__SHOW_EINSATZBERICHTE_MAINLOOP', false);
-define('EINSATZVERWALTUNG__D__OPEN_EXTEINSATZMITTEL_NEWWINDOW', false);
-
 use WP_Query;
 use wpdb;
 
@@ -312,7 +301,7 @@ class Core
     public static function formatEinsatznummer($jahr, $nummer)
     {
         $stellen = Options::getEinsatznummerStellen();
-        $lfdvorne = get_option('einsatzvw_einsatznummer_lfdvorne', false);
+        $lfdvorne = Options::isEinsatznummerLfdVorne();
         if ($lfdvorne) {
             return str_pad($nummer, $stellen, "0", STR_PAD_LEFT).$jahr;
         } else {
@@ -646,7 +635,7 @@ class Core
      */
     private function checkDatabaseVersion()
     {
-        $evwInstalledVersion = get_site_option(EINSATZVERWALTUNG__DBVERSION_OPTION);
+        $evwInstalledVersion = get_site_option('einsatzvw_db_version');
 
         if ($evwInstalledVersion === false) {
             $evwInstalledVersion = 0;
@@ -679,7 +668,7 @@ class Core
                         }
                     }
                     add_action('save_post', array($this, 'savePostdata'));
-                    update_site_option(EINSATZVERWALTUNG__DBVERSION_OPTION, 1);
+                    update_site_option('einsatzvw_db_version', 1);
                     // no break
                 case 1:
                     update_option('einsatzvw_cap_roles_administrator', 1);
@@ -687,11 +676,11 @@ class Core
                     foreach (Core::getCapabilities() as $cap) {
                         $role_obj->add_cap($cap);
                     }
-                    update_site_option(EINSATZVERWALTUNG__DBVERSION_OPTION, 2);
+                    update_site_option('einsatzvw_db_version', 2);
                     // no break
                 case 2:
                     delete_option('einsatzvw_show_links_in_excerpt');
-                    update_site_option(EINSATZVERWALTUNG__DBVERSION_OPTION, 3);
+                    update_site_option('einsatzvw_db_version', 3);
                     // no break
             }
         }

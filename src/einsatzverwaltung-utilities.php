@@ -17,7 +17,7 @@ class Utilities
      */
     public static function checked($value)
     {
-        return ($value == 1 ? 'checked="checked" ' : '');
+        return ($value === true || $value == 1 ? 'checked="checked" ' : '');
     }
 
 
@@ -137,7 +137,7 @@ class Utilities
         if (is_numeric($val) && $val > 0) {
             return $val;
         } else {
-            return Options::DEFAULT_EINSATZNR_STELLEN;
+            return Options::getDefaultEinsatznummerStellen();
         }
     }
 
@@ -154,7 +154,7 @@ class Utilities
         if (array_key_exists($input, Core::getExcerptTypes())) {
             return $input;
         } else {
-            return EINSATZVERWALTUNG__D__EXCERPT_TYPE;
+            return Options::getDefaultExcerptType();
         }
     }
 
@@ -189,7 +189,7 @@ class Utilities
     public static function sanitizeColumns($input)
     {
         if (empty($input)) {
-            return Options::DEFAULT_COLUMNS;
+            return Options::getDefaultColumns();
         }
 
         $columns = Core::getListColumns();
@@ -205,7 +205,7 @@ class Utilities
         }
 
         if (empty($validColumnIds)) {
-            return Options::DEFAULT_COLUMNS;
+            return Options::getDefaultColumns();
         }
 
         return implode(',', $validColumnIds);

@@ -88,7 +88,7 @@ class ToolEinsatznummernReparieren
 
         $einsatzberichte = Core::getEinsatzberichte($kalenderjahr);
 
-        $format = get_option('date_format', 'd.m.Y').' '.get_option('time_format', 'H:i');
+        $format = Options::getDateFormat().' '.Options::getTimeFormat();
         $jahr_alt = '';
         $aenderungen = 0;
         $kollisionen = 0;

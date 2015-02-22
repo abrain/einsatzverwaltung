@@ -1,15 +1,14 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
-
 use WP_Query;
 use wpdb;
 
 /**
  * Stellt Methoden zur Datenabfrage und Datenmanipulation bereit
  */
-class Data {
-
+class Data
+{
     /**
      * @param $kalenderjahr
      *

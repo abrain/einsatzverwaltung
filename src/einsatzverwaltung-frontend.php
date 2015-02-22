@@ -79,16 +79,8 @@ class Frontend
         if (get_post_type($post) == "einsatz") {
             $make_links = $may_contain_links;
 
-            $alarmierungsart = get_the_terms($post->ID, 'alarmierungsart');
-            if ($alarmierungsart && ! is_wp_error($alarmierungsart)) {
-                $alarm_namen = array();
-                foreach ($alarmierungsart as $alarmart) {
-                    $alarm_namen[] = $alarmart->name;
-                }
-                $alarm_string = join(", ", $alarm_namen);
-            } else {
-                $alarm_string = '';
-            }
+            $alarmierungsarten = Data::getAlarmierungsart($post->ID);
+            $alarm_string = self::getAlarmierungsartString($alarmierungsarten);
 
             $duration = Data::getDauer($post->ID);
             $dauerstring = ($duration === false ? '' : Utilities::getDurationString($duration));
@@ -435,6 +427,11 @@ class Frontend
                             case 'vehicles':
                                 $vehicles = Data::getFahrzeuge($query->post->ID);
                                 $string .= self::getFahrzeugeString($vehicles, false, false);
+                                break;
+                            case 'alarmType':
+                                $alarmierungsarten = Data::getAlarmierungsart($query->post->ID);
+                                $string .= self::getAlarmierungsartString($alarmierungsarten);
+                                break;
                             default:
                                 $string .= '&nbsp;';
                         }
@@ -474,6 +471,26 @@ class Frontend
         $string .= "</tr></thead>";
 
         return $string;
+    }
+
+    /**
+     * Gibt die Alarmierungsarten als kommaseparierten String zurück
+     *
+     * @param array $alarmierungsarten
+     *
+     * @return string
+     */
+    public function getAlarmierungsartString($alarmierungsarten)
+    {
+        if ($alarmierungsarten === false || is_wp_error($alarmierungsarten) || !is_array($alarmierungsarten)) {
+            return '';
+        }
+
+        $alarmNamen = array();
+        foreach ($alarmierungsarten as $alarmart) {
+            $alarmNamen[] = $alarmart->name;
+        }
+        return join(", ", $alarmNamen);
     }
 
     /**

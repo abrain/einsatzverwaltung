@@ -10,7 +10,19 @@ use wpdb;
 class Data
 {
     /**
-     * Gibt die Alarmdatum und -zeit zurück
+     * Gibt das Term-Object der Alarmierungsart zurück
+     *
+     * @param int $postId ID des Einsatzberichts
+     *
+     * @return array|bool|\WP_Error
+     */
+    public static function getAlarmierungsart($postId)
+    {
+        return get_the_terms($postId, 'alarmierungsart');
+    }
+
+    /**
+     * Gibt Alarmdatum und -zeit zurück
      *
      * @param int $postId ID des Einsatzberichts
      *

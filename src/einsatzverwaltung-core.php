@@ -335,6 +335,9 @@ class Core
             ),
             'vehicles' => array(
                 'name' => 'Fahrzeuge'
+            ),
+            'alarmType' => array(
+                'name' => 'Alarmierungsart'
             )
         );
     }

@@ -138,7 +138,7 @@ class Frontend
                 $art = (empty($art) ? 'Fehlalarm' : $art.' (Fehlalarm)');
             }
 
-            $einsatzort = get_post_meta($post->ID, $key = 'einsatz_einsatzort', $single = true);
+            $einsatzort = Data::getEinsatzort($post->ID);
 
             $einsatzleiter = Data::getEinsatzleiter($post->ID);
 
@@ -474,6 +474,9 @@ class Frontend
                                 break;
                             case 'incidentCommander':
                                 $string .= Data::getEinsatzleiter($query->post->ID);
+                                break;
+                            case 'location':
+                                $string .= Data::getEinsatzort($query->post->ID);
                                 break;
                             default:
                                 $string .= '&nbsp;';

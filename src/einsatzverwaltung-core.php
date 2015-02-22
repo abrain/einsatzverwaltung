@@ -323,6 +323,9 @@ class Core
             ),
             'incidentCommander' => array(
                 'name' => 'Einsatzleiter'
+            ),
+            'location' => array(
+                'name' => 'Einsatzort'
             )
         );
     }

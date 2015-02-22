@@ -81,6 +81,18 @@ class Data
     }
 
     /**
+     * Gibt den eingetragenen Einsatzort zurück
+     *
+     * @param int $postId ID des Einsatzberichts
+     *
+     * @return mixed
+     */
+    public static function getEinsatzort($postId)
+    {
+        return get_post_meta($postId, 'einsatz_einsatzort', true);
+    }
+
+    /**
      * Gibt ein Array mit Jahreszahlen zurück, in denen Einsätze vorliegen
      */
     public static function getJahreMitEinsatz()

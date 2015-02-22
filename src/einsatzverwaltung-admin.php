@@ -106,7 +106,7 @@ class Admin
         $fehlalarm = get_post_meta($post->ID, $key = 'einsatz_fehlalarm', $single = true);
         $mannschaftsstaerke = get_post_meta($post->ID, $key = 'einsatz_mannschaft', $single = true);
 
-        $names = Data::getEinsatzleiter();
+        $names = Data::getEinsatzleiterNamen();
         echo '<input type="hidden" id="einsatzleiter_used_values" value="' . implode(',', $names) . '" />';
 
         echo '<table><tbody>';

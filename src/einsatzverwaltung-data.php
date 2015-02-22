@@ -53,7 +53,7 @@ class Data
      *
      * @return array
      */
-    public static function getEinsatzleiter()
+    public static function getEinsatzleiterNamen()
     {
         /** @var wpdb $wpdb */
         global $wpdb;
@@ -66,6 +66,18 @@ class Data
             $names[] = $result->meta_value;
         }
         return $names;
+    }
+
+    /**
+     * Gibt den eingetragenen Einsatzleiter zurück
+     *
+     * @param int $postId ID des Einsatzberichts
+     *
+     * @return mixed
+     */
+    public static function getEinsatzleiter($postId)
+    {
+        return get_post_meta($postId, 'einsatz_einsatzleiter', true);
     }
 
     /**

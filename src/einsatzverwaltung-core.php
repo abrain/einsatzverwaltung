@@ -320,6 +320,9 @@ class Core
             ),
             'title' => array(
                 'name' => 'Einsatzmeldung'
+            ),
+            'incidentCommander' => array(
+                'name' => 'Einsatzleiter'
             )
         );
     }

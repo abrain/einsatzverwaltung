@@ -140,7 +140,7 @@ class Frontend
 
             $einsatzort = get_post_meta($post->ID, $key = 'einsatz_einsatzort', $single = true);
 
-            $einsatzleiter = get_post_meta($post->ID, $key = 'einsatz_einsatzleiter', $single = true);
+            $einsatzleiter = Data::getEinsatzleiter($post->ID);
 
             $mannschaft = get_post_meta($post->ID, $key = 'einsatz_mannschaft', $single = true);
             if (empty($mannschaft)) {
@@ -471,6 +471,9 @@ class Frontend
                                 }
                                 $url = get_permalink($query->post->ID);
                                 $string .= '<a href="' . $url . '" rel="bookmark">' . $post_title . '</a>';
+                                break;
+                            case 'incidentCommander':
+                                $string .= Data::getEinsatzleiter($query->post->ID);
                                 break;
                             default:
                                 $string .= '&nbsp;';

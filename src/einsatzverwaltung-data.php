@@ -108,6 +108,22 @@ class Data
     }
 
     /**
+     * Gibt die eingetragene Mannschaftsstärke zurück
+     *
+     * @param int $postId ID des Einsatzberichts
+     *
+     * @return mixed
+     */
+    public static function getMannschaftsstaerke($postId)
+    {
+        $mannschaft = get_post_meta($postId, 'einsatz_mannschaft', true);
+        if (empty($mannschaft)) {
+            $mannschaft = 0;
+        }
+        return $mannschaft;
+    }
+
+    /**
      * Zusätzliche Metadaten des Einsatzberichts speichern
      *
      * @param int $post_id ID des Posts

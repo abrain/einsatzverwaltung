@@ -326,6 +326,9 @@ class Core
             ),
             'location' => array(
                 'name' => 'Einsatzort'
+            ),
+            'workforce' => array(
+                'name' => 'Mannschaftsst&auml;rke'
             )
         );
     }

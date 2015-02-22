@@ -142,10 +142,7 @@ class Frontend
 
             $einsatzleiter = Data::getEinsatzleiter($post->ID);
 
-            $mannschaft = get_post_meta($post->ID, $key = 'einsatz_mannschaft', $single = true);
-            if (empty($mannschaft)) {
-                $mannschaft = 0;
-            }
+            $mannschaft = Data::getMannschaftsstaerke($post->ID);
 
             $fahrzeuge = get_the_terms($post->ID, 'fahrzeug');
             if ($fahrzeuge && ! is_wp_error($fahrzeuge)) {
@@ -477,6 +474,9 @@ class Frontend
                                 break;
                             case 'location':
                                 $string .= Data::getEinsatzort($query->post->ID);
+                                break;
+                            case 'workforce':
+                                $string .= Data::getMannschaftsstaerke($query->post->ID);
                                 break;
                             default:
                                 $string .= '&nbsp;';

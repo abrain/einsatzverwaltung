@@ -338,6 +338,9 @@ class Core
             ),
             'alarmType' => array(
                 'name' => 'Alarmierungsart'
+            ),
+            'incidentType' => array(
+                'name' => 'Einsatzart'
             )
         );
     }

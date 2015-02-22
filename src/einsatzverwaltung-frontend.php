@@ -86,16 +86,8 @@ class Frontend
             $dauerstring = ($duration === false ? '' : Utilities::getDurationString($duration));
 
             $einsatzart = Data::getEinsatzart($post->ID);
-            if ($einsatzart) {
-                $showEinsatzartArchiveLink = $showArchiveLinks && Options::isShowEinsatzartArchive();
-                $art = self::getEinsatzartString(
-                    $einsatzart,
-                    $make_links,
-                    $showEinsatzartArchiveLink
-                );
-            } else {
-                $art = '';
-            }
+            $showEinsatzartArchiveLink = $showArchiveLinks && Options::isShowEinsatzartArchive();
+            $art = self::getEinsatzartString($einsatzart, $make_links, $showEinsatzartArchiveLink);
 
             $fehlalarm = get_post_meta($post->ID, $key = 'einsatz_fehlalarm', $single = true);
             if (empty($fehlalarm)) {
@@ -432,6 +424,10 @@ class Frontend
                                 $alarmierungsarten = Data::getAlarmierungsart($query->post->ID);
                                 $string .= self::getAlarmierungsartString($alarmierungsarten);
                                 break;
+                            case 'incidentType':
+                                $einsatzart = Data::getEinsatzart($query->post->ID);
+                                $string .= self::getEinsatzartString($einsatzart, false, false, false);
+                                break;
                             default:
                                 $string .= '&nbsp;';
                         }
@@ -499,11 +495,16 @@ class Frontend
      * @param object $einsatzart
      * @param bool $make_links
      * @param bool $show_archive_links
+     * @param bool $showHierarchy
      *
      * @return string
      */
-    public static function getEinsatzartString($einsatzart, $make_links, $show_archive_links)
+    public static function getEinsatzartString($einsatzart, $make_links, $show_archive_links, $showHierarchy = true)
     {
+        if ($einsatzart === false || is_wp_error($einsatzart) || empty($einsatzart)) {
+            return '';
+        }
+
         $str = '';
         do {
             if (!empty($str)) {
@@ -518,7 +519,7 @@ class Frontend
                 $str = '&nbsp;' . $link . $str;
             }
             $str = $einsatzart->name . $str;
-        } while ($einsatzart->parent != 0);
+        } while ($showHierarchy && $einsatzart->parent != 0);
         return $str;
     }
 

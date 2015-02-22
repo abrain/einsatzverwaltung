@@ -79,9 +79,6 @@ class Frontend
         if (get_post_type($post) == "einsatz") {
             $make_links = $may_contain_links;
 
-            $alarmzeit = get_post_meta($post->ID, 'einsatz_alarmzeit', true);
-            $einsatzende = get_post_meta($post->ID, 'einsatz_einsatzende', true);
-
             $alarmierungsart = get_the_terms($post->ID, 'alarmierungsart');
             if ($alarmierungsart && ! is_wp_error($alarmierungsart)) {
                 $alarm_namen = array();
@@ -93,30 +90,8 @@ class Frontend
                 $alarm_string = '';
             }
 
-            $dauerstring = '';
-            if (!empty($alarmzeit) && !empty($einsatzende)) {
-                $timestamp1 = strtotime($alarmzeit);
-                $timestamp2 = strtotime($einsatzende);
-                $differenz = $timestamp2 - $timestamp1;
-                $dauer = intval($differenz / 60);
-
-                if (empty($dauer) || !is_numeric($dauer)) {
-                    $dauerstring = '';
-                } else {
-                    if ($dauer <= 0) {
-                        $dauerstring = '';
-                    } elseif ($dauer < 60) {
-                        $dauerstring = $dauer." Minute".($dauer > 1 ? "n" : "");
-                    } else {
-                        $dauer_h = intval($dauer / 60);
-                        $dauer_m = $dauer % 60;
-                        $dauerstring = $dauer_h." Stunde".($dauer_h > 1 ? "n" : "");
-                        if ($dauer_m > 0) {
-                            $dauerstring .= " ".$dauer_m." Minute".($dauer_m > 1 ? "n" : "");
-                        }
-                    }
-                }
-            }
+            $duration = Data::getDauer($post->ID);
+            $dauerstring = ($duration === false ? '' : Utilities::getDurationString($duration));
 
             $einsatzart = Data::getEinsatzart($post->ID);
             if ($einsatzart) {
@@ -139,9 +114,7 @@ class Frontend
             }
 
             $einsatzort = Data::getEinsatzort($post->ID);
-
             $einsatzleiter = Data::getEinsatzleiter($post->ID);
-
             $mannschaft = Data::getMannschaftsstaerke($post->ID);
 
             $fahrzeuge = get_the_terms($post->ID, 'fahrzeug');
@@ -199,6 +172,7 @@ class Frontend
                 $ext_string = '';
             }
 
+            $alarmzeit = Data::getAlarmzeit($post->ID);
             $alarm_timestamp = strtotime($alarmzeit);
             $datumsformat = Options::getDateFormat();
             $zeitformat = Options::getTimeFormat();
@@ -477,6 +451,10 @@ class Frontend
                                 break;
                             case 'workforce':
                                 $string .= Data::getMannschaftsstaerke($query->post->ID);
+                                break;
+                            case 'duration':
+                                $minutes = Data::getDauer($query->post->ID);
+                                $string .= Utilities::getDurationString($minutes);
                                 break;
                             default:
                                 $string .= '&nbsp;';

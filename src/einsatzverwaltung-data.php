@@ -10,6 +10,40 @@ use wpdb;
 class Data
 {
     /**
+     * Gibt die Alarmdatum und -zeit zurück
+     *
+     * @param int $postId ID des Einsatzberichts
+     *
+     * @return mixed
+     */
+    public static function getAlarmzeit($postId)
+    {
+        return get_post_meta($postId, 'einsatz_alarmzeit', true);
+    }
+
+    /**
+     * Gibt die Einsatzdauer in Minuten zurück
+     *
+     * @param int $postId ID des Einsatzberichts
+     *
+     * @return bool|int Dauer in Minuten oder false, wenn Alarmzeit und/oder Einsatzende nicht verfügbar sind
+     */
+    public static function getDauer($postId)
+    {
+        $alarmzeit = self::getAlarmzeit($postId);
+        $einsatzende = self::getEinsatzende($postId);
+
+        if (empty($alarmzeit) || empty($einsatzende)) {
+            return false;
+        }
+
+        $timestamp1 = strtotime($alarmzeit);
+        $timestamp2 = strtotime($einsatzende);
+        $differenz = $timestamp2 - $timestamp1;
+        return intval($differenz / 60);
+    }
+
+    /**
      * @param $kalenderjahr
      *
      * @return array
@@ -34,7 +68,8 @@ class Data
      * Bestimmt die Einsatzart eines bestimmten Einsatzes. Ist nötig, weil die Taxonomie
      * 'einsatzart' mehrere Werte speichern kann, aber nur einer genutzt werden soll
      *
-     * @param int $postId
+     * @param int $postId ID des Einsatzberichts
+     *
      * @return object|bool
      */
     public static function getEinsatzart($postId)
@@ -46,6 +81,18 @@ class Data
         } else {
             return false;
         }
+    }
+
+    /**
+     * Gibt Datum und Zeit des Einsatzendes zurück
+     *
+     * @param int $postId ID des Einsatzberichts
+     *
+     * @return mixed
+     */
+    public static function getEinsatzende($postId)
+    {
+        return get_post_meta($postId, 'einsatz_einsatzende', true);
     }
 
     /**

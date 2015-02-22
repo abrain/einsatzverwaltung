@@ -329,6 +329,9 @@ class Core
             ),
             'workforce' => array(
                 'name' => 'Mannschaftsst&auml;rke'
+            ),
+            'duration' => array(
+                'name' => 'Dauer'
             )
         );
     }

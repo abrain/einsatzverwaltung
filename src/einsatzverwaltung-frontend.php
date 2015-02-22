@@ -184,12 +184,15 @@ class Frontend
                         $url = Taxonomies::getTermField($ext->term_id, 'exteinsatzmittel', 'url');
                         if ($url !== false) {
                             $open_in_new_window = Options::isOpenExtEinsatzmittelNewWindow();
-                            $ext_name = '<a href="'.$url.'" title="Mehr Informationen zu '.$ext->name.'"' . ($open_in_new_window ? ' target="_blank"' : '') . '>'.$ext->name.'</a>';
+                            $ext_name = '<a href="'.$url.'" title="Mehr Informationen zu '.$ext->name.'"';
+                            $ext_name .= ($open_in_new_window ? ' target="_blank"' : '') . '>'.$ext->name.'</a>';
                         }
                     }
 
                     if ($make_links && $showArchiveLinks && Options::isShowExtEinsatzmittelArchive()) {
-                        $ext_name .= '&nbsp;<a href="'.get_term_link($ext).'" class="fa fa-filter" style="text-decoration:none;" title="Eins&auml;tze unter Beteiligung von '.$ext->name.' anzeigen"></a>';
+                        $title = 'Eins&auml;tze unter Beteiligung von ' . $ext->name . ' anzeigen';
+                        $ext_name .= '&nbsp;<a href="'.get_term_link($ext).'" class="fa fa-filter" ';
+                        $ext_name .= 'style="text-decoration:none;" title="' . $title . '"></a>';
                     }
 
                     $ext_namen[] = $ext_name;
@@ -371,13 +374,16 @@ class Frontend
      */
     public function addEinsatzberichteToMainloop($query)
     {
-        if (
-            Options::isShowEinsatzberichteInMainloop() &&
+        if (Options::isShowEinsatzberichteInMainloop() &&
             $query->is_main_query() &&
             is_home() &&
             empty($query->query_vars['suppress_filters'])
         ) {
-            $post_types = isset($query->query_vars['post_type']) ? (array) $query->query_vars['post_type'] : array('post');
+            if (isset($query->query_vars['post_type'])) {
+                $post_types = (array) $query->query_vars['post_type'];
+            } else {
+                $post_types = array('post');
+            }
             $post_types[] = 'einsatz';
             $query->set('post_type', $post_types);
         }
@@ -463,7 +469,8 @@ class Frontend
                                 if (empty($post_title)) {
                                     $post_title = '(kein Titel)';
                                 }
-                                $string .= '<a href="' . get_permalink($query->post->ID) . '" rel="bookmark">' . $post_title . '</a>';
+                                $url = get_permalink($query->post->ID);
+                                $string .= '<a href="' . $url . '" rel="bookmark">' . $post_title . '</a>';
                                 break;
                             default:
                                 $string .= '&nbsp;';

@@ -106,7 +106,12 @@ class ToolEinsatznummernReparieren
             $enr_neu = Core::formatEinsatznummer($jahr, $counter);
             if ($enr != $enr_neu) {
                 $aenderungen++;
-                printf('Einsatz %s (%s) erh&auml;lt die Nummer %s', '<strong>'.$enr.'</strong>', date_i18n($format, date_timestamp_get($datum)), '<strong>'.$enr_neu.'</strong>');
+                printf(
+                    'Einsatz %s (%s) erh&auml;lt die Nummer %s',
+                    '<strong>'.$enr.'</strong>',
+                    date_i18n($format, date_timestamp_get($datum)),
+                    '<strong>'.$enr_neu.'</strong>'
+                );
                 if (!$simulieren) {
                     $this->data->setEinsatznummer($einsatzbericht->ID, $enr_neu);
                     $enr_neu_slug = get_post_field('post_name', $einsatzbericht->ID);

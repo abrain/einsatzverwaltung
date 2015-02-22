@@ -58,8 +58,7 @@ class ToolImportWpEinsatz
         if ($wpdb->get_var("SHOW TABLES LIKE '$tablename'") != $tablename) {
             Utilities::printError('Die Tabelle, in der wp-einsatz seine Daten speichert, konnte nicht gefunden werden.');
         } else {
-            if (
-                array_key_exists('submit', $_POST) &&
+            if (array_key_exists('submit', $_POST) &&
                 array_key_exists('aktion', $_POST) &&
                 $_POST['aktion'] == 'analyse'
             ) {

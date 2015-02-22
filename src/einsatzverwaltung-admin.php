@@ -111,30 +111,88 @@ class Admin
 
         echo '<table><tbody>';
 
-        echo '<tr><td><label for="einsatzverwaltung_nummer">' . __("Einsatznummer", 'einsatzverwaltung') . '</label></td>';
-        echo '<td><input type="text" id="einsatzverwaltung_nummer" name="einsatzverwaltung_nummer" value="'.esc_attr($nummer).'" size="10" placeholder="'.Core::getNextEinsatznummer(date('Y')).'" /></td></tr>';
+        $this->echoInputText(
+            __("Einsatznummer", 'einsatzverwaltung'),
+            'einsatzverwaltung_nummer',
+            esc_attr($nummer),
+            Core::getNextEinsatznummer(date('Y')),
+            10
+        );
 
-        echo '<tr><td><label for="einsatzverwaltung_alarmzeit">'. __("Alarmzeit", 'einsatzverwaltung') . '</label></td>';
-        echo '<td><input type="text" id="einsatzverwaltung_alarmzeit" name="einsatzverwaltung_alarmzeit" value="'.esc_attr($alarmzeit).'" size="20" placeholder="JJJJ-MM-TT hh:mm" />&nbsp;<span class="einsatzverwaltung_hint" id="einsatzverwaltung_alarmzeit_hint"></span></td></tr>';
+        $this->echoInputText(
+            __("Alarmzeit", 'einsatzverwaltung'),
+            'einsatzverwaltung_alarmzeit',
+            esc_attr($alarmzeit),
+            'JJJJ-MM-TT hh:mm'
+        );
 
-        echo '<tr><td><label for="einsatzverwaltung_einsatzende">'. __("Einsatzende", 'einsatzverwaltung') . '</label></td>';
-        echo '<td><input type="text" id="einsatzverwaltung_einsatzende" name="einsatzverwaltung_einsatzende" value="'.esc_attr($einsatzende).'" size="20" placeholder="JJJJ-MM-TT hh:mm" />&nbsp;<span class="einsatzverwaltung_hint" id="einsatzverwaltung_einsatzende_hint"></span></td></tr>';
+        $this->echoInputText(
+            __("Einsatzende", 'einsatzverwaltung'),
+            'einsatzverwaltung_einsatzende',
+            esc_attr($einsatzende),
+            'JJJJ-MM-TT hh:mm'
+        );
 
-        echo '<tr><td><label for="einsatzverwaltung_fehlalarm">'. __("Fehlalarm", 'einsatzverwaltung') . '</label></td>';
-        echo '<td><input type="checkbox" id="einsatzverwaltung_fehlalarm" name="einsatzverwaltung_fehlalarm" value="1" ' . Utilities::checked($fehlalarm) . '/></td></tr>';
+        $this->echoInputCheckbox(
+            __("Fehlalarm", 'einsatzverwaltung'),
+            'einsatzverwaltung_fehlalarm',
+            $fehlalarm
+        );
 
         echo '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';
 
-        echo '<tr><td><label for="einsatzverwaltung_einsatzort">'. __("Einsatzort", 'einsatzverwaltung') . '</label></td>';
-        echo '<td><input type="text" id="einsatzverwaltung_einsatzort" name="einsatzverwaltung_einsatzort" value="'.esc_attr($einsatzort).'" size="20" /></td></tr>';
+        $this->echoInputText(
+            __("Einsatzort", 'einsatzverwaltung'),
+            'einsatzverwaltung_einsatzort',
+            esc_attr($einsatzort)
+        );
 
-        echo '<tr><td><label for="einsatzverwaltung_einsatzleiter">'. __("Einsatzleiter", 'einsatzverwaltung') . '</label></td>';
-        echo '<td><input type="text" id="einsatzverwaltung_einsatzleiter" name="einsatzverwaltung_einsatzleiter" value="'.esc_attr($einsatzleiter).'" size="20" /></td></tr>';
+        $this->echoInputText(
+            __("Einsatzleiter", 'einsatzverwaltung'),
+            'einsatzverwaltung_einsatzleiter',
+            esc_attr($einsatzleiter)
+        );
 
-        echo '<tr><td><label for="einsatzverwaltung_mannschaft">'. __("Mannschaftsst&auml;rke", 'einsatzverwaltung') . '</label></td>';
-        echo '<td><input type="text" id="einsatzverwaltung_mannschaft" name="einsatzverwaltung_mannschaft" value="'.esc_attr($mannschaftsstaerke).'" size="20" /></td></tr>';
+        $this->echoInputText(
+            __("Mannschaftsst&auml;rke", 'einsatzverwaltung'),
+            'einsatzverwaltung_mannschaft',
+            esc_attr($mannschaftsstaerke)
+        );
 
         echo '</tbody></table>';
+    }
+
+    /**
+     * Gibt ein Eingabefeld für die Metabox aus
+     *
+     * @param string $label Beschriftung
+     * @param string $id Feld-ID
+     * @param string $value Feldwert
+     * @param string $placeholder Platzhalter
+     * @param int $size Größe des Eingabefelds
+     */
+    private function echoInputText($label, $id, $value, $placeholder = '', $size = 20)
+    {
+        echo '<tr><td><label for="' . $id . '">' . $label . '</label></td>';
+        echo '<td><input type="text" id="' . $id . '" name="' . $id . '" value="'.$value.'" size="' . $size . '" ';
+        if (!empty($placeholder)) {
+            echo 'placeholder="'.$placeholder.'" ';
+        }
+        echo '/></td></tr>';
+    }
+
+    /**
+     * Gibt eine Checkbox für die Metabox aus
+     *
+     * @param string $label Beschriftung
+     * @param string $id Feld-ID
+     * @param mixed $state Zustandswert
+     */
+    private function echoInputCheckbox($label, $id, $state)
+    {
+        echo '<tr><td><label for="' . $id . '">' . $label . '</label></td>';
+        echo '<td><input type="checkbox" id="' . $id . '" name="' . $id . '" value="1" ';
+        echo Utilities::checked($state) . '/></td></tr>';
     }
 
     /**
@@ -222,7 +280,15 @@ class Admin
 
                 $term = Data::getEinsatzart($post_id);
                 if ($term) {
-                    $url = esc_url(add_query_arg(array('post_type' => $post->post_type, 'einsatzart' => $term->slug), 'edit.php'));
+                    $url = esc_url(
+                        add_query_arg(
+                            array(
+                                'post_type' => $post->post_type,
+                                'einsatzart' => $term->slug
+                            ),
+                            'edit.php'
+                        )
+                    );
                     $text = esc_html(sanitize_term_field('name', $term->name, $term->term_id, 'einsatzart', 'display'));
                     echo '<a href="' . $url . '">' . $text . '</a>';
                 } else {
@@ -238,8 +304,24 @@ class Admin
                 if (!empty($terms)) {
                     $out = array();
                     foreach ($terms as $term) {
-                        $url = esc_url(add_query_arg(array('post_type' => $post->post_type, 'fahrzeug' => $term->slug), 'edit.php'));
-                        $text = esc_html(sanitize_term_field('name', $term->name, $term->term_id, 'fahrzeug', 'display'));
+                        $url = esc_url(
+                            add_query_arg(
+                                array(
+                                    'post_type' => $post->post_type,
+                                    'fahrzeug' => $term->slug
+                                ),
+                                'edit.php'
+                            )
+                        );
+                        $text = esc_html(
+                            sanitize_term_field(
+                                'name',
+                                $term->name,
+                                $term->term_id,
+                                'fahrzeug',
+                                'display'
+                            )
+                        );
                         $out[] = '<a href="' . $url . '">' . $text . '</a>';
                     }
 
@@ -269,7 +351,8 @@ class Admin
             $pt_info = get_post_type_object($postType); // get a specific CPT's details
             $num_posts = wp_count_posts($postType); // retrieve number of posts associated with this CPT
             $num = number_format_i18n($num_posts->publish); // number of published posts for this CPT
-            $text = _n($pt_info->labels->singular_name, $pt_info->labels->name, intval($num_posts->publish)); // singular/plural text label for CPT
+            // singular/plural text label for CPT
+            $text = _n($pt_info->labels->singular_name, $pt_info->labels->name, intval($num_posts->publish));
             echo '<li class="'.$pt_info->name.'-count page-count">';
             if (current_user_can('edit_einsatzberichte')) {
                 echo '<a href="edit.php?post_type='.$postType.'">'.$num.' '.$text.'</a>';
@@ -292,7 +375,8 @@ class Admin
             $pt_info = get_post_type_object($postType); // get a specific CPT's details
             $num_posts = wp_count_posts($postType); // retrieve number of posts associated with this CPT
             $num = number_format_i18n($num_posts->publish); // number of published posts for this CPT
-            $text = _n($pt_info->labels->singular_name, $pt_info->labels->name, intval($num_posts->publish)); // singular/plural text label for CPT
+            // singular/plural text label for CPT
+            $text = _n($pt_info->labels->singular_name, $pt_info->labels->name, intval($num_posts->publish));
             echo '<tr><td class="first b">';
             if (current_user_can('edit_einsatzberichte')) {
                 echo '<a href="edit.php?post_type='.$postType.'">'.$num.'</a>';

@@ -11,7 +11,7 @@ class Utilities
     /**
      * Hilfsfunktion für Checkboxen, übersetzt 1/0 Logik in Haken an/aus
      *
-     * @param string $value Der zu überprüfende Wert
+     * @param mixed $value Der zu überprüfende Wert
      *
      * @return bool Der entsprechende boolsche Wert für $value
      */

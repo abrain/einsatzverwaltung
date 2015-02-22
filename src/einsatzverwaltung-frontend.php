@@ -362,7 +362,7 @@ class Frontend
                         $string .= '<td>';
                         switch ($colId) {
                             case 'number':
-                                $string .= get_post_field('post_name', $query->post->ID);
+                                $string .= Data::getEinsatznummer($query->post->ID);
                                 break;
                             case 'date':
                                 $string .= date('d.m.Y', $einsatz_timestamp);
@@ -393,7 +393,8 @@ class Frontend
                                 break;
                             case 'vehicles':
                                 $vehicles = Data::getFahrzeuge($query->post->ID);
-                                $string .= self::getFahrzeugeString($vehicles, false, false);
+                                $makeFahrzeugLinks = Options::getBoolOption('einsatzvw_list_fahrzeuge_link');
+                                $string .= self::getFahrzeugeString($vehicles, $makeFahrzeugLinks, false);
                                 break;
                             case 'alarmType':
                                 $alarmierungsarten = Data::getAlarmierungsart($query->post->ID);
@@ -401,11 +402,13 @@ class Frontend
                                 break;
                             case 'additionalForces':
                                 $exteinsatzmittel = Data::getWeitereKraefte($query->post->ID);
-                                $string .= self::getWeitereKraefteString($exteinsatzmittel, false, false);
+                                $makeLinks = Options::getBoolOption('einsatzvw_list_ext_link');
+                                $string .= self::getWeitereKraefteString($exteinsatzmittel, $makeLinks, false);
                                 break;
                             case 'incidentType':
                                 $einsatzart = Data::getEinsatzart($query->post->ID);
-                                $string .= self::getEinsatzartString($einsatzart, false, false, false);
+                                $showHierarchy = Options::getBoolOption('einsatzvw_list_art_hierarchy');
+                                $string .= self::getEinsatzartString($einsatzart, false, false, $showHierarchy);
                                 break;
                             default:
                                 $string .= '&nbsp;';

@@ -123,6 +123,21 @@ class Settings
             'einsatzvw_list_columns',
             array('abrain\Einsatzverwaltung\Utilities', 'sanitizeColumns')
         );
+        register_setting(
+            'einsatzvw_settings',
+            'einsatzvw_list_art_hierarchy',
+            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+        );
+        register_setting(
+            'einsatzvw_settings',
+            'einsatzvw_list_fahrzeuge_link',
+            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+        );
+        register_setting(
+            'einsatzvw_settings',
+            'einsatzvw_list_ext_link',
+            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+        );
 
         $roles = get_editable_roles();
         if (!empty($roles)) {
@@ -230,6 +245,13 @@ class Settings
             'einsatzvw_settings_einsatzliste'
         );
         add_settings_field(
+            'einsatzvw_settings_column_settings',
+            'Einstellungen zu einzelnen Spalten',
+            array($this, 'echoEinsatzlisteColumnSettings'),
+            self::EVW_SETTINGS_SLUG,
+            'einsatzvw_settings_einsatzliste'
+        );
+        add_settings_field(
             'einsatzvw_settings_caps_roles',
             'Rollen',
             array($this, 'echoSettingsCapsRoles'),
@@ -248,7 +270,7 @@ class Settings
     private function echoSettingsCheckbox($checkboxId, $text)
     {
         echo '<input type="checkbox" value="1" id="' . $checkboxId . '" name="' . $checkboxId . '" ';
-        echo Utilities::checked(Options::getOption($checkboxId)) . '/><label for="' . $checkboxId . '">';
+        echo Utilities::checked(Options::getBoolOption($checkboxId)) . '/><label for="' . $checkboxId . '">';
         echo $text . '</label>';
     }
 
@@ -422,6 +444,23 @@ class Settings
         echo '<input name="einsatzvw_list_columns" id="einsatzvw_list_columns" type="hidden" value="'.implode(',', $enabledColumns).'">';
     }
 
+    public function echoEinsatzlisteColumnSettings()
+    {
+        $this->echoSettingsCheckbox(
+            'einsatzvw_list_art_hierarchy',
+            '<strong>Einsatzart</strong>: Hierarchie der Einsatzart anzeigen'
+        );
+        echo '<br/>';
+        $this->echoSettingsCheckbox(
+            'einsatzvw_list_fahrzeuge_link',
+            '<strong>Fahrzeuge</strong>: Links zu den Fahrzeugseiten anzeigen, sofern verf&uuml;gbar'
+        );
+        echo '<br/>';
+        $this->echoSettingsCheckbox(
+            'einsatzvw_list_ext_link',
+            '<strong>Weitere Kr&auml;fte</strong>: Links anzeigen, sofern verf&uuml;gbar'
+        );
+    }
 
     /**
      * Gibt die Einstellmöglichkeiten für die Berechtigungen aus

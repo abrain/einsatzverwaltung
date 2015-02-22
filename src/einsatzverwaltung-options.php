@@ -20,7 +20,10 @@ class Options
         'einsatzvw_einsatznummer_lfdvorne' => false,
         'date_format' => 'd.m.Y',
         'time_format' => 'H:i',
-        'einsatzvw_cap_roles_administrator' => true
+        'einsatzvw_cap_roles_administrator' => true,
+        'einsatzvw_list_art_hierarchy' => false,
+        'einsatzvw_list_ext_link' => false,
+        'einsatzvw_list_fahrzeuge_link' => false
     );
 
     /**
@@ -41,6 +44,17 @@ class Options
             $defaultValue = false;
         }
         return get_option($key, $defaultValue);
+    }
+
+    /**
+     * @param string $key Schlüssel der Option
+     *
+     * @return bool
+     */
+    public static function getBoolOption($key)
+    {
+        $option = self::getOption($key);
+        return self::toBoolean($option);
     }
 
     public static function getDefaultColumns()

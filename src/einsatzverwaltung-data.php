@@ -140,6 +140,16 @@ class Data
     }
 
     /**
+     * @param int $postId ID des Einsatzberichts
+     *
+     * @return string
+     */
+    public static function getEinsatznummer($postId)
+    {
+        return get_post_field('post_name', $postId);
+    }
+
+    /**
      * Gibt den eingetragenen Einsatzort zurück
      *
      * @param int $postId ID des Einsatzberichts
@@ -161,6 +171,16 @@ class Data
     public static function getFahrzeuge($postId)
     {
         return get_the_terms($postId, 'fahrzeug');
+    }
+
+    /**
+     * @param int $postId ID des Einsatzberichts
+     *
+     * @return mixed
+     */
+    public static function getFehlalarm($postId)
+    {
+        return get_post_meta($postId, 'einsatz_fehlalarm', true);
     }
 
     /**

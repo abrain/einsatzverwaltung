@@ -89,7 +89,7 @@ class Frontend
             $showEinsatzartArchiveLink = $showArchiveLinks && Options::isShowEinsatzartArchive();
             $art = self::getEinsatzartString($einsatzart, $make_links, $showEinsatzartArchiveLink);
 
-            $fehlalarm = get_post_meta($post->ID, $key = 'einsatz_fehlalarm', $single = true);
+            $fehlalarm = Data::getFehlalarm($post->ID);
             if (empty($fehlalarm)) {
                 $fehlalarm = 0;
             }

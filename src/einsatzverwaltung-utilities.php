@@ -20,6 +20,17 @@ class Utilities
         return ($value === true || $value == 1 ? 'checked="checked" ' : '');
     }
 
+    /**
+     * @param array $array
+     * @param string $key
+     * @param mixed $default
+     *
+     * @return mixed
+     */
+    public static function getArrayValueIfKey($array, $key, $default)
+    {
+        return (array_key_exists($key, $array) ? $array[$key] : $default);
+    }
 
     /**
      * Gibt eine lesbare Angabe einer Dauer zurück (z.B. 2 Stunden 12 Minuten)

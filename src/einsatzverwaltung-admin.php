@@ -96,19 +96,16 @@ class Admin
         // Use nonce for verification
         wp_nonce_field('save_einsatz_details', 'einsatzverwaltung_nonce');
 
-        // The actual fields for data entry
-        // Use get_post_meta to retrieve an existing value from the database and use the value for the form
-        $nummer = get_post_field('post_name', $post->ID);
-        $alarmzeit = get_post_meta($post->ID, $key = 'einsatz_alarmzeit', $single = true);
-        $einsatzende = get_post_meta($post->ID, $key = 'einsatz_einsatzende', $single = true);
-        $einsatzort = get_post_meta($post->ID, $key = 'einsatz_einsatzort', $single = true);
-        $einsatzleiter = get_post_meta($post->ID, $key = 'einsatz_einsatzleiter', $single = true);
-        $fehlalarm = get_post_meta($post->ID, $key = 'einsatz_fehlalarm', $single = true);
-        $mannschaftsstaerke = get_post_meta($post->ID, $key = 'einsatz_mannschaft', $single = true);
+        $nummer = Data::getEinsatznummer($post->ID);
+        $alarmzeit = Data::getAlarmzeit($post->ID);
+        $einsatzende = Data::getEinsatzende($post->ID);
+        $einsatzort = Data::getEinsatzort($post->ID);
+        $einsatzleiter = Data::getEinsatzleiter($post->ID);
+        $fehlalarm = Data::getFehlalarm($post->ID);
+        $mannschaftsstaerke = Data::getMannschaftsstaerke($post->ID);
 
         $names = Data::getEinsatzleiterNamen();
         echo '<input type="hidden" id="einsatzleiter_used_values" value="' . implode(',', $names) . '" />';
-
         echo '<table><tbody>';
 
         $this->echoInputText(
@@ -241,11 +238,11 @@ class Admin
 
         switch($column) {
             case 'e_nummer':
-                $einsatz_nummer = get_post_field('post_name', $post_id);
+                $einsatz_nummer = Data::getEinsatznummer($post_id);
                 echo (empty($einsatz_nummer) ? '-' : $einsatz_nummer);
                 break;
             case 'e_einsatzende':
-                $einsatz_einsatzende = get_post_meta($post_id, 'einsatz_einsatzende', true);
+                $einsatz_einsatzende = Data::getEinsatzende($post_id);
                 if (empty($einsatz_einsatzende)) {
                     echo '-';
                 } else {
@@ -254,7 +251,7 @@ class Admin
                 }
                 break;
             case 'e_alarmzeit':
-                $einsatz_alarmzeit = get_post_meta($post_id, 'einsatz_alarmzeit', true);
+                $einsatz_alarmzeit = Data::getAlarmzeit($post_id);
 
                 if (empty($einsatz_alarmzeit)) {
                     echo '-';
@@ -279,11 +276,11 @@ class Admin
                 }
                 break;
             case 'e_fzg':
-                $terms = get_the_terms($post_id, 'fahrzeug');
+                $fahrzeuge = Data::getFahrzeuge($post_id);
 
-                if (!empty($terms)) {
+                if (!empty($fahrzeuge)) {
                     $out = array();
-                    foreach ($terms as $term) {
+                    foreach ($fahrzeuge as $term) {
                         $url = esc_url(
                             add_query_arg(
                                 array('post_type' => $post->post_type, 'fahrzeug' => $term->slug),

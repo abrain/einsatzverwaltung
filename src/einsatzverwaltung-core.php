@@ -344,6 +344,10 @@ class Core
             ),
             'incidentType' => array(
                 'name' => 'Einsatzart'
+            ),
+            'seqNum' => array(
+                'name' => 'Lfd.',
+                'longName' => 'Laufende Nummer'
             )
         );
     }

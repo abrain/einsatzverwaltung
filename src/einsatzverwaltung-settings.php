@@ -424,7 +424,8 @@ class Settings
             if (in_array($colId, $enabledColumns)) {
                 continue;
             }
-            echo '<li id="'.$colId.'" class="evw-column"><span>'.$colInfo['name'].'</span></li>';
+            $name = Utilities::getArrayValueIfKey($colInfo, 'longName', $colInfo['name']);
+            echo '<li id="'.$colId.'" class="evw-column"><span>'. $name .'</span></li>';
         }
         echo '</ul></td></tr></table>';
 
@@ -438,7 +439,8 @@ class Settings
             }
 
             $colInfo = $columns[$colId];
-            echo '<li id="'.$colId.'" class="evw-column"><span>'.$colInfo['name'].'</span></li>';
+            $name = Utilities::getArrayValueIfKey($colInfo, 'longName', $colInfo['name']);
+            echo '<li id="'.$colId.'" class="evw-column"><span>'. $name .'</span></li>';
         }
         echo '</ul></td></tr></table>';
         echo '<input name="einsatzvw_list_columns" id="einsatzvw_list_columns" type="hidden" value="'.implode(',', $enabledColumns).'">';

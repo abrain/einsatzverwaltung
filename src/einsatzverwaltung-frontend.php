@@ -303,6 +303,8 @@ class Frontend
 
             $string .= '<h3>Eins&auml;tze '.$einsatzjahr.'</h3>';
             if ($query->have_posts()) {
+                $lfd = ($desc ? $query->found_posts : 1);
+
                 if (!$splitmonths) {
                     $string .= '<table class="einsatzliste">';
                     $string .= $this->getEinsatzlisteHeader();
@@ -388,6 +390,9 @@ class Frontend
                                 $showHierarchy = Options::getBoolOption('einsatzvw_list_art_hierarchy');
                                 $string .= self::getEinsatzartString($einsatzart, false, false, $showHierarchy);
                                 break;
+                            case 'seqNum':
+                                $string .= $lfd;
+                                break;
                             default:
                                 $string .= '&nbsp;';
                         }
@@ -396,6 +401,7 @@ class Frontend
 
                     $string .= '</tr>';
                     $oldmonth = $month;
+                    $lfd += ($desc ? -1 : 1);
                 }
                 $string .= '</tbody></table>';
             } else {

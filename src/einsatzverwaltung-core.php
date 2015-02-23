@@ -476,7 +476,7 @@ class Core
                     foreach (self::getCapabilities() as $cap) {
                         $role_obj->add_cap($cap);
                     }
-                    $this->setDatabaseVersion(2);;
+                    $this->setDatabaseVersion(2);
                     // no break
                 case 2:
                     delete_option('einsatzvw_show_links_in_excerpt');

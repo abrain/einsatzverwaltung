@@ -434,7 +434,7 @@ class Core
      */
     private function checkDatabaseVersion()
     {
-        $evwInstalledVersion = get_site_option('einsatzvw_db_version');
+        $evwInstalledVersion = get_option('einsatzvw_db_version');
 
         if ($evwInstalledVersion === false) {
             $evwInstalledVersion = 0;
@@ -450,23 +450,20 @@ class Core
 
             switch ($evwInstalledVersion) {
                 case 0:
-                    $berichte = Data::getEinsatzberichte('');
-
-                    remove_action('save_post', array($this->data, 'savePostdata'));
-                    foreach ($berichte as $bericht) {
-                        $post_id = $bericht->ID;
-                        if (! wp_is_post_revision($post_id)) {
-                            $gmtdate = get_gmt_from_date($bericht->post_date);
-                            $wpdb->query(
-                                $wpdb->prepare(
-                                    "UPDATE $wpdb->posts SET post_date_gmt = %s WHERE ID = %d",
-                                    $gmtdate,
-                                    $post_id
-                                )
-                            );
+                    // GMT-Datum wurde nicht gespeichert EVW-58
+                    foreach (Data::getEinsatzberichte('') as $bericht) {
+                        $gmtdate = get_gmt_from_date($bericht->post_date);
+                        $result = $wpdb->update(
+                            $wpdb->posts,
+                            array('post_date_gmt' => $gmtdate),
+                            array('ID' => $bericht->ID),
+                            array('%s'),
+                            array('%d')
+                        );
+                        if (false === $result) {
+                            error_log('Problem beim Aktualisieren des GMT-Datums bei Post-ID ' . $bericht->ID);
                         }
                     }
-                    add_action('save_post', array($this->data, 'savePostdata'));
                     $this->setDatabaseVersion(1);
                     // no break
                 case 1:
@@ -503,7 +500,7 @@ class Core
      */
     private function setDatabaseVersion($version)
     {
-        update_site_option('einsatzvw_db_version', $version);
+        update_option('einsatzvw_db_version', $version);
     }
 }
 

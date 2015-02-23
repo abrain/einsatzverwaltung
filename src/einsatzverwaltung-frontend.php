@@ -121,7 +121,7 @@ class Frontend
             $headerstring .= $this->getDetailString('Art:', $art);
             $headerstring .= $this->getDetailString('Einsatzort:', $einsatzort);
             $headerstring .= $this->getDetailString('Einsatzleiter:', $einsatzleiter);
-            $headerstring .= $this->getNumericDetailString('Mannschaftsst&auml;rke:', $mannschaft, true);
+            $headerstring .= $this->getDetailString('Mannschaftsst&auml;rke:', $mannschaft);
             $headerstring .= $this->getDetailString('Fahrzeuge:', $fzg_string);
             $headerstring .= $this->getDetailString('Weitere Kr&auml;fte:', $ext_string);
 
@@ -142,33 +142,11 @@ class Frontend
      */
     private function getDetailString($title, $value, $newline = true)
     {
-        $hide_empty_details = Options::isHideEmptyDetails();
-
-        if (!$hide_empty_details || !empty($value)) {
-            return '<strong>'.$title.'</strong> '.$value.($newline ? '<br>' : '');
+        if (Options::isHideEmptyDetails() && (!isset($value) || $value === '')) {
+            return '';
         }
-        return '';
-    }
 
-
-    /**
-     * Erzeugt eine Zeile für die Einsatzdetails, speziell für numerische Angaben
-     *
-     * @param string $title Bezeichnung des Einsatzdetails
-     * @param string $value Wert des Einsatzdetails
-     * @param bool $is_zero_empty Ob die 0 als leer gewertet wird
-     * @param bool $newline Zeilenumbruch hinzufügen
-     *
-     * @return string Formatiertes Einsatzdetail
-     */
-    private function getNumericDetailString($title, $value, $is_zero_empty = true, $newline = true)
-    {
-        $hide_empty_details = Options::isHideEmptyDetails();
-
-        if (!($hide_empty_details && $is_zero_empty && $value == 0)) {
-            return '<strong>'.$title.'</strong> '.$value.($newline ? '<br>' : '');
-        }
-        return '';
+        return '<strong>'.$title.'</strong> '.$value.($newline ? '<br>' : '');
     }
 
 

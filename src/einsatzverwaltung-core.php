@@ -21,7 +21,7 @@ use wpdb;
  */
 class Core
 {
-    const DB_VERSION = 3;
+    const DB_VERSION = 4;
 
     //public static $pluginBase;
     public static $pluginDir;
@@ -459,7 +459,7 @@ class Core
                             $gmtdate = get_gmt_from_date($bericht->post_date);
                             $wpdb->query(
                                 $wpdb->prepare(
-                                    'UPDATE $wpdb->posts SET post_date_gmt = %s WHERE ID = %d',
+                                    "UPDATE $wpdb->posts SET post_date_gmt = %s WHERE ID = %d",
                                     $gmtdate,
                                     $post_id
                                 )
@@ -467,7 +467,7 @@ class Core
                         }
                     }
                     add_action('save_post', array($this->data, 'savePostdata'));
-                    update_site_option('einsatzvw_db_version', 1);
+                    $this->setDatabaseVersion(1);
                     // no break
                 case 1:
                     update_option('einsatzvw_cap_roles_administrator', 1);
@@ -475,14 +475,35 @@ class Core
                     foreach (self::getCapabilities() as $cap) {
                         $role_obj->add_cap($cap);
                     }
-                    update_site_option('einsatzvw_db_version', 2);
+                    $this->setDatabaseVersion(2);;
                     // no break
                 case 2:
                     delete_option('einsatzvw_show_links_in_excerpt');
-                    update_site_option('einsatzvw_db_version', 3);
+                    $this->setDatabaseVersion(3);
+                    // no break
+                case 3:
+                    $result = $wpdb->delete(
+                        $wpdb->postmeta,
+                        array(
+                            'meta_key' => 'einsatz_mannschaft',
+                            'meta_value' => '0'
+                        )
+                    );
+                    if (false === $result) {
+                        break;
+                    }
+                    $this->setDatabaseVersion(4);
                     // no break
             }
         }
+    }
+
+    /**
+     * @param int $version
+     */
+    private function setDatabaseVersion($version)
+    {
+        update_site_option('einsatzvw_db_version', $version);
     }
 }
 

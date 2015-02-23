@@ -207,11 +207,7 @@ class Data
      */
     public static function getMannschaftsstaerke($postId)
     {
-        $mannschaft = get_post_meta($postId, 'einsatz_mannschaft', true);
-        if (empty($mannschaft)) {
-            $mannschaft = 0;
-        }
-        return $mannschaft;
+        return get_post_meta($postId, 'einsatz_mannschaft', true);
     }
 
     /**
@@ -303,7 +299,7 @@ class Data
         $einsatzleiter = sanitize_text_field($_POST['einsatzverwaltung_einsatzleiter']);
 
         // Mannschaftsstärke validieren
-        $mannschaftsstaerke = Utilities::sanitizePositiveNumber($_POST['einsatzverwaltung_mannschaft'], 0);
+        $mannschaftsstaerke = sanitize_text_field($_POST['einsatzverwaltung_mannschaft']);
 
         // Fehlalarm validieren
         $fehlalarm = Utilities::sanitizeCheckbox(array($_POST, 'einsatzverwaltung_fehlalarm'));

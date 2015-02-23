@@ -357,7 +357,7 @@ class ToolImportWpEinsatz
 
             // Mannschaftsstärke validieren
             if (array_key_exists('einsatz_mannschaft', $meta_values)) {
-                $meta_values['einsatz_mannschaft'] = Utilities::sanitizePositiveNumber($meta_values['einsatz_mannschaft']);
+                $meta_values['einsatz_mannschaft'] = sanitize_text_field($meta_values['einsatz_mannschaft']);
             }
 
             // Neuen Beitrag anlegen

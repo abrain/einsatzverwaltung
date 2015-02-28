@@ -96,8 +96,16 @@ class WidgetLetzteEinsaetze extends WP_Widget
 
         echo $args['before_widget'];
         echo $args['before_title'] . $title . $args['after_title'];
-        echo (empty($letzteEinsaetze) ? 'Keine Eins&auml;tze' : '<ul class="einsatzberichte">'.$letzteEinsaetze.'</ul>');
-        echo ($zeigeFeedlink ? '<p class="einsatzfeed"><span class="fa fa-rss"></span>&nbsp;<a href="'.get_post_type_archive_feed_link('einsatz').'">Einsatzberichte (Feed)</a></p>' : '');
+        if (empty($letzteEinsaetze)) {
+            echo '<p>Keine Eins&auml;tze</p>';
+        } else {
+            echo '<ul class="einsatzberichte">' . $letzteEinsaetze . '</ul>';
+        }
+        if ($zeigeFeedlink) {
+            echo '<p class="einsatzfeed"><span class="fa fa-rss"></span>&nbsp;<a href="';
+            echo get_post_type_archive_feed_link('einsatz');
+            echo '">Einsatzberichte (Feed)</a></p>';
+        }
         echo $args['after_widget'];
     }
 

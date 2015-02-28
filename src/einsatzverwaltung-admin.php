@@ -77,8 +77,10 @@ class Admin
         }
 
         wp_enqueue_style(
-            'einsatzverwaltung-fontawesome',
-            Core::$pluginUrl . 'font-awesome/css/font-awesome.min.css'
+            'font-awesome',
+            Core::$pluginUrl . 'font-awesome/css/font-awesome.min.css',
+            false,
+            '4.3.0'
         );
         wp_enqueue_style(
             'einsatzverwaltung-admin',

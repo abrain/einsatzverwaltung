@@ -476,7 +476,7 @@ class Frontend
         $str = '';
         do {
             if (!empty($str)) {
-                $str = ' > '.$str;
+                $str = ' &gt; '.$str;
                 $einsatzart = get_term($einsatzart->parent, 'einsatzart');
             }
 

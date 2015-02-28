@@ -55,7 +55,7 @@ class WidgetLetzteEinsaetze extends WP_Widget
         $query = new WP_Query('&post_type=einsatz&post_status=publish&posts_per_page='.$anzahl);
         while ($query->have_posts()) {
             $nextPost = $query->next_post();
-            $letzteEinsaetze .= "<li>";
+            $letzteEinsaetze .= '<li class="einsatzbericht">';
 
             $letzteEinsaetze .= "<a href=\"".get_permalink($nextPost->ID)."\" rel=\"bookmark\" class=\"einsatzmeldung\">";
             $meldung = get_the_title($nextPost->ID);
@@ -96,8 +96,8 @@ class WidgetLetzteEinsaetze extends WP_Widget
 
         echo $args['before_widget'];
         echo $args['before_title'] . $title . $args['after_title'];
-        echo (empty($letzteEinsaetze) ? "Keine Eins&auml;tze" : "<ul>".$letzteEinsaetze."</ul>");
-        echo ($zeigeFeedlink ? '<p><span class="fa fa-rss"></span>&nbsp;<a href="'.get_post_type_archive_feed_link('einsatz').'">Einsatzberichte (Feed)</a></p>' : '');
+        echo (empty($letzteEinsaetze) ? 'Keine Eins&auml;tze' : '<ul class="einsatzberichte">'.$letzteEinsaetze.'</ul>');
+        echo ($zeigeFeedlink ? '<p class="einsatzfeed"><span class="fa fa-rss"></span>&nbsp;<a href="'.get_post_type_archive_feed_link('einsatz').'">Einsatzberichte (Feed)</a></p>' : '');
         echo $args['after_widget'];
     }
 

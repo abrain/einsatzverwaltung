@@ -418,7 +418,7 @@ class Settings
 
         echo '<table id="columns-available"><tr><td style="width: 250px;">';
         echo '<span class="evw-area-title">Verf&uuml;gbare Spalten</span>';
-        echo '<p class="description">Spalten in unteres Feld ziehen, um sie auf der Seite anzuzeigen</p>';
+        echo '<p class="description">Spaltennamen in unteres Feld ziehen, um sie auf der Seite anzuzeigen</p>';
         echo '</td><td class="columns"><ul>';
         foreach ($columns as $colId => $colInfo) {
             if (in_array($colId, $enabledColumns)) {

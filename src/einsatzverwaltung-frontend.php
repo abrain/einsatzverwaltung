@@ -371,7 +371,7 @@ class Frontend
                                 break;
                             case 'duration':
                                 $minutes = Data::getDauer($query->post->ID);
-                                $string .= Utilities::getDurationString($minutes);
+                                $string .= Utilities::getDurationString($minutes, true);
                                 break;
                             case 'vehicles':
                                 $vehicles = Data::getFahrzeuge($query->post->ID);

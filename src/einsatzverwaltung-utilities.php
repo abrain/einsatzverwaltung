@@ -36,25 +36,27 @@ class Utilities
      * Gibt eine lesbare Angabe einer Dauer zurück (z.B. 2 Stunden 12 Minuten)
      *
      * @param int $minutes Dauer in Minuten
+     * @param bool $abbreviated
      *
      * @return string
      */
-    public static function getDurationString($minutes)
+    public static function getDurationString($minutes, $abbreviated = false)
     {
         if (!is_numeric($minutes) || $minutes < 0) {
             return '';
         }
 
         if ($minutes < 60) {
-            $dauerstring = $minutes . ' ' . _n('Minute', 'Minuten', $minutes);
+            $dauerstring = $minutes . ' ' . ($abbreviated ? 'min' : _n('Minute', 'Minuten', $minutes));
         } else {
             $hours = intval($minutes / 60);
             $remainingMinutes = $minutes % 60;
-            $dauerstring = $hours . ' ' . _n('Stunde', 'Stunden', $hours);
+            $dauerstring = $hours . ' ' . ($abbreviated ? 'h' : _n('Stunde', 'Stunden', $hours));
             if ($remainingMinutes > 0) {
-                $dauerstring .= ' ' . $remainingMinutes . ' ' . _n('Minute', 'Minuten', $remainingMinutes);
+                $dauerstring .= ' ' . $remainingMinutes . ' ' . ($abbreviated ? 'min' : _n('Minute', 'Minuten', $remainingMinutes));
             }
         }
+
         return $dauerstring;
     }
 

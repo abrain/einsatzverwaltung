@@ -77,6 +77,7 @@ class Core
             'choose_from_most_used' => 'Aus h&auml;ufigen Einsatzarten w&auml;hlen'),
         'public' => true,
         'show_in_nav_menus' => false,
+        'meta_box_cb' => 'abrain\Einsatzverwaltung\Admin::displayMetaBoxEinsatzart',
         'capabilities' => array (
             'manage_terms' => 'edit_einsatzberichte',
             'edit_terms' => 'edit_einsatzberichte',

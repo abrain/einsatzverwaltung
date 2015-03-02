@@ -39,15 +39,6 @@ class Admin
             'normal',
             'high'
         );
-
-        add_meta_box(
-            'einsatzartdiv',
-            'Einsatzart',
-            array($this, 'displayMetaBoxEinsatzart'),
-            'einsatz',
-            'side',
-            'high'
-        );
     }
 
     /**
@@ -199,7 +190,7 @@ class Admin
      *
      * @param WP_Post $post Post-Object
      */
-    public function displayMetaBoxEinsatzart($post)
+    public static function displayMetaBoxEinsatzart($post)
     {
         $einsatzart = Data::getEinsatzart($post->ID);
         Frontend::dropdownEinsatzart($einsatzart ? $einsatzart->term_id : 0);

@@ -213,6 +213,7 @@ class Core
     {
         // Posttypen registrieren
         self::registerTypes();
+        self::addRewriteRules();
 
         // Permalinks aktualisieren
         flush_rewrite_rules();
@@ -224,7 +225,7 @@ class Core
     public function onInit()
     {
         self::registerTypes();
-        $this->addRewriteRules();
+        self::addRewriteRules();
     }
 
     public function onPluginsLoaded()
@@ -244,7 +245,7 @@ class Core
         register_taxonomy('alarmierungsart', 'einsatz', self::$args_alarmierungsart);
     }
 
-    private function addRewriteRules()
+    private static function addRewriteRules()
     {
         $base = self::$args_einsatz['rewrite']['slug'];
         add_rewrite_rule(

@@ -2,13 +2,13 @@
 Contributors: abrain
 Donate link: https://www.abrain.de/software/unterstuetzen/
 Tags: Feuerwehr, Einsatz, Rettung, Rettungsdienst, THW, HiOrg, Wasserwacht, Bergrettung
-Requires at least: 3.1.0
+Requires at least: 3.4.0
 Tested up to: 4.1
 Stable tag: 0.8.4
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Plugin zur Verwaltung von Feuerwehreins&auml;tzen
+Verwaltung und Darstellung von Einsatzberichten der Feuerwehr und anderer Hilfsorganisationen
 
 == Description ==
 
@@ -20,15 +20,17 @@ Funktionen im &Uuml;berblick:
 
 * Einsatzberichte als vollwertige Beitr&auml;ge ver&ouml;ffentlichen
 * Information &uuml;ber Einsatzart, eingesetzte Fahrzeuge, Dauer und vieles mehr
-* Shortcode zum Einbinden einer Liste von Eins&auml;tzen eines Jahres
+* Shortcode zum Einbinden von Einsatzlisten
 * Widget zeigt die aktuellsten X Eins&auml;tze
 * Import aus wp-einsatz
+* Newsfeed f&uuml;r Einsatzberichte
+* Pflege der Einsatzberichte kann auf bestimmte Rollen beschr&auml;nkt werden
 
 Uses Font Awesome by Dave Gandy - http://fontawesome.io
 
 == Installation ==
 
-Das Plugin kann entweder aus WordPress heraus aus dem [Pluginverzeichnis](http://wordpress.org/plugins/einsatzverwaltung/) installiert werden oder aber durch Hochladen der Plugindateien in das Verzeichnis `/wp-content/plugins/`.
+Das Plugin kann entweder aus WordPress heraus aus dem [Pluginverzeichnis](https://wordpress.org/plugins/einsatzverwaltung/) installiert werden oder aber durch Hochladen der Plugindateien in das Verzeichnis `/wp-content/plugins/`.
 
 In beiden F&auml;llen muss das Plugin erst aktiviert werden, bevor es benutzt werden kann.
 
@@ -42,13 +44,20 @@ Die Dokumentation gibt es [hier](https://www.abrain.de/software/einsatzverwaltun
 
 = Ich f&auml;nde es gut, wenn Funktionalit&auml;t X hinzugef&uuml;gt / verbessert werden k&ouml;nnte =
 
-Die Aufgaben f&uuml;r die kommenden Versionen werden auf [GitHub](https://github.com/abrain/einsatzverwaltung/issues) verwaltet, Feedback ist jederzeit willkommen.
+Entweder einen Issue auf [GitHub](https://github.com/abrain/einsatzverwaltung/issues) er&ouml;ffnen (sofern es nicht schon einen solchen gibt) oder einfach eine [Mail](mailto:kontakt@abrain.de) schreiben.
 
 = Wie kann ich den Entwickler erreichen? =
 
-Entweder [per Mail](mailto:kontakt@abrain.de), auf [Twitter](https://twitter.com/einsatzvw) oder [App.net](https://alpha.app.net/einsatzverwaltung). Bugs und Verbesserungsvorschl&auml;ge gerne auch als [Issue auf GitHub](https://github.com/abrain/einsatzverwaltung/issues).
+Entweder [per Mail](mailto:kontakt@abrain.de), per PN auf [Facebook](https://www.facebook.com/einsatzverwaltung), auf [Twitter](https://twitter.com/einsatzvw) oder [App.net](https://alpha.app.net/einsatzverwaltung). Bugs und Verbesserungsvorschl&auml;ge gerne auch als [Issue auf GitHub](https://github.com/abrain/einsatzverwaltung/issues).
 
 == Changelog ==
+
+= 0.9.0 =
+* Komplettsanierung: Unter der Haube wurde kr&auml;ftig umgebaut und zusammengefasst, klarere Strukturen beschleunigen die Entwicklung
+* Neu: Spalten der Einsatzliste sind jetzt einstellbar
+* Neu: F&uuml;r die Einsatzliste stehen mehr Spalten zur Auswahl (Alarmierungsart, Dauer, Einsatzart, Einsatzleiter, Einsatzort, Fahrzeuge, Laufende Nummer, Mannschaftsst&auml;rke, Weitere Kr&auml;fte)
+* Verbesserung: Die Mannschaftst&auml;rke muss keine einzelne Zahl mehr sein, Angaben wie 1:8 sind m&ouml;glich
+* Hinweis: Dieses Update entfernt alle Eintr&auml;ge zur Mannschaftsst&auml;rke, die 0 lauten. Ein Backup der Datenbank vor dem Update wird empfohlen.
 
 = 0.8.4 =
 * Fehlerbehebung: Erstellen von Standard-WordPress-Beitr&auml;gen war beeintr&auml;chtigt
@@ -164,6 +173,9 @@ Entweder [per Mail](mailto:kontakt@abrain.de), auf [Twitter](https://twitter.com
 
 == Upgrade Notice ==
 
+= 0.9.0 =
+Siehe Changelog f&uuml;r Details und wichtigen Hinweis
+
 = 0.8.4 =
 Wichtige Fehlerbehebung
 
@@ -183,7 +195,7 @@ Import aus wp-einsatz, Anzeige von Einsatzberichten als normale Beitr&auml;ge un
 Publizieren mit Jetpack aktiviert
 
 = 0.7.0 =
-Neue Rechteverwaltung, neue Darstellungsoption für Einsatzliste
+Neue Rechteverwaltung, neue Darstellungsoption f&uuml;r Einsatzliste
 
 = 0.6.0 =
 Neuerungen, Verbesserungen, Fehlerbehebungen. Da ist f&uuml;r alle was dabei.
@@ -192,7 +204,7 @@ Neuerungen, Verbesserungen, Fehlerbehebungen. Da ist f&uuml;r alle was dabei.
 Korrektur des Datums im Feed, bitte Update erst nach Backup durchf&uuml;hren
 
 = 0.5.3 =
-Erhöhte Kompatibilität für zukünftige Installationen
+Erh&ouml;hte Kompatibilit&auml;t f&uuml;r zuk&uuml;nftige Installationen
 
 = 0.5.2 =
 Mehr Einstellungen im Widget

@@ -14,13 +14,13 @@ require_once dirname(__FILE__) . '/einsatzverwaltung-tools-wpe.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-taxonomies.php';
 
 use WP_Query;
-use wpdb;
 
 /**
  * Grundlegende Funktionen
  */
 class Core
 {
+    const VERSION = '0.9.0-dev';
     const DB_VERSION = 4;
 
     //public static $pluginBase;
@@ -211,6 +211,11 @@ class Core
      */
     public static function onActivation()
     {
+        update_option('einsatzvw_version', self::VERSION);
+        add_option('einsatzvw_db_version', self::DB_VERSION);
+
+        self::maybeUpdate();
+
         // Posttypen registrieren
         self::registerTypes();
         self::addRewriteRules();
@@ -230,7 +235,7 @@ class Core
 
     public function onPluginsLoaded()
     {
-        $this->checkDatabaseVersion();
+        self::maybeUpdate();
     }
 
     /**
@@ -435,78 +440,16 @@ class Core
         );
     }
 
-    /**
-     * Reparaturen oder Anpassungen der Datenbank nach einem Update
-     */
-    private function checkDatabaseVersion()
+    private static function maybeUpdate()
     {
-        $evwInstalledVersion = get_option('einsatzvw_db_version');
-
-        if ($evwInstalledVersion === false) {
-            $evwInstalledVersion = 0;
-        } elseif (is_numeric($evwInstalledVersion)) {
-            $evwInstalledVersion = intval($evwInstalledVersion);
-        } else {
-            $evwInstalledVersion = 0;
+        $currentDbVersion = get_option('einsatzvw_db_version', self::DB_VERSION);
+        if ($currentDbVersion >= self::DB_VERSION) {
+            return;
         }
 
-        if ($evwInstalledVersion < self::DB_VERSION) {
-            /** @var wpdb $wpdb */
-            global $wpdb;
-
-            switch ($evwInstalledVersion) {
-                case 0:
-                    // GMT-Datum wurde nicht gespeichert EVW-58
-                    foreach (Data::getEinsatzberichte('') as $bericht) {
-                        $gmtdate = get_gmt_from_date($bericht->post_date);
-                        $result = $wpdb->update(
-                            $wpdb->posts,
-                            array('post_date_gmt' => $gmtdate),
-                            array('ID' => $bericht->ID),
-                            array('%s'),
-                            array('%d')
-                        );
-                        if (false === $result) {
-                            error_log('Problem beim Aktualisieren des GMT-Datums bei Post-ID ' . $bericht->ID);
-                        }
-                    }
-                    $this->setDatabaseVersion(1);
-                    // no break
-                case 1:
-                    update_option('einsatzvw_cap_roles_administrator', 1);
-                    $role_obj = get_role('administrator');
-                    foreach (self::getCapabilities() as $cap) {
-                        $role_obj->add_cap($cap);
-                    }
-                    $this->setDatabaseVersion(2);
-                    // no break
-                case 2:
-                    delete_option('einsatzvw_show_links_in_excerpt');
-                    $this->setDatabaseVersion(3);
-                    // no break
-                case 3:
-                    $result = $wpdb->delete(
-                        $wpdb->postmeta,
-                        array(
-                            'meta_key' => 'einsatz_mannschaft',
-                            'meta_value' => '0'
-                        )
-                    );
-                    if (false === $result) {
-                        break;
-                    }
-                    $this->setDatabaseVersion(4);
-                    // no break
-            }
-        }
-    }
-
-    /**
-     * @param int $version
-     */
-    private function setDatabaseVersion($version)
-    {
-        update_option('einsatzvw_db_version', $version);
+        require_once( __DIR__ . '/einsatzverwaltung-update.php' );
+        $update = new Update();
+        $update->doUpdate($currentDbVersion, self::DB_VERSION);
     }
 }
 

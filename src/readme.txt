@@ -57,6 +57,7 @@ Entweder [per Mail](mailto:kontakt@abrain.de), per PN auf [Facebook](https://www
 * Neu: Spalten der Einsatzliste sind jetzt einstellbar
 * Neu: F&uuml;r die Einsatzliste stehen mehr Spalten zur Auswahl (Alarmierungsart, Dauer, Einsatzart, Einsatzleiter, Einsatzort, Fahrzeuge, Laufende Nummer, Mannschaftsst&auml;rke, Weitere Kr&auml;fte)
 * Verbesserung: Die Mannschaftst&auml;rke muss keine einzelne Zahl mehr sein, Angaben wie 1:8 sind m&ouml;glich
+* Font Awesome auf Version 4.3 aktualisiert
 * Hinweis: Dieses Update entfernt alle Eintr&auml;ge zur Mannschaftsst&auml;rke, die 0 lauten. Ein Backup der Datenbank vor dem Update wird empfohlen.
 
 = 0.8.4 =

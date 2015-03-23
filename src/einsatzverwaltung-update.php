@@ -14,7 +14,8 @@ class Update
      * @param int $current_db_ver derzeitige Version der Datenbank
      * @param int $target_db_ver Zielversion der Datenbank
      */
-    function doUpdate($current_db_ver, $target_db_ver) {
+    public function doUpdate($current_db_ver, $target_db_ver)
+    {
         if (empty($current_db_ver) || empty($target_db_ver)) {
             error_log('Parameter für Datenbank-Update unvollständig');
             return;
@@ -47,7 +48,7 @@ class Update
     /**
      * GMT-Datum wurde nicht gespeichert EVW-58
      */
-    function updateTo1()
+    private function updateTo1()
     {
         /** @var wpdb $wpdb */
         global $wpdb;
@@ -67,7 +68,7 @@ class Update
         }
     }
 
-    function updateTo2()
+    private function updateTo2()
     {
         update_option('einsatzvw_cap_roles_administrator', 1);
         $role_obj = get_role('administrator');
@@ -79,7 +80,7 @@ class Update
     /**
      * @return bool True bei Erfolg, False bei Fehler
      */
-    function updateTo3()
+    private function updateTo3()
     {
         delete_option('einsatzvw_show_links_in_excerpt');
         return true;
@@ -88,7 +89,7 @@ class Update
     /**
      * @return bool True bei Erfolg, False bei Fehler
      */
-    function updateTo4()
+    private function updateTo4()
     {
         /** @var wpdb $wpdb */
         global $wpdb;

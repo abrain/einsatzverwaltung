@@ -1,6 +1,8 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
+use wpdb;
+
 /**
  * Kümmert sich um die an Taxonomien angehängten Zusatzfelder
  */
@@ -28,6 +30,7 @@ class Taxonomies
         add_action('edited_term', array($this, 'saveTerm'), 10, 3);
         add_action('created_term', array($this, 'saveTerm'), 10, 3);
         add_action('delete_term', array($this, 'deleteTerm'), 10, 4);
+        add_action('split_shared_term', array($this, 'splitSharedTerms'), 10, 4);
     }
 
     /**
@@ -188,5 +191,38 @@ class Taxonomies
     public static function getTaxonomies()
     {
         return self::$taxonomies;
+    }
+
+    /**
+     * Terms, die von mehreren Taxonimien genutzt werden, bekommen ab WordPress 4.2 verschiedene IDs. Bestehende doppelt
+     * genutzte Terms werden beim erneuten Speichern in zwei Terms mit dem gleichen Namen aber verschiedenen IDs
+     * aufgespalten. Danach wird diese Methode über den Filter split_shared_term aufgerufen, um Einträge in der
+     * Datenbank, die IDs von Terms enthalten, zu aktualisieren.
+     * Siehe auch https://make.wordpress.org/core/2015/02/16/taxonomy-term-splitting-in-4-2-a-developer-guide/
+     *
+     * @param $old_term_id
+     * @param $new_term_id
+     * @param $term_taxonomy_id
+     * @param $taxonomy
+     */
+    public function splitSharedTerms($old_term_id, $new_term_id, $term_taxonomy_id, $taxonomy)
+    {
+        if (!array_key_exists($taxonomy, self::$taxonomies)) {
+            return;
+        }
+
+        error_log("split_shared_term for $taxonomy: ttid $term_taxonomy_id from $old_term_id to $new_term_id");
+
+        global $wpdb; /** @var wpdb $wpdb */
+        $fields = self::$taxonomies[$taxonomy];
+
+        foreach ($fields as $field) {
+            $oldKey = self::getTermOptionKey($old_term_id, $taxonomy, $field);
+            $newKey = self::getTermOptionKey($new_term_id, $taxonomy, $field);
+            $result = $wpdb->update($wpdb->options, array('option_name' => $newKey), array('option_name' => $oldKey));
+            if (false === $result) {
+                error_log('Fehler beim Termsplit ' . $taxonomy . ': ' . $wpdb->last_error);
+            }
+        }
     }
 }

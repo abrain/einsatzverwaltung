@@ -27,6 +27,8 @@ class Taxonomies
         add_action('exteinsatzmittel_edit_form_fields', array($this, 'addFieldsExteinsatzmittelEdit'));
         add_action('fahrzeug_add_form_fields', array($this, 'addFieldsFahrzeugNew'));
         add_action('fahrzeug_edit_form_fields', array($this, 'addFieldsFahrzeugEdit'));
+        add_action('manage_edit-fahrzeug_columns', array($this, 'customColumnsFahrzeug'));
+        add_action('manage_fahrzeug_custom_column', array($this, 'columnContentFahrzeug'), 10, 3);
         add_action('edited_term', array($this, 'saveTerm'), 10, 3);
         add_action('created_term', array($this, 'saveTerm'), 10, 3);
         add_action('delete_term', array($this, 'deleteTerm'), 10, 4);
@@ -98,6 +100,53 @@ class Taxonomies
             )
         );
         echo '<p class="description">Seite mit mehr Informationen &uuml;ber das Fahrzeug. Wird in Einsatzberichten mit diesem Fahrzeug verlinkt.</p></td></tr>';
+    }
+
+    /**
+     * Filterfunktion für die Spalten der Adminansicht der Taxonomie Fahrzeug
+     *
+     * @param array $columns Liste der Spaltentitel
+     *
+     * @return array Die gefilterte Liste
+     */
+    public function customColumnsFahrzeug($columns)
+    {
+        // Fahrzeugseite nach der Spalte 'Beschreibung' einblenden, ansonsten am Ende
+        $filteredColumns = array();
+        if (array_key_exists('description', $columns)) {
+            foreach ($columns as $slug => $name) {
+                $filteredColumns[$slug] = $name;
+                if ($slug == 'description') {
+                    $filteredColumns['fahrzeugpage'] = 'Fahrzeugseite';
+                }
+            }
+        } else {
+            $filteredColumns['fahrzeugpage'] = 'Fahrzeugseite';
+        }
+        error_log(print_r($filteredColumns, true));
+        return $filteredColumns;
+    }
+
+    /**
+     * Filterfunktion für den Inhalt der selbst angelegten Spalten
+     * 
+     * @param string $string Leerer String.
+     * @param string $column_name Name der Spalte
+     * @param int $term_id Term ID
+     *
+     * @return string Inhalt der Spalte
+     */
+    public function columnContentFahrzeug($string, $column_name, $term_id)
+    {
+        error_log($string . '/' . $column_name . '/' . $term_id);
+        $fahrzeugpid = self::getTermField($term_id, 'fahrzeug', 'fahrzeugpid');
+        if (false === $fahrzeugpid) {
+            return '&nbsp;';
+        } else {
+            $url = get_page_link($fahrzeugpid);
+            $title = get_the_title($fahrzeugpid);
+            return '<a href="' . $url . '" title="&quot;' . $title . '&quot; ansehen">' . $title . '</a>';
+        }
     }
 
     /**

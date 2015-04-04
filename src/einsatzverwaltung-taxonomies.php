@@ -188,7 +188,7 @@ class Taxonomies
         if (false === $url) {
             return '&nbsp;';
         } else {
-            return '<a href="' . $url . '" title="' . $url . ' besuchen" target="_blank">URL</a>';
+            return '<a href="' . $url . '" title="' . $url . ' besuchen" target="_blank">' . $url . '</a>';
         }
     }
 

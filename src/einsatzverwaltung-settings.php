@@ -496,7 +496,7 @@ class Settings
 
         echo '<div id="einsatzverwaltung_contactinfo">';
         echo '<h3>Entwicklerkontakt &amp; Social Media</h3>';
-        echo 'eMail: <a href="mailto:kontakt@abrain.de">kontakt@abrain.de</a><br>';
+        echo 'eMail: <a href="mailto:kontakt@abrain.de">kontakt@abrain.de</a> <span title="PGP Schl&uuml;ssel-ID: 8752EB8F" class="pgpbadge"><i class="fa fa-unlock-alt"></i>&nbsp;PGP</span><br>';
         echo 'Twitter: <a href="https://twitter.com/einsatzvw">@einsatzvw</a><br>';
         echo 'App.net: <a href="https://alpha.app.net/einsatzverwaltung">@einsatzverwaltung</a><br>';
         echo 'Facebook: <a href="https://www.facebook.com/einsatzverwaltung/">Einsatzverwaltung</a>';

@@ -50,6 +50,14 @@ Entweder einen Issue auf [GitHub](https://github.com/abrain/einsatzverwaltung/is
 
 Entweder [per Mail](mailto:kontakt@abrain.de), per PN auf [Facebook](https://www.facebook.com/einsatzverwaltung), auf [Twitter](https://twitter.com/einsatzvw) oder [App.net](https://alpha.app.net/einsatzverwaltung). Bugs und Verbesserungsvorschl&auml;ge gerne auch als [Issue auf GitHub](https://github.com/abrain/einsatzverwaltung/issues).
 
+= Meine eMails mag ich am liebsten verschl&uuml;sselt und signiert, hast Du da was? =
+
+F&uuml;r eMails von/an [kontakt@abrain.de](mailto:kontakt@abrain.de) kann ich PGP anbieten, Schl&uuml;ssel-ID 8752EB8F.
+
+= Du oder Sie? =
+
+Das Du halte ich f&uuml;r die angenehmere Arbeitsgrundlage, aber man darf mich gerne auch siezen ohne dass ich mich alt f&uuml;hle.
+
 == Changelog ==
 
 = 0.9.0 =

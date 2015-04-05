@@ -37,7 +37,3 @@ if (version_compare($php_version, $php_version_min) < 0) {
 require_once dirname(__FILE__) . '/einsatzverwaltung-core.php';
 
 register_activation_hook(__FILE__, array('abrain\Einsatzverwaltung\Core', 'onActivation'));
-add_filter(
-    'plugin_action_links_' . plugin_basename(__FILE__),
-    array('abrain\Einsatzverwaltung\Settings','addActionLinks')
-);

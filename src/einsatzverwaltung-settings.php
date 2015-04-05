@@ -42,21 +42,6 @@ class Settings
 
 
     /**
-     * Zeigt einen Link zu den Einstellungen direkt auf der Plugin-Seite an
-     *
-     * @param $links
-     *
-     * @return array
-     */
-    public static function addActionLinks($links)
-    {
-        $settingsPage = 'options-general.php?page=' . self::EVW_SETTINGS_SLUG;
-        $actionLinks = array('<a href="' . admin_url($settingsPage) . '">Einstellungen</a>');
-        return array_merge($links, $actionLinks);
-    }
-
-
-    /**
      * Macht Einstellungen im System bekannt und regelt die Zugehörigkeit zu Abschnitten auf Einstellungsseiten
      */
     public function registerSettings()

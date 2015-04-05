@@ -13,6 +13,15 @@ Text Domain: einsatzverwaltung
 $php_version_min = '5.3.0';
 
 /**
+ * Gibt die Hauptdatei des Plugins zurück, wichtig für bestimmte Hooks
+ * @return string
+ */
+function einsatzverwaltung_plugin_file()
+{
+    return __FILE__;
+}
+
+/**
  * Prüfe, ob PHP mindestens in Version $php_version_min läuft
  */
 $php_version = phpversion();

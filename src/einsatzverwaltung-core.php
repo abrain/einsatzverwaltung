@@ -23,7 +23,8 @@ class Core
     const VERSION = '0.9.0';
     const DB_VERSION = 4;
 
-    //public static $pluginBase;
+    public static $pluginFile;
+    public static $pluginBasename;
     public static $pluginDir;
     public static $pluginUrl;
     public static $scriptUrl;
@@ -178,8 +179,10 @@ class Core
      */
     public function __construct()
     {
-        self::$pluginDir = plugin_dir_path(__FILE__);
-        self::$pluginUrl = plugin_dir_url(__FILE__);
+        self::$pluginFile = einsatzverwaltung_plugin_file();
+        self::$pluginBasename = plugin_basename(self::$pluginFile);
+        self::$pluginDir = plugin_dir_path(self::$pluginFile);
+        self::$pluginUrl = plugin_dir_url(self::$pluginFile);
         self::$scriptUrl = self::$pluginUrl . 'js/';
         self::$styleUrl = self::$pluginUrl . 'css/';
 

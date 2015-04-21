@@ -63,7 +63,7 @@ Das Du halte ich f&uuml;r die angenehmere Arbeitsgrundlage, aber man darf mich g
 = 0.9.1 =
 * Getestet mit WordPress 4.2
 * Fehlerbehebung: Administratoren hatten nicht sofort nach der Installation des Plugins Zugriff auf alle Funktionen
-* Verbesserung: &Uuml;bersichtsseite der Fahrzeuge bzw. externen Einsatzmittel zeigt jetzt auch die verlinkte Fahrzeugseite bzw. die angegebene URL
+* Verbesserung: &Uuml;bersichtsseite der Fahrzeuge bzw. externen Einsatzmittel im Adminbereich zeigt jetzt auch die verlinkte Fahrzeugseite bzw. die angegebene URL
 * Kontaktinformationen und FAQs aktualisiert
 
 = 0.9.0 =

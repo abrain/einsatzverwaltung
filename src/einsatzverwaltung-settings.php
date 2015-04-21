@@ -328,7 +328,7 @@ class Settings
             'einsatzvw_einsatz_hideemptydetails',
             'Nicht ausgef&uuml;llte Details ausblenden'
         );
-        echo '<p class="description">Ein Einsatzdetail gilt als nicht ausgef&uuml;llt, wenn das entsprechende Textfeld oder die entsprechende Liste leer ist. Bei der Mannschaftsst&auml;rke z&auml;hlt auch eine eingetragene 0 als leer.</p>';
+        echo '<p class="description">Ein Einsatzdetail gilt als nicht ausgef&uuml;llt, wenn das entsprechende Textfeld oder die entsprechende Liste leer ist.</p>';
     }
 
 

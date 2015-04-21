@@ -3,8 +3,8 @@ Contributors: abrain
 Donate link: https://www.abrain.de/software/unterstuetzen/
 Tags: Feuerwehr, Einsatz, Rettung, Rettungsdienst, THW, HiOrg, Wasserwacht, Bergrettung
 Requires at least: 3.4.0
-Tested up to: 4.1
-Stable tag: 0.9.0
+Tested up to: 4.2
+Stable tag: 0.9.1
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -50,7 +50,21 @@ Entweder einen Issue auf [GitHub](https://github.com/abrain/einsatzverwaltung/is
 
 Entweder [per Mail](mailto:kontakt@abrain.de), per PN auf [Facebook](https://www.facebook.com/einsatzverwaltung), auf [Twitter](https://twitter.com/einsatzvw) oder [App.net](https://alpha.app.net/einsatzverwaltung). Bugs und Verbesserungsvorschl&auml;ge gerne auch als [Issue auf GitHub](https://github.com/abrain/einsatzverwaltung/issues).
 
+= Meine eMails mag ich am liebsten verschl&uuml;sselt und signiert, hast Du da was? =
+
+F&uuml;r eMails von/an [kontakt@abrain.de](mailto:kontakt@abrain.de) kann ich PGP anbieten, Schl&uuml;ssel-ID 8752EB8F.
+
+= Du oder Sie? =
+
+Das Du halte ich f&uuml;r die angenehmere Arbeitsgrundlage, aber man darf mich gerne auch siezen ohne dass ich mich alt f&uuml;hle.
+
 == Changelog ==
+
+= 0.9.1 =
+* Getestet mit WordPress 4.2
+* Fehlerbehebung: Administratoren hatten nicht sofort nach der Installation des Plugins Zugriff auf alle Funktionen
+* Verbesserung: &Uuml;bersichtsseite der Fahrzeuge bzw. externen Einsatzmittel zeigt jetzt auch die verlinkte Fahrzeugseite bzw. die angegebene URL
+* Kontaktinformationen und FAQs aktualisiert
 
 = 0.9.0 =
 * Komplettsanierung: Unter der Haube wurde kr&auml;ftig umgebaut und zusammengefasst, klarere Strukturen beschleunigen die Entwicklung
@@ -174,6 +188,9 @@ Entweder [per Mail](mailto:kontakt@abrain.de), per PN auf [Facebook](https://www
 * Widget zeigt die aktuellsten X Eins&auml;tze
 
 == Upgrade Notice ==
+
+= 0.9.1 =
+Update f&uuml;r WordPress 4.2, sowie Fehlerbehebung und Verbesserung
 
 = 0.9.0 =
 Siehe Changelog f&uuml;r Details und wichtigen Hinweis

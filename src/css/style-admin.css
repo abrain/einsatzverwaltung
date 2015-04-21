@@ -1,8 +1,8 @@
 #einsatzverwaltung_contactinfo {
     background-color: #ddd;
-    padding: 20px;
+    padding: 0 20px;
     margin: 10px;
-    width: 180px;
+    width: 210px;
     position: absolute;
     top: 30px;
     right: 30px;
@@ -14,7 +14,6 @@
 	font: normal 20px/1 'dashicons';
 	vertical-align: top;
 	margin-right: 5px;
-	margin-right: 0.5rem;
 }
 
 #dashboard_right_now .einsatz-count a:before, #dashboard_right_now .einsatz-count span:before {
@@ -91,4 +90,11 @@ li.dropzone {
     font-size: 15px;
     font-weight: normal;
     margin-bottom: 15px;
+}
+
+.pgpbadge {
+    background-color: darkgray;
+    padding: 0 5px;
+    border-radius: 6px;
+    font-weight: bold;
 }

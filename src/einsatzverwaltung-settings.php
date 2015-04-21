@@ -42,21 +42,6 @@ class Settings
 
 
     /**
-     * Zeigt einen Link zu den Einstellungen direkt auf der Plugin-Seite an
-     *
-     * @param $links
-     *
-     * @return array
-     */
-    public static function addActionLinks($links)
-    {
-        $settingsPage = 'options-general.php?page=' . self::EVW_SETTINGS_SLUG;
-        $actionLinks = array('<a href="' . admin_url($settingsPage) . '">Einstellungen</a>');
-        return array_merge($links, $actionLinks);
-    }
-
-
-    /**
      * Macht Einstellungen im System bekannt und regelt die Zugehörigkeit zu Abschnitten auf Einstellungsseiten
      */
     public function registerSettings()
@@ -343,7 +328,7 @@ class Settings
             'einsatzvw_einsatz_hideemptydetails',
             'Nicht ausgef&uuml;llte Details ausblenden'
         );
-        echo '<p class="description">Ein Einsatzdetail gilt als nicht ausgef&uuml;llt, wenn das entsprechende Textfeld oder die entsprechende Liste leer ist. Bei der Mannschaftsst&auml;rke z&auml;hlt auch eine eingetragene 0 als leer.</p>';
+        echo '<p class="description">Ein Einsatzdetail gilt als nicht ausgef&uuml;llt, wenn das entsprechende Textfeld oder die entsprechende Liste leer ist.</p>';
     }
 
 
@@ -496,11 +481,12 @@ class Settings
 
         echo '<div id="einsatzverwaltung_contactinfo">';
         echo '<h3>Entwicklerkontakt &amp; Social Media</h3>';
-        echo 'eMail: <a href="mailto:kontakt@abrain.de">kontakt@abrain.de</a><br>';
-        echo 'Twitter: <a href="https://twitter.com/einsatzvw">@einsatzvw</a><br>';
-        echo 'App.net: <a href="https://alpha.app.net/einsatzverwaltung">@einsatzverwaltung</a><br>';
-        echo 'Facebook: <a href="https://www.facebook.com/einsatzverwaltung/">Einsatzverwaltung</a>';
-        echo '</div>';
+        echo '<p>eMail: <a href="mailto:kontakt@abrain.de">kontakt@abrain.de</a> <span title="PGP Schl&uuml;ssel-ID: 8752EB8F" class="pgpbadge"><i class="fa fa-lock"></i>&nbsp;PGP</span></p>';
+        echo '<p align="center"><a href="https://www.facebook.com/einsatzverwaltung/" title="Einsatzverwaltung auf Facebook"><i class="fa fa-facebook-official fa-2x"></i></a>&nbsp;&nbsp;';
+        echo '<a href="https://twitter.com/einsatzvw" title="Einsatzverwaltung auf Twitter"><i class="fa fa-twitter fa-2x"></i></a>&nbsp;&nbsp;';
+        echo '<a href="https://alpha.app.net/einsatzverwaltung" title="Einsatzverwaltung auf Alpha by App.net"><i class="fa fa-adn fa-2x"></i></a>&nbsp;&nbsp;';
+        echo '<a href="https://www.abrain.de/category/software/einsatzverwaltung/feed/" title="RSS-Feed mit Neuigkeiten zu Einsatzverwaltung"><i class="fa fa-rss-square fa-2x"></i></a>';
+        echo '</p></div>';
 
         echo '<div class="wrap">';
         echo '<h2>Einstellungen &rsaquo; Einsatzverwaltung</h2>';

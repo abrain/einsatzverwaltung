@@ -20,10 +20,11 @@ use WP_Query;
  */
 class Core
 {
-    const VERSION = '0.9.0';
+    const VERSION = '0.9.1';
     const DB_VERSION = 4;
 
-    //public static $pluginBase;
+    public static $pluginFile;
+    public static $pluginBasename;
     public static $pluginDir;
     public static $pluginUrl;
     public static $scriptUrl;
@@ -178,8 +179,10 @@ class Core
      */
     public function __construct()
     {
-        self::$pluginDir = plugin_dir_path(__FILE__);
-        self::$pluginUrl = plugin_dir_url(__FILE__);
+        self::$pluginFile = einsatzverwaltung_plugin_file();
+        self::$pluginBasename = plugin_basename(self::$pluginFile);
+        self::$pluginDir = plugin_dir_path(self::$pluginFile);
+        self::$pluginUrl = plugin_dir_url(self::$pluginFile);
         self::$scriptUrl = self::$pluginUrl . 'js/';
         self::$styleUrl = self::$pluginUrl . 'css/';
 
@@ -204,24 +207,31 @@ class Core
         add_action('init', array($this, 'onInit'));
         add_action('plugins_loaded', array($this, 'onPluginsLoaded'));
         add_action('save_post', array($this->data, 'savePostdata'));
+        register_activation_hook(self::$pluginFile, array($this, 'onActivation'));
     }
 
     /**
      * Wird beim Aktivieren des Plugins aufgerufen
      */
-    public static function onActivation()
+    public function onActivation()
     {
         update_option('einsatzvw_version', self::VERSION);
         add_option('einsatzvw_db_version', self::DB_VERSION);
 
-        self::maybeUpdate();
+        $this->maybeUpdate();
 
         // Posttypen registrieren
-        self::registerTypes();
-        self::addRewriteRules();
+        $this->registerTypes();
+        $this->addRewriteRules();
 
         // Permalinks aktualisieren
         flush_rewrite_rules();
+
+        // Rechte für Administratoren setzen
+        $role_obj = get_role('administrator');
+        foreach (self::getCapabilities() as $cap) {
+            $role_obj->add_cap($cap, true);
+        }
     }
 
     /**
@@ -229,19 +239,19 @@ class Core
      */
     public function onInit()
     {
-        self::registerTypes();
-        self::addRewriteRules();
+        $this->registerTypes();
+        $this->addRewriteRules();
     }
 
     public function onPluginsLoaded()
     {
-        self::maybeUpdate();
+        $this->maybeUpdate();
     }
 
     /**
      * Erzeugt den neuen Beitragstyp Einsatzbericht und die zugehörigen Taxonomien
      */
-    private static function registerTypes()
+    private function registerTypes()
     {
         register_post_type('einsatz', self::$args_einsatz);
         register_taxonomy('einsatzart', 'einsatz', self::$args_einsatzart);
@@ -250,7 +260,7 @@ class Core
         register_taxonomy('alarmierungsart', 'einsatz', self::$args_alarmierungsart);
     }
 
-    private static function addRewriteRules()
+    private function addRewriteRules()
     {
         $base = self::$args_einsatz['rewrite']['slug'];
         add_rewrite_rule(
@@ -440,7 +450,7 @@ class Core
         );
     }
 
-    private static function maybeUpdate()
+    private function maybeUpdate()
     {
         $currentDbVersion = get_option('einsatzvw_db_version', self::DB_VERSION);
         if ($currentDbVersion >= self::DB_VERSION) {

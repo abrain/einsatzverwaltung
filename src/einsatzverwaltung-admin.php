@@ -24,6 +24,8 @@ class Admin
         add_action('manage_einsatz_posts_custom_column', array($this, 'filterColumnContentEinsatz'), 10, 2);
         add_action('dashboard_glance_items', array($this, 'addEinsatzberichteToDashboard')); // since WP 3.8
         add_action('right_now_content_table_end', array($this, 'addEinsatzberichteToDashboardLegacy')); // before WP 3.8
+        add_filter('plugin_row_meta', array($this, 'pluginMetaLinks'), 10, 2);
+        add_filter('plugin_action_links_' . Core::$pluginBasename, array($this,'addActionLinks'));
     }
 
     /**
@@ -349,5 +351,35 @@ class Admin
             }
             echo '</td></tr>';
         }
+    }
+
+    /**
+     * Fügt weiterführende Links in der Pluginliste ein
+     *
+     * @param array $links Liste mit Standardlinks von WordPress
+     * @param string $file Name der Plugindatei
+     * @return array Vervollständigte Liste mit Links
+     */
+    public function pluginMetaLinks($links, $file)
+    {
+        if (Core::$pluginBasename === $file) {
+            $links[] = '<a href="https://www.abrain.de/category/software/einsatzverwaltung/feed/">Newsfeed</a>';
+        }
+
+        return $links;
+    }
+
+    /**
+     * Zeigt einen Link zu den Einstellungen direkt auf der Plugin-Seite an
+     *
+     * @param $links
+     *
+     * @return array
+     */
+    public function addActionLinks($links)
+    {
+        $settingsPage = 'options-general.php?page=' . Settings::EVW_SETTINGS_SLUG;
+        $actionLinks = array('<a href="' . admin_url($settingsPage) . '">Einstellungen</a>');
+        return array_merge($links, $actionLinks);
     }
 }

@@ -294,8 +294,9 @@ class Frontend
         }
 
         $enabledColumns = Options::getEinsatzlisteEnabledColumns();
+        $numEnabledColumns = count($enabledColumns);
 
-        $string = "";
+        $string = '<table class="einsatzliste">';
         foreach ($einsatzjahre as $einsatzjahr) {
             $query = new WP_Query(array('year' => $einsatzjahr,
                 'post_type' => 'einsatz',
@@ -305,17 +306,16 @@ class Frontend
                 'nopaging' => true
             ));
 
-            $string .= '<h3>Eins&auml;tze '.$einsatzjahr.'</h3>';
+            $string .= '<tbody>';
+            $string .= '<tr class="einsatzliste-title"><td class="einsatzliste-title-year" colspan="' . $numEnabledColumns . '">Eins&auml;tze '.$einsatzjahr.'</td></tr>';
             if ($query->have_posts()) {
                 $lfd = ($desc ? $query->found_posts : 1);
+                $oldmonth = 0;
 
                 if (!$splitmonths) {
-                    $string .= '<table class="einsatzliste">';
                     $string .= $this->getEinsatzlisteHeader();
-                    $string .= '<tbody>';
                 }
 
-                $oldmonth = 0;
                 while ($query->have_posts()) {
                     $query->next_post();
 
@@ -324,18 +324,11 @@ class Frontend
                     $month = date('m', $einsatz_timestamp);
 
                     if ($splitmonths && $month != $oldmonth) {
-                        if ($oldmonth != 0) {
-                            // Nicht im ersten Durchlauf
-                            $string .= '</tbody></table>';
-                        }
-                        $string .= '<h5>' . date_i18n('F', $einsatz_timestamp) . '</h5>';
-                        $string .= '<table class="einsatzliste">';
+                        $string .= '<tr class="einsatzliste-title"><td class="einsatzliste-title-month" colspan="' . $numEnabledColumns . '">' . date_i18n('F', $einsatz_timestamp) . '</td></tr>';
                         $string .= $this->getEinsatzlisteHeader();
-                        $string .= '<tbody>';
                     }
 
-                    $string .= '<tr>';
-
+                    $string .= '<tr class="einsatzliste-row">';
                     foreach ($enabledColumns as $colId) {
                         $string .= '<td>';
                         if($colId == 'seqNum') {
@@ -345,16 +338,17 @@ class Frontend
                         }
                         $string .= '</td>';
                     }
-
                     $string .= '</tr>';
+
                     $oldmonth = $month;
                     $lfd += ($desc ? -1 : 1);
                 }
-                $string .= '</tbody></table>';
             } else {
-                $string .= sprintf('Keine Eins&auml;tze im Jahr %s', $einsatzjahr);
+                $string .= '<tr class="einsatzliste-row-noresult"><td colspan="' . $numEnabledColumns . '">' . sprintf('Keine Eins&auml;tze im Jahr %s', $einsatzjahr) . '</td></tr>';
             }
+            $string .= '</tbody>';
         }
+        $string .= '</table>';
 
         return $string;
     }
@@ -368,7 +362,7 @@ class Frontend
         $columns = Core::getListColumns();
         $enabledColumns = Options::getEinsatzlisteEnabledColumns();
 
-        $string = "<thead><tr>";
+        $string = '<tr class="einsatzliste-header">';
         foreach ($enabledColumns as $colId) {
             if (!array_key_exists($colId, $columns)) {
                 continue;
@@ -377,7 +371,7 @@ class Frontend
             $colInfo = $columns[$colId];
             $string .= '<th>' . $colInfo['name'] . '</th>';
         }
-        $string .= "</tr></thead>";
+        $string .= "</tr>";
 
         return $string;
     }

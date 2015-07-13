@@ -317,7 +317,7 @@ class Frontend
                 while ($query->have_posts()) {
                     $query->next_post();
 
-                    $alarmzeit = get_post_meta($query->post->ID, 'einsatz_alarmzeit', true);
+                    $alarmzeit = Data::getAlarmzeit($query->post->ID);
                     $einsatz_timestamp = strtotime($alarmzeit);
                     $month = date('m', $einsatz_timestamp);
 

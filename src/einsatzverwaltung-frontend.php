@@ -293,6 +293,9 @@ class Frontend
             rsort($einsatzjahre);
         }
 
+        $columns = Core::getListColumns();
+        $enabledColumns = Options::getEinsatzlisteEnabledColumns();
+
         $string = "";
         foreach ($einsatzjahre as $einsatzjahr) {
             $query = new WP_Query(array('year' => $einsatzjahr,
@@ -334,8 +337,6 @@ class Frontend
 
                     $string .= '<tr>';
 
-                    $columns = Core::getListColumns();
-                    $enabledColumns = Options::getEinsatzlisteEnabledColumns();
                     foreach ($enabledColumns as $colId) {
                         if (!array_key_exists($colId, $columns)) {
                             continue;

@@ -106,8 +106,7 @@ class ToolImportWpEinsatz
                 // Felder matchen
                 echo "<h3>Felder zuordnen</h3>";
                 $this->renderMatchForm($felder);
-            } elseif (
-                array_key_exists('submit', $_POST) &&
+            } elseif (array_key_exists('submit', $_POST) &&
                 array_key_exists('aktion', $_POST) &&
                 $_POST['aktion'] == 'import_wpe'
             ) {

@@ -47,7 +47,7 @@ class WidgetLetzteEinsaetze extends WP_Widget
             $title = "Letzte Eins&auml;tze";
         }
 
-        if (!isset($anzahl) || empty ($anzahl) || !is_numeric($anzahl) || $anzahl < 1) {
+        if (!isset($anzahl) || empty($anzahl) || !is_numeric($anzahl) || $anzahl < 1) {
             $anzahl = 3;
         }
 
@@ -125,7 +125,7 @@ class WidgetLetzteEinsaetze extends WP_Widget
         $instance['title'] = strip_tags($new_instance['title']);
 
         $anzahl = $new_instance['anzahl'];
-        if (empty ($anzahl) || !is_numeric($anzahl) || $anzahl < 1) {
+        if (empty($anzahl) || !is_numeric($anzahl) || $anzahl < 1) {
             $instance['anzahl'] = $old_instance['anzahl'];
         } else {
             $instance['anzahl'] = $new_instance['anzahl'];
@@ -189,6 +189,6 @@ class WidgetLetzteEinsaetze extends WP_Widget
 }
 
 // Widget in WordPress registrieren
-add_action('widgets_init', function() {
+add_action('widgets_init', function () {
     register_widget('abrain\Einsatzverwaltung\WidgetLetzteEinsaetze');
 });

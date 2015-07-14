@@ -331,7 +331,7 @@ class Frontend
                     $string .= '<tr class="einsatzliste-row">';
                     foreach ($enabledColumns as $colId) {
                         $string .= '<td>';
-                        if($colId == 'seqNum') {
+                        if ($colId == 'seqNum') {
                             $string .= $lfd;
                         } else {
                             $string .= self::getEinsatzlisteCellContent($query->post->ID, $colId);

@@ -457,7 +457,7 @@ class Core
             return;
         }
 
-        require_once( __DIR__ . '/einsatzverwaltung-update.php' );
+        require_once(__DIR__ . '/einsatzverwaltung-update.php');
         $update = new Update();
         $update->doUpdate($currentDbVersion, self::DB_VERSION);
     }

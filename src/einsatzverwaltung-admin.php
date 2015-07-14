@@ -231,7 +231,7 @@ class Admin
     {
         global $post;
 
-        switch($column) {
+        switch ($column) {
             case 'e_nummer':
                 $einsatz_nummer = Data::getEinsatznummer($post_id);
                 echo (empty($einsatz_nummer) ? '-' : $einsatz_nummer);

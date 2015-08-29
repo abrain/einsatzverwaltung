@@ -52,7 +52,7 @@ class Core
             'slug' => 'einsaetze',
             'feeds' => true
         ),
-        'supports' => array('title', 'editor', 'thumbnail', 'publicize', 'author'),
+        'supports' => array('title', 'editor', 'thumbnail', 'publicize', 'author', 'revisions'),
         'show_in_nav_menus' => false,
         'capability_type' => array('einsatzbericht', 'einsatzberichte'),
         'map_meta_cap' => true,

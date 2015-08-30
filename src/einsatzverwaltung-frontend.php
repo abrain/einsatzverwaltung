@@ -35,7 +35,7 @@ class Frontend
             'font-awesome',
             Core::$pluginUrl . 'font-awesome/css/font-awesome.min.css',
             false,
-            '4.3.0'
+            '4.4.0'
         );
         wp_enqueue_style(
             'einsatzverwaltung-frontend',
@@ -293,7 +293,10 @@ class Frontend
             rsort($einsatzjahre);
         }
 
-        $string = "";
+        $enabledColumns = Options::getEinsatzlisteEnabledColumns();
+        $numEnabledColumns = count($enabledColumns);
+
+        $string = '<table class="einsatzliste">';
         foreach ($einsatzjahre as $einsatzjahr) {
             $query = new WP_Query(array('year' => $einsatzjahr,
                 'post_type' => 'einsatz',
@@ -303,113 +306,49 @@ class Frontend
                 'nopaging' => true
             ));
 
-            $string .= '<h3>Eins&auml;tze '.$einsatzjahr.'</h3>';
+            $string .= '<tbody>';
+            $string .= '<tr class="einsatzliste-title"><td class="einsatzliste-title-year" colspan="' . $numEnabledColumns . '">Eins&auml;tze '.$einsatzjahr.'</td></tr>';
             if ($query->have_posts()) {
                 $lfd = ($desc ? $query->found_posts : 1);
+                $oldmonth = 0;
 
                 if (!$splitmonths) {
-                    $string .= '<table class="einsatzliste">';
                     $string .= $this->getEinsatzlisteHeader();
-                    $string .= '<tbody>';
                 }
 
-                $oldmonth = 0;
                 while ($query->have_posts()) {
                     $query->next_post();
 
-                    $alarmzeit = get_post_meta($query->post->ID, 'einsatz_alarmzeit', true);
+                    $alarmzeit = Data::getAlarmzeit($query->post->ID);
                     $einsatz_timestamp = strtotime($alarmzeit);
                     $month = date('m', $einsatz_timestamp);
 
                     if ($splitmonths && $month != $oldmonth) {
-                        if ($oldmonth != 0) {
-                            // Nicht im ersten Durchlauf
-                            $string .= '</tbody></table>';
-                        }
-                        $string .= '<h5>' . date_i18n('F', $einsatz_timestamp) . '</h5>';
-                        $string .= '<table class="einsatzliste">';
+                        $string .= '<tr class="einsatzliste-title"><td class="einsatzliste-title-month" colspan="' . $numEnabledColumns . '">' . date_i18n('F', $einsatz_timestamp) . '</td></tr>';
                         $string .= $this->getEinsatzlisteHeader();
-                        $string .= '<tbody>';
                     }
 
-                    $string .= '<tr>';
-
-                    $columns = Core::getListColumns();
-                    $enabledColumns = Options::getEinsatzlisteEnabledColumns();
+                    $string .= '<tr class="einsatzliste-row">';
                     foreach ($enabledColumns as $colId) {
-                        if (!array_key_exists($colId, $columns)) {
-                            continue;
-                        }
-
                         $string .= '<td>';
-                        switch ($colId) {
-                            case 'number':
-                                $string .= Data::getEinsatznummer($query->post->ID);
-                                break;
-                            case 'date':
-                                $string .= date('d.m.Y', $einsatz_timestamp);
-                                break;
-                            case 'time':
-                                $string .= date('H:i', $einsatz_timestamp);
-                                break;
-                            case 'title':
-                                $post_title = get_the_title($query->post->ID);
-                                if (empty($post_title)) {
-                                    $post_title = '(kein Titel)';
-                                }
-                                $url = get_permalink($query->post->ID);
-                                $string .= '<a href="' . $url . '" rel="bookmark">' . $post_title . '</a>';
-                                break;
-                            case 'incidentCommander':
-                                $string .= Data::getEinsatzleiter($query->post->ID);
-                                break;
-                            case 'location':
-                                $string .= Data::getEinsatzort($query->post->ID);
-                                break;
-                            case 'workforce':
-                                $string .= Data::getMannschaftsstaerke($query->post->ID);
-                                break;
-                            case 'duration':
-                                $minutes = Data::getDauer($query->post->ID);
-                                $string .= Utilities::getDurationString($minutes, true);
-                                break;
-                            case 'vehicles':
-                                $vehicles = Data::getFahrzeuge($query->post->ID);
-                                $makeFahrzeugLinks = Options::getBoolOption('einsatzvw_list_fahrzeuge_link');
-                                $string .= self::getFahrzeugeString($vehicles, $makeFahrzeugLinks, false);
-                                break;
-                            case 'alarmType':
-                                $alarmierungsarten = Data::getAlarmierungsart($query->post->ID);
-                                $string .= self::getAlarmierungsartString($alarmierungsarten);
-                                break;
-                            case 'additionalForces':
-                                $exteinsatzmittel = Data::getWeitereKraefte($query->post->ID);
-                                $makeLinks = Options::getBoolOption('einsatzvw_list_ext_link');
-                                $string .= self::getWeitereKraefteString($exteinsatzmittel, $makeLinks, false);
-                                break;
-                            case 'incidentType':
-                                $einsatzart = Data::getEinsatzart($query->post->ID);
-                                $showHierarchy = Options::getBoolOption('einsatzvw_list_art_hierarchy');
-                                $string .= self::getEinsatzartString($einsatzart, false, false, $showHierarchy);
-                                break;
-                            case 'seqNum':
-                                $string .= $lfd;
-                                break;
-                            default:
-                                $string .= '&nbsp;';
+                        if ($colId == 'seqNum') {
+                            $string .= $lfd;
+                        } else {
+                            $string .= self::getEinsatzlisteCellContent($query->post->ID, $colId);
                         }
                         $string .= '</td>';
                     }
-
                     $string .= '</tr>';
+
                     $oldmonth = $month;
                     $lfd += ($desc ? -1 : 1);
                 }
-                $string .= '</tbody></table>';
             } else {
-                $string .= sprintf('Keine Eins&auml;tze im Jahr %s', $einsatzjahr);
+                $string .= '<tr class="einsatzliste-row-noresult"><td colspan="' . $numEnabledColumns . '">' . sprintf('Keine Eins&auml;tze im Jahr %s', $einsatzjahr) . '</td></tr>';
             }
+            $string .= '</tbody>';
         }
+        $string .= '</table>';
 
         return $string;
     }
@@ -423,7 +362,7 @@ class Frontend
         $columns = Core::getListColumns();
         $enabledColumns = Options::getEinsatzlisteEnabledColumns();
 
-        $string = "<thead><tr>";
+        $string = '<tr class="einsatzliste-header">';
         foreach ($enabledColumns as $colId) {
             if (!array_key_exists($colId, $columns)) {
                 continue;
@@ -432,9 +371,77 @@ class Frontend
             $colInfo = $columns[$colId];
             $string .= '<th>' . $colInfo['name'] . '</th>';
         }
-        $string .= "</tr></thead>";
+        $string .= "</tr>";
 
         return $string;
+    }
+
+    /**
+     * Gibt den Inhalt der Tabellenzelle einer bestimmten Spalte für einen bestimmten Einsatzbericht zurück
+     *
+     * @param string $colId Eindeutige Kennung der Spalte
+     * @param int $postId ID des Einsatzberichts
+     * @return string
+     */
+    private function getEinsatzlisteCellContent($postId, $colId)
+    {
+        switch ($colId) {
+            case 'number':
+                return Data::getEinsatznummer($postId);
+                break;
+            case 'date':
+                $alarmzeit = Data::getAlarmzeit($postId);
+                $einsatz_timestamp = strtotime($alarmzeit);
+                return date('d.m.Y', $einsatz_timestamp);
+                break;
+            case 'time':
+                $alarmzeit = Data::getAlarmzeit($postId);
+                $einsatz_timestamp = strtotime($alarmzeit);
+                return date('H:i', $einsatz_timestamp);
+                break;
+            case 'title':
+                $post_title = get_the_title($postId);
+                if (empty($post_title)) {
+                    $post_title = '(kein Titel)';
+                }
+                $url = get_permalink($postId);
+                return '<a href="' . $url . '" rel="bookmark">' . $post_title . '</a>';
+                break;
+            case 'incidentCommander':
+                return Data::getEinsatzleiter($postId);
+                break;
+            case 'location':
+                return Data::getEinsatzort($postId);
+                break;
+            case 'workforce':
+                return Data::getMannschaftsstaerke($postId);
+                break;
+            case 'duration':
+                $minutes = Data::getDauer($postId);
+                return Utilities::getDurationString($minutes, true);
+                break;
+            case 'vehicles':
+                $vehicles = Data::getFahrzeuge($postId);
+                $makeFahrzeugLinks = Options::getBoolOption('einsatzvw_list_fahrzeuge_link');
+                return self::getFahrzeugeString($vehicles, $makeFahrzeugLinks, false);
+                break;
+            case 'alarmType':
+                $alarmierungsarten = Data::getAlarmierungsart($postId);
+                return self::getAlarmierungsartString($alarmierungsarten);
+                break;
+            case 'additionalForces':
+                $exteinsatzmittel = Data::getWeitereKraefte($postId);
+                $makeLinks = Options::getBoolOption('einsatzvw_list_ext_link');
+                return self::getWeitereKraefteString($exteinsatzmittel, $makeLinks, false);
+                break;
+            case 'incidentType':
+                $einsatzart = Data::getEinsatzart($postId);
+                $showHierarchy = Options::getBoolOption('einsatzvw_list_art_hierarchy');
+                return self::getEinsatzartString($einsatzart, false, false, $showHierarchy);
+                break;
+            default:
+                return '&nbsp;';
+        }
     }
 
     /**

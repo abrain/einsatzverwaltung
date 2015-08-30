@@ -1,7 +1,40 @@
-.einsatzliste {
+table.einsatzliste {
     width: 100%;
+    border: none;
+    background: none;
 }
 
 .einsatzliste th {
     text-align: left;
+}
+
+.einsatzliste-title td.einsatzliste-title-year {
+    border: none;
+    font-size: large;
+    padding: 20px 0 8px 0;
+}
+
+.einsatzliste-title td.einsatzliste-title-month {
+    border: none;
+    font-size: medium;
+    padding: 12px 8px 8px 8px;
+}
+
+.einsatzliste-header th {
+    border-top: 1px solid #d3d3d3;
+    border-right: 1px solid #d3d3d3;
+    border-bottom: 1px solid #d3d3d3;
+}
+
+.einsatzliste-row td {
+    border-right: 1px solid #d3d3d3;
+    border-bottom: 1px solid #d3d3d3;
+}
+
+.einsatzliste-row-noresult td {
+    border: none;
+}
+
+.einsatzliste-row td:first-child, .einsatzliste th:first-child {
+    border-left: 1px solid #d3d3d3;
 }

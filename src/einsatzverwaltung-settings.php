@@ -151,7 +151,7 @@ class Settings
         add_settings_section(
             'einsatzvw_settings_einsatzberichte',
             'Einsatzberichte',
-            function() {
+            function () {
                 echo '<p>Mit diesen Einstellungen kann das Aussehen der Einsatzberichte beeinflusst werden.</p>';
             },
             self::EVW_SETTINGS_SLUG
@@ -159,7 +159,7 @@ class Settings
         add_settings_section(
             'einsatzvw_settings_einsatzliste',
             'Einsatzliste',
-            function() {
+            function () {
                 echo '<p>Mit diesen Einstellungen kann das Aussehen der Einsatzlisten beeinflusst werden.</p>';
             },
             self::EVW_SETTINGS_SLUG
@@ -167,7 +167,7 @@ class Settings
         add_settings_section(
             'einsatzvw_settings_caps',
             'Berechtigungen',
-            function() {
+            function () {
                 echo '<p>Hier kann festgelegt werden, welche Benutzer die Einsatzberichte verwalten k&ouml;nnen.</p>';
             },
             self::EVW_SETTINGS_SLUG
@@ -489,7 +489,7 @@ class Settings
         echo '</p></div>';
 
         echo '<div class="wrap">';
-        echo '<h2>Einstellungen &rsaquo; Einsatzverwaltung</h2>';
+        echo '<h1>Einstellungen &rsaquo; Einsatzverwaltung</h1>';
 
         // Berechtigungen aktualisieren
         $roles = get_editable_roles();

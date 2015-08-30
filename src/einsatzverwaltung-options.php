@@ -81,7 +81,9 @@ class Options
     }
 
     /**
-     * @return array
+     * Gibt die aktiven Spalten für die Einsatzliste zurück
+     *
+     * @return array Spalten-IDs der aktiven Spalten, geprüft auf Existenz. Bei Problemen die Standardspalten.
      */
     public static function getEinsatzlisteEnabledColumns()
     {

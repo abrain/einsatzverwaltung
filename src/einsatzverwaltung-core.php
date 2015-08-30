@@ -20,7 +20,7 @@ use WP_Query;
  */
 class Core
 {
-    const VERSION = '0.9.1';
+    const VERSION = '0.9.2';
     const DB_VERSION = 4;
 
     public static $pluginFile;
@@ -52,7 +52,7 @@ class Core
             'slug' => 'einsaetze',
             'feeds' => true
         ),
-        'supports' => array('title', 'editor', 'thumbnail', 'publicize', 'author'),
+        'supports' => array('title', 'editor', 'thumbnail', 'publicize', 'author', 'revisions'),
         'show_in_nav_menus' => false,
         'capability_type' => array('einsatzbericht', 'einsatzberichte'),
         'map_meta_cap' => true,
@@ -446,7 +446,7 @@ class Core
             'post_date' => 'Alarmzeit',
             'post_name' => 'Einsatznummer',
             'post_content' => 'Berichtstext',
-            'post_title' => 'Einsatzstichwort'
+            'post_title' => 'Berichtstitel'
         );
     }
 
@@ -457,7 +457,7 @@ class Core
             return;
         }
 
-        require_once( __DIR__ . '/einsatzverwaltung-update.php' );
+        require_once(__DIR__ . '/einsatzverwaltung-update.php');
         $update = new Update();
         $update->doUpdate($currentDbVersion, self::DB_VERSION);
     }

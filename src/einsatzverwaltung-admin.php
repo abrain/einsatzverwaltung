@@ -73,7 +73,7 @@ class Admin
             'font-awesome',
             Core::$pluginUrl . 'font-awesome/css/font-awesome.min.css',
             false,
-            '4.3.0'
+            '4.4.0'
         );
         wp_enqueue_style(
             'einsatzverwaltung-admin',
@@ -231,7 +231,7 @@ class Admin
     {
         global $post;
 
-        switch($column) {
+        switch ($column) {
             case 'e_nummer':
                 $einsatz_nummer = Data::getEinsatznummer($post_id);
                 echo (empty($einsatz_nummer) ? '-' : $einsatz_nummer);

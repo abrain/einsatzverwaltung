@@ -3,8 +3,8 @@ Contributors: abrain
 Donate link: https://www.abrain.de/software/unterstuetzen/
 Tags: Feuerwehr, Einsatz, Rettung, Rettungsdienst, THW, HiOrg, Wasserwacht, Bergrettung
 Requires at least: 3.4.0
-Tested up to: 4.2
-Stable tag: 0.9.1
+Tested up to: 4.3
+Stable tag: 0.9.2
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -59,6 +59,12 @@ F&uuml;r eMails von/an [kontakt@abrain.de](mailto:kontakt@abrain.de) kann ich PG
 Das Du halte ich f&uuml;r die angenehmere Arbeitsgrundlage, aber man darf mich gerne auch siezen ohne dass ich mich alt f&uuml;hle.
 
 == Changelog ==
+
+= 0.9.2 =
+* Getestet mit WordPress 4.3
+* Gleiche Spaltenbreite &uuml;ber gesamte Einsatzliste
+* &Auml;nderungen an den Einsatzberichten sind jetzt &uuml;ber Revisionen nachverfolgbar
+* Font Awesome auf Version 4.4 aktualisiert
 
 = 0.9.1 =
 * Getestet mit WordPress 4.2
@@ -188,6 +194,9 @@ Das Du halte ich f&uuml;r die angenehmere Arbeitsgrundlage, aber man darf mich g
 * Widget zeigt die aktuellsten X Eins&auml;tze
 
 == Upgrade Notice ==
+
+= 0.9.2 =
+Kleine Verbesserungen, siehe Changelog f&uuml;r Details
 
 = 0.9.1 =
 Update f&uuml;r WordPress 4.2, sowie Fehlerbehebung und Verbesserung

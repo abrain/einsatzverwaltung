@@ -35,7 +35,7 @@ class Frontend
             'font-awesome',
             Core::$pluginUrl . 'font-awesome/css/font-awesome.min.css',
             false,
-            '4.3.0'
+            '4.4.0'
         );
         wp_enqueue_style(
             'einsatzverwaltung-frontend',

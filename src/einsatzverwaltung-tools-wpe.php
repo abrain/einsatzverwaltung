@@ -49,7 +49,7 @@ class ToolImportWpEinsatz
         global $wpdb;
 
         echo '<div class="wrap">';
-        echo '<h2>Import aus wp-einsatz</h2>';
+        echo '<h1>Import aus wp-einsatz</h1>';
 
         echo '<p>Dieses Werkzeug importiert Einsätze aus wp-einsatz.</p>';
 

@@ -46,7 +46,7 @@ class ToolEinsatznummernReparieren
     public function renderToolPage()
     {
         echo '<div class="wrap">';
-        echo '<h2>Einsatznummern reparieren</h2>';
+        echo '<h1>Einsatznummern reparieren</h1>';
 
         echo '<p>Dieses Werkzeug stellt sicher, dass alle Einsatznummern in korrekter Abfolge und Formatierung vorliegen.</p>';
 

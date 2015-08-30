@@ -489,7 +489,7 @@ class Settings
         echo '</p></div>';
 
         echo '<div class="wrap">';
-        echo '<h2>Einstellungen &rsaquo; Einsatzverwaltung</h2>';
+        echo '<h1>Einstellungen &rsaquo; Einsatzverwaltung</h1>';
 
         // Berechtigungen aktualisieren
         $roles = get_editable_roles();

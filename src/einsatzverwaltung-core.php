@@ -446,7 +446,7 @@ class Core
             'post_date' => 'Alarmzeit',
             'post_name' => 'Einsatznummer',
             'post_content' => 'Berichtstext',
-            'post_title' => 'Einsatzstichwort'
+            'post_title' => 'Berichtstitel'
         );
     }
 

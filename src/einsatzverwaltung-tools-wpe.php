@@ -96,12 +96,11 @@ class ToolImportWpEinsatz
                 }
 
                 // Hinweise ausgeben
-                echo '<h3>Hinweise zu den Daten</h3>';
-                echo '<p>Die Felder <strong>Berichtstext, Einsatzleiter, Einsatzort</strong> und <strong>Einsatzstichwort</strong> sind Freitextfelder.</p>';
+                echo '<h3>Hinweise zu den erwarteten Daten</h3>';
+                echo '<p>Die Felder <strong>Berichtstext, Berichtstitel, Einsatzleiter, Einsatzort</strong> und <strong>Mannschaftsst&auml;rke</strong> sind Freitextfelder.</p>';
                 echo '<p>F&uuml;r die Felder <strong>Alarmierungsart, Einsatzart, Externe Einsatzmittel</strong> und <strong>Fahrzeuge</strong> wird eine kommagetrennte Liste erwartet.<br>Bisher unbekannte Eintr&auml;ge werden automatisch angelegt, die Einsatzart sollte nur ein einzelner Wert sein.</p>';
                 echo '<p>Das Feld <strong>Einsatzende</strong> erwartet eine Datums- und Zeitangabe im Format <code>JJJJ-MM-TT hh:mm:ss</code> (z.B. 2014-04-21 21:48:06). Die Sekundenangabe ist optional.</p>';
                 echo '<p>Das Feld <strong>Fehlalarm</strong> erwartet den Wert 1 (= ja) oder 0 (= nein). Es darf auch leer bleiben, was als 0 (= nein) zählt.</p>';
-                echo '<p>Das Feld <strong>Mannschaftsst&auml;rke</strong> erwartet eine Zahl größer oder gleich 0. Es darf auch leer bleiben.</p>';
 
                 // Felder matchen
                 echo "<h3>Felder zuordnen</h3>";

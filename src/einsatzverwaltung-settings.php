@@ -503,6 +503,16 @@ class Settings
             }
         }
 
+        // Prüfen, ob Rewrite Slug von einer Seite genutzt wird
+        $rewriteSlug = Options::getRewriteSlug();
+        $conflictingPage = get_page_by_path($rewriteSlug);
+        if ($conflictingPage instanceof \WP_Post) {
+            $pageEditLink = '<a href="' . get_edit_post_link($conflictingPage->ID) . '">' . $conflictingPage->post_title . '</a>';
+            $message = sprintf('Die Seite %s und das Archiv der Einsatzberichte haben einen identischen Permalink (%s). &Auml;ndere einen der beiden Permalinks, um beide Seiten erreichen zu k&ouml;nnen.', $pageEditLink, $rewriteSlug);
+            echo '<div class="error"><p>' . $message . '</p></div>';
+        }
+
+        // Einstellungen ausgeben
         echo '<form method="post" action="options.php">';
         settings_fields('einsatzvw_settings');
         do_settings_sections(self::EVW_SETTINGS_SLUG);

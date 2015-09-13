@@ -120,6 +120,16 @@ class Options
     }
 
     /**
+     * Gibt die Basis für die URL zu Einsatzberichten zurück
+     *
+     * @return string
+     */
+    public static function getRewriteSlug()
+    {
+        return 'einsaetze';
+    }
+
+    /**
      * @return mixed
      */
     public static function getTimeFormat()

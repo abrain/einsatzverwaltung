@@ -49,7 +49,6 @@ class Core
         'public' => true,
         'has_archive' => true,
         'rewrite' => array(
-            'slug' => 'einsaetze',
             'feeds' => true
         ),
         'supports' => array('title', 'editor', 'thumbnail', 'publicize', 'author', 'revisions'),
@@ -189,6 +188,7 @@ class Core
         if (Utilities::isMinWPVersion("3.9")) {
             self::$args_einsatz['menu_icon'] = 'dashicons-media-document';
         }
+        self::$args_einsatz['rewrite']['slug'] = Options::getRewriteSlug();
 
         new Admin();
         $this->data = new Data();
@@ -262,7 +262,7 @@ class Core
 
     private function addRewriteRules()
     {
-        $base = self::$args_einsatz['rewrite']['slug'];
+        $base = Options::getRewriteSlug();
         add_rewrite_rule(
             $base . '/(\d{4})/page/(\d{1,})/?$',
             'index.php?post_type=einsatz&year=$matches[1]&paged=$matches[2]',

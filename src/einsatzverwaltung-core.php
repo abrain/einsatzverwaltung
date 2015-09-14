@@ -21,7 +21,7 @@ use WP_Query;
 class Core
 {
     const VERSION = '0.9.2';
-    const DB_VERSION = 4;
+    const DB_VERSION = 5;
 
     public static $pluginFile;
     public static $pluginBasename;
@@ -241,6 +241,10 @@ class Core
     {
         $this->registerTypes();
         $this->addRewriteRules();
+        if (Options::isFlushRewriteRules()) {
+            flush_rewrite_rules();
+            Options::setFlushRewriteRules(false);
+        }
     }
 
     public function onPluginsLoaded()

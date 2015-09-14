@@ -103,4 +103,13 @@ class Update
         );
         return (false !== $result);
     }
+
+    /**
+     * @return bool Gibt immer True zurück
+     */
+    private function updateTo5()
+    {
+        add_option('einsatzvw_rewrite_slug', 'einsaetze');
+        return true;
+    }
 }

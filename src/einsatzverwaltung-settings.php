@@ -23,6 +23,12 @@ class Settings
     {
         add_action('admin_menu', array($this, 'addToSettingsMenu'));
         add_action('admin_init', array($this, 'registerSettings'));
+        add_filter('pre_update_option_einsatzvw_rewrite_slug', function ($new_value, $old_value) {
+            if ($new_value != $old_value) {
+                Options::setFlushRewriteRules(true);
+            }
+            return $new_value;
+        }, 10, 2);
     }
 
 
@@ -53,6 +59,11 @@ class Settings
         $this->addSettingsFields();
 
         // Registration
+        register_setting(
+            'einsatzvw_settings',
+            'einsatzvw_rewrite_slug',
+            'sanitize_title'
+        );
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_einsatznummer_stellen',
@@ -181,6 +192,13 @@ class Settings
     private function addSettingsFields()
     {
         add_settings_field(
+            'einsatzvw_permalinks',
+            'Permalinks',
+            array($this, 'echoSettingsPermalinks'),
+            self::EVW_SETTINGS_SLUG,
+            'einsatzvw_settings_general'
+        );
+        add_settings_field(
             'einsatzvw_einsatznummer_stellen',
             'Format der Einsatznummer',
             array($this, 'echoSettingsEinsatznummerFormat'),
@@ -279,20 +297,34 @@ class Settings
 
 
     /**
-     *
+     * @param $name
+     * @param $description
+     * @param string $value
      */
-    /*private function echoSettingsInput($args)
+    private function echoSettingsInput($name, $description, $value = '')
     {
-        $inputId = $args[0];
-        $text = $args[1];
         printf(
             '<input type="text" value="%2$s" id="%1$s" name="%1$s" /><p class="description">%3$s</p>',
-            $inputId,
-            Options::getOption($inputId),
-            $text
+            $name,
+            (empty($value) ? Options::getOption($name) : $value),
+            $description
         );
-    }*/
+    }
 
+
+    public function echoSettingsPermalinks()
+    {
+        $this->echoSettingsInput(
+            'einsatzvw_rewrite_slug',
+            sprintf(
+                'Basis f&uuml;r Links zu Einsatzberichten, zum %1$sArchiv%2$s und zum %3$sFeed%2$s.',
+                '<a href="'.get_post_type_archive_link('einsatz').'">',
+                '</a>',
+                '<a href="'.get_post_type_archive_feed_link('einsatz').'">'
+            ),
+            Options::getRewriteSlug()
+        );
+    }
 
     /**
      *

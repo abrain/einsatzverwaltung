@@ -23,7 +23,9 @@ class Options
         'einsatzvw_cap_roles_administrator' => true,
         'einsatzvw_list_art_hierarchy' => false,
         'einsatzvw_list_ext_link' => false,
-        'einsatzvw_list_fahrzeuge_link' => false
+        'einsatzvw_list_fahrzeuge_link' => false,
+        'einsatzvw_rewrite_slug' => 'einsatzberichte',
+        'einsatzvw_flush_rewrite_rules' => false
     );
 
     /**
@@ -126,7 +128,8 @@ class Options
      */
     public static function getRewriteSlug()
     {
-        return 'einsaetze';
+        $option = self::getOption('einsatzvw_rewrite_slug');
+        return sanitize_title($option, self::$defaults['einsatzvw_rewrite_slug']);
     }
 
     /**
@@ -144,6 +147,14 @@ class Options
     {
         $option = self::getOption('einsatzvw_einsatznummer_lfdvorne');
         return self::toBoolean($option);
+    }
+
+    /**
+     * @return bool
+     */
+    public static function isFlushRewriteRules()
+    {
+        return self::getBoolOption('einsatzvw_flush_rewrite_rules');
     }
 
     /**
@@ -215,6 +226,14 @@ class Options
     {
         $option = self::getOption('einsatzvw_show_fahrzeug_archive');
         return self::toBoolean($option);
+    }
+
+    /**
+     * @param bool $value
+     */
+    public static function setFlushRewriteRules($value)
+    {
+        update_option('einsatzvw_flush_rewrite_rules', $value ? 1 : 0);
     }
 
     /**

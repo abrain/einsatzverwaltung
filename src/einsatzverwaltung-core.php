@@ -55,7 +55,8 @@ class Core
         'show_in_nav_menus' => false,
         'capability_type' => array('einsatzbericht', 'einsatzberichte'),
         'map_meta_cap' => true,
-        'menu_position' => 5
+        'menu_position' => 5,
+        'taxonomies' => array('post_tag')
     );
 
     private static $args_einsatzart = array(

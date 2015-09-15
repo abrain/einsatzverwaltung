@@ -260,8 +260,7 @@ class Frontend
      */
     public function addEinsatzberichteToMainloop($query)
     {
-        if (
-            (
+        if ((
                 is_home() && Options::isShowEinsatzberichteInMainloop() ||
                 is_tag()
             ) &&

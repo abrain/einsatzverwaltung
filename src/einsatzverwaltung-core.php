@@ -285,7 +285,8 @@ class Core
      *
      * @return string Die zu verwendende WHERE-Klausel
      */
-    public function postsWhere($where, $wpq) {
+    public function postsWhere($where, $wpq)
+    {
         if ($wpq->is_category && $wpq->get_queried_object_id() === Options::getEinsatzberichteCategory()) {
             // Einsatzberichte in die eingestellte Kategorie einblenden
             global $wpdb;

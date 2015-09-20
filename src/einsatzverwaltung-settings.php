@@ -81,6 +81,11 @@ class Settings
         );
         register_setting(
             'einsatzvw_settings',
+            'einsatzvw_category',
+            'intval'
+        );
+        register_setting(
+            'einsatzvw_settings',
             'einsatzvw_einsatz_hideemptydetails',
             array('abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
         );
@@ -339,15 +344,28 @@ class Settings
 
 
     /**
-     * Gibt die Einstellmöglichkeit aus, ob Einsatzberichte zusammen mit anderen Beiträgen ausgegeben werden sollen
+     * Gibt die Einstellmöglichkeit aus, ob und wie Einsatzberichte zusammen mit anderen Beiträgen ausgegeben werden
+     * sollen
      */
     public function echoEinsatzberichteMainloop()
     {
         $this->echoSettingsCheckbox(
             'einsatzvw_show_einsatzberichte_mainloop',
-            'Einsatzberichte wie reguläre Beitr&auml;ge anzeigen'
+            'Einsatzberichte zwischen den regul&auml;ren WordPress-Beitr&auml;gen (z.B. auf der Startseite) anzeigen'
         );
-        echo '<p class="description">Mit dieser Option werden Einsatzberichte zwischen den anderen WordPress-Beiträgen (z.B. auf der Startseite) angezeigt.</p>';
+
+        echo '<p><label for="einsatzvw_category">';
+        _e('Davon unabh&auml;ngig Einsatzberichte in folgender Kategorie einblenden:', 'einsatzverwaltung');
+        echo '&nbsp;</label>';
+        wp_dropdown_categories(array(
+            'show_option_none' => '- keine -',
+            'hide_empty' => false,
+            'name' => 'einsatzvw_category',
+            'selected' => Options::getEinsatzberichteCategory(),
+            'orderby' => 'name',
+            'hierarchical' => true
+        ));
+        echo '</p>';
     }
 
 

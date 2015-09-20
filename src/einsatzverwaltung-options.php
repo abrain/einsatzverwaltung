@@ -25,7 +25,8 @@ class Options
         'einsatzvw_list_ext_link' => false,
         'einsatzvw_list_fahrzeuge_link' => false,
         'einsatzvw_rewrite_slug' => 'einsatzberichte',
-        'einsatzvw_flush_rewrite_rules' => false
+        'einsatzvw_flush_rewrite_rules' => false,
+        'einsatzvw_category' => false
     );
 
     /**
@@ -80,6 +81,17 @@ class Options
     public static function getDateFormat()
     {
         return self::getOption('date_format');
+    }
+
+    /**
+     * Gibt die Kategorie zurück, in der neben Beiträgen auch Einsatzberichte angezeigt werden sollen
+     *
+     * @return int Die ID der Kategorie oder 0, wenn nicht gesetzt
+     */
+    public static function getEinsatzberichteCategory()
+    {
+        $categoryId = self::getOption('einsatzvw_category');
+        return (false === $categoryId ? 0 : intval($categoryId));
     }
 
     /**

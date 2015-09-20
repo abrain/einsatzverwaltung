@@ -209,6 +209,7 @@ class Core
         add_action('plugins_loaded', array($this, 'onPluginsLoaded'));
         add_action('save_post', array($this->data, 'savePostdata'));
         register_activation_hook(self::$pluginFile, array($this, 'onActivation'));
+        add_filter('posts_where', array($this, 'postsWhere'), 10, 2);
     }
 
     /**
@@ -274,6 +275,23 @@ class Core
             'top'
         );
         add_rewrite_rule($base . '/(\d{4})/?$', 'index.php?post_type=einsatz&year=$matches[1]', 'top');
+    }
+
+    /**
+     * Modifiziert die WHERE-Klausel bei bestimmten Datenbankabfragen
+     *
+     * @param string $where Die original WHERE-Klausel
+     * @param WP_Query $wpq Die verwendete WP-Query-Instanz
+     *
+     * @return string Die zu verwendende WHERE-Klausel
+     */
+    public function postsWhere($where, $wpq) {
+        if ($wpq->is_category && $wpq->get_queried_object_id() === Options::getEinsatzberichteCategory()) {
+            // Einsatzberichte in die eingestellte Kategorie einblenden
+            global $wpdb;
+            return $where . " OR {$wpdb->posts}.post_type = 'einsatz' AND ({$wpdb->posts}.post_status = 'publish' OR {$wpdb->posts}.post_status = 'private')";
+        }
+        return $where;
     }
 
     /**

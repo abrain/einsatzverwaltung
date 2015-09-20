@@ -155,13 +155,11 @@ class Utilities
 
         if (intval($neededversionparts[0]) > intval($currentversionparts[0])) {
             return false;
-        } elseif (
-            intval($neededversionparts[0]) == intval($currentversionparts[0]) &&
+        } elseif (intval($neededversionparts[0]) == intval($currentversionparts[0]) &&
             intval($neededversionparts[1]) > intval($currentversionparts[1])
         ) {
             return false;
-        } elseif (
-            intval($neededversionparts[0]) == intval($currentversionparts[0]) &&
+        } elseif (intval($neededversionparts[0]) == intval($currentversionparts[0]) &&
             intval($neededversionparts[1]) == intval($currentversionparts[1]) &&
             intval($neededversionparts[2]) > intval($currentversionparts[2])
         ) {

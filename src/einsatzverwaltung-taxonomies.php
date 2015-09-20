@@ -133,13 +133,19 @@ class Taxonomies
      */
     public function columnContentFahrzeug($string, $column_name, $term_id)
     {
-        $fahrzeugpid = self::getTermField($term_id, 'fahrzeug', 'fahrzeugpid');
-        if (false === $fahrzeugpid) {
-            return '&nbsp;';
-        } else {
-            $url = get_permalink($fahrzeugpid);
-            $title = get_the_title($fahrzeugpid);
-            return '<a href="' . $url . '" title="&quot;' . $title . '&quot; ansehen">' . $title . '</a>';
+        switch ($column_name) {
+            case 'fahrzeugpage':
+                $fahrzeugpid = self::getTermField($term_id, 'fahrzeug', 'fahrzeugpid');
+                if (false === $fahrzeugpid) {
+                    return '&nbsp;';
+                } else {
+                    $url = get_permalink($fahrzeugpid);
+                    $title = get_the_title($fahrzeugpid);
+                    return '<a href="' . $url . '" title="&quot;' . $title . '&quot; ansehen">' . $title . '</a>';
+                }
+                break;
+            default:
+                return '&nbsp;';
         }
     }
 

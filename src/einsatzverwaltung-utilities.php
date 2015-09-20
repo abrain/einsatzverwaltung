@@ -126,7 +126,8 @@ class Utilities
             $remainingMinutes = $minutes % 60;
             $dauerstring = $hours . ' ' . ($abbreviated ? 'h' : _n('Stunde', 'Stunden', $hours));
             if ($remainingMinutes > 0) {
-                $dauerstring .= ' ' . $remainingMinutes . ' ' . ($abbreviated ? 'min' : _n('Minute', 'Minuten', $remainingMinutes));
+                $unit = $abbreviated ? 'min' : _n('Minute', 'Minuten', $remainingMinutes);
+                $dauerstring .= sprintf(' %d %s', $remainingMinutes, $unit);
             }
         }
 
@@ -154,12 +155,16 @@ class Utilities
 
         if (intval($neededversionparts[0]) > intval($currentversionparts[0])) {
             return false;
-        } elseif (intval($neededversionparts[0]) == intval($currentversionparts[0]) &&
-                    intval($neededversionparts[1]) > intval($currentversionparts[1])) {
+        } elseif (
+            intval($neededversionparts[0]) == intval($currentversionparts[0]) &&
+            intval($neededversionparts[1]) > intval($currentversionparts[1])
+        ) {
             return false;
-        } elseif (intval($neededversionparts[0]) == intval($currentversionparts[0]) &&
-                    intval($neededversionparts[1]) == intval($currentversionparts[1]) &&
-                    intval($neededversionparts[2]) > intval($currentversionparts[2])) {
+        } elseif (
+            intval($neededversionparts[0]) == intval($currentversionparts[0]) &&
+            intval($neededversionparts[1]) == intval($currentversionparts[1]) &&
+            intval($neededversionparts[2]) > intval($currentversionparts[2])
+        ) {
             return false;
         }
 

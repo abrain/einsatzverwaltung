@@ -351,17 +351,21 @@ class Core
     {
         return array(
             'number' => array(
-                'name' => 'Nummer'
+                'name' => 'Nummer',
+                'nowrap' => true
             ),
             'date' => array(
-                'name' => 'Datum'
+                'name' => 'Datum',
+                'nowrap' => true
             ),
             'time' => array(
-                'name' => 'Zeit'
+                'name' => 'Zeit',
+                'nowrap' => true
             ),
             'datetime' => array(
                 'name' => 'Datum',
-                'longName' => 'Datum + Zeit'
+                'longName' => 'Datum + Zeit',
+                'nowrap' => true
             ),
             'title' => array(
                 'name' => 'Einsatzmeldung'
@@ -376,7 +380,8 @@ class Core
                 'name' => 'Mannschaftsst&auml;rke'
             ),
             'duration' => array(
-                'name' => 'Dauer'
+                'name' => 'Dauer',
+                'nowrap' => true
             ),
             'vehicles' => array(
                 'name' => 'Fahrzeuge'

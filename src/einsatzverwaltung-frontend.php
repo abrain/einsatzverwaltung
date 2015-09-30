@@ -371,7 +371,8 @@ class Frontend
             }
 
             $colInfo = $columns[$colId];
-            $string .= '<th>' . $colInfo['name'] . '</th>';
+            $style = Utilities::getArrayValueIfKey($colInfo, 'nowrap', false) ? 'white-space: nowrap;' : '';
+            $string .= '<th' . (empty($style) ? '' : ' style="' . $style . '"') . '>' . $colInfo['name'] . '</th>';
         }
         $string .= "</tr>";
 

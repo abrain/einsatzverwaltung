@@ -260,9 +260,11 @@ class Frontend
      */
     public function addEinsatzberichteToMainloop($query)
     {
-        if (Options::isShowEinsatzberichteInMainloop() &&
+        if ((
+                is_home() && Options::isShowEinsatzberichteInMainloop() ||
+                is_tag()
+            ) &&
             $query->is_main_query() &&
-            is_home() &&
             empty($query->query_vars['suppress_filters'])
         ) {
             if (isset($query->query_vars['post_type'])) {
@@ -369,7 +371,8 @@ class Frontend
             }
 
             $colInfo = $columns[$colId];
-            $string .= '<th>' . $colInfo['name'] . '</th>';
+            $style = Utilities::getArrayValueIfKey($colInfo, 'nowrap', false) ? 'white-space: nowrap;' : '';
+            $string .= '<th' . (empty($style) ? '' : ' style="' . $style . '"') . '>' . $colInfo['name'] . '</th>';
         }
         $string .= "</tr>";
 
@@ -398,6 +401,11 @@ class Frontend
                 $alarmzeit = Data::getAlarmzeit($postId);
                 $einsatz_timestamp = strtotime($alarmzeit);
                 return date('H:i', $einsatz_timestamp);
+                break;
+            case 'datetime':
+                $alarmzeit = Data::getAlarmzeit($postId);
+                $einsatz_timestamp = strtotime($alarmzeit);
+                return date('d.m.Y H:i', $einsatz_timestamp);
                 break;
             case 'title':
                 $post_title = get_the_title($postId);

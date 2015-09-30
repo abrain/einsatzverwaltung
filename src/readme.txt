@@ -4,7 +4,7 @@ Donate link: https://www.abrain.de/software/unterstuetzen/
 Tags: Feuerwehr, Einsatz, Rettung, Rettungsdienst, THW, HiOrg, Wasserwacht, Bergrettung
 Requires at least: 3.4.0
 Tested up to: 4.3
-Stable tag: 0.9.2
+Stable tag: 1.0.0
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -44,7 +44,7 @@ Die Dokumentation gibt es [hier](https://www.abrain.de/software/einsatzverwaltun
 
 = Ich f&auml;nde es gut, wenn Funktionalit&auml;t X hinzugef&uuml;gt / verbessert werden k&ouml;nnte =
 
-Entweder einen Issue auf [GitHub](https://github.com/abrain/einsatzverwaltung/issues) er&ouml;ffnen (sofern es nicht schon einen solchen gibt) oder einfach eine [Mail](mailto:kontakt@abrain.de) schreiben.
+Entweder einen Issue auf [GitHub](https://github.com/abrain/einsatzverwaltung/issues) er&ouml;ffnen (sofern es nicht schon einen solchen gibt) oder die anderen Kontaktm&ouml;glichkeiten nutzen.
 
 = Wie kann ich den Entwickler erreichen? =
 
@@ -59,6 +59,15 @@ F&uuml;r eMails von/an [kontakt@abrain.de](mailto:kontakt@abrain.de) kann ich PG
 Das Du halte ich f&uuml;r die angenehmere Arbeitsgrundlage, aber man darf mich gerne auch siezen ohne dass ich mich alt f&uuml;hle.
 
 == Changelog ==
+
+= 1.0.0 =
+* Basispfad der Einsatzberichte (bisher einsaetze) kann eingestellt werden
+* Hinweis bei &Uuml;berschneidung von Basispfad und dem Pfad einer Seite
+* Einsatzberichte k&ouml;nnen Schlagworte der Beitr&auml;ge nutzen
+* Jeder in WordPress vorhandene &ouml;ffentliche Beitragstyp kann nun als Fahrzeugseite verwendet werden
+* Einsatzberichte k&ouml;nnen in einer bestimmten Beitragskategorie eingeblendet werden
+* Neue Spalte f&uuml;r Einsatzliste: Datum + Zeit
+* Kurze Spaltentitel der Einsatzliste (Nummer, Datum, Zeit, Dauer) werden auch bei wenig Platz nicht mehr umgebrochen
 
 = 0.9.2 =
 * Getestet mit WordPress 4.3
@@ -194,6 +203,9 @@ Das Du halte ich f&uuml;r die angenehmere Arbeitsgrundlage, aber man darf mich g
 * Widget zeigt die aktuellsten X Eins&auml;tze
 
 == Upgrade Notice ==
+
+= 1.0.0 =
+Ver&auml;nderbarer Basispfad, Kategorie f&uuml;r Einsatzberichte, Schlagw&ouml;rter und einiges mehr
 
 = 0.9.2 =
 Kleine Verbesserungen, siehe Changelog f&uuml;r Details

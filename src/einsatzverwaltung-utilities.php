@@ -21,6 +21,79 @@ class Utilities
     }
 
     /**
+     * Generiert ein Dropdown ähnlich zu wp_dropdown_pages, allerdings mit frei wählbaren Beitragstypen
+     *
+     * @param array $args {
+     *     @type bool|int $echo      Ob der generierte Code aus- oder zurückgegeben werden soll. Standard true (ausgeben)
+     *     @type array    $post_type Array mit Beitragstypen, die auswählbar sein sollen
+     *     @type int      $selected  Post-ID, die vorausgewählt sein soll
+     *     @type string   $name      Wert für name-Attribut des Auswahlfelds
+     *     @type string   $id        Wert für id-Attribut des Auswahlfelds, erhält im Standard den Wert von name
+     * }
+     * @return string HTML-Code für Auswahlfeld
+     */
+    public static function dropdownPosts($args)
+    {
+        $defaults = array(
+            'echo' => true,
+            'post_type' => array('post'),
+            'selected' => 0,
+            'name' => '',
+            'id' => ''
+        );
+        $parsedArgs = wp_parse_args($args, $defaults);
+
+        if (empty($parsedArgs['id'])) {
+            $parsedArgs['id'] = $parsedArgs['name'];
+        }
+
+        $wpQuery = new \WP_Query(array(
+            'post_type' => $parsedArgs['post_type'],
+            'post_status' => 'publish',
+            'orderby' => 'type title',
+            'order' => 'ASC',
+            'nopaging' => true
+        ));
+
+        $string = sprintf('<select name="%s" id="%s">', $parsedArgs['name'], $parsedArgs['id']);
+        $string .= '<option value="">- keine -</option>';
+        if ($wpQuery->have_posts()) {
+            $oldPtype = null;
+            while ($wpQuery->have_posts()) {
+                $wpQuery->the_post();
+
+                // Gruppierung der Elemente nach Beitragstyp
+                $postType = get_post_type();
+                if ($oldPtype != $postType) {
+                    if ($oldPtype != null) {
+                        // Nicht beim ersten Mal
+                        $string .= '</optgroup>';
+                    }
+                    $string .= '<optgroup label="' . get_post_type_labels(get_post_type_object($postType))->name . '">';
+                }
+
+                // Element ausgeben
+                $postId = get_the_ID();
+                $postTitle = get_the_title();
+                $string .= sprintf(
+                    '<option value="%s"' . selected($postId, $parsedArgs['selected'], false) . '>%s</option>',
+                    $postId,
+                    (empty($postTitle) ? '(Kein Titel)' : $postTitle)
+                );
+                $oldPtype = $postType;
+            }
+            $string .= '</optgroup>';
+        }
+        $string .= '</select>';
+
+        if ($parsedArgs['echo']) {
+            echo $string;
+        }
+
+        return $string;
+    }
+
+    /**
      * @param array $array
      * @param string $key
      * @param mixed $default
@@ -53,7 +126,8 @@ class Utilities
             $remainingMinutes = $minutes % 60;
             $dauerstring = $hours . ' ' . ($abbreviated ? 'h' : _n('Stunde', 'Stunden', $hours));
             if ($remainingMinutes > 0) {
-                $dauerstring .= ' ' . $remainingMinutes . ' ' . ($abbreviated ? 'min' : _n('Minute', 'Minuten', $remainingMinutes));
+                $unit = $abbreviated ? 'min' : _n('Minute', 'Minuten', $remainingMinutes);
+                $dauerstring .= sprintf(' %d %s', $remainingMinutes, $unit);
             }
         }
 
@@ -82,11 +156,13 @@ class Utilities
         if (intval($neededversionparts[0]) > intval($currentversionparts[0])) {
             return false;
         } elseif (intval($neededversionparts[0]) == intval($currentversionparts[0]) &&
-                    intval($neededversionparts[1]) > intval($currentversionparts[1])) {
+            intval($neededversionparts[1]) > intval($currentversionparts[1])
+        ) {
             return false;
         } elseif (intval($neededversionparts[0]) == intval($currentversionparts[0]) &&
-                    intval($neededversionparts[1]) == intval($currentversionparts[1]) &&
-                    intval($neededversionparts[2]) > intval($currentversionparts[2])) {
+            intval($neededversionparts[1]) == intval($currentversionparts[1]) &&
+            intval($neededversionparts[2]) > intval($currentversionparts[2])
+        ) {
             return false;
         }
 

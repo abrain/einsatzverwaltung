@@ -72,13 +72,10 @@ class Taxonomies
     {
         echo '<div class="form-field">';
         echo '<label for="tag-fahrzeugpid">Fahrzeugseite</label>';
-        wp_dropdown_pages(
-            array (
-                'name' => 'fahrzeugpid',
-                'show_option_none' => '- keine -',
-                'option_none_value' => ''
-            )
-        );
+        Utilities::dropdownPosts(array(
+            'name' => 'fahrzeugpid',
+            'post_type' => $this->getFahrzeugPostTypes()
+        ));
         echo '<p>Seite mit mehr Informationen &uuml;ber das Fahrzeug. Wird in Einsatzberichten mit diesem Fahrzeug verlinkt.</p></div>';
     }
 
@@ -93,14 +90,11 @@ class Taxonomies
 
         echo '<tr class="form-field">';
         echo '<th scope="row"><label for="fahrzeugpid">Fahrzeugseite</label></th><td>';
-        wp_dropdown_pages(
-            array (
-                'selected' => $fahrzeug_pid,
-                'name' => 'fahrzeugpid',
-                'show_option_none' => '- keine -',
-                'option_none_value' => ''
-            )
-        );
+        Utilities::dropdownPosts(array(
+            'selected' => $fahrzeug_pid,
+            'name' => 'fahrzeugpid',
+            'post_type' => $this->getFahrzeugPostTypes()
+        ));
         echo '<p class="description">Seite mit mehr Informationen &uuml;ber das Fahrzeug. Wird in Einsatzberichten mit diesem Fahrzeug verlinkt.</p></td></tr>';
     }
 
@@ -139,13 +133,19 @@ class Taxonomies
      */
     public function columnContentFahrzeug($string, $column_name, $term_id)
     {
-        $fahrzeugpid = self::getTermField($term_id, 'fahrzeug', 'fahrzeugpid');
-        if (false === $fahrzeugpid) {
-            return '&nbsp;';
-        } else {
-            $url = get_page_link($fahrzeugpid);
-            $title = get_the_title($fahrzeugpid);
-            return '<a href="' . $url . '" title="&quot;' . $title . '&quot; ansehen">' . $title . '</a>';
+        switch ($column_name) {
+            case 'fahrzeugpage':
+                $fahrzeugpid = self::getTermField($term_id, 'fahrzeug', 'fahrzeugpid');
+                if (false === $fahrzeugpid) {
+                    return '&nbsp;';
+                } else {
+                    $url = get_permalink($fahrzeugpid);
+                    $title = get_the_title($fahrzeugpid);
+                    return '<a href="' . $url . '" title="&quot;' . $title . '&quot; ansehen">' . $title . '</a>';
+                }
+                break;
+            default:
+                return '&nbsp;';
         }
     }
 
@@ -316,5 +316,20 @@ class Taxonomies
                 error_log('Fehler beim Termsplit ' . $taxonomy . ': ' . $wpdb->last_error);
             }
         }
+    }
+
+    /**
+     * @return array
+     */
+    private function getFahrzeugPostTypes()
+    {
+        $postTypes = get_post_types(array('public' => true));
+
+        return array_filter(
+            $postTypes,
+            function ($value) {
+                return !in_array($value, array('einsatz', 'attachment'));
+            }
+        );
     }
 }

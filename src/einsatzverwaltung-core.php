@@ -20,8 +20,8 @@ use WP_Query;
  */
 class Core
 {
-    const VERSION = '0.9.2';
-    const DB_VERSION = 4;
+    const VERSION = '1.0.0';
+    const DB_VERSION = 5;
 
     public static $pluginFile;
     public static $pluginBasename;
@@ -49,14 +49,14 @@ class Core
         'public' => true,
         'has_archive' => true,
         'rewrite' => array(
-            'slug' => 'einsaetze',
             'feeds' => true
         ),
         'supports' => array('title', 'editor', 'thumbnail', 'publicize', 'author', 'revisions'),
         'show_in_nav_menus' => false,
         'capability_type' => array('einsatzbericht', 'einsatzberichte'),
         'map_meta_cap' => true,
-        'menu_position' => 5
+        'menu_position' => 5,
+        'taxonomies' => array('post_tag')
     );
 
     private static $args_einsatzart = array(
@@ -186,10 +186,6 @@ class Core
         self::$scriptUrl = self::$pluginUrl . 'js/';
         self::$styleUrl = self::$pluginUrl . 'css/';
 
-        if (Utilities::isMinWPVersion("3.9")) {
-            self::$args_einsatz['menu_icon'] = 'dashicons-media-document';
-        }
-
         new Admin();
         $this->data = new Data();
         $frontend = new Frontend();
@@ -208,6 +204,7 @@ class Core
         add_action('plugins_loaded', array($this, 'onPluginsLoaded'));
         add_action('save_post', array($this->data, 'savePostdata'));
         register_activation_hook(self::$pluginFile, array($this, 'onActivation'));
+        add_filter('posts_where', array($this, 'postsWhere'), 10, 2);
     }
 
     /**
@@ -241,6 +238,10 @@ class Core
     {
         $this->registerTypes();
         $this->addRewriteRules();
+        if (Options::isFlushRewriteRules()) {
+            flush_rewrite_rules();
+            Options::setFlushRewriteRules(false);
+        }
     }
 
     public function onPluginsLoaded()
@@ -253,6 +254,12 @@ class Core
      */
     private function registerTypes()
     {
+        // Anpassungen der Parameter
+        if (Utilities::isMinWPVersion("3.9")) {
+            self::$args_einsatz['menu_icon'] = 'dashicons-media-document';
+        }
+        self::$args_einsatz['rewrite']['slug'] = Options::getRewriteSlug();
+
         register_post_type('einsatz', self::$args_einsatz);
         register_taxonomy('einsatzart', 'einsatz', self::$args_einsatzart);
         register_taxonomy('fahrzeug', 'einsatz', self::$args_fahrzeug);
@@ -262,13 +269,31 @@ class Core
 
     private function addRewriteRules()
     {
-        $base = self::$args_einsatz['rewrite']['slug'];
+        $base = Options::getRewriteSlug();
         add_rewrite_rule(
             $base . '/(\d{4})/page/(\d{1,})/?$',
             'index.php?post_type=einsatz&year=$matches[1]&paged=$matches[2]',
             'top'
         );
         add_rewrite_rule($base . '/(\d{4})/?$', 'index.php?post_type=einsatz&year=$matches[1]', 'top');
+    }
+
+    /**
+     * Modifiziert die WHERE-Klausel bei bestimmten Datenbankabfragen
+     *
+     * @param string $where Die original WHERE-Klausel
+     * @param WP_Query $wpq Die verwendete WP-Query-Instanz
+     *
+     * @return string Die zu verwendende WHERE-Klausel
+     */
+    public function postsWhere($where, $wpq)
+    {
+        if ($wpq->is_category && $wpq->get_queried_object_id() === Options::getEinsatzberichteCategory()) {
+            // Einsatzberichte in die eingestellte Kategorie einblenden
+            global $wpdb;
+            return $where . " OR {$wpdb->posts}.post_type = 'einsatz' AND ({$wpdb->posts}.post_status = 'publish' OR {$wpdb->posts}.post_status = 'private')";
+        }
+        return $where;
     }
 
     /**
@@ -327,13 +352,21 @@ class Core
     {
         return array(
             'number' => array(
-                'name' => 'Nummer'
+                'name' => 'Nummer',
+                'nowrap' => true
             ),
             'date' => array(
-                'name' => 'Datum'
+                'name' => 'Datum',
+                'nowrap' => true
             ),
             'time' => array(
-                'name' => 'Zeit'
+                'name' => 'Zeit',
+                'nowrap' => true
+            ),
+            'datetime' => array(
+                'name' => 'Datum',
+                'longName' => 'Datum + Zeit',
+                'nowrap' => true
             ),
             'title' => array(
                 'name' => 'Einsatzmeldung'
@@ -348,7 +381,8 @@ class Core
                 'name' => 'Mannschaftsst&auml;rke'
             ),
             'duration' => array(
-                'name' => 'Dauer'
+                'name' => 'Dauer',
+                'nowrap' => true
             ),
             'vehicles' => array(
                 'name' => 'Fahrzeuge'

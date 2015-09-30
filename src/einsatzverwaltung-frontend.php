@@ -401,6 +401,11 @@ class Frontend
                 $einsatz_timestamp = strtotime($alarmzeit);
                 return date('H:i', $einsatz_timestamp);
                 break;
+            case 'datetime':
+                $alarmzeit = Data::getAlarmzeit($postId);
+                $einsatz_timestamp = strtotime($alarmzeit);
+                return date('d.m.Y H:i', $einsatz_timestamp);
+                break;
             case 'title':
                 $post_title = get_the_title($postId);
                 if (empty($post_title)) {

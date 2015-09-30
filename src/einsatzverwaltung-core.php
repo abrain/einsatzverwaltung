@@ -359,6 +359,10 @@ class Core
             'time' => array(
                 'name' => 'Zeit'
             ),
+            'datetime' => array(
+                'name' => 'Datum',
+                'longName' => 'Datum + Zeit'
+            ),
             'title' => array(
                 'name' => 'Einsatzmeldung'
             ),

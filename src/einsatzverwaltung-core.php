@@ -186,11 +186,6 @@ class Core
         self::$scriptUrl = self::$pluginUrl . 'js/';
         self::$styleUrl = self::$pluginUrl . 'css/';
 
-        if (Utilities::isMinWPVersion("3.9")) {
-            self::$args_einsatz['menu_icon'] = 'dashicons-media-document';
-        }
-        self::$args_einsatz['rewrite']['slug'] = Options::getRewriteSlug();
-
         new Admin();
         $this->data = new Data();
         $frontend = new Frontend();
@@ -259,6 +254,12 @@ class Core
      */
     private function registerTypes()
     {
+        // Anpassungen der Parameter
+        if (Utilities::isMinWPVersion("3.9")) {
+            self::$args_einsatz['menu_icon'] = 'dashicons-media-document';
+        }
+        self::$args_einsatz['rewrite']['slug'] = Options::getRewriteSlug();
+
         register_post_type('einsatz', self::$args_einsatz);
         register_taxonomy('einsatzart', 'einsatz', self::$args_einsatzart);
         register_taxonomy('fahrzeug', 'einsatz', self::$args_fahrzeug);

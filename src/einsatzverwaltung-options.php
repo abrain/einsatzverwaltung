@@ -24,7 +24,7 @@ class Options
         'einsatzvw_list_art_hierarchy' => false,
         'einsatzvw_list_ext_link' => false,
         'einsatzvw_list_fahrzeuge_link' => false,
-        'einsatzvw_rewrite_slug' => 'einsaetze',
+        'einsatzvw_rewrite_slug' => 'einsatzberichte',
         'einsatzvw_flush_rewrite_rules' => false,
         'einsatzvw_category' => false
     );

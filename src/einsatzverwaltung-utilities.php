@@ -23,6 +23,8 @@ class Utilities
     /**
      * Generiert ein Dropdown ähnlich zu wp_dropdown_pages, allerdings mit frei wählbaren Beitragstypen
      *
+     * @since 1.0.0
+     *
      * @param array $args {
      *     @type bool|int $echo      Ob der generierte Code aus- oder zurückgegeben werden soll. Standard true (ausgeben)
      *     @type array    $post_type Array mit Beitragstypen, die auswählbar sein sollen

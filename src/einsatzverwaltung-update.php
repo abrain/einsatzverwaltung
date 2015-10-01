@@ -105,6 +105,8 @@ class Update
     }
 
     /**
+     * @since 1.0.0
+     *
      * @return bool Gibt immer True zurück
      */
     private function updateTo5()

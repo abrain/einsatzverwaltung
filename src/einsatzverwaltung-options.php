@@ -86,6 +86,8 @@ class Options
     /**
      * Gibt die Kategorie zurück, in der neben Beiträgen auch Einsatzberichte angezeigt werden sollen
      *
+     * @since 1.0.0
+     *
      * @return int Die ID der Kategorie oder 0, wenn nicht gesetzt
      */
     public static function getEinsatzberichteCategory()
@@ -136,6 +138,8 @@ class Options
     /**
      * Gibt die Basis für die URL zu Einsatzberichten zurück
      *
+     * @since 1.0.0
+     *
      * @return string
      */
     public static function getRewriteSlug()
@@ -162,6 +166,8 @@ class Options
     }
 
     /**
+     * @since 1.0.0
+     *
      * @return bool
      */
     public static function isFlushRewriteRules()
@@ -241,6 +247,8 @@ class Options
     }
 
     /**
+     * @since 1.0.0
+     *
      * @param bool $value
      */
     public static function setFlushRewriteRules($value)

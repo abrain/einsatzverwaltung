@@ -281,6 +281,8 @@ class Core
     /**
      * Modifiziert die WHERE-Klausel bei bestimmten Datenbankabfragen
      *
+     * @since 1.0.0
+     *
      * @param string $where Die original WHERE-Klausel
      * @param WP_Query $wpq Die verwendete WP-Query-Instanz
      *

@@ -319,6 +319,8 @@ class Taxonomies
     }
 
     /**
+     * @since 1.0.0
+     *
      * @return array
      */
     private function getFahrzeugPostTypes()

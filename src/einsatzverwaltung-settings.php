@@ -302,9 +302,13 @@ class Settings
 
 
     /**
-     * @param $name
-     * @param $description
-     * @param string $value
+     * Gibt ein Eingabefeld aus
+     *
+     * @since 1.0.0
+     *
+     * @param string $name Name des Parameters
+     * @param string $description Beschreibungstext
+     * @param string $value Wert, der im Eingabefeld stehen soll
      */
     private function echoSettingsInput($name, $description, $value = '')
     {
@@ -317,6 +321,9 @@ class Settings
     }
 
 
+    /**
+     * @since 1.0.0
+     */
     public function echoSettingsPermalinks()
     {
         $this->echoSettingsInput(

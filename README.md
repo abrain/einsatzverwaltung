@@ -7,29 +7,23 @@ Dieses Plugin f&uuml;gt WordPress eine neue Beitragsart "Einsatzbericht" hinzu. 
 
 Die prim&auml;re Zielgruppe des Plugins sind Feuerwehren im deutschsprachigen Raum, es ist aber genauso geeignet f&uuml;r Rettungsdienste, die Wasserwacht, das THW und sonstige Hilfsorganisationen, die ihre Eins&auml;tze im Internet pr&auml;sentieren m&ouml;chten.
 
-[Anleitung](https://www.abrain.de/software/einsatzverwaltung/anleitung/) [Changelog](https://github.com/abrain/einsatzverwaltung/releases)
-
-### Funktionen im &Uuml;berblick:
-
-* Einsatzberichte als vollwertige Beitr&auml;ge ver&ouml;ffentlichen
-* Information &uuml;ber Einsatzart, eingesetzte Fahrzeuge, Dauer und vieles mehr
-* Shortcode zum Einbinden von Einsatzlisten
-* Widget zeigt die aktuellsten Einsatzberichte
-* Import aus wp-einsatz
-* Newsfeed f&uuml;r Einsatzberichte
-* Pflege der Einsatzberichte kann auf bestimmte Benutzerrollen beschr&auml;nkt werden
+[Plugin auf wordpress.org](https://wordpress.org/plugins/einsatzverwaltung/) - [Benutzerhandbuch](https://www.abrain.de/software/einsatzverwaltung/anleitung/) - [Changelog](https://github.com/abrain/einsatzverwaltung/releases)
 
 Uses Font Awesome by Dave Gandy - http://fontawesome.io
 
-### Installation
+### Hinweise f&uuml;r Entwickler
+Dieses Projekt arbeitet mit [git-flow](http://nvie.com/posts/a-successful-git-branching-model/).
+Die Entwicklung findet im Branch [develop](https://github.com/abrain/einsatzverwaltung/tree/develop) statt, im Branch [master](https://github.com/abrain/einsatzverwaltung/tree/master) befindet sich immer der Stand der zuletzt ver&ouml;ffentlichten Version.
+Pull Requests werden nur im Branch `develop` angenommen.
 
-Das Plugin kann entweder aus WordPress heraus aus dem [Pluginverzeichnis](https://wordpress.org/plugins/einsatzverwaltung/) installiert werden oder aber durch Hochladen der Plugindateien in das Verzeichnis `/wp-content/plugins/`.
+Das Plugin an sich liegt im Ordner `src`, alles andere dient der Unterst&uuml;tzung bei der Entwicklung.
+Code aus einem anderen Branch als `master` sollte nicht f&uuml;r Produktivsysteme verwendet werden.
 
-In beiden F&auml;llen muss das Plugin erst aktiviert werden, bevor es benutzt werden kann.
+Der PHP-Code wird gem&auml;&szlig; dem Coding Style Guide [PSR-2](http://www.php-fig.org/psr/psr-2/) formatiert.
 
-In diesem Repository befindet sich mehr als die Plugindateien, f&uuml;r den Betrieb ist nur der Inhalt des Ordners `src` n&ouml;tig.
-
-__Es wird PHP 5.3.0 oder neuer ben&ouml;tigt__
+### Mindestvoraussetzungen
+* PHP: 5.3.0
+* WordPress: 3.4
 
 ### Social Media
 

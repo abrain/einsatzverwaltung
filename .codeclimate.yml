@@ -1,0 +1,16 @@
+engines:
+  phpcodesniffer:
+    enabled: true
+  phpmd:
+    enabled: true
+  eslint:
+    enabled: true
+  csslint:
+    enabled: true
+ratings:
+  paths:
+  - src/**/*.php
+  - src/**/*.js
+  - src/**/*.css
+exclude_paths:
+- src/font-awesome/**/*

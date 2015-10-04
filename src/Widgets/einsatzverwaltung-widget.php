@@ -26,6 +26,11 @@ class RecentIncidents extends WP_Widget
             'Letzte Eins&auml;tze', // Name
             array('description' => __('Zeigt die neuesten Eins&auml;tze an', 'einsatzverwaltung'),) // Args
         );
+
+        // Widget in WordPress registrieren
+        add_action('widgets_init', function () {
+            register_widget('abrain\Einsatzverwaltung\Widgets\RecentIncidents');
+        });
     }
 
     /**
@@ -191,8 +196,3 @@ class RecentIncidents extends WP_Widget
         echo '&nbsp;<label for="'.$this->get_field_id('zeigeOrt').'">' . __('Ort anzeigen', 'einsatzverwaltung') . '</label></p>';
     }
 }
-
-// Widget in WordPress registrieren
-add_action('widgets_init', function () {
-    register_widget('abrain\Einsatzverwaltung\Widgets\RecentIncidents');
-});

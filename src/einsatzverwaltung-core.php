@@ -13,6 +13,7 @@ require_once dirname(__FILE__) . '/einsatzverwaltung-tools.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-tools-wpe.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-taxonomies.php';
 
+use abrain\Einsatzverwaltung\Widgets\RecentIncidents;
 use WP_Query;
 
 /**
@@ -192,8 +193,13 @@ class Core
         new Settings();
         new Shortcodes($frontend);
         new Taxonomies();
+
+        // Tools
         new ToolEinsatznummernReparieren($this->data);
         new ToolImportWpEinsatz();
+
+        // Widgets
+        new RecentIncidents();
 
         $this->addHooks();
     }

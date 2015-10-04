@@ -5,7 +5,7 @@ require_once dirname(__FILE__) . '/einsatzverwaltung-admin.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-data.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-utilities.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-frontend.php';
-require_once dirname(__FILE__) . '/Widgets/einsatzverwaltung-widget.php';
+require_once dirname(__FILE__) . '/Widgets/RecentIncidents.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-options.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-shortcodes.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-settings.php';

@@ -1,6 +1,10 @@
 <?php
-namespace abrain\Einsatzverwaltung;
+namespace abrain\Einsatzverwaltung\Widgets;
 
+use abrain\Einsatzverwaltung\Data;
+use abrain\Einsatzverwaltung\Frontend;
+use abrain\Einsatzverwaltung\Options;
+use abrain\Einsatzverwaltung\Utilities;
 use WP_Widget;
 use WP_Query;
 
@@ -9,7 +13,7 @@ use WP_Query;
  *
  * @author Andreas Brain
  */
-class WidgetLetzteEinsaetze extends WP_Widget
+class RecentIncidents extends WP_Widget
 {
 
     /**
@@ -190,5 +194,5 @@ class WidgetLetzteEinsaetze extends WP_Widget
 
 // Widget in WordPress registrieren
 add_action('widgets_init', function () {
-    register_widget('abrain\Einsatzverwaltung\WidgetLetzteEinsaetze');
+    register_widget('abrain\Einsatzverwaltung\Widgets\RecentIncidents');
 });

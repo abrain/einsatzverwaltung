@@ -5,7 +5,9 @@ require_once dirname(__FILE__) . '/einsatzverwaltung-admin.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-data.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-utilities.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-frontend.php';
+require_once dirname(__FILE__) . '/Util/Formatter.php';
 require_once dirname(__FILE__) . '/Widgets/RecentIncidents.php';
+require_once dirname(__FILE__) . '/Widgets/RecentIncidentsFormatted.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-options.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-shortcodes.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-settings.php';
@@ -14,6 +16,7 @@ require_once dirname(__FILE__) . '/einsatzverwaltung-tools-wpe.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-taxonomies.php';
 
 use abrain\Einsatzverwaltung\Widgets\RecentIncidents;
+use abrain\Einsatzverwaltung\Widgets\RecentIncidentsFormatted;
 use WP_Query;
 
 /**
@@ -200,6 +203,7 @@ class Core
 
         // Widgets
         new RecentIncidents();
+        new RecentIncidentsFormatted();
 
         $this->addHooks();
     }

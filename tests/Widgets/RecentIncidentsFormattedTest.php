@@ -11,6 +11,6 @@ use WP_UnitTestCase;
 class RecentIncidentsFormattedTest extends WP_UnitTestCase {
 
 	function testUpdate() {
-        assertTrue(true);
+        $this->assertTrue(true);
 	}
 }

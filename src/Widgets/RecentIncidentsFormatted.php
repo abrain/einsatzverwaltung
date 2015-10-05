@@ -168,7 +168,7 @@ class RecentIncidentsFormatted extends WP_Widget
         $instance = array();
         $instance['title'] = strip_tags($new_instance['title']);
         $instance['numIncidents'] = Utilities::sanitizeNumberGreaterZero($new_instance['numIncidents'],
-            $old_instance['numIncidents']);
+            $this->defaults['numIncidents']);
         $instance['beforeContent'] = wp_kses($new_instance['beforeContent'], $this->allowedHtmlTags);
         $instance['pattern'] = wp_kses($new_instance['pattern'], $this->allowedHtmlTags);
         $instance['afterContent'] = wp_kses($new_instance['afterContent'], $this->allowedHtmlTags);

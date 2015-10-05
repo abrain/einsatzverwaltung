@@ -185,17 +185,15 @@ class RecentIncidentsFormatted extends WP_Widget
      */
     public function form($instance)
     {
-        $title = Utilities::getArrayValueIfKey($instance, 'title', '');
-        $numIncidents = Utilities::getArrayValueIfKey($instance, 'numIncidents', $this->defaults['numIncidents']);
-
         echo '<p>';
         printf('<label for="%1$s">%2$s</label><input class="widefat" id="%1$s" name="%3$s" type="text" value="%4$s" />',
             $this->get_field_id('title'),
             __('Titel:', 'einsatzverwaltung'),
             $this->get_field_name('title'),
-            esc_attr($title));
+            esc_attr(Utilities::getArrayValueIfKey($instance, 'title', '')));
         echo '</p>';
 
+        $numIncidents = Utilities::getArrayValueIfKey($instance, 'numIncidents', $this->defaults['numIncidents']);
         echo '<p>';
         printf('<label for="%1$s">%2$s</label>&nbsp;<input id="%1$s" name="%3$s" type="text" value="%4$s" size="3" />',
             $this->get_field_id('numIncidents'),

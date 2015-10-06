@@ -96,6 +96,9 @@ class RecentIncidentsFormatted extends WP_Widget
         'pattern' => '',
         'afterContent' => ''
     );
+    private $allowedTagsPattern = array('%title%', '%date%', '%time%', '%location%', '%duration%', '%incidentType%',
+        '%url%');
+    private $allowedTagsAfter = array('%feedUrl%');
 
     /**
      * Konstruktor, generiert und registriert das Widget
@@ -146,10 +149,9 @@ class RecentIncidentsFormatted extends WP_Widget
 
         $widgetContent = $settings['beforeContent'];
         foreach ($incidents as $incident) {
-            $widgetContent .= Formatter::formatIncidentData($incident, $settings['pattern'], array('%title%', '%date%',
-                '%time%', '%location%', '%duration%', '%incidentType%', '%url%'));
+            $widgetContent .= Formatter::formatIncidentData($incident, $settings['pattern'], $this->allowedTagsPattern);
         }
-        $widgetContent .= Formatter::formatIncidentData(null, $settings['afterContent'], array('%feedUrl%'));
+        $widgetContent .= Formatter::formatIncidentData(null, $settings['afterContent'], $this->allowedTagsAfter);
 
         echo wp_kses($widgetContent, $this->allowedHtmlTags);
         echo $args['after_widget'];
@@ -216,6 +218,11 @@ class RecentIncidentsFormatted extends WP_Widget
             __('HTML-Template pro Einsatzbericht:', 'einsatzverwaltung'),
             $this->get_field_name('pattern'),
             Utilities::getArrayValueIfKey($instance, 'pattern', ''));
+        echo '</p><p class="description">' . __('Folgende Tags werden ersetzt:', 'einsatzverwaltung');
+        $formatterTags = Formatter::getTags();
+        foreach ($this->allowedTagsPattern as $tag) {
+            echo '<br>' . $tag . ' (' . $formatterTags[$tag] . ')';
+        }
         echo '</p>';
 
         echo '<p>';
@@ -224,6 +231,10 @@ class RecentIncidentsFormatted extends WP_Widget
             __('HTML-Code nach den Einsatzberichten:', 'einsatzverwaltung'),
             $this->get_field_name('afterContent'),
             Utilities::getArrayValueIfKey($instance, 'afterContent', ''));
+        echo '</p><p class="description">' . __('Folgende Tags werden ersetzt:', 'einsatzverwaltung');
+        foreach ($this->allowedTagsAfter as $tag) {
+            echo '<br>' . $tag . ' (' . $formatterTags[$tag] . ')';
+        }
         echo '</p>';
     }
 

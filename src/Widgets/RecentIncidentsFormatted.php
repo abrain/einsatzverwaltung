@@ -197,7 +197,7 @@ class RecentIncidentsFormatted extends WP_Widget
         echo '<p>';
         printf('<label for="%1$s">%2$s</label>&nbsp;<input id="%1$s" name="%3$s" type="text" value="%4$s" size="3" />',
             $this->get_field_id('numIncidents'),
-            __('Anzahl der Eins&auml;tze, die angezeigt werden:', 'einsatzverwaltung'),
+            __('Anzahl der Einsatzberichte, die angezeigt werden:', 'einsatzverwaltung'),
             $this->get_field_name('numIncidents'),
             empty($numIncidents) ? $this->defaults['numIncidents'] : esc_attr($numIncidents));
         echo '</p>';
@@ -205,7 +205,7 @@ class RecentIncidentsFormatted extends WP_Widget
         echo '<p>';
         printf('<label for="%1$s">%2$s</label><textarea class="widefat" id="%1$s" name="%3$s">%4$s</textarea>',
             $this->get_field_id('beforeContent'),
-            __('Vorher:', 'einsatzverwaltung'),
+            __('HTML-Code vor den Einsatzberichten:', 'einsatzverwaltung'),
             $this->get_field_name('beforeContent'),
             Utilities::getArrayValueIfKey($instance, 'beforeContent', ''));
         echo '</p>';
@@ -213,7 +213,7 @@ class RecentIncidentsFormatted extends WP_Widget
         echo '<p>';
         printf('<label for="%1$s">%2$s</label><textarea class="widefat" id="%1$s" name="%3$s">%4$s</textarea>',
             $this->get_field_id('pattern'),
-            __('Pattern:', 'einsatzverwaltung'),
+            __('HTML-Template pro Einsatzbericht:', 'einsatzverwaltung'),
             $this->get_field_name('pattern'),
             Utilities::getArrayValueIfKey($instance, 'pattern', ''));
         echo '</p>';
@@ -221,7 +221,7 @@ class RecentIncidentsFormatted extends WP_Widget
         echo '<p>';
         printf('<label for="%1$s">%2$s</label><textarea class="widefat" id="%1$s" name="%3$s">%4$s</textarea>',
             $this->get_field_id('afterContent'),
-            __('Danach:', 'einsatzverwaltung'),
+            __('HTML-Code nach den Einsatzberichten:', 'einsatzverwaltung'),
             $this->get_field_name('afterContent'),
             Utilities::getArrayValueIfKey($instance, 'afterContent', ''));
         echo '</p>';

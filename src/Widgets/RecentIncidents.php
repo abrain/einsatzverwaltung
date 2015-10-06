@@ -172,7 +172,7 @@ class RecentIncidents extends WP_Widget
         echo '<p><label for="'.$this->get_field_id('title').'">' . __('Titel:', 'einsatzverwaltung') . '</label>';
         echo '<input class="widefat" id="' . $this->get_field_id('title') . '" name="' . $this->get_field_name('title') . '" type="text" value="' . esc_attr($title).'" /></p>';
 
-        echo '<p><label for="'.$this->get_field_id('anzahl').'">' . __('Anzahl der Eins&auml;tze, die angezeigt werden:', 'einsatzverwaltung') . '</label>&nbsp;';
+        echo '<p><label for="'.$this->get_field_id('anzahl').'">' . __('Anzahl der Einsatzberichte, die angezeigt werden:', 'einsatzverwaltung') . '</label>&nbsp;';
         echo '<input id="'.$this->get_field_id('anzahl').'" name="'.$this->get_field_name('anzahl').'" type="text" value="'.$anzahl.'" size="3" /></p>';
 
         echo '<p><input id="'.$this->get_field_id('zeigeFeedlink').'" name="'.$this->get_field_name('zeigeFeedlink').'" type="checkbox" '.($zeigeFeedlink ? 'checked="checked" ' : '').'/>';

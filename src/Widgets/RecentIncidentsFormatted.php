@@ -146,10 +146,10 @@ class RecentIncidentsFormatted extends WP_Widget
 
         $widgetContent = $settings['beforeContent'];
         foreach ($incidents as $incident) {
-            $widgetContent .= Formatter::format($incident, $settings['pattern']);
+            $widgetContent .= Formatter::formatIncidentData($incident, $settings['pattern']);
         }
-        $widgetContent .= $settings['afterContent'];
-        error_log("widget content: " . print_r($widgetContent, true));
+        $widgetContent .= str_replace('%feedUrl%', get_post_type_archive_feed_link('einsatz'),
+            $settings['afterContent']);
 
         echo wp_kses($widgetContent, $this->allowedHtmlTags);
         echo $args['after_widget'];

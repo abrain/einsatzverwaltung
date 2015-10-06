@@ -131,7 +131,7 @@ class RecentIncidentsFormatted extends WP_Widget
         $settings = wp_parse_args($instance, $this->defaults);
 
         if (empty($settings['title'])) {
-            $settings['title'] = $this->getDefaultTitle();
+            $settings['title'] = __('Letzte Eins&auml;tze', 'einsatzverwaltung');
         }
 
         if (empty($settings['numIncidents'])) {
@@ -236,15 +236,5 @@ class RecentIncidentsFormatted extends WP_Widget
             echo '<br>' . $tag . ' (' . $formatterTags[$tag] . ')';
         }
         echo '</p>';
-    }
-
-    /**
-     * Gibt die Standardüberschrift für das Widget zurück
-     *
-     * @return string|void
-     */
-    private function getDefaultTitle()
-    {
-        return __('Letzte Eins&auml;tze', 'einsatzverwaltung');
     }
 }

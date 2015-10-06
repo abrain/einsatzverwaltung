@@ -64,8 +64,11 @@ class Formatter
             case '%duration%':
                 return str_replace('%duration%', Utilities::getDurationString(Data::getDauer($post->ID)), $pattern);
             case '%incidentType%':
-                return str_replace('%incidentType%', Frontend::getEinsatzartString(Data::getEinsatzart($post->ID),
-                    false, false, false), $pattern);
+                return str_replace(
+                    '%incidentType%',
+                    Frontend::getEinsatzartString(Data::getEinsatzart($post->ID), false, false, false),
+                    $pattern
+                );
             case '%url%':
                 return str_replace('%url%', get_permalink($post->ID), $pattern);
             case '%location%':

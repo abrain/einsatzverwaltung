@@ -284,11 +284,10 @@ class Utilities
      *
      * @return int
      */
-    public static function sanitizePositiveNumber($input, $defaultvalue = 0)
+    public static function sanitizeNumberGreaterZero($input, $defaultvalue = 0)
     {
-        $val = intval($input);
-        if (is_numeric($val) && $val >= 0) {
-            return $val;
+        if (is_numeric($input) && intval($input) > 0 && intval($input) < PHP_INT_MAX) {
+            return intval($input);
         } else {
             return $defaultvalue;
         }

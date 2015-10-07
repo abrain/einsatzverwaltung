@@ -149,9 +149,9 @@ class RecentIncidentsFormatted extends WP_Widget
 
         $widgetContent = $settings['beforeContent'];
         foreach ($incidents as $incident) {
-            $widgetContent .= Formatter::formatIncidentData($incident, $settings['pattern'], $this->allowedTagsPattern);
+            $widgetContent .= Formatter::formatIncidentData($settings['pattern'], $this->allowedTagsPattern, $incident);
         }
-        $widgetContent .= Formatter::formatIncidentData(null, $settings['afterContent'], $this->allowedTagsAfter);
+        $widgetContent .= Formatter::formatIncidentData($settings['afterContent'], $this->allowedTagsAfter);
 
         echo wp_kses($widgetContent, $this->allowedHtmlTags);
         echo $args['after_widget'];

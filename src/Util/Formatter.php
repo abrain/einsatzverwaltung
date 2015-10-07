@@ -17,13 +17,13 @@ class Formatter
     private static $tagsNotNeedingPost = array('%feedUrl%');
 
     /**
-     * @param WP_Post $post
      * @param string $pattern
      * @param array $allowedTags
+     * @param WP_Post $post
      *
      * @return mixed
      */
-    public static function formatIncidentData($post, $pattern, $allowedTags = array())
+    public static function formatIncidentData($pattern, $allowedTags = array(), $post = null)
     {
         if (empty($allowedTags)) {
             $allowedTags = array_keys(self::getTags());

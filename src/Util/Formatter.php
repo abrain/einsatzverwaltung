@@ -75,6 +75,8 @@ class Formatter
                 return str_replace('%location%', Data::getEinsatzort($post->ID), $pattern);
             case '%feedUrl%':
                 return str_replace('%feedUrl%', get_post_type_archive_feed_link('einsatz'), $pattern);
+            case '%number%':
+                return str_replace('%number%', Data::getEinsatznummer($post->ID), $pattern);
             default:
                 return $pattern;
         }
@@ -94,6 +96,7 @@ class Formatter
             '%url%' => __('URL zum Einsatzbericht', 'einsatzverwaltung'),
             '%location%' => __('Ort des Einsatzes', 'einsatzverwaltung'),
             '%feedUrl%' => __('URL zum Feed', 'einsatzverwaltung'),
+            '%number%' => __('Einsatznummer', 'einsatzverwaltung'),
         );
     }
 }

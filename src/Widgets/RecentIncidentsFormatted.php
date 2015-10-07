@@ -160,22 +160,22 @@ class RecentIncidentsFormatted extends WP_Widget
     /**
      * Eine bestimmte Instanz des Widgets aktualisieren
      *
-     * @param array $new_instance Die neuen Einstellungen
-     * @param array $old_instance Die bisherigen Einstellungen
+     * @param array $newInstance Die neuen Einstellungen
+     * @param array $oldInstance Die bisherigen Einstellungen
      *
      * @return array Die zu speichernden Einstellungen oder false um das Speichern abzubrechen
      */
-    public function update($new_instance, $old_instance)
+    public function update($newInstance, $oldInstance)
     {
         $instance = array();
-        $instance['title'] = strip_tags($new_instance['title']);
+        $instance['title'] = strip_tags($newInstance['title']);
         $instance['numIncidents'] = Utilities::sanitizeNumberGreaterZero(
-            $new_instance['numIncidents'],
+            $newInstance['numIncidents'],
             $this->defaults['numIncidents']
         );
-        $instance['beforeContent'] = wp_kses($new_instance['beforeContent'], $this->allowedHtmlTags);
-        $instance['pattern'] = wp_kses($new_instance['pattern'], $this->allowedHtmlTags);
-        $instance['afterContent'] = wp_kses($new_instance['afterContent'], $this->allowedHtmlTags);
+        $instance['beforeContent'] = wp_kses($newInstance['beforeContent'], $this->allowedHtmlTags);
+        $instance['pattern'] = wp_kses($newInstance['pattern'], $this->allowedHtmlTags);
+        $instance['afterContent'] = wp_kses($newInstance['afterContent'], $this->allowedHtmlTags);
 
         return $instance;
     }

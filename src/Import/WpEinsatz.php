@@ -1,12 +1,14 @@
 <?php
-namespace abrain\Einsatzverwaltung;
+namespace abrain\Einsatzverwaltung\Import;
 
+use abrain\Einsatzverwaltung\Core;
+use abrain\Einsatzverwaltung\Utilities;
 use wpdb;
 
 /**
  * Importiert Daten aus wp-einsatz
  */
-class ToolImportWpEinsatz
+class WpEinsatz
 {
 
     const EVW_TOOL_WPE_SLUG = 'einsatzvw-tool-wpe';

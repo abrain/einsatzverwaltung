@@ -1,166 +1,153 @@
 <?php
-namespace abrain\Einsatzverwaltung\Import;
+namespace abrain\Einsatzverwaltung\Import\Sources;
 
 use abrain\Einsatzverwaltung\Core;
+use abrain\Einsatzverwaltung\ToolEinsatznummernReparieren;
 use abrain\Einsatzverwaltung\Utilities;
 use wpdb;
 
 /**
  * Importiert Daten aus wp-einsatz
  */
-class WpEinsatz
+class WpEinsatz extends AbstractSource
 {
-
-    const EVW_TOOL_WPE_SLUG = 'einsatzvw-tool-wpe';
     const EVW_TOOL_WPE_DATE_COLUMN = 'Datum';
     const EVW_TOOL_WPE_INPUT_NAME_PREFIX = 'evw_wpe_';
 
     /**
-     * Konstruktor
+     * @inheritDoc
      */
-    public function __construct()
+    public function getDescription()
     {
-        $this->addHooks();
-    }
-
-    private function addHooks()
-    {
-        add_action('admin_menu', array($this, 'addToolToMenu'));
+        return __('Importiert Einsätze aus dem WordPress-Plugin wp-einsatz.', 'einsatzverwaltung');
     }
 
     /**
-     * Fügt das Werkzeug für wp-einsatz zum Menü hinzu
+     * @inheritDoc
      */
-    public function addToolToMenu()
+    public function getIdentifier()
     {
-        add_management_page(
-            'Import aus wp-einsatz',
-            'Import aus wp-einsatz',
-            'manage_options',
-            self::EVW_TOOL_WPE_SLUG,
-            array($this, 'renderToolPage')
-        );
+        return 'evw_wpe';
     }
 
     /**
-     * Generiert den Inhalt der Werkzeugseiten
+     * @inheritDoc
      */
-    public function renderToolPage()
+    public function getName()
+    {
+        return 'wp-einsatz';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function renderPage($action)
     {
         /** @var wpdb $wpdb */
         global $wpdb;
-
-        echo '<div class="wrap">';
-        echo '<h1>Import aus wp-einsatz</h1>';
-
-        echo '<p>Dieses Werkzeug importiert Einsätze aus wp-einsatz.</p>';
-
-        // Existenz der wp-einsatz Datenbank feststellen
         $tablename = $wpdb->prefix . "einsaetze";
-        if ($wpdb->get_var("SHOW TABLES LIKE '$tablename'") != $tablename) {
-            Utilities::printError('Die Tabelle, in der wp-einsatz seine Daten speichert, konnte nicht gefunden werden.');
-        } else {
-            if (array_key_exists('submit', $_POST) &&
-                array_key_exists('aktion', $_POST) &&
-                $_POST['aktion'] == 'analyse'
-            ) {
-                // Nonce überprüfen
-                check_admin_referer('evw-import-wpe-analyse');
 
-                // Datenbank analysieren
-                echo "<h3>Analyse</h3>";
-                echo "<p>Die Daten von wp-einsatz werden analysiert...</p>";
-                $felder = $this->getWpeFelder($tablename);
-                if (empty($felder)) {
-                    Utilities::printError('Es wurden keine Felder in der Tabelle gefunden');
-                    return;
-                }
-
-                Utilities::printSuccess('Es wurden folgende Felder gefunden: ' . implode($felder, ', '));
-
-                // Auf Pflichtfelder prüfen
-                if (!in_array(self::EVW_TOOL_WPE_DATE_COLUMN, $felder)) {
-                    echo '<br>';
-                    Utilities::printError('Das Feld "'.self::EVW_TOOL_WPE_DATE_COLUMN.'" konnte nicht in der Datenbank gefunden werden!');
-                    return;
-                }
-
-                // Einsätze zählen
-                $anzahl_einsaetze = $wpdb->get_var("SELECT COUNT(*) FROM $tablename");
-                if ($anzahl_einsaetze === null) {
-                    Utilities::printWarning('Konnte die Anzahl der Ein&auml;tze in wp-einsatz nicht abfragen. M&ouml;glicherweise gibt es ein Problem mit der Datenbank.');
-                } else {
-                    if ($anzahl_einsaetze > 0) {
-                        Utilities::printSuccess("Es wurden $anzahl_einsaetze Eins&auml;tze gefunden");
-                    } else {
-                        Utilities::printWarning('Es wurden keine Eins&auml;tze gefunden.');
-                    }
-                }
-
-                // Hinweise ausgeben
-                echo '<h3>Hinweise zu den erwarteten Daten</h3>';
-                echo '<p>Die Felder <strong>Berichtstext, Berichtstitel, Einsatzleiter, Einsatzort</strong> und <strong>Mannschaftsst&auml;rke</strong> sind Freitextfelder.</p>';
-                echo '<p>F&uuml;r die Felder <strong>Alarmierungsart, Einsatzart, Externe Einsatzmittel</strong> und <strong>Fahrzeuge</strong> wird eine kommagetrennte Liste erwartet.<br>Bisher unbekannte Eintr&auml;ge werden automatisch angelegt, die Einsatzart sollte nur ein einzelner Wert sein.</p>';
-                echo '<p>Das Feld <strong>Einsatzende</strong> erwartet eine Datums- und Zeitangabe im Format <code>JJJJ-MM-TT hh:mm:ss</code> (z.B. 2014-04-21 21:48:06). Die Sekundenangabe ist optional.</p>';
-                echo '<p>Das Feld <strong>Fehlalarm</strong> erwartet den Wert 1 (= ja) oder 0 (= nein). Es darf auch leer bleiben, was als 0 (= nein) zählt.</p>';
-
-                // Felder matchen
-                echo "<h3>Felder zuordnen</h3>";
-                $this->renderMatchForm($felder);
-            } elseif (array_key_exists('submit', $_POST) &&
-                array_key_exists('aktion', $_POST) &&
-                $_POST['aktion'] == 'import_wpe'
-            ) {
-                // Nonce überprüfen
-                check_admin_referer('evw-import-wpe-import');
-
-                echo '<h3>Import</h3>';
-
-                $wpe_felder = $this->getWpeFelder($tablename);
-                if (empty($wpe_felder)) {
-                    Utilities::printError('Es wurden keine Felder in der Tabelle von wp-einsatz gefunden');
-                    return;
-                }
-
-                // nicht zu importierende Felder aussortieren
-                $feld_mapping = array();
-                foreach ($wpe_felder as $wpe_feld) {
-                    $index = self::EVW_TOOL_WPE_INPUT_NAME_PREFIX . strtolower($wpe_feld);
-                    if (array_key_exists($index, $_POST)) {
-                        $evw_feld_name = $_POST[$index];
-                        if (!empty($evw_feld_name) && is_string($evw_feld_name) && $evw_feld_name != '-') {
-                            if (array_key_exists($evw_feld_name, Core::getFields())) {
-                                $feld_mapping[$wpe_feld] = $evw_feld_name;
-                            } else {
-                                Utilities::printWarning("Unbekanntes Feld: $evw_feld_name");
-                            }
-                        }
-                    }
-                }
-                $feld_mapping[self::EVW_TOOL_WPE_DATE_COLUMN] = 'post_date';
-
-                // Prüfen, ob mehrere Felder das gleiche Zielfeld haben
-                $value_count = array_count_values($feld_mapping);
-                foreach ($value_count as $zielfeld => $anzahl) {
-                    if ($anzahl > 1) {
-                        $evw_felder = Core::getFields();
-                        Utilities::printError("Feld $evw_felder[$zielfeld] kann nur f&uuml;r ein wp-einsatz-Feld als Importziel angegeben werden");
-                        $this->renderMatchForm($wpe_felder, $feld_mapping);
-                        return;
-                    }
-                }
-
-                // Import starten
-                echo '<p>Die Daten werden eingelesen, das kann einen Moment dauern.</p>';
-                $this->import($tablename, $feld_mapping);
+        if ($action == 'begin') {
+            check_admin_referer($this->getIdentifier() . '-begin');
+            if ($wpdb->get_var("SHOW TABLES LIKE '$tablename'") != $tablename) {
+                Utilities::printError('Die Tabelle, in der wp-einsatz seine Daten speichert, konnte nicht gefunden werden.');
             } else {
                 Utilities::printSuccess('Die Tabelle, in der wp-einsatz seine Daten speichert, wurde gefunden. Analyse jetzt starten?');
                 echo '<form method="post">';
-                echo '<input type="hidden" name="aktion" value="analyse" />';
+                echo '<input type="hidden" name="aktion" value="' . $this->getActionAttribute('analyse') . '" />';
                 wp_nonce_field('evw-import-wpe-analyse');
                 submit_button('Analyse starten');
                 echo '</form>';
             }
+        } else if ($action == 'analyse') {
+            // Nonce überprüfen
+            check_admin_referer('evw-import-wpe-analyse');
+
+            // Datenbank analysieren
+            echo "<h3>Analyse</h3>";
+            echo "<p>Die Daten von wp-einsatz werden analysiert...</p>";
+            $felder = $this->getWpeFelder($tablename);
+            if (empty($felder)) {
+                Utilities::printError('Es wurden keine Felder in der Tabelle gefunden');
+                return;
+            }
+
+            Utilities::printSuccess('Es wurden folgende Felder gefunden: ' . implode($felder, ', '));
+
+            // Auf Pflichtfelder prüfen
+            if (!in_array(self::EVW_TOOL_WPE_DATE_COLUMN, $felder)) {
+                echo '<br>';
+                Utilities::printError('Das Feld "'.self::EVW_TOOL_WPE_DATE_COLUMN.'" konnte nicht in der Datenbank gefunden werden!');
+                return;
+            }
+
+            // Einsätze zählen
+            $anzahl_einsaetze = $wpdb->get_var("SELECT COUNT(*) FROM $tablename");
+            if ($anzahl_einsaetze === null) {
+                Utilities::printWarning('Konnte die Anzahl der Ein&auml;tze in wp-einsatz nicht abfragen. M&ouml;glicherweise gibt es ein Problem mit der Datenbank.');
+            } else {
+                if ($anzahl_einsaetze > 0) {
+                    Utilities::printSuccess("Es wurden $anzahl_einsaetze Eins&auml;tze gefunden");
+                } else {
+                    Utilities::printWarning('Es wurden keine Eins&auml;tze gefunden.');
+                }
+            }
+
+            // Hinweise ausgeben
+            echo '<h3>Hinweise zu den erwarteten Daten</h3>';
+            echo '<p>Die Felder <strong>Berichtstext, Berichtstitel, Einsatzleiter, Einsatzort</strong> und <strong>Mannschaftsst&auml;rke</strong> sind Freitextfelder.</p>';
+            echo '<p>F&uuml;r die Felder <strong>Alarmierungsart, Einsatzart, Externe Einsatzmittel</strong> und <strong>Fahrzeuge</strong> wird eine kommagetrennte Liste erwartet.<br>Bisher unbekannte Eintr&auml;ge werden automatisch angelegt, die Einsatzart sollte nur ein einzelner Wert sein.</p>';
+            echo '<p>Das Feld <strong>Einsatzende</strong> erwartet eine Datums- und Zeitangabe im Format <code>JJJJ-MM-TT hh:mm:ss</code> (z.B. 2014-04-21 21:48:06). Die Sekundenangabe ist optional.</p>';
+            echo '<p>Das Feld <strong>Fehlalarm</strong> erwartet den Wert 1 (= ja) oder 0 (= nein). Es darf auch leer bleiben, was als 0 (= nein) zählt.</p>';
+
+            // Felder matchen
+            echo "<h3>Felder zuordnen</h3>";
+            $this->renderMatchForm($felder);
+        } else if ($action == 'import_wpe') {
+            // Nonce überprüfen
+            check_admin_referer('evw-import-wpe-import');
+
+            echo '<h3>Import</h3>';
+
+            $wpe_felder = $this->getWpeFelder($tablename);
+            if (empty($wpe_felder)) {
+                Utilities::printError('Es wurden keine Felder in der Tabelle von wp-einsatz gefunden');
+                return;
+            }
+
+            // nicht zu importierende Felder aussortieren
+            $feld_mapping = array();
+            foreach ($wpe_felder as $wpe_feld) {
+                $index = self::EVW_TOOL_WPE_INPUT_NAME_PREFIX . strtolower($wpe_feld);
+                if (array_key_exists($index, $_POST)) {
+                    $evw_feld_name = $_POST[$index];
+                    if (!empty($evw_feld_name) && is_string($evw_feld_name) && $evw_feld_name != '-') {
+                        if (array_key_exists($evw_feld_name, Core::getFields())) {
+                            $feld_mapping[$wpe_feld] = $evw_feld_name;
+                        } else {
+                            Utilities::printWarning("Unbekanntes Feld: $evw_feld_name");
+                        }
+                    }
+                }
+            }
+            $feld_mapping[self::EVW_TOOL_WPE_DATE_COLUMN] = 'post_date';
+
+            // Prüfen, ob mehrere Felder das gleiche Zielfeld haben
+            $value_count = array_count_values($feld_mapping);
+            foreach ($value_count as $zielfeld => $anzahl) {
+                if ($anzahl > 1) {
+                    $evw_felder = Core::getFields();
+                    Utilities::printError("Feld $evw_felder[$zielfeld] kann nur f&uuml;r ein wp-einsatz-Feld als Importziel angegeben werden");
+                    $this->renderMatchForm($wpe_felder, $feld_mapping);
+                    return;
+                }
+            }
+
+            // Import starten
+            echo '<p>Die Daten werden eingelesen, das kann einen Moment dauern.</p>';
+            $this->import($tablename, $feld_mapping);
+        } else {
+            echo "Unbekannte Aktion";
         }
     }
 
@@ -174,7 +161,7 @@ class WpEinsatz
     {
         echo '<form method="post">';
         wp_nonce_field('evw-import-wpe-import');
-        echo '<input type="hidden" name="aktion" value="import_wpe" />';
+        echo '<input type="hidden" name="aktion" value="' . $this->getActionAttribute('import_wpe') . '" />';
         echo '<table class="evw_match_fields"><tr><th>Feld in wp-einsatz</th><th>Feld in Einsatzverwaltung</th></tr><tbody>';
         foreach ($felder as $feld) {
             echo '<tr><td><strong>' . $feld . '</strong></td><td>';

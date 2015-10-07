@@ -12,10 +12,10 @@ require_once dirname(__FILE__) . '/einsatzverwaltung-options.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-shortcodes.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-settings.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-tools.php';
-require_once dirname(__FILE__) . '/Import/WpEinsatz.php';
+require_once dirname(__FILE__) . '/Import/Tool.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-taxonomies.php';
 
-use abrain\Einsatzverwaltung\Import\WpEinsatz;
+use abrain\Einsatzverwaltung\Import\Tool as ImportTool;
 use abrain\Einsatzverwaltung\Widgets\RecentIncidents;
 use abrain\Einsatzverwaltung\Widgets\RecentIncidentsFormatted;
 use WP_Query;
@@ -200,7 +200,7 @@ class Core
 
         // Tools
         new ToolEinsatznummernReparieren($this->data);
-        new WpEinsatz();
+        new ImportTool();
 
         // Widgets
         new RecentIncidents();

@@ -49,23 +49,15 @@ class WpEinsatz extends AbstractSource
 
         if ($action == 'begin') {
             check_admin_referer($this->getIdentifier() . '-begin');
+
             if ($wpdb->get_var("SHOW TABLES LIKE '$tablename'") != $tablename) {
                 Utilities::printError('Die Tabelle, in der wp-einsatz seine Daten speichert, konnte nicht gefunden werden.');
-            } else {
-                Utilities::printSuccess('Die Tabelle, in der wp-einsatz seine Daten speichert, wurde gefunden. Analyse jetzt starten?');
-                echo '<form method="post">';
-                echo '<input type="hidden" name="aktion" value="' . $this->getActionAttribute('analyse') . '" />';
-                wp_nonce_field('evw-import-wpe-analyse');
-                submit_button('Analyse starten');
-                echo '</form>';
+                return;
             }
-        } else if ($action == 'analyse') {
-            // Nonce überprüfen
-            check_admin_referer('evw-import-wpe-analyse');
+            Utilities::printSuccess('Die Tabelle, in der wp-einsatz seine Daten speichert, wurde gefunden.');
 
             // Datenbank analysieren
             echo "<h3>Analyse</h3>";
-            echo "<p>Die Daten von wp-einsatz werden analysiert...</p>";
             $felder = $this->getWpeFelder($tablename);
             if (empty($felder)) {
                 Utilities::printError('Es wurden keine Felder in der Tabelle gefunden');

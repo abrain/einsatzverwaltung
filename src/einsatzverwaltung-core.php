@@ -5,6 +5,7 @@ require_once dirname(__FILE__) . '/einsatzverwaltung-admin.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-data.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-utilities.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-frontend.php';
+require_once dirname(__FILE__) . '/Model/IncidentReport.php';
 require_once dirname(__FILE__) . '/Util/Formatter.php';
 require_once dirname(__FILE__) . '/Widgets/RecentIncidents.php';
 require_once dirname(__FILE__) . '/Widgets/RecentIncidentsFormatted.php';
@@ -348,15 +349,6 @@ class Core
     }
 
     /**
-     * Gibt ein Array aller Felder und deren Namen zurück,
-     * Hauptverwendungszweck ist das Mapping beim Import
-     */
-    public static function getFields()
-    {
-        return array_merge(self::getMetaFields(), self::getTerms(), self::getPostFields());
-    }
-
-    /**
      * Gibt die möglichen Spalten für die Einsatzübersicht zurück
      *
      * @return array
@@ -448,52 +440,6 @@ class Core
             'delete_private_einsatzberichte',
             'delete_published_einsatzberichte',
             'delete_others_einsatzberichte'
-        );
-    }
-
-    /**
-     * Gibt die slugs und Namen der Metafelder zurück
-     *
-     * @return array
-     */
-    public static function getMetaFields()
-    {
-        return array(
-            'einsatz_einsatzort' => 'Einsatzort',
-            'einsatz_einsatzleiter' => 'Einsatzleiter',
-            'einsatz_einsatzende' => 'Einsatzende',
-            'einsatz_fehlalarm' => 'Fehlalarm',
-            'einsatz_mannschaft' => 'Mannschaftsstärke'
-        );
-    }
-
-    /**
-     * Gibt die slugs und Namen der Taxonomien zurück
-     *
-     * @return array
-     */
-    public static function getTerms()
-    {
-        return array(
-            'alarmierungsart' => 'Alarmierungsart',
-            'einsatzart' => 'Einsatzart',
-            'fahrzeug' => 'Fahrzeuge',
-            'exteinsatzmittel' => 'Externe Einsatzmittel'
-        );
-    }
-
-    /**
-     * Gibt slugs und Namen der Direkt dem Post zugeordneten Felder zurück
-     *
-     * @return array
-     */
-    public static function getPostFields()
-    {
-        return array(
-            'post_date' => 'Alarmzeit',
-            'post_name' => 'Einsatznummer',
-            'post_content' => 'Berichtstext',
-            'post_title' => 'Berichtstitel'
         );
     }
 

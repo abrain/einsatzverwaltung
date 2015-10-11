@@ -2,6 +2,7 @@
 namespace abrain\Einsatzverwaltung\Import\Sources;
 
 use abrain\Einsatzverwaltung\Core;
+use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\ToolEinsatznummernReparieren;
 use abrain\Einsatzverwaltung\Utilities;
 use wpdb;
@@ -121,7 +122,7 @@ class WpEinsatz extends AbstractSource
                 if (array_key_exists($index, $_POST)) {
                     $evw_feld_name = $_POST[$index];
                     if (!empty($evw_feld_name) && is_string($evw_feld_name) && $evw_feld_name != '-') {
-                        if (array_key_exists($evw_feld_name, Core::getFields())) {
+                        if (array_key_exists($evw_feld_name, IncidentReport::getFields())) {
                             $feld_mapping[$wpe_feld] = $evw_feld_name;
                         } else {
                             Utilities::printWarning("Unbekanntes Feld: $evw_feld_name");
@@ -135,7 +136,7 @@ class WpEinsatz extends AbstractSource
             $value_count = array_count_values($feld_mapping);
             foreach ($value_count as $zielfeld => $anzahl) {
                 if ($anzahl > 1) {
-                    $evw_felder = Core::getFields();
+                    $evw_felder = IncidentReport::getFields();
                     Utilities::printError("Feld $evw_felder[$zielfeld] kann nur f&uuml;r ein wp-einsatz-Feld als Importziel angegeben werden");
                     $this->renderMatchForm($wpe_felder, $feld_mapping);
                     return;
@@ -193,7 +194,7 @@ class WpEinsatz extends AbstractSource
      */
     private function dropdownEigeneFelder($name, $selected = '-')
     {
-        $felder = Core::getFields();
+        $felder = IncidentReport::getFields();
 
         // Felder, die automatisch beschrieben werden, nicht zur Auswahl stellen
         unset($felder['post_date']);
@@ -269,8 +270,8 @@ class WpEinsatz extends AbstractSource
 
             foreach ($feld_mapping as $wpe_feld_name => $evw_feld_name) {
                 if (!empty($evw_feld_name) && is_string($evw_feld_name)) {
-                    $evw_terms = Core::getTerms();
-                    if (array_key_exists($evw_feld_name, Core::getMetaFields())) {
+                    $evw_terms = IncidentReport::getTerms();
+                    if (array_key_exists($evw_feld_name, IncidentReport::getMetaFields())) {
                         // Wert gehört in ein Metafeld
                         $meta_values[$evw_feld_name] = $wpe_einsatz[$wpe_feld_name];
                     } elseif (array_key_exists($evw_feld_name, $evw_terms)) {
@@ -302,7 +303,7 @@ class WpEinsatz extends AbstractSource
                             // Name kann direkt verwendet werden
                             $einsatz_args['tax_input'][$evw_feld_name] = $wpe_einsatz[$wpe_feld_name];
                         }
-                    } elseif (array_key_exists($evw_feld_name, Core::getPostFields())) {
+                    } elseif (array_key_exists($evw_feld_name, IncidentReport::getPostFields())) {
                         // Wert gehört direkt zum Post
                         $einsatz_args[$evw_feld_name] = $wpe_einsatz[$wpe_feld_name];
                     } elseif ($evw_feld_name == '-') {

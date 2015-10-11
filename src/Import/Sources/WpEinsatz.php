@@ -12,7 +12,6 @@ use wpdb;
 class WpEinsatz extends AbstractSource
 {
     const EVW_TOOL_WPE_DATE_COLUMN = 'Datum';
-    const EVW_TOOL_WPE_INPUT_NAME_PREFIX = 'evw_wpe_';
 
     /**
      * @inheritDoc
@@ -118,7 +117,7 @@ class WpEinsatz extends AbstractSource
             // nicht zu importierende Felder aussortieren
             $feld_mapping = array();
             foreach ($wpe_felder as $wpe_feld) {
-                $index = self::EVW_TOOL_WPE_INPUT_NAME_PREFIX . strtolower($wpe_feld);
+                $index = $this->getInputName(strtolower($wpe_feld));
                 if (array_key_exists($index, $_POST)) {
                     $evw_feld_name = $_POST[$index];
                     if (!empty($evw_feld_name) && is_string($evw_feld_name) && $evw_feld_name != '-') {
@@ -176,7 +175,7 @@ class WpEinsatz extends AbstractSource
                     if (!empty($mapping) && array_key_exists($feld, $mapping) && !empty($mapping[$feld])) {
                         $selected = $mapping[$feld];
                     }
-                    $this->dropdownEigeneFelder(self::EVW_TOOL_WPE_INPUT_NAME_PREFIX . strtolower($feld), $selected);
+                    $this->dropdownEigeneFelder($this->getInputName(strtolower($feld)), $selected);
                 }
             }
             echo '</td></tr>';

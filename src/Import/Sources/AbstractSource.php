@@ -30,6 +30,17 @@ abstract class AbstractSource
     abstract public function getIdentifier();
 
     /**
+     * Gibt den Wert für das name-Attribut eines Formularelements zurück
+     *
+     * @param string $field Bezeichner des Felds
+     * @return string Eindeutiger Name bestehend aus Bezeichnern der Importquelle und des Felds
+     */
+    public function getInputName($field)
+    {
+        return $this->getIdentifier() . '-' . $field;
+    }
+
+    /**
      * Gibt den Namen der Importquelle zurück
      *
      * @return string Name der Importquelle
@@ -41,6 +52,4 @@ abstract class AbstractSource
      * @return mixed
      */
     abstract public function renderPage($action);
-
-
 }

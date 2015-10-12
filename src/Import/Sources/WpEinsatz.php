@@ -12,7 +12,15 @@ use wpdb;
  */
 class WpEinsatz extends AbstractSource
 {
-    const EVW_TOOL_WPE_DATE_COLUMN = 'Datum';
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->autoMatchFields = array(
+            'Datum' => 'post_date'
+        );
+    }
 
     /**
      * @inheritDoc
@@ -67,11 +75,17 @@ class WpEinsatz extends AbstractSource
             Utilities::printSuccess('Es wurden folgende Felder gefunden: ' . implode($felder, ', '));
 
             // Auf Pflichtfelder prüfen
-            if (!in_array(self::EVW_TOOL_WPE_DATE_COLUMN, $felder)) {
-                echo '<br>';
-                Utilities::printError('Das Feld "'.self::EVW_TOOL_WPE_DATE_COLUMN.'" konnte nicht in der Datenbank gefunden werden!');
-                return;
+            foreach (array_keys($this->autoMatchFields) as $mandatoryField) {
+                if (!in_array($mandatoryField, $felder)) {
+                    Utilities::printError(
+                        sprintf('Das Pflichtfeld %s konnte nicht in der Datenbank gefunden werden!', $mandatoryField)
+                    );
+                    return;
+                }
             }
+
+            // Auf problematische Felder prüfen
+            $this->checkForProblems($felder);
 
             // Einsätze zählen
             $anzahl_einsaetze = $wpdb->get_var("SELECT COUNT(*) FROM $tablename");
@@ -94,7 +108,11 @@ class WpEinsatz extends AbstractSource
 
             // Felder matchen
             echo "<h3>Felder zuordnen</h3>";
-            $this->renderMatchForm($felder);
+            $this->renderMatchForm(array(
+                'fields' => $felder,
+                'nonce_action' => 'evw-import-wpe-import',
+                'action_value' => $this->getActionAttribute('import_wpe')
+            ));
         } else if ($action == 'import_wpe') {
             // Nonce überprüfen
             check_admin_referer('evw-import-wpe-import');
@@ -108,31 +126,18 @@ class WpEinsatz extends AbstractSource
             }
 
             // nicht zu importierende Felder aussortieren
-            $feld_mapping = array();
-            foreach ($wpe_felder as $wpe_feld) {
-                $index = $this->getInputName(strtolower($wpe_feld));
-                if (array_key_exists($index, $_POST)) {
-                    $evw_feld_name = $_POST[$index];
-                    if (!empty($evw_feld_name) && is_string($evw_feld_name) && $evw_feld_name != '-') {
-                        if (array_key_exists($evw_feld_name, IncidentReport::getFields())) {
-                            $feld_mapping[$wpe_feld] = $evw_feld_name;
-                        } else {
-                            Utilities::printWarning("Unbekanntes Feld: $evw_feld_name");
-                        }
-                    }
-                }
-            }
-            $feld_mapping[self::EVW_TOOL_WPE_DATE_COLUMN] = 'post_date';
+            $evw_felder = IncidentReport::getFields();
+            $feld_mapping = $this->getMapping($wpe_felder, $evw_felder);
 
             // Prüfen, ob mehrere Felder das gleiche Zielfeld haben
-            $value_count = array_count_values($feld_mapping);
-            foreach ($value_count as $zielfeld => $anzahl) {
-                if ($anzahl > 1) {
-                    $evw_felder = IncidentReport::getFields();
-                    Utilities::printError("Feld $evw_felder[$zielfeld] kann nur f&uuml;r ein wp-einsatz-Feld als Importziel angegeben werden");
-                    $this->renderMatchForm($wpe_felder, $feld_mapping);
-                    return;
-                }
+            if (!$this->validateMapping($feld_mapping)) {
+                $this->renderMatchForm(array(
+                    'fields' => $wpe_felder,
+                    'mapping' => $feld_mapping,
+                    'nonce_action' => 'evw-import-wpe-import',
+                    'action_value' => $this->getActionAttribute('import_wpe')
+                ));
+                return;
             }
 
             // Import starten
@@ -141,68 +146,6 @@ class WpEinsatz extends AbstractSource
         } else {
             echo "Unbekannte Aktion";
         }
-    }
-
-    /**
-     * Gibt das Formular für die Zuordnung zwischen zu importieren Feldern und denen von Einsatzverwaltung aus
-     *
-     * @param array $felder Liste der Feldnamen aus wp-einsatz
-     * @param array $mapping Zuordnung von wp-einsatz-Feldern auf Einsatzverwaltungsfelder
-     */
-    private function renderMatchForm($felder, $mapping = array())
-    {
-        echo '<form method="post">';
-        wp_nonce_field('evw-import-wpe-import');
-        echo '<input type="hidden" name="aktion" value="' . $this->getActionAttribute('import_wpe') . '" />';
-        echo '<table class="evw_match_fields"><tr><th>Feld in wp-einsatz</th><th>Feld in Einsatzverwaltung</th></tr><tbody>';
-        foreach ($felder as $feld) {
-            echo '<tr><td><strong>' . $feld . '</strong></td><td>';
-            if ($feld == self::EVW_TOOL_WPE_DATE_COLUMN) {
-                echo 'wird automatisch zugeordnet';
-            } else {
-                // Auf problematische Zeichen prüfen
-                if (strpbrk($feld, 'äöüÄÖÜß/#')) {
-                    Utilities::printWarning('Feldname enth&auml;lt Zeichen (z.B. Umlaute oder Sonderzeichen), die beim Import zu Problemen f&uuml;hren.<br>Bitte das Feld in den Einstellungen von wp-einsatz umbenennen, wenn Sie es importieren wollen.');
-                } else {
-                    $selected = '-';
-                    if (!empty($mapping) && array_key_exists($feld, $mapping) && !empty($mapping[$feld])) {
-                        $selected = $mapping[$feld];
-                    }
-                    $this->dropdownEigeneFelder($this->getInputName(strtolower($feld)), $selected);
-                }
-            }
-            echo '</td></tr>';
-        }
-        echo '</tbody></table>';
-        submit_button('Import starten');
-        echo '</form>';
-    }
-
-    /**
-     * Gibt ein Auswahlfeld zur Zuordnung der Felder in Einsatzverwaltung aus
-     *
-     * @param string $name Name des Dropdownfelds im Formular
-     * @param string $selected Wert der ausgewählten Option
-     */
-    private function dropdownEigeneFelder($name, $selected = '-')
-    {
-        $felder = IncidentReport::getFields();
-
-        // Felder, die automatisch beschrieben werden, nicht zur Auswahl stellen
-        unset($felder['post_date']);
-        unset($felder['post_name']);
-
-        // Sortieren und ausgeben
-        asort($felder);
-        $string = '';
-        $string .= '<select name="' . $name . '">';
-        $string .= '<option value="-"' . ($selected == '-' ? ' selected="selected"' : '') . '>nicht importieren</option>';
-        foreach ($felder as $slug => $feldname) {
-            $string .= '<option value="' . $slug . '"' . ($selected == $slug ? ' selected="selected"' : '') . '>' . $feldname . '</option>';
-        }
-        $string .= '</select>';
-
-        echo $string;
     }
 
     /**
@@ -240,7 +183,7 @@ class WpEinsatz extends AbstractSource
         /** @var wpdb $wpdb */
         global $wpdb;
 
-        $query = sprintf('SELECT ID,%s FROM %s ORDER BY %s', implode(array_keys($feld_mapping), ','), $tablename, self::EVW_TOOL_WPE_DATE_COLUMN);
+        $query = sprintf('SELECT ID,%s FROM %s ORDER BY Datum', implode(array_keys($feld_mapping), ','), $tablename);
         $wpe_einsaetze = $wpdb->get_results($query, ARRAY_A);
 
         if ($wpe_einsaetze === null) {
@@ -361,5 +304,24 @@ class WpEinsatz extends AbstractSource
 
         Utilities::printSuccess('Der Import ist abgeschlossen');
         echo '<a href="edit.php?post_type=einsatz">Zu den Einsatzberichten</a>';
+    }
+
+    /**
+     * @param array $felder
+     * @param bool $quiet
+     */
+    private function checkForProblems($felder, $quiet = false)
+    {
+        foreach ($felder as $feld) {
+            if (strpbrk($feld, 'äöüÄÖÜß/#')) {
+                if (!$quiet) {
+                    Utilities::printWarning(sprintf(
+                        'Feldname %s enth&auml;lt Zeichen (z.B. Umlaute oder Sonderzeichen), die beim Import zu Problemen f&uuml;hren.<br>Bitte das Feld in den Einstellungen von wp-einsatz umbenennen, wenn Sie es importieren wollen.',
+                        $feld
+                    ));
+                }
+                $this->problematicFields[] = $feld;
+            }
+        }
     }
 }

@@ -10,6 +10,19 @@ namespace abrain\Einsatzverwaltung\Model;
 class IncidentReport
 {
     /**
+     * Gibt die Beschriftung für ein Feld zurück
+     *
+     * @param string $field Slug des Feldes
+     *
+     * @return string Die Beschriftung oder $field, wenn es das Feld nicht gibt
+     */
+    public static function getFieldLabel($field)
+    {
+        $fields = self::getFields();
+        return (array_key_exists($field, $fields) ? $fields[$field] : $field);
+    }
+
+    /**
      * Gibt ein Array aller Felder und deren Namen zurück,
      * Hauptverwendungszweck ist das Mapping beim Import
      */

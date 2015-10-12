@@ -12,11 +12,17 @@ use wpdb;
  */
 class WpEinsatz extends AbstractSource
 {
+    private $tablename;
+
     /**
      * Constructor
      */
     public function __construct()
     {
+        /** @var wpdb $wpdb */
+        global $wpdb;
+        $this->tablename = $wpdb->prefix . 'einsaetze';
+
         $this->autoMatchFields = array(
             'Datum' => 'post_date'
         );
@@ -51,14 +57,12 @@ class WpEinsatz extends AbstractSource
      */
     public function renderPage($action)
     {
-        /** @var wpdb $wpdb */
-        global $wpdb;
-        $tablename = $wpdb->prefix . "einsaetze";
-
         if ($action == 'begin') {
             check_admin_referer($this->getIdentifier() . '-begin');
 
-            if ($wpdb->get_var("SHOW TABLES LIKE '$tablename'") != $tablename) {
+            /** @var wpdb $wpdb */
+            global $wpdb;
+            if ($wpdb->get_var("SHOW TABLES LIKE '$this->tablename'") != $this->tablename) {
                 Utilities::printError('Die Tabelle, in der wp-einsatz seine Daten speichert, konnte nicht gefunden werden.');
                 return;
             }
@@ -66,7 +70,7 @@ class WpEinsatz extends AbstractSource
 
             // Datenbank analysieren
             echo "<h3>Analyse</h3>";
-            $felder = $this->getWpeFelder($tablename);
+            $felder = $this->getFields();
             if (empty($felder)) {
                 Utilities::printError('Es wurden keine Felder in der Tabelle gefunden');
                 return;
@@ -88,7 +92,7 @@ class WpEinsatz extends AbstractSource
             $this->checkForProblems($felder);
 
             // Einsätze zählen
-            $anzahl_einsaetze = $wpdb->get_var("SELECT COUNT(*) FROM $tablename");
+            $anzahl_einsaetze = $wpdb->get_var("SELECT COUNT(*) FROM $this->tablename");
             if ($anzahl_einsaetze === null) {
                 Utilities::printWarning('Konnte die Anzahl der Ein&auml;tze in wp-einsatz nicht abfragen. M&ouml;glicherweise gibt es ein Problem mit der Datenbank.');
             } else {
@@ -119,7 +123,7 @@ class WpEinsatz extends AbstractSource
 
             echo '<h3>Import</h3>';
 
-            $wpe_felder = $this->getWpeFelder($tablename);
+            $wpe_felder = $this->getFields();
             if (empty($wpe_felder)) {
                 Utilities::printError('Es wurden keine Felder in der Tabelle von wp-einsatz gefunden');
                 return;
@@ -142,7 +146,7 @@ class WpEinsatz extends AbstractSource
 
             // Import starten
             echo '<p>Die Daten werden eingelesen, das kann einen Moment dauern.</p>';
-            $this->import($tablename, $feld_mapping);
+            $this->import($feld_mapping);
         } else {
             echo "Unbekannte Aktion";
         }
@@ -152,16 +156,14 @@ class WpEinsatz extends AbstractSource
      * Gibt die Spaltennamen der wp-einsatz-Tabelle zurück
      * (ohne ID, Nr_Jahr und Nr_Monat)
      *
-     * @param string $tablename Tabellenname der wp-einsatz-Tabelle
-     *
      * @return array Die Spaltennamen
      */
-    private function getWpeFelder($tablename)
+    private function getFields()
     {
         global $wpdb; /** @var wpdb $wpdb */
 
         $felder = array();
-        foreach ($wpdb->get_col("DESC " . $tablename, 0) as $column_name) {
+        foreach ($wpdb->get_col("DESC " . $this->tablename, 0) as $column_name) {
             // Unwichtiges ignorieren
             if ($column_name == 'ID' || $column_name == 'Nr_Jahr' || $column_name == 'Nr_Monat') {
                 continue;
@@ -175,15 +177,14 @@ class WpEinsatz extends AbstractSource
     /**
      * Importiert Einsätze aus der wp-einsatz-Tabelle
      *
-     * @param string $tablename Tabellenname der wp-einsatz-Tabelle
      * @param array $feld_mapping Zuordnung von wp-einsatz-Feldern auf Einsatzverwaltungsfelder
      */
-    private function import($tablename, $feld_mapping)
+    private function import($feld_mapping)
     {
         /** @var wpdb $wpdb */
         global $wpdb;
 
-        $query = sprintf('SELECT ID,%s FROM %s ORDER BY Datum', implode(array_keys($feld_mapping), ','), $tablename);
+        $query = sprintf('SELECT ID,%s FROM %s ORDER BY Datum', implode(array_keys($feld_mapping), ','), $this->tablename);
         $wpe_einsaetze = $wpdb->get_results($query, ARRAY_A);
 
         if ($wpe_einsaetze === null) {

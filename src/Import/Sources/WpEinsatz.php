@@ -113,7 +113,7 @@ class WpEinsatz extends AbstractSource
                 'nonce_action' => 'evw-import-wpe-import',
                 'action_value' => $this->getActionAttribute('import_wpe')
             ));
-        } else if ($action == 'import_wpe') {
+        } elseif ($action == 'import_wpe') {
             // Nonce überprüfen
             check_admin_referer('evw-import-wpe-import');
 

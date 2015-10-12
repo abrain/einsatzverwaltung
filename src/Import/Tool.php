@@ -61,7 +61,9 @@ class Tool
         $aktion = null;
         if (array_key_exists('aktion', $_POST)) {
             list($identifier, $aktion) = explode(':', $_POST['aktion']);
-            $source = $this->sources[$identifier];
+            if (array_key_exists($identifier, $this->sources)) {
+                $source = $this->sources[$identifier];
+            }
         }
 
         if ($source != null && $source instanceof AbstractSource) {
@@ -76,7 +78,7 @@ class Tool
                 echo '<h3>' . $source->getName() . '</h3>';
                 echo '<p class="description">' . $source->getDescription() . '</p>';
                 echo '<form method="post">';
-                echo '<input type="hidden" name="aktion" value="' . $source->getIdentifier() . ':begin" />';
+                echo '<input type="hidden" name="aktion" value="' . $source->getActionAttribute('begin') . '" />';
                 wp_nonce_field($source->getIdentifier() . '-begin');
                 submit_button(__('Assistent starten', 'einsatzverwaltung'));
                 echo '</form>';

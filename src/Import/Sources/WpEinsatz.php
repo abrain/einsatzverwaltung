@@ -111,13 +111,13 @@ class WpEinsatz extends AbstractSource
         global $wpdb; /** @var wpdb $wpdb */
 
         $felder = array();
-        foreach ($wpdb->get_col("DESC " . $this->tablename, 0) as $column_name) {
+        foreach ($wpdb->get_col("DESC " . $this->tablename, 0) as $columnName) {
             // Unwichtiges ignorieren
-            if ($column_name == 'ID' || $column_name == 'Nr_Jahr' || $column_name == 'Nr_Monat') {
+            if ($columnName == 'ID' || $columnName == 'Nr_Jahr' || $columnName == 'Nr_Monat') {
                 continue;
             }
 
-            $felder[] = $column_name;
+            $felder[] = $columnName;
         }
         return $felder;
     }

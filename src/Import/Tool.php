@@ -112,7 +112,7 @@ class Tool
 
         // Nonce überprüfen
         $this->checkNonce($source, $aktion);
-        
+
         // TODO gemeinsame Prüfungen auslagern
         if ('begin' == $aktion) {
             echo "<h3>Analyse</h3>";

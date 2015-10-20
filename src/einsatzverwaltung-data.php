@@ -71,7 +71,7 @@ class Data
             'orderby' => 'post_date',
             'order' => 'ASC',
             'post_type' => 'einsatz',
-            'post_status' => 'publish',
+            'post_status' => array('publish', 'private'),
             'year' => $kalenderjahr
         ));
     }

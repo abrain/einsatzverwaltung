@@ -323,7 +323,12 @@ class Core
         if (empty($jahr) || !is_numeric($jahr)) {
             $jahr = date('Y');
         }
-        $query = new WP_Query('year=' . $jahr .'&post_type=einsatz&post_status=publish&nopaging=true');
+        $query = new WP_Query(array(
+            'year' =>  $jahr,
+            'post_type' => 'einsatz',
+            'post_status' => array('publish', 'private'),
+            'nopaging' => true
+        ));
         return self::formatEinsatznummer($jahr, $query->found_posts + ($minuseins ? 0 : 1));
     }
 

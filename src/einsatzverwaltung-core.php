@@ -111,6 +111,7 @@ class Core
             'choose_from_most_used' => 'Aus h&auml;ufig eingesetzten Fahrzeugen w&auml;hlen'),
         'public' => true,
         'show_in_nav_menus' => false,
+        'hierarchical' => true,
         'capabilities' => array (
             'manage_terms' => 'edit_einsatzberichte',
             'edit_terms' => 'edit_einsatzberichte',

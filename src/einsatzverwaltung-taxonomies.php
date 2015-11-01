@@ -10,7 +10,7 @@ class Taxonomies
 {
     private static $taxonomies = array(
         'exteinsatzmittel' => array('url'),
-        'fahrzeug' => array('fahrzeugpid')
+        'fahrzeug' => array('fahrzeugpid', 'vehicleorder')
     );
 
     /**
@@ -77,6 +77,11 @@ class Taxonomies
             'post_type' => $this->getFahrzeugPostTypes()
         ));
         echo '<p>Seite mit mehr Informationen &uuml;ber das Fahrzeug. Wird in Einsatzberichten mit diesem Fahrzeug verlinkt.</p></div>';
+
+        echo '<div class="form-field">';
+        echo '<label for="tag-vehicleorder">Reihenfolge</label>';
+        echo '<input id="tag-vehicleorder" type="number" min="0" value="0" name="vehicleorder">';
+        echo '<p class="description">Optionale Angabe, mit der die Anzeigereihenfolge der Fahrzeuge beeinflusst werden kann. Fahrzeuge mit der kleineren Zahl werden zuerst angezeigt, anschlie&szlig;end diejenigen ohne Angabe bzw. dem Wert 0 in alphabetischer Reihenfolge.</p></div>';
     }
 
     /**
@@ -96,6 +101,12 @@ class Taxonomies
             'post_type' => $this->getFahrzeugPostTypes()
         ));
         echo '<p class="description">Seite mit mehr Informationen &uuml;ber das Fahrzeug. Wird in Einsatzberichten mit diesem Fahrzeug verlinkt.</p></td></tr>';
+
+        $vehicleOrder = self::getTermField($tag->term_id, 'fahrzeug', 'vehicleorder', 0);
+        echo '<tr class="form-field">';
+        echo '<th scope="row"><label for="tag-vehicleorder">Reihenfolge</label></th><td>';
+        echo '<input id="tag-vehicleorder" type="number" min="0" value="' . esc_attr($vehicleOrder) . '" name="vehicleorder">';
+        echo '<p class="description">Optionale Angabe, mit der die Anzeigereihenfolge der Fahrzeuge beeinflusst werden kann. Fahrzeuge mit der kleineren Zahl werden zuerst angezeigt, anschlie&szlig;end diejenigen ohne Angabe bzw. dem Wert 0 in alphabetischer Reihenfolge.</p></td></tr>';
     }
 
     /**
@@ -114,10 +125,12 @@ class Taxonomies
                 $filteredColumns[$slug] = $name;
                 if ($slug == 'description') {
                     $filteredColumns['fahrzeugpage'] = 'Fahrzeugseite';
+                    $filteredColumns['vehicleorder'] = 'Reihenfolge';
                 }
             }
         } else {
             $filteredColumns['fahrzeugpage'] = 'Fahrzeugseite';
+            $filteredColumns['vehicleorder'] = 'Reihenfolge';
         }
         return $filteredColumns;
     }
@@ -143,6 +156,10 @@ class Taxonomies
                     $title = get_the_title($fahrzeugpid);
                     return '<a href="' . $url . '" title="&quot;' . $title . '&quot; ansehen">' . $title . '</a>';
                 }
+                break;
+            case 'vehicleorder':
+                $vehicleOrder = self::getTermField($term_id, 'fahrzeug', 'vehicleorder');
+                return (empty($vehicleOrder) ? '&nbsp;' : esc_html($vehicleOrder));
                 break;
             default:
                 return '&nbsp;';

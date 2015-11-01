@@ -60,7 +60,7 @@ class Taxonomies
 
         echo '<tr class="form-field">';
         echo '<th scope="row"><label for="url">URL</label></th>';
-        echo '<td><input name="url" id="url" type="text" value="'.$exteinsatzmittel_url.'" size="40" />';
+        echo '<td><input name="url" id="url" type="text" value="'.esc_attr($exteinsatzmittel_url).'" size="40" />';
         echo '<p class="description">URL zu mehr Informationen &uuml;ber ein externes Einsatzmittel, beispielsweise dessen Webseite.</p></td>';
         echo '</tr>';
     }
@@ -154,7 +154,12 @@ class Taxonomies
                 } else {
                     $url = get_permalink($fahrzeugpid);
                     $title = get_the_title($fahrzeugpid);
-                    return '<a href="' . $url . '" title="&quot;' . $title . '&quot; ansehen">' . $title . '</a>';
+                    return sprintf(
+                        '<a href="%1$s" title="&quot;%2$s&quot; ansehen" target="_blank">%3$s</a>',
+                        esc_attr($url),
+                        esc_attr($title),
+                        esc_html($title)
+                    );
                 }
                 break;
             case 'vehicleorder':
@@ -205,7 +210,11 @@ class Taxonomies
         if (false === $url) {
             return '&nbsp;';
         } else {
-            return '<a href="' . $url . '" title="' . $url . ' besuchen" target="_blank">' . $url . '</a>';
+            return sprintf(
+                '<a href="%1$s" title="%1$s besuchen" target="_blank">%2$s</a>',
+                esc_attr($url),
+                esc_html($url)
+            );
         }
     }
 
@@ -226,7 +235,7 @@ class Taxonomies
 
         foreach ($evw_taxonomies[$taxonomy] as $field) {
             if (isset($field) && !empty($field) && isset($_POST[$field])) {
-                $value = $_POST[$field];
+                $value = $_POST[$field]; //FIXME sanitize
                 $key = self::getTermOptionKey($term_id, $taxonomy, $field);
                 if (empty($value)) {
                     delete_option($key);

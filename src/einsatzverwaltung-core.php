@@ -105,12 +105,12 @@ class Core
             'add_new_item' => 'Neues Fahrzeug',
             'new_item_name' => 'Fahrzeug hinzuf&uuml;gen',
             'search_items' => 'Fahrzeuge suchen',
-            'popular_items' => 'Oft eingesetzte Fahrzeuge',
-            'separate_items_with_commas' => 'Fahrzeuge mit Kommata trennen',
-            'add_or_remove_items' => 'Fahrzeuge hinzuf&uuml;gen oder entfernen',
-            'choose_from_most_used' => 'Aus h&auml;ufig eingesetzten Fahrzeugen w&auml;hlen'),
+            'parent_item' => '&Uuml;bergeordnete Einheit',
+            'parent_item_colon' => '&Uuml;bergeordnete Einheit:'
+        ),
         'public' => true,
         'show_in_nav_menus' => false,
+        'hierarchical' => true,
         'capabilities' => array (
             'manage_terms' => 'edit_einsatzberichte',
             'edit_terms' => 'edit_einsatzberichte',

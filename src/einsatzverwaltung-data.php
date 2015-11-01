@@ -170,7 +170,42 @@ class Data
      */
     public static function getFahrzeuge($postId)
     {
-        return get_the_terms($postId, 'fahrzeug');
+        $vehicles = get_the_terms($postId, 'fahrzeug');
+
+        if (empty($vehicles)) {
+            return $vehicles;
+        }
+
+        // Reihenfolge abfragen
+        foreach ($vehicles as $vehicle) {
+            if (!isset($vehicle->term_id)) {
+                continue;
+            }
+
+            $vehicleOrder = Taxonomies::getTermField($vehicle->term_id, 'fahrzeug', 'vehicleorder');
+            if (!empty($vehicleOrder)) {
+                $vehicle->vehicle_order = $vehicleOrder;
+            }
+        }
+
+        // Fahrzeuge vor Rückgabe sortieren
+        usort($vehicles, function ($a, $b) {
+            if (empty($a->vehicle_order) && !empty($b->vehicle_order)) {
+                return 1;
+            }
+
+            if (!empty($a->vehicle_order) && empty($b->vehicle_order)) {
+                return -1;
+            }
+
+            if (empty($a->vehicle_order) && empty($b->vehicle_order) || $a->vehicle_order == $b->vehicle_order) {
+                return strcasecmp($a->name, $b->name);
+            }
+
+            return ($a->vehicle_order < $b->vehicle_order) ? -1 : 1;
+        });
+
+        return $vehicles;
     }
 
     /**

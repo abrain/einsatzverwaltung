@@ -90,9 +90,9 @@ class Data
         if ($einsatzarten && !is_wp_error($einsatzarten) && !empty($einsatzarten)) {
             $keys = array_keys($einsatzarten);
             return $einsatzarten[$keys[0]];
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
@@ -189,20 +189,22 @@ class Data
         }
 
         // Fahrzeuge vor Rückgabe sortieren
-        usort($vehicles, function ($a, $b) {
-            if (empty($a->vehicle_order) && !empty($b->vehicle_order)) {
+        usort($vehicles, function ($vehicle1, $vehicle2) {
+            if (empty($vehicle1->vehicle_order) && !empty($vehicle2->vehicle_order)) {
                 return 1;
             }
 
-            if (!empty($a->vehicle_order) && empty($b->vehicle_order)) {
+            if (!empty($vehicle1->vehicle_order) && empty($vehicle2->vehicle_order)) {
                 return -1;
             }
 
-            if (empty($a->vehicle_order) && empty($b->vehicle_order) || $a->vehicle_order == $b->vehicle_order) {
-                return strcasecmp($a->name, $b->name);
+            if (empty($vehicle1->vehicle_order) && empty($vehicle2->vehicle_order) ||
+                $vehicle1->vehicle_order == $vehicle2->vehicle_order
+            ) {
+                return strcasecmp($vehicle1->name, $vehicle2->name);
             }
 
-            return ($a->vehicle_order < $b->vehicle_order) ? -1 : 1;
+            return ($vehicle1->vehicle_order < $vehicle2->vehicle_order) ? -1 : 1;
         });
 
         return $vehicles;
@@ -258,9 +260,9 @@ class Data
     /**
      * Zusätzliche Metadaten des Einsatzberichts speichern
      *
-     * @param int $post_id ID des Posts
+     * @param int $postId ID des Posts
      */
-    public function savePostdata($post_id)
+    public function savePostdata($postId)
     {
         // verify if this is an auto save routine.
         // If it is our form has not been submitted, so we dont want to do anything
@@ -280,16 +282,16 @@ class Data
         }
 
         // Schreibrechte prüfen
-        if (!current_user_can('edit_einsatzbericht', $post_id)) {
+        if (!current_user_can('edit_einsatzbericht', $postId)) {
             return;
         }
 
-        $update_args = array();
+        $updateArgs = array();
 
         // Alarmzeit validieren
-        $input_alarmzeit = sanitize_text_field($_POST['einsatzverwaltung_alarmzeit']);
-        if (!empty($input_alarmzeit)) {
-            $alarmzeit = date_create($input_alarmzeit);
+        $inputAlarmzeit = sanitize_text_field($_POST['einsatzverwaltung_alarmzeit']);
+        if (!empty($inputAlarmzeit)) {
+            $alarmzeit = date_create($inputAlarmzeit);
         }
         if (empty($alarmzeit)) {
             $alarmzeit = date_create(
@@ -304,8 +306,8 @@ class Data
                 )
             );
         } else {
-            $update_args['post_date'] = date_format($alarmzeit, 'Y-m-d H:i:s');
-            $update_args['post_date_gmt'] = get_gmt_from_date($update_args['post_date']);
+            $updateArgs['post_date'] = date_format($alarmzeit, 'Y-m-d H:i:s');
+            $updateArgs['post_date_gmt'] = get_gmt_from_date($updateArgs['post_date']);
         }
 
         // Einsatznummer validieren
@@ -313,13 +315,13 @@ class Data
         $einsatzNrFallback = Core::getNextEinsatznummer($einsatzjahr, $einsatzjahr == date('Y'));
         $einsatznummer = sanitize_title($_POST['einsatzverwaltung_nummer'], $einsatzNrFallback, 'save');
         if (!empty($einsatznummer)) {
-            $update_args['post_name'] = $einsatznummer; // Slug setzen
+            $updateArgs['post_name'] = $einsatznummer; // Slug setzen
         }
 
         // Einsatzende validieren
-        $input_einsatzende = sanitize_text_field($_POST['einsatzverwaltung_einsatzende']);
-        if (!empty($input_einsatzende)) {
-            $einsatzende = date_create($input_einsatzende);
+        $inputEinsatzende = sanitize_text_field($_POST['einsatzverwaltung_einsatzende']);
+        if (!empty($inputEinsatzende)) {
+            $einsatzende = date_create($inputEinsatzende);
         }
         if (empty($einsatzende)) {
             $einsatzende = "";
@@ -340,20 +342,20 @@ class Data
         $fehlalarm = Utilities::sanitizeCheckbox(array($_POST, 'einsatzverwaltung_fehlalarm'));
 
         // Metadaten schreiben
-        update_post_meta($post_id, 'einsatz_alarmzeit', date_format($alarmzeit, 'Y-m-d H:i'));
-        update_post_meta($post_id, 'einsatz_einsatzende', $einsatzende);
-        update_post_meta($post_id, 'einsatz_einsatzort', $einsatzort);
-        update_post_meta($post_id, 'einsatz_einsatzleiter', $einsatzleiter);
-        update_post_meta($post_id, 'einsatz_mannschaft', $mannschaftsstaerke);
-        update_post_meta($post_id, 'einsatz_fehlalarm', $fehlalarm);
+        update_post_meta($postId, 'einsatz_alarmzeit', date_format($alarmzeit, 'Y-m-d H:i'));
+        update_post_meta($postId, 'einsatz_einsatzende', $einsatzende);
+        update_post_meta($postId, 'einsatz_einsatzort', $einsatzort);
+        update_post_meta($postId, 'einsatz_einsatzleiter', $einsatzleiter);
+        update_post_meta($postId, 'einsatz_mannschaft', $mannschaftsstaerke);
+        update_post_meta($postId, 'einsatz_fehlalarm', $fehlalarm);
 
-        if (!empty($update_args)) {
-            if (! wp_is_post_revision($post_id)) {
-                $update_args['ID'] = $post_id;
+        if (!empty($updateArgs)) {
+            if (! wp_is_post_revision($postId)) {
+                $updateArgs['ID'] = $postId;
 
                 // save_post Filter kurzzeitig deaktivieren, damit keine Dauerschleife entsteht
                 remove_action('save_post', array($this, 'savePostdata'));
-                wp_update_post($update_args);
+                wp_update_post($updateArgs);
                 add_action('save_post', array($this, 'savePostdata'));
             }
         }
@@ -362,22 +364,22 @@ class Data
     /**
      * Ändert die Einsatznummer eines bestehenden Einsatzes
      *
-     * @param int $post_id ID des Einsatzberichts
+     * @param int $postId ID des Einsatzberichts
      * @param string $einsatznummer Einsatznummer
      */
-    public function setEinsatznummer($post_id, $einsatznummer)
+    public function setEinsatznummer($postId, $einsatznummer)
     {
-        if (empty($post_id) || empty($einsatznummer)) {
+        if (empty($postId) || empty($einsatznummer)) {
             return;
         }
 
-        $update_args = array();
-        $update_args['post_name'] = $einsatznummer;
-        $update_args['ID'] = $post_id;
+        $updateArgs = array();
+        $updateArgs['post_name'] = $einsatznummer;
+        $updateArgs['ID'] = $postId;
 
         // keine Sonderbehandlung beim Speichern
         remove_action('save_post', array($this, 'savePostdata'));
-        wp_update_post($update_args);
+        wp_update_post($updateArgs);
         add_action('save_post', array($this, 'savePostdata'));
     }
 }

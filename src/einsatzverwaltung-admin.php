@@ -112,6 +112,7 @@ class Admin
         $einsatzort = Data::getEinsatzort($post->ID);
         $einsatzleiter = Data::getEinsatzleiter($post->ID);
         $fehlalarm = Data::getFehlalarm($post->ID);
+        $isSpecial = Data::isSpecial($post->ID);
         $mannschaftsstaerke = Data::getMannschaftsstaerke($post->ID);
 
         $names = Data::getEinsatzleiterNamen();
@@ -144,6 +145,12 @@ class Admin
             __("Fehlalarm", 'einsatzverwaltung'),
             'einsatzverwaltung_fehlalarm',
             $fehlalarm
+        );
+
+        $this->echoInputCheckbox(
+            __("Besonderer Einsatz", 'einsatzverwaltung'),
+            'einsatzverwaltung_special',
+            $isSpecial
         );
 
         echo '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';

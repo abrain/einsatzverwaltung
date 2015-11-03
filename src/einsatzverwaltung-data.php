@@ -302,6 +302,17 @@ class Data
     }
 
     /**
+     * Gibt zurück, ob ein Einsatzbericht als besonders markiert wurde oder nicht
+     *
+     * @param int $postId
+     * @return bool
+     */
+    public static function isSpecial($postId)
+    {
+        return get_post_meta($postId, 'einsatz_special', true);
+    }
+
+    /**
      * Zusätzliche Metadaten des Einsatzberichts speichern
      *
      * @param int $postId ID des Posts
@@ -388,6 +399,8 @@ class Data
         // Fehlalarm validieren
         $fehlalarm = $this->utilities->sanitizeCheckbox(array($_POST, 'einsatzverwaltung_fehlalarm'));
 
+        $isSpecial = Utilities::sanitizeCheckbox(array($_POST, 'einsatzverwaltung_special'));
+
         // Metadaten schreiben
         update_post_meta($postId, 'einsatz_alarmzeit', date_format($alarmzeit, 'Y-m-d H:i'));
         update_post_meta($postId, 'einsatz_einsatzende', $einsatzende);
@@ -395,6 +408,7 @@ class Data
         update_post_meta($postId, 'einsatz_einsatzleiter', $einsatzleiter);
         update_post_meta($postId, 'einsatz_mannschaft', $mannschaftsstaerke);
         update_post_meta($postId, 'einsatz_fehlalarm', $fehlalarm);
+        update_post_meta($postId, 'einsatz_special', $isSpecial);
 
         if (!empty($updateArgs)) {
             $updateArgs['ID'] = $postId;

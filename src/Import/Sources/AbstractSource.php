@@ -8,6 +8,7 @@ use abrain\Einsatzverwaltung\Utilities;
  */
 abstract class AbstractSource
 {
+    protected $actionOrder = array();
     protected $autoMatchFields = array();
     protected $internalFields = array('post_name');
     protected $problematicFields = array();
@@ -40,6 +41,28 @@ abstract class AbstractSource
     }
 
     /**
+     * Gibt das Action-Array für $slug zurück
+     *
+     * @param string $slug Slug der Action
+     *
+     * @return array|bool Das Array der Action oder false, wenn es keines für $slug gibt
+     */
+    public function getAction($slug)
+    {
+        if (empty($slug)) {
+            return false;
+        }
+
+        foreach ($this->actionOrder as $action) {
+            if ($action['slug'] == $slug) {
+                return $action;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * @return array
      */
     public function getAutoMatchFields()
@@ -61,6 +84,20 @@ abstract class AbstractSource
      * @return array
      */
     abstract public function getFields();
+
+    /**
+     * Gibt die erste Action der Importquelle zurück
+     *
+     * @return array|bool Ein Array, das die erste Action beschreibt, oder false, wenn es keine Action gibt
+     */
+    public function getFirstAction()
+    {
+        if (empty($this->actionOrder)) {
+            return false;
+        }
+
+        return $this->actionOrder[0];
+    }
 
     /**
      * Gibt den eindeutigen Bezeichner der Importquelle zurück
@@ -114,6 +151,28 @@ abstract class AbstractSource
      * @return string Name der Importquelle
      */
     abstract public function getName();
+
+    /**
+     * Gibt die nächste Action der Importquelle zurück
+     *
+     * @param array $currentAction Array, das die aktuelle Action beschreibt
+     *
+     * @return array|bool Ein Array, das die nächste Action beschreibt, oder false, wenn es keine weitere gibt
+     */
+    public function getNextAction($currentAction)
+    {
+        if (empty($this->actionOrder)) {
+            return false;
+        }
+
+        $key = array_search($currentAction, $this->actionOrder);
+
+        if ($key + 1 >= count($this->actionOrder)) {
+            return false;
+        }
+
+        return $this->actionOrder[$key + 1];
+    }
 
     /**
      * @return array

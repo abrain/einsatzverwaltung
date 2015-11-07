@@ -23,6 +23,17 @@ class WpEinsatz extends AbstractSource
         $this->autoMatchFields = array(
             'Datum' => 'post_date'
         );
+
+        $this->actionOrder = array(
+            array(
+                'slug' => 'begin',
+                'button_text' => __('Datenbank analysieren', 'einsatzverwaltung')
+            ),
+            array(
+                'slug' => 'import',
+                'button_text' => __('Import starten', 'einsatzverwaltung')
+            )
+        );
     }
 
     /**

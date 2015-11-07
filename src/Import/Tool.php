@@ -96,14 +96,18 @@ class Tool
             echo '<ul>';
             /** @var AbstractSource $source */
             foreach ($this->sources as $source) {
+                $firstAction = $source->getFirstAction();
+
                 echo '<li>';
                 echo '<h3>' . $source->getName() . '</h3>';
                 echo '<p class="description">' . $source->getDescription() . '</p>';
-                echo '<form method="post">';
-                echo '<input type="hidden" name="aktion" value="' . $source->getActionAttribute('begin') . '" />';
-                wp_nonce_field($this->getNonceAction($source, 'begin'));
-                submit_button(__('Assistent starten', 'einsatzverwaltung'));
-                echo '</form>';
+                if (false !== $firstAction) {
+                    echo '<form method="post">';
+                    echo '<input type="hidden" name="aktion" value="' . $source->getActionAttribute($firstAction['slug']) . '" />';
+                    wp_nonce_field($this->getNonceAction($source, $firstAction['slug']));
+                    submit_button($firstAction['button_text']);
+                    echo '</form>';
+                }
                 echo '</li>';
             }
             echo '</ul>';
@@ -112,6 +116,8 @@ class Tool
 
         // Nonce überprüfen
         $this->checkNonce($source, $aktion);
+
+        $currentAction = $source->getAction($aktion);
 
         // TODO gemeinsame Prüfungen auslagern
         if ('begin' == $aktion) {
@@ -164,9 +170,15 @@ class Tool
 
             // Felder matchen
             echo "<h3>Felder zuordnen</h3>";
+            $nextAction = $source->getNextAction($currentAction);
+            if (false === $nextAction) {
+                Utilities::printError('Keine Nachfolgeaktion gefunden!');
+                return;
+            }
+
             $helper->renderMatchForm($source, array(
-                'nonce_action' => $this->getNonceAction($source, 'import'),
-                'action_value' => $source->getActionAttribute('import')
+                'nonce_action' => $this->getNonceAction($source, $nextAction['slug']),
+                'action_value' => $source->getActionAttribute($nextAction['slug'])
             ));
         } elseif ('import' == $aktion) {
             echo '<h3>Import</h3>';
@@ -184,8 +196,8 @@ class Tool
             if (!$helper->validateMapping($mapping)) {
                 $helper->renderMatchForm($source, array(
                     'mapping' => $mapping,
-                    'nonce_action' => $this->getNonceAction($source, 'import'),
-                    'action_value' => $source->getActionAttribute('import')
+                    'nonce_action' => $this->getNonceAction($source, $currentAction['slug']),
+                    'action_value' => $source->getActionAttribute($currentAction['slug'])
                 ));
                 return;
             }

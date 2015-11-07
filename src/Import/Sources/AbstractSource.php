@@ -9,6 +9,7 @@ use abrain\Einsatzverwaltung\Utilities;
 abstract class AbstractSource
 {
     protected $actionOrder = array();
+    protected $args = array();
     protected $autoMatchFields = array();
     protected $internalFields = array('post_name');
     protected $problematicFields = array();
@@ -188,5 +189,14 @@ abstract class AbstractSource
     public function getUnmatchableFields()
     {
         return array_merge(array_values($this->autoMatchFields), $this->internalFields);
+    }
+
+    public function putArg($key, $value)
+    {
+        if (empty($key)) {
+            return;
+        }
+
+        $this->args[$key] = $value;
     }
 }

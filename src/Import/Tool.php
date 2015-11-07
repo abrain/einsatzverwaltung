@@ -2,6 +2,7 @@
 namespace abrain\Einsatzverwaltung\Import;
 
 use abrain\Einsatzverwaltung\Import\Sources\AbstractSource;
+use abrain\Einsatzverwaltung\Import\Sources\Csv;
 use abrain\Einsatzverwaltung\Import\Sources\WpEinsatz;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Utilities;
@@ -68,6 +69,10 @@ class Tool
         require_once dirname(__FILE__) . '/Sources/WpEinsatz.php';
         $wpEinsatz = new WpEinsatz();
         $this->sources[$wpEinsatz->getIdentifier()] = $wpEinsatz;
+
+        require_once dirname(__FILE__) . '/Sources/Csv.php';
+        $csv = new Csv();
+        $this->sources[$csv->getIdentifier()] = $csv;
     }
 
     /**
@@ -118,11 +123,19 @@ class Tool
         $this->checkNonce($source, $aktion);
 
         $currentAction = $source->getAction($aktion);
+        $nextAction = $source->getNextAction($currentAction);
+
+        if (array_key_exists('args', $currentAction) && is_array($currentAction['args'])) {
+            foreach ($currentAction['args'] as $arg) {
+                $value = (array_key_exists($arg, $_POST) ? $_POST[$arg] : null);
+                $source->putArg($arg, $value);
+            }
+        }
+
+        echo "<h3>{$currentAction['name']}</h3>";
 
         // TODO gemeinsame Prüfungen auslagern
         if ('analysis' == $aktion) {
-            echo "<h3>{$currentAction['name']}</h3>";
-
             if (!$source->checkPreconditions()) {
                 return;
             }
@@ -171,7 +184,6 @@ class Tool
 
             // Felder matchen
             echo "<h3>Felder zuordnen</h3>";
-            $nextAction = $source->getNextAction($currentAction);
             if (false === $nextAction) {
                 Utilities::printError('Keine Nachfolgeaktion gefunden!');
                 return;
@@ -182,8 +194,6 @@ class Tool
                 'action_value' => $source->getActionAttribute($nextAction['slug'])
             ));
         } elseif ('import' == $aktion) {
-            echo "<h3>{$currentAction['name']}</h3>";
-
             $sourceFields = $source->getFields();
             if (empty($sourceFields)) {
                 Utilities::printError('Es wurden keine Felder gefunden');
@@ -217,6 +227,18 @@ class Tool
             // Import starten
             echo '<p>Die Daten werden eingelesen, das kann einen Moment dauern.</p>';
             $helper->import($entries, $mapping);
+        } elseif ('selectfile' == $aktion) {
+            if (false === $nextAction) {
+                Utilities::printError('Keine Nachfolgeaktion gefunden!');
+                return;
+            }
+
+            echo '<form method="post"><input id="csv_file_id" name="csv_file_id" type="text" />';
+            wp_nonce_field($this->getNonceAction($source, $nextAction['slug']));
+            // TODO Dialog zur Dateiauswahl
+            echo '<input type="hidden" name="aktion" value="' . $source->getActionAttribute($nextAction['slug']) . '" />';
+            submit_button($nextAction['button_text']);
+            echo '</form>';
         }
 
         echo '</div>';

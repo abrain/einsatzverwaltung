@@ -183,7 +183,6 @@ class Tool
             // Prüfen, ob mehrere Felder das gleiche Zielfeld haben
             if (!$helper->validateMapping($mapping)) {
                 $helper->renderMatchForm($source, array(
-                    'fields' => $sourceFields,
                     'mapping' => $mapping,
                     'nonce_action' => $this->getNonceAction($source, 'import'),
                     'action_value' => $source->getActionAttribute('import')

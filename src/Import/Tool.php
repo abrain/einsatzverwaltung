@@ -121,7 +121,8 @@ class Tool
 
         // TODO gemeinsame Prüfungen auslagern
         if ('analysis' == $aktion) {
-            echo "<h3>Analyse</h3>";
+            echo "<h3>{$currentAction['name']}</h3>";
+
             if (!$source->checkPreconditions()) {
                 return;
             }
@@ -181,13 +182,16 @@ class Tool
                 'action_value' => $source->getActionAttribute($nextAction['slug'])
             ));
         } elseif ('import' == $aktion) {
-            echo '<h3>Import</h3>';
+            echo "<h3>{$currentAction['name']}</h3>";
 
             $sourceFields = $source->getFields();
             if (empty($sourceFields)) {
                 Utilities::printError('Es wurden keine Felder gefunden');
                 return;
             }
+
+            // Auf problematische Felder prüfen
+            $source->checkForProblems($sourceFields);
 
             // Mapping einlesen
             $mapping = $source->getMapping($sourceFields, IncidentReport::getFields());

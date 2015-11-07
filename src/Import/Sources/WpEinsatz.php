@@ -27,10 +27,12 @@ class WpEinsatz extends AbstractSource
         $this->actionOrder = array(
             array(
                 'slug' => 'analysis',
+                'name' => __('Analyse', 'einsatzverwaltung'),
                 'button_text' => __('Datenbank analysieren', 'einsatzverwaltung')
             ),
             array(
                 'slug' => 'import',
+                'name' => __('Import', 'einsatzverwaltung'),
                 'button_text' => __('Import starten', 'einsatzverwaltung')
             )
         );

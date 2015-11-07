@@ -26,7 +26,7 @@ class WpEinsatz extends AbstractSource
 
         $this->actionOrder = array(
             array(
-                'slug' => 'begin',
+                'slug' => 'analysis',
                 'button_text' => __('Datenbank analysieren', 'einsatzverwaltung')
             ),
             array(

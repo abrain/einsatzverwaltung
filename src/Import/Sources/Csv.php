@@ -130,7 +130,7 @@ class Csv extends AbstractSource
             }, range(1, count($fields[0])));
         }
 
-        $this->cachedFields = $fields;
+        $this->cachedFields = $fields[0];
 
         // Gebe die Überschriften der Spalten zurück
         return $fields[0];

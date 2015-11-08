@@ -39,11 +39,21 @@ class IncidentReport
     public static function getMetaFields()
     {
         return array(
-            'einsatz_einsatzort' => 'Einsatzort',
-            'einsatz_einsatzleiter' => 'Einsatzleiter',
-            'einsatz_einsatzende' => 'Einsatzende',
-            'einsatz_fehlalarm' => 'Fehlalarm',
-            'einsatz_mannschaft' => 'Mannschaftsstärke'
+            'einsatz_einsatzort' => array(
+                'label' => 'Einsatzort'
+            ),
+            'einsatz_einsatzleiter' => array(
+                'label' => 'Einsatzleiter'
+            ),
+            'einsatz_einsatzende' => array(
+                'label' => 'Einsatzende'
+            ),
+            'einsatz_fehlalarm' => array(
+                'label' => 'Fehlalarm'
+            ),
+            'einsatz_mannschaft' => array(
+                'label' => 'Mannschaftsstärke'
+            )
         );
     }
 
@@ -55,10 +65,18 @@ class IncidentReport
     public static function getTerms()
     {
         return array(
-            'alarmierungsart' => 'Alarmierungsart',
-            'einsatzart' => 'Einsatzart',
-            'fahrzeug' => 'Fahrzeuge',
-            'exteinsatzmittel' => 'Externe Einsatzmittel'
+            'alarmierungsart' => array(
+                'label' => 'Alarmierungsart'
+            ),
+            'einsatzart' => array(
+                'label' => 'Einsatzart'
+            ),
+            'fahrzeug' => array(
+                'label' => 'Fahrzeuge'
+            ),
+            'exteinsatzmittel' => array(
+                'label' => 'Externe Einsatzmittel'
+            )
         );
     }
 
@@ -70,10 +88,18 @@ class IncidentReport
     public static function getPostFields()
     {
         return array(
-            'post_date' => 'Alarmzeit',
-            'post_name' => 'Einsatznummer',
-            'post_content' => 'Berichtstext',
-            'post_title' => 'Berichtstitel'
+            'post_date' => array(
+                'label' => 'Alarmzeit'
+            ),
+            'post_name' => array(
+                'label' => 'Einsatznummer'
+            ),
+            'post_content' => array(
+                'label' => 'Berichtstext'
+            ),
+            'post_title' => array(
+                'label' => 'Berichtstitel'
+            )
         );
     }
 }

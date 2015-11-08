@@ -42,13 +42,15 @@ class Helper
         }
 
         // Sortieren und ausgeben
-        asort($fields);
+        uasort($fields, function ($field1, $field2) {
+            return strcmp($field1['label'], $field2['label']);
+        });
         $string = '<select name="' . $parsedArgs['name'] . '">';
         $string .= '<option value="-"' . ($parsedArgs['selected'] == '-' ? ' selected="selected"' : '') . '>';
         $string .= __('nicht importieren', 'einsatzverwaltung') . '</option>';
-        foreach ($fields as $slug => $fieldName) {
+        foreach ($fields as $slug => $fieldProperties) {
             $string .= '<option value="' . $slug . '"' . ($parsedArgs['selected'] == $slug ? ' selected="selected"' : '') . '>';
-            $string .= $fieldName . '</option>';
+            $string .= $fieldProperties['label'] . '</option>';
         }
         $string .= '</select>';
 
@@ -88,7 +90,7 @@ class Helper
                                     Utilities::printError(
                                         sprintf(
                                             "Konnte %s '%s' nicht anlegen: %s",
-                                            $ownTerms[$ownField],
+                                            $ownTerms[$ownField]['label'],
                                             $sourceEntry[$sourceField],
                                             $newterm->get_error_message()
                                         )

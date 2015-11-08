@@ -80,6 +80,10 @@ class Helper
                         $metaValues[$ownField] = $sourceEntry[$sourceField];
                     } elseif (array_key_exists($ownField, $ownTerms)) {
                         // Wert gehört zu einer Taxonomie
+                        if (empty($sourceEntry[$sourceField])) {
+                            // Leere Terms überspringen
+                            continue;
+                        }
                         if (is_taxonomy_hierarchical($ownField)) {
                             // Bei hierarchischen Taxonomien muss die ID statt des Namens verwendet werden
                             $term = get_term_by('name', $sourceEntry[$sourceField], $ownField);

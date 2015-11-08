@@ -39,15 +39,6 @@ class Csv extends AbstractSource
     }
 
     /**
-     * @param $felder
-     * @param bool|false $quiet
-     */
-    public function checkForProblems($felder, $quiet = false)
-    {
-        // Probleme? Welche Probleme?
-    }
-
-    /**
      * @return boolean True, wenn Voraussetzungen stimmen, ansonsten false
      */
     public function checkPreconditions()

@@ -41,24 +41,6 @@ class WpEinsatz extends AbstractSource
     /**
      * @inheritDoc
      */
-    public function checkForProblems($fields, $quiet = false)
-    {
-        foreach ($fields as $field) {
-            if (strpbrk($field, 'äöüÄÖÜß/#')) {
-                if (!$quiet) {
-                    Utilities::printWarning(sprintf(
-                        'Feldname %s enth&auml;lt Zeichen (z.B. Umlaute oder Sonderzeichen), die beim Import zu Problemen f&uuml;hren.<br>Bitte das Feld in den Einstellungen von wp-einsatz umbenennen, wenn Sie es importieren wollen.',
-                        $field
-                    ));
-                }
-                $this->problematicFields[] = $field;
-            }
-        }
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function checkPreconditions()
     {
         global $wpdb; /** @var wpdb $wpdb */
@@ -123,15 +105,26 @@ class WpEinsatz extends AbstractSource
     {
         global $wpdb; /** @var wpdb $wpdb */
 
-        $felder = array();
+        $fields = array();
         foreach ($wpdb->get_col("DESC " . $this->tablename, 0) as $columnName) {
             // Unwichtiges ignorieren
             if ($columnName == 'ID' || $columnName == 'Nr_Jahr' || $columnName == 'Nr_Monat') {
                 continue;
             }
 
-            $felder[] = $columnName;
+            $fields[] = $columnName;
         }
-        return $felder;
+
+        foreach ($fields as $field) {
+            if (strpbrk($field, 'äöüÄÖÜß/#')) {
+                Utilities::printWarning(sprintf(
+                    'Feldname %s enth&auml;lt Zeichen (z.B. Umlaute oder Sonderzeichen), die beim Import zu Problemen f&uuml;hren.<br>Bitte das Feld in den Einstellungen von wp-einsatz umbenennen, wenn Sie es importieren wollen.',
+                    $field
+                ));
+                $this->problematicFields[] = $field;
+            }
+        }
+
+        return $fields;
     }
 }

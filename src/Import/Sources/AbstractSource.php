@@ -15,12 +15,6 @@ abstract class AbstractSource
     protected $problematicFields = array();
 
     /**
-     * @param $felder
-     * @param bool|false $quiet
-     */
-    abstract public function checkForProblems($felder, $quiet = false);
-
-    /**
      * @return boolean True, wenn Voraussetzungen stimmen, ansonsten false
      */
     abstract public function checkPreconditions();

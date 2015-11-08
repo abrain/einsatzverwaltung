@@ -161,9 +161,6 @@ class Tool
                 return;
             }
 
-            // Auf problematische Felder prüfen
-            $source->checkForProblems($felder);
-
             // Einsätze zählen
             $entries = $source->getEntries(null);
             if (false === $entries) {
@@ -199,9 +196,6 @@ class Tool
                 Utilities::printError('Es wurden keine Felder gefunden');
                 return;
             }
-
-            // Auf problematische Felder prüfen
-            $source->checkForProblems($sourceFields);
 
             // Mapping einlesen
             $mapping = $source->getMapping($sourceFields, IncidentReport::getFields());

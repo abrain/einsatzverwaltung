@@ -201,10 +201,10 @@ class Tool
 
         // Auf Pflichtfelder prüfen
         $mandatoryFieldsOk = true;
-        foreach (array_keys($this->currentSource->getAutoMatchFields()) as $mandatoryField) {
-            if (!in_array($mandatoryField, $felder)) {
+        foreach (array_keys($this->currentSource->getAutoMatchFields()) as $autoMatchField) {
+            if (!in_array($autoMatchField, $felder)) {
                 Utilities::printError(
-                    sprintf('Das Pflichtfeld %s konnte nicht gefunden werden!', $mandatoryField)
+                    sprintf('Das automatisch zu importierende Feld %s konnte nicht gefunden werden!', $autoMatchField)
                 );
                 $mandatoryFieldsOk = false;
             }

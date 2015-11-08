@@ -17,6 +17,26 @@ class Tool
     private $sources = array();
 
     /**
+     * @var AbstractSource
+     */
+    private $currentSource;
+
+    /**
+     * @var array
+     */
+    private $currentAction;
+
+    /**
+     * @var array
+     */
+    private $nextAction;
+
+    /**
+     * @var Helper
+     */
+    private $helper;
+
+    /**
      * Konstruktor
      */
     public function __construct()
@@ -81,21 +101,20 @@ class Tool
     public function renderToolPage()
     {
         require_once dirname(__FILE__) . '/Helper.php';
-        $helper = new Helper();
+        $this->helper = new Helper();
 
         echo '<div class="wrap">';
         echo '<h1>' . __('Einsatzberichte importieren', 'einsatzverwaltung') . '</h1>';
 
-        $source = null;
         $aktion = null;
         if (array_key_exists('aktion', $_POST)) {
             list($identifier, $aktion) = explode(':', $_POST['aktion']);
             if (array_key_exists($identifier, $this->sources)) {
-                $source = $this->sources[$identifier];
+                $this->currentSource = $this->sources[$identifier];
             }
         }
 
-        if (null == $source || !($source instanceof AbstractSource) || empty($aktion)) {
+        if (null == $this->currentSource || !($this->currentSource instanceof AbstractSource) || empty($aktion)) {
             echo '<p>Dieses Werkzeug importiert Einsatzberichte aus verschiedenen Quellen.</p>';
 
             echo '<ul>';
@@ -120,115 +139,33 @@ class Tool
         }
 
         // Nonce überprüfen
-        $this->checkNonce($source, $aktion);
+        $this->checkNonce($this->currentSource, $aktion);
 
-        $currentAction = $source->getAction($aktion);
-        $nextAction = $source->getNextAction($currentAction);
+        $this->currentAction = $this->currentSource->getAction($aktion);
+        $this->nextAction = $this->currentSource->getNextAction($this->currentAction);
 
-        if (array_key_exists('args', $currentAction) && is_array($currentAction['args'])) {
-            foreach ($currentAction['args'] as $arg) {
+        if (array_key_exists('args', $this->currentAction) && is_array($this->currentAction['args'])) {
+            foreach ($this->currentAction['args'] as $arg) {
                 $value = (array_key_exists($arg, $_POST) ? $_POST[$arg] : null); //TODO sanitize
-                $source->putArg($arg, $value);
+                $this->currentSource->putArg($arg, $value);
             }
         }
 
-        echo "<h3>{$currentAction['name']}</h3>";
+        echo "<h3>{$this->currentAction['name']}</h3>";
 
         // TODO gemeinsame Prüfungen auslagern
         if ('analysis' == $aktion) {
-            if (!$source->checkPreconditions()) {
-                return;
-            }
-
-            $felder = $source->getFields();
-            if (empty($felder)) {
-                Utilities::printError('Es wurden keine Felder gefunden');
-                return;
-            }
-            Utilities::printSuccess('Es wurden folgende Felder gefunden: ' . implode($felder, ', '));
-
-            // Auf Pflichtfelder prüfen
-            $mandatoryFieldsOk = true;
-            foreach (array_keys($source->getAutoMatchFields()) as $mandatoryField) {
-                if (!in_array($mandatoryField, $felder)) {
-                    Utilities::printError(
-                        sprintf('Das Pflichtfeld %s konnte nicht gefunden werden!', $mandatoryField)
-                    );
-                    $mandatoryFieldsOk = false;
-                }
-            }
-            if (!$mandatoryFieldsOk) {
-                return;
-            }
-
-            // Einsätze zählen
-            $entries = $source->getEntries(null);
-            if (false === $entries) {
-                return;
-            }
-            if (empty($entries)) {
-                Utilities::printWarning('Es wurden keine Eins&auml;tze gefunden.');
-                return;
-            }
-            Utilities::printSuccess(sprintf("Es wurden %s Eins&auml;tze gefunden", count($entries)));
-
-            // Hinweise ausgeben
-            echo '<h3>Hinweise zu den erwarteten Daten</h3>';
-            echo '<p>Die Felder <strong>Berichtstext, Berichtstitel, Einsatzleiter, Einsatzort</strong> und <strong>Mannschaftsst&auml;rke</strong> sind Freitextfelder.</p>';
-            echo '<p>F&uuml;r die Felder <strong>Alarmierungsart, Einsatzart, Externe Einsatzmittel</strong> und <strong>Fahrzeuge</strong> wird eine kommagetrennte Liste erwartet.<br>Bisher unbekannte Eintr&auml;ge werden automatisch angelegt, die Einsatzart sollte nur ein einzelner Wert sein.</p>';
-            echo '<p>Das Feld <strong>Einsatzende</strong> erwartet eine Datums- und Zeitangabe im Format <code>JJJJ-MM-TT hh:mm:ss</code> (z.B. 2014-04-21 21:48:06). Die Sekundenangabe ist optional.</p>';
-            echo '<p>Das Feld <strong>Fehlalarm</strong> erwartet den Wert 1 (= ja) oder 0 (= nein). Es darf auch leer bleiben, was als 0 (= nein) zählt.</p>';
-
-            // Felder matchen
-            echo "<h3>Felder zuordnen</h3>";
-            if (false === $nextAction) {
-                Utilities::printError('Keine Nachfolgeaktion gefunden!');
-                return;
-            }
-
-            $helper->renderMatchForm($source, array(
-                'nonce_action' => $this->getNonceAction($source, $nextAction['slug']),
-                'action_value' => $source->getActionAttribute($nextAction['slug'])
-            ));
+            $this->analysisPage();
         } elseif ('import' == $aktion) {
-            $sourceFields = $source->getFields();
-            if (empty($sourceFields)) {
-                Utilities::printError('Es wurden keine Felder gefunden');
-                return;
-            }
-
-            // Mapping einlesen
-            $mapping = $source->getMapping($sourceFields, IncidentReport::getFields());
-
-            // Prüfen, ob mehrere Felder das gleiche Zielfeld haben
-            if (!$helper->validateMapping($mapping)) {
-                $helper->renderMatchForm($source, array(
-                    'mapping' => $mapping,
-                    'nonce_action' => $this->getNonceAction($source, $currentAction['slug']),
-                    'action_value' => $source->getActionAttribute($currentAction['slug'])
-                ));
-                return;
-            }
-
-            // Datenbank auslesen
-            $entries = $source->getEntries(array_keys($mapping));
-
-            if (empty($entries)) {
-                Utilities::printError('Die Importquelle lieferte keine Ergebnisse. Entweder sind dort keine Eins&auml;tze gespeichert oder es gab ein Problem bei der Abfrage.');
-                return;
-            }
-
-            // Import starten
-            echo '<p>Die Daten werden eingelesen, das kann einen Moment dauern.</p>';
-            $helper->import($entries, $mapping);
+            $this->importPage();
         } elseif ('selectcsvfile' == $aktion) {
-            if (false === $nextAction) {
+            if (false === $this->nextAction) {
                 Utilities::printError('Keine Nachfolgeaktion gefunden!');
                 return;
             }
 
             echo '<form method="post"><input id="csv_file_id" name="csv_file_id" type="text" />';
-            wp_nonce_field($this->getNonceAction($source, $nextAction['slug']));
+            wp_nonce_field($this->getNonceAction($this->currentSource, $this->nextAction['slug']));
             // TODO Dialog zur Dateiauswahl
             ?>
             <br/><input id="has_headlines" name="has_headlines" type="checkbox" value="1" />
@@ -241,11 +178,103 @@ class Tool
                 </select>
             </label>
             <?php
-            echo '<input type="hidden" name="aktion" value="' . $source->getActionAttribute($nextAction['slug']) . '" />';
-            submit_button($nextAction['button_text']);
+            echo '<input type="hidden" name="aktion" value="' . $this->currentSource->getActionAttribute($this->nextAction['slug']) . '" />';
+            submit_button($this->nextAction['button_text']);
             echo '</form>';
         }
 
         echo '</div>';
+    }
+
+    private function analysisPage()
+    {
+        if (!$this->currentSource->checkPreconditions()) {
+            return;
+        }
+
+        $felder = $this->currentSource->getFields();
+        if (empty($felder)) {
+            Utilities::printError('Es wurden keine Felder gefunden');
+            return;
+        }
+        Utilities::printSuccess('Es wurden folgende Felder gefunden: ' . implode($felder, ', '));
+
+        // Auf Pflichtfelder prüfen
+        $mandatoryFieldsOk = true;
+        foreach (array_keys($this->currentSource->getAutoMatchFields()) as $mandatoryField) {
+            if (!in_array($mandatoryField, $felder)) {
+                Utilities::printError(
+                    sprintf('Das Pflichtfeld %s konnte nicht gefunden werden!', $mandatoryField)
+                );
+                $mandatoryFieldsOk = false;
+            }
+        }
+        if (!$mandatoryFieldsOk) {
+            return;
+        }
+
+        // Einsätze zählen
+        $entries = $this->currentSource->getEntries(null);
+        if (false === $entries) {
+            return;
+        }
+        if (empty($entries)) {
+            Utilities::printWarning('Es wurden keine Eins&auml;tze gefunden.');
+            return;
+        }
+        Utilities::printSuccess(sprintf("Es wurden %s Eins&auml;tze gefunden", count($entries)));
+
+        // Hinweise ausgeben
+        echo '<h3>Hinweise zu den erwarteten Daten</h3>';
+        echo '<p>Die Felder <strong>Berichtstext, Berichtstitel, Einsatzleiter, Einsatzort</strong> und <strong>Mannschaftsst&auml;rke</strong> sind Freitextfelder.</p>';
+        echo '<p>F&uuml;r die Felder <strong>Alarmierungsart, Einsatzart, Externe Einsatzmittel</strong> und <strong>Fahrzeuge</strong> wird eine kommagetrennte Liste erwartet.<br>Bisher unbekannte Eintr&auml;ge werden automatisch angelegt, die Einsatzart sollte nur ein einzelner Wert sein.</p>';
+        echo '<p>Das Feld <strong>Einsatzende</strong> erwartet eine Datums- und Zeitangabe im Format <code>JJJJ-MM-TT hh:mm:ss</code> (z.B. 2014-04-21 21:48:06). Die Sekundenangabe ist optional.</p>';
+        echo '<p>Das Feld <strong>Fehlalarm</strong> erwartet den Wert 1 (= ja) oder 0 (= nein). Es darf auch leer bleiben, was als 0 (= nein) zählt.</p>';
+
+        // Felder matchen
+        echo "<h3>Felder zuordnen</h3>";
+        if (false === $this->nextAction) {
+            Utilities::printError('Keine Nachfolgeaktion gefunden!');
+            return;
+        }
+
+        $this->helper->renderMatchForm($this->currentSource, array(
+            'nonce_action' => $this->getNonceAction($this->currentSource, $this->nextAction['slug']),
+            'action_value' => $this->currentSource->getActionAttribute($this->nextAction['slug'])
+        ));
+    }
+
+    private function importPage()
+    {
+        $sourceFields = $this->currentSource->getFields();
+        if (empty($sourceFields)) {
+            Utilities::printError('Es wurden keine Felder gefunden');
+            return;
+        }
+
+        // Mapping einlesen
+        $mapping = $this->currentSource->getMapping($sourceFields, IncidentReport::getFields());
+
+        // Prüfen, ob mehrere Felder das gleiche Zielfeld haben
+        if (!$this->helper->validateMapping($mapping)) {
+            $this->helper->renderMatchForm($this->currentSource, array(
+                'mapping' => $mapping,
+                'nonce_action' => $this->getNonceAction($this->currentSource, $this->currentAction['slug']),
+                'action_value' => $this->currentSource->getActionAttribute($this->currentAction['slug'])
+            ));
+            return;
+        }
+
+        // Datenbank auslesen
+        $entries = $this->currentSource->getEntries(array_keys($mapping));
+
+        if (empty($entries)) {
+            Utilities::printError('Die Importquelle lieferte keine Ergebnisse. Entweder sind dort keine Eins&auml;tze gespeichert oder es gab ein Problem bei der Abfrage.');
+            return;
+        }
+
+        // Import starten
+        echo '<p>Die Daten werden eingelesen, das kann einen Moment dauern.</p>';
+        $this->helper->import($entries, $mapping);
     }
 }

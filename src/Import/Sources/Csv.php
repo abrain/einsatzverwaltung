@@ -2,14 +2,13 @@
 namespace abrain\Einsatzverwaltung\Import\Sources;
 
 use abrain\Einsatzverwaltung\Utilities;
-use Exception;
 
 /**
  * Importiert Einsatzberichte aus einer CSV-Datei
  */
 class Csv extends AbstractSource
 {
-    private $csvFileHandle;
+    private $csvFilePath;
     private $delimiter = ';';
     private $enclosure = '"';
     private $fileHasHeadlines = false;
@@ -45,7 +44,7 @@ class Csv extends AbstractSource
      */
     public function checkForProblems($felder, $quiet = false)
     {
-        // TODO: Implement checkForProblems() method.
+        // Probleme? Welche Probleme?
     }
 
     /**
@@ -77,19 +76,16 @@ class Csv extends AbstractSource
             return false;
         }
 
+        $this->csvFilePath = $csvFilePath;
         Utilities::printInfo('File path: ' . $csvFilePath);
 
-        try {
-            if (!file_exists($csvFilePath)) {
-                throw new Exception('Datei existiert nicht');
-            }
+        if (!file_exists($csvFilePath)) {
+            Utilities::printError('Datei existiert nicht');
+            return false;
+        }
 
-            $this->csvFileHandle = fopen($csvFilePath, 'r');
-            if (empty($this->csvFileHandle)) {
-                throw new Exception('Konnte Datei nicht öffnen');
-            }
-        } catch (Exception $e) {
-            Utilities::printError($e->getMessage());
+        $readFile = $this->readFile(0);
+        if (false === $readFile) {
             return false;
         }
 
@@ -116,7 +112,13 @@ class Csv extends AbstractSource
      */
     public function getEntries($fields)
     {
-        // TODO: Implement getEntries() method.
+        $lines = $this->readFile();
+
+        if ($this->fileHasHeadlines) {
+            return array_slice($lines, 1);
+        }
+
+        return $lines;
     }
 
     /**
@@ -124,30 +126,17 @@ class Csv extends AbstractSource
      */
     public function getFields()
     {
-        // Zum Anfang der Datei gehen
-        if (!rewind($this->csvFileHandle)) {
-            Utilities::printError('Konnte nicht zum Anfang der Datei springen');
-            return false;
-        }
-
-        do {
-            $fields = fgetcsv($this->csvFileHandle, 0, $this->delimiter, $this->enclosure);
-
-            // Problem beim Lesen
-            if (empty($fields)) {
-                return false;
-            }
-        } while (is_array($fields) && $fields[0] == null);
+        $fields = $this->readFile(1);
 
         // Gebe nummerierte Spalten zurück, wenn es keine Überschriften gibt
         if (!$this->fileHasHeadlines) {
             return array_map(function ($number) {
                 return sprintf('Spalte %d', $number);
-            }, range(1, count($fields)));
+            }, range(1, count($fields[0])));
         }
 
         // Gebe die Überschriften der Spalten zurück
-        return $fields;
+        return $fields[0];
     }
 
     /**
@@ -168,5 +157,44 @@ class Csv extends AbstractSource
     public function getName()
     {
         return 'CSV';
+    }
+
+    /**
+     * @param int|null $numLines Maximale Anzahl zu lesender Zeilen, oder null um alle Zeilen einzulesen
+     *
+     * @return array|bool
+     */
+    private function readFile($numLines = null)
+    {
+        $handle = fopen($this->csvFilePath, 'r');
+        if (empty($handle)) {
+            Utilities::printError('Konnte Datei nicht öffnen');
+            return false;
+        }
+
+        if ($numLines === 0) {
+            fclose($handle);
+            return array();
+        }
+
+        $lines = array();
+        while (null === $numLines || count($lines) < $numLines) {
+            $line = fgetcsv($handle, 0, $this->delimiter, $this->enclosure);
+
+            // Problem beim Lesen oder Ende der Datei
+            if (empty($line)) {
+                break;
+            }
+
+            // Leere Zeile
+            if (is_array($line) && $line[0] == null) {
+                continue;
+            }
+
+            $lines[] = $line;
+        }
+
+        fclose($handle);
+        return $lines;
     }
 }

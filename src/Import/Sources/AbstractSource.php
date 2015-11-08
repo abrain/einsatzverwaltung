@@ -191,6 +191,12 @@ abstract class AbstractSource
         return array_merge(array_values($this->autoMatchFields), $this->internalFields);
     }
 
+    /**
+     * Setzt ein Argument in der Importquelle
+     *
+     * @param $key
+     * @param $value
+     */
     public function putArg($key, $value)
     {
         if (empty($key)) {

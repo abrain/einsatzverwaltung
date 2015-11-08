@@ -21,7 +21,7 @@ class Csv extends AbstractSource
     {
         $this->actionOrder = array(
             array(
-                'slug' => 'selectfile',
+                'slug' => 'selectcsvfile',
                 'name' => __('Dateiauswahl', 'einsatzverwaltung'),
                 'button_text' => __('Datei ausw&auml;hlen', 'einsatzverwaltung')
             ),
@@ -29,7 +29,7 @@ class Csv extends AbstractSource
                 'slug' => 'analysis',
                 'name' => __('Analyse', 'einsatzverwaltung'),
                 'button_text' => __('Datei analysieren', 'einsatzverwaltung'),
-                'args' => array('csv_file_id')
+                'args' => array('csv_file_id', 'has_headlines', 'delimiter')
             ),
             array(
                 'slug' => 'import',
@@ -53,9 +53,12 @@ class Csv extends AbstractSource
      */
     public function checkPreconditions()
     {
-        // TODO delimiter einstellen
-        // TODO enclosure einstellen
-        // TODO fileHasHeadlines einstellen
+        $this->fileHasHeadlines = (bool) Utilities::getArrayValueIfKey($this->args, 'has_headlines', false);
+
+        $delimiter = Utilities::getArrayValueIfKey($this->args, 'delimiter', false);
+        if (in_array($delimiter, array(';', ','))) {
+            $this->delimiter = $delimiter;
+        }
 
         $attachmentId = $this->args['csv_file_id'];
         if (empty($attachmentId)) {

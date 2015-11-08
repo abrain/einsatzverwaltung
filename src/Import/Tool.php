@@ -127,7 +127,7 @@ class Tool
 
         if (array_key_exists('args', $currentAction) && is_array($currentAction['args'])) {
             foreach ($currentAction['args'] as $arg) {
-                $value = (array_key_exists($arg, $_POST) ? $_POST[$arg] : null);
+                $value = (array_key_exists($arg, $_POST) ? $_POST[$arg] : null); //TODO sanitize
                 $source->putArg($arg, $value);
             }
         }
@@ -227,7 +227,7 @@ class Tool
             // Import starten
             echo '<p>Die Daten werden eingelesen, das kann einen Moment dauern.</p>';
             $helper->import($entries, $mapping);
-        } elseif ('selectfile' == $aktion) {
+        } elseif ('selectcsvfile' == $aktion) {
             if (false === $nextAction) {
                 Utilities::printError('Keine Nachfolgeaktion gefunden!');
                 return;
@@ -236,6 +236,17 @@ class Tool
             echo '<form method="post"><input id="csv_file_id" name="csv_file_id" type="text" />';
             wp_nonce_field($this->getNonceAction($source, $nextAction['slug']));
             // TODO Dialog zur Dateiauswahl
+            ?>
+            <br/><input id="has_headlines" name="has_headlines" type="checkbox" value="1" />
+            <label for="has_headlines">Erste Zeile der Datei enth&auml;lt Spaltenbeschriftung</label>
+            <br/><label>
+                Trennzeichen zwischen den Spalten:
+                <select name="delimiter">
+                    <option value=";">Semikolon</option>
+                    <option value=",">Komma</option>
+                </select>
+            </label>
+            <?php
             echo '<input type="hidden" name="aktion" value="' . $source->getActionAttribute($nextAction['slug']) . '" />';
             submit_button($nextAction['button_text']);
             echo '</form>';

@@ -1,11 +1,18 @@
 <?php
 namespace abrain\Einsatzverwaltung\Import\Sources;
 
+use abrain\Einsatzverwaltung\Utilities;
+use Exception;
+
 /**
  * Importiert Einsatzberichte aus einer CSV-Datei
  */
 class Csv extends AbstractSource
 {
+    private $csvFileHandle;
+    private $delimiter = ';';
+    private $enclosure = '"';
+
     /**
      * Csv constructor.
      */
@@ -45,12 +52,39 @@ class Csv extends AbstractSource
      */
     public function checkPreconditions()
     {
-        // TODO: Implement checkPreconditions() method.
-        if (empty($this->args['csv_file_id'])) {
+        $attachmentId = $this->args['csv_file_id'];
+        if (empty($attachmentId)) {
+            Utilities::printError('Keine Attachment ID angegeben');
             return false;
         }
 
-        echo $this->args['csv_file_id'];
+        if (!is_numeric($attachmentId)) {
+            Utilities::printError('Attachment ID ist keine Zahl');
+            return false;
+        }
+
+        $csvFilePath = get_attached_file($attachmentId);
+        if (empty($csvFilePath)) {
+            Utilities::printError(sprintf('Konnte Attachment mit ID %d nicht finden', $attachmentId));
+            return false;
+        }
+
+        Utilities::printInfo('File path: ' . $csvFilePath);
+
+        try {
+            if (!file_exists($csvFilePath)) {
+                throw new Exception('Datei existiert nicht');
+            }
+
+            $this->csvFileHandle = fopen($csvFilePath, 'r');
+            if (empty($this->csvFileHandle)) {
+                throw new Exception('Konnte Datei nicht öffnen');
+            }
+        } catch (Exception $e) {
+            Utilities::printError($e->getMessage());
+            return false;
+        }
+
         return true;
     }
 
@@ -82,7 +116,22 @@ class Csv extends AbstractSource
      */
     public function getFields()
     {
-        // TODO: Implement getFields() method.
+        // Zum Anfang der Datei gehen
+        if (!rewind($this->csvFileHandle)) {
+            Utilities::printError('Konnte nicht zum Anfang der Datei springen');
+            return false;
+        }
+
+        $fields = fgetcsv($this->csvFileHandle, 0, $this->delimiter, $this->enclosure);
+        if (empty($fields)) {
+            // TODO Fehler
+        }
+
+        if (is_array($fields) && $fields[0] == null) {
+            // TODO Leere Zeile
+        }
+
+        return $fields;
     }
 
     /**

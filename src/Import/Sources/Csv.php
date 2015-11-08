@@ -104,7 +104,7 @@ class Csv extends AbstractSource
      */
     public function getEntries($fields)
     {
-        $lines = $this->readFile();
+        $lines = $this->readFile(null, $fields);
 
         if (empty($lines)) {
             return false;
@@ -167,11 +167,20 @@ class Csv extends AbstractSource
 
     /**
      * @param int|null $numLines Maximale Anzahl zu lesender Zeilen, oder null um alle Zeilen einzulesen
+     * @param array $requestedFields
      *
      * @return array|bool
      */
-    private function readFile($numLines = null)
+    private function readFile($numLines = null, $requestedFields = array())
     {
+        $fieldMap = array();
+        if (!empty($requestedFields)) {
+            $fields = $this->getFields();
+            foreach ($requestedFields as $requestedField) {
+                $fieldMap[$requestedField] = array_search($requestedField, $fields);
+            }
+        }
+
         $handle = fopen($this->csvFilePath, 'r');
         if (empty($handle)) {
             Utilities::printError('Konnte Datei nicht öffnen');
@@ -197,7 +206,16 @@ class Csv extends AbstractSource
                 continue;
             }
 
-            $lines[] = $line;
+            if (empty($requestedFields)) {
+                $lines[] = $line;
+                continue;
+            }
+
+            $filteredLine = array();
+            foreach ($fieldMap as $fieldName => $index) {
+                $filteredLine[$fieldName] = $line[$index];
+            }
+            $lines[] = $filteredLine;
         }
 
         fclose($handle);

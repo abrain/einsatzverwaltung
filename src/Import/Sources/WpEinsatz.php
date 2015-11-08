@@ -103,6 +103,10 @@ class WpEinsatz extends AbstractSource
      */
     public function getFields()
     {
+        if (!empty($this->cachedFields)) {
+            return $this->cachedFields;
+        }
+
         global $wpdb; /** @var wpdb $wpdb */
 
         $fields = array();
@@ -124,6 +128,8 @@ class WpEinsatz extends AbstractSource
                 $this->problematicFields[] = $field;
             }
         }
+
+        $this->cachedFields = $fields;
 
         return $fields;
     }

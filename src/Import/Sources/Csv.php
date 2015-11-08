@@ -117,6 +117,10 @@ class Csv extends AbstractSource
      */
     public function getFields()
     {
+        if (!empty($this->cachedFields)) {
+            return $this->cachedFields;
+        }
+
         $fields = $this->readFile(1);
 
         // Gebe nummerierte Spalten zurück, wenn es keine Überschriften gibt
@@ -125,6 +129,8 @@ class Csv extends AbstractSource
                 return sprintf('Spalte %d', $number);
             }, range(1, count($fields[0])));
         }
+
+        $this->cachedFields = $fields;
 
         // Gebe die Überschriften der Spalten zurück
         return $fields[0];

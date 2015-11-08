@@ -13,6 +13,7 @@ abstract class AbstractSource
     protected $autoMatchFields = array();
     protected $internalFields = array('post_name');
     protected $problematicFields = array();
+    protected $cachedFields;
 
     /**
      * @return boolean True, wenn Voraussetzungen stimmen, ansonsten false

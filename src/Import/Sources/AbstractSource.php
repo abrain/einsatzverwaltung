@@ -21,6 +21,25 @@ abstract class AbstractSource
     abstract public function checkPreconditions();
 
     /**
+     * Generiert für Argumente, die in der nächsten Action wieder gebraucht werden, Felder, die in das Formular
+     * eingebaut werden können, damit diese mitgenommen werden
+     *
+     * @param array $nextAction Die nächste Action
+     */
+    public function echoExtraFormFields($nextAction)
+    {
+        if (empty($nextAction)) {
+            return;
+        }
+
+        foreach ($nextAction['args'] as $arg) {
+            if (array_key_exists($arg, $this->args)) {
+                echo '<input type="hidden" name="'.$arg.'" value="' . $this->args[$arg] . '" />';
+            }
+        }
+    }
+
+    /**
      * Gibt die Beschreibung der Importquelle zurück
      *
      * @return string Beschreibung der Importquelle

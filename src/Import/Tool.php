@@ -240,12 +240,17 @@ class Tool
 
         $this->helper->renderMatchForm($this->currentSource, array(
             'nonce_action' => $this->getNonceAction($this->currentSource, $this->nextAction['slug']),
-            'action_value' => $this->currentSource->getActionAttribute($this->nextAction['slug'])
+            'action_value' => $this->currentSource->getActionAttribute($this->nextAction['slug']),
+            'next_action' => $this->nextAction
         ));
     }
 
     private function importPage()
     {
+        if (!$this->currentSource->checkPreconditions()) {
+            return;
+        }
+
         $sourceFields = $this->currentSource->getFields();
         if (empty($sourceFields)) {
             Utilities::printError('Es wurden keine Felder gefunden');
@@ -257,10 +262,14 @@ class Tool
 
         // Prüfen, ob mehrere Felder das gleiche Zielfeld haben
         if (!$this->helper->validateMapping($mapping)) {
+            // Und gleich nochmal...
+            $this->nextAction = $this->currentAction;
+
             $this->helper->renderMatchForm($this->currentSource, array(
                 'mapping' => $mapping,
-                'nonce_action' => $this->getNonceAction($this->currentSource, $this->currentAction['slug']),
-                'action_value' => $this->currentSource->getActionAttribute($this->currentAction['slug'])
+                'nonce_action' => $this->getNonceAction($this->currentSource, $this->nextAction['slug']),
+                'action_value' => $this->currentSource->getActionAttribute($this->nextAction['slug']),
+                'next_action' => $this->nextAction
             ));
             return;
         }

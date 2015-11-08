@@ -179,6 +179,7 @@ class Helper
      * @param AbstractSource $source
      * @param array $args {
      *     @type array  $mapping           Zuordnung von zu importieren Feldern auf Einsatzverwaltungsfelder
+     *     @type array  $next_action       Array der nächsten Action
      *     @type string $nonce_action      Wert der Nonce
      *     @type string $action_value      Wert der action-Variable
      *     @type string submit_button_text Beschriftung für den Button unter dem Formular
@@ -188,6 +189,7 @@ class Helper
     {
         $defaults = array(
             'mapping' => array(),
+            'next_action' => null,
             'nonce_action' => '',
             'action_value' => '',
             'submit_button_text' => __('Import starten', 'einsatzverwaltung')
@@ -225,6 +227,9 @@ class Helper
             echo '</td></tr>';
         }
         echo '</tbody></table>';
+        if (!empty($parsedArgs['next_action'])) {
+            $source->echoExtraFormFields($parsedArgs['next_action']);
+        }
         submit_button($parsedArgs['submit_button_text']);
         echo '</form>';
     }
@@ -239,6 +244,14 @@ class Helper
     public function validateMapping($mapping)
     {
         $valid = true;
+
+        // Pflichtfelder prüfen
+        if (!in_array('post_date', $mapping)) {
+            Utilities::printError('Pflichtfeld Alarmzeit wurde nicht zugeordnet');
+            $valid = false;
+        }
+
+        // Mehrfache Zuweisungen prüfen
         foreach (array_count_values($mapping) as $ownField => $count) {
             if ($count > 1) {
                 Utilities::printError(sprintf(
@@ -248,6 +261,7 @@ class Helper
                 $valid = false;
             }
         }
+
         return $valid;
     }
 }

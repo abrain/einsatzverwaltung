@@ -33,7 +33,8 @@ class Csv extends AbstractSource
             array(
                 'slug' => 'import',
                 'name' => __('Import', 'einsatzverwaltung'),
-                'button_text' => __('Import starten', 'einsatzverwaltung')
+                'button_text' => __('Import starten', 'einsatzverwaltung'),
+                'args' => array('csv_file_id', 'has_headlines', 'delimiter')
             )
         );
     }
@@ -105,6 +106,10 @@ class Csv extends AbstractSource
     {
         $lines = $this->readFile();
 
+        if (empty($lines)) {
+            return false;
+        }
+
         if ($this->fileHasHeadlines) {
             return array_slice($lines, 1);
         }
@@ -122,6 +127,10 @@ class Csv extends AbstractSource
         }
 
         $fields = $this->readFile(1);
+
+        if (empty($fields)) {
+            return false;
+        }
 
         // Gebe nummerierte Spalten zurück, wenn es keine Überschriften gibt
         if (!$this->fileHasHeadlines) {

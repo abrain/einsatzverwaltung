@@ -12,6 +12,7 @@ class Csv extends AbstractSource
     private $csvFileHandle;
     private $delimiter = ';';
     private $enclosure = '"';
+    private $fileHasHeadlines = false;
 
     /**
      * Csv constructor.
@@ -52,6 +53,10 @@ class Csv extends AbstractSource
      */
     public function checkPreconditions()
     {
+        // TODO delimiter einstellen
+        // TODO enclosure einstellen
+        // TODO fileHasHeadlines einstellen
+
         $attachmentId = $this->args['csv_file_id'];
         if (empty($attachmentId)) {
             Utilities::printError('Keine Attachment ID angegeben');
@@ -122,15 +127,23 @@ class Csv extends AbstractSource
             return false;
         }
 
-        $fields = fgetcsv($this->csvFileHandle, 0, $this->delimiter, $this->enclosure);
-        if (empty($fields)) {
-            // TODO Fehler
+        do {
+            $fields = fgetcsv($this->csvFileHandle, 0, $this->delimiter, $this->enclosure);
+
+            // Problem beim Lesen
+            if (empty($fields)) {
+                return false;
+            }
+        } while (is_array($fields) && $fields[0] == null);
+
+        // Gebe nummerierte Spalten zurück, wenn es keine Überschriften gibt
+        if (!$this->fileHasHeadlines) {
+            return array_map(function ($number) {
+                return sprintf('Spalte %d', $number);
+            }, range(1, count($fields)));
         }
 
-        if (is_array($fields) && $fields[0] == null) {
-            // TODO Leere Zeile
-        }
-
+        // Gebe die Überschriften der Spalten zurück
         return $fields;
     }
 

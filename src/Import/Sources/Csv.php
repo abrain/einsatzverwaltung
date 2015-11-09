@@ -8,6 +8,8 @@ use abrain\Einsatzverwaltung\Utilities;
  */
 class Csv extends AbstractSource
 {
+    private $dateFormats = array('Y-m-d', 'd.m.Y', 'd.m.y');
+    private $timeFormats = array('H:i:s', 'G:i:s');
     private $csvFilePath;
     private $delimiter = ';';
     private $enclosure = '"';
@@ -83,6 +85,30 @@ class Csv extends AbstractSource
 
         return true;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function echoExtraFormFields($nextAction)
+    {
+        $dateExample = strtotime('December 5th 5:29 am');
+        echo '<p><label>Datumsformat<select name="import_date_format">';
+        foreach ($this->dateFormats as $dateFormat) {
+            echo '<option value="'.$dateFormat.'"'.selected($_POST['import_date_format'], $dateFormat).'>';
+            echo date($dateFormat, $dateExample) . '</option>';
+        }
+        echo '</select></label></p>';
+
+        echo '<p><label>Zeitformat<select name="import_time_format">';
+        foreach ($this->timeFormats as $timeFormat) {
+            echo '<option value="'.$timeFormat.'"'.selected($_POST['import_time_format'], $timeFormat).'>';
+            echo date($timeFormat, $dateExample) . '</option>';
+        }
+        echo '</select></label></p>';
+
+        parent::echoExtraFormFields($nextAction);
+    }
+
 
     /**
      * Gibt die Beschreibung der Importquelle zurück
@@ -191,6 +217,8 @@ class Csv extends AbstractSource
             fclose($handle);
             return array();
         }
+
+        // TODO ggf. erste Zeile überspringen
 
         $lines = array();
         while (null === $numLines || count($lines) < $numLines) {

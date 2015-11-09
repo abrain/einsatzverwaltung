@@ -141,15 +141,18 @@ class Tool
         // Nonce überprüfen
         $this->checkNonce($this->currentSource, $aktion);
 
+        // Variablen für die Ablaufsteuerung
         $this->currentAction = $this->currentSource->getAction($aktion);
         $this->nextAction = $this->currentSource->getNextAction($this->currentAction);
 
+        // Einstellungen an die Imortquelle übergeben
         if (array_key_exists('args', $this->currentAction) && is_array($this->currentAction['args'])) {
             foreach ($this->currentAction['args'] as $arg) {
                 $value = (array_key_exists($arg, $_POST) ? $_POST[$arg] : null); //TODO sanitize
                 $this->currentSource->putArg($arg, $value);
             }
         }
+        //TODO Datums- und Zeitformat übernehmen
 
         echo "<h3>{$this->currentAction['name']}</h3>";
 

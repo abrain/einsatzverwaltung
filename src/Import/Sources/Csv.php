@@ -72,8 +72,6 @@ class Csv extends AbstractSource
         }
 
         $this->csvFilePath = $csvFilePath;
-        Utilities::printInfo('File path: ' . $csvFilePath);
-
         if (!file_exists($csvFilePath)) {
             Utilities::printError('Datei existiert nicht');
             return false;

@@ -6,6 +6,7 @@ use abrain\Einsatzverwaltung\Import\Sources\AbstractSource;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\ToolEinsatznummernReparieren;
 use abrain\Einsatzverwaltung\Utilities;
+use DateTime;
 
 /**
  * Verschiedene Funktionen für den Import von Einsatzberichten
@@ -79,7 +80,6 @@ class Helper
         if (empty($dateTimeFormat)) {
             $dateTimeFormat = 'Y-m-d H:i';
         }
-        error_log('Format ist: ' . $dateTimeFormat);
 
         foreach ($sourceEntries as $sourceEntry) {
             $metaValues = array();

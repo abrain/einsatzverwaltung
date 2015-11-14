@@ -60,11 +60,17 @@ class Helper
     /**
      * Importiert Einsätze aus der wp-einsatz-Tabelle
      *
-     * @param array $sourceEntries
+     * @param AbstractSource $source
      * @param array $mapping Zuordnung zwischen zu importieren Feldern und denen der Einsatzverwaltung
      */
-    public function import($sourceEntries, $mapping)
+    public function import($source, $mapping)
     {
+        $sourceEntries = $source->getEntries(array_keys($mapping));
+        if (empty($sourceEntries)) {
+            Utilities::printError('Die Importquelle lieferte keine Ergebnisse. Entweder sind dort keine Eins&auml;tze gespeichert oder es gab ein Problem bei der Abfrage.');
+            return;
+        }
+
         foreach ($sourceEntries as $sourceEntry) {
             $metaValues = array();
             $insertArgs = array();

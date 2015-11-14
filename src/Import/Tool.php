@@ -277,16 +277,8 @@ class Tool
             return;
         }
 
-        // Datenbank auslesen
-        $entries = $this->currentSource->getEntries(array_keys($mapping));
-
-        if (empty($entries)) {
-            Utilities::printError('Die Importquelle lieferte keine Ergebnisse. Entweder sind dort keine Eins&auml;tze gespeichert oder es gab ein Problem bei der Abfrage.');
-            return;
-        }
-
         // Import starten
         echo '<p>Die Daten werden eingelesen, das kann einen Moment dauern.</p>';
-        $this->helper->import($entries, $mapping);
+        $this->helper->import($this->currentSource, $mapping);
     }
 }

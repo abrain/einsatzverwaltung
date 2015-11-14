@@ -164,7 +164,7 @@ class Tool
             }
         }
 
-        echo "<h3>{$this->currentAction['name']}</h3>";
+        echo "<h2>{$this->currentAction['name']}</h2>";
 
         // TODO gemeinsame Prüfungen auslagern
         if ('analysis' == $aktion) {
@@ -177,19 +177,37 @@ class Tool
                 return;
             }
 
-            echo '<form method="post"><input id="csv_file_id" name="csv_file_id" type="text" />';
+            echo '<form method="post">';
             wp_nonce_field($this->getNonceAction($this->currentSource, $this->nextAction['slug']));
-            // TODO Dialog zur Dateiauswahl
+
+            $csvAttachments = get_posts(array(
+                'post_type' => 'attachment',
+                'post_mime_type' => 'text/csv'
+            ));
+
+            if (empty($csvAttachments)) {
+                Utilities::printInfo('Bitte lade die zu importierende CSV-Datei <a href="' . admin_url('media-new.php') . '">hier</a> in die Mediathek hoch. Nach dem Import kann und sollte die Datei aus der Mediathek gel&ouml;scht werden, sofern sie nicht &ouml;ffentlich zug&auml;nglich sein soll.');
+                return;
+            }
+
+            echo '<h3>In der Mediathek gefundene CSV-Dateien</h3>';
+            echo '<fieldset>';
+            foreach ($csvAttachments as $csvAttachment) {
+                /** @var \WP_Post $csvAttachment */
+                echo '<label><input type="radio" name="csv_file_id" value="' . $csvAttachment->ID . '">';
+                echo $csvAttachment->post_title . '</label><br/>';
+            }
+            echo '</fieldset>';
             ?>
-            <br/><input id="has_headlines" name="has_headlines" type="checkbox" value="1" />
+            <h3>Aufbau der CSV-Datei</h3>
+            <input id="has_headlines" name="has_headlines" type="checkbox" value="1" />
             <label for="has_headlines">Erste Zeile der Datei enth&auml;lt Spaltenbeschriftung</label>
-            <br/><label>
-                Trennzeichen zwischen den Spalten:
-                <select name="delimiter">
-                    <option value=";">Semikolon</option>
-                    <option value=",">Komma</option>
-                </select>
-            </label>
+            <p class="description">Setze diesen Haken, wenn die erste Zeile der CSV-Datei keine Daten von Eins&auml;tzen enth&auml;lt, sondern nur die &Uuml;berschriften der jeweiligen Spalten.</p>
+            <br>
+            Trennzeichen zwischen den Spalten:&nbsp;
+            <label><input type="radio" name="delimiter" value=";" checked="checked"><code>;</code> Semikolon</label>
+            &nbsp;<label><input type="radio" name="delimiter" value=","><code>,</code> Komma</label>
+            <p class="description">Meist werden die Spalten mit einem Semikolon voneinander getrennt. Wenn du unsicher bist, solltest du die CSV-Datei mit einem Texteditor &ouml;ffnen und nachsehen.</p>
             <?php
             echo '<input type="hidden" name="aktion" value="' . $this->currentSource->getActionAttribute($this->nextAction['slug']) . '" />';
             submit_button($this->nextAction['button_text']);

@@ -54,6 +54,14 @@ class WpEinsatz extends AbstractSource
     }
 
     /**
+     * @return string
+     */
+    public function getDateFormat()
+    {
+        return 'Y-m-d';
+    }
+
+    /**
      * @inheritDoc
      */
     public function getDescription()
@@ -93,6 +101,14 @@ class WpEinsatz extends AbstractSource
     public function getName()
     {
         return 'wp-einsatz';
+    }
+
+    /**
+     * @return string
+     */
+    public function getTimeFormat()
+    {
+        return 'H:i:s';
     }
 
     /**

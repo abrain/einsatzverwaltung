@@ -8,8 +8,8 @@ use abrain\Einsatzverwaltung\Utilities;
  */
 class Csv extends AbstractSource
 {
-    private $dateFormats = array('Y-m-d', 'd.m.Y', 'd.m.y');
-    private $timeFormats = array('H:i:s', 'G:i:s');
+    private $dateFormats = array('d.m.Y', 'd.m.y', 'Y-m-d', 'm/d/Y', 'm/d/y');
+    private $timeFormats = array('H:i', 'G:i', 'H:i:s', 'G:i:s');
     private $csvFilePath;
     private $delimiter = ';';
     private $enclosure = '"';
@@ -94,14 +94,14 @@ class Csv extends AbstractSource
         $dateExample = strtotime('December 5th 5:29 am');
         echo '<p><label>Datumsformat<select name="import_date_format">';
         foreach ($this->dateFormats as $dateFormat) {
-            echo '<option value="'.$dateFormat.'"'.selected($_POST['import_date_format'], $dateFormat).'>';
+            echo '<option value="'.$dateFormat.'"'.selected($this->getDateFormat(), $dateFormat).'>';
             echo date($dateFormat, $dateExample) . '</option>';
         }
         echo '</select></label></p>';
 
         echo '<p><label>Zeitformat<select name="import_time_format">';
         foreach ($this->timeFormats as $timeFormat) {
-            echo '<option value="'.$timeFormat.'"'.selected($_POST['import_time_format'], $timeFormat).'>';
+            echo '<option value="'.$timeFormat.'"'.selected($this->getTimeFormat(), $timeFormat).'>';
             echo date($timeFormat, $dateExample) . '</option>';
         }
         echo '</select></label></p>';
@@ -109,6 +109,18 @@ class Csv extends AbstractSource
         parent::echoExtraFormFields($nextAction);
     }
 
+    /**
+     * @return string
+     */
+    public function getDateFormat()
+    {
+        if (!array_key_exists('import_date_format', $this->args)) {
+            $fallbackDateFormat = $this->dateFormats[0];
+            return $fallbackDateFormat;
+        }
+
+        return $this->args['import_date_format'];
+    }
 
     /**
      * Gibt die Beschreibung der Importquelle zurück
@@ -189,6 +201,19 @@ class Csv extends AbstractSource
     public function getName()
     {
         return 'CSV';
+    }
+
+    /**
+     * @return string
+     */
+    public function getTimeFormat()
+    {
+        if (!array_key_exists('import_time_format', $this->args)) {
+            $fallbackTimeFormat = $this->timeFormats[0];
+            return $fallbackTimeFormat;
+        }
+
+        return $this->args['import_time_format'];
     }
 
     /**

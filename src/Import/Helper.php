@@ -71,6 +71,16 @@ class Helper
             return;
         }
 
+        $dateFormat = $source->getDateFormat();
+        $timeFormat = $source->getTimeFormat();
+        if (!empty($dateFormat) && !empty($timeFormat)) {
+            $dateTimeFormat = $dateFormat . ' ' . $timeFormat;
+        }
+        if (empty($dateTimeFormat)) {
+            $dateTimeFormat = 'Y-m-d H:i';
+        }
+        error_log('Format ist: ' . $dateTimeFormat);
+
         foreach ($sourceEntries as $sourceEntry) {
             $metaValues = array();
             $insertArgs = array();
@@ -131,21 +141,26 @@ class Helper
             }
 
             // Datum des Einsatzes prüfen
-            $alarmzeit = date_create($insertArgs['post_date']);
-            if ($alarmzeit === false) {
+            $alarmzeit = DateTime::createFromFormat($dateTimeFormat, $insertArgs['post_date']);
+            if (false === $alarmzeit) {
                 Utilities::printError(
-                    sprintf('Datum %s besitzt kein bekanntes Format', esc_html($insertArgs['post_date']))
+                    sprintf(
+                        'Das Datum %s konnte mit dem angegebenen Format %s nicht eingelesen werden',
+                        esc_html($insertArgs['post_date']),
+                        esc_html($dateTimeFormat)
+                    )
                 );
                 continue;
             }
 
-            $einsatzjahr = date_format($alarmzeit, 'Y');
+            $einsatzjahr = $alarmzeit->format('Y');
+            $insertArgs['post_date'] = $alarmzeit->format('Y-m-d H:i');
             $einsatznummer = Core::getNextEinsatznummer($einsatzjahr);
             $insertArgs['post_name'] = $einsatznummer;
             $insertArgs['post_type'] = 'einsatz';
             $insertArgs['post_status'] = 'publish';
             $insertArgs['post_date_gmt'] = get_gmt_from_date($insertArgs['post_date']);
-            $metaValues['einsatz_alarmzeit'] = date_format($alarmzeit, 'Y-m-d H:i');
+            $metaValues['einsatz_alarmzeit'] = $insertArgs['post_date'];
 
             // Titel sicherstellen
             if (!array_key_exists('post_title', $insertArgs)) {

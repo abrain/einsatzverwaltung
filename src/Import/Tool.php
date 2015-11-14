@@ -152,7 +152,17 @@ class Tool
                 $this->currentSource->putArg($arg, $value);
             }
         }
-        //TODO Datums- und Zeitformat übernehmen
+
+        // Datums- und Zeitformat für CSV-Import übernehmen
+        if ('evw_csv' == $this->currentSource->getIdentifier()) {
+            if (array_key_exists('import_date_format', $_POST)) {
+                $this->currentSource->putArg('import_date_format', $_POST['import_date_format']);
+            }
+
+            if (array_key_exists('import_time_format', $_POST)) {
+                $this->currentSource->putArg('import_time_format', $_POST['import_time_format']);
+            }
+        }
 
         echo "<h3>{$this->currentAction['name']}</h3>";
 

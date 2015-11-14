@@ -86,6 +86,11 @@ abstract class AbstractSource
     }
 
     /**
+     * @return string
+     */
+    abstract public function getDateFormat();
+
+    /**
      * Gibt die Einsatzberichte der Importquelle zurück
      *
      * @param array $fields Felder der Importquelle, die abgefragt werden sollen. Ist dieser Parameter null, werden alle
@@ -196,6 +201,11 @@ abstract class AbstractSource
     {
         return $this->problematicFields;
     }
+
+    /**
+     * @return string
+     */
+    abstract public function getTimeFormat();
 
     /**
      * @return array Felder, die nicht als Importziel angeboten werden sollen

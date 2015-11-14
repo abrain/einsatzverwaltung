@@ -24,7 +24,8 @@ class Csv extends AbstractSource
             array(
                 'slug' => 'selectcsvfile',
                 'name' => __('Dateiauswahl', 'einsatzverwaltung'),
-                'button_text' => __('Datei ausw&auml;hlen', 'einsatzverwaltung')
+                'button_text' => __('Datei ausw&auml;hlen', 'einsatzverwaltung'),
+                'args' => array()
             ),
             array(
                 'slug' => 'analysis',

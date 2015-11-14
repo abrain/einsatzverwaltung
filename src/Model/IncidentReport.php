@@ -19,7 +19,7 @@ class IncidentReport
     public static function getFieldLabel($field)
     {
         $fields = self::getFields();
-        return (array_key_exists($field, $fields) ? $fields[$field] : $field);
+        return (array_key_exists($field, $fields) ? $fields[$field]['label'] : $field);
     }
 
     /**

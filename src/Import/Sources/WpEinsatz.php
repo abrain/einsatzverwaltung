@@ -28,12 +28,14 @@ class WpEinsatz extends AbstractSource
             array(
                 'slug' => 'analysis',
                 'name' => __('Analyse', 'einsatzverwaltung'),
-                'button_text' => __('Datenbank analysieren', 'einsatzverwaltung')
+                'button_text' => __('Datenbank analysieren', 'einsatzverwaltung'),
+                'args' => array()
             ),
             array(
                 'slug' => 'import',
                 'name' => __('Import', 'einsatzverwaltung'),
-                'button_text' => __('Import starten', 'einsatzverwaltung')
+                'button_text' => __('Import starten', 'einsatzverwaltung'),
+                'args' => array()
             )
         );
     }

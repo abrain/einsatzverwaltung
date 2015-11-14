@@ -148,7 +148,7 @@ class Tool
         // Einstellungen an die Imortquelle übergeben
         if (array_key_exists('args', $this->currentAction) && is_array($this->currentAction['args'])) {
             foreach ($this->currentAction['args'] as $arg) {
-                $value = (array_key_exists($arg, $_POST) ? $_POST[$arg] : null); //TODO sanitize
+                $value = (array_key_exists($arg, $_POST) ? sanitize_text_field($_POST[$arg]) : null);
                 $this->currentSource->putArg($arg, $value);
             }
         }
@@ -156,11 +156,11 @@ class Tool
         // Datums- und Zeitformat für CSV-Import übernehmen
         if ('evw_csv' == $this->currentSource->getIdentifier()) {
             if (array_key_exists('import_date_format', $_POST)) {
-                $this->currentSource->putArg('import_date_format', $_POST['import_date_format']);
+                $this->currentSource->putArg('import_date_format', sanitize_text_field($_POST['import_date_format']));
             }
 
             if (array_key_exists('import_time_format', $_POST)) {
-                $this->currentSource->putArg('import_time_format', $_POST['import_time_format']);
+                $this->currentSource->putArg('import_time_format', sanitize_text_field($_POST['import_time_format']));
             }
         }
 

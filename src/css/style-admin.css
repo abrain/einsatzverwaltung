@@ -98,3 +98,14 @@ li.dropzone {
     border-radius: 6px;
     font-weight: bold;
 }
+
+.import-date-formats {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.import-time-formats {
+    display: inline-block;
+    vertical-align: top;
+    margin-left: 20px;
+}

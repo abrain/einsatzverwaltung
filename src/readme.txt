@@ -16,6 +16,8 @@ Dieses Plugin f&uuml;gt WordPress eine neue Beitragsart "Einsatzbericht" hinzu. 
 
 Die prim&auml;re Zielgruppe des Plugins sind Feuerwehren im deutschsprachigen Raum, es ist aber genauso geeignet f&uuml;r Rettungsdienste, die Wasserwacht, das THW und sonstige Hilfsorganisationen, die ihre Eins&auml;tze im Internet pr&auml;sentieren m&ouml;chten.
 
+__Dieses Plugin steht in keiner Verbindung zu einsatzverwaltung.eu!__
+
 Funktionen im &Uuml;berblick:
 
 * Einsatzberichte als vollwertige Beitr&auml;ge ver&ouml;ffentlichen
@@ -37,6 +39,10 @@ In beiden F&auml;llen muss das Plugin erst aktiviert werden, bevor es benutzt we
 __Es wird PHP 5.3.0 oder neuer ben&ouml;tigt__
 
 == Frequently Asked Questions ==
+
+= Ist das hier das WordPress-Plugin für einsatzverwaltung.eu? =
+
+Nein, dieses Plugin hat nichts mit einsatzverwaltung.eu zu tun.
 
 = Wo finde ich die Anleitung bzw. Dokumentation? =
 

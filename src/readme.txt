@@ -4,7 +4,7 @@ Donate link: https://www.abrain.de/software/unterstuetzen/
 Tags: Feuerwehr, Einsatz, Rettung, Rettungsdienst, THW, HiOrg, Wasserwacht, Bergrettung
 Requires at least: 3.4.0
 Tested up to: 4.3
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -22,7 +22,7 @@ Funktionen im &Uuml;berblick:
 * Information &uuml;ber Einsatzart, eingesetzte Fahrzeuge, Dauer und vieles mehr
 * Shortcode zum Einbinden von Einsatzlisten
 * Widget zeigt die aktuellsten Einsatzberichte
-* Import aus wp-einsatz
+* Import aus wp-einsatz und CSV-Dateien
 * Newsfeed f&uuml;r Einsatzberichte
 * Pflege der Einsatzberichte kann auf bestimmte Benutzerrollen beschr&auml;nkt werden
 
@@ -59,6 +59,15 @@ F&uuml;r eMails von/an [kontakt@abrain.de](mailto:kontakt@abrain.de) kann ich PG
 Das Du halte ich f&uuml;r die angenehmere Arbeitsgrundlage, aber man darf mich gerne auch siezen ohne dass ich mich alt f&uuml;hle.
 
 == Changelog ==
+
+= 1.1.0 =
+* Neues Widget kann per HTML komplett selbst gestaltet werden
+* Anzeigereihenfolge der Fahrzeuge kann festgelegt werden
+* Fahrzeuge k&ouml;nnen in Hierarchie (z.B. Standorte) organisiert werden (hat noch keine Auswirkung auf die Darstellung)
+* Import von Einsatzberichten aus CSV-Dateien m&ouml;glich
+* Problem mit Benutzerrechten behoben
+* Einsatzberichte bleiben erhalten, wenn der Autor gel&ouml;scht wird
+* Als privat markierte Einsatzberichte wurden bei der Berechnung der Einsatznummern nicht ber&uuml;cksichtigt
 
 = 1.0.0 =
 * Basispfad der Einsatzberichte (bisher einsaetze) kann eingestellt werden

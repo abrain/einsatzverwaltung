@@ -54,14 +54,15 @@ class Options
     public function getOption($key)
     {
         if (array_key_exists($key, $this->defaults)) {
-            $defaultValue = $this->defaults[$key];
-        } else {
-            if (strpos($key, 'einsatzvw_cap_roles_') !== 0) {
-                error_log(sprintf('Kein Standardwert für %s gefunden!', $key));
-            }
-            $defaultValue = false;
+            return get_option($key, $this->defaults[$key]);
         }
-        return get_option($key, $defaultValue);
+
+        // Fehlenden Standardwert beklagen, außer es handelt sich um eine Rechteeinstellung
+        if (strpos($key, 'einsatzvw_cap_roles_') !== 0) {
+            error_log(sprintf('Kein Standardwert für %s gefunden!', $key));
+        }
+
+        return get_option($key, false);
     }
 
     /**

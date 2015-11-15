@@ -601,7 +601,8 @@ class Settings
      * @param string $old_value Der alte Wert
      * @return string Der zu speichernde Wert
      */
-    public function maybeRewriteSlugChanged($new_value, $old_value) {
+    public function maybeRewriteSlugChanged($new_value, $old_value)
+    {
         if ($new_value != $old_value) {
             $this->options->setFlushRewriteRules(true);
         }

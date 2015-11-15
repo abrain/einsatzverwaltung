@@ -129,7 +129,7 @@ class Tool
                     echo '<form method="post">';
                     echo '<input type="hidden" name="aktion" value="' . $source->getActionAttribute($firstAction['slug']) . '" />';
                     wp_nonce_field($this->getNonceAction($source, $firstAction['slug']));
-                    submit_button($firstAction['button_text']);
+                    submit_button($firstAction['button_text'], 'secondary', 'submit', false);
                     echo '</form>';
                 }
                 echo '</li>';

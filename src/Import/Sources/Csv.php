@@ -56,7 +56,7 @@ class Csv extends AbstractSource
 
         $attachmentId = $this->args['csv_file_id'];
         if (empty($attachmentId)) {
-            Utilities::printError('Keine Attachment ID angegeben');
+            Utilities::printError('Keine Datei ausgew&auml;hlt');
             return false;
         }
 
@@ -90,20 +90,24 @@ class Csv extends AbstractSource
      */
     public function echoExtraFormFields($nextAction)
     {
-        $dateExample = strtotime('December 5th 5:29 am');
-        echo '<p><label>Datumsformat<select name="import_date_format">';
-        foreach ($this->dateFormats as $dateFormat) {
-            echo '<option value="'.$dateFormat.'"'.selected($this->getDateFormat(), $dateFormat).'>';
-            echo date($dateFormat, $dateExample) . '</option>';
-        }
-        echo '</select></label></p>';
+        echo '<h3>Datums- und Zeitformat</h3>';
+        $dateExample = strtotime('December 31st 5:29 am');
 
-        echo '<p><label>Zeitformat<select name="import_time_format">';
-        foreach ($this->timeFormats as $timeFormat) {
-            echo '<option value="'.$timeFormat.'"'.selected($this->getTimeFormat(), $timeFormat).'>';
-            echo date($timeFormat, $dateExample) . '</option>';
+        echo '<div class="import-date-formats">';
+        foreach ($this->dateFormats as $dateFormat) {
+            echo '<label><input type="radio" name="import_date_format" value="'.$dateFormat.'"';
+            checked($this->getDateFormat(), $dateFormat);
+            echo ' />' . date($dateFormat, $dateExample) . '</label><br/>';
         }
-        echo '</select></label></p>';
+        echo '</div>';
+
+        echo '<div class="import-time-formats">';
+        foreach ($this->timeFormats as $timeFormat) {
+            echo '<label><input type="radio" name="import_time_format" value="'.$timeFormat.'"';
+            checked($this->getTimeFormat(), $timeFormat);
+            echo ' />' . date($timeFormat, $dateExample) . '</label><br/>';
+        }
+        echo '</div>';
 
         parent::echoExtraFormFields($nextAction);
     }
@@ -241,8 +245,6 @@ class Csv extends AbstractSource
             fclose($handle);
             return array();
         }
-
-        // TODO ggf. erste Zeile überspringen
 
         $lines = array();
         while (null === $numLines || count($lines) < $numLines) {

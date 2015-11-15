@@ -14,6 +14,28 @@ use DateTime;
 class Helper
 {
     /**
+     * @var Utilities
+     */
+    private $utilities;
+
+    /**
+     * @var Core
+     */
+    private $core;
+
+    /**
+     * Helper constructor.
+     * @param Utilities $utilities
+     * @param Core $core
+     */
+    public function __construct(Utilities $utilities, Core $core)
+    {
+        $this->utilities = $utilities;
+        $this->core = $core;
+    }
+
+
+    /**
      * Gibt ein Auswahlfeld zur Zuordnung der Felder in Einsatzverwaltung aus
      *
      * @param array $args {
@@ -68,7 +90,7 @@ class Helper
     {
         $sourceEntries = $source->getEntries(array_keys($mapping));
         if (empty($sourceEntries)) {
-            Utilities::printError('Die Importquelle lieferte keine Ergebnisse. Entweder sind dort keine Eins&auml;tze gespeichert oder es gab ein Problem bei der Abfrage.');
+            $this->utilities->printError('Die Importquelle lieferte keine Ergebnisse. Entweder sind dort keine Eins&auml;tze gespeichert oder es gab ein Problem bei der Abfrage.');
             return;
         }
 
@@ -107,7 +129,7 @@ class Helper
                                 // Term existiert in dieser Taxonomie noch nicht, neu anlegen
                                 $newterm = wp_insert_term($sourceEntry[$sourceField], $ownField);
                                 if (is_wp_error($newterm)) {
-                                    Utilities::printError(
+                                    $this->utilities->printError(
                                         sprintf(
                                             "Konnte %s '%s' nicht anlegen: %s",
                                             $ownTerms[$ownField]['label'],
@@ -131,19 +153,19 @@ class Helper
                         // Wert gehört direkt zum Post
                         $insertArgs[$ownField] = $sourceEntry[$sourceField];
                     } elseif ($ownField == '-') {
-                        Utilities::printWarning("Feld '$sourceField' nicht zugeordnet");
+                        $this->utilities->printWarning("Feld '$sourceField' nicht zugeordnet");
                     } else {
-                        Utilities::printError("Feld '$ownField' unbekannt");
+                        $this->utilities->printError("Feld '$ownField' unbekannt");
                     }
                 } else {
-                    Utilities::printError("Feld '$ownField' ung&uuml;ltig");
+                    $this->utilities->printError("Feld '$ownField' ung&uuml;ltig");
                 }
             }
 
             // Datum des Einsatzes prüfen
             $alarmzeit = DateTime::createFromFormat($dateTimeFormat, $insertArgs['post_date']);
             if (false === $alarmzeit) {
-                Utilities::printError(
+                $this->utilities->printError(
                     sprintf(
                         'Das Datum %s konnte mit dem angegebenen Format %s nicht eingelesen werden',
                         esc_html($insertArgs['post_date']),
@@ -155,7 +177,7 @@ class Helper
 
             $einsatzjahr = $alarmzeit->format('Y');
             $insertArgs['post_date'] = $alarmzeit->format('Y-m-d H:i');
-            $einsatznummer = Core::getNextEinsatznummer($einsatzjahr);
+            $einsatznummer = $this->core->getNextEinsatznummer($einsatzjahr);
             $insertArgs['post_name'] = $einsatznummer;
             $insertArgs['post_type'] = 'einsatz';
             $insertArgs['post_status'] = 'publish';
@@ -179,9 +201,9 @@ class Helper
             // Neuen Beitrag anlegen
             $postId = wp_insert_post($insertArgs, true);
             if (is_wp_error($postId)) {
-                Utilities::printError('Konnte Einsatz nicht importieren: ' . $postId->get_error_message());
+                $this->utilities->printError('Konnte Einsatz nicht importieren: ' . $postId->get_error_message());
             } else {
-                Utilities::printInfo('Einsatz importiert, ID ' . $postId);
+                $this->utilities->printInfo('Einsatz importiert, ID ' . $postId);
                 foreach ($metaValues as $mkey => $mval) {
                     update_post_meta($postId, $mkey, $mval);
                 }
@@ -189,12 +211,12 @@ class Helper
                 // Einsatznummer prüfen
                 $gespeicherteEnr = get_post_field('post_name', $postId);
                 if ($gespeicherteEnr != $einsatznummer) {
-                    Utilities::printWarning('WordPress hat diesem Einsatz nicht die vorgesehene Einsatznummer erteilt.<br>Verwendung des Werkzeugs <a href="'.admin_url('tools.php?page='.ToolEinsatznummernReparieren::EVW_TOOL_ENR_SLUG).'">Einsatznummern reparieren</a> wird empfohlen.');
+                    $this->utilities->printWarning('WordPress hat diesem Einsatz nicht die vorgesehene Einsatznummer erteilt.<br>Verwendung des Werkzeugs <a href="'.admin_url('tools.php?page='.ToolEinsatznummernReparieren::EVW_TOOL_ENR_SLUG).'">Einsatznummern reparieren</a> wird empfohlen.');
                 }
             }
         }
 
-        Utilities::printSuccess('Der Import ist abgeschlossen');
+        $this->utilities->printSuccess('Der Import ist abgeschlossen');
         echo '<a href="edit.php?post_type=einsatz">Zu den Einsatzberichten</a>';
     }
 
@@ -234,7 +256,7 @@ class Helper
             if (array_key_exists($field, $source->getAutoMatchFields())) {
                 _e('wird automatisch zugeordnet', 'einsatzverwaltung');
             } elseif (in_array($field, $source->getProblematicFields())) {
-                Utilities::printWarning(sprintf('Probleme mit Feld %s, siehe Analyse', $field));
+                $this->utilities->printWarning(sprintf('Probleme mit Feld %s, siehe Analyse', $field));
             } else {
                 $selected = '-';
                 if (!empty($parsedArgs['mapping']) &&
@@ -272,14 +294,14 @@ class Helper
 
         // Pflichtfelder prüfen
         if (!in_array('post_date', $mapping)) {
-            Utilities::printError('Pflichtfeld Alarmzeit wurde nicht zugeordnet');
+            $this->utilities->printError('Pflichtfeld Alarmzeit wurde nicht zugeordnet');
             $valid = false;
         }
 
         // Mehrfache Zuweisungen prüfen
         foreach (array_count_values($mapping) as $ownField => $count) {
             if ($count > 1) {
-                Utilities::printError(sprintf(
+                $this->utilities->printError(sprintf(
                     'Feld %s kann nicht f&uuml;r mehr als ein zu importierendes Feld als Ziel angegeben werden',
                     IncidentReport::getFieldLabel($ownField)
                 ));

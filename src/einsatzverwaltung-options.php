@@ -6,7 +6,7 @@ namespace abrain\Einsatzverwaltung;
  */
 class Options
 {
-    private static $defaults = array(
+    private $defaults = array(
         'einsatzvw_list_columns' => 'number,date,time,title',
         'einsatzvw_einsatznummer_stellen' => 3,
         'einsatzvw_show_einsatzart_archive' => false,
@@ -30,16 +30,31 @@ class Options
     );
 
     /**
+     * @var Utilities
+     */
+    private $utilities;
+
+    /**
+     * Options constructor.
+     *
+     * @param Utilities $utilities
+     */
+    public function __construct($utilities)
+    {
+        $this->utilities = $utilities;
+    }
+
+    /**
      * Ruft die benannte Option aus der Datenbank ab
      *
      * @param string $key Schlüssel der Option
      *
      * @return mixed
      */
-    public static function getOption($key)
+    public function getOption($key)
     {
-        if (array_key_exists($key, self::$defaults)) {
-            $defaultValue = self::$defaults[$key];
+        if (array_key_exists($key, $this->defaults)) {
+            $defaultValue = $this->defaults[$key];
         } else {
             if (strpos($key, 'einsatzvw_cap_roles_') !== 0) {
                 error_log(sprintf('Kein Standardwert für %s gefunden!', $key));
@@ -54,33 +69,33 @@ class Options
      *
      * @return bool
      */
-    public static function getBoolOption($key)
+    public function getBoolOption($key)
     {
-        $option = self::getOption($key);
-        return self::toBoolean($option);
+        $option = $this->getOption($key);
+        return $this->toBoolean($option);
     }
 
-    public static function getDefaultColumns()
+    public function getDefaultColumns()
     {
-        return self::$defaults['einsatzvw_list_columns'];
+        return $this->defaults['einsatzvw_list_columns'];
     }
 
-    public static function getDefaultEinsatznummerStellen()
+    public function getDefaultEinsatznummerStellen()
     {
-        return self::$defaults['einsatzvw_einsatznummer_stellen'];
+        return $this->defaults['einsatzvw_einsatznummer_stellen'];
     }
 
-    public static function getDefaultExcerptType()
+    public function getDefaultExcerptType()
     {
-        return self::$defaults['einsatzvw_excerpt_type'];
+        return $this->defaults['einsatzvw_excerpt_type'];
     }
 
     /**
      * Gibt das Datumsformat von WordPress zurück
      */
-    public static function getDateFormat()
+    public function getDateFormat()
     {
-        return self::getOption('date_format');
+        return $this->getOption('date_format');
     }
 
     /**
@@ -90,9 +105,9 @@ class Options
      *
      * @return int Die ID der Kategorie oder 0, wenn nicht gesetzt
      */
-    public static function getEinsatzberichteCategory()
+    public function getEinsatzberichteCategory()
     {
-        $categoryId = self::getOption('einsatzvw_category');
+        $categoryId = $this->getOption('einsatzvw_category');
         return (false === $categoryId ? 0 : intval($categoryId));
     }
 
@@ -101,38 +116,38 @@ class Options
      *
      * @return array Spalten-IDs der aktiven Spalten, geprüft auf Existenz. Bei Problemen die Standardspalten.
      */
-    public static function getEinsatzlisteEnabledColumns()
+    public function getEinsatzlisteEnabledColumns()
     {
-        $enabledColumns = self::getOption('einsatzvw_list_columns');
-        $enabledColumns = Utilities::sanitizeColumns($enabledColumns);
+        $enabledColumns = $this->getOption('einsatzvw_list_columns');
+        $enabledColumns = $this->utilities->sanitizeColumns($enabledColumns);
         return explode(',', $enabledColumns);
     }
 
     /**
      * @return int
      */
-    public static function getEinsatznummerStellen()
+    public function getEinsatznummerStellen()
     {
-        $option = self::getOption('einsatzvw_einsatznummer_stellen');
-        return Utilities::sanitizeEinsatznummerStellen($option);
+        $option = $this->getOption('einsatzvw_einsatznummer_stellen');
+        return $this->utilities->sanitizeEinsatznummerStellen($option);
     }
 
     /**
      * @return string
      */
-    public static function getExcerptType()
+    public function getExcerptType()
     {
-        $option = self::getOption('einsatzvw_excerpt_type');
-        return Utilities::sanitizeExcerptType($option);
+        $option = $this->getOption('einsatzvw_excerpt_type');
+        return $this->utilities->sanitizeExcerptType($option);
     }
 
     /**
      * @return string
      */
-    public static function getExcerptTypeFeed()
+    public function getExcerptTypeFeed()
     {
-        $option = self::getOption('einsatzvw_excerpt_type_feed');
-        return Utilities::sanitizeExcerptType($option);
+        $option = $this->getOption('einsatzvw_excerpt_type_feed');
+        return $this->utilities->sanitizeExcerptType($option);
     }
 
     /**
@@ -142,27 +157,27 @@ class Options
      *
      * @return string
      */
-    public static function getRewriteSlug()
+    public function getRewriteSlug()
     {
-        $option = self::getOption('einsatzvw_rewrite_slug');
-        return sanitize_title($option, self::$defaults['einsatzvw_rewrite_slug']);
+        $option = $this->getOption('einsatzvw_rewrite_slug');
+        return sanitize_title($option, $this->defaults['einsatzvw_rewrite_slug']);
     }
 
     /**
      * @return mixed
      */
-    public static function getTimeFormat()
+    public function getTimeFormat()
     {
-        return self::getOption('time_format');
+        return $this->getOption('time_format');
     }
 
     /**
      * @return bool
      */
-    public static function isEinsatznummerLfdVorne()
+    public function isEinsatznummerLfdVorne()
     {
-        $option = self::getOption('einsatzvw_einsatznummer_lfdvorne');
-        return self::toBoolean($option);
+        $option = $this->getOption('einsatzvw_einsatznummer_lfdvorne');
+        return $this->toBoolean($option);
     }
 
     /**
@@ -170,9 +185,9 @@ class Options
      *
      * @return bool
      */
-    public static function isFlushRewriteRules()
+    public function isFlushRewriteRules()
     {
-        return self::getBoolOption('einsatzvw_flush_rewrite_rules');
+        return $this->getBoolOption('einsatzvw_flush_rewrite_rules');
     }
 
     /**
@@ -180,19 +195,19 @@ class Options
      *
      * @return bool
      */
-    public static function isHideEmptyDetails()
+    public function isHideEmptyDetails()
     {
-        $option = self::getOption('einsatzvw_einsatz_hideemptydetails');
-        return self::toBoolean($option);
+        $option = $this->getOption('einsatzvw_einsatz_hideemptydetails');
+        return $this->toBoolean($option);
     }
 
     /**
      * @return bool
      */
-    public static function isOpenExtEinsatzmittelNewWindow()
+    public function isOpenExtEinsatzmittelNewWindow()
     {
-        $option = self::getOption('einsatzvw_open_ext_in_new');
-        return self::toBoolean($option);
+        $option = $this->getOption('einsatzvw_open_ext_in_new');
+        return $this->toBoolean($option);
     }
 
     /**
@@ -200,50 +215,50 @@ class Options
      *
      * @return bool
      */
-    public static function isRoleAllowedToEdit($roleSlug)
+    public function isRoleAllowedToEdit($roleSlug)
     {
         if ($roleSlug === 'administrator') {
             return true;
         }
 
-        $option = self::getOption('einsatzvw_cap_roles_' . $roleSlug);
-        return self::toBoolean($option);
+        $option = $this->getOption('einsatzvw_cap_roles_' . $roleSlug);
+        return $this->toBoolean($option);
     }
 
     /**
      * @return bool
      */
-    public static function isShowEinsatzartArchive()
+    public function isShowEinsatzartArchive()
     {
-        $option = self::getOption('einsatzvw_show_einsatzart_archive');
-        return self::toBoolean($option);
+        $option = $this->getOption('einsatzvw_show_einsatzart_archive');
+        return $this->toBoolean($option);
     }
 
     /**
      * @return bool
      */
-    public static function isShowEinsatzberichteInMainloop()
+    public function isShowEinsatzberichteInMainloop()
     {
-        $option = self::getOption('einsatzvw_show_einsatzberichte_mainloop');
-        return self::toBoolean($option);
+        $option = $this->getOption('einsatzvw_show_einsatzberichte_mainloop');
+        return $this->toBoolean($option);
     }
 
     /**
      * @return bool
      */
-    public static function isShowExtEinsatzmittelArchive()
+    public function isShowExtEinsatzmittelArchive()
     {
-        $option = self::getOption('einsatzvw_show_exteinsatzmittel_archive');
-        return self::toBoolean($option);
+        $option = $this->getOption('einsatzvw_show_exteinsatzmittel_archive');
+        return $this->toBoolean($option);
     }
 
     /**
      * @return bool
      */
-    public static function isShowFahrzeugArchive()
+    public function isShowFahrzeugArchive()
     {
-        $option = self::getOption('einsatzvw_show_fahrzeug_archive');
-        return self::toBoolean($option);
+        $option = $this->getOption('einsatzvw_show_fahrzeug_archive');
+        return $this->toBoolean($option);
     }
 
     /**
@@ -251,7 +266,7 @@ class Options
      *
      * @param bool $value
      */
-    public static function setFlushRewriteRules($value)
+    public function setFlushRewriteRules($value)
     {
         update_option('einsatzvw_flush_rewrite_rules', $value ? 1 : 0);
     }
@@ -261,7 +276,7 @@ class Options
      *
      * @return bool
      */
-    private static function toBoolean($value)
+    private function toBoolean($value)
     {
         return in_array($value, array(1, true, '1', 'yes', 'on'), true);
     }

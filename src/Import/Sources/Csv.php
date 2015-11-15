@@ -8,6 +8,10 @@ use abrain\Einsatzverwaltung\Utilities;
  */
 class Csv extends AbstractSource
 {
+    /**
+     * @var Utilities
+     */
+    protected $utilities;
     private $dateFormats = array('d.m.Y', 'd.m.y', 'Y-m-d', 'm/d/Y', 'm/d/y');
     private $timeFormats = array('H:i', 'G:i', 'H:i:s', 'G:i:s');
     private $csvFilePath;
@@ -17,9 +21,13 @@ class Csv extends AbstractSource
 
     /**
      * Csv constructor.
+     *
+     * @param Utilities $utilities
      */
-    public function __construct()
+    public function __construct($utilities)
     {
+        $this->utilities = $utilities;
+
         $this->actionOrder = array(
             array(
                 'slug' => 'selectcsvfile',
@@ -47,33 +55,33 @@ class Csv extends AbstractSource
      */
     public function checkPreconditions()
     {
-        $this->fileHasHeadlines = (bool) Utilities::getArrayValueIfKey($this->args, 'has_headlines', false);
+        $this->fileHasHeadlines = (bool) $this->utilities->getArrayValueIfKey($this->args, 'has_headlines', false);
 
-        $delimiter = Utilities::getArrayValueIfKey($this->args, 'delimiter', false);
+        $delimiter = $this->utilities->getArrayValueIfKey($this->args, 'delimiter', false);
         if (in_array($delimiter, array(';', ','))) {
             $this->delimiter = $delimiter;
         }
 
         $attachmentId = $this->args['csv_file_id'];
         if (empty($attachmentId)) {
-            Utilities::printError('Keine Datei ausgew&auml;hlt');
+            $this->utilities->printError('Keine Datei ausgew&auml;hlt');
             return false;
         }
 
         if (!is_numeric($attachmentId)) {
-            Utilities::printError('Attachment ID ist keine Zahl');
+            $this->utilities->printError('Attachment ID ist keine Zahl');
             return false;
         }
 
         $csvFilePath = get_attached_file($attachmentId);
         if (empty($csvFilePath)) {
-            Utilities::printError(sprintf('Konnte Attachment mit ID %d nicht finden', $attachmentId));
+            $this->utilities->printError(sprintf('Konnte Attachment mit ID %d nicht finden', $attachmentId));
             return false;
         }
 
         $this->csvFilePath = $csvFilePath;
         if (!file_exists($csvFilePath)) {
-            Utilities::printError('Datei existiert nicht');
+            $this->utilities->printError('Datei existiert nicht');
             return false;
         }
 
@@ -237,7 +245,7 @@ class Csv extends AbstractSource
 
         $handle = fopen($this->csvFilePath, 'r');
         if (empty($handle)) {
-            Utilities::printError('Konnte Datei nicht öffnen');
+            $this->utilities->printError('Konnte Datei nicht öffnen');
             return false;
         }
 

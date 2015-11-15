@@ -9,10 +9,25 @@ use WP_Post;
 class Admin
 {
     /**
-     * Constructor
+     * @var Core
      */
-    public function __construct()
+    private $core;
+
+    /**
+     * @var Utilities
+     */
+    private $utilities;
+
+    /**
+     * Constructor
+     *
+     * @param Core $core
+     * @param Utilities $utilities
+     */
+    public function __construct($core, $utilities)
     {
+        $this->core = $core;
+        $this->utilities = $utilities;
         $this->addHooks();
     }
 
@@ -25,7 +40,7 @@ class Admin
         add_action('dashboard_glance_items', array($this, 'addEinsatzberichteToDashboard')); // since WP 3.8
         add_action('right_now_content_table_end', array($this, 'addEinsatzberichteToDashboardLegacy')); // before WP 3.8
         add_filter('plugin_row_meta', array($this, 'pluginMetaLinks'), 10, 2);
-        add_filter('plugin_action_links_' . Core::$pluginBasename, array($this,'addActionLinks'));
+        add_filter('plugin_action_links_' . $this->core->pluginBasename, array($this,'addActionLinks'));
     }
 
     /**
@@ -54,30 +69,30 @@ class Admin
             // Nur auf der Bearbeitungsseite anzeigen
             wp_enqueue_script(
                 'einsatzverwaltung-edit-script',
-                Core::$scriptUrl . 'einsatzverwaltung-edit.js',
+                $this->core->scriptUrl . 'einsatzverwaltung-edit.js',
                 array('jquery', 'jquery-ui-autocomplete')
             );
             wp_enqueue_style(
                 'einsatzverwaltung-edit',
-                Core::$styleUrl . 'style-edit.css'
+                $this->core->styleUrl . 'style-edit.css'
             );
         } elseif ('settings_page_einsatzvw-settings' == $hook) {
             wp_enqueue_script(
                 'einsatzverwaltung-settings-script',
-                Core::$scriptUrl . 'einsatzverwaltung-settings.js',
+                $this->core->scriptUrl . 'einsatzverwaltung-settings.js',
                 array('jquery-ui-draggable', 'jquery-ui-droppable', 'jquery-ui-sortable')
             );
         }
 
         wp_enqueue_style(
             'font-awesome',
-            Core::$pluginUrl . 'font-awesome/css/font-awesome.min.css',
+            $this->core->pluginUrl . 'font-awesome/css/font-awesome.min.css',
             false,
             '4.4.0'
         );
         wp_enqueue_style(
             'einsatzverwaltung-admin',
-            Core::$styleUrl . 'style-admin.css'
+            $this->core->styleUrl . 'style-admin.css'
         );
     }
 
@@ -107,7 +122,7 @@ class Admin
             __("Einsatznummer", 'einsatzverwaltung'),
             'einsatzverwaltung_nummer',
             esc_attr($nummer),
-            Core::getNextEinsatznummer(date('Y')),
+            $this->core->getNextEinsatznummer(date('Y')),
             10
         );
 
@@ -184,7 +199,7 @@ class Admin
     {
         echo '<tr><td><label for="' . $name . '">' . $label . '</label></td>';
         echo '<td><input type="checkbox" id="' . $name . '" name="' . $name . '" value="1" ';
-        echo Utilities::checked($state) . '/></td></tr>';
+        echo $this->utilities->checked($state) . '/></td></tr>';
     }
 
     /**
@@ -362,7 +377,7 @@ class Admin
      */
     public function pluginMetaLinks($links, $file)
     {
-        if (Core::$pluginBasename === $file) {
+        if ($this->core->pluginBasename === $file) {
             $links[] = '<a href="https://www.abrain.de/category/software/einsatzverwaltung/feed/">Newsfeed</a>';
         }
 

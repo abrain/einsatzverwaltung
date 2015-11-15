@@ -9,13 +9,21 @@ use wpdb;
  */
 class WpEinsatz extends AbstractSource
 {
+    /**
+     * @var Utilities
+     */
+    protected $utilities;
     private $tablename;
 
     /**
      * Constructor
+     *
+     * @param Utilities $utilities
      */
-    public function __construct()
+    public function __construct($utilities)
     {
+        $this->utilities = $utilities;
+
         /** @var wpdb $wpdb */
         global $wpdb;
         $this->tablename = $wpdb->prefix . 'einsaetze';
@@ -47,11 +55,11 @@ class WpEinsatz extends AbstractSource
     {
         global $wpdb; /** @var wpdb $wpdb */
         if ($wpdb->get_var("SHOW TABLES LIKE '$this->tablename'") != $this->tablename) {
-            Utilities::printError('Die Tabelle, in der wp-einsatz seine Daten speichert, konnte nicht gefunden werden.');
+            $this->utilities->printError('Die Tabelle, in der wp-einsatz seine Daten speichert, konnte nicht gefunden werden.');
             return false;
         }
 
-        Utilities::printSuccess('Die Tabelle, in der wp-einsatz seine Daten speichert, wurde gefunden.');
+        $this->utilities->printSuccess('Die Tabelle, in der wp-einsatz seine Daten speichert, wurde gefunden.');
         return true;
     }
 
@@ -82,7 +90,7 @@ class WpEinsatz extends AbstractSource
         $entries = $wpdb->get_results($query, ARRAY_A);
 
         if ($entries === null) {
-            Utilities::printError('Dieser Fehler sollte nicht auftreten, da hat der Entwickler Mist gebaut...');
+            $this->utilities->printError('Dieser Fehler sollte nicht auftreten, da hat der Entwickler Mist gebaut...');
             return false;
         }
 
@@ -139,7 +147,7 @@ class WpEinsatz extends AbstractSource
 
         foreach ($fields as $field) {
             if (strpbrk($field, 'äöüÄÖÜß/#')) {
-                Utilities::printWarning(sprintf(
+                $this->utilities->printWarning(sprintf(
                     'Feldname %s enth&auml;lt Zeichen (z.B. Umlaute oder Sonderzeichen), die beim Import zu Problemen f&uuml;hren.<br>Bitte das Feld in den Einstellungen von wp-einsatz umbenennen, wenn Sie es importieren wollen.',
                     $field
                 ));

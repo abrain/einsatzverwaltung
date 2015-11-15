@@ -10,6 +10,28 @@ use wpdb;
 class Data
 {
     /**
+     * @var Core
+     */
+    private $core;
+
+    /**
+     * @var Utilities
+     */
+    private $utilities;
+
+    /**
+     * Constructor
+     *
+     * @param Core $core
+     * @param Utilities $utilities
+     */
+    public function __construct($core, $utilities)
+    {
+        $this->core = $core;
+        $this->utilities = $utilities;
+    }
+
+    /**
      * Gibt das Term-Object der Alarmierungsart zurück
      *
      * @param int $postId ID des Einsatzberichts
@@ -312,7 +334,7 @@ class Data
 
         // Einsatznummer validieren
         $einsatzjahr = date_format($alarmzeit, 'Y');
-        $einsatzNrFallback = Core::getNextEinsatznummer($einsatzjahr, $einsatzjahr == date('Y'));
+        $einsatzNrFallback = $this->core->getNextEinsatznummer($einsatzjahr, $einsatzjahr == date('Y'));
         $einsatznummer = sanitize_title($_POST['einsatzverwaltung_nummer'], $einsatzNrFallback, 'save');
         if (!empty($einsatznummer)) {
             $updateArgs['post_name'] = $einsatznummer; // Slug setzen
@@ -339,7 +361,7 @@ class Data
         $mannschaftsstaerke = sanitize_text_field($_POST['einsatzverwaltung_mannschaft']);
 
         // Fehlalarm validieren
-        $fehlalarm = Utilities::sanitizeCheckbox(array($_POST, 'einsatzverwaltung_fehlalarm'));
+        $fehlalarm = $this->utilities->sanitizeCheckbox(array($_POST, 'einsatzverwaltung_fehlalarm'));
 
         // Metadaten schreiben
         update_post_meta($postId, 'einsatz_alarmzeit', date_format($alarmzeit, 'Y-m-d H:i'));

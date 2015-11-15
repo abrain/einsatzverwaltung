@@ -15,6 +15,15 @@ use WP_Query;
  */
 class RecentIncidents extends WP_Widget
 {
+    /**
+     * @var Options
+     */
+    private static $options;
+
+    /**
+     * @var Utilities
+     */
+    private static $utilities;
 
     /**
      * Register widget with WordPress.
@@ -26,11 +35,16 @@ class RecentIncidents extends WP_Widget
             'Letzte Eins&auml;tze', // Name
             array('description' => __('Zeigt die neuesten Eins&auml;tze an.', 'einsatzverwaltung'),) // Args
         );
+    }
 
-        // Widget in WordPress registrieren
-        add_action('widgets_init', function () {
-            register_widget('abrain\Einsatzverwaltung\Widgets\RecentIncidents');
-        });
+    /**
+     * @param Options $options
+     * @param Utilities $utilities
+     */
+    public static function setDependencies($options, $utilities)
+    {
+        self::$options = $options;
+        self::$utilities = $utilities;
     }
 
     /**
@@ -44,13 +58,13 @@ class RecentIncidents extends WP_Widget
     public function widget($args, $instance)
     {
         $title = apply_filters('widget_title', $instance['title']);
-        $anzahl = Utilities::getArrayValueIfKey($instance, 'anzahl', 3);
-        $zeigeDatum = Utilities::getArrayValueIfKey($instance, 'zeigeDatum', false);
-        $zeigeZeit = Utilities::getArrayValueIfKey($instance, 'zeigeZeit', false);
-        $zeigeFeedlink = Utilities::getArrayValueIfKey($instance, 'zeigeFeedlink', false);
-        $zeigeOrt = Utilities::getArrayValueIfKey($instance, 'zeigeOrt', false);
-        $zeigeArt = Utilities::getArrayValueIfKey($instance, 'zeigeArt', false);
-        $zeigeArtHierarchie = Utilities::getArrayValueIfKey($instance, 'zeigeArtHierarchie', false);
+        $anzahl = self::$utilities->getArrayValueIfKey($instance, 'anzahl', 3);
+        $zeigeDatum = self::$utilities->getArrayValueIfKey($instance, 'zeigeDatum', false);
+        $zeigeZeit = self::$utilities->getArrayValueIfKey($instance, 'zeigeZeit', false);
+        $zeigeFeedlink = self::$utilities->getArrayValueIfKey($instance, 'zeigeFeedlink', false);
+        $zeigeOrt = self::$utilities->getArrayValueIfKey($instance, 'zeigeOrt', false);
+        $zeigeArt = self::$utilities->getArrayValueIfKey($instance, 'zeigeArt', false);
+        $zeigeArtHierarchie = self::$utilities->getArrayValueIfKey($instance, 'zeigeArtHierarchie', false);
 
         if (empty($title)) {
             $title = "Letzte Eins&auml;tze";
@@ -77,10 +91,10 @@ class RecentIncidents extends WP_Widget
 
             if ($zeigeDatum) {
                 $timestamp = strtotime($nextPost->post_date);
-                $datumsformat = Options::getDateFormat();
+                $datumsformat = self::$options->getDateFormat();
                 $letzteEinsaetze .= "<br><span class=\"einsatzdatum\">".date_i18n($datumsformat, $timestamp)."</span>";
                 if ($zeigeZeit) {
-                    $zeitformat = Options::getTimeFormat();
+                    $zeitformat = self::$options->getTimeFormat();
                     $letzteEinsaetze .= " | <span class=\"einsatzzeit\">".date_i18n($zeitformat, $timestamp)." Uhr</span>";
                 }
             }
@@ -140,12 +154,12 @@ class RecentIncidents extends WP_Widget
             $instance['anzahl'] = $new_instance['anzahl'];
         }
 
-        $instance['zeigeDatum'] = Utilities::getArrayValueIfKey($new_instance, 'zeigeDatum', false);
-        $instance['zeigeZeit'] = Utilities::getArrayValueIfKey($new_instance, 'zeigeZeit', false);
-        $instance['zeigeOrt'] = Utilities::getArrayValueIfKey($new_instance, 'zeigeOrt', false);
-        $instance['zeigeArt'] = Utilities::getArrayValueIfKey($new_instance, 'zeigeArt', false);
-        $instance['zeigeArtHierarchie'] = Utilities::getArrayValueIfKey($new_instance, 'zeigeArtHierarchie', false);
-        $instance['zeigeFeedlink'] = Utilities::getArrayValueIfKey($new_instance, 'zeigeFeedlink', false);
+        $instance['zeigeDatum'] = self::$utilities->getArrayValueIfKey($new_instance, 'zeigeDatum', false);
+        $instance['zeigeZeit'] = self::$utilities->getArrayValueIfKey($new_instance, 'zeigeZeit', false);
+        $instance['zeigeOrt'] = self::$utilities->getArrayValueIfKey($new_instance, 'zeigeOrt', false);
+        $instance['zeigeArt'] = self::$utilities->getArrayValueIfKey($new_instance, 'zeigeArt', false);
+        $instance['zeigeArtHierarchie'] = self::$utilities->getArrayValueIfKey($new_instance, 'zeigeArtHierarchie', false);
+        $instance['zeigeFeedlink'] = self::$utilities->getArrayValueIfKey($new_instance, 'zeigeFeedlink', false);
 
         return $instance;
     }
@@ -160,14 +174,14 @@ class RecentIncidents extends WP_Widget
      */
     public function form($instance)
     {
-        $title = Utilities::getArrayValueIfKey($instance, 'title', __('Letzte Eins&auml;tze', 'einsatzverwaltung'));
-        $anzahl = Utilities::getArrayValueIfKey($instance, 'anzahl', 3);
-        $zeigeDatum = Utilities::getArrayValueIfKey($instance, 'zeigeDatum', false);
-        $zeigeZeit = Utilities::getArrayValueIfKey($instance, 'zeigeZeit', false);
-        $zeigeFeedlink = Utilities::getArrayValueIfKey($instance, 'zeigeFeedlink', false);
-        $zeigeOrt = Utilities::getArrayValueIfKey($instance, 'zeigeOrt', false);
-        $zeigeArt = Utilities::getArrayValueIfKey($instance, 'zeigeArt', false);
-        $zeigeArtHierarchie = Utilities::getArrayValueIfKey($instance, 'zeigeArtHierarchie', false);
+        $title = self::$utilities->getArrayValueIfKey($instance, 'title', __('Letzte Eins&auml;tze', 'einsatzverwaltung'));
+        $anzahl = self::$utilities->getArrayValueIfKey($instance, 'anzahl', 3);
+        $zeigeDatum = self::$utilities->getArrayValueIfKey($instance, 'zeigeDatum', false);
+        $zeigeZeit = self::$utilities->getArrayValueIfKey($instance, 'zeigeZeit', false);
+        $zeigeFeedlink = self::$utilities->getArrayValueIfKey($instance, 'zeigeFeedlink', false);
+        $zeigeOrt = self::$utilities->getArrayValueIfKey($instance, 'zeigeOrt', false);
+        $zeigeArt = self::$utilities->getArrayValueIfKey($instance, 'zeigeArt', false);
+        $zeigeArtHierarchie = self::$utilities->getArrayValueIfKey($instance, 'zeigeArtHierarchie', false);
 
         echo '<p><label for="'.$this->get_field_id('title').'">' . __('Titel:', 'einsatzverwaltung') . '</label>';
         echo '<input class="widefat" id="' . $this->get_field_id('title') . '" name="' . $this->get_field_name('title') . '" type="text" value="' . esc_attr($title).'" /></p>';

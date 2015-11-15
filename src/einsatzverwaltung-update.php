@@ -9,6 +9,20 @@ use wpdb;
 class Update
 {
     /**
+     * @var Core
+     */
+    private $core;
+
+    /**
+     * Update constructor.
+     * @param Core $core
+     */
+    public function __construct($core)
+    {
+        $this->core = $core;
+    }
+
+    /**
      * Fürt ein Update der Datenbank duch
      *
      * @param int $current_db_ver derzeitige Version der Datenbank
@@ -72,7 +86,7 @@ class Update
     {
         update_option('einsatzvw_cap_roles_administrator', 1);
         $role_obj = get_role('administrator');
-        foreach (Core::getCapabilities() as $cap) {
+        foreach ($this->core->getCapabilities() as $cap) {
             $role_obj->add_cap($cap);
         }
     }

@@ -14,7 +14,29 @@ use WP_Post;
  */
 class Formatter
 {
-    private static $tagsNotNeedingPost = array('%feedUrl%');
+    private $tagsNotNeedingPost = array('%feedUrl%');
+
+    /**
+     * @var Options
+     */
+    private $options;
+
+    /**
+     * @var Utilities
+     */
+    private $utilities;
+
+    /**
+     * Formatter constructor.
+     * @param Options $options
+     * @param Utilities $utilities
+     */
+    public function __construct($options, $utilities)
+    {
+        $this->options = $options;
+        $this->utilities = $utilities;
+    }
+
 
     /**
      * @param string $pattern
@@ -23,15 +45,15 @@ class Formatter
      *
      * @return mixed
      */
-    public static function formatIncidentData($pattern, $allowedTags = array(), $post = null)
+    public function formatIncidentData($pattern, $allowedTags = array(), $post = null)
     {
         if (empty($allowedTags)) {
-            $allowedTags = array_keys(self::getTags());
+            $allowedTags = array_keys($this->getTags());
         }
 
         $formattedString = $pattern;
         foreach ($allowedTags as $tag) {
-            $formattedString = self::format($post, $formattedString, $tag);
+            $formattedString = $this->format($post, $formattedString, $tag);
         }
         return $formattedString;
     }
@@ -42,10 +64,10 @@ class Formatter
      * @param string $tag
      * @return mixed|string
      */
-    private static function format($post, $pattern, $tag)
+    private function format($post, $pattern, $tag)
     {
-        if ($post == null && !in_array($tag, self::$tagsNotNeedingPost)) {
-            $message = 'Alle Tags außer ' . implode(',', self::$tagsNotNeedingPost) . ' brauchen ein Post-Objekt';
+        if ($post == null && !in_array($tag, $this->tagsNotNeedingPost)) {
+            $message = 'Alle Tags außer ' . implode(',', $this->tagsNotNeedingPost) . ' brauchen ein Post-Objekt';
             _doing_it_wrong(__FUNCTION__, $message, null);
             return '';
         }
@@ -56,13 +78,13 @@ class Formatter
             case '%date%':
                 $timeOfAlerting = Data::getAlarmzeit($post->ID);
                 $timeOfAlertingTS = strtotime($timeOfAlerting);
-                return str_replace('%date%', date_i18n(Options::getDateFormat(), $timeOfAlertingTS), $pattern);
+                return str_replace('%date%', date_i18n($this->options->getDateFormat(), $timeOfAlertingTS), $pattern);
             case '%time%':
                 $timeOfAlerting = Data::getAlarmzeit($post->ID);
                 $timeOfAlertingTS = strtotime($timeOfAlerting);
-                return str_replace('%time%', date_i18n(Options::getTimeFormat(), $timeOfAlertingTS), $pattern);
+                return str_replace('%time%', date_i18n($this->options->getTimeFormat(), $timeOfAlertingTS), $pattern);
             case '%duration%':
-                return str_replace('%duration%', Utilities::getDurationString(Data::getDauer($post->ID)), $pattern);
+                return str_replace('%duration%', $this->utilities->getDurationString(Data::getDauer($post->ID)), $pattern);
             case '%incidentType%':
                 return str_replace(
                     '%incidentType%',
@@ -85,7 +107,7 @@ class Formatter
     /**
      * @return array Ersetzbare Tags und ihre Beschreibungen
      */
-    public static function getTags()
+    public function getTags()
     {
         return array(
             '%title%' => __('Titel des Einsatzberichts', 'einsatzverwaltung'),

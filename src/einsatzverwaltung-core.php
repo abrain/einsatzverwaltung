@@ -17,6 +17,7 @@ require_once dirname(__FILE__) . '/Import/Tool.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-taxonomies.php';
 
 use abrain\Einsatzverwaltung\Import\Tool as ImportTool;
+use abrain\Einsatzverwaltung\Util\Formatter;
 use abrain\Einsatzverwaltung\Widgets\RecentIncidents;
 use abrain\Einsatzverwaltung\Widgets\RecentIncidentsFormatted;
 use WP_Query;
@@ -29,14 +30,14 @@ class Core
     const VERSION = '1.0.0';
     const DB_VERSION = 5;
 
-    public static $pluginFile;
-    public static $pluginBasename;
-    public static $pluginDir;
-    public static $pluginUrl;
-    public static $scriptUrl;
-    public static $styleUrl;
+    public $pluginFile;
+    public $pluginBasename;
+    public $pluginDir;
+    public $pluginUrl;
+    public $scriptUrl;
+    public $styleUrl;
 
-    private static $args_einsatz = array(
+    private $args_einsatz = array(
         'labels' => array(
             'name' => 'Einsatzberichte',
             'singular_name' => 'Einsatzbericht',
@@ -82,7 +83,7 @@ class Core
         'delete_with_user' => false,
     );
 
-    private static $args_einsatzart = array(
+    private $args_einsatzart = array(
         'label' => 'Einsatzarten',
         'labels' => array(
             'name' => 'Einsatzarten',
@@ -111,7 +112,7 @@ class Core
         'hierarchical' => true
     );
 
-    private static $args_fahrzeug = array(
+    private $args_fahrzeug = array(
         'label' => 'Fahrzeuge',
         'labels' => array(
             'name' => 'Fahrzeuge',
@@ -138,7 +139,7 @@ class Core
         )
     );
 
-    private static $argsExteinsatzmittel = array(
+    private $argsExteinsatzmittel = array(
         'label' => 'Externe Einsatzmittel',
         'labels' => array(
             'name' => 'Externe Einsatzmittel',
@@ -168,7 +169,7 @@ class Core
         )
     );
 
-    private static $args_alarmierungsart = array(
+    private $args_alarmierungsart = array(
         'label' => 'Alarmierungsart',
         'labels' => array(
             'name' => 'Alarmierungsarten',
@@ -195,34 +196,52 @@ class Core
         )
     );
 
+    /**
+     * @var Data
+     */
     private $data;
+    
+    /**
+     * @var Options
+     */
+    private $options;
+    
+    /**
+     * @var Utilities
+     */
+    private $utilities;
 
     /**
      * Constructor
      */
     public function __construct()
     {
-        self::$pluginFile = einsatzverwaltung_plugin_file();
-        self::$pluginBasename = plugin_basename(self::$pluginFile);
-        self::$pluginDir = plugin_dir_path(self::$pluginFile);
-        self::$pluginUrl = plugin_dir_url(self::$pluginFile);
-        self::$scriptUrl = self::$pluginUrl . 'js/';
-        self::$styleUrl = self::$pluginUrl . 'css/';
+        $this->pluginFile = einsatzverwaltung_plugin_file();
+        $this->pluginBasename = plugin_basename($this->pluginFile);
+        $this->pluginDir = plugin_dir_path($this->pluginFile);
+        $this->pluginUrl = plugin_dir_url($this->pluginFile);
+        $this->scriptUrl = $this->pluginUrl . 'js/';
+        $this->styleUrl = $this->pluginUrl . 'css/';
 
-        new Admin();
-        $this->data = new Data();
-        $frontend = new Frontend();
-        new Settings();
+        $this->utilities = new Utilities($this);
+        $this->options = new Options($this->utilities);
+        $this->utilities->setDependencies($this->options);
+
+        new Admin($this, $this->utilities);
+        $this->data = new Data($this, $this->utilities);
+        $frontend = new Frontend($this, $this->options, $this->utilities);
+        new Settings($this, $this->options, $this->utilities);
         new Shortcodes($frontend);
-        new Taxonomies();
+        new Taxonomies($this->utilities);
 
         // Tools
-        new ToolEinsatznummernReparieren($this->data);
-        new ImportTool();
+        new ToolEinsatznummernReparieren($this, $this->data, $this->options);
+        new ImportTool($this, $this->utilities);
 
         // Widgets
-        new RecentIncidents();
-        new RecentIncidentsFormatted();
+        RecentIncidents::setDependencies($this->options, $this->utilities);
+        $formatter = new Formatter($this->options, $this->utilities);
+        RecentIncidentsFormatted::setDependencies($formatter, $this->utilities);
 
         $this->addHooks();
     }
@@ -232,8 +251,9 @@ class Core
         add_action('init', array($this, 'onInit'));
         add_action('plugins_loaded', array($this, 'onPluginsLoaded'));
         add_action('save_post', array($this->data, 'savePostdata'));
-        register_activation_hook(self::$pluginFile, array($this, 'onActivation'));
+        register_activation_hook($this->pluginFile, array($this, 'onActivation'));
         add_filter('posts_where', array($this, 'postsWhere'), 10, 2);
+        add_action('widgets_init', array($this, 'registerWidgets'));
     }
 
     /**
@@ -255,7 +275,7 @@ class Core
 
         // Rechte für Administratoren setzen
         $role_obj = get_role('administrator');
-        foreach (self::getCapabilities() as $cap) {
+        foreach ($this->getCapabilities() as $cap) {
             $role_obj->add_cap($cap, true);
         }
     }
@@ -267,9 +287,9 @@ class Core
     {
         $this->registerTypes();
         $this->addRewriteRules();
-        if (Options::isFlushRewriteRules()) {
+        if ($this->options->isFlushRewriteRules()) {
             flush_rewrite_rules();
-            Options::setFlushRewriteRules(false);
+            $this->options->setFlushRewriteRules(false);
         }
     }
 
@@ -284,27 +304,33 @@ class Core
     private function registerTypes()
     {
         // Anpassungen der Parameter
-        if (Utilities::isMinWPVersion("3.9")) {
-            self::$args_einsatz['menu_icon'] = 'dashicons-media-document';
+        if ($this->utilities->isMinWPVersion("3.9")) {
+            $this->args_einsatz['menu_icon'] = 'dashicons-media-document';
         }
-        self::$args_einsatz['rewrite']['slug'] = Options::getRewriteSlug();
+        $this->args_einsatz['rewrite']['slug'] = $this->options->getRewriteSlug();
 
-        register_post_type('einsatz', self::$args_einsatz);
-        register_taxonomy('einsatzart', 'einsatz', self::$args_einsatzart);
-        register_taxonomy('fahrzeug', 'einsatz', self::$args_fahrzeug);
-        register_taxonomy('exteinsatzmittel', 'einsatz', self::$argsExteinsatzmittel);
-        register_taxonomy('alarmierungsart', 'einsatz', self::$args_alarmierungsart);
+        register_post_type('einsatz', $this->args_einsatz);
+        register_taxonomy('einsatzart', 'einsatz', $this->args_einsatzart);
+        register_taxonomy('fahrzeug', 'einsatz', $this->args_fahrzeug);
+        register_taxonomy('exteinsatzmittel', 'einsatz', $this->argsExteinsatzmittel);
+        register_taxonomy('alarmierungsart', 'einsatz', $this->args_alarmierungsart);
     }
 
     private function addRewriteRules()
     {
-        $base = Options::getRewriteSlug();
+        $base = $this->options->getRewriteSlug();
         add_rewrite_rule(
             $base . '/(\d{4})/page/(\d{1,})/?$',
             'index.php?post_type=einsatz&year=$matches[1]&paged=$matches[2]',
             'top'
         );
         add_rewrite_rule($base . '/(\d{4})/?$', 'index.php?post_type=einsatz&year=$matches[1]', 'top');
+    }
+
+    public function registerWidgets()
+    {
+        register_widget('abrain\Einsatzverwaltung\Widgets\RecentIncidents');
+        register_widget('abrain\Einsatzverwaltung\Widgets\RecentIncidentsFormatted');
     }
 
     /**
@@ -319,7 +345,7 @@ class Core
      */
     public function postsWhere($where, $wpq)
     {
-        if ($wpq->is_category && $wpq->get_queried_object_id() === Options::getEinsatzberichteCategory()) {
+        if ($wpq->is_category && $wpq->get_queried_object_id() === $this->options->getEinsatzberichteCategory()) {
             // Einsatzberichte in die eingestellte Kategorie einblenden
             global $wpdb;
             return $where . " OR {$wpdb->posts}.post_type = 'einsatz' AND ({$wpdb->posts}.post_status = 'publish' OR {$wpdb->posts}.post_status = 'private')";
@@ -337,7 +363,7 @@ class Core
      *
      * @return string Nächste freie Einsatznummer im angegebenen Jahr
      */
-    public static function getNextEinsatznummer($jahr, $minuseins = false)
+    public function getNextEinsatznummer($jahr, $minuseins = false)
     {
         if (empty($jahr) || !is_numeric($jahr)) {
             $jahr = date('Y');
@@ -348,7 +374,7 @@ class Core
             'post_status' => array('publish', 'private'),
             'nopaging' => true
         ));
-        return self::formatEinsatznummer($jahr, $query->found_posts + ($minuseins ? 0 : 1));
+        return $this->formatEinsatznummer($jahr, $query->found_posts + ($minuseins ? 0 : 1));
     }
 
     /**
@@ -359,10 +385,10 @@ class Core
      *
      * @return string Formatierte Einsatznummer
      */
-    public static function formatEinsatznummer($jahr, $nummer)
+    public function formatEinsatznummer($jahr, $nummer)
     {
-        $stellen = Options::getEinsatznummerStellen();
-        $lfdvorne = Options::isEinsatznummerLfdVorne();
+        $stellen = $this->options->getEinsatznummerStellen();
+        $lfdvorne = $this->options->isEinsatznummerLfdVorne();
         if ($lfdvorne) {
             return str_pad($nummer, $stellen, "0", STR_PAD_LEFT).$jahr;
         } else {
@@ -375,7 +401,7 @@ class Core
      *
      * @return array
      */
-    public static function getListColumns()
+    public function getListColumns()
     {
         return array(
             'number' => array(
@@ -435,7 +461,7 @@ class Core
      *
      * @return array
      */
-    public static function getExcerptTypes()
+    public function getExcerptTypes()
     {
         return array(
             'none' => 'Leer',
@@ -449,7 +475,7 @@ class Core
      *
      * @return array
      */
-    public static function getCapabilities()
+    public function getCapabilities()
     {
         return array(
             'edit_einsatzberichte',
@@ -473,7 +499,7 @@ class Core
         }
 
         require_once(__DIR__ . '/einsatzverwaltung-update.php');
-        $update = new Update();
+        $update = new Update($this);
         $update->doUpdate($currentDbVersion, self::DB_VERSION);
     }
 }

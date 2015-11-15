@@ -8,6 +8,11 @@ use wpdb;
  */
 class Taxonomies
 {
+    /**
+     * @var Utilities
+     */
+    private $utilities;
+
     private static $taxonomies = array(
         'exteinsatzmittel' => array('url'),
         'fahrzeug' => array('fahrzeugpid', 'vehicleorder')
@@ -15,9 +20,12 @@ class Taxonomies
 
     /**
      * Constructor
+     *
+     * @param Utilities $utilities
      */
-    public function __construct()
+    public function __construct($utilities)
     {
+        $this->utilities = $utilities;
         $this->addHooks();
     }
 
@@ -72,7 +80,7 @@ class Taxonomies
     {
         echo '<div class="form-field">';
         echo '<label for="tag-fahrzeugpid">Fahrzeugseite</label>';
-        Utilities::dropdownPosts(array(
+        $this->utilities->dropdownPosts(array(
             'name' => 'fahrzeugpid',
             'post_type' => $this->getFahrzeugPostTypes()
         ));
@@ -95,7 +103,7 @@ class Taxonomies
 
         echo '<tr class="form-field">';
         echo '<th scope="row"><label for="fahrzeugpid">Fahrzeugseite</label></th><td>';
-        Utilities::dropdownPosts(array(
+        $this->utilities->dropdownPosts(array(
             'selected' => $fahrzeug_pid,
             'name' => 'fahrzeugpid',
             'post_type' => $this->getFahrzeugPostTypes()

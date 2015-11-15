@@ -8,12 +8,23 @@ use abrain\Einsatzverwaltung\Utilities;
  */
 abstract class AbstractSource
 {
+    /**
+     * @var Utilities
+     */
+    protected $utilities;
     protected $actionOrder = array();
     protected $args = array();
     protected $autoMatchFields = array();
     protected $internalFields = array('post_name');
     protected $problematicFields = array();
     protected $cachedFields;
+
+    /**
+     * AbstractSource constructor.
+     *
+     * @param Utilities $utilities
+     */
+    abstract public function __construct($utilities);
 
     /**
      * @return boolean True, wenn Voraussetzungen stimmen, ansonsten false
@@ -154,7 +165,7 @@ abstract class AbstractSource
                     if (array_key_exists($ownField, $ownFields)) {
                         $mapping[$sourceField] = $ownField;
                     } else {
-                        Utilities::printWarning("Unbekanntes Feld: $ownField");
+                        $this->utilities->printWarning("Unbekanntes Feld: $ownField");
                     }
                 }
             }

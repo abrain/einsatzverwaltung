@@ -1,6 +1,7 @@
 <?php
 namespace abrain\Einsatzverwaltung\Import;
 
+use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\Import\Sources\AbstractSource;
 use abrain\Einsatzverwaltung\Import\Sources\Csv;
 use abrain\Einsatzverwaltung\Import\Sources\WpEinsatz;
@@ -37,10 +38,25 @@ class Tool
     private $helper;
 
     /**
-     * Konstruktor
+     * @var Utilities
      */
-    public function __construct()
+    private $utilities;
+
+    /**
+     * @var Core
+     */
+    private $core;
+
+    /**
+     * Konstruktor
+     *
+     * @param Core $core
+     * @param Utilities $utilities
+     */
+    public function __construct($core, $utilities)
     {
+        $this->core = $core;
+        $this->utilities = $utilities;
         $this->addHooks();
         $this->loadSources();
     }
@@ -87,11 +103,11 @@ class Tool
     {
         require_once dirname(__FILE__) . '/Sources/AbstractSource.php';
         require_once dirname(__FILE__) . '/Sources/WpEinsatz.php';
-        $wpEinsatz = new WpEinsatz();
+        $wpEinsatz = new WpEinsatz($this->utilities);
         $this->sources[$wpEinsatz->getIdentifier()] = $wpEinsatz;
 
         require_once dirname(__FILE__) . '/Sources/Csv.php';
-        $csv = new Csv();
+        $csv = new Csv($this->utilities);
         $this->sources[$csv->getIdentifier()] = $csv;
     }
 
@@ -101,7 +117,7 @@ class Tool
     public function renderToolPage()
     {
         require_once dirname(__FILE__) . '/Helper.php';
-        $this->helper = new Helper();
+        $this->helper = new Helper($this->utilities, $this->core);
 
         echo '<div class="wrap">';
         echo '<h1>' . __('Einsatzberichte importieren', 'einsatzverwaltung') . '</h1>';
@@ -173,7 +189,7 @@ class Tool
             $this->importPage();
         } elseif ('selectcsvfile' == $aktion) {
             if (false === $this->nextAction) {
-                Utilities::printError('Keine Nachfolgeaktion gefunden!');
+                $this->utilities->printError('Keine Nachfolgeaktion gefunden!');
                 return;
             }
 
@@ -186,7 +202,7 @@ class Tool
             ));
 
             if (empty($csvAttachments)) {
-                Utilities::printInfo('Bitte lade die zu importierende CSV-Datei <a href="' . admin_url('media-new.php') . '">hier</a> in die Mediathek hoch. Nach dem Import kann und sollte die Datei aus der Mediathek gel&ouml;scht werden, sofern sie nicht &ouml;ffentlich zug&auml;nglich sein soll.');
+                $this->utilities->printInfo('Bitte lade die zu importierende CSV-Datei <a href="' . admin_url('media-new.php') . '">hier</a> in die Mediathek hoch. Nach dem Import kann und sollte die Datei aus der Mediathek gel&ouml;scht werden, sofern sie nicht &ouml;ffentlich zug&auml;nglich sein soll.');
                 return;
             }
 
@@ -225,16 +241,16 @@ class Tool
 
         $felder = $this->currentSource->getFields();
         if (empty($felder)) {
-            Utilities::printError('Es wurden keine Felder gefunden');
+            $this->utilities->printError('Es wurden keine Felder gefunden');
             return;
         }
-        Utilities::printSuccess('Es wurden folgende Felder gefunden: ' . implode($felder, ', '));
+        $this->utilities->printSuccess('Es wurden folgende Felder gefunden: ' . implode($felder, ', '));
 
         // Auf Pflichtfelder prüfen
         $mandatoryFieldsOk = true;
         foreach (array_keys($this->currentSource->getAutoMatchFields()) as $autoMatchField) {
             if (!in_array($autoMatchField, $felder)) {
-                Utilities::printError(
+                $this->utilities->printError(
                     sprintf('Das automatisch zu importierende Feld %s konnte nicht gefunden werden!', $autoMatchField)
                 );
                 $mandatoryFieldsOk = false;
@@ -250,10 +266,10 @@ class Tool
             return;
         }
         if (empty($entries)) {
-            Utilities::printWarning('Es wurden keine Eins&auml;tze gefunden.');
+            $this->utilities->printWarning('Es wurden keine Eins&auml;tze gefunden.');
             return;
         }
-        Utilities::printSuccess(sprintf("Es wurden %s Eins&auml;tze gefunden", count($entries)));
+        $this->utilities->printSuccess(sprintf("Es wurden %s Eins&auml;tze gefunden", count($entries)));
 
         // Hinweise ausgeben
         echo '<h3>Hinweise zu den erwarteten Daten</h3>';
@@ -270,7 +286,7 @@ class Tool
         // Felder matchen
         echo "<h3>Felder zuordnen</h3>";
         if (false === $this->nextAction) {
-            Utilities::printError('Keine Nachfolgeaktion gefunden!');
+            $this->utilities->printError('Keine Nachfolgeaktion gefunden!');
             return;
         }
 
@@ -289,7 +305,7 @@ class Tool
 
         $sourceFields = $this->currentSource->getFields();
         if (empty($sourceFields)) {
-            Utilities::printError('Es wurden keine Felder gefunden');
+            $this->utilities->printError('Es wurden keine Felder gefunden');
             return;
         }
 

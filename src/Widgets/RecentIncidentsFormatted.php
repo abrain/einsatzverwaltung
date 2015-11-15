@@ -12,6 +12,16 @@ use WP_Widget;
  */
 class RecentIncidentsFormatted extends WP_Widget
 {
+    /**
+     * @var Formatter
+     */
+    private static $formatter;
+
+    /**
+     * @var Utilities
+     */
+    private static $utilities;
+
     private $allowedHtmlTags = array(
         'a' => array(
             'href' => true,
@@ -113,11 +123,16 @@ class RecentIncidentsFormatted extends WP_Widget
                     __('Das Aussehen kann vollst&auml;ndig mit eigenem HTML bestimmt werden.', 'einsatzverwaltung')
             )
         );
+    }
 
-        // Widget in WordPress registrieren
-        add_action('widgets_init', function () {
-            register_widget('abrain\Einsatzverwaltung\Widgets\RecentIncidentsFormatted');
-        });
+    /**
+     * @param Formatter $formatter
+     * @param Utilities $utilities
+     */
+    public static function setDependencies($formatter, $utilities)
+    {
+        self::$formatter = $formatter;
+        self::$utilities = $utilities;
     }
 
     /**
@@ -149,9 +164,9 @@ class RecentIncidentsFormatted extends WP_Widget
 
         $widgetContent = $settings['beforeContent'];
         foreach ($incidents as $incident) {
-            $widgetContent .= Formatter::formatIncidentData($settings['pattern'], $this->allowedTagsPattern, $incident);
+            $widgetContent .= self::$formatter->formatIncidentData($settings['pattern'], $this->allowedTagsPattern, $incident);
         }
-        $widgetContent .= Formatter::formatIncidentData($settings['afterContent'], $this->allowedTagsAfter);
+        $widgetContent .= self::$formatter->formatIncidentData($settings['afterContent'], $this->allowedTagsAfter);
 
         echo wp_kses($widgetContent, $this->allowedHtmlTags);
         echo $args['after_widget'];
@@ -169,7 +184,7 @@ class RecentIncidentsFormatted extends WP_Widget
     {
         $instance = array();
         $instance['title'] = strip_tags($newInstance['title']);
-        $instance['numIncidents'] = Utilities::sanitizeNumberGreaterZero(
+        $instance['numIncidents'] = self::$utilities->sanitizeNumberGreaterZero(
             $newInstance['numIncidents'],
             $this->defaults['numIncidents']
         );
@@ -195,11 +210,11 @@ class RecentIncidentsFormatted extends WP_Widget
             $this->get_field_id('title'),
             __('Titel:', 'einsatzverwaltung'),
             $this->get_field_name('title'),
-            esc_attr(Utilities::getArrayValueIfKey($instance, 'title', ''))
+            esc_attr(self::$utilities->getArrayValueIfKey($instance, 'title', ''))
         );
         echo '</p>';
 
-        $numIncidents = Utilities::getArrayValueIfKey($instance, 'numIncidents', $this->defaults['numIncidents']);
+        $numIncidents = self::$utilities->getArrayValueIfKey($instance, 'numIncidents', $this->defaults['numIncidents']);
         echo '<p>';
         printf(
             '<label for="%1$s">%2$s</label>&nbsp;<input id="%1$s" name="%3$s" type="text" value="%4$s" size="3" />',
@@ -216,7 +231,7 @@ class RecentIncidentsFormatted extends WP_Widget
             $this->get_field_id('beforeContent'),
             __('HTML-Code vor den Einsatzberichten:', 'einsatzverwaltung'),
             $this->get_field_name('beforeContent'),
-            Utilities::getArrayValueIfKey($instance, 'beforeContent', '')
+            self::$utilities->getArrayValueIfKey($instance, 'beforeContent', '')
         );
         echo '</p>';
 
@@ -226,10 +241,10 @@ class RecentIncidentsFormatted extends WP_Widget
             $this->get_field_id('pattern'),
             __('HTML-Template pro Einsatzbericht:', 'einsatzverwaltung'),
             $this->get_field_name('pattern'),
-            Utilities::getArrayValueIfKey($instance, 'pattern', '')
+            self::$utilities->getArrayValueIfKey($instance, 'pattern', '')
         );
         echo '</p><p class="description">' . __('Folgende Tags werden ersetzt:', 'einsatzverwaltung');
-        $formatterTags = Formatter::getTags();
+        $formatterTags = self::$formatter->getTags();
         foreach ($this->allowedTagsPattern as $tag) {
             echo '<br>' . $tag . ' (' . $formatterTags[$tag] . ')';
         }
@@ -241,7 +256,7 @@ class RecentIncidentsFormatted extends WP_Widget
             $this->get_field_id('afterContent'),
             __('HTML-Code nach den Einsatzberichten:', 'einsatzverwaltung'),
             $this->get_field_name('afterContent'),
-            Utilities::getArrayValueIfKey($instance, 'afterContent', '')
+            self::$utilities->getArrayValueIfKey($instance, 'afterContent', '')
         );
         echo '</p><p class="description">' . __('Folgende Tags werden ersetzt:', 'einsatzverwaltung');
         foreach ($this->allowedTagsAfter as $tag) {

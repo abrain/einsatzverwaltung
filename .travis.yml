@@ -1,0 +1,40 @@
+language: php
+
+notifications:
+  email:
+    on_success: never
+    on_failure: change
+
+matrix:
+  include:
+    - php: 5.3
+      env: WP_VERSION=latest WP_MULTISITE=0
+    - php: 5.3
+      env: WP_VERSION=3.7 WP_MULTISITE=0
+    - php: 5.4
+      env: WP_VERSION=latest WP_MULTISITE=0
+    - php: 5.5
+      env: WP_VERSION=latest WP_MULTISITE=0
+    - php: 5.6
+      env: WP_VERSION=latest WP_MULTISITE=0
+    - php: hhvm
+      env: WP_VERSION=latest WP_MULTISITE=0
+    - php: nightly
+      env: WP_VERSION=latest WP_MULTISITE=0
+allow_failures:
+  - php: hhvm
+  - php: nightly
+fast_finish: true
+
+before_script:
+  - bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
+  - composer install --dev
+
+script: phpunit
+
+after_script:
+  - CODECLIMATE_REPO_TOKEN=c0e18ea554a37a7495947a34c818939c0599bde7c1efa3ee136989c053dde9da ./vendor/bin/test-reporter
+
+addons:
+    code_climate:
+        repo_token: c0e18ea554a37a7495947a34c818939c0599bde7c1efa3ee136989c053dde9da

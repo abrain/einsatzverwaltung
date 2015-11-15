@@ -1,37 +1,29 @@
-#Einsatzverwaltung
-##Plugin zur Verwaltung von Feuerwehreins&auml;tzen
+# Einsatzverwaltung
+## Plugin zur Verwaltung von Feuerwehreins&auml;tzen
 
-[![Flattr](https://api.flattr.com/button/flattr-badge-large.png)](http://flattr.com/thing/2638688/abraineinsatzverwaltung-on-GitHub)
+[![Flattr](https://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/thing/2638688/abraineinsatzverwaltung-on-GitHub) [![Build Status](https://travis-ci.org/abrain/einsatzverwaltung.svg)](https://travis-ci.org/abrain/einsatzverwaltung) [![Code Climate](https://codeclimate.com/github/abrain/einsatzverwaltung/badges/gpa.svg)](https://codeclimate.com/github/abrain/einsatzverwaltung)
 
-Dieses Plugin f&uuml;gt WordPress eine neue Beitragsart "Einsatzbericht" hinzu. Dieser kann wie ein normaler Beitrag ver&ouml;ffentlicht werden und somit zus&auml;tzlichen Inhalt wie z.B. Bilder bieten. Jeder Bericht bekommt eine eindeutige Einsatznummer und ist mit Alarmzeit und Einsatzdauer versehen. Zus&auml;tzlich kann man Einsatzart, eingesetzte Fahrzeuge, externe Kr&auml;fte und mehr angeben.
+Dieses Plugin f&uuml;gt WordPress eine neue Beitragsart "Einsatzbericht" hinzu. Diese Einsatzberichte werden wie gew&ouml;hnliche WordPress-Beitr&auml;ge erstellt, es k&ouml;nnen aber zus&auml;tzliche Informationen wie Alarmzeit, Art des Einsatzes, eingesetzte Fahrzeuge und vieles mehr angegeben werden. Zudem stellt das Plugin verschiedene M&ouml;glichkeiten zur Darstellung der Einsatzberichte zur Verf&uuml;gung.
 
 Die prim&auml;re Zielgruppe des Plugins sind Feuerwehren im deutschsprachigen Raum, es ist aber genauso geeignet f&uuml;r Rettungsdienste, die Wasserwacht, das THW und sonstige Hilfsorganisationen, die ihre Eins&auml;tze im Internet pr&auml;sentieren m&ouml;chten.
 
-[Anleitung](https://www.abrain.de/software/einsatzverwaltung/anleitung/)
-
-### Funktionen im &Uuml;berblick:
-
-* Einsatzberichte als vollwertige Beitr&auml;ge ver&ouml;ffentlichen
-* Information &uuml;ber Einsatzart, eingesetzte Fahrzeuge, Dauer und vieles mehr
-* Shortcode zum Einbinden einer Liste von Eins&auml;tzen eines Jahres
-* Widget zeigt die aktuellsten X Eins&auml;tze
-* Import aus wp-einsatz
+[Plugin auf wordpress.org](https://wordpress.org/plugins/einsatzverwaltung/) - [Benutzerhandbuch](https://www.abrain.de/software/einsatzverwaltung/anleitung/) - [Changelog](https://github.com/abrain/einsatzverwaltung/releases)
 
 Uses Font Awesome by Dave Gandy - http://fontawesome.io
 
-### Installation
+### Hinweise f&uuml;r Entwickler
+Dieses Projekt arbeitet mit [git-flow](http://nvie.com/posts/a-successful-git-branching-model/).
+Die Entwicklung findet im Branch [develop](https://github.com/abrain/einsatzverwaltung/tree/develop) statt, im Branch [master](https://github.com/abrain/einsatzverwaltung/tree/master) befindet sich immer der Stand der zuletzt ver&ouml;ffentlichten Version.
+Pull Requests werden nur im Branch `develop` angenommen.
 
-Das Plugin kann entweder aus WordPress heraus aus dem [Pluginverzeichnis](http://wordpress.org/plugins/einsatzverwaltung/) installiert werden oder aber durch Hochladen der Plugindateien in das Verzeichnis `/wp-content/plugins/`.
+Das Plugin an sich liegt im Ordner `src`, alles andere dient der Unterst&uuml;tzung bei der Entwicklung.
+Code aus einem anderen Branch als `master` sollte nicht f&uuml;r Produktivsysteme verwendet werden.
 
-In beiden F&auml;llen muss das Plugin erst aktiviert werden, bevor es benutzt werden kann.
+Der PHP-Code wird gem&auml;&szlig; dem Coding Style Guide [PSR-2](http://www.php-fig.org/psr/psr-2/) formatiert.
 
-In diesem Repository befindet sich mehr als die Plugindateien, f&uuml;r den Betrieb ist nur der Inhalt des Ordners `src` n&ouml;tig.
-
-__Es wird PHP 5.3.0 oder neuer ben&ouml;tigt__
-
-### Changelog
-
-Siehe https://github.com/abrain/einsatzverwaltung/releases
+### Mindestvoraussetzungen
+* PHP: 5.3.0
+* WordPress: 3.4
 
 ### Social Media
 

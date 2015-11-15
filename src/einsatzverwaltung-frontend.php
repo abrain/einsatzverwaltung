@@ -10,10 +10,32 @@ use WP_Query;
 class Frontend
 {
     /**
-     * Constructor
+     * @var Core
      */
-    public function __construct()
+    private $core;
+
+    /**
+     * @var Options
+     */
+    private $options;
+    
+    /**
+     * @var Utilities
+     */
+    private $utilities;
+
+    /**
+     * Constructor
+     *
+     * @param Core $core
+     * @param Options $options
+     * @param Utilities $utilities
+     */
+    public function __construct($core, $options, $utilities)
     {
+        $this->core = $core;
+        $this->options = $options;
+        $this->utilities = $utilities;
         $this->addHooks();
     }
 
@@ -33,13 +55,13 @@ class Frontend
     {
         wp_enqueue_style(
             'font-awesome',
-            Core::$pluginUrl . 'font-awesome/css/font-awesome.min.css',
+            $this->core->pluginUrl . 'font-awesome/css/font-awesome.min.css',
             false,
             '4.4.0'
         );
         wp_enqueue_style(
             'einsatzverwaltung-frontend',
-            Core::$styleUrl . 'style-frontend.css'
+            $this->core->styleUrl . 'style-frontend.css'
         );
     }
 
@@ -85,10 +107,10 @@ class Frontend
             $alarm_string = self::getAlarmierungsartString($alarmierungsarten);
 
             $duration = Data::getDauer($post->ID);
-            $dauerstring = ($duration === false ? '' : Utilities::getDurationString($duration));
+            $dauerstring = ($duration === false ? '' : $this->utilities->getDurationString($duration));
 
             $einsatzart = Data::getEinsatzart($post->ID);
-            $showEinsatzartArchiveLink = $showArchiveLinks && Options::isShowEinsatzartArchive();
+            $showEinsatzartArchiveLink = $showArchiveLinks && $this->options->isShowEinsatzartArchive();
             $art = self::getEinsatzartString($einsatzart, $make_links, $showEinsatzartArchiveLink);
 
             $fehlalarm = Data::getFehlalarm($post->ID);
@@ -111,8 +133,8 @@ class Frontend
 
             $alarmzeit = Data::getAlarmzeit($post->ID);
             $alarm_timestamp = strtotime($alarmzeit);
-            $datumsformat = Options::getDateFormat();
-            $zeitformat = Options::getTimeFormat();
+            $datumsformat = $this->options->getDateFormat();
+            $zeitformat = $this->options->getTimeFormat();
             $einsatz_datum = ($alarm_timestamp ? date_i18n($datumsformat, $alarm_timestamp) : '-');
             $einsatz_zeit = ($alarm_timestamp ? date_i18n($zeitformat, $alarm_timestamp).' Uhr' : '-');
 
@@ -144,7 +166,7 @@ class Frontend
      */
     private function getDetailString($title, $value, $newline = true)
     {
-        if (Options::isHideEmptyDetails() && (!isset($value) || $value === '')) {
+        if ($this->options->isHideEmptyDetails() && (!isset($value) || $value === '')) {
             return '';
         }
 
@@ -203,7 +225,7 @@ class Frontend
             return $excerpt;
         }
 
-        $excerptType = Options::getExcerptType();
+        $excerptType = $this->options->getExcerptType();
         return $this->getEinsatzExcerpt($post, $excerptType, true, true);
     }
 
@@ -223,7 +245,7 @@ class Frontend
             return $excerpt;
         }
 
-        $excerptType = Options::getExcerptTypeFeed();
+        $excerptType = $this->options->getExcerptTypeFeed();
         $get_excerpt = $this->getEinsatzExcerpt($post, $excerptType, true, false);
         $get_excerpt = str_replace('<strong>', '', $get_excerpt);
         $get_excerpt = str_replace('</strong>', '', $get_excerpt);
@@ -261,7 +283,7 @@ class Frontend
     public function addEinsatzberichteToMainloop($query)
     {
         if ((
-                is_home() && Options::isShowEinsatzberichteInMainloop() ||
+                is_home() && $this->options->isShowEinsatzberichteInMainloop() ||
                 is_tag()
             ) &&
             $query->is_main_query() &&
@@ -295,7 +317,7 @@ class Frontend
             rsort($einsatzjahre);
         }
 
-        $enabledColumns = Options::getEinsatzlisteEnabledColumns();
+        $enabledColumns = $this->options->getEinsatzlisteEnabledColumns();
         $numEnabledColumns = count($enabledColumns);
 
         $string = '<table class="einsatzliste">';
@@ -361,8 +383,8 @@ class Frontend
      */
     private function getEinsatzlisteHeader()
     {
-        $columns = Core::getListColumns();
-        $enabledColumns = Options::getEinsatzlisteEnabledColumns();
+        $columns = $this->core->getListColumns();
+        $enabledColumns = $this->options->getEinsatzlisteEnabledColumns();
 
         $string = '<tr class="einsatzliste-header">';
         foreach ($enabledColumns as $colId) {
@@ -371,7 +393,7 @@ class Frontend
             }
 
             $colInfo = $columns[$colId];
-            $style = Utilities::getArrayValueIfKey($colInfo, 'nowrap', false) ? 'white-space: nowrap;' : '';
+            $style = $this->utilities->getArrayValueIfKey($colInfo, 'nowrap', false) ? 'white-space: nowrap;' : '';
             $string .= '<th' . (empty($style) ? '' : ' style="' . $style . '"') . '>' . $colInfo['name'] . '</th>';
         }
         $string .= "</tr>";
@@ -426,11 +448,11 @@ class Frontend
                 break;
             case 'duration':
                 $minutes = Data::getDauer($postId);
-                return Utilities::getDurationString($minutes, true);
+                return $this->utilities->getDurationString($minutes, true);
                 break;
             case 'vehicles':
                 $vehicles = Data::getFahrzeuge($postId);
-                $makeFahrzeugLinks = Options::getBoolOption('einsatzvw_list_fahrzeuge_link');
+                $makeFahrzeugLinks = $this->options->getBoolOption('einsatzvw_list_fahrzeuge_link');
                 return self::getFahrzeugeString($vehicles, $makeFahrzeugLinks, false);
                 break;
             case 'alarmType':
@@ -439,12 +461,12 @@ class Frontend
                 break;
             case 'additionalForces':
                 $exteinsatzmittel = Data::getWeitereKraefte($postId);
-                $makeLinks = Options::getBoolOption('einsatzvw_list_ext_link');
+                $makeLinks = $this->options->getBoolOption('einsatzvw_list_ext_link');
                 return self::getWeitereKraefteString($exteinsatzmittel, $makeLinks, false);
                 break;
             case 'incidentType':
                 $einsatzart = Data::getEinsatzart($postId);
-                $showHierarchy = Options::getBoolOption('einsatzvw_list_art_hierarchy');
+                $showHierarchy = $this->options->getBoolOption('einsatzvw_list_art_hierarchy');
                 return self::getEinsatzartString($einsatzart, false, false, $showHierarchy);
                 break;
             default:
@@ -513,7 +535,7 @@ class Frontend
      *
      * @return string
      */
-    public static function getFahrzeugeString($fahrzeuge, $makeLinks, $showArchiveLinks)
+    public function getFahrzeugeString($fahrzeuge, $makeLinks, $showArchiveLinks)
     {
         if ($fahrzeuge === false || is_wp_error($fahrzeuge) || !is_array($fahrzeuge)) {
             return '';
@@ -533,7 +555,7 @@ class Frontend
                 }
             }
 
-            if ($makeLinks && $showArchiveLinks && Options::isShowFahrzeugArchive()) {
+            if ($makeLinks && $showArchiveLinks && $this->options->isShowFahrzeugArchive()) {
                 $fzg_name .= '&nbsp;<a href="'.get_term_link($fahrzeug).'" class="fa fa-filter" style="text-decoration:none;" title="Eins&auml;tze unter Beteiligung von '.$fahrzeug->name.' anzeigen"></a>';
             }
 
@@ -549,7 +571,7 @@ class Frontend
      *
      * @return string
      */
-    public static function getWeitereKraefteString($exteinsatzmittel, $makeLinks, $showArchiveLinks)
+    public function getWeitereKraefteString($exteinsatzmittel, $makeLinks, $showArchiveLinks)
     {
         if ($exteinsatzmittel === false || is_wp_error($exteinsatzmittel) || !is_array($exteinsatzmittel)) {
             return '';
@@ -562,13 +584,13 @@ class Frontend
             if ($makeLinks) {
                 $url = Taxonomies::getTermField($ext->term_id, 'exteinsatzmittel', 'url');
                 if ($url !== false) {
-                    $open_in_new_window = Options::isOpenExtEinsatzmittelNewWindow();
+                    $open_in_new_window = $this->options->isOpenExtEinsatzmittelNewWindow();
                     $ext_name = '<a href="'.$url.'" title="Mehr Informationen zu '.$ext->name.'"';
                     $ext_name .= ($open_in_new_window ? ' target="_blank"' : '') . '>'.$ext->name.'</a>';
                 }
             }
 
-            if ($makeLinks && $showArchiveLinks && Options::isShowExtEinsatzmittelArchive()) {
+            if ($makeLinks && $showArchiveLinks && $this->options->isShowExtEinsatzmittelArchive()) {
                 $title = 'Eins&auml;tze unter Beteiligung von ' . $ext->name . ' anzeigen';
                 $ext_name .= '&nbsp;<a href="'.get_term_link($ext).'" class="fa fa-filter" ';
                 $ext_name .= 'style="text-decoration:none;" title="' . $title . '"></a>';

@@ -8,16 +8,33 @@ class ToolEinsatznummernReparieren
 {
     const EVW_TOOL_ENR_SLUG = 'einsatzvw-tool-enr';
 
+    /**
+     * @var Core
+     */
+    private $core;
+
+    /**
+     * @var Data
+     */
     private $data;
+
+    /**
+     * @var Options
+     */
+    private $options;
 
     /**
      * Konstruktor
      *
+     * @param Core $core
      * @param Data $data
+     * @param Options $options
      */
-    public function __construct($data)
+    public function __construct($core, $data, $options)
     {
+        $this->core = $core;
         $this->data = $data;
+        $this->options = $options;
         $this->addHooks();
     }
 
@@ -88,7 +105,7 @@ class ToolEinsatznummernReparieren
 
         $einsatzberichte = Data::getEinsatzberichte($kalenderjahr);
 
-        $format = Options::getDateFormat().' '.Options::getTimeFormat();
+        $format = $this->options->getDateFormat().' '.$this->options->getTimeFormat();
         $jahr_alt = '';
         $aenderungen = 0;
         $kollisionen = 0;
@@ -103,7 +120,7 @@ class ToolEinsatznummernReparieren
 
             // Den Einsatzbericht nur aktualisieren, wenn sich die Einsatznummer ändert
             $enr = $einsatzbericht->post_name;
-            $enr_neu = Core::formatEinsatznummer($jahr, $counter);
+            $enr_neu = $this->core->formatEinsatznummer($jahr, $counter);
             if ($enr != $enr_neu) {
                 $aenderungen++;
                 printf(

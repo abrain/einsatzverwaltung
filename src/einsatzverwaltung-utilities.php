@@ -9,19 +9,49 @@ namespace abrain\Einsatzverwaltung;
 class Utilities
 {
     /**
+     * @var Options
+     */
+    private $options;
+
+    /**
+     * @var Core
+     */
+    private $core;
+
+    /**
+     * Utilities constructor.
+     *
+     * @param Core $core
+     */
+    public function __construct($core)
+    {
+        $this->core = $core;
+    }
+
+    /**
+     * @param Options $options
+     */
+    public function setDependencies($options)
+    {
+        $this->options = $options;
+    }
+
+    /**
      * Hilfsfunktion für Checkboxen, übersetzt 1/0 Logik in Haken an/aus
      *
      * @param mixed $value Der zu überprüfende Wert
      *
      * @return bool Der entsprechende boolsche Wert für $value
      */
-    public static function checked($value)
+    public function checked($value)
     {
         return ($value === true || $value == 1 ? 'checked="checked" ' : '');
     }
 
     /**
      * Generiert ein Dropdown ähnlich zu wp_dropdown_pages, allerdings mit frei wählbaren Beitragstypen
+     *
+     * @since 1.0.0
      *
      * @param array $args {
      *     @type bool|int $echo      Ob der generierte Code aus- oder zurückgegeben werden soll. Standard true (ausgeben)
@@ -32,7 +62,7 @@ class Utilities
      * }
      * @return string HTML-Code für Auswahlfeld
      */
-    public static function dropdownPosts($args)
+    public function dropdownPosts($args)
     {
         $defaults = array(
             'echo' => true,
@@ -100,7 +130,7 @@ class Utilities
      *
      * @return mixed
      */
-    public static function getArrayValueIfKey($array, $key, $default)
+    public function getArrayValueIfKey($array, $key, $default)
     {
         return (array_key_exists($key, $array) ? $array[$key] : $default);
     }
@@ -113,7 +143,7 @@ class Utilities
      *
      * @return string
      */
-    public static function getDurationString($minutes, $abbreviated = false)
+    public function getDurationString($minutes, $abbreviated = false)
     {
         if (!is_numeric($minutes) || $minutes < 0) {
             return '';
@@ -141,7 +171,7 @@ class Utilities
      *
      * @return bool
      */
-    public static function isMinWPVersion($ver)
+    public function isMinWPVersion($ver)
     {
         $currentversionparts = explode(".", get_bloginfo('version'));
         if (count($currentversionparts) < 3) {
@@ -175,7 +205,7 @@ class Utilities
      *
      * @param string $message Meldung, die ausgegeben werden soll
      */
-    public static function printError($message)
+    public function printError($message)
     {
         echo '<p class="evw_error"><i class="fa fa-exclamation-circle"></i>&nbsp;' . $message . '</p>';
     }
@@ -186,7 +216,7 @@ class Utilities
      *
      * @param string $message Meldung, die ausgegeben werden soll
      */
-    public static function printWarning($message)
+    public function printWarning($message)
     {
         echo '<p class="evw_warning"><i class="fa fa-exclamation-triangle"></i>&nbsp;' . $message . '</p>';
     }
@@ -197,7 +227,7 @@ class Utilities
      *
      * @param string $message Meldung, die ausgegeben werden soll
      */
-    public static function printSuccess($message)
+    public function printSuccess($message)
     {
         echo '<p class="evw_success"><i class="fa fa-check-circle"></i>&nbsp;' . $message . '</p>';
     }
@@ -208,7 +238,7 @@ class Utilities
      *
      * @param string $message Meldung, die ausgegeben werden soll
      */
-    public static function printInfo($message)
+    public function printInfo($message)
     {
         echo '<p class="evw_info"><i class="fa fa-info-circle"></i>&nbsp;' . $message . '</p>';
     }
@@ -221,7 +251,7 @@ class Utilities
      *
      * @return int 0 für false, 1 für true
      */
-    public static function sanitizeCheckbox($input)
+    public function sanitizeCheckbox($input)
     {
         if (is_array($input)) {
             $arr = $input[0];
@@ -246,13 +276,13 @@ class Utilities
      *
      * @return int
      */
-    public static function sanitizeEinsatznummerStellen($input)
+    public function sanitizeEinsatznummerStellen($input)
     {
         $val = intval($input);
         if (is_numeric($val) && $val > 0) {
             return $val;
         } else {
-            return Options::getDefaultEinsatznummerStellen();
+            return $this->options->getDefaultEinsatznummerStellen();
         }
     }
 
@@ -264,12 +294,12 @@ class Utilities
      *
      * @return string Der Eingabewert, wenn gültig, ansonsten ein Standardwert
      */
-    public static function sanitizeExcerptType($input)
+    public function sanitizeExcerptType($input)
     {
-        if (array_key_exists($input, Core::getExcerptTypes())) {
+        if (array_key_exists($input, $this->core->getExcerptTypes())) {
             return $input;
         } else {
-            return Options::getDefaultExcerptType();
+            return $this->options->getDefaultExcerptType();
         }
     }
 
@@ -282,11 +312,10 @@ class Utilities
      *
      * @return int
      */
-    public static function sanitizePositiveNumber($input, $defaultvalue = 0)
+    public function sanitizeNumberGreaterZero($input, $defaultvalue = 0)
     {
-        $val = intval($input);
-        if (is_numeric($val) && $val >= 0) {
-            return $val;
+        if (is_numeric($input) && intval($input) > 0 && intval($input) < PHP_INT_MAX) {
+            return intval($input);
         } else {
             return $defaultvalue;
         }
@@ -301,13 +330,13 @@ class Utilities
      * @return string Der Eingabestring ohne ungültige Spalten-Ids, bei Problemen werden die Standardspalten
      * zurückgegeben
      */
-    public static function sanitizeColumns($input)
+    public function sanitizeColumns($input)
     {
         if (empty($input)) {
-            return Options::getDefaultColumns();
+            return $this->options->getDefaultColumns();
         }
 
-        $columns = Core::getListColumns();
+        $columns = $this->core->getListColumns();
         $columnIds = array_keys($columns);
 
         $inputArray = explode(',', $input);
@@ -320,7 +349,7 @@ class Utilities
         }
 
         if (empty($validColumnIds)) {
-            return Options::getDefaultColumns();
+            return $this->options->getDefaultColumns();
         }
 
         return implode(',', $validColumnIds);

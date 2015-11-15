@@ -8,16 +8,24 @@ use wpdb;
  */
 class Taxonomies
 {
+    /**
+     * @var Utilities
+     */
+    private $utilities;
+
     private static $taxonomies = array(
         'exteinsatzmittel' => array('url'),
-        'fahrzeug' => array('fahrzeugpid')
+        'fahrzeug' => array('fahrzeugpid', 'vehicleorder')
     );
 
     /**
      * Constructor
+     *
+     * @param Utilities $utilities
      */
-    public function __construct()
+    public function __construct($utilities)
     {
+        $this->utilities = $utilities;
         $this->addHooks();
     }
 
@@ -60,7 +68,7 @@ class Taxonomies
 
         echo '<tr class="form-field">';
         echo '<th scope="row"><label for="url">URL</label></th>';
-        echo '<td><input name="url" id="url" type="text" value="'.$exteinsatzmittel_url.'" size="40" />';
+        echo '<td><input name="url" id="url" type="text" value="'.esc_attr($exteinsatzmittel_url).'" size="40" />';
         echo '<p class="description">URL zu mehr Informationen &uuml;ber ein externes Einsatzmittel, beispielsweise dessen Webseite.</p></td>';
         echo '</tr>';
     }
@@ -72,11 +80,16 @@ class Taxonomies
     {
         echo '<div class="form-field">';
         echo '<label for="tag-fahrzeugpid">Fahrzeugseite</label>';
-        Utilities::dropdownPosts(array(
+        $this->utilities->dropdownPosts(array(
             'name' => 'fahrzeugpid',
             'post_type' => $this->getFahrzeugPostTypes()
         ));
         echo '<p>Seite mit mehr Informationen &uuml;ber das Fahrzeug. Wird in Einsatzberichten mit diesem Fahrzeug verlinkt.</p></div>';
+
+        echo '<div class="form-field">';
+        echo '<label for="tag-vehicleorder">Reihenfolge</label>';
+        echo '<input id="tag-vehicleorder" type="number" min="0" value="0" name="vehicleorder">';
+        echo '<p class="description">Optionale Angabe, mit der die Anzeigereihenfolge der Fahrzeuge beeinflusst werden kann. Fahrzeuge mit der kleineren Zahl werden zuerst angezeigt, anschlie&szlig;end diejenigen ohne Angabe bzw. dem Wert 0 in alphabetischer Reihenfolge.</p></div>';
     }
 
     /**
@@ -90,12 +103,18 @@ class Taxonomies
 
         echo '<tr class="form-field">';
         echo '<th scope="row"><label for="fahrzeugpid">Fahrzeugseite</label></th><td>';
-        Utilities::dropdownPosts(array(
+        $this->utilities->dropdownPosts(array(
             'selected' => $fahrzeug_pid,
             'name' => 'fahrzeugpid',
             'post_type' => $this->getFahrzeugPostTypes()
         ));
         echo '<p class="description">Seite mit mehr Informationen &uuml;ber das Fahrzeug. Wird in Einsatzberichten mit diesem Fahrzeug verlinkt.</p></td></tr>';
+
+        $vehicleOrder = self::getTermField($tag->term_id, 'fahrzeug', 'vehicleorder', 0);
+        echo '<tr class="form-field">';
+        echo '<th scope="row"><label for="tag-vehicleorder">Reihenfolge</label></th><td>';
+        echo '<input id="tag-vehicleorder" type="number" min="0" value="' . esc_attr($vehicleOrder) . '" name="vehicleorder">';
+        echo '<p class="description">Optionale Angabe, mit der die Anzeigereihenfolge der Fahrzeuge beeinflusst werden kann. Fahrzeuge mit der kleineren Zahl werden zuerst angezeigt, anschlie&szlig;end diejenigen ohne Angabe bzw. dem Wert 0 in alphabetischer Reihenfolge.</p></td></tr>';
     }
 
     /**
@@ -114,10 +133,12 @@ class Taxonomies
                 $filteredColumns[$slug] = $name;
                 if ($slug == 'description') {
                     $filteredColumns['fahrzeugpage'] = 'Fahrzeugseite';
+                    $filteredColumns['vehicleorder'] = 'Reihenfolge';
                 }
             }
         } else {
             $filteredColumns['fahrzeugpage'] = 'Fahrzeugseite';
+            $filteredColumns['vehicleorder'] = 'Reihenfolge';
         }
         return $filteredColumns;
     }
@@ -141,8 +162,17 @@ class Taxonomies
                 } else {
                     $url = get_permalink($fahrzeugpid);
                     $title = get_the_title($fahrzeugpid);
-                    return '<a href="' . $url . '" title="&quot;' . $title . '&quot; ansehen">' . $title . '</a>';
+                    return sprintf(
+                        '<a href="%1$s" title="&quot;%2$s&quot; ansehen" target="_blank">%3$s</a>',
+                        esc_attr($url),
+                        esc_attr($title),
+                        esc_html($title)
+                    );
                 }
+                break;
+            case 'vehicleorder':
+                $vehicleOrder = self::getTermField($term_id, 'fahrzeug', 'vehicleorder');
+                return (empty($vehicleOrder) ? '&nbsp;' : esc_html($vehicleOrder));
                 break;
             default:
                 return '&nbsp;';
@@ -188,7 +218,11 @@ class Taxonomies
         if (false === $url) {
             return '&nbsp;';
         } else {
-            return '<a href="' . $url . '" title="' . $url . ' besuchen" target="_blank">' . $url . '</a>';
+            return sprintf(
+                '<a href="%1$s" title="%1$s besuchen" target="_blank">%2$s</a>',
+                esc_attr($url),
+                esc_html($url)
+            );
         }
     }
 
@@ -209,7 +243,7 @@ class Taxonomies
 
         foreach ($evw_taxonomies[$taxonomy] as $field) {
             if (isset($field) && !empty($field) && isset($_POST[$field])) {
-                $value = $_POST[$field];
+                $value = $_POST[$field]; //FIXME sanitize
                 $key = self::getTermOptionKey($term_id, $taxonomy, $field);
                 if (empty($value)) {
                     delete_option($key);
@@ -319,6 +353,8 @@ class Taxonomies
     }
 
     /**
+     * @since 1.0.0
+     *
      * @return array
      */
     private function getFahrzeugPostTypes()

@@ -4,7 +4,7 @@ Donate link: https://www.abrain.de/software/unterstuetzen/
 Tags: Feuerwehr, Einsatz, Rettung, Rettungsdienst, THW, HiOrg, Wasserwacht, Bergrettung
 Requires at least: 3.4.0
 Tested up to: 4.3
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,7 +12,7 @@ Verwaltung und Darstellung von Einsatzberichten der Feuerwehr und anderer Hilfso
 
 == Description ==
 
-Dieses Plugin f&uuml;gt WordPress eine neue Beitragsart "Einsatzbericht" hinzu. Dieser kann wie ein normaler Beitrag ver&ouml;ffentlicht werden und somit zus&auml;tzlichen Inhalt wie z.B. Bilder bieten. Jeder Bericht bekommt eine eindeutige Einsatznummer und ist mit Alarmzeit und Einsatzdauer versehen. Zus&auml;tzlich kann man Einsatzart, eingesetzte Fahrzeuge, externe Kr&auml;fte und mehr angeben.
+Dieses Plugin f&uuml;gt WordPress eine neue Beitragsart "Einsatzbericht" hinzu. Diese Einsatzberichte werden wie gew&ouml;hnliche WordPress-Beitr&auml;ge erstellt, es k&ouml;nnen aber zus&auml;tzliche Informationen wie Alarmzeit, Art des Einsatzes, eingesetzte Fahrzeuge und vieles mehr angegeben werden. Zudem stellt das Plugin verschiedene M&ouml;glichkeiten zur Darstellung der Einsatzberichte zur Verf&uuml;gung.
 
 Die prim&auml;re Zielgruppe des Plugins sind Feuerwehren im deutschsprachigen Raum, es ist aber genauso geeignet f&uuml;r Rettungsdienste, die Wasserwacht, das THW und sonstige Hilfsorganisationen, die ihre Eins&auml;tze im Internet pr&auml;sentieren m&ouml;chten.
 
@@ -21,10 +21,10 @@ Funktionen im &Uuml;berblick:
 * Einsatzberichte als vollwertige Beitr&auml;ge ver&ouml;ffentlichen
 * Information &uuml;ber Einsatzart, eingesetzte Fahrzeuge, Dauer und vieles mehr
 * Shortcode zum Einbinden von Einsatzlisten
-* Widget zeigt die aktuellsten X Eins&auml;tze
-* Import aus wp-einsatz
+* Widget zeigt die aktuellsten Einsatzberichte
+* Import aus wp-einsatz und CSV-Dateien
 * Newsfeed f&uuml;r Einsatzberichte
-* Pflege der Einsatzberichte kann auf bestimmte Rollen beschr&auml;nkt werden
+* Pflege der Einsatzberichte kann auf bestimmte Benutzerrollen beschr&auml;nkt werden
 
 Uses Font Awesome by Dave Gandy - http://fontawesome.io
 
@@ -59,6 +59,15 @@ F&uuml;r eMails von/an [kontakt@abrain.de](mailto:kontakt@abrain.de) kann ich PG
 Das Du halte ich f&uuml;r die angenehmere Arbeitsgrundlage, aber man darf mich gerne auch siezen ohne dass ich mich alt f&uuml;hle.
 
 == Changelog ==
+
+= 1.1.0 =
+* Neues Widget kann per HTML komplett selbst gestaltet werden
+* Anzeigereihenfolge der Fahrzeuge kann festgelegt werden
+* Fahrzeuge k&ouml;nnen in Hierarchie (z.B. Standorte) organisiert werden (hat noch keine Auswirkung auf die Darstellung)
+* Import von Einsatzberichten aus CSV-Dateien m&ouml;glich
+* Problem mit Benutzerrechten behoben
+* Einsatzberichte bleiben erhalten, wenn der Autor gel&ouml;scht wird
+* Als privat markierte Einsatzberichte wurden bei der Berechnung der Einsatznummern nicht ber&uuml;cksichtigt
 
 = 1.0.0 =
 * Basispfad der Einsatzberichte (bisher einsaetze) kann eingestellt werden

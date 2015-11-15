@@ -9,12 +9,33 @@ namespace abrain\Einsatzverwaltung;
 class Settings
 {
     const EVW_SETTINGS_SLUG = 'einsatzvw-settings';
+    /**
+     * @var Options
+     */
+    private $options;
+
+    /**
+     * @var Core
+     */
+    private $core;
+
+    /**
+     * @var Utilities
+     */
+    private $utilities;
 
     /**
      * Konstruktor
+     *
+     * @param Core $core
+     * @param Options $options
+     * @param Utilities $utilities
      */
-    public function __construct()
+    public function __construct($core, $options, $utilities)
     {
+        $this->core = $core;
+        $this->options = $options;
+        $this->utilities = $utilities;
         $this->addHooks();
     }
 
@@ -23,12 +44,7 @@ class Settings
     {
         add_action('admin_menu', array($this, 'addToSettingsMenu'));
         add_action('admin_init', array($this, 'registerSettings'));
-        add_filter('pre_update_option_einsatzvw_rewrite_slug', function ($new_value, $old_value) {
-            if ($new_value != $old_value) {
-                Options::setFlushRewriteRules(true);
-            }
-            return $new_value;
-        }, 10, 2);
+        add_filter('pre_update_option_einsatzvw_rewrite_slug', array($this, 'maybeRewriteSlugChanged'), 10, 2);
     }
 
 
@@ -67,17 +83,17 @@ class Settings
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_einsatznummer_stellen',
-            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeEinsatznummerStellen')
+            array($this->utilities, 'sanitizeEinsatznummerStellen')
         );
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_einsatznummer_lfdvorne',
-            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            array($this->utilities, 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_show_einsatzberichte_mainloop',
-            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            array($this->utilities, 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings',
@@ -87,57 +103,57 @@ class Settings
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_einsatz_hideemptydetails',
-            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            array($this->utilities, 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_show_exteinsatzmittel_archive',
-            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            array($this->utilities, 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_show_einsatzart_archive',
-            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            array($this->utilities, 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_show_fahrzeug_archive',
-            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            array($this->utilities, 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_open_ext_in_new',
-            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            array($this->utilities, 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_excerpt_type',
-            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeExcerptType')
+            array($this->utilities, 'sanitizeExcerptType')
         );
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_excerpt_type_feed',
-            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeExcerptType')
+            array($this->utilities, 'sanitizeExcerptType')
         );
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_list_columns',
-            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeColumns')
+            array($this->utilities, 'sanitizeColumns')
         );
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_list_art_hierarchy',
-            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            array($this->utilities, 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_list_fahrzeuge_link',
-            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            array($this->utilities, 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_list_ext_link',
-            array('abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            array($this->utilities, 'sanitizeCheckbox')
         );
 
         $roles = get_editable_roles();
@@ -146,7 +162,7 @@ class Settings
                 register_setting(
                     'einsatzvw_settings',
                     'einsatzvw_cap_roles_' . $role_slug,
-                    array('abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+                    array($this->utilities, 'sanitizeCheckbox')
                 );
             }
         }
@@ -278,7 +294,7 @@ class Settings
     private function echoSettingsCheckbox($checkboxId, $text)
     {
         echo '<input type="checkbox" value="1" id="' . $checkboxId . '" name="' . $checkboxId . '" ';
-        echo Utilities::checked(Options::getBoolOption($checkboxId)) . '/><label for="' . $checkboxId . '">';
+        echo $this->utilities->checked($this->options->getBoolOption($checkboxId)) . '/><label for="' . $checkboxId . '">';
         echo $text . '</label>';
     }
 
@@ -302,21 +318,28 @@ class Settings
 
 
     /**
-     * @param $name
-     * @param $description
-     * @param string $value
+     * Gibt ein Eingabefeld aus
+     *
+     * @since 1.0.0
+     *
+     * @param string $name Name des Parameters
+     * @param string $description Beschreibungstext
+     * @param string $value Wert, der im Eingabefeld stehen soll
      */
     private function echoSettingsInput($name, $description, $value = '')
     {
         printf(
             '<input type="text" value="%2$s" id="%1$s" name="%1$s" /><p class="description">%3$s</p>',
             $name,
-            (empty($value) ? Options::getOption($name) : $value),
+            (empty($value) ? $this->options->getOption($name) : $value),
             $description
         );
     }
 
 
+    /**
+     * @since 1.0.0
+     */
     public function echoSettingsPermalinks()
     {
         $this->echoSettingsInput(
@@ -327,7 +350,7 @@ class Settings
                 '</a>',
                 '<a href="'.get_post_type_archive_feed_link('einsatz').'">'
             ),
-            Options::getRewriteSlug()
+            $this->options->getRewriteSlug()
         );
     }
 
@@ -336,7 +359,7 @@ class Settings
      */
     public function echoSettingsEinsatznummerFormat()
     {
-        printf('Jahreszahl + jahresbezogene, fortlaufende Nummer mit <input type="text" value="%2$s" size="2" id="%1$s" name="%1$s" /> Stellen<p class="description">Beispiel f&uuml;r den f&uuml;nften Einsatz in 2014:<br>bei 2 Stellen: 201405<br>bei 4 Stellen: 20140005</p><br>', 'einsatzvw_einsatznummer_stellen', Options::getEinsatznummerStellen());
+        printf('Jahreszahl + jahresbezogene, fortlaufende Nummer mit <input type="text" value="%2$s" size="2" id="%1$s" name="%1$s" /> Stellen<p class="description">Beispiel f&uuml;r den f&uuml;nften Einsatz in 2014:<br>bei 2 Stellen: 201405<br>bei 4 Stellen: 20140005</p><br>', 'einsatzvw_einsatznummer_stellen', $this->options->getEinsatznummerStellen());
         $this->echoSettingsCheckbox('einsatzvw_einsatznummer_lfdvorne', 'Laufende Nummer vor das Jahr stellen');
 
         echo '<br><br><strong>Hinweis:</strong> Nach einer &Auml;nderung des Formats erhalten die bestehenden Einsatzberichte nicht automatisch aktualisierte Nummern. Nutzen Sie daf&uuml;r das Werkzeug <a href="'.admin_url('tools.php?page=einsatzvw-tool-enr').'">Einsatznummern reparieren</a>.';
@@ -361,7 +384,7 @@ class Settings
             'show_option_none' => '- keine -',
             'hide_empty' => false,
             'name' => 'einsatzvw_category',
-            'selected' => Options::getEinsatzberichteCategory(),
+            'selected' => $this->options->getEinsatzberichteCategory(),
             'orderby' => 'name',
             'hierarchical' => true
         ));
@@ -423,13 +446,13 @@ class Settings
      */
     public function echoSettingsExcerpt()
     {
-        $types = Core::getExcerptTypes();
+        $types = $this->core->getExcerptTypes();
 
         echo '<p>Kurzfassung auf der Webseite:&nbsp;';
         $this->echoSelect(
             'einsatzvw_excerpt_type',
             $types,
-            Options::getExcerptType()
+            $this->options->getExcerptType()
         );
         echo '<p class="description">Sollte diese Einstellung keinen Effekt auf der Webseite zeigen, nutzt das verwendete Theme m&ouml;glicherweise keine Kurzfassungen und zeigt immer den vollen Beitrag.</p>';
 
@@ -437,7 +460,7 @@ class Settings
         $this->echoSelect(
             'einsatzvw_excerpt_type_feed',
             $types,
-            Options::getExcerptTypeFeed()
+            $this->options->getExcerptTypeFeed()
         );
         echo '<p class="description">Bitte auch die Einstellung zum Umfang der Eintr&auml;ge im Feed (Einstellungen &gt; Lesen) beachten!<br/>Im Feed werden bei den Einsatzdetails aus technischen Gr&uuml;nden keine Links zu gefilterten Einsatzlisten angezeigt.</p>';
     }
@@ -448,8 +471,8 @@ class Settings
      */
     public function echoEinsatzlisteColumns()
     {
-        $columns = Core::getListColumns();
-        $enabledColumns = Options::getEinsatzlisteEnabledColumns();
+        $columns = $this->core->getListColumns();
+        $enabledColumns = $this->options->getEinsatzlisteEnabledColumns();
 
         echo '<table id="columns-available"><tr><td style="width: 250px;">';
         echo '<span class="evw-area-title">Verf&uuml;gbare Spalten</span>';
@@ -459,7 +482,7 @@ class Settings
             if (in_array($colId, $enabledColumns)) {
                 continue;
             }
-            $name = Utilities::getArrayValueIfKey($colInfo, 'longName', $colInfo['name']);
+            $name = $this->utilities->getArrayValueIfKey($colInfo, 'longName', $colInfo['name']);
             echo '<li id="'.$colId.'" class="evw-column"><span>'. $name .'</span></li>';
         }
         echo '</ul></td></tr></table>';
@@ -474,7 +497,7 @@ class Settings
             }
 
             $colInfo = $columns[$colId];
-            $name = Utilities::getArrayValueIfKey($colInfo, 'longName', $colInfo['name']);
+            $name = $this->utilities->getArrayValueIfKey($colInfo, 'longName', $colInfo['name']);
             echo '<li id="'.$colId.'" class="evw-column"><span>'. $name .'</span></li>';
         }
         echo '</ul></td></tr></table>';
@@ -546,15 +569,15 @@ class Settings
         if (!empty($roles)) {
             foreach (array_keys($roles) as $role_slug) {
                 $role_obj = get_role($role_slug);
-                $allowed = Options::isRoleAllowedToEdit($role_slug);
-                foreach (Core::getCapabilities() as $cap) {
+                $allowed = $this->options->isRoleAllowedToEdit($role_slug);
+                foreach ($this->core->getCapabilities() as $cap) {
                     $role_obj->add_cap($cap, $allowed);
                 }
             }
         }
 
         // Prüfen, ob Rewrite Slug von einer Seite genutzt wird
-        $rewriteSlug = Options::getRewriteSlug();
+        $rewriteSlug = $this->options->getRewriteSlug();
         $conflictingPage = get_page_by_path($rewriteSlug);
         if ($conflictingPage instanceof \WP_Post) {
             $pageEditLink = '<a href="' . get_edit_post_link($conflictingPage->ID) . '">' . $conflictingPage->post_title . '</a>';
@@ -568,5 +591,21 @@ class Settings
         do_settings_sections(self::EVW_SETTINGS_SLUG);
         submit_button();
         echo '</form>';
+    }
+
+    /**
+     * Prüft, ob sich die Basis für die Links zu Einsatzberichten ändert und veranlasst gegebenenfalls ein Erneuern der
+     * Permalinkstruktur
+     *
+     * @param string $new_value Der neue Wert
+     * @param string $old_value Der alte Wert
+     * @return string Der zu speichernde Wert
+     */
+    public function maybeRewriteSlugChanged($new_value, $old_value)
+    {
+        if ($new_value != $old_value) {
+            $this->options->setFlushRewriteRules(true);
+        }
+        return $new_value;
     }
 }

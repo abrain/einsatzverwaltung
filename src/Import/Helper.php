@@ -128,6 +128,7 @@ class Helper
 
                             $termNames = explode(',', $sourceEntry[$sourceField]);
                             foreach ($termNames as $termName) {
+                                $termName = trim($termName);
                                 $term = get_term_by('name', $termName, $ownField);
 
                                 if ($term !== false) {

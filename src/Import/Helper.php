@@ -124,27 +124,37 @@ class Helper
                         }
                         if (is_taxonomy_hierarchical($ownField)) {
                             // Bei hierarchischen Taxonomien muss die ID statt des Namens verwendet werden
-                            $term = get_term_by('name', $sourceEntry[$sourceField], $ownField);
-                            if ($term === false) {
+                            $termIds = array();
+
+                            $termNames = explode(',', $sourceEntry[$sourceField]);
+                            foreach ($termNames as $termName) {
+                                $term = get_term_by('name', $termName, $ownField);
+
+                                if ($term !== false) {
+                                    // Term existiert bereits, ID verwenden
+                                    $termIds[] = $term->term_id;
+                                    continue;
+                                }
+
                                 // Term existiert in dieser Taxonomie noch nicht, neu anlegen
-                                $newterm = wp_insert_term($sourceEntry[$sourceField], $ownField);
+                                $newterm = wp_insert_term($termName, $ownField);
                                 if (is_wp_error($newterm)) {
                                     $this->utilities->printError(
                                         sprintf(
                                             "Konnte %s '%s' nicht anlegen: %s",
                                             $ownTerms[$ownField]['label'],
-                                            $sourceEntry[$sourceField],
+                                            $termName,
                                             $newterm->get_error_message()
                                         )
                                     );
-                                } else {
-                                    // Anlegen erfolgreich, zurückgegebene ID verwenden
-                                    $insertArgs['tax_input'][$ownField] = $newterm['term_id'];
+                                    continue;
                                 }
-                            } else {
-                                // Term existiert bereits, ID verwenden
-                                $insertArgs['tax_input'][$ownField] = $term->term_id;
+
+                                // Anlegen erfolgreich, zurückgegebene ID verwenden
+                                $termIds[] = $newterm['term_id'];
                             }
+
+                            $insertArgs['tax_input'][$ownField] = implode(',', $termIds);
                         } else {
                             // Name kann direkt verwendet werden
                             $insertArgs['tax_input'][$ownField] = $sourceEntry[$sourceField];

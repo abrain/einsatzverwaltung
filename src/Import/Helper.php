@@ -167,7 +167,7 @@ class Helper
             if (false === $alarmzeit) {
                 $this->utilities->printError(
                     sprintf(
-                        'Das Datum %s konnte mit dem angegebenen Format %s nicht eingelesen werden',
+                        'Die Alarmzeit %s konnte mit dem angegebenen Format %s nicht eingelesen werden',
                         esc_html($insertArgs['post_date']),
                         esc_html($dateTimeFormat)
                     )
@@ -177,12 +177,30 @@ class Helper
 
             $einsatzjahr = $alarmzeit->format('Y');
             $insertArgs['post_date'] = $alarmzeit->format('Y-m-d H:i');
+            $insertArgs['post_date_gmt'] = get_gmt_from_date($insertArgs['post_date']);
+            $metaValues['einsatz_alarmzeit'] = $insertArgs['post_date'];
+
+            // Einsatzende korrekt formatieren
+            if (array_key_exists('einsatz_einsatzende', $metaValues) && !empty($metaValues['einsatz_einsatzende'])) {
+                $einsatzende = DateTime::createFromFormat($dateTimeFormat, $metaValues['einsatz_einsatzende']);
+                if (false === $einsatzende) {
+                    $this->utilities->printError(
+                        sprintf(
+                            'Das Einsatzende %s konnte mit dem angegebenen Format %s nicht eingelesen werden',
+                            esc_html($metaValues['einsatz_einsatzende']),
+                            esc_html($dateTimeFormat)
+                        )
+                    );
+                    continue;
+                }
+
+                $metaValues['einsatz_einsatzende'] = $einsatzende->format('Y-m-d H:i');
+            }
+
             $einsatznummer = $this->core->getNextEinsatznummer($einsatzjahr);
             $insertArgs['post_name'] = $einsatznummer;
             $insertArgs['post_type'] = 'einsatz';
             $insertArgs['post_status'] = 'publish';
-            $insertArgs['post_date_gmt'] = get_gmt_from_date($insertArgs['post_date']);
-            $metaValues['einsatz_alarmzeit'] = $insertArgs['post_date'];
 
             // Titel sicherstellen
             if (!array_key_exists('post_title', $insertArgs)) {

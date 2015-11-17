@@ -124,27 +124,38 @@ class Helper
                         }
                         if (is_taxonomy_hierarchical($ownField)) {
                             // Bei hierarchischen Taxonomien muss die ID statt des Namens verwendet werden
-                            $term = get_term_by('name', $sourceEntry[$sourceField], $ownField);
-                            if ($term === false) {
+                            $termIds = array();
+
+                            $termNames = explode(',', $sourceEntry[$sourceField]);
+                            foreach ($termNames as $termName) {
+                                $termName = trim($termName);
+                                $term = get_term_by('name', $termName, $ownField);
+
+                                if ($term !== false) {
+                                    // Term existiert bereits, ID verwenden
+                                    $termIds[] = $term->term_id;
+                                    continue;
+                                }
+
                                 // Term existiert in dieser Taxonomie noch nicht, neu anlegen
-                                $newterm = wp_insert_term($sourceEntry[$sourceField], $ownField);
+                                $newterm = wp_insert_term($termName, $ownField);
                                 if (is_wp_error($newterm)) {
                                     $this->utilities->printError(
                                         sprintf(
                                             "Konnte %s '%s' nicht anlegen: %s",
                                             $ownTerms[$ownField]['label'],
-                                            $sourceEntry[$sourceField],
+                                            $termName,
                                             $newterm->get_error_message()
                                         )
                                     );
-                                } else {
-                                    // Anlegen erfolgreich, zurückgegebene ID verwenden
-                                    $insertArgs['tax_input'][$ownField] = $newterm['term_id'];
+                                    continue;
                                 }
-                            } else {
-                                // Term existiert bereits, ID verwenden
-                                $insertArgs['tax_input'][$ownField] = $term->term_id;
+
+                                // Anlegen erfolgreich, zurückgegebene ID verwenden
+                                $termIds[] = $newterm['term_id'];
                             }
+
+                            $insertArgs['tax_input'][$ownField] = implode(',', $termIds);
                         } else {
                             // Name kann direkt verwendet werden
                             $insertArgs['tax_input'][$ownField] = $sourceEntry[$sourceField];
@@ -167,7 +178,7 @@ class Helper
             if (false === $alarmzeit) {
                 $this->utilities->printError(
                     sprintf(
-                        'Das Datum %s konnte mit dem angegebenen Format %s nicht eingelesen werden',
+                        'Die Alarmzeit %s konnte mit dem angegebenen Format %s nicht eingelesen werden',
                         esc_html($insertArgs['post_date']),
                         esc_html($dateTimeFormat)
                     )
@@ -177,12 +188,30 @@ class Helper
 
             $einsatzjahr = $alarmzeit->format('Y');
             $insertArgs['post_date'] = $alarmzeit->format('Y-m-d H:i');
+            $insertArgs['post_date_gmt'] = get_gmt_from_date($insertArgs['post_date']);
+            $metaValues['einsatz_alarmzeit'] = $insertArgs['post_date'];
+
+            // Einsatzende korrekt formatieren
+            if (array_key_exists('einsatz_einsatzende', $metaValues) && !empty($metaValues['einsatz_einsatzende'])) {
+                $einsatzende = DateTime::createFromFormat($dateTimeFormat, $metaValues['einsatz_einsatzende']);
+                if (false === $einsatzende) {
+                    $this->utilities->printError(
+                        sprintf(
+                            'Das Einsatzende %s konnte mit dem angegebenen Format %s nicht eingelesen werden',
+                            esc_html($metaValues['einsatz_einsatzende']),
+                            esc_html($dateTimeFormat)
+                        )
+                    );
+                    continue;
+                }
+
+                $metaValues['einsatz_einsatzende'] = $einsatzende->format('Y-m-d H:i');
+            }
+
             $einsatznummer = $this->core->getNextEinsatznummer($einsatzjahr);
             $insertArgs['post_name'] = $einsatznummer;
             $insertArgs['post_type'] = 'einsatz';
             $insertArgs['post_status'] = 'publish';
-            $insertArgs['post_date_gmt'] = get_gmt_from_date($insertArgs['post_date']);
-            $metaValues['einsatz_alarmzeit'] = $insertArgs['post_date'];
 
             // Titel sicherstellen
             if (!array_key_exists('post_title', $insertArgs)) {

@@ -96,10 +96,10 @@ class ToolEinsatznummernReparieren
     private function process($kalenderjahr, $simulieren = false)
     {
         if ($simulieren) {
-            echo '<h3>Simulation</h3>';
+            echo '<h2>Simulation</h2>';
             echo '<p>Die folgenden &Auml;nderungen w&uuml;rden bei einer Reparatur angewendet:</p>';
         } else {
-            echo '<h3>Reparatur</h3>';
+            echo '<h2>Reparatur</h2>';
             echo '<p>Die folgenden &Auml;nderungen werden angewendet:</p>';
         }
 

@@ -78,7 +78,7 @@ class ToolEinsatznummernReparieren
             echo '<option value="'.$j.'">'.$j.'</option>';
         }
         echo '</select><br>';
-        echo '<input type="checkbox" name="evw_tool_enr_sim" value="1" checked="checked" />&nbsp;<label for="evw_tool_enr_sim">Simulieren (zeigt nur, was sich ändern würde)</label>';
+        echo '<input type="checkbox" name="evw_tool_enr_sim" id="evw_tool_enr_sim" value="1" checked="checked" />&nbsp;<label for="evw_tool_enr_sim">Simulieren (zeigt nur, was sich ändern würde)</label>';
         submit_button('Starten');
         echo '</form>';
 

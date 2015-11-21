@@ -145,7 +145,8 @@ abstract class AbstractSource
      */
     public function getInputName($field)
     {
-        return $this->getIdentifier() . '-' . $field;
+        $fieldId = array_search($field, $this->getFields());
+        return $this->getIdentifier() . '-field' . $fieldId;
     }
 
     /**
@@ -158,7 +159,7 @@ abstract class AbstractSource
     {
         $mapping = array();
         foreach ($sourceFields as $sourceField) {
-            $index = $this->getInputName(strtolower($sourceField));
+            $index = $this->getInputName($sourceField);
             if (array_key_exists($index, $_POST)) {
                 $ownField = $_POST[$index];
                 if (!empty($ownField) && is_string($ownField) && $ownField != '-') {

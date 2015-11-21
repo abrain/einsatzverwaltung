@@ -27,7 +27,7 @@ use WP_Query;
  */
 class Core
 {
-    const VERSION = '1.1.1';
+    const VERSION = '1.1.2';
     const DB_VERSION = 5;
 
     public $pluginFile;
@@ -51,7 +51,10 @@ class Core
             'view_item' => 'Einsatzbericht ansehen',
             'search_items' => 'Einsatzberichte suchen',
             'not_found' => 'Keine Einsatzberichte gefunden',
-            'not_found_in_trash' => 'Keine Einsatzberichte im Papierkorb gefunden'
+            'not_found_in_trash' => 'Keine Einsatzberichte im Papierkorb gefunden',
+            'filter_items_list' => 'Liste der Einsatzberichte filtern',
+            'items_list_navigation' => 'Navigation der Liste der Einsatzberichte',
+            'items_list' => 'Liste der Einsatzberichte',
         ),
         'public' => true,
         'has_archive' => true,
@@ -99,7 +102,10 @@ class Core
             'popular_items' => 'H&auml;ufige Einsatzarten',
             'separate_items_with_commas' => 'Einsatzarten mit Kommata trennen',
             'add_or_remove_items' => 'Einsatzarten hinzuf&uuml;gen oder entfernen',
-            'choose_from_most_used' => 'Aus h&auml;ufigen Einsatzarten w&auml;hlen'),
+            'choose_from_most_used' => 'Aus h&auml;ufigen Einsatzarten w&auml;hlen',
+            'items_list_navigation' => 'Navigation der Liste der Einsatzarten',
+            'items_list' => 'Liste der Einsatzarten',
+        ),
         'public' => true,
         'show_in_nav_menus' => false,
         'meta_box_cb' => 'abrain\Einsatzverwaltung\Admin::displayMetaBoxEinsatzart',
@@ -126,7 +132,9 @@ class Core
             'new_item_name' => 'Fahrzeug hinzuf&uuml;gen',
             'search_items' => 'Fahrzeuge suchen',
             'parent_item' => '&Uuml;bergeordnete Einheit',
-            'parent_item_colon' => '&Uuml;bergeordnete Einheit:'
+            'parent_item_colon' => '&Uuml;bergeordnete Einheit:',
+            'items_list_navigation' => 'Navigation der Fahrzeugliste',
+            'items_list' => 'Fahrzeugliste',
         ),
         'public' => true,
         'show_in_nav_menus' => false,
@@ -155,7 +163,10 @@ class Core
             'popular_items' => 'Oft eingesetzte externe Einsatzmittel',
             'separate_items_with_commas' => 'Externe Einsatzmittel mit Kommata trennen',
             'add_or_remove_items' => 'Externe Einsatzmittel hinzuf&uuml;gen oder entfernen',
-            'choose_from_most_used' => 'Aus h&auml;ufig eingesetzten externen Einsatzmitteln w&auml;hlen'),
+            'choose_from_most_used' => 'Aus h&auml;ufig eingesetzten externen Einsatzmitteln w&auml;hlen',
+            'items_list_navigation' => 'Navigation der Liste der externen Einsatzmittel',
+            'items_list' => 'Liste der externen Einsatzmittel',
+        ),
         'public' => true,
         'show_in_nav_menus' => false,
         'capabilities' => array (
@@ -185,7 +196,10 @@ class Core
             'popular_items' => 'H&auml;ufige Alarmierungsarten',
             'separate_items_with_commas' => 'Alarmierungsarten mit Kommata trennen',
             'add_or_remove_items' => 'Alarmierungsarten hinzuf&uuml;gen oder entfernen',
-            'choose_from_most_used' => 'Aus h&auml;ufigen Alarmierungsarten w&auml;hlen'),
+            'choose_from_most_used' => 'Aus h&auml;ufigen Alarmierungsarten w&auml;hlen',
+            'items_list_navigation' => 'Navigation der Liste der Alarmierungsarten',
+            'items_list' => 'Liste der Alarmierungsarten',
+        ),
         'public' => true,
         'show_in_nav_menus' => false,
         'capabilities' => array (
@@ -252,6 +266,7 @@ class Core
         add_action('plugins_loaded', array($this, 'onPluginsLoaded'));
         add_action('save_post', array($this->data, 'savePostdata'));
         register_activation_hook($this->pluginFile, array($this, 'onActivation'));
+        register_deactivation_hook($this->pluginFile, array($this, 'onDeactivation'));
         add_filter('posts_where', array($this, 'postsWhere'), 10, 2);
         add_action('widgets_init', array($this, 'registerWidgets'));
     }
@@ -278,6 +293,15 @@ class Core
         foreach ($this->getCapabilities() as $cap) {
             $role_obj->add_cap($cap, true);
         }
+    }
+
+    /**
+     * Wird beim Deaktivieren des Plugins aufgerufen
+     */
+    public function onDeactivation()
+    {
+        // Permalinks aktualisieren (derzeit ohne Effekt, siehe https://core.trac.wordpress.org/ticket/29118)
+        flush_rewrite_rules();
     }
 
     /**

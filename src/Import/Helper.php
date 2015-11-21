@@ -295,7 +295,7 @@ class Helper
                     $selected = $parsedArgs['mapping'][$field];
                 }
                 $this->dropdownEigeneFelder(array(
-                    'name' => $source->getInputName(strtolower($field)),
+                    'name' => $source->getInputName($field),
                     'selected' => $selected,
                     'unmatchableFields' => $source->getUnmatchableFields()
                 ));

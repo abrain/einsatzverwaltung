@@ -78,7 +78,7 @@ class ToolEinsatznummernReparieren
             echo '<option value="'.$j.'">'.$j.'</option>';
         }
         echo '</select><br>';
-        echo '<input type="checkbox" name="evw_tool_enr_sim" value="1" checked="checked" />&nbsp;<label for="evw_tool_enr_sim">Simulieren (zeigt nur, was sich ändern würde)</label>';
+        echo '<input type="checkbox" name="evw_tool_enr_sim" id="evw_tool_enr_sim" value="1" checked="checked" />&nbsp;<label for="evw_tool_enr_sim">Simulieren (zeigt nur, was sich ändern würde)</label>';
         submit_button('Starten');
         echo '</form>';
 
@@ -96,10 +96,10 @@ class ToolEinsatznummernReparieren
     private function process($kalenderjahr, $simulieren = false)
     {
         if ($simulieren) {
-            echo '<h3>Simulation</h3>';
+            echo '<h2>Simulation</h2>';
             echo '<p>Die folgenden &Auml;nderungen w&uuml;rden bei einer Reparatur angewendet:</p>';
         } else {
-            echo '<h3>Reparatur</h3>';
+            echo '<h2>Reparatur</h2>';
             echo '<p>Die folgenden &Auml;nderungen werden angewendet:</p>';
         }
 

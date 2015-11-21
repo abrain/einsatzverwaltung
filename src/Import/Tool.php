@@ -139,7 +139,7 @@ class Tool
                 $firstAction = $source->getFirstAction();
 
                 echo '<li>';
-                echo '<h3>' . $source->getName() . '</h3>';
+                echo '<h2>' . $source->getName() . '</h2>';
                 echo '<p class="description">' . $source->getDescription() . '</p>';
                 if (false !== $firstAction) {
                     echo '<form method="post">';

@@ -252,6 +252,7 @@ class Core
         add_action('plugins_loaded', array($this, 'onPluginsLoaded'));
         add_action('save_post', array($this->data, 'savePostdata'));
         register_activation_hook($this->pluginFile, array($this, 'onActivation'));
+        register_deactivation_hook($this->pluginFile, array($this, 'onDeactivation'));
         add_filter('posts_where', array($this, 'postsWhere'), 10, 2);
         add_action('widgets_init', array($this, 'registerWidgets'));
     }
@@ -278,6 +279,15 @@ class Core
         foreach ($this->getCapabilities() as $cap) {
             $role_obj->add_cap($cap, true);
         }
+    }
+
+    /**
+     * Wird beim Deaktivieren des Plugins aufgerufen
+     */
+    public function onDeactivation()
+    {
+        // Permalinks aktualisieren (derzeit ohne Effekt, siehe https://core.trac.wordpress.org/ticket/29118)
+        flush_rewrite_rules();
     }
 
     /**

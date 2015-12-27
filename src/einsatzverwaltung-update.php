@@ -128,4 +128,27 @@ class Update
         add_option('einsatzvw_rewrite_slug', 'einsaetze');
         return true;
     }
+
+    /**
+     * Entfernt die Berechtigungen aus den Benutzerrollen
+     *
+     * @return bool Gibt immer True zurück
+     */
+    private function updateTo6()
+    {
+        if (!function_exists('get_editable_roles')) {
+            require_once(ABSPATH . 'wp-admin/includes/user.php');
+        }
+        $roles = get_editable_roles();
+        if (!empty($roles)) {
+            foreach (array_keys($roles) as $role_slug) {
+                $role_obj = get_role($role_slug);
+                foreach ($this->core->getCapabilities() as $cap) {
+                    error_log("Remove $cap from $role_slug");
+                    $role_obj->remove_cap($cap);
+                }
+            }
+        }
+        return true;
+    }
 }

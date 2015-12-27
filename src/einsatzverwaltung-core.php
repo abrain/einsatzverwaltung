@@ -28,7 +28,7 @@ use WP_Query;
 class Core
 {
     const VERSION = '1.1.2';
-    const DB_VERSION = 5;
+    const DB_VERSION = 6;
 
     public $pluginFile;
     public $pluginBasename;

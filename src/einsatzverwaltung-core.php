@@ -287,12 +287,6 @@ class Core
 
         // Permalinks aktualisieren
         flush_rewrite_rules();
-
-        // Rechte für Administratoren setzen
-        $role_obj = get_role('administrator');
-        foreach ($this->getCapabilities() as $cap) {
-            $role_obj->add_cap($cap, true);
-        }
     }
 
     /**

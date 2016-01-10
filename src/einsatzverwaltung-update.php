@@ -130,7 +130,7 @@ class Update
     }
 
     /**
-     * Entfernt die Berechtigungen aus den Benutzerrollen
+     * Entfernt die Berechtigungen aus den Benutzerrollen und die unnötige Option für Administratoren
      *
      * @return bool Gibt immer True zurück
      */
@@ -149,6 +149,8 @@ class Update
                 }
             }
         }
+
+        delete_option('einsatzvw_cap_roles_administrator');
         return true;
     }
 }

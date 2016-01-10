@@ -27,8 +27,7 @@ class CoreTest extends WP_UnitTestCase
      */
     public function testUserHasCap()
     {
-        $userID1 = wp_create_user('Testuser', 'abc123');
-        $user1 = get_user_by('ID', $userID1);
+        $user1 = $this->factory->user->create_and_get(); /* @var \WP_User $user1 */
 
         // Ohne Rolle keine Rechte
         $requestedCaps = array('edit_einsatzberichte');

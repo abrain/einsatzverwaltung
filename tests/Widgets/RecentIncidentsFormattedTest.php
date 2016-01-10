@@ -8,9 +8,10 @@ use WP_UnitTestCase;
  *
  * @author Andreas Brain
  */
-class RecentIncidentsFormattedTest extends WP_UnitTestCase {
-
-	function testUpdate() {
+class RecentIncidentsFormattedTest extends WP_UnitTestCase
+{
+    public function testUpdate()
+    {
         $widget = new RecentIncidentsFormatted();
         $new = array(
             'title' => '',
@@ -46,5 +47,5 @@ class RecentIncidentsFormattedTest extends WP_UnitTestCase {
         $this->assertEquals('Nix<p>Text<br><span>', $result['beforeContent']);
         $this->assertEquals('<li>%title%<a href="#">Link</a><br></li>', $result['pattern']);
         $this->assertEquals('', $result['afterContent']);
-	}
+    }
 }

@@ -22,8 +22,8 @@ class CoreTest extends WP_UnitTestCase
     }
 
     /**
-     * Testet, ob die Benutzerberechtigungen korrekt vergeben werden. Die Implementierung könnte schöner sein, aber bei
-     * der Entkopplung von den Benutzerrollen ändert sich ohnehin wieder vieles/alles.
+     * Testet, ob die Benutzerberechtigungen korrekt vergeben werden. Die Implementierung könnte schöner sein, aber
+     * bei der Entkopplung von den Benutzerrollen ändert sich ohnehin wieder vieles/alles.
      */
     public function testUserHasCap()
     {

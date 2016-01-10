@@ -14,5 +14,6 @@ ratings:
   - src/**/*.php
   - src/**/*.js
   - src/**/*.css
+  - tests/**/*.php
 exclude_paths:
 - src/font-awesome/**/*

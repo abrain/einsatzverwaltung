@@ -315,6 +315,7 @@ class Core
 
     public function onPluginsLoaded()
     {
+        load_plugin_textdomain('einsatzverwaltung');
         $this->maybeUpdate();
     }
 

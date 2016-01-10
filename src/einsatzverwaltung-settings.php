@@ -159,6 +159,11 @@ class Settings
         $roles = get_editable_roles();
         if (!empty($roles)) {
             foreach (array_keys($roles) as $role_slug) {
+                // Administratoren haben immer Zugriff, deshalb ist keine Einstellung nötig
+                if ('administrator' === $role_slug) {
+                    continue;
+                }
+
                 register_setting(
                     'einsatzvw_settings',
                     'einsatzvw_cap_roles_' . $role_slug,
@@ -532,6 +537,11 @@ class Settings
             echo "Es konnten keine Rollen gefunden werden.";
         } else {
             foreach ($roles as $role_slug => $role) {
+                // Administratoren haben immer Zugriff, deshalb ist keine Einstellung nötig
+                if ('administrator' === $role_slug) {
+                    continue;
+                }
+
                 $this->echoSettingsCheckbox(
                     'einsatzvw_cap_roles_' . $role_slug,
                     translate_user_role($role['name'])
@@ -563,18 +573,6 @@ class Settings
 
         echo '<div class="wrap">';
         echo '<h1>Einstellungen &rsaquo; Einsatzverwaltung</h1>';
-
-        // Berechtigungen aktualisieren
-        $roles = get_editable_roles();
-        if (!empty($roles)) {
-            foreach (array_keys($roles) as $role_slug) {
-                $role_obj = get_role($role_slug);
-                $allowed = $this->options->isRoleAllowedToEdit($role_slug);
-                foreach ($this->core->getCapabilities() as $cap) {
-                    $role_obj->add_cap($cap, $allowed);
-                }
-            }
-        }
 
         // Prüfen, ob Rewrite Slug von einer Seite genutzt wird
         $rewriteSlug = $this->options->getRewriteSlug();

@@ -20,7 +20,6 @@ class Options
         'einsatzvw_einsatznummer_lfdvorne' => false,
         'date_format' => 'd.m.Y',
         'time_format' => 'H:i',
-        'einsatzvw_cap_roles_administrator' => true,
         'einsatzvw_list_art_hierarchy' => false,
         'einsatzvw_list_ext_link' => false,
         'einsatzvw_list_fahrzeuge_link' => false,

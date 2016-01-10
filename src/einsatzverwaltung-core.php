@@ -21,6 +21,7 @@ use abrain\Einsatzverwaltung\Util\Formatter;
 use abrain\Einsatzverwaltung\Widgets\RecentIncidents;
 use abrain\Einsatzverwaltung\Widgets\RecentIncidentsFormatted;
 use WP_Query;
+use WP_User;
 
 /**
  * Grundlegende Funktionen
@@ -28,7 +29,7 @@ use WP_Query;
 class Core
 {
     const VERSION = '1.1.2';
-    const DB_VERSION = 5;
+    const DB_VERSION = 6;
 
     public $pluginFile;
     public $pluginBasename;
@@ -269,6 +270,7 @@ class Core
         register_deactivation_hook($this->pluginFile, array($this, 'onDeactivation'));
         add_filter('posts_where', array($this, 'postsWhere'), 10, 2);
         add_action('widgets_init', array($this, 'registerWidgets'));
+        add_filter('user_has_cap', array($this, 'userHasCap'), 10, 4);
     }
 
     /**
@@ -287,12 +289,6 @@ class Core
 
         // Permalinks aktualisieren
         flush_rewrite_rules();
-
-        // Rechte für Administratoren setzen
-        $role_obj = get_role('administrator');
-        foreach ($this->getCapabilities() as $cap) {
-            $role_obj->add_cap($cap, true);
-        }
     }
 
     /**
@@ -513,6 +509,36 @@ class Core
             'delete_published_einsatzberichte',
             'delete_others_einsatzberichte'
         );
+    }
+
+    /**
+     * Prüft und vergibt Benutzerrechte zur Laufzeit
+     *
+     * @param array $allcaps Effektive Nutzerrechte
+     * @param array $caps Die angefragten Nutzerrechte
+     * @param array $args Zusätzliche Parameter wie Objekt-ID
+     * @param WP_User $user Benutzerobjekt
+     *
+     * @return array Die gefilterten oder erweiterten Nutzerrechte
+     */
+    public function userHasCap($allcaps, $caps, $args, $user)
+    {
+        $requestedCaps = array_intersect($this->getCapabilities(), $caps);
+
+        // Wenn es nicht um Berechtigungen aus der Einsatzverwaltung geht, können wir uns den Rest sparen
+        if (count($requestedCaps) == 0) {
+            return $allcaps;
+        }
+
+        // Wenn der Benutzer mindestens einer berechtigten Rolle zugeordnet ist, werden die Berechtigungen erteilt
+        $allowedUserRoles = array_filter($user->roles, array($this->options, 'isRoleAllowedToEdit'));
+        if (count($allowedUserRoles) > 0) {
+            foreach ($requestedCaps as $requestedCap) {
+                $allcaps[$requestedCap] = 1;
+            }
+        }
+
+        return $allcaps;
     }
 
     private function maybeUpdate()

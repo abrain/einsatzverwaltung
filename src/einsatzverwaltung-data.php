@@ -283,16 +283,18 @@ class Data
      * Zusätzliche Metadaten des Einsatzberichts speichern
      *
      * @param int $postId ID des Posts
+     * @param \WP_Post $post Das Post-Objekt
+     * @param bool $update Ob ein bestehender Post aktualisiert wird oder nicht
      */
-    public function savePostdata($postId)
+    public function savePostdata($postId, $post, $update)
     {
-        // verify if this is an auto save routine.
-        // If it is our form has not been submitted, so we dont want to do anything
+        // Automatische Speicherungen sollen nicht berücksichtigt werden
         if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
             return;
         }
 
-        if (!array_key_exists('post_type', $_POST) || 'einsatz' !== $_POST['post_type']) {
+        // Fängt Speichervorgänge per QuickEdit ab
+        if (defined('DOING_AJAX') && DOING_AJAX) {
             return;
         }
 
@@ -372,14 +374,12 @@ class Data
         update_post_meta($postId, 'einsatz_fehlalarm', $fehlalarm);
 
         if (!empty($updateArgs)) {
-            if (! wp_is_post_revision($postId)) {
-                $updateArgs['ID'] = $postId;
+            $updateArgs['ID'] = $postId;
 
-                // save_post Filter kurzzeitig deaktivieren, damit keine Dauerschleife entsteht
-                remove_action('save_post', array($this, 'savePostdata'));
-                wp_update_post($updateArgs);
-                add_action('save_post', array($this, 'savePostdata'));
-            }
+            // save_post Filter kurzzeitig deaktivieren, damit keine Dauerschleife entsteht
+            remove_action('save_post_einsatz', array($this, 'savePostdata'));
+            wp_update_post($updateArgs);
+            add_action('save_post_einsatz', array($this, 'savePostdata'), 10, 3);
         }
     }
 
@@ -400,8 +400,8 @@ class Data
         $updateArgs['ID'] = $postId;
 
         // keine Sonderbehandlung beim Speichern
-        remove_action('save_post', array($this, 'savePostdata'));
+        remove_action('save_post_einsatz', array($this, 'savePostdata'));
         wp_update_post($updateArgs);
-        add_action('save_post', array($this, 'savePostdata'));
+        add_action('save_post_einsatz', array($this, 'savePostdata'), 10, 3);
     }
 }

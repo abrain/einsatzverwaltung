@@ -268,7 +268,7 @@ class Core
     {
         add_action('init', array($this, 'onInit'));
         add_action('plugins_loaded', array($this, 'onPluginsLoaded'));
-        add_action('save_post', array($this->data, 'savePostdata'));
+        add_action('save_post_einsatz', array($this->data, 'savePostdata'), 10, 3);
         register_activation_hook($this->pluginFile, array($this, 'onActivation'));
         register_deactivation_hook($this->pluginFile, array($this, 'onDeactivation'));
         add_filter('posts_where', array($this, 'postsWhere'), 10, 2);

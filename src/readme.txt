@@ -2,9 +2,9 @@
 Contributors: abrain
 Donate link: https://www.abrain.de/software/unterstuetzen/
 Tags: Feuerwehr, Einsatz, Rettung, Rettungsdienst, THW, HiOrg, Wasserwacht, Bergrettung
-Requires at least: 3.4.0
-Tested up to: 4.3
-Stable tag: 1.1.2
+Requires at least: 3.7.0
+Tested up to: 4.4
+Stable tag: 1.1.3
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -65,6 +65,11 @@ F&uuml;r eMails von/an [kontakt@abrain.de](mailto:kontakt@abrain.de) kann ich PG
 Das Du halte ich f&uuml;r die angenehmere Arbeitsgrundlage, aber man darf mich gerne auch siezen ohne dass ich mich alt f&uuml;hle.
 
 == Changelog ==
+
+= 1.1.3 =
+* Problem mit Benutzerrechten behoben
+* Getestet mit WordPress 4.4
+* Mindestanforderung auf WordPress 3.7 angehoben
 
 = 1.1.2 =
 * CSV-Import: Ein Leerzeichen in der Spaltenbeschriftung verhinderte den Import dieser Spalte
@@ -227,6 +232,9 @@ Das Du halte ich f&uuml;r die angenehmere Arbeitsgrundlage, aber man darf mich g
 
 == Upgrade Notice ==
 
+= 1.1.3 =
+Problem mit Benutzerrechten behoben
+
 = 1.1.2 =
 Fehlerbehebung bei der Importfunktion und Anpassungen f&uuml;r WordPress 4.4
 
@@ -316,3 +324,4 @@ Kein Upgrade, sondern die erste Version
 * Twitter: [@einsatzvw](https://twitter.com/einsatzvw)
 * App.net: [@einsatzverwaltung](https://alpha.app.net/einsatzverwaltung)
 * Facebook: [Einsatzverwaltung](https://www.facebook.com/einsatzverwaltung/)
+* GNU social: [@einsatzverwaltung](https://gnusocial.abrain.de/einsatzverwaltung)

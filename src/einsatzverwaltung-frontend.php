@@ -333,7 +333,6 @@ class Frontend
             $string .= '<tbody>';
             $string .= '<tr class="einsatzliste-title"><td class="einsatzliste-title-year" colspan="' . $numEnabledColumns . '">Eins&auml;tze '.$einsatzjahr.'</td></tr>';
             if ($query->have_posts()) {
-                $lfd = ($desc ? $query->found_posts : 1);
                 $oldmonth = 0;
 
                 if (!$splitmonths) {
@@ -354,18 +353,11 @@ class Frontend
 
                     $string .= '<tr class="einsatzliste-row">';
                     foreach ($enabledColumns as $colId) {
-                        $string .= '<td>';
-                        if ($colId == 'seqNum') {
-                            $string .= $lfd;
-                        } else {
-                            $string .= self::getEinsatzlisteCellContent($query->post->ID, $colId);
-                        }
-                        $string .= '</td>';
+                        $string .= '<td>' . self::getEinsatzlisteCellContent($query->post->ID, $colId) . '</td>';
                     }
                     $string .= '</tr>';
 
                     $oldmonth = $month;
-                    $lfd += ($desc ? -1 : 1);
                 }
             } else {
                 $string .= '<tr class="einsatzliste-row-noresult"><td colspan="' . $numEnabledColumns . '">' . sprintf('Keine Eins&auml;tze im Jahr %s', $einsatzjahr) . '</td></tr>';
@@ -468,6 +460,9 @@ class Frontend
                 $einsatzart = Data::getEinsatzart($postId);
                 $showHierarchy = $this->options->getBoolOption('einsatzvw_list_art_hierarchy');
                 return self::getEinsatzartString($einsatzart, false, false, $showHierarchy);
+                break;
+            case 'seqNum':
+                return Data::getLaufendeNummer($postId);
                 break;
             default:
                 return '&nbsp;';

@@ -258,6 +258,18 @@ class Data
     }
 
     /**
+     * Gibt die laufende Nummer des Einsatzberichts bezogen auf das Kalenderjahr zurück
+     *
+     * @param int $postId ID des Einsatzberichts
+     *
+     * @return mixed
+     */
+    public static function getLaufendeNummer($postId)
+    {
+        return get_post_meta($postId, 'einsatz_seqNum', true);
+    }
+
+    /**
      * Gibt die eingetragene Mannschaftsstärke zurück
      *
      * @param int $postId ID des Einsatzberichts

@@ -342,13 +342,16 @@ class Core
 
     private function addRewriteRules()
     {
-        $base = $this->options->getRewriteSlug();
-        add_rewrite_rule(
-            $base . '/(\d{4})/page/(\d{1,})/?$',
-            'index.php?post_type=einsatz&year=$matches[1]&paged=$matches[2]',
-            'top'
-        );
-        add_rewrite_rule($base . '/(\d{4})/?$', 'index.php?post_type=einsatz&year=$matches[1]', 'top');
+        global $wp_rewrite;
+        if ($wp_rewrite->using_permalinks()) {
+            $base = ltrim($wp_rewrite->front, '/') . $this->options->getRewriteSlug();
+            add_rewrite_rule(
+                $base . '/(\d{4})/page/(\d{1,})/?$',
+                'index.php?post_type=einsatz&year=$matches[1]&paged=$matches[2]',
+                'top'
+            );
+            add_rewrite_rule($base . '/(\d{4})/?$', 'index.php?post_type=einsatz&year=$matches[1]', 'top');
+        }
     }
 
     public function registerWidgets()

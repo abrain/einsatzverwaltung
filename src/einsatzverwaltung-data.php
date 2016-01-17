@@ -39,6 +39,8 @@ class Data
         add_action('private_einsatz', array($this, 'onPrivate'), 10, 2);
         add_action('publish_einsatz', array($this, 'onPublish'), 10, 2);
         add_action('trash_einsatz', array($this, 'onTrash'), 10, 2);
+        add_filter('sanitize_post_meta_einsatz_fehlalarm', array($this->utilities, 'sanitizeCheckbox'));
+        add_filter('sanitize_post_meta_einsatz_special', array($this->utilities, 'sanitizeCheckbox'));
     }
 
     /**

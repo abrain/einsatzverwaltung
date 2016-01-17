@@ -56,6 +56,13 @@ class Admin
             'normal',
             'high'
         );
+        add_meta_box(
+            'einsatzverwaltung_meta_annotations',
+            'Vermerke',
+            array($this, 'displayMetaBoxAnnotations'),
+            'einsatz',
+            'side'
+        );
     }
 
     /**
@@ -97,6 +104,30 @@ class Admin
     }
 
     /**
+     * Inhalt der Metabox für Vermerke zum Einsatzbericht
+     *
+     * @param WP_Post $post Das Post-Objekt des aktuell bearbeiteten Einsatzberichts
+     */
+    public function displayMetaBoxAnnotations($post)
+    {
+        $fehlalarm = Data::getFehlalarm($post->ID);
+        $isSpecial = Data::isSpecial($post->ID);
+
+        $this->echoInputCheckbox(
+            __("Fehlalarm", 'einsatzverwaltung'),
+            'einsatzverwaltung_fehlalarm',
+            $fehlalarm
+        );
+        echo '<br>';
+
+        $this->echoInputCheckbox(
+            __("Besonderer Einsatz", 'einsatzverwaltung'),
+            'einsatzverwaltung_special',
+            $isSpecial
+        );
+    }
+
+    /**
      * Inhalt der Metabox zum Bearbeiten der Einsatzdetails
      *
      * @param WP_Post $post Das Post-Objekt des aktuell bearbeiteten Einsatzberichts
@@ -111,8 +142,6 @@ class Admin
         $einsatzende = Data::getEinsatzende($post->ID);
         $einsatzort = Data::getEinsatzort($post->ID);
         $einsatzleiter = Data::getEinsatzleiter($post->ID);
-        $fehlalarm = Data::getFehlalarm($post->ID);
-        $isSpecial = Data::isSpecial($post->ID);
         $mannschaftsstaerke = Data::getMannschaftsstaerke($post->ID);
 
         $names = Data::getEinsatzleiterNamen();
@@ -139,18 +168,6 @@ class Admin
             'einsatzverwaltung_einsatzende',
             esc_attr($einsatzende),
             'JJJJ-MM-TT hh:mm'
-        );
-
-        $this->echoInputCheckbox(
-            __("Fehlalarm", 'einsatzverwaltung'),
-            'einsatzverwaltung_fehlalarm',
-            $fehlalarm
-        );
-
-        $this->echoInputCheckbox(
-            __("Besonderer Einsatz", 'einsatzverwaltung'),
-            'einsatzverwaltung_special',
-            $isSpecial
         );
 
         echo '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';
@@ -204,9 +221,8 @@ class Admin
      */
     private function echoInputCheckbox($label, $name, $state)
     {
-        echo '<tr><td><label for="' . $name . '">' . $label . '</label></td>';
-        echo '<td><input type="checkbox" id="' . $name . '" name="' . $name . '" value="1" ';
-        echo $this->utilities->checked($state) . '/></td></tr>';
+        echo '<input type="checkbox" id="' . $name . '" name="' . $name . '" value="1" ';
+        echo $this->utilities->checked($state) . '/><label for="' . $name . '">' . $label . '</label>';
     }
 
     /**

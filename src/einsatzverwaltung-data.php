@@ -399,7 +399,7 @@ class Data
         // Fehlalarm validieren
         $fehlalarm = $this->utilities->sanitizeCheckbox(array($_POST, 'einsatzverwaltung_fehlalarm'));
 
-        $isSpecial = Utilities::sanitizeCheckbox(array($_POST, 'einsatzverwaltung_special'));
+        $isSpecial = $this->utilities->sanitizeCheckbox(array($_POST, 'einsatzverwaltung_special'));
 
         // Metadaten schreiben
         update_post_meta($postId, 'einsatz_alarmzeit', date_format($alarmzeit, 'Y-m-d H:i'));

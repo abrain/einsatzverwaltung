@@ -281,7 +281,7 @@ class Tool
         if ('evw_csv' == $this->currentSource->getIdentifier()) {
             echo '<p>Die Felder <strong>Alarmzeit</strong> und <strong>Einsatzende</strong> erwarten eine Datums- und Zeitangabe im unten einstellbaren Format.</p>';
         }
-        echo '<p>Das Feld <strong>Fehlalarm</strong> erwartet den Wert 1 (= ja) oder 0 (= nein). Es darf auch leer bleiben, was als 0 (= nein) zählt.</p>';
+        echo '<p>Die Felder <strong>Besonderer Einsatz</strong> und <strong>Fehlalarm</strong> erwarten den Wert 1 (= ja) oder 0 (= nein). Sie d&uuml;rfen auch leer bleiben, was als 0 (= nein) zählt.</p>';
 
         // Felder matchen
         echo "<h3>Felder zuordnen</h3>";

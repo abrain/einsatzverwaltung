@@ -28,8 +28,8 @@ use WP_User;
  */
 class Core
 {
-    const VERSION = '1.1.3';
-    const DB_VERSION = 6;
+    const VERSION = '1.1.4';
+    const DB_VERSION = 7;
 
     public $pluginFile;
     public $pluginBasename;
@@ -342,13 +342,16 @@ class Core
 
     private function addRewriteRules()
     {
-        $base = $this->options->getRewriteSlug();
-        add_rewrite_rule(
-            $base . '/(\d{4})/page/(\d{1,})/?$',
-            'index.php?post_type=einsatz&year=$matches[1]&paged=$matches[2]',
-            'top'
-        );
-        add_rewrite_rule($base . '/(\d{4})/?$', 'index.php?post_type=einsatz&year=$matches[1]', 'top');
+        global $wp_rewrite;
+        if ($wp_rewrite->using_permalinks()) {
+            $base = ltrim($wp_rewrite->front, '/') . $this->options->getRewriteSlug();
+            add_rewrite_rule(
+                $base . '/(\d{4})/page/(\d{1,})/?$',
+                'index.php?post_type=einsatz&year=$matches[1]&paged=$matches[2]',
+                'top'
+            );
+            add_rewrite_rule($base . '/(\d{4})/?$', 'index.php?post_type=einsatz&year=$matches[1]', 'top');
+        }
     }
 
     public function registerWidgets()
@@ -553,7 +556,7 @@ class Core
         }
 
         require_once(__DIR__ . '/einsatzverwaltung-update.php');
-        $update = new Update($this);
+        $update = new Update($this, $this->options);
         $update->doUpdate($currentDbVersion, self::DB_VERSION);
     }
 }

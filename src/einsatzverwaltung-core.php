@@ -29,7 +29,7 @@ use WP_User;
 class Core
 {
     const VERSION = '1.1.3';
-    const DB_VERSION = 6;
+    const DB_VERSION = 7;
 
     public $pluginFile;
     public $pluginBasename;
@@ -556,7 +556,7 @@ class Core
         }
 
         require_once(__DIR__ . '/einsatzverwaltung-update.php');
-        $update = new Update($this);
+        $update = new Update($this, $this->options);
         $update->doUpdate($currentDbVersion, self::DB_VERSION);
     }
 }

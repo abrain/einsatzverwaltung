@@ -4,7 +4,7 @@ Donate link: https://www.abrain.de/software/unterstuetzen/
 Tags: Feuerwehr, Einsatz, Rettung, Rettungsdienst, THW, HiOrg, Wasserwacht, Bergrettung
 Requires at least: 3.7.0
 Tested up to: 4.4
-Stable tag: 1.1.3
+Stable tag: 1.1.4
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -65,6 +65,10 @@ F&uuml;r eMails von/an [kontakt@abrain.de](mailto:kontakt@abrain.de) kann ich PG
 Das Du halte ich f&uuml;r die angenehmere Arbeitsgrundlage, aber man darf mich gerne auch siezen ohne dass ich mich alt f&uuml;hle.
 
 == Changelog ==
+
+= 1.1.4 =
+* Links zum Jahresarchiv wurden falsch generiert, wenn Permalinkstruktur nicht mit einem Schrägstrich endete
+* Präfix der Permalinkstruktur (z.B. /archive/) wurde bei den Jahresarchiven nicht berücksichtigt
 
 = 1.1.3 =
 * Problem mit Benutzerrechten behoben
@@ -231,6 +235,9 @@ Das Du halte ich f&uuml;r die angenehmere Arbeitsgrundlage, aber man darf mich g
 * Widget zeigt die aktuellsten X Eins&auml;tze
 
 == Upgrade Notice ==
+
+= 1.1.4 =
+Fehler bei Links zum Jahresarchiv ausgebessert
 
 = 1.1.3 =
 Problem mit Benutzerrechten behoben

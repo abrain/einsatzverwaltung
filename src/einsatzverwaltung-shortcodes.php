@@ -66,26 +66,26 @@ class Shortcodes
      */
     public function einsatzjahre()
     {
-        global $year;
+        global $year, $wp_rewrite;
         $jahre = Data::getJahreMitEinsatz();
-        $permalink_structure = get_option('permalink_structure');
 
-        $string = "";
+        $string = '';
         foreach ($jahre as $jahr) {
             if (!empty($string)) {
-                $string .= " | ";
+                $string .= ' | ';
             }
 
-            $link = get_post_type_archive_link('einsatz') . (empty($permalink_structure) ? '&year='.$jahr : $jahr);
-            $string .= '<a href="' . $link . '">';
+            $link = get_post_type_archive_link('einsatz');
+            $link = ($wp_rewrite->using_permalinks() ? trailingslashit($link) : $link . '&year=') . $jahr;
+            $string .= '<a href="' . user_trailingslashit($link) . '">';
 
-            if ($year == $jahr || empty($year) && $jahr == date("Y")) {
-                $string .= "<strong>".$jahr."</strong>";
+            if ($year == $jahr || empty($year) && $jahr == date('Y')) {
+                $string .= "<strong>$jahr</strong>";
             } else {
                 $string .= $jahr;
             }
 
-            $string .= "</a>";
+            $string .= '</a>';
         }
 
         return $string;

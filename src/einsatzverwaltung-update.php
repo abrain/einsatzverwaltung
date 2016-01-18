@@ -14,12 +14,19 @@ class Update
     private $core;
 
     /**
+     * @var Options
+     */
+    private $options;
+
+    /**
      * Update constructor.
      * @param Core $core
+     * @param Options $options
      */
-    public function __construct($core)
+    public function __construct($core, $options)
     {
         $this->core = $core;
+        $this->options = $options;
     }
 
     /**
@@ -152,5 +159,13 @@ class Update
 
         delete_option('einsatzvw_cap_roles_administrator');
         return true;
+    }
+
+    /**
+     * Aktualisiert die Rewrite Rules nach einer Änderung
+     */
+    private function updateTo7()
+    {
+        $this->options->setFlushRewriteRules(true);
     }
 }

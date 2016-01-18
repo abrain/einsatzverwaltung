@@ -282,13 +282,14 @@ class Frontend
      */
     public function addReportsToQuery($query)
     {
+        $categoryId = $this->options->getEinsatzberichteCategory();
         if (!is_admin() &&
             $query->is_main_query() &&
             empty($query->query_vars['suppress_filters']) &&
             (
                 $query->is_home() && $this->options->isShowEinsatzberichteInMainloop() ||
                 $query->is_tag() ||
-                $query->is_category()
+                $categoryId != -1 && $query->is_category($categoryId)
             )
         ) {
             if (isset($query->query_vars['post_type'])) {

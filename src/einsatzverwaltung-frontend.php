@@ -284,7 +284,8 @@ class Frontend
     {
         if ((
                 is_home() && $this->options->isShowEinsatzberichteInMainloop() ||
-                is_tag()
+                is_tag() ||
+                is_category()
             ) &&
             $query->is_main_query() &&
             empty($query->query_vars['suppress_filters'])

@@ -270,7 +270,6 @@ class Core
         add_action('plugins_loaded', array($this, 'onPluginsLoaded'));
         register_activation_hook($this->pluginFile, array($this, 'onActivation'));
         register_deactivation_hook($this->pluginFile, array($this, 'onDeactivation'));
-        add_filter('posts_where', array($this, 'postsWhere'), 10, 2);
         add_action('widgets_init', array($this, 'registerWidgets'));
         add_filter('user_has_cap', array($this, 'userHasCap'), 10, 4);
     }
@@ -354,26 +353,6 @@ class Core
     {
         register_widget('abrain\Einsatzverwaltung\Widgets\RecentIncidents');
         register_widget('abrain\Einsatzverwaltung\Widgets\RecentIncidentsFormatted');
-    }
-
-    /**
-     * Modifiziert die WHERE-Klausel bei bestimmten Datenbankabfragen
-     *
-     * @since 1.0.0
-     *
-     * @param string $where Die original WHERE-Klausel
-     * @param WP_Query $wpq Die verwendete WP-Query-Instanz
-     *
-     * @return string Die zu verwendende WHERE-Klausel
-     */
-    public function postsWhere($where, $wpq)
-    {
-        if ($wpq->is_category && $wpq->get_queried_object_id() === $this->options->getEinsatzberichteCategory()) {
-            // Einsatzberichte in die eingestellte Kategorie einblenden
-            global $wpdb;
-            return $where . " OR {$wpdb->posts}.post_type = 'einsatz' AND ({$wpdb->posts}.post_status = 'publish' OR {$wpdb->posts}.post_status = 'private')";
-        }
-        return $where;
     }
 
     /**

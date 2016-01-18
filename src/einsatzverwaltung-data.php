@@ -36,7 +36,7 @@ class Data
     private function addHooks()
     {
         add_action('save_post_einsatz', array($this, 'savePostdata'), 10, 3);
-        add_action('private_einsatz', array($this, 'onPrivate'), 10, 2);
+        add_action('private_einsatz', array($this, 'onPublish'), 10, 2);
         add_action('publish_einsatz', array($this, 'onPublish'), 10, 2);
         add_action('trash_einsatz', array($this, 'onTrash'), 10, 2);
         add_filter('sanitize_post_meta_einsatz_fehlalarm', array($this->utilities, 'sanitizeCheckbox'));
@@ -451,18 +451,6 @@ class Data
                 $counter++;
             }
         }
-    }
-
-    /**
-     * Wird aufgerufen, sobald ein Einsatzbericht als privat veröffentlicht wird
-     *
-     * @param int $postId Die ID des Einsatzberichts
-     * @param \WP_Post $post Das Post-Objekt des Einsatzberichts
-     */
-    public function onPrivate($postId, $post)
-    {
-        $date = date_create($post->post_date);
-        $this->updateSequenceNumbers(date_format($date, 'Y'));
     }
 
     /**

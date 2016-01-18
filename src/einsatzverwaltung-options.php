@@ -103,12 +103,12 @@ class Options
      *
      * @since 1.0.0
      *
-     * @return int Die ID der Kategorie oder 0, wenn nicht gesetzt
+     * @return int Die ID der Kategorie oder -1, wenn nicht gesetzt
      */
     public function getEinsatzberichteCategory()
     {
         $categoryId = $this->getOption('einsatzvw_category');
-        return (false === $categoryId ? 0 : intval($categoryId));
+        return (false === $categoryId ? -1 : intval($categoryId));
     }
 
     /**

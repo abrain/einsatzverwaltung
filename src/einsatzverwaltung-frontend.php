@@ -45,7 +45,7 @@ class Frontend
         add_filter('the_content', array($this, 'renderContent'));
         add_filter('the_excerpt', array($this, 'filterEinsatzExcerpt'));
         add_filter('the_excerpt_rss', array($this, 'filterEinsatzExcerptFeed'));
-        add_action('pre_get_posts', array($this, 'addEinsatzberichteToMainloop'));
+        add_action('pre_get_posts', array($this, 'addReportsToQuery'));
     }
 
     /**
@@ -280,15 +280,16 @@ class Frontend
      *
      * @param WP_Query $query
      */
-    public function addEinsatzberichteToMainloop($query)
+    public function addReportsToQuery($query)
     {
-        if ((
-                is_home() && $this->options->isShowEinsatzberichteInMainloop() ||
-                is_tag() ||
-                is_category()
-            ) &&
+        if (!is_admin() &&
             $query->is_main_query() &&
-            empty($query->query_vars['suppress_filters'])
+            empty($query->query_vars['suppress_filters']) &&
+            (
+                $query->is_home() && $this->options->isShowEinsatzberichteInMainloop() ||
+                $query->is_tag() ||
+                $query->is_category()
+            )
         ) {
             if (isset($query->query_vars['post_type'])) {
                 $post_types = (array) $query->query_vars['post_type'];

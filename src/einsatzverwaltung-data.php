@@ -20,17 +20,24 @@ class Data
     private $utilities;
 
     /**
+     * @var Options
+     */
+    private $options;
+
+    /**
      * Constructor
      *
      * @param Core $core
      * @param Utilities $utilities
+     * @param Options $options
      */
-    public function __construct($core, $utilities)
+    public function __construct($core, $utilities, $options)
     {
         $this->core = $core;
         $this->utilities = $utilities;
 
         $this->addHooks();
+        $this->options = $options;
     }
 
     private function addHooks()
@@ -461,8 +468,15 @@ class Data
      */
     public function onPublish($postId, $post)
     {
+        // Laufende Nummern aktualisieren
         $date = date_create($post->post_date);
         $this->updateSequenceNumbers(date_format($date, 'Y'));
+
+        // Kategoriezugehörigkeit aktualisieren
+        $category = $this->options->getEinsatzberichteCategory();
+        if ($category != -1) {
+            $this->utilities->addPostToCategory($postId, $category);
+        }
     }
 
     /**
@@ -473,9 +487,16 @@ class Data
      */
     public function onTrash($postId, $post)
     {
+        // Laufende Nummern aktualisieren
         $date = date_create($post->post_date);
         $this->updateSequenceNumbers(date_format($date, 'Y'));
         delete_post_meta($postId, 'einsatz_seqNum');
+
+        // Kategoriezugehörigkeit aktualisieren
+        $category = $this->options->getEinsatzberichteCategory();
+        if ($category != -1) {
+            $this->utilities->removePostFromCategory($postId, $category);
+        }
     }
 
     /**

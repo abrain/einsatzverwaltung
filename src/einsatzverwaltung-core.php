@@ -246,7 +246,7 @@ class Core
         $this->utilities->setDependencies($this->options);
 
         new Admin($this, $this->utilities);
-        $this->data = new Data($this, $this->utilities);
+        $this->data = new Data($this, $this->utilities, $this->options);
         $frontend = new Frontend($this, $this->options, $this->utilities);
         new Settings($this, $this->options, $this->utilities);
         new Shortcodes($frontend);

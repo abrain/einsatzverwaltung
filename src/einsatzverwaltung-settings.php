@@ -45,6 +45,7 @@ class Settings
         add_action('admin_menu', array($this, 'addToSettingsMenu'));
         add_action('admin_init', array($this, 'registerSettings'));
         add_filter('pre_update_option_einsatzvw_rewrite_slug', array($this, 'maybeRewriteSlugChanged'), 10, 2);
+        add_filter('pre_update_option_einsatzvw_category', array($this, 'maybeCategoryChanged'), 10, 2);
     }
 
 
@@ -605,5 +606,38 @@ class Settings
             $this->options->setFlushRewriteRules(true);
         }
         return $new_value;
+    }
+
+    /**
+     * Prüft, ob sich die Kategorie der Einsatzberichte ändert und veranlasst gegebenenfalls ein Erneuern der
+     * Kategoriezuordnung
+     *
+     * @param string $newValue Der neue Wert
+     * @param string $oldValue Der alte Wert
+     * @return string Der zu speichernde Wert
+     */
+    public function maybeCategoryChanged($newValue, $oldValue)
+    {
+        if ($newValue != $oldValue) {
+            error_log("Changed from $oldValue to $newValue");
+
+            $posts = get_posts(array(
+                'post_type' => 'einsatz',
+                'post_status' => array('publish', 'private'),
+                'numberposts' => -1
+            ));
+
+            foreach ($posts as $post) {
+                if ($oldValue != -1) {
+                    $this->utilities->removePostFromCategory($post->ID, $oldValue);
+                }
+
+                if ($newValue != -1) {
+                    $this->utilities->addPostToCategory($post->ID, $newValue);
+                }
+            }
+        }
+
+        return $newValue;
     }
 }

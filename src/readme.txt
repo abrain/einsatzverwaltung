@@ -67,8 +67,8 @@ Das Du halte ich f&uuml;r die angenehmere Arbeitsgrundlage, aber man darf mich g
 == Changelog ==
 
 = 1.1.4 =
-* Links zum Jahresarchiv wurden falsch generiert, wenn Permalinkstruktur nicht mit einem Schrägstrich endete
-* Präfix der Permalinkstruktur (z.B. /archive/) wurde bei den Jahresarchiven nicht berücksichtigt
+* Links zum Jahresarchiv wurden falsch generiert, wenn Permalinkstruktur nicht mit einem Schr&auml;gstrich endete
+* Pr&auml;fix der Permalinkstruktur (z.B. /archive/) wurde bei den Jahresarchiven nicht ber&uuml;cksichtigt
 
 = 1.1.3 =
 * Problem mit Benutzerrechten behoben

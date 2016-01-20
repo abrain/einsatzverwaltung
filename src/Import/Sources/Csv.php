@@ -275,7 +275,8 @@ class Csv extends AbstractSource
 
             $filteredLine = array();
             foreach ($fieldMap as $fieldName => $index) {
-                $filteredLine[$fieldName] = $line[$index];
+                // Fehlende Felder in zu kurzen Zeilen werden als leer gewertet
+                $filteredLine[$fieldName] = array_key_exists($index, $line) ? $line[$index] : '';
             }
             $lines[] = $filteredLine;
         }

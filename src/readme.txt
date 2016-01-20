@@ -4,7 +4,7 @@ Donate link: https://www.abrain.de/software/unterstuetzen/
 Tags: Feuerwehr, Einsatz, Rettung, Rettungsdienst, THW, HiOrg, Wasserwacht, Bergrettung
 Requires at least: 3.7.0
 Tested up to: 4.4
-Stable tag: 1.1.4
+Stable tag: 1.1.5
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -66,9 +66,13 @@ Das Du halte ich f&uuml;r die angenehmere Arbeitsgrundlage, aber man darf mich g
 
 == Changelog ==
 
+= 1.1.5 =
+* CSV-Import: Leerzeichen zu Beginn des Feldes verhinderte Auswertung des Datums
+* CSV-Import: Zu kurze Zeilen verursachten Fehlermeldung
+
 = 1.1.4 =
-* Links zum Jahresarchiv wurden falsch generiert, wenn Permalinkstruktur nicht mit einem Schrägstrich endete
-* Präfix der Permalinkstruktur (z.B. /archive/) wurde bei den Jahresarchiven nicht berücksichtigt
+* Links zum Jahresarchiv wurden falsch generiert, wenn Permalinkstruktur nicht mit einem Schr&auml;gstrich endete
+* Pr&auml;fix der Permalinkstruktur (z.B. /archive/) wurde bei den Jahresarchiven nicht ber&uuml;cksichtigt
 
 = 1.1.3 =
 * Problem mit Benutzerrechten behoben
@@ -235,6 +239,9 @@ Das Du halte ich f&uuml;r die angenehmere Arbeitsgrundlage, aber man darf mich g
 * Widget zeigt die aktuellsten X Eins&auml;tze
 
 == Upgrade Notice ==
+
+= 1.1.5 =
+Fehlerbehebungen bei der Importfunktion
 
 = 1.1.4 =
 Fehler bei Links zum Jahresarchiv ausgebessert

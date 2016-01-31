@@ -113,12 +113,13 @@ class Helper
 
             foreach ($mapping as $sourceField => $ownField) {
                 if (!empty($ownField) && is_string($ownField)) {
+                    $sourceValue = trim($sourceEntry[$sourceField]);
                     if (array_key_exists($ownField, IncidentReport::getMetaFields())) {
                         // Wert gehört in ein Metafeld
-                        $metaValues[$ownField] = $sourceEntry[$sourceField];
+                        $metaValues[$ownField] = $sourceValue;
                     } elseif (array_key_exists($ownField, $ownTerms)) {
                         // Wert gehört zu einer Taxonomie
-                        if (empty($sourceEntry[$sourceField])) {
+                        if (empty($sourceValue)) {
                             // Leere Terms überspringen
                             continue;
                         }
@@ -126,7 +127,7 @@ class Helper
                             // Bei hierarchischen Taxonomien muss die ID statt des Namens verwendet werden
                             $termIds = array();
 
-                            $termNames = explode(',', $sourceEntry[$sourceField]);
+                            $termNames = explode(',', $sourceValue);
                             foreach ($termNames as $termName) {
                                 $termName = trim($termName);
                                 $term = get_term_by('name', $termName, $ownField);
@@ -158,11 +159,11 @@ class Helper
                             $insertArgs['tax_input'][$ownField] = implode(',', $termIds);
                         } else {
                             // Name kann direkt verwendet werden
-                            $insertArgs['tax_input'][$ownField] = $sourceEntry[$sourceField];
+                            $insertArgs['tax_input'][$ownField] = $sourceValue;
                         }
                     } elseif (array_key_exists($ownField, $postFields)) {
                         // Wert gehört direkt zum Post
-                        $insertArgs[$ownField] = $sourceEntry[$sourceField];
+                        $insertArgs[$ownField] = $sourceValue;
                     } elseif ($ownField == '-') {
                         $this->utilities->printWarning("Feld '$sourceField' nicht zugeordnet");
                     } else {

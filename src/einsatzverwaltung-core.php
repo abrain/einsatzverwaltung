@@ -28,7 +28,7 @@ use WP_User;
  */
 class Core
 {
-    const VERSION = '1.1.4';
+    const VERSION = '1.1.5';
     const DB_VERSION = 8;
 
     public $pluginFile;

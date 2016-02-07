@@ -25,17 +25,24 @@ class Settings
     private $utilities;
 
     /**
+     * @var Data
+     */
+    private $data;
+
+    /**
      * Konstruktor
      *
      * @param Core $core
      * @param Options $options
      * @param Utilities $utilities
+     * @param Data $data
      */
-    public function __construct($core, $options, $utilities)
+    public function __construct($core, $options, $utilities, $data)
     {
         $this->core = $core;
         $this->options = $options;
         $this->utilities = $utilities;
+        $this->data = $data;
         $this->addHooks();
     }
 
@@ -46,6 +53,7 @@ class Settings
         add_action('admin_init', array($this, 'registerSettings'));
         add_filter('pre_update_option_einsatzvw_rewrite_slug', array($this, 'maybeRewriteSlugChanged'), 10, 2);
         add_filter('pre_update_option_einsatzvw_category', array($this, 'maybeCategoryChanged'), 10, 2);
+        add_filter('pre_update_option_einsatzvw_category_only_special', array($this, 'maybeCategorySpecialChanged'), 10, 2);
     }
 
 
@@ -100,6 +108,11 @@ class Settings
             'einsatzvw_settings',
             'einsatzvw_category',
             'intval'
+        );
+        register_setting(
+            'einsatzvw_settings',
+            'einsatzvw_category_only_special',
+            array($this->utilities, 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings',
@@ -384,7 +397,7 @@ class Settings
         );
 
         echo '<p><label for="einsatzvw_category">';
-        _e('Davon unabh&auml;ngig Einsatzberichte in folgender Kategorie einblenden:', 'einsatzverwaltung');
+        _e('Davon unabh&auml;ngig Einsatzberichte folgender Kategorie zuordnen:', 'einsatzverwaltung');
         echo '&nbsp;</label>';
         wp_dropdown_categories(array(
             'show_option_none' => '- keine -',
@@ -395,6 +408,12 @@ class Settings
             'hierarchical' => true
         ));
         echo '</p>';
+
+
+        $this->echoSettingsCheckbox(
+            'einsatzvw_category_only_special',
+            'Nur als besonders markierte Einsatzberichte der Kategorie zuordnen'
+        );
     }
 
 
@@ -635,6 +654,56 @@ class Settings
 
                 if ($newValue != -1) {
                     $this->utilities->addPostToCategory($post->ID, $newValue);
+                }
+            }
+        }
+
+        return $newValue;
+    }
+
+    /**
+     * Prüft, ob sich die Beschränkung, nur als besonders markierte Einsatzberichte der Kategorie zuzuordnen, ändert
+     * und veranlasst gegebenenfalls ein Erneuern der Kategoriezuordnung
+     *
+     * @param string $newValue Der neue Wert
+     * @param string $oldValue Der alte Wert
+     *
+     * @return string Der zu speichernde Wert
+     */
+    public function maybeCategorySpecialChanged($newValue, $oldValue)
+    {
+        // Nur Änderungen sind interessant
+        if ($newValue == $oldValue) {
+            return $newValue;
+        }
+
+        // Ohne gesetzte Kategorie brauchen wir nicht weitermachen
+        $categoryId = $this->options->getEinsatzberichteCategory();
+        if (-1 === $categoryId) {
+            return $newValue;
+        }
+
+        $posts = get_posts(array(
+            'post_type' => 'einsatz',
+            'post_status' => array('publish', 'private'),
+            'numberposts' => -1
+        ));
+
+        // Wenn die Einstellung abgewählt wurde, werden alle Einsatzberichte zur Kategorie hinzugefügt
+        if ($newValue == 0) {
+            foreach ($posts as $post) {
+                $this->utilities->addPostToCategory($post->ID, $categoryId);
+            }
+        }
+
+        // Wenn die Einstellung aktiviert wurde, werden nur die als besonders markierten Einsatzberichte zur Kategorie
+        // hinzugefügt, alle anderen daraus entfernt
+        if ($newValue == 1) {
+            foreach ($posts as $post) {
+                if ($this->data->isSpecial($post->ID)) {
+                    $this->utilities->addPostToCategory($post->ID, $categoryId);
+                } else {
+                    $this->utilities->removePostFromCategory($post->ID, $categoryId);
                 }
             }
         }

@@ -25,7 +25,8 @@ class Options
         'einsatzvw_list_fahrzeuge_link' => false,
         'einsatzvw_rewrite_slug' => 'einsatzberichte',
         'einsatzvw_flush_rewrite_rules' => false,
-        'einsatzvw_category' => false
+        'einsatzvw_category' => false,
+        'einsatzvw_category_only_special' => false,
     );
 
     /**
@@ -200,6 +201,18 @@ class Options
         $option = $this->getOption('einsatzvw_einsatz_hideemptydetails');
         return $this->toBoolean($option);
     }
+
+    /**
+     * Gibt zurück, ob nur als besonders markierte Einsatzberichte der Kategorie in einsatzvw_category zugeordnet
+     * werden sollen
+     *
+     * @return bool
+     */
+    public function isOnlySpecialInCategory()
+    {
+        return $this->getBoolOption('einsatzvw_category_only_special');
+    }
+
 
     /**
      * @return bool

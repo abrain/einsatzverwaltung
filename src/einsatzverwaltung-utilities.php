@@ -37,6 +37,17 @@ class Utilities
     }
 
     /**
+     * Veranlasst die Zuordnung eines Einsatzberichts (bzw. eines beliebigen Beitrags) zu einer Kategorie
+     *
+     * @param int $postId Die ID des Einsatzberichts
+     * @param int $category Die ID der Kategorie
+     */
+    public function addPostToCategory($postId, $category)
+    {
+        wp_set_post_categories($postId, $category, true);
+    }
+
+    /**
      * Hilfsfunktion für Checkboxen, übersetzt 1/0 Logik in Haken an/aus
      *
      * @param mixed $value Der zu überprüfende Wert
@@ -243,6 +254,21 @@ class Utilities
         echo '<p class="evw_info"><i class="fa fa-info-circle"></i>&nbsp;' . $message . '</p>';
     }
 
+    /**
+     * Entfernt die Zuordnung eines Einsatzberichts (bzw. eines beliebigen Beitrags) zu einer Kategorie
+     *
+     * @param int $postId Die ID des Einsatzberichts
+     * @param int $category Die ID der Kategorie
+     */
+    public function removePostFromCategory($postId, $category)
+    {
+        $categories = wp_get_post_categories($postId);
+        $key = array_search($category, $categories);
+        if ($key !== false) {
+            array_splice($categories, $key, 1);
+            wp_set_post_categories($postId, $categories);
+        }
+    }
 
     /**
      * Bereitet den Formularwert einer Checkbox für das Speichern in der Datenbank vor

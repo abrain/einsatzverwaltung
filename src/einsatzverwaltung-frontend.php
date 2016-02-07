@@ -45,7 +45,7 @@ class Frontend
         add_filter('the_content', array($this, 'renderContent'));
         add_filter('the_excerpt', array($this, 'filterEinsatzExcerpt'));
         add_filter('the_excerpt_rss', array($this, 'filterEinsatzExcerptFeed'));
-        add_action('pre_get_posts', array($this, 'addEinsatzberichteToMainloop'));
+        add_action('pre_get_posts', array($this, 'addReportsToQuery'));
     }
 
     /**
@@ -280,14 +280,17 @@ class Frontend
      *
      * @param WP_Query $query
      */
-    public function addEinsatzberichteToMainloop($query)
+    public function addReportsToQuery($query)
     {
-        if ((
-                is_home() && $this->options->isShowEinsatzberichteInMainloop() ||
-                is_tag()
-            ) &&
+        $categoryId = $this->options->getEinsatzberichteCategory();
+        if (!is_admin() &&
             $query->is_main_query() &&
-            empty($query->query_vars['suppress_filters'])
+            empty($query->query_vars['suppress_filters']) &&
+            (
+                $query->is_home() && $this->options->isShowEinsatzberichteInMainloop() ||
+                $query->is_tag() ||
+                $categoryId != -1 && $query->is_category($categoryId)
+            )
         ) {
             if (isset($query->query_vars['post_type'])) {
                 $post_types = (array) $query->query_vars['post_type'];
@@ -337,7 +340,6 @@ class Frontend
 
             $string .= '<tbody>';
             if ($query->have_posts()) {
-                $lfd = ($desc ? $query->found_posts : 1);
                 $oldmonth = 0;
 
                 if (!$splitmonths) {
@@ -358,19 +360,11 @@ class Frontend
 
                     $string .= '<tr>';
                     foreach ($enabledColumns as $colId) {
-                        /* Klasse auf einsatz-col geändert für Responsive Design */
-                        $string .= '<td class="einsatz-column-' . $colId . '">';
-                        if ($colId == 'seqNum') {
-                            $string .= $lfd;
-                        } else {
-                            $string .= self::getEinsatzlisteCellContent($query->post->ID, $colId);
-                        }
-                        $string .= '</td>';
+                        $string .= '<td class="einsatz-column-' . $colId . '">' . $this->getEinsatzlisteCellContent($query->post->ID, $colId) . '</td>';
                     }
                     $string .= '</tr>';
 
                     $oldmonth = $month;
-                    $lfd += ($desc ? -1 : 1);
                 }
             } else {
                 $string .= '<tr><td colspan="' . $numEnabledColumns . '">' . sprintf('Keine Eins&auml;tze im Jahr %s', $einsatzjahr) . '</td></tr>';
@@ -474,6 +468,9 @@ class Frontend
                 $showHierarchy = $this->options->getBoolOption('einsatzvw_list_art_hierarchy');
                 return self::getEinsatzartString($einsatzart, false, false, $showHierarchy);
                 break;
+            case 'seqNum':
+                return Data::getLaufendeNummer($postId);
+                break;
             default:
                 return '&nbsp;';
         }
@@ -503,13 +500,13 @@ class Frontend
      * Gibt die Einsatzart als String zurück, wenn vorhanden auch mit den übergeordneten Einsatzarten
      *
      * @param object $einsatzart
-     * @param bool $make_links
-     * @param bool $show_archive_links
+     * @param bool $makeLinks
+     * @param bool $showArchiveLinks
      * @param bool $showHierarchy
      *
      * @return string
      */
-    public static function getEinsatzartString($einsatzart, $make_links, $show_archive_links, $showHierarchy = true)
+    public static function getEinsatzartString($einsatzart, $makeLinks, $showArchiveLinks, $showHierarchy = true)
     {
         if ($einsatzart === false || is_wp_error($einsatzart) || empty($einsatzart)) {
             return '';
@@ -522,7 +519,7 @@ class Frontend
                 $einsatzart = get_term($einsatzart->parent, 'einsatzart');
             }
 
-            if ($make_links && $show_archive_links) {
+            if ($makeLinks && $showArchiveLinks) {
                 $title = 'Alle Eins&auml;tze vom Typ '. $einsatzart->name . ' anzeigen';
                 $url = get_term_link($einsatzart);
                 $link = '<a href="'.$url.'" class="fa fa-filter" style="text-decoration:none;" title="'.$title.'"></a>';

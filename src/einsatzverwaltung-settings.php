@@ -25,17 +25,24 @@ class Settings
     private $utilities;
 
     /**
+     * @var Data
+     */
+    private $data;
+
+    /**
      * Konstruktor
      *
      * @param Core $core
      * @param Options $options
      * @param Utilities $utilities
+     * @param Data $data
      */
-    public function __construct($core, $options, $utilities)
+    public function __construct($core, $options, $utilities, $data)
     {
         $this->core = $core;
         $this->options = $options;
         $this->utilities = $utilities;
+        $this->data = $data;
         $this->addHooks();
     }
 
@@ -45,6 +52,8 @@ class Settings
         add_action('admin_menu', array($this, 'addToSettingsMenu'));
         add_action('admin_init', array($this, 'registerSettings'));
         add_filter('pre_update_option_einsatzvw_rewrite_slug', array($this, 'maybeRewriteSlugChanged'), 10, 2);
+        add_filter('pre_update_option_einsatzvw_category', array($this, 'maybeCategoryChanged'), 10, 2);
+        add_filter('pre_update_option_einsatzvw_category_only_special', array($this, 'maybeCategorySpecialChanged'), 10, 2);
     }
 
 
@@ -99,6 +108,11 @@ class Settings
             'einsatzvw_settings',
             'einsatzvw_category',
             'intval'
+        );
+        register_setting(
+            'einsatzvw_settings',
+            'einsatzvw_category_only_special',
+            array($this->utilities, 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings',
@@ -159,6 +173,11 @@ class Settings
         $roles = get_editable_roles();
         if (!empty($roles)) {
             foreach (array_keys($roles) as $role_slug) {
+                // Administratoren haben immer Zugriff, deshalb ist keine Einstellung nötig
+                if ('administrator' === $role_slug) {
+                    continue;
+                }
+
                 register_setting(
                     'einsatzvw_settings',
                     'einsatzvw_cap_roles_' . $role_slug,
@@ -346,9 +365,9 @@ class Settings
             'einsatzvw_rewrite_slug',
             sprintf(
                 'Basis f&uuml;r Links zu Einsatzberichten, zum %1$sArchiv%2$s und zum %3$sFeed%2$s.',
-                '<a href="'.get_post_type_archive_link('einsatz').'">',
+                '<a href="' . get_post_type_archive_link('einsatz') . '">',
                 '</a>',
-                '<a href="'.get_post_type_archive_feed_link('einsatz').'">'
+                '<a href="' . get_post_type_archive_feed_link('einsatz') . '">'
             ),
             $this->options->getRewriteSlug()
         );
@@ -362,7 +381,7 @@ class Settings
         printf('Jahreszahl + jahresbezogene, fortlaufende Nummer mit <input type="text" value="%2$s" size="2" id="%1$s" name="%1$s" /> Stellen<p class="description">Beispiel f&uuml;r den f&uuml;nften Einsatz in 2014:<br>bei 2 Stellen: 201405<br>bei 4 Stellen: 20140005</p><br>', 'einsatzvw_einsatznummer_stellen', $this->options->getEinsatznummerStellen());
         $this->echoSettingsCheckbox('einsatzvw_einsatznummer_lfdvorne', 'Laufende Nummer vor das Jahr stellen');
 
-        echo '<br><br><strong>Hinweis:</strong> Nach einer &Auml;nderung des Formats erhalten die bestehenden Einsatzberichte nicht automatisch aktualisierte Nummern. Nutzen Sie daf&uuml;r das Werkzeug <a href="'.admin_url('tools.php?page=einsatzvw-tool-enr').'">Einsatznummern reparieren</a>.';
+        echo '<br><br><strong>Hinweis:</strong> Nach einer &Auml;nderung des Formats erhalten die bestehenden Einsatzberichte nicht automatisch aktualisierte Nummern. Nutzen Sie daf&uuml;r das Werkzeug <a href="' . admin_url('tools.php?page=einsatzvw-tool-enr') . '">Einsatznummern reparieren</a>.';
     }
 
 
@@ -378,7 +397,7 @@ class Settings
         );
 
         echo '<p><label for="einsatzvw_category">';
-        _e('Davon unabh&auml;ngig Einsatzberichte in folgender Kategorie einblenden:', 'einsatzverwaltung');
+        _e('Davon unabh&auml;ngig Einsatzberichte folgender Kategorie zuordnen:', 'einsatzverwaltung');
         echo '&nbsp;</label>';
         wp_dropdown_categories(array(
             'show_option_none' => '- keine -',
@@ -389,6 +408,12 @@ class Settings
             'hierarchical' => true
         ));
         echo '</p>';
+
+
+        $this->echoSettingsCheckbox(
+            'einsatzvw_category_only_special',
+            'Nur als besonders markierte Einsatzberichte der Kategorie zuordnen'
+        );
     }
 
 
@@ -483,7 +508,7 @@ class Settings
                 continue;
             }
             $name = $this->utilities->getArrayValueIfKey($colInfo, 'longName', $colInfo['name']);
-            echo '<li id="'.$colId.'" class="evw-column"><span>'. $name .'</span></li>';
+            echo '<li id="' . $colId . '" class="evw-column"><span>' . $name . '</span></li>';
         }
         echo '</ul></td></tr></table>';
 
@@ -498,10 +523,10 @@ class Settings
 
             $colInfo = $columns[$colId];
             $name = $this->utilities->getArrayValueIfKey($colInfo, 'longName', $colInfo['name']);
-            echo '<li id="'.$colId.'" class="evw-column"><span>'. $name .'</span></li>';
+            echo '<li id="' . $colId . '" class="evw-column"><span>' . $name . '</span></li>';
         }
         echo '</ul></td></tr></table>';
-        echo '<input name="einsatzvw_list_columns" id="einsatzvw_list_columns" type="hidden" value="'.implode(',', $enabledColumns).'">';
+        echo '<input name="einsatzvw_list_columns" id="einsatzvw_list_columns" type="hidden" value="' . implode(',', $enabledColumns) . '">';
     }
 
     public function echoEinsatzlisteColumnSettings()
@@ -532,6 +557,11 @@ class Settings
             echo "Es konnten keine Rollen gefunden werden.";
         } else {
             foreach ($roles as $role_slug => $role) {
+                // Administratoren haben immer Zugriff, deshalb ist keine Einstellung nötig
+                if ('administrator' === $role_slug) {
+                    continue;
+                }
+
                 $this->echoSettingsCheckbox(
                     'einsatzvw_cap_roles_' . $role_slug,
                     translate_user_role($role['name'])
@@ -564,18 +594,6 @@ class Settings
         echo '<div class="wrap">';
         echo '<h1>Einstellungen &rsaquo; Einsatzverwaltung</h1>';
 
-        // Berechtigungen aktualisieren
-        $roles = get_editable_roles();
-        if (!empty($roles)) {
-            foreach (array_keys($roles) as $role_slug) {
-                $role_obj = get_role($role_slug);
-                $allowed = $this->options->isRoleAllowedToEdit($role_slug);
-                foreach ($this->core->getCapabilities() as $cap) {
-                    $role_obj->add_cap($cap, $allowed);
-                }
-            }
-        }
-
         // Prüfen, ob Rewrite Slug von einer Seite genutzt wird
         $rewriteSlug = $this->options->getRewriteSlug();
         $conflictingPage = get_page_by_path($rewriteSlug);
@@ -606,6 +624,99 @@ class Settings
         if ($new_value != $old_value) {
             $this->options->setFlushRewriteRules(true);
         }
+
         return $new_value;
+    }
+
+    /**
+     * Prüft, ob sich die Kategorie der Einsatzberichte ändert und veranlasst gegebenenfalls ein Erneuern der
+     * Kategoriezuordnung
+     *
+     * @param string $newValue Der neue Wert
+     * @param string $oldValue Der alte Wert
+     *
+     * @return string Der zu speichernde Wert
+     */
+    public function maybeCategoryChanged($newValue, $oldValue)
+    {
+        // Nur Änderungen sind interessant
+        if ($newValue == $oldValue) {
+            return $newValue;
+        }
+
+        $posts = get_posts(array(
+            'post_type' => 'einsatz',
+            'post_status' => array('publish', 'private'),
+            'numberposts' => -1
+        ));
+
+        // Wenn zuvor eine Kategorie gesetzt war, müssen die Einsatzberichte aus dieser entfernt werden
+        if ($oldValue != -1) {
+            foreach ($posts as $post) {
+                $this->utilities->removePostFromCategory($post->ID, $oldValue);
+            }
+        }
+
+        // Wenn eine neue Kategorie gesetzt wird, müssen Einsatzberichte dieser zugeordnet werden
+        if ($newValue != -1) {
+            $onlySpecialInCategory = $this->options->isOnlySpecialInCategory();
+            foreach ($posts as $post) {
+                if (!$onlySpecialInCategory || $this->data->isSpecial($post->ID)) {
+                    $this->utilities->addPostToCategory($post->ID, $newValue);
+                }
+            }
+        }
+
+        return $newValue;
+    }
+
+    /**
+     * Prüft, ob sich die Beschränkung, nur als besonders markierte Einsatzberichte der Kategorie zuzuordnen, ändert
+     * und veranlasst gegebenenfalls ein Erneuern der Kategoriezuordnung
+     *
+     * @param string $newValue Der neue Wert
+     * @param string $oldValue Der alte Wert
+     *
+     * @return string Der zu speichernde Wert
+     */
+    public function maybeCategorySpecialChanged($newValue, $oldValue)
+    {
+        // Nur Änderungen sind interessant
+        if ($newValue == $oldValue) {
+            return $newValue;
+        }
+
+        // Ohne gesetzte Kategorie brauchen wir nicht weitermachen
+        $categoryId = $this->options->getEinsatzberichteCategory();
+        if (-1 === $categoryId) {
+            return $newValue;
+        }
+
+        $posts = get_posts(array(
+            'post_type' => 'einsatz',
+            'post_status' => array('publish', 'private'),
+            'numberposts' => -1
+        ));
+
+        // Wenn die Einstellung abgewählt wurde, werden alle Einsatzberichte zur Kategorie hinzugefügt
+        if ($newValue == 0) {
+            foreach ($posts as $post) {
+                $this->utilities->addPostToCategory($post->ID, $categoryId);
+            }
+        }
+
+        // Wenn die Einstellung aktiviert wurde, werden nur die als besonders markierten Einsatzberichte zur Kategorie
+        // hinzugefügt, alle anderen daraus entfernt
+        if ($newValue == 1) {
+            foreach ($posts as $post) {
+                if ($this->data->isSpecial($post->ID)) {
+                    $this->utilities->addPostToCategory($post->ID, $categoryId);
+                } else {
+                    $this->utilities->removePostFromCategory($post->ID, $categoryId);
+                }
+            }
+        }
+
+        return $newValue;
     }
 }

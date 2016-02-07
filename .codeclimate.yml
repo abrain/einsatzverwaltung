@@ -3,6 +3,8 @@ engines:
     enabled: true
   phpmd:
     enabled: true
+    config:
+      standard: "PSR1,PSR2"
   eslint:
     enabled: true
   csslint:
@@ -14,5 +16,6 @@ ratings:
   - src/**/*.php
   - src/**/*.js
   - src/**/*.css
+  - tests/**/*.php
 exclude_paths:
 - src/font-awesome/**/*

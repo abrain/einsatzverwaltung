@@ -53,7 +53,10 @@ class IncidentReport
             ),
             'einsatz_mannschaft' => array(
                 'label' => 'Mannschaftsstärke'
-            )
+            ),
+            'einsatz_special' => array(
+                'label' => 'Besonderer Einsatz'
+            ),
         );
     }
 

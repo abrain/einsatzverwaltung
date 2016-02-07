@@ -23,10 +23,11 @@ Der PHP-Code wird gem&auml;&szlig; dem Coding Style Guide [PSR-2](http://www.php
 
 ### Mindestvoraussetzungen
 * PHP: 5.3.0
-* WordPress: 3.4
+* WordPress: 3.7
 
 ### Social Media
 
 * Twitter: [@einsatzvw](https://twitter.com/einsatzvw)
 * App.net: [@einsatzverwaltung](https://alpha.app.net/einsatzverwaltung)
 * Facebook: [Einsatzverwaltung](https://www.facebook.com/einsatzverwaltung/)
+* GNU social: [@einsatzverwaltung](https://gnusocial.abrain.de/einsatzverwaltung)

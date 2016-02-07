@@ -20,13 +20,13 @@ class Options
         'einsatzvw_einsatznummer_lfdvorne' => false,
         'date_format' => 'd.m.Y',
         'time_format' => 'H:i',
-        'einsatzvw_cap_roles_administrator' => true,
         'einsatzvw_list_art_hierarchy' => false,
         'einsatzvw_list_ext_link' => false,
         'einsatzvw_list_fahrzeuge_link' => false,
         'einsatzvw_rewrite_slug' => 'einsatzberichte',
         'einsatzvw_flush_rewrite_rules' => false,
-        'einsatzvw_category' => false
+        'einsatzvw_category' => false,
+        'einsatzvw_category_only_special' => false,
     );
 
     /**
@@ -104,12 +104,12 @@ class Options
      *
      * @since 1.0.0
      *
-     * @return int Die ID der Kategorie oder 0, wenn nicht gesetzt
+     * @return int Die ID der Kategorie oder -1, wenn nicht gesetzt
      */
     public function getEinsatzberichteCategory()
     {
         $categoryId = $this->getOption('einsatzvw_category');
-        return (false === $categoryId ? 0 : intval($categoryId));
+        return (false === $categoryId ? -1 : intval($categoryId));
     }
 
     /**
@@ -201,6 +201,18 @@ class Options
         $option = $this->getOption('einsatzvw_einsatz_hideemptydetails');
         return $this->toBoolean($option);
     }
+
+    /**
+     * Gibt zurück, ob nur als besonders markierte Einsatzberichte der Kategorie in einsatzvw_category zugeordnet
+     * werden sollen
+     *
+     * @return bool
+     */
+    public function isOnlySpecialInCategory()
+    {
+        return $this->getBoolOption('einsatzvw_category_only_special');
+    }
+
 
     /**
      * @return bool

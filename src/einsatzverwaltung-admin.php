@@ -56,6 +56,13 @@ class Admin
             'normal',
             'high'
         );
+        add_meta_box(
+            'einsatzverwaltung_meta_annotations',
+            'Vermerke',
+            array($this, 'displayMetaBoxAnnotations'),
+            'einsatz',
+            'side'
+        );
     }
 
     /**
@@ -97,6 +104,30 @@ class Admin
     }
 
     /**
+     * Inhalt der Metabox für Vermerke zum Einsatzbericht
+     *
+     * @param WP_Post $post Das Post-Objekt des aktuell bearbeiteten Einsatzberichts
+     */
+    public function displayMetaBoxAnnotations($post)
+    {
+        $fehlalarm = Data::getFehlalarm($post->ID);
+        $isSpecial = Data::isSpecial($post->ID);
+
+        $this->echoInputCheckbox(
+            __("Fehlalarm", 'einsatzverwaltung'),
+            'einsatzverwaltung_fehlalarm',
+            $fehlalarm
+        );
+        echo '<br>';
+
+        $this->echoInputCheckbox(
+            __("Besonderer Einsatz", 'einsatzverwaltung'),
+            'einsatzverwaltung_special',
+            $isSpecial
+        );
+    }
+
+    /**
      * Inhalt der Metabox zum Bearbeiten der Einsatzdetails
      *
      * @param WP_Post $post Das Post-Objekt des aktuell bearbeiteten Einsatzberichts
@@ -111,7 +142,6 @@ class Admin
         $einsatzende = Data::getEinsatzende($post->ID);
         $einsatzort = Data::getEinsatzort($post->ID);
         $einsatzleiter = Data::getEinsatzleiter($post->ID);
-        $fehlalarm = Data::getFehlalarm($post->ID);
         $mannschaftsstaerke = Data::getMannschaftsstaerke($post->ID);
 
         $names = Data::getEinsatzleiterNamen();
@@ -138,12 +168,6 @@ class Admin
             'einsatzverwaltung_einsatzende',
             esc_attr($einsatzende),
             'JJJJ-MM-TT hh:mm'
-        );
-
-        $this->echoInputCheckbox(
-            __("Fehlalarm", 'einsatzverwaltung'),
-            'einsatzverwaltung_fehlalarm',
-            $fehlalarm
         );
 
         echo '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';
@@ -197,9 +221,8 @@ class Admin
      */
     private function echoInputCheckbox($label, $name, $state)
     {
-        echo '<tr><td><label for="' . $name . '">' . $label . '</label></td>';
-        echo '<td><input type="checkbox" id="' . $name . '" name="' . $name . '" value="1" ';
-        echo $this->utilities->checked($state) . '/></td></tr>';
+        echo '<input type="checkbox" id="' . $name . '" name="' . $name . '" value="1" ';
+        echo $this->utilities->checked($state) . '/><label for="' . $name . '">' . $label . '</label>';
     }
 
     /**
@@ -240,19 +263,19 @@ class Admin
      * Einsatzberichte im Adminbereich
      *
      * @param string $column
-     * @param int $post_id
+     * @param int $postId
      */
-    public function filterColumnContentEinsatz($column, $post_id)
+    public function filterColumnContentEinsatz($column, $postId)
     {
         global $post;
 
         switch ($column) {
             case 'e_nummer':
-                $einsatz_nummer = Data::getEinsatznummer($post_id);
+                $einsatz_nummer = Data::getEinsatznummer($postId);
                 echo (empty($einsatz_nummer) ? '-' : $einsatz_nummer);
                 break;
             case 'e_einsatzende':
-                $einsatz_einsatzende = Data::getEinsatzende($post_id);
+                $einsatz_einsatzende = Data::getEinsatzende($postId);
                 if (empty($einsatz_einsatzende)) {
                     echo '-';
                 } else {
@@ -261,7 +284,7 @@ class Admin
                 }
                 break;
             case 'e_alarmzeit':
-                $einsatz_alarmzeit = Data::getAlarmzeit($post_id);
+                $einsatz_alarmzeit = Data::getAlarmzeit($postId);
 
                 if (empty($einsatz_alarmzeit)) {
                     echo '-';
@@ -271,7 +294,7 @@ class Admin
                 }
                 break;
             case 'e_art':
-                $term = Data::getEinsatzart($post_id);
+                $term = Data::getEinsatzart($postId);
                 if ($term) {
                     $url = esc_url(
                         add_query_arg(
@@ -286,7 +309,7 @@ class Admin
                 }
                 break;
             case 'e_fzg':
-                $fahrzeuge = Data::getFahrzeuge($post_id);
+                $fahrzeuge = Data::getFahrzeuge($postId);
 
                 if (!empty($fahrzeuge)) {
                     $out = array();

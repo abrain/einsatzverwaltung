@@ -352,9 +352,9 @@ class Settings
             'einsatzvw_rewrite_slug',
             sprintf(
                 'Basis f&uuml;r Links zu Einsatzberichten, zum %1$sArchiv%2$s und zum %3$sFeed%2$s.',
-                '<a href="'.get_post_type_archive_link('einsatz').'">',
+                '<a href="' . get_post_type_archive_link('einsatz') . '">',
                 '</a>',
-                '<a href="'.get_post_type_archive_feed_link('einsatz').'">'
+                '<a href="' . get_post_type_archive_feed_link('einsatz') . '">'
             ),
             $this->options->getRewriteSlug()
         );
@@ -368,7 +368,7 @@ class Settings
         printf('Jahreszahl + jahresbezogene, fortlaufende Nummer mit <input type="text" value="%2$s" size="2" id="%1$s" name="%1$s" /> Stellen<p class="description">Beispiel f&uuml;r den f&uuml;nften Einsatz in 2014:<br>bei 2 Stellen: 201405<br>bei 4 Stellen: 20140005</p><br>', 'einsatzvw_einsatznummer_stellen', $this->options->getEinsatznummerStellen());
         $this->echoSettingsCheckbox('einsatzvw_einsatznummer_lfdvorne', 'Laufende Nummer vor das Jahr stellen');
 
-        echo '<br><br><strong>Hinweis:</strong> Nach einer &Auml;nderung des Formats erhalten die bestehenden Einsatzberichte nicht automatisch aktualisierte Nummern. Nutzen Sie daf&uuml;r das Werkzeug <a href="'.admin_url('tools.php?page=einsatzvw-tool-enr').'">Einsatznummern reparieren</a>.';
+        echo '<br><br><strong>Hinweis:</strong> Nach einer &Auml;nderung des Formats erhalten die bestehenden Einsatzberichte nicht automatisch aktualisierte Nummern. Nutzen Sie daf&uuml;r das Werkzeug <a href="' . admin_url('tools.php?page=einsatzvw-tool-enr') . '">Einsatznummern reparieren</a>.';
     }
 
 
@@ -489,7 +489,7 @@ class Settings
                 continue;
             }
             $name = $this->utilities->getArrayValueIfKey($colInfo, 'longName', $colInfo['name']);
-            echo '<li id="'.$colId.'" class="evw-column"><span>'. $name .'</span></li>';
+            echo '<li id="' . $colId . '" class="evw-column"><span>' . $name . '</span></li>';
         }
         echo '</ul></td></tr></table>';
 
@@ -504,10 +504,10 @@ class Settings
 
             $colInfo = $columns[$colId];
             $name = $this->utilities->getArrayValueIfKey($colInfo, 'longName', $colInfo['name']);
-            echo '<li id="'.$colId.'" class="evw-column"><span>'. $name .'</span></li>';
+            echo '<li id="' . $colId . '" class="evw-column"><span>' . $name . '</span></li>';
         }
         echo '</ul></td></tr></table>';
-        echo '<input name="einsatzvw_list_columns" id="einsatzvw_list_columns" type="hidden" value="'.implode(',', $enabledColumns).'">';
+        echo '<input name="einsatzvw_list_columns" id="einsatzvw_list_columns" type="hidden" value="' . implode(',', $enabledColumns) . '">';
     }
 
     public function echoEinsatzlisteColumnSettings()
@@ -605,6 +605,7 @@ class Settings
         if ($new_value != $old_value) {
             $this->options->setFlushRewriteRules(true);
         }
+
         return $new_value;
     }
 

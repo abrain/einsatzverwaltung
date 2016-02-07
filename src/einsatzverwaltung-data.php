@@ -360,18 +360,7 @@ class Data
             $alarmzeit = date_create($inputAlarmzeit);
         }
         if (empty($alarmzeit)) {
-            // FIXME Auf das Datum aus dem $post-Objekt zugreifen, anstatt auf $_POST
-            $alarmzeit = date_create(
-                sprintf(
-                    '%s-%s-%s %s:%s:%s',
-                    $_POST['aa'],
-                    $_POST['mm'],
-                    $_POST['jj'],
-                    $_POST['hh'],
-                    $_POST['mn'],
-                    $_POST['ss']
-                )
-            );
+            $alarmzeit = date_create($post->post_date);
         } else {
             $updateArgs['post_date'] = date_format($alarmzeit, 'Y-m-d H:i:s');
             $updateArgs['post_date_gmt'] = get_gmt_from_date($updateArgs['post_date']);

@@ -496,13 +496,13 @@ class Frontend
      * Gibt die Einsatzart als String zurück, wenn vorhanden auch mit den übergeordneten Einsatzarten
      *
      * @param object $einsatzart
-     * @param bool $make_links
-     * @param bool $show_archive_links
+     * @param bool $makeLinks
+     * @param bool $showArchiveLinks
      * @param bool $showHierarchy
      *
      * @return string
      */
-    public static function getEinsatzartString($einsatzart, $make_links, $show_archive_links, $showHierarchy = true)
+    public static function getEinsatzartString($einsatzart, $makeLinks, $showArchiveLinks, $showHierarchy = true)
     {
         if ($einsatzart === false || is_wp_error($einsatzart) || empty($einsatzart)) {
             return '';
@@ -515,7 +515,7 @@ class Frontend
                 $einsatzart = get_term($einsatzart->parent, 'einsatzart');
             }
 
-            if ($make_links && $show_archive_links) {
+            if ($makeLinks && $showArchiveLinks) {
                 $title = 'Alle Eins&auml;tze vom Typ '. $einsatzart->name . ' anzeigen';
                 $url = get_term_link($einsatzart);
                 $link = '<a href="'.$url.'" class="fa fa-filter" style="text-decoration:none;" title="'.$title.'"></a>';

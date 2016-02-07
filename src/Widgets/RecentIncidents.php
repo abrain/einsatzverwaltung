@@ -137,29 +137,29 @@ class RecentIncidents extends WP_Widget
      *
      * @see WP_Widget::update()
      *
-     * @param array $new_instance Values just sent to be saved.
-     * @param array $old_instance Previously saved values from database.
+     * @param array $newInstance Values just sent to be saved.
+     * @param array $oldInstance Previously saved values from database.
      *
      * @return array Updated safe values to be saved.
      */
-    public function update($new_instance, $old_instance)
+    public function update($newInstance, $oldInstance)
     {
         $instance = array();
-        $instance['title'] = strip_tags($new_instance['title']);
+        $instance['title'] = strip_tags($newInstance['title']);
 
-        $anzahl = $new_instance['anzahl'];
+        $anzahl = $newInstance['anzahl'];
         if (empty($anzahl) || !is_numeric($anzahl) || $anzahl < 1) {
-            $instance['anzahl'] = $old_instance['anzahl'];
+            $instance['anzahl'] = $oldInstance['anzahl'];
         } else {
-            $instance['anzahl'] = $new_instance['anzahl'];
+            $instance['anzahl'] = $newInstance['anzahl'];
         }
 
-        $instance['zeigeDatum'] = self::$utilities->getArrayValueIfKey($new_instance, 'zeigeDatum', false);
-        $instance['zeigeZeit'] = self::$utilities->getArrayValueIfKey($new_instance, 'zeigeZeit', false);
-        $instance['zeigeOrt'] = self::$utilities->getArrayValueIfKey($new_instance, 'zeigeOrt', false);
-        $instance['zeigeArt'] = self::$utilities->getArrayValueIfKey($new_instance, 'zeigeArt', false);
-        $instance['zeigeArtHierarchie'] = self::$utilities->getArrayValueIfKey($new_instance, 'zeigeArtHierarchie', false);
-        $instance['zeigeFeedlink'] = self::$utilities->getArrayValueIfKey($new_instance, 'zeigeFeedlink', false);
+        $instance['zeigeDatum'] = self::$utilities->getArrayValueIfKey($newInstance, 'zeigeDatum', false);
+        $instance['zeigeZeit'] = self::$utilities->getArrayValueIfKey($newInstance, 'zeigeZeit', false);
+        $instance['zeigeOrt'] = self::$utilities->getArrayValueIfKey($newInstance, 'zeigeOrt', false);
+        $instance['zeigeArt'] = self::$utilities->getArrayValueIfKey($newInstance, 'zeigeArt', false);
+        $instance['zeigeArtHierarchie'] = self::$utilities->getArrayValueIfKey($newInstance, 'zeigeArtHierarchie', false);
+        $instance['zeigeFeedlink'] = self::$utilities->getArrayValueIfKey($newInstance, 'zeigeFeedlink', false);
 
         return $instance;
     }

@@ -263,19 +263,19 @@ class Admin
      * Einsatzberichte im Adminbereich
      *
      * @param string $column
-     * @param int $post_id
+     * @param int $postId
      */
-    public function filterColumnContentEinsatz($column, $post_id)
+    public function filterColumnContentEinsatz($column, $postId)
     {
         global $post;
 
         switch ($column) {
             case 'e_nummer':
-                $einsatz_nummer = Data::getEinsatznummer($post_id);
+                $einsatz_nummer = Data::getEinsatznummer($postId);
                 echo (empty($einsatz_nummer) ? '-' : $einsatz_nummer);
                 break;
             case 'e_einsatzende':
-                $einsatz_einsatzende = Data::getEinsatzende($post_id);
+                $einsatz_einsatzende = Data::getEinsatzende($postId);
                 if (empty($einsatz_einsatzende)) {
                     echo '-';
                 } else {
@@ -284,7 +284,7 @@ class Admin
                 }
                 break;
             case 'e_alarmzeit':
-                $einsatz_alarmzeit = Data::getAlarmzeit($post_id);
+                $einsatz_alarmzeit = Data::getAlarmzeit($postId);
 
                 if (empty($einsatz_alarmzeit)) {
                     echo '-';
@@ -294,7 +294,7 @@ class Admin
                 }
                 break;
             case 'e_art':
-                $term = Data::getEinsatzart($post_id);
+                $term = Data::getEinsatzart($postId);
                 if ($term) {
                     $url = esc_url(
                         add_query_arg(
@@ -309,7 +309,7 @@ class Admin
                 }
                 break;
             case 'e_fzg':
-                $fahrzeuge = Data::getFahrzeuge($post_id);
+                $fahrzeuge = Data::getFahrzeuge($postId);
 
                 if (!empty($fahrzeuge)) {
                     $out = array();

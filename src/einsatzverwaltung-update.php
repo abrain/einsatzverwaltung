@@ -39,12 +39,12 @@ class Update
     /**
      * Fürt ein Update der Datenbank duch
      *
-     * @param int $current_db_ver derzeitige Version der Datenbank
-     * @param int $target_db_ver Zielversion der Datenbank
+     * @param int $currentDbVersion derzeitige Version der Datenbank
+     * @param int $targetDbVersion Zielversion der Datenbank
      */
-    public function doUpdate($current_db_ver, $target_db_ver)
+    public function doUpdate($currentDbVersion, $targetDbVersion)
     {
-        if (empty($current_db_ver) || empty($target_db_ver)) {
+        if (empty($currentDbVersion) || empty($targetDbVersion)) {
             error_log('Parameter für Datenbank-Update unvollständig');
             return;
         }
@@ -52,22 +52,22 @@ class Update
         // Kein Timeout während des Updates
         set_time_limit(0);
 
-        while ($current_db_ver < $target_db_ver) {
-            $current_db_ver ++;
-            error_log("Update auf DB-Version {$current_db_ver}...");
-            $func = array($this, "updateTo{$current_db_ver}");
+        while ($currentDbVersion < $targetDbVersion) {
+            $currentDbVersion ++;
+            error_log("Update auf DB-Version {$currentDbVersion}...");
+            $func = array($this, "updateTo{$currentDbVersion}");
             if (!is_callable($func)) {
-                error_log("Keine Update-Methode für Datenbankversion {$current_db_ver} gefunden!");
+                error_log("Keine Update-Methode für Datenbankversion {$currentDbVersion} gefunden!");
                 break;
             }
 
             $result = call_user_func($func);
             if ($result === false) {
-                error_log("Datenbankupdate auf Version {$current_db_ver} ist fehlgeschlagen");
+                error_log("Datenbankupdate auf Version {$currentDbVersion} ist fehlgeschlagen");
                 break;
             }
 
-            update_option('einsatzvw_db_version', $current_db_ver);
+            update_option('einsatzvw_db_version', $currentDbVersion);
         }
 
         error_log("Datenbank-Update beendet");

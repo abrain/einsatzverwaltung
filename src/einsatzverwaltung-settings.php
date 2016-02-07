@@ -634,25 +634,34 @@ class Settings
      *
      * @param string $newValue Der neue Wert
      * @param string $oldValue Der alte Wert
+     *
      * @return string Der zu speichernde Wert
      */
     public function maybeCategoryChanged($newValue, $oldValue)
     {
-        if ($newValue != $oldValue) {
-            error_log("Changed from $oldValue to $newValue");
+        // Nur Änderungen sind interessant
+        if ($newValue == $oldValue) {
+            return $newValue;
+        }
 
-            $posts = get_posts(array(
-                'post_type' => 'einsatz',
-                'post_status' => array('publish', 'private'),
-                'numberposts' => -1
-            ));
+        $posts = get_posts(array(
+            'post_type' => 'einsatz',
+            'post_status' => array('publish', 'private'),
+            'numberposts' => -1
+        ));
 
+        // Wenn zuvor eine Kategorie gesetzt war, müssen die Einsatzberichte aus dieser entfernt werden
+        if ($oldValue != -1) {
             foreach ($posts as $post) {
-                if ($oldValue != -1) {
-                    $this->utilities->removePostFromCategory($post->ID, $oldValue);
-                }
+                $this->utilities->removePostFromCategory($post->ID, $oldValue);
+            }
+        }
 
-                if ($newValue != -1) {
+        // Wenn eine neue Kategorie gesetzt wird, müssen Einsatzberichte dieser zugeordnet werden
+        if ($newValue != -1) {
+            $onlySpecialInCategory = $this->options->isOnlySpecialInCategory();
+            foreach ($posts as $post) {
+                if (!$onlySpecialInCategory || $this->data->isSpecial($post->ID)) {
                     $this->utilities->addPostToCategory($post->ID, $newValue);
                 }
             }

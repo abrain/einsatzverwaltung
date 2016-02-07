@@ -317,10 +317,10 @@ class Frontend
             rsort($einsatzjahre);
         }
 
+        $string = '';
         $enabledColumns = $this->options->getEinsatzlisteEnabledColumns();
         $numEnabledColumns = count($enabledColumns);
         foreach ($einsatzjahre as $einsatzjahr) {
-
             /* Einsätze mit Jahreszahl als Überschrift eingefügt */
             $string .= '<h2>Eins&auml;tze '.$einsatzjahr.'</h2>';
             /* Tabellen Klasse auf geändertes CSS für das Responsive Design umgestellt */

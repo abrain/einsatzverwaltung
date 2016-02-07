@@ -138,8 +138,8 @@ class Frontend
             $einsatz_datum = ($alarm_timestamp ? date_i18n($datumsformat, $alarm_timestamp) : '-');
             $einsatz_zeit = ($alarm_timestamp ? date_i18n($zeitformat, $alarm_timestamp).' Uhr' : '-');
 
-            $headerstring = "<strong>Datum:</strong> ".$einsatz_datum."<br>";
-            $headerstring .= "<strong>Alarmzeit:</strong> ".$einsatz_zeit."<br>";
+            $headerstring = "<strong>Datum:</strong> ".$einsatz_datum."&nbsp;<br>";
+            $headerstring .= "<strong>Alarmzeit:</strong> ".$einsatz_zeit."&nbsp;<br>";
             $headerstring .= $this->getDetailString('Alarmierungsart:', $alarm_string);
             $headerstring .= $this->getDetailString('Dauer:', $dauerstring);
             $headerstring .= $this->getDetailString('Art:', $art);
@@ -170,7 +170,7 @@ class Frontend
             return '';
         }
 
-        return '<strong>'.$title.'</strong> '.$value.($newline ? '<br>' : '');
+        return '<strong>'.$title.'</strong> '.$value.($newline ? '&nbsp;<br>' : '&nbsp;');
     }
 
 
@@ -319,9 +319,14 @@ class Frontend
 
         $enabledColumns = $this->options->getEinsatzlisteEnabledColumns();
         $numEnabledColumns = count($enabledColumns);
-
-        $string = '<table class="einsatzliste">';
         foreach ($einsatzjahre as $einsatzjahr) {
+
+            /* Einsätze mit Jahreszahl als Überschrift eingefügt */
+            $string .= '<h2>Eins&auml;tze '.$einsatzjahr.'</h2>';
+            /* Tabellen Klasse auf geändertes CSS für das Responsive Design umgestellt */
+            $string .= '<table class="responsive-stacked-table with-mobile-labels">';
+        
+        
             $query = new WP_Query(array('year' => $einsatzjahr,
                 'post_type' => 'einsatz',
                 'post_status' => 'publish',
@@ -331,7 +336,6 @@ class Frontend
             ));
 
             $string .= '<tbody>';
-            $string .= '<tr class="einsatzliste-title"><td class="einsatzliste-title-year" colspan="' . $numEnabledColumns . '">Eins&auml;tze '.$einsatzjahr.'</td></tr>';
             if ($query->have_posts()) {
                 $lfd = ($desc ? $query->found_posts : 1);
                 $oldmonth = 0;
@@ -348,13 +352,14 @@ class Frontend
                     $month = date('m', $einsatz_timestamp);
 
                     if ($splitmonths && $month != $oldmonth) {
-                        $string .= '<tr class="einsatzliste-title"><td class="einsatzliste-title-month" colspan="' . $numEnabledColumns . '">' . date_i18n('F', $einsatz_timestamp) . '</td></tr>';
+                        $string .= '<tr><td class="einsatz-title-month" colspan="' . $numEnabledColumns . '">' . date_i18n('F', $einsatz_timestamp) . '</td></tr>';
                         $string .= $this->getEinsatzlisteHeader();
                     }
 
-                    $string .= '<tr class="einsatzliste-row">';
+                    $string .= '<tr>';
                     foreach ($enabledColumns as $colId) {
-                        $string .= '<td>';
+                        /* Klasse auf einsatz-col geändert für Responsive Design */
+                        $string .= '<td class="einsatz-column-' . $colId . '">';
                         if ($colId == 'seqNum') {
                             $string .= $lfd;
                         } else {
@@ -368,12 +373,12 @@ class Frontend
                     $lfd += ($desc ? -1 : 1);
                 }
             } else {
-                $string .= '<tr class="einsatzliste-row-noresult"><td colspan="' . $numEnabledColumns . '">' . sprintf('Keine Eins&auml;tze im Jahr %s', $einsatzjahr) . '</td></tr>';
+                $string .= '<tr><td colspan="' . $numEnabledColumns . '">' . sprintf('Keine Eins&auml;tze im Jahr %s', $einsatzjahr) . '</td></tr>';
             }
             $string .= '</tbody>';
+            /* Tabellenende in die "foreach einsatzjahre" Schleife gezogen um 1 Tabelle pro Jahr zu Realisieren */
+            $string .= '</table>';
         }
-        $string .= '</table>';
-
         return $string;
     }
 
@@ -386,7 +391,7 @@ class Frontend
         $columns = $this->core->getListColumns();
         $enabledColumns = $this->options->getEinsatzlisteEnabledColumns();
 
-        $string = '<tr class="einsatzliste-header">';
+        $string = '<tr class="einsatz-header">';
         foreach ($enabledColumns as $colId) {
             if (!array_key_exists($colId, $columns)) {
                 continue;

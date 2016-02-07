@@ -20,15 +20,34 @@ class Data
     private $utilities;
 
     /**
+     * @var Options
+     */
+    private $options;
+
+    /**
      * Constructor
      *
      * @param Core $core
      * @param Utilities $utilities
+     * @param Options $options
      */
-    public function __construct($core, $utilities)
+    public function __construct($core, $utilities, $options)
     {
         $this->core = $core;
         $this->utilities = $utilities;
+
+        $this->addHooks();
+        $this->options = $options;
+    }
+
+    private function addHooks()
+    {
+        add_action('save_post_einsatz', array($this, 'savePostdata'), 10, 2);
+        add_action('private_einsatz', array($this, 'onPublish'), 10, 2);
+        add_action('publish_einsatz', array($this, 'onPublish'), 10, 2);
+        add_action('trash_einsatz', array($this, 'onTrash'), 10, 2);
+        add_filter('sanitize_post_meta_einsatz_fehlalarm', array($this->utilities, 'sanitizeCheckbox'));
+        add_filter('sanitize_post_meta_einsatz_special', array($this->utilities, 'sanitizeCheckbox'));
     }
 
     /**
@@ -258,6 +277,18 @@ class Data
     }
 
     /**
+     * Gibt die laufende Nummer des Einsatzberichts bezogen auf das Kalenderjahr zurück
+     *
+     * @param int $postId ID des Einsatzberichts
+     *
+     * @return mixed
+     */
+    public static function getLaufendeNummer($postId)
+    {
+        return get_post_meta($postId, 'einsatz_seqNum', true);
+    }
+
+    /**
      * Gibt die eingetragene Mannschaftsstärke zurück
      *
      * @param int $postId ID des Einsatzberichts
@@ -280,19 +311,31 @@ class Data
     }
 
     /**
+     * Gibt zurück, ob ein Einsatzbericht als besonders markiert wurde oder nicht
+     *
+     * @param int $postId
+     * @return bool
+     */
+    public static function isSpecial($postId)
+    {
+        return get_post_meta($postId, 'einsatz_special', true);
+    }
+
+    /**
      * Zusätzliche Metadaten des Einsatzberichts speichern
      *
      * @param int $postId ID des Posts
+     * @param \WP_Post $post Das Post-Objekt
      */
-    public function savePostdata($postId)
+    public function savePostdata($postId, $post)
     {
-        // verify if this is an auto save routine.
-        // If it is our form has not been submitted, so we dont want to do anything
+        // Automatische Speicherungen sollen nicht berücksichtigt werden
         if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
             return;
         }
 
-        if (!array_key_exists('post_type', $_POST) || 'einsatz' !== $_POST['post_type']) {
+        // Fängt Speichervorgänge per QuickEdit ab
+        if (defined('DOING_AJAX') && DOING_AJAX) {
             return;
         }
 
@@ -316,17 +359,7 @@ class Data
             $alarmzeit = date_create($inputAlarmzeit);
         }
         if (empty($alarmzeit)) {
-            $alarmzeit = date_create(
-                sprintf(
-                    '%s-%s-%s %s:%s:%s',
-                    $_POST['aa'],
-                    $_POST['mm'],
-                    $_POST['jj'],
-                    $_POST['hh'],
-                    $_POST['mn'],
-                    $_POST['ss']
-                )
-            );
+            $alarmzeit = date_create($post->post_date);
         } else {
             $updateArgs['post_date'] = date_format($alarmzeit, 'Y-m-d H:i:s');
             $updateArgs['post_date_gmt'] = get_gmt_from_date($updateArgs['post_date']);
@@ -360,8 +393,9 @@ class Data
         // Mannschaftsstärke validieren
         $mannschaftsstaerke = sanitize_text_field($_POST['einsatzverwaltung_mannschaft']);
 
-        // Fehlalarm validieren
+        // Vermerke validieren
         $fehlalarm = $this->utilities->sanitizeCheckbox(array($_POST, 'einsatzverwaltung_fehlalarm'));
+        $isSpecial = $this->utilities->sanitizeCheckbox(array($_POST, 'einsatzverwaltung_special'));
 
         // Metadaten schreiben
         update_post_meta($postId, 'einsatz_alarmzeit', date_format($alarmzeit, 'Y-m-d H:i'));
@@ -370,16 +404,87 @@ class Data
         update_post_meta($postId, 'einsatz_einsatzleiter', $einsatzleiter);
         update_post_meta($postId, 'einsatz_mannschaft', $mannschaftsstaerke);
         update_post_meta($postId, 'einsatz_fehlalarm', $fehlalarm);
+        update_post_meta($postId, 'einsatz_special', $isSpecial);
 
         if (!empty($updateArgs)) {
-            if (! wp_is_post_revision($postId)) {
-                $updateArgs['ID'] = $postId;
+            $updateArgs['ID'] = $postId;
 
-                // save_post Filter kurzzeitig deaktivieren, damit keine Dauerschleife entsteht
-                remove_action('save_post', array($this, 'savePostdata'));
-                wp_update_post($updateArgs);
-                add_action('save_post', array($this, 'savePostdata'));
+            // save_post Filter kurzzeitig deaktivieren, damit keine Dauerschleife entsteht
+            remove_action('save_post_einsatz', array($this, 'savePostdata'));
+            wp_update_post($updateArgs);
+            add_action('save_post_einsatz', array($this, 'savePostdata'), 10, 2);
+        }
+    }
+
+    /**
+     * Aktualisiert die laufende Nummer der Einsatzberichte
+     *
+     * @param string|null $yearToUpdate Kalenderjahr, für das die laufenden Nummern aktualisiert werden soll. Wird der
+     * Parameter weggelassen, werden die Einsatzberichte aus allen Jahren aktualisiert.
+     */
+    public function updateSequenceNumbers($yearToUpdate = null)
+    {
+        if (empty($yearToUpdate)) {
+            $years = self::getJahreMitEinsatz();
+        }
+
+        if (!is_array($yearToUpdate) && is_string($yearToUpdate) && is_numeric($yearToUpdate)) {
+            $years = array($yearToUpdate);
+        }
+
+        if (empty($years) || !is_array($years)) {
+            return;
+        }
+
+        foreach ($years as $year) {
+            $posts = self::getEinsatzberichte($year);
+
+            $counter = 1;
+            foreach ($posts as $post) {
+                update_post_meta($post->ID, 'einsatz_seqNum', $counter);
+                $counter++;
             }
+        }
+    }
+
+    /**
+     * Wird aufgerufen, sobald ein Einsatzbericht veröffentlicht wird
+     *
+     * @param int $postId Die ID des Einsatzberichts
+     * @param \WP_Post $post Das Post-Objekt des Einsatzberichts
+     */
+    public function onPublish($postId, $post)
+    {
+        // Laufende Nummern aktualisieren
+        $date = date_create($post->post_date);
+        $this->updateSequenceNumbers(date_format($date, 'Y'));
+
+        // Kategoriezugehörigkeit aktualisieren
+        $category = $this->options->getEinsatzberichteCategory();
+        if ($category != -1) {
+            if (!($this->options->isOnlySpecialInCategory()) || self::isSpecial($postId)) {
+                $this->utilities->addPostToCategory($postId, $category);
+            }
+        }
+    }
+
+    /**
+     * Wird aufgerufen, sobald ein Einsatzbericht in den Papierkorb verschoben wird
+     *
+     * @param int $postId Die ID des Einsatzberichts
+     * @param \WP_Post $post Das Post-Objekt des Einsatzberichts
+     */
+    public function onTrash($postId, $post)
+    {
+        // Laufende Nummern aktualisieren
+        $date = date_create($post->post_date);
+        $this->updateSequenceNumbers(date_format($date, 'Y'));
+        delete_post_meta($postId, 'einsatz_seqNum');
+
+        // Kategoriezugehörigkeit aktualisieren
+        $category = $this->options->getEinsatzberichteCategory();
+        if ($category != -1) {
+            $this->utilities->removePostFromCategory($postId, $category);
         }
     }
 
@@ -400,8 +505,8 @@ class Data
         $updateArgs['ID'] = $postId;
 
         // keine Sonderbehandlung beim Speichern
-        remove_action('save_post', array($this, 'savePostdata'));
+        remove_action('save_post_einsatz', array($this, 'savePostdata'));
         wp_update_post($updateArgs);
-        add_action('save_post', array($this, 'savePostdata'));
+        add_action('save_post_einsatz', array($this, 'savePostdata'), 10, 2);
     }
 }

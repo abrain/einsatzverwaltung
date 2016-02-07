@@ -45,7 +45,7 @@ class Frontend
         add_filter('the_content', array($this, 'renderContent'));
         add_filter('the_excerpt', array($this, 'filterEinsatzExcerpt'));
         add_filter('the_excerpt_rss', array($this, 'filterEinsatzExcerptFeed'));
-        add_action('pre_get_posts', array($this, 'addEinsatzberichteToMainloop'));
+        add_action('pre_get_posts', array($this, 'addReportsToQuery'));
     }
 
     /**
@@ -280,14 +280,17 @@ class Frontend
      *
      * @param WP_Query $query
      */
-    public function addEinsatzberichteToMainloop($query)
+    public function addReportsToQuery($query)
     {
-        if ((
-                is_home() && $this->options->isShowEinsatzberichteInMainloop() ||
-                is_tag()
-            ) &&
+        $categoryId = $this->options->getEinsatzberichteCategory();
+        if (!is_admin() &&
             $query->is_main_query() &&
-            empty($query->query_vars['suppress_filters'])
+            empty($query->query_vars['suppress_filters']) &&
+            (
+                $query->is_home() && $this->options->isShowEinsatzberichteInMainloop() ||
+                $query->is_tag() ||
+                $categoryId != -1 && $query->is_category($categoryId)
+            )
         ) {
             if (isset($query->query_vars['post_type'])) {
                 $post_types = (array) $query->query_vars['post_type'];
@@ -333,7 +336,6 @@ class Frontend
             $string .= '<tbody>';
             $string .= '<tr class="einsatzliste-title"><td class="einsatzliste-title-year" colspan="' . $numEnabledColumns . '">Eins&auml;tze '.$einsatzjahr.'</td></tr>';
             if ($query->have_posts()) {
-                $lfd = ($desc ? $query->found_posts : 1);
                 $oldmonth = 0;
 
                 if (!$splitmonths) {
@@ -354,18 +356,11 @@ class Frontend
 
                     $string .= '<tr class="einsatzliste-row">';
                     foreach ($enabledColumns as $colId) {
-                        $string .= '<td>';
-                        if ($colId == 'seqNum') {
-                            $string .= $lfd;
-                        } else {
-                            $string .= self::getEinsatzlisteCellContent($query->post->ID, $colId);
-                        }
-                        $string .= '</td>';
+                        $string .= '<td>' . self::getEinsatzlisteCellContent($query->post->ID, $colId) . '</td>';
                     }
                     $string .= '</tr>';
 
                     $oldmonth = $month;
-                    $lfd += ($desc ? -1 : 1);
                 }
             } else {
                 $string .= '<tr class="einsatzliste-row-noresult"><td colspan="' . $numEnabledColumns . '">' . sprintf('Keine Eins&auml;tze im Jahr %s', $einsatzjahr) . '</td></tr>';
@@ -468,6 +463,9 @@ class Frontend
                 $einsatzart = Data::getEinsatzart($postId);
                 $showHierarchy = $this->options->getBoolOption('einsatzvw_list_art_hierarchy');
                 return self::getEinsatzartString($einsatzart, false, false, $showHierarchy);
+                break;
+            case 'seqNum':
+                return Data::getLaufendeNummer($postId);
                 break;
             default:
                 return '&nbsp;';

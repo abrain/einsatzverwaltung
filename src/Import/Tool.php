@@ -193,6 +193,9 @@ class Tool
                 return;
             }
 
+            echo '<p>Die CSV-Datei muss f&uuml;r den Import ein bestimmtes Format aufweisen. Jede Zeile in der Datei steht f&uuml;r einen Einsatzbericht und jede Spalte f&uuml;r ein Feld des Einsatzberichts (z.B. Alarmzeit, Einsatzort, ...). Die Reihenfolge der Spalten ist unerheblich, im n&auml;chsten Schritt k&ouml;nnen die Felder aus der Datei denen in der Einsatzverwaltung zugeordnet werden. Die erste Zeile in der Datei kann als Beschriftung der Spalten verwendet werden.</p>';
+            $this->printDataNotice();
+
             echo '<form method="post">';
             wp_nonce_field($this->getNonceAction($this->currentSource, $this->nextAction['slug']));
 
@@ -271,17 +274,9 @@ class Tool
         }
         $this->utilities->printSuccess(sprintf("Es wurden %s Eins&auml;tze gefunden", count($entries)));
 
-        // Hinweise ausgeben
-        echo '<h3>Hinweise zu den erwarteten Daten</h3>';
-        echo '<p>Die Felder <strong>Berichtstext, Berichtstitel, Einsatzleiter, Einsatzort</strong> und <strong>Mannschaftsst&auml;rke</strong> sind Freitextfelder.</p>';
-        echo '<p>F&uuml;r die Felder <strong>Alarmierungsart, Einsatzart, Externe Einsatzmittel</strong> und <strong>Fahrzeuge</strong> wird eine kommagetrennte Liste erwartet.<br>Bisher unbekannte Eintr&auml;ge werden automatisch angelegt, die Einsatzart sollte nur ein einzelner Wert sein.</p>';
         if ('evw_wpe' == $this->currentSource->getIdentifier()) {
-            echo '<p>Das Feld <strong>Einsatzende</strong> erwartet eine Datums- und Zeitangabe im Format <code>JJJJ-MM-TT hh:mm:ss</code> (z.B. 2014-04-21 21:48:06). Die Sekundenangabe ist optional.</p>';
+            $this->printDataNotice();
         }
-        if ('evw_csv' == $this->currentSource->getIdentifier()) {
-            echo '<p>Die Felder <strong>Alarmzeit</strong> und <strong>Einsatzende</strong> erwarten eine Datums- und Zeitangabe im unten einstellbaren Format.</p>';
-        }
-        echo '<p>Das Feld <strong>Fehlalarm</strong> erwartet den Wert 1 (= ja) oder 0 (= nein). Es darf auch leer bleiben, was als 0 (= nein) zählt.</p>';
 
         // Felder matchen
         echo "<h3>Felder zuordnen</h3>";
@@ -329,5 +324,20 @@ class Tool
         // Import starten
         echo '<p>Die Daten werden eingelesen, das kann einen Moment dauern.</p>';
         $this->helper->import($this->currentSource, $mapping);
+    }
+
+    private function printDataNotice()
+    {
+        // Hinweise ausgeben
+        echo '<h3>Hinweise zu den erwarteten Daten</h3>';
+        echo '<p>Die Felder <strong>Berichtstext, Berichtstitel, Einsatzleiter, Einsatzort</strong> und <strong>Mannschaftsst&auml;rke</strong> sind Freitextfelder.</p>';
+        echo '<p>F&uuml;r die Felder <strong>Alarmierungsart, Einsatzart, Externe Einsatzmittel</strong> und <strong>Fahrzeuge</strong> wird eine kommagetrennte Liste erwartet.<br>Bisher unbekannte Eintr&auml;ge werden automatisch angelegt, die Einsatzart sollte nur ein einzelner Wert sein.</p>';
+        if ('evw_wpe' == $this->currentSource->getIdentifier()) {
+            echo '<p>Das Feld <strong>Einsatzende</strong> erwartet eine Datums- und Zeitangabe im Format <code>JJJJ-MM-TT hh:mm:ss</code> (z.B. 2014-04-21 21:48:06). Die Sekundenangabe ist optional.</p>';
+        }
+        if ('evw_csv' == $this->currentSource->getIdentifier()) {
+            echo '<p>Die Felder <strong>Alarmzeit</strong> und <strong>Einsatzende</strong> erwarten eine Datums- und Zeitangabe, das Format kann bei der Zuordnung der Felder angegeben werden.</p>';
+        }
+        echo '<p>Die Felder <strong>Besonderer Einsatz</strong> und <strong>Fehlalarm</strong> erwarten den Wert <code>1</code> (= ja) oder <code>0</code> (= nein). Sie d&uuml;rfen auch leer bleiben, was als 0 (= nein) zählt.</p>';
     }
 }

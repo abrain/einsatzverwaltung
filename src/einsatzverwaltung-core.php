@@ -29,7 +29,7 @@ use WP_User;
 class Core
 {
     const VERSION = '1.1.5';
-    const DB_VERSION = 7;
+    const DB_VERSION = 8;
 
     public $pluginFile;
     public $pluginBasename;
@@ -246,9 +246,9 @@ class Core
         $this->utilities->setDependencies($this->options);
 
         new Admin($this, $this->utilities);
-        $this->data = new Data($this, $this->utilities);
+        $this->data = new Data($this, $this->utilities, $this->options);
         $frontend = new Frontend($this, $this->options, $this->utilities);
-        new Settings($this, $this->options, $this->utilities);
+        new Settings($this, $this->options, $this->utilities, $this->data);
         new Shortcodes($frontend);
         new Taxonomies($this->utilities);
 
@@ -268,10 +268,8 @@ class Core
     {
         add_action('init', array($this, 'onInit'));
         add_action('plugins_loaded', array($this, 'onPluginsLoaded'));
-        add_action('save_post', array($this->data, 'savePostdata'));
         register_activation_hook($this->pluginFile, array($this, 'onActivation'));
         register_deactivation_hook($this->pluginFile, array($this, 'onDeactivation'));
-        add_filter('posts_where', array($this, 'postsWhere'), 10, 2);
         add_action('widgets_init', array($this, 'registerWidgets'));
         add_filter('user_has_cap', array($this, 'userHasCap'), 10, 4);
     }
@@ -358,26 +356,6 @@ class Core
     {
         register_widget('abrain\Einsatzverwaltung\Widgets\RecentIncidents');
         register_widget('abrain\Einsatzverwaltung\Widgets\RecentIncidentsFormatted');
-    }
-
-    /**
-     * Modifiziert die WHERE-Klausel bei bestimmten Datenbankabfragen
-     *
-     * @since 1.0.0
-     *
-     * @param string $where Die original WHERE-Klausel
-     * @param WP_Query $wpq Die verwendete WP-Query-Instanz
-     *
-     * @return string Die zu verwendende WHERE-Klausel
-     */
-    public function postsWhere($where, $wpq)
-    {
-        if ($wpq->is_category && $wpq->get_queried_object_id() === $this->options->getEinsatzberichteCategory()) {
-            // Einsatzberichte in die eingestellte Kategorie einblenden
-            global $wpdb;
-            return $where . " OR {$wpdb->posts}.post_type = 'einsatz' AND ({$wpdb->posts}.post_status = 'publish' OR {$wpdb->posts}.post_status = 'private')";
-        }
-        return $where;
     }
 
     /**
@@ -556,7 +534,7 @@ class Core
         }
 
         require_once(__DIR__ . '/einsatzverwaltung-update.php');
-        $update = new Update($this, $this->options);
+        $update = new Update($this, $this->options, $this->utilities);
         $update->doUpdate($currentDbVersion, self::DB_VERSION);
     }
 }

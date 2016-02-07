@@ -19,14 +19,21 @@ class Update
     private $options;
 
     /**
+     * @var Utilities
+     */
+    private $utilities;
+
+    /**
      * Update constructor.
      * @param Core $core
      * @param Options $options
+     * @param Utilities $utilities
      */
-    public function __construct($core, $options)
+    public function __construct($core, $options, $utilities)
     {
         $this->core = $core;
         $this->options = $options;
+        $this->utilities = $utilities;
     }
 
     /**
@@ -167,5 +174,29 @@ class Update
     private function updateTo7()
     {
         $this->options->setFlushRewriteRules(true);
+    }
+
+    /**
+     * Fügt alle veröffentlichten Einsatzberichte einer Kategorie hinzu, wenn diese in den Einstellungen für die
+     * Einsatzberichte gesetzt wurde
+     */
+    private function updateTo8()
+    {
+        if (!function_exists('category_exists')) {
+            require_once(ABSPATH . 'wp-admin/includes/taxonomy.php');
+        }
+
+        $categoryId = $this->options->getEinsatzberichteCategory();
+        if (category_exists($categoryId)) {
+            $posts = get_posts(array(
+                'post_type' => 'einsatz',
+                'post_status' => array('publish', 'private'),
+                'numberposts' => -1
+            ));
+
+            foreach ($posts as $post) {
+                $this->utilities->addPostToCategory($post->ID, $categoryId);
+            }
+        }
     }
 }

@@ -42,7 +42,7 @@ class Data
 
     private function addHooks()
     {
-        add_action('save_post_einsatz', array($this, 'savePostdata'), 10, 3);
+        add_action('save_post_einsatz', array($this, 'savePostdata'), 10, 2);
         add_action('private_einsatz', array($this, 'onPublish'), 10, 2);
         add_action('publish_einsatz', array($this, 'onPublish'), 10, 2);
         add_action('trash_einsatz', array($this, 'onTrash'), 10, 2);
@@ -326,9 +326,8 @@ class Data
      *
      * @param int $postId ID des Posts
      * @param \WP_Post $post Das Post-Objekt
-     * @param bool $update Ob ein bestehender Post aktualisiert wird oder nicht
      */
-    public function savePostdata($postId, $post, $update)
+    public function savePostdata($postId, $post)
     {
         // Automatische Speicherungen sollen nicht berücksichtigt werden
         if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
@@ -394,9 +393,8 @@ class Data
         // Mannschaftsstärke validieren
         $mannschaftsstaerke = sanitize_text_field($_POST['einsatzverwaltung_mannschaft']);
 
-        // Fehlalarm validieren
+        // Vermerke validieren
         $fehlalarm = $this->utilities->sanitizeCheckbox(array($_POST, 'einsatzverwaltung_fehlalarm'));
-
         $isSpecial = $this->utilities->sanitizeCheckbox(array($_POST, 'einsatzverwaltung_special'));
 
         // Metadaten schreiben
@@ -414,7 +412,7 @@ class Data
             // save_post Filter kurzzeitig deaktivieren, damit keine Dauerschleife entsteht
             remove_action('save_post_einsatz', array($this, 'savePostdata'));
             wp_update_post($updateArgs);
-            add_action('save_post_einsatz', array($this, 'savePostdata'), 10, 3);
+            add_action('save_post_einsatz', array($this, 'savePostdata'), 10, 2);
         }
     }
 
@@ -509,6 +507,6 @@ class Data
         // keine Sonderbehandlung beim Speichern
         remove_action('save_post_einsatz', array($this, 'savePostdata'));
         wp_update_post($updateArgs);
-        add_action('save_post_einsatz', array($this, 'savePostdata'), 10, 3);
+        add_action('save_post_einsatz', array($this, 'savePostdata'), 10, 2);
     }
 }

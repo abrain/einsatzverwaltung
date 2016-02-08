@@ -2,6 +2,8 @@
 
 namespace abrain\Einsatzverwaltung\Model;
 
+use WP_Post;
+
 /**
  * Datenmodellklasse für Einsatzberichte
  *
@@ -9,6 +11,35 @@ namespace abrain\Einsatzverwaltung\Model;
  */
 class IncidentReport
 {
+    /**
+     * Wenn es sich um einen bestehenden Beitrag handelt, ist hier das WordPress-Beitragsobjekt gespeichert.
+     *
+     * @var WP_Post
+     */
+    private $post;
+
+    /**
+     * IncidentReport constructor.
+     *
+     * @param int|WP_Post $post
+     */
+    public function __construct($post = null)
+    {
+        if (!empty($post) && !is_int($post) && !is_a($post, 'WP_Post')) {
+            _doing_it_wrong(__FUNCTION__, 'Parameter post muss null oder vom Typ Integer oder WP_Post sein', null);
+            return;
+        }
+
+        if (!empty($post)) {
+            if (get_post_type($post) != 'einsatz') {
+                _doing_it_wrong(__FUNCTION__, 'WP_Post-Objekt ist kein Einsatzbericht', null);
+                return;
+            }
+
+            $this->post = get_post($post);
+        }
+    }
+
     /**
      * Gibt die Beschriftung für ein Feld zurück
      *

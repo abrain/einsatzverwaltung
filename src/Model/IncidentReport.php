@@ -182,6 +182,14 @@ class IncidentReport
     }
 
     /**
+     * @return bool|int
+     */
+    public function getPostId()
+    {
+        return $this->post ? $this->post->ID : false;
+    }
+
+    /**
      * Gibt die laufende Nummer des Einsatzberichts bezogen auf das Kalenderjahr zurück
      *
      * @return mixed

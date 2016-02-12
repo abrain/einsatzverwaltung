@@ -1,19 +1,26 @@
 <?php
 namespace abrain\Einsatzverwaltung\Frontend;
 
+use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Utilities;
 use DateTime;
 
 /**
  * Tabellarische Übersicht für Einsatzberichte
- * 
+ *
  * @author Andreas Brain
  * @package abrain\Einsatzverwaltung\Frontend
  */
 class ReportList
 {
     private $columns;
+
+    /**
+     * @var Core
+     */
+    private $core;
+
     private $numberOfColumns;
 
     /**
@@ -39,10 +46,12 @@ class ReportList
      * ReportList constructor.
      *
      * @param Utilities $utilities
+     * @param Core $core
      */
-    public function __construct($utilities)
+    public function __construct($utilities, $core)
     {
         $this->utilities = $utilities;
+        $this->core = $core;
     }
 
     /**
@@ -151,7 +160,20 @@ class ReportList
 
     private function insertTableHeader()
     {
-        // TODO
+        $allColumns = $this->core->getListColumns();
+
+        $this->string .= '<tr class="einsatz-header">';
+        foreach ($this->columns as $colId) {
+            if (!array_key_exists($colId, $allColumns)) {
+                $this->string .= '<th>&nbsp;</th>';
+                continue;
+            }
+
+            $colInfo = $allColumns[$colId];
+            $style = $this->utilities->getArrayValueIfKey($colInfo, 'nowrap', false) ? 'white-space: nowrap;' : '';
+            $this->string .= '<th' . (empty($style) ? '' : ' style="' . $style . '"') . '>' . $colInfo['name'] . '</th>';
+        }
+        $this->string .= '</tr>';
     }
 
     /**

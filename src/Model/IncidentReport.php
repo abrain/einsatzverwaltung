@@ -3,6 +3,7 @@
 namespace abrain\Einsatzverwaltung\Model;
 
 use abrain\Einsatzverwaltung\Data;
+use DateTime;
 use WP_Post;
 
 /**
@@ -202,11 +203,12 @@ class IncidentReport
     /**
      * Gibt Alarmdatum und -zeit zurück
      *
-     * @return mixed
+     * @return DateTime
      */
     public function getTimeOfAlerting()
     {
-        return Data::getAlarmzeit($this->post->ID);
+        $time = get_post_meta($this->post->ID, 'einsatz_alarmzeit', true);
+        return DateTime::createFromFormat('Y-m-d H:i', $time);
     }
 
     /**

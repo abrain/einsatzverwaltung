@@ -67,7 +67,6 @@ class Shortcodes
             $dateQuery = array('year' => $jahr);
         }
 
-        error_log(print_r($dateQuery, true));
         // TODO Für diese Art von Anfragen eine eigene Klasse wie WP_Query bauen
         $posts = get_posts(array(
             'post_type' => 'einsatz',
@@ -79,8 +78,8 @@ class Shortcodes
         ));
         $reports = $this->utilities->postsToIncidentReports($posts);
 
-        $reportList = new ReportList();
-        return $reportList->getList($reports, ($monateTrennen == 'ja'));
+        $reportList = new ReportList($this->utilities);
+        return $reportList->getList($reports, array('splitMonths' => ($monateTrennen == 'ja')));
     }
 
     /**

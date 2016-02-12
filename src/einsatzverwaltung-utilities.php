@@ -380,10 +380,21 @@ class Utilities
             return $this->options->getDefaultColumns();
         }
 
+        $inputArray = explode(',', $input);
+        $validColumnIds = $this->sanitizeColumnsArray($inputArray);
+
+        if (empty($validColumnIds)) {
+            return $this->options->getDefaultColumns();
+        }
+
+        return implode(',', $validColumnIds);
+    }
+
+    public function sanitizeColumnsArray($inputArray)
+    {
         $columns = $this->core->getListColumns();
         $columnIds = array_keys($columns);
 
-        $inputArray = explode(',', $input);
         $validColumnIds = array();
         foreach ($inputArray as $colId) {
             $colId = trim($colId);
@@ -393,9 +404,10 @@ class Utilities
         }
 
         if (empty($validColumnIds)) {
-            return $this->options->getDefaultColumns();
+            $defaultColumns = $this->options->getDefaultColumns();
+            $validColumnIds = explode(',', $defaultColumns);
         }
 
-        return implode(',', $validColumnIds);
+        return $validColumnIds;
     }
 }

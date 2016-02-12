@@ -15,6 +15,7 @@ require_once dirname(__FILE__) . '/einsatzverwaltung-settings.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-tools.php';
 require_once dirname(__FILE__) . '/Import/Tool.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-taxonomies.php';
+require_once dirname(__FILE__) . '/Frontend/ReportList.php';
 
 use abrain\Einsatzverwaltung\Import\Tool as ImportTool;
 use abrain\Einsatzverwaltung\Util\Formatter;
@@ -247,9 +248,9 @@ class Core
 
         new Admin($this, $this->utilities);
         $this->data = new Data($this, $this->utilities, $this->options);
-        $frontend = new Frontend($this, $this->options, $this->utilities);
+        new Frontend($this, $this->options, $this->utilities);
         new Settings($this, $this->options, $this->utilities, $this->data);
-        new Shortcodes($frontend);
+        new Shortcodes($this->utilities);
         new Taxonomies($this->utilities);
 
         // Tools

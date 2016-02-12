@@ -1,22 +1,27 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
+use abrain\Einsatzverwaltung\Frontend\ReportList;
+
 /**
  * Ersetzt die Shortcodes durch Inhalte
  */
 class Shortcodes
 {
-    private $frontend;
+    /**
+     * @var Utilities
+     */
+    private $utilities;
 
     /**
      * Constructor
      *
-     * @param Frontend $frontend
+     * @param Utilities $utilities
      */
-    public function __construct($frontend)
+    public function __construct($utilities)
     {
         $this->addHooks();
-        $this->frontend = $frontend;
+        $this->utilities = $utilities;
     }
 
     private function addHooks()
@@ -42,21 +47,40 @@ class Shortcodes
         $sort = $shortcodeParams['sort'];
         $monateTrennen = $shortcodeParams['monatetrennen'];
 
-        $einsatzjahre = array();
+        $dateQuery = array();
         if ($jahr == '*') {
-            $einsatzjahre = Data::getJahreMitEinsatz();
+            $jahreMitEinsatz = Data::getJahreMitEinsatz();
+            foreach ($jahreMitEinsatz as $year) {
+                $dateQuery[] = array('year' => $year);
+            }
+            $dateQuery['relation'] = 'OR';
         } elseif (is_numeric($jahr) && $jahr < 0) {
             for ($i=0; $i < abs(intval($jahr)) && $i < $aktuelles_jahr; $i++) {
-                $einsatzjahre[] = $aktuelles_jahr - $i;
+                $dateQuery[] = array('year' => $aktuelles_jahr - $i);
             }
+            $dateQuery['relation'] = 'OR';
         } elseif (empty($jahr) || strlen($jahr)!=4 || !is_numeric($jahr)) {
             echo '<p>' . sprintf('INFO: Jahreszahl %s ung&uuml;ltig, verwende %s', $jahr, $aktuelles_jahr) . '</p>';
-            $einsatzjahre = array($aktuelles_jahr);
+            $dateQuery = array('year' => $aktuelles_jahr);
         } else {
-            $einsatzjahre = array($jahr);
+            // FIXME hier sind noch keine Fehlerfälle abgefangen
+            $dateQuery = array('year' => $jahr);
         }
 
-        return $this->frontend->printEinsatzliste($einsatzjahre, !($sort == 'auf'), ($monateTrennen == 'ja'));
+        error_log(print_r($dateQuery, true));
+        // TODO Für diese Art von Anfragen eine eigene Klasse wie WP_Query bauen
+        $posts = get_posts(array(
+            'post_type' => 'einsatz',
+            'post_status' => 'publish',
+            'orderby' => 'date',
+            'order' => ($sort == 'auf' ? 'ASC' : 'DESC'),
+            'nopaging' => true,
+            'date_query' => $dateQuery
+        ));
+        $reports = $this->utilities->postsToIncidentReports($posts);
+
+        $reportList = new ReportList();
+        return $reportList->getList($reports, ($monateTrennen == 'ja'));
     }
 
     /**

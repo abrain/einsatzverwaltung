@@ -267,7 +267,7 @@ class Data
 
         // Laufende Nummern aktualisieren
         $date = $report->getTimeOfAlerting();
-        $this->updateSequenceNumbers(date_format($date, 'Y'));
+        $this->updateSequenceNumbers($date->format('Y'));
 
         // Kategoriezugehörigkeit aktualisieren
         $category = $this->options->getEinsatzberichteCategory();

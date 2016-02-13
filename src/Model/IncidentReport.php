@@ -210,8 +210,8 @@ class IncidentReport
             return false;
         }
 
-        $time = get_post_meta($this->post->ID, 'einsatz_alarmzeit', true);
-        return DateTime::createFromFormat('Y-m-d H:i', $time);
+        $time = $this->post->post_date;
+        return DateTime::createFromFormat('Y-m-d H:i:s', $time);
     }
 
     /**

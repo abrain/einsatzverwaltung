@@ -110,13 +110,13 @@ class Frontend
 
             $alarm_string = $formatter->getTypesOfAlerting($report);
 
-            $duration = Data::getDauer($post->ID);
+            $duration = Data::getDauer($report);
             $dauerstring = ($duration === false ? '' : $this->utilities->getDurationString($duration));
 
             $showEinsatzartArchiveLink = $showArchiveLinks && $this->options->isShowEinsatzartArchive();
             $art = $formatter->getTypeOfIncident($report, $make_links, $showEinsatzartArchiveLink);
 
-            $fehlalarm = Data::getFehlalarm($post->ID);
+            $fehlalarm = $report->isFalseAlarm();
             if (empty($fehlalarm)) {
                 $fehlalarm = 0;
             }
@@ -124,20 +124,19 @@ class Frontend
                 $art = (empty($art) ? 'Fehlalarm' : $art.' (Fehlalarm)');
             }
 
-            $einsatzort = Data::getEinsatzort($post->ID);
-            $einsatzleiter = Data::getEinsatzleiter($post->ID);
-            $mannschaft = Data::getMannschaftsstaerke($post->ID);
+            $einsatzort = $report->getLocation();
+            $einsatzleiter = $report->getIncidentCommander();
+            $mannschaft = $report->getWorkforce();
 
             $fzg_string = $formatter->getVehicles($report, $make_links, $showArchiveLinks);
 
             $ext_string = $formatter->getAdditionalForces($report, $make_links, $showArchiveLinks);
 
-            $alarmzeit = Data::getAlarmzeit($post->ID);
-            $alarm_timestamp = strtotime($alarmzeit);
+            $timeOfAlerting = $report->getTimeOfAlerting();
             $datumsformat = $this->options->getDateFormat();
             $zeitformat = $this->options->getTimeFormat();
-            $einsatz_datum = ($alarm_timestamp ? date_i18n($datumsformat, $alarm_timestamp) : '-');
-            $einsatz_zeit = ($alarm_timestamp ? date_i18n($zeitformat, $alarm_timestamp).' Uhr' : '-');
+            $einsatz_datum = ($timeOfAlerting ? date_i18n($datumsformat, $timeOfAlerting->getTimestamp()) : '-');
+            $einsatz_zeit = ($timeOfAlerting ? date_i18n($zeitformat, $timeOfAlerting->getTimestamp()).' Uhr' : '-');
 
             $headerstring = "<strong>Datum:</strong> ".$einsatz_datum."&nbsp;<br>";
             $headerstring .= "<strong>Alarmzeit:</strong> ".$einsatz_zeit."&nbsp;<br>";

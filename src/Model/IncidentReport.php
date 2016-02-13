@@ -2,14 +2,13 @@
 
 namespace abrain\Einsatzverwaltung\Model;
 
-use abrain\Einsatzverwaltung\Data;
+use abrain\Einsatzverwaltung\Taxonomies;
 use DateTime;
 use WP_Post;
 
 /**
  * Datenmodellklasse für Einsatzberichte
  *
- * TODO Methoden aus Klasse Data übernehmen
  * TODO Rückgabetypen festlegen und sicherstellen
  *
  * @author Andreas Brain
@@ -149,7 +148,7 @@ class IncidentReport
      */
     public function getAdditionalForces()
     {
-        return Data::getWeitereKraefte($this->post->ID);
+        return get_the_terms($this->post->ID, 'exteinsatzmittel');
     }
 
     /**
@@ -159,7 +158,7 @@ class IncidentReport
      */
     public function getIncidentCommander()
     {
-        return Data::getEinsatzleiter($this->post->ID);
+        return get_post_meta($this->post->ID, 'einsatz_einsatzleiter', true);
     }
 
     /**
@@ -169,7 +168,7 @@ class IncidentReport
      */
     public function getLocation()
     {
-        return Data::getEinsatzort($this->post->ID);
+        return get_post_meta($this->post->ID, 'einsatz_einsatzort', true);
     }
 
     /**
@@ -179,7 +178,7 @@ class IncidentReport
      */
     public function getNumber()
     {
-        return Data::getEinsatznummer($this->post->ID);
+        return get_post_field('post_name', $this->post->ID);
     }
 
     /**
@@ -197,16 +196,20 @@ class IncidentReport
      */
     public function getSequentialNumber()
     {
-        return Data::getLaufendeNummer($this->post->ID);
+        return get_post_meta($this->post->ID, 'einsatz_seqNum', true);
     }
 
     /**
      * Gibt Alarmdatum und -zeit zurück
      *
-     * @return DateTime
+     * @return DateTime|false
      */
     public function getTimeOfAlerting()
     {
+        if (empty($this->post)) {
+            return false;
+        }
+
         $time = get_post_meta($this->post->ID, 'einsatz_alarmzeit', true);
         return DateTime::createFromFormat('Y-m-d H:i', $time);
     }
@@ -218,7 +221,7 @@ class IncidentReport
      */
     public function getTimeOfEnding()
     {
-        return Data::getEinsatzende($this->post->ID);
+        return get_post_meta($this->post->ID, 'einsatz_einsatzende', true);
     }
 
     /**
@@ -228,7 +231,7 @@ class IncidentReport
      */
     public function getTypesOfAlerting()
     {
-        return Data::getAlarmierungsart($this->post->ID);
+        return get_the_terms($this->post->ID, 'alarmierungsart');
     }
 
     /**
@@ -239,7 +242,13 @@ class IncidentReport
      */
     public function getTypeOfIncident()
     {
-        return Data::getEinsatzart($this->post->ID);
+        $einsatzarten = get_the_terms($this->post->ID, 'einsatzart');
+        if ($einsatzarten && !is_wp_error($einsatzarten) && !empty($einsatzarten)) {
+            $keys = array_keys($einsatzarten);
+            return $einsatzarten[$keys[0]];
+        }
+
+        return false;
     }
 
     /**
@@ -249,7 +258,44 @@ class IncidentReport
      */
     public function getVehicles()
     {
-        return Data::getFahrzeuge($this->post->ID);
+        $vehicles = get_the_terms($this->post->ID, 'fahrzeug');
+
+        if (empty($vehicles)) {
+            return $vehicles;
+        }
+
+        // Reihenfolge abfragen
+        foreach ($vehicles as $vehicle) {
+            if (!isset($vehicle->term_id)) {
+                continue;
+            }
+
+            $vehicleOrder = Taxonomies::getTermField($vehicle->term_id, 'fahrzeug', 'vehicleorder');
+            if (!empty($vehicleOrder)) {
+                $vehicle->vehicle_order = $vehicleOrder;
+            }
+        }
+
+        // Fahrzeuge vor Rückgabe sortieren
+        usort($vehicles, function ($vehicle1, $vehicle2) {
+            if (empty($vehicle1->vehicle_order) && !empty($vehicle2->vehicle_order)) {
+                return 1;
+            }
+
+            if (!empty($vehicle1->vehicle_order) && empty($vehicle2->vehicle_order)) {
+                return -1;
+            }
+
+            if (empty($vehicle1->vehicle_order) && empty($vehicle2->vehicle_order) ||
+                $vehicle1->vehicle_order == $vehicle2->vehicle_order
+            ) {
+                return strcasecmp($vehicle1->name, $vehicle2->name);
+            }
+
+            return ($vehicle1->vehicle_order < $vehicle2->vehicle_order) ? -1 : 1;
+        });
+
+        return $vehicles;
     }
 
     /**
@@ -259,7 +305,7 @@ class IncidentReport
      */
     public function getWorkforce()
     {
-        return Data::getMannschaftsstaerke($this->post->ID);
+        return get_post_meta($this->post->ID, 'einsatz_mannschaft', true);
     }
 
     /**
@@ -267,7 +313,7 @@ class IncidentReport
      */
     public function isFalseAlarm()
     {
-        return Data::getFehlalarm($this->post->ID);
+        return get_post_meta($this->post->ID, 'einsatz_fehlalarm', true);
     }
 
     /**
@@ -277,6 +323,6 @@ class IncidentReport
      */
     public function isSpecial()
     {
-        return Data::isSpecial($this->post->ID);
+        return get_post_meta($this->post->ID, 'einsatz_special', true);
     }
 }

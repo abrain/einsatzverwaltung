@@ -269,7 +269,7 @@ class ReportList
                 $cellContent = $report->getWorkforce();
                 break;
             case 'duration':
-                $minutes = Data::getDauer($report->getPostId());
+                $minutes = Data::getDauer($report);
                 $cellContent = $this->utilities->getDurationString($minutes, true);
                 break;
             case 'vehicles':

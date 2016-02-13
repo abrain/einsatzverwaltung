@@ -75,20 +75,17 @@ class Formatter
         }
 
         $incidentReport = new IncidentReport($post);
+        $timeOfAlerting = $incidentReport->getTimeOfAlerting();
 
         switch ($tag) {
             case '%title%':
                 return str_replace('%title%', get_the_title($post), $pattern);
             case '%date%':
-                $timeOfAlerting = Data::getAlarmzeit($post->ID);
-                $timeOfAlertingTS = strtotime($timeOfAlerting);
-                return str_replace('%date%', date_i18n($this->options->getDateFormat(), $timeOfAlertingTS), $pattern);
+                return str_replace('%date%', date_i18n($this->options->getDateFormat(), $timeOfAlerting->getTimestamp()), $pattern);
             case '%time%':
-                $timeOfAlerting = Data::getAlarmzeit($post->ID);
-                $timeOfAlertingTS = strtotime($timeOfAlerting);
-                return str_replace('%time%', date_i18n($this->options->getTimeFormat(), $timeOfAlertingTS), $pattern);
+                return str_replace('%time%', date_i18n($this->options->getTimeFormat(), $timeOfAlerting->getTimestamp()), $pattern);
             case '%duration%':
-                return str_replace('%duration%', $this->utilities->getDurationString(Data::getDauer($post->ID)), $pattern);
+                return str_replace('%duration%', $this->utilities->getDurationString(Data::getDauer($incidentReport)), $pattern);
             case '%incidentType%':
                 return str_replace(
                     '%incidentType%',
@@ -98,11 +95,11 @@ class Formatter
             case '%url%':
                 return str_replace('%url%', get_permalink($post->ID), $pattern);
             case '%location%':
-                return str_replace('%location%', Data::getEinsatzort($post->ID), $pattern);
+                return str_replace('%location%', $incidentReport->getLocation(), $pattern);
             case '%feedUrl%':
                 return str_replace('%feedUrl%', get_post_type_archive_feed_link('einsatz'), $pattern);
             case '%number%':
-                return str_replace('%number%', Data::getEinsatznummer($post->ID), $pattern);
+                return str_replace('%number%', $incidentReport->getNumber(), $pattern);
             default:
                 return $pattern;
         }

@@ -2,6 +2,7 @@
 namespace abrain\Einsatzverwaltung;
 
 use abrain\Einsatzverwaltung\Frontend\ReportList;
+use abrain\Einsatzverwaltung\Model\IncidentReport;
 
 /**
  * Erzeugt die Einstellungsseite
@@ -651,20 +652,23 @@ class Settings
             'post_status' => array('publish', 'private'),
             'numberposts' => -1
         ));
+        $reports = $this->utilities->postsToIncidentReports($posts);
 
         // Wenn zuvor eine Kategorie gesetzt war, müssen die Einsatzberichte aus dieser entfernt werden
         if ($oldValue != -1) {
-            foreach ($posts as $post) {
-                $this->utilities->removePostFromCategory($post->ID, $oldValue);
+            /** @var IncidentReport $report */
+            foreach ($reports as $report) {
+                $this->utilities->removePostFromCategory($report->getPostId(), $oldValue);
             }
         }
 
         // Wenn eine neue Kategorie gesetzt wird, müssen Einsatzberichte dieser zugeordnet werden
         if ($newValue != -1) {
             $onlySpecialInCategory = $this->options->isOnlySpecialInCategory();
-            foreach ($posts as $post) {
-                if (!$onlySpecialInCategory || $this->data->isSpecial($post->ID)) {
-                    $this->utilities->addPostToCategory($post->ID, $newValue);
+            /** @var IncidentReport $report */
+            foreach ($reports as $report) {
+                if (!$onlySpecialInCategory || $report->isSpecial()) {
+                    $this->utilities->addPostToCategory($report->getPostId(), $newValue);
                 }
             }
         }
@@ -699,22 +703,25 @@ class Settings
             'post_status' => array('publish', 'private'),
             'numberposts' => -1
         ));
+        $reports = $this->utilities->postsToIncidentReports($posts);
 
         // Wenn die Einstellung abgewählt wurde, werden alle Einsatzberichte zur Kategorie hinzugefügt
         if ($newValue == 0) {
-            foreach ($posts as $post) {
-                $this->utilities->addPostToCategory($post->ID, $categoryId);
+            /** @var IncidentReport $report */
+            foreach ($reports as $report) {
+                $this->utilities->addPostToCategory($report->getPostId(), $categoryId);
             }
         }
 
         // Wenn die Einstellung aktiviert wurde, werden nur die als besonders markierten Einsatzberichte zur Kategorie
         // hinzugefügt, alle anderen daraus entfernt
         if ($newValue == 1) {
-            foreach ($posts as $post) {
-                if ($this->data->isSpecial($post->ID)) {
-                    $this->utilities->addPostToCategory($post->ID, $categoryId);
+            /** @var IncidentReport $report */
+            foreach ($reports as $report) {
+                if ($report->isSpecial()) {
+                    $this->utilities->addPostToCategory($report->getPostId(), $categoryId);
                 } else {
-                    $this->utilities->removePostFromCategory($post->ID, $categoryId);
+                    $this->utilities->removePostFromCategory($report->getPostId(), $categoryId);
                 }
             }
         }

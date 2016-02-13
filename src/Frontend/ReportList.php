@@ -34,6 +34,20 @@ class ReportList
     private $formatter;
 
     /**
+     * Gibt an, ob die zusätzlichen Kräfte mit einem Link zu der ggf. gesetzten Adresse versehen werden sollen
+     *
+     * @var bool
+     */
+    private $linkToAddForces;
+
+    /**
+     * Gibt an, ob die Fahrzeuge mit einem Link zu der ggf. gesetzten Fahrzeugseite versehen werden sollen
+     *
+     * @var bool
+     */
+    private $linkToVehicles;
+
+    /**
      * @var int
      */
     private $numberOfColumns;
@@ -61,6 +75,7 @@ class ReportList
      * @var Utilities
      */
     private $utilities;
+
 
     /**
      * ReportList constructor.
@@ -92,14 +107,17 @@ class ReportList
 
         $defaults = array(
             'splitMonths' => false,
-            'columns' => array()
+            'columns' => array(),
+            'linkToVehicles' => $this->options->getBoolOption('einsatzvw_list_fahrzeuge_link'),
+            'linkToAddForces' => $this->options->getBoolOption('einsatzvw_list_ext_link'),
         );
         $parsedArgs = wp_parse_args($args, $defaults);
 
-        // TODO Argumente validieren
         $this->splitMonths = boolval($parsedArgs['splitMonths']);
         $this->columns = $this->utilities->sanitizeColumnsArray($parsedArgs['columns']);
         $this->numberOfColumns = count($this->columns);
+        $this->linkToVehicles = boolval($parsedArgs['linkToVehicles']);
+        $this->linkToAddForces = boolval($parsedArgs['linkToAddForces']);
 
         $veryFirstReport = true;
         $currentYear = null;
@@ -273,15 +291,13 @@ class ReportList
                 $cellContent = $this->utilities->getDurationString($minutes, true);
                 break;
             case 'vehicles':
-                $makeFahrzeugLinks = $this->options->getBoolOption('einsatzvw_list_fahrzeuge_link');
-                $cellContent = $this->formatter->getVehicles($report, $makeFahrzeugLinks, false);
+                $cellContent = $this->formatter->getVehicles($report, $this->linkToVehicles, false);
                 break;
             case 'alarmType':
                 $cellContent = $this->formatter->getTypesOfAlerting($report);
                 break;
             case 'additionalForces':
-                $makeLinks = $this->options->getBoolOption('einsatzvw_list_ext_link');
-                $cellContent = $this->formatter->getAdditionalForces($report, $makeLinks, false);
+                $cellContent = $this->formatter->getAdditionalForces($report, $this->linkToAddForces, false);
                 break;
             case 'incidentType':
                 $showHierarchy = $this->options->getBoolOption('einsatzvw_list_art_hierarchy');

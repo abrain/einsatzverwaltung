@@ -252,12 +252,12 @@ class ReportList
                 $cellContent = $timeOfAlerting->format('d.m.Y H:i');
                 break;
             case 'title':
-                $post_title = get_the_title($report->getPostId());
-                if (empty($post_title)) {
-                    $post_title = '(kein Titel)';
+                $postTitle = get_the_title($report->getPostId());
+                if (empty($postTitle)) {
+                    $postTitle = '(kein Titel)';
                 }
                 $url = get_permalink($report->getPostId());
-                $cellContent = '<a href="' . $url . '" rel="bookmark">' . $post_title . '</a>';
+                $cellContent = '<a href="' . $url . '" rel="bookmark">' . $postTitle . '</a>';
                 break;
             case 'incidentCommander':
                 $cellContent = $report->getIncidentCommander();

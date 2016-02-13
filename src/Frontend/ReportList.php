@@ -2,6 +2,7 @@
 namespace abrain\Einsatzverwaltung\Frontend;
 
 use abrain\Einsatzverwaltung\Core;
+use abrain\Einsatzverwaltung\Frontend;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Utilities;
 use DateTime;
@@ -160,7 +161,7 @@ class ReportList
 
     private function insertTableHeader()
     {
-        $allColumns = $this->core->getListColumns();
+        $allColumns = self::getListColumns();
 
         $this->string .= '<tr class="einsatz-header">';
         foreach ($this->columns as $colId) {
@@ -197,5 +198,65 @@ class ReportList
             $this->string .= '&nbsp;</td>';
         }
         $this->string .= '</tr>';
+    }
+
+    /**
+     * Gibt die möglichen Spalten für die Tabelle zurück
+     *
+     * @return array
+     */
+    public static function getListColumns()
+    {
+        return array(
+            'number' => array(
+                'name' => 'Nummer',
+                'nowrap' => true
+            ),
+            'date' => array(
+                'name' => 'Datum',
+                'nowrap' => true
+            ),
+            'time' => array(
+                'name' => 'Zeit',
+                'nowrap' => true
+            ),
+            'datetime' => array(
+                'name' => 'Datum',
+                'longName' => 'Datum + Zeit',
+                'nowrap' => true
+            ),
+            'title' => array(
+                'name' => 'Einsatzmeldung'
+            ),
+            'incidentCommander' => array(
+                'name' => 'Einsatzleiter'
+            ),
+            'location' => array(
+                'name' => 'Einsatzort'
+            ),
+            'workforce' => array(
+                'name' => 'Mannschaftsst&auml;rke'
+            ),
+            'duration' => array(
+                'name' => 'Dauer',
+                'nowrap' => true
+            ),
+            'vehicles' => array(
+                'name' => 'Fahrzeuge'
+            ),
+            'alarmType' => array(
+                'name' => 'Alarmierungsart'
+            ),
+            'additionalForces' => array(
+                'name' => 'Weitere Kräfte'
+            ),
+            'incidentType' => array(
+                'name' => 'Einsatzart'
+            ),
+            'seqNum' => array(
+                'name' => 'Lfd.',
+                'longName' => 'Laufende Nummer'
+            )
+        );
     }
 }

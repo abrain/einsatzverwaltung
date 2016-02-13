@@ -1,6 +1,7 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
+use abrain\Einsatzverwaltung\Frontend\ReportList;
 use WP_Post;
 use WP_Query;
 
@@ -382,7 +383,7 @@ class Frontend
      */
     private function getEinsatzlisteHeader()
     {
-        $columns = $this->core->getListColumns();
+        $columns = ReportList::getListColumns();
         $enabledColumns = $this->options->getEinsatzlisteEnabledColumns();
 
         $string = '<tr class="einsatz-header">';

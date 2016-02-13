@@ -403,66 +403,6 @@ class Core
     }
 
     /**
-     * Gibt die möglichen Spalten für die Einsatzübersicht zurück
-     *
-     * @return array
-     */
-    public function getListColumns()
-    {
-        return array(
-            'number' => array(
-                'name' => 'Nummer',
-                'nowrap' => true
-            ),
-            'date' => array(
-                'name' => 'Datum',
-                'nowrap' => true
-            ),
-            'time' => array(
-                'name' => 'Zeit',
-                'nowrap' => true
-            ),
-            'datetime' => array(
-                'name' => 'Datum',
-                'longName' => 'Datum + Zeit',
-                'nowrap' => true
-            ),
-            'title' => array(
-                'name' => 'Einsatzmeldung'
-            ),
-            'incidentCommander' => array(
-                'name' => 'Einsatzleiter'
-            ),
-            'location' => array(
-                'name' => 'Einsatzort'
-            ),
-            'workforce' => array(
-                'name' => 'Mannschaftsst&auml;rke'
-            ),
-            'duration' => array(
-                'name' => 'Dauer',
-                'nowrap' => true
-            ),
-            'vehicles' => array(
-                'name' => 'Fahrzeuge'
-            ),
-            'alarmType' => array(
-                'name' => 'Alarmierungsart'
-            ),
-            'additionalForces' => array(
-                'name' => 'Weitere Kräfte'
-            ),
-            'incidentType' => array(
-                'name' => 'Einsatzart'
-            ),
-            'seqNum' => array(
-                'name' => 'Lfd.',
-                'longName' => 'Laufende Nummer'
-            )
-        );
-    }
-
-    /**
      * Gibt die möglichen Kurzfassungstypen zurück
      *
      * @return array

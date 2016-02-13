@@ -1,6 +1,8 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
+use abrain\Einsatzverwaltung\Frontend\ReportList;
+
 /**
  * Erzeugt die Einstellungsseite
  *
@@ -496,7 +498,7 @@ class Settings
      */
     public function echoEinsatzlisteColumns()
     {
-        $columns = $this->core->getListColumns();
+        $columns = ReportList::getListColumns();
         $enabledColumns = $this->options->getEinsatzlisteEnabledColumns();
 
         echo '<table id="columns-available"><tr><td style="width: 250px;">';

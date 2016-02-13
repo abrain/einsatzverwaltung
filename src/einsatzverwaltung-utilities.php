@@ -1,6 +1,7 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
+use abrain\Einsatzverwaltung\Frontend\ReportList;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 
 /**
@@ -390,9 +391,16 @@ class Utilities
         return implode(',', $validColumnIds);
     }
 
+    /**
+     * Bereinigt ein Array von Spalten-Ids, sodass nur gültige Ids darin verbleiben
+     *
+     * @param $inputArray
+     *
+     * @return array
+     */
     public function sanitizeColumnsArray($inputArray)
     {
-        $columns = $this->core->getListColumns();
+        $columns = ReportList::getListColumns();
         $columnIds = array_keys($columns);
 
         $validColumnIds = array();

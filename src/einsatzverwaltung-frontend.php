@@ -1,7 +1,8 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
-use abrain\Einsatzverwaltung\Frontend\ReportList;
+use abrain\Einsatzverwaltung\Model\IncidentReport;
+use abrain\Einsatzverwaltung\Util\Formatter;
 use WP_Post;
 use WP_Query;
 
@@ -102,17 +103,18 @@ class Frontend
     public function getEinsatzberichtHeader($post, $may_contain_links = true, $showArchiveLinks = true)
     {
         if (get_post_type($post) == "einsatz") {
+            $report = new IncidentReport($post);
+            $formatter = new Formatter($this->options, $this->utilities);
+
             $make_links = $may_contain_links;
 
-            $alarmierungsarten = Data::getAlarmierungsart($post->ID);
-            $alarm_string = self::getAlarmierungsartString($alarmierungsarten);
+            $alarm_string = $formatter->getTypesOfAlerting($report);
 
             $duration = Data::getDauer($post->ID);
             $dauerstring = ($duration === false ? '' : $this->utilities->getDurationString($duration));
 
-            $einsatzart = Data::getEinsatzart($post->ID);
             $showEinsatzartArchiveLink = $showArchiveLinks && $this->options->isShowEinsatzartArchive();
-            $art = self::getEinsatzartString($einsatzart, $make_links, $showEinsatzartArchiveLink);
+            $art = $formatter->getTypeOfIncident($report, $make_links, $showEinsatzartArchiveLink);
 
             $fehlalarm = Data::getFehlalarm($post->ID);
             if (empty($fehlalarm)) {
@@ -126,11 +128,9 @@ class Frontend
             $einsatzleiter = Data::getEinsatzleiter($post->ID);
             $mannschaft = Data::getMannschaftsstaerke($post->ID);
 
-            $fahrzeuge = Data::getFahrzeuge($post->ID);
-            $fzg_string = self::getFahrzeugeString($fahrzeuge, $make_links, $showArchiveLinks);
+            $fzg_string = $formatter->getVehicles($report, $make_links, $showArchiveLinks);
 
-            $exteinsatzmittel = Data::getWeitereKraefte($post->ID);
-            $ext_string = self::getWeitereKraefteString($exteinsatzmittel, $make_links, $showArchiveLinks);
+            $ext_string = $formatter->getAdditionalForces($report, $make_links, $showArchiveLinks);
 
             $alarmzeit = Data::getAlarmzeit($post->ID);
             $alarm_timestamp = strtotime($alarmzeit);
@@ -301,306 +301,5 @@ class Frontend
             $post_types[] = 'einsatz';
             $query->set('post_type', $post_types);
         }
-    }
-
-
-    /**
-     * Gibt eine Tabelle mit Einsätzen aus dem gegebenen Jahr zurück
-     *
-     * @param array $einsatzjahre
-     * @param bool $desc
-     * @param bool $splitmonths
-     *
-     * @return string
-     */
-    public function printEinsatzliste($einsatzjahre = array(), $desc = true, $splitmonths = false)
-    {
-        if ($desc === false) {
-            sort($einsatzjahre);
-        } else {
-            rsort($einsatzjahre);
-        }
-
-        $string = '';
-        $enabledColumns = $this->options->getEinsatzlisteEnabledColumns();
-        $numEnabledColumns = count($enabledColumns);
-        foreach ($einsatzjahre as $einsatzjahr) {
-            /* Einsätze mit Jahreszahl als Überschrift eingefügt */
-            $string .= '<h2>Eins&auml;tze '.$einsatzjahr.'</h2>';
-            /* Tabellen Klasse auf geändertes CSS für das Responsive Design umgestellt */
-            $string .= '<table class="responsive-stacked-table with-mobile-labels">';
-        
-        
-            $query = new WP_Query(array('year' => $einsatzjahr,
-                'post_type' => 'einsatz',
-                'post_status' => 'publish',
-                'orderby' => 'date',
-                'order' => ($desc === false ? 'ASC' : 'DESC'),
-                'nopaging' => true
-            ));
-
-            $string .= '<tbody>';
-            if ($query->have_posts()) {
-                $oldmonth = 0;
-
-                if (!$splitmonths) {
-                    $string .= $this->getEinsatzlisteHeader();
-                }
-
-                while ($query->have_posts()) {
-                    $query->next_post();
-
-                    $alarmzeit = Data::getAlarmzeit($query->post->ID);
-                    $einsatz_timestamp = strtotime($alarmzeit);
-                    $month = date('m', $einsatz_timestamp);
-
-                    if ($splitmonths && $month != $oldmonth) {
-                        $string .= '<tr><td class="einsatz-title-month" colspan="' . $numEnabledColumns . '">' . date_i18n('F', $einsatz_timestamp) . '</td></tr>';
-                        $string .= $this->getEinsatzlisteHeader();
-                    }
-
-                    $string .= '<tr>';
-                    foreach ($enabledColumns as $colId) {
-                        $string .= '<td class="einsatz-column-' . $colId . '">' . $this->getEinsatzlisteCellContent($query->post->ID, $colId) . '</td>';
-                    }
-                    $string .= '</tr>';
-
-                    $oldmonth = $month;
-                }
-            } else {
-                $string .= '<tr><td colspan="' . $numEnabledColumns . '">' . sprintf('Keine Eins&auml;tze im Jahr %s', $einsatzjahr) . '</td></tr>';
-            }
-            $string .= '</tbody>';
-            /* Tabellenende in die "foreach einsatzjahre" Schleife gezogen um 1 Tabelle pro Jahr zu Realisieren */
-            $string .= '</table>';
-        }
-        return $string;
-    }
-
-
-    /**
-     * Gibt die Kopfzeile der Tabelle für die Einsatzübersicht zurück
-     */
-    private function getEinsatzlisteHeader()
-    {
-        $columns = ReportList::getListColumns();
-        $enabledColumns = $this->options->getEinsatzlisteEnabledColumns();
-
-        $string = '<tr class="einsatz-header">';
-        foreach ($enabledColumns as $colId) {
-            if (!array_key_exists($colId, $columns)) {
-                continue;
-            }
-
-            $colInfo = $columns[$colId];
-            $style = $this->utilities->getArrayValueIfKey($colInfo, 'nowrap', false) ? 'white-space: nowrap;' : '';
-            $string .= '<th' . (empty($style) ? '' : ' style="' . $style . '"') . '>' . $colInfo['name'] . '</th>';
-        }
-        $string .= "</tr>";
-
-        return $string;
-    }
-
-    /**
-     * Gibt den Inhalt der Tabellenzelle einer bestimmten Spalte für einen bestimmten Einsatzbericht zurück
-     *
-     * @param string $colId Eindeutige Kennung der Spalte
-     * @param int $postId ID des Einsatzberichts
-     * @return string
-     */
-    private function getEinsatzlisteCellContent($postId, $colId)
-    {
-        switch ($colId) {
-            case 'number':
-                return Data::getEinsatznummer($postId);
-                break;
-            case 'date':
-                $alarmzeit = Data::getAlarmzeit($postId);
-                $einsatz_timestamp = strtotime($alarmzeit);
-                return date('d.m.Y', $einsatz_timestamp);
-                break;
-            case 'time':
-                $alarmzeit = Data::getAlarmzeit($postId);
-                $einsatz_timestamp = strtotime($alarmzeit);
-                return date('H:i', $einsatz_timestamp);
-                break;
-            case 'datetime':
-                $alarmzeit = Data::getAlarmzeit($postId);
-                $einsatz_timestamp = strtotime($alarmzeit);
-                return date('d.m.Y H:i', $einsatz_timestamp);
-                break;
-            case 'title':
-                $post_title = get_the_title($postId);
-                if (empty($post_title)) {
-                    $post_title = '(kein Titel)';
-                }
-                $url = get_permalink($postId);
-                return '<a href="' . $url . '" rel="bookmark">' . $post_title . '</a>';
-                break;
-            case 'incidentCommander':
-                return Data::getEinsatzleiter($postId);
-                break;
-            case 'location':
-                return Data::getEinsatzort($postId);
-                break;
-            case 'workforce':
-                return Data::getMannschaftsstaerke($postId);
-                break;
-            case 'duration':
-                $minutes = Data::getDauer($postId);
-                return $this->utilities->getDurationString($minutes, true);
-                break;
-            case 'vehicles':
-                $vehicles = Data::getFahrzeuge($postId);
-                $makeFahrzeugLinks = $this->options->getBoolOption('einsatzvw_list_fahrzeuge_link');
-                return self::getFahrzeugeString($vehicles, $makeFahrzeugLinks, false);
-                break;
-            case 'alarmType':
-                $alarmierungsarten = Data::getAlarmierungsart($postId);
-                return self::getAlarmierungsartString($alarmierungsarten);
-                break;
-            case 'additionalForces':
-                $exteinsatzmittel = Data::getWeitereKraefte($postId);
-                $makeLinks = $this->options->getBoolOption('einsatzvw_list_ext_link');
-                return self::getWeitereKraefteString($exteinsatzmittel, $makeLinks, false);
-                break;
-            case 'incidentType':
-                $einsatzart = Data::getEinsatzart($postId);
-                $showHierarchy = $this->options->getBoolOption('einsatzvw_list_art_hierarchy');
-                return self::getEinsatzartString($einsatzart, false, false, $showHierarchy);
-                break;
-            case 'seqNum':
-                return Data::getLaufendeNummer($postId);
-                break;
-            default:
-                return '&nbsp;';
-        }
-    }
-
-    /**
-     * Gibt die Alarmierungsarten als kommaseparierten String zurück
-     *
-     * @param array $alarmierungsarten
-     *
-     * @return string
-     */
-    public function getAlarmierungsartString($alarmierungsarten)
-    {
-        if ($alarmierungsarten === false || is_wp_error($alarmierungsarten) || !is_array($alarmierungsarten)) {
-            return '';
-        }
-
-        $alarmNamen = array();
-        foreach ($alarmierungsarten as $alarmart) {
-            $alarmNamen[] = $alarmart->name;
-        }
-        return join(", ", $alarmNamen);
-    }
-
-    /**
-     * Gibt die Einsatzart als String zurück, wenn vorhanden auch mit den übergeordneten Einsatzarten
-     *
-     * @param object $einsatzart
-     * @param bool $makeLinks
-     * @param bool $showArchiveLinks
-     * @param bool $showHierarchy
-     *
-     * @return string
-     */
-    public static function getEinsatzartString($einsatzart, $makeLinks, $showArchiveLinks, $showHierarchy = true)
-    {
-        if ($einsatzart === false || is_wp_error($einsatzart) || empty($einsatzart)) {
-            return '';
-        }
-
-        $str = '';
-        do {
-            if (!empty($str)) {
-                $str = ' &gt; '.$str;
-                $einsatzart = get_term($einsatzart->parent, 'einsatzart');
-            }
-
-            if ($makeLinks && $showArchiveLinks) {
-                $title = 'Alle Eins&auml;tze vom Typ '. $einsatzart->name . ' anzeigen';
-                $url = get_term_link($einsatzart);
-                $link = '<a href="'.$url.'" class="fa fa-filter" style="text-decoration:none;" title="'.$title.'"></a>';
-                $str = '&nbsp;' . $link . $str;
-            }
-            $str = $einsatzart->name . $str;
-        } while ($showHierarchy && $einsatzart->parent != 0);
-        return $str;
-    }
-
-    /**
-     * @param array $fahrzeuge
-     * @param bool $makeLinks Fahrzeugname als Link zur Fahrzeugseite angeben, wenn diese eingetragen wurde
-     * @param bool $showArchiveLinks Generiere zusätzlichen Link zur Archivseite des Fahrzeugs
-     *
-     * @return string
-     */
-    public function getFahrzeugeString($fahrzeuge, $makeLinks, $showArchiveLinks)
-    {
-        if ($fahrzeuge === false || is_wp_error($fahrzeuge) || !is_array($fahrzeuge)) {
-            return '';
-        }
-
-        $fzg_namen = array();
-        foreach ($fahrzeuge as $fahrzeug) {
-            $fzg_name = $fahrzeug->name;
-
-            if ($makeLinks) {
-                $pageid = Taxonomies::getTermField($fahrzeug->term_id, 'fahrzeug', 'fahrzeugpid');
-                if ($pageid !== false) {
-                    $pageurl = get_permalink($pageid);
-                    if ($pageurl !== false) {
-                        $fzg_name = '<a href="'.$pageurl.'" title="Mehr Informationen zu '.$fahrzeug->name.'">'.$fahrzeug->name.'</a>';
-                    }
-                }
-            }
-
-            if ($makeLinks && $showArchiveLinks && $this->options->isShowFahrzeugArchive()) {
-                $fzg_name .= '&nbsp;<a href="'.get_term_link($fahrzeug).'" class="fa fa-filter" style="text-decoration:none;" title="Eins&auml;tze unter Beteiligung von '.$fahrzeug->name.' anzeigen"></a>';
-            }
-
-            $fzg_namen[] = $fzg_name;
-        }
-        return join(", ", $fzg_namen);
-    }
-
-    /**
-     * @param $exteinsatzmittel
-     * @param $makeLinks
-     * @param $showArchiveLinks
-     *
-     * @return string
-     */
-    public function getWeitereKraefteString($exteinsatzmittel, $makeLinks, $showArchiveLinks)
-    {
-        if ($exteinsatzmittel === false || is_wp_error($exteinsatzmittel) || !is_array($exteinsatzmittel)) {
-            return '';
-        }
-
-        $ext_namen = array();
-        foreach ($exteinsatzmittel as $ext) {
-            $ext_name = $ext->name;
-
-            if ($makeLinks) {
-                $url = Taxonomies::getTermField($ext->term_id, 'exteinsatzmittel', 'url');
-                if ($url !== false) {
-                    $open_in_new_window = $this->options->isOpenExtEinsatzmittelNewWindow();
-                    $ext_name = '<a href="'.$url.'" title="Mehr Informationen zu '.$ext->name.'"';
-                    $ext_name .= ($open_in_new_window ? ' target="_blank"' : '') . '>'.$ext->name.'</a>';
-                }
-            }
-
-            if ($makeLinks && $showArchiveLinks && $this->options->isShowExtEinsatzmittelArchive()) {
-                $title = 'Eins&auml;tze unter Beteiligung von ' . $ext->name . ' anzeigen';
-                $ext_name .= '&nbsp;<a href="'.get_term_link($ext).'" class="fa fa-filter" ';
-                $ext_name .= 'style="text-decoration:none;" title="' . $title . '"></a>';
-            }
-
-            $ext_namen[] = $ext_name;
-        }
-        return join(", ", $ext_namen);
     }
 }

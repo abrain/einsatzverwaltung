@@ -250,7 +250,7 @@ class Core
         $this->data = new Data($this, $this->utilities, $this->options);
         new Frontend($this, $this->options, $this->utilities);
         new Settings($this, $this->options, $this->utilities, $this->data);
-        new Shortcodes($this->utilities, $this);
+        new Shortcodes($this->utilities, $this, $this->options);
         new Taxonomies($this->utilities);
 
         // Tools

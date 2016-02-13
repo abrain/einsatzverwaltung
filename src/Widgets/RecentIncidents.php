@@ -3,7 +3,9 @@ namespace abrain\Einsatzverwaltung\Widgets;
 
 use abrain\Einsatzverwaltung\Data;
 use abrain\Einsatzverwaltung\Frontend;
+use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Options;
+use abrain\Einsatzverwaltung\Util\Formatter;
 use abrain\Einsatzverwaltung\Utilities;
 use WP_Widget;
 use WP_Query;
@@ -78,6 +80,7 @@ class RecentIncidents extends WP_Widget
         $query = new WP_Query('&post_type=einsatz&post_status=publish&posts_per_page='.$anzahl);
         while ($query->have_posts()) {
             $nextPost = $query->next_post();
+            $report = new IncidentReport($nextPost);
             $letzteEinsaetze .= '<li class="einsatzbericht">';
 
             $letzteEinsaetze .= "<a href=\"".get_permalink($nextPost->ID)."\" rel=\"bookmark\" class=\"einsatzmeldung\">";
@@ -102,7 +105,8 @@ class RecentIncidents extends WP_Widget
             if ($zeigeArt) {
                 $einsatzart = Data::getEinsatzart($nextPost->ID);
                 if ($einsatzart !== false) {
-                    $einsatzart_str = Frontend::getEinsatzartString($einsatzart, false, false, $zeigeArtHierarchie);
+                    $formatter = new Formatter(self::$options, self::$utilities);
+                    $einsatzart_str = $formatter->getTypeOfIncident($report, false, false, $zeigeArtHierarchie);
                     $letzteEinsaetze .= sprintf('<br><span class="einsatzart">%s</span>', $einsatzart_str);
                 }
             }

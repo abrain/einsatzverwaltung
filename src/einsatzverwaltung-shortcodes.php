@@ -19,16 +19,23 @@ class Shortcodes
     private $core;
 
     /**
+     * @var Options
+     */
+    private $options;
+
+    /**
      * Constructor
      *
      * @param Utilities $utilities
      * @param Core $core
+     * @param Options $options
      */
-    public function __construct($utilities, $core)
+    public function __construct($utilities, $core, $options)
     {
         $this->addHooks();
         $this->utilities = $utilities;
         $this->core = $core;
+        $this->options = $options;
     }
 
     private function addHooks()
@@ -85,7 +92,7 @@ class Shortcodes
         ));
         $reports = $this->utilities->postsToIncidentReports($posts);
 
-        $reportList = new ReportList($this->utilities, $this->core);
+        $reportList = new ReportList($this->utilities, $this->core, $this->options);
         return $reportList->getList($reports, array('splitMonths' => ($monateTrennen == 'ja')));
     }
 

@@ -2,8 +2,11 @@
 namespace abrain\Einsatzverwaltung\Frontend;
 
 use abrain\Einsatzverwaltung\Core;
+use abrain\Einsatzverwaltung\Data;
 use abrain\Einsatzverwaltung\Frontend;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
+use abrain\Einsatzverwaltung\Options;
+use abrain\Einsatzverwaltung\Util\Formatter;
 use abrain\Einsatzverwaltung\Utilities;
 use DateTime;
 
@@ -15,6 +18,9 @@ use DateTime;
  */
 class ReportList
 {
+    /**
+     * @var array
+     */
     private $columns;
 
     /**
@@ -22,7 +28,20 @@ class ReportList
      */
     private $core;
 
+    /**
+     * @var Formatter
+     */
+    private $formatter;
+
+    /**
+     * @var int
+     */
     private $numberOfColumns;
+
+    /**
+     * @var Options
+     */
+    private $options;
 
     /**
      * Gibt an, ob nach jedem Monat eine Trennung eingefügt werden soll
@@ -48,11 +67,14 @@ class ReportList
      *
      * @param Utilities $utilities
      * @param Core $core
+     * @param Options $options
      */
-    public function __construct($utilities, $core)
+    public function __construct($utilities, $core, $options)
     {
         $this->utilities = $utilities;
         $this->core = $core;
+        $this->options = $options;
+        $this->formatter = new Formatter($options, $utilities);
     }
 
     /**
@@ -194,10 +216,90 @@ class ReportList
         $this->string .= '<tr>';
         foreach ($this->columns as $colId) {
             $this->string .= '<td class="einsatz-column-' . $colId . '">';
-            // TODO Inhalt der Zelle
-            $this->string .= '&nbsp;</td>';
+            $this->string .= $this->getCellContent($report, $colId);
+            $this->string .= '</td>';
         }
         $this->string .= '</tr>';
+    }
+
+    /**
+     * Gibt den Inhalt der Tabellenzelle einer bestimmten Spalte für einen bestimmten Einsatzbericht zurück
+     *
+     * @param IncidentReport $report
+     * @param string $colId Eindeutige Kennung der Spalte
+     *
+     * @return string
+     */
+    private function getCellContent($report, $colId)
+    {
+        if (empty($report)) {
+            return '&nbsp;';
+        }
+
+        $timeOfAlerting = $report->getTimeOfAlerting();
+
+        switch ($colId) {
+            case 'number':
+                $cellContent = $report->getNumber();
+                break;
+            case 'date':
+                $cellContent = $timeOfAlerting->format('d.m.Y');
+                break;
+            case 'time':
+                $cellContent = $timeOfAlerting->format('H:i');
+                break;
+            case 'datetime':
+                $cellContent = $timeOfAlerting->format('d.m.Y H:i');
+                break;
+            case 'title':
+                $post_title = get_the_title($report->getPostId());
+                if (empty($post_title)) {
+                    $post_title = '(kein Titel)';
+                }
+                $url = get_permalink($report->getPostId());
+                $cellContent = '<a href="' . $url . '" rel="bookmark">' . $post_title . '</a>';
+                break;
+            case 'incidentCommander':
+                $cellContent = $report->getIncidentCommander();
+                break;
+            case 'location':
+                $cellContent = $report->getLocation();
+                break;
+            case 'workforce':
+                $cellContent = $report->getWorkforce();
+                break;
+            case 'duration':
+                $minutes = Data::getDauer($report->getPostId());
+                $cellContent = $this->utilities->getDurationString($minutes, true);
+                break;
+            case 'vehicles':
+                $makeFahrzeugLinks = $this->options->getBoolOption('einsatzvw_list_fahrzeuge_link');
+                $cellContent = $this->formatter->getVehicles($report, $makeFahrzeugLinks, false);
+                break;
+            case 'alarmType':
+                $cellContent = $this->formatter->getTypesOfAlerting($report);
+                break;
+            case 'additionalForces':
+                $makeLinks = $this->options->getBoolOption('einsatzvw_list_ext_link');
+                $cellContent = $this->formatter->getAdditionalForces($report, $makeLinks, false);
+                break;
+            case 'incidentType':
+                $showHierarchy = $this->options->getBoolOption('einsatzvw_list_art_hierarchy');
+                $cellContent = $this->formatter->getTypeOfIncident($report, false, false, $showHierarchy);
+                break;
+            case 'seqNum':
+                $cellContent = $report->getSequentialNumber();
+                break;
+            default:
+                $cellContent = '';
+        }
+
+        // Damit Zellen einer Tabelle nicht komplett leer sind
+        if (empty($cellContent)) {
+            $cellContent = '&nbsp;';
+        }
+
+        return $cellContent;
     }
 
     /**

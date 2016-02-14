@@ -93,7 +93,13 @@ class Shortcodes
         $reports = $this->utilities->postsToIncidentReports($posts);
 
         $reportList = new ReportList($this->utilities, $this->core, $this->options);
-        return $reportList->getList($reports, array('splitMonths' => ($monateTrennen == 'ja')));
+        return $reportList->getList(
+            $reports,
+            array(
+                'splitMonths' => ($monateTrennen == 'ja'),
+                'columns' => $this->options->getEinsatzlisteEnabledColumns(),
+            )
+        );
     }
 
     /**

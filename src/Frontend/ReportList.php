@@ -227,7 +227,7 @@ class ReportList
      */
     private function insertMonthSeparator($date)
     {
-        $this->string .= '<tr><td class="einsatz-title-month" colspan="' . $this->numberOfColumns . '">';
+        $this->string .= '<tr class="einsatz-title-month"><td colspan="' . $this->numberOfColumns . '">';
         $this->string .=  date_i18n('F', $date->getTimestamp()) . '</td></tr>';
     }
 

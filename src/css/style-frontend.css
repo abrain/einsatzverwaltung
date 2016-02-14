@@ -1,12 +1,10 @@
 .responsive-stacked-table {
 	width: 100%;
-	border: 1px solid #ddd;
 	border-collapse: collapse;
 }
 .responsive-stacked-table th,
 .responsive-stacked-table td {
-	padding: 10px;
-	border-top: 1px solid #ddd;
+	padding: 3px 5px;
 }
 .responsive-stacked-table thead {
 	background: #eee;
@@ -14,26 +12,17 @@
 }
 .responsive-stacked-table .einsatz-header {
 	background: #eee;
-	border-bottom: 3px solid #ddd;
+	border-bottom: 2px solid #ddd;
 }
 .responsive-stacked-table tr:nth-child(even) {
-	background: #f5f5f5;
-}
-.responsive-stacked-table .fa {
-	margin-right: 5px;
-}
-.responsive-stacked-table .fa-check-circle {
-	color: #690;
-}
-.responsive-stacked-table .fa-times-circle {
-	color: #c00;
+	background: #f0f0f0;
 }
 
-.responsive-stacked-table .einsatz-title-month {
+.responsive-stacked-table .einsatz-title-month td {
 	border: none;
-	font-size: 2em;
-    padding: 12px 8px 8px 8px;
-	background: #ddd none repeat scroll 0% 0%;
+	font-size: 1.3em;
+    padding: 3px 8px;
+	background: #ddd none repeat scroll 0 0;
 }
 
 .responsive-stacked-table.with-mobile-labels {
@@ -49,23 +38,27 @@
 	.responsive-stacked-table td {
 		display: block;
 	}
+
+    .responsive-stacked-table tr {
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+
+    .responsive-stacked-table tr.einsatz-title-month {
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+
 	.responsive-stacked-table td {
-        padding: 2px 10px;
-		border-top: none;
-	}
-	.responsive-stacked-table tr td:first-child {
-		border-top: 1px solid #ddd;
-		font-weight: bold;
+        padding: 0 10px;
+		border: none;
 	}
 	.responsive-stacked-table .einsatz-header {
 		display: none;
 	}
-	.responsive-stacked-table.with-mobile-labels tr td:first-child {
-		font-weight: 300;
-	}
 	.responsive-stacked-table.with-mobile-labels td:before {
-		display: block;
 		font-weight: bold;
+		margin-right: 5px;
 	}
 	.responsive-stacked-table.with-mobile-labels td.einsatz-column-number:before {
 		content: "Einsatznummer:";

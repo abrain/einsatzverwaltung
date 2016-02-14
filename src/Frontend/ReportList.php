@@ -18,6 +18,8 @@ use DateTime;
  */
 class ReportList
 {
+    const TABLECLASS = 'einsatzverwaltung-reportlist';
+
     /**
      * @var array
      */
@@ -196,7 +198,7 @@ class ReportList
     private function beginTable($year)
     {
         $this->string .= '<h2>Eins&auml;tze '.$year.'</h2>';
-        $this->string .= '<table class="einsatzverwaltung-reportlist"><tbody>';
+        $this->string .= '<table class="' . self::TABLECLASS . '"><tbody>';
     }
 
     private function endTable()
@@ -371,7 +373,7 @@ class ReportList
                 'name' => 'Alarmierungsart'
             ),
             'additionalForces' => array(
-                'name' => 'Weitere Kräfte'
+                'name' => 'Weitere Kr&auml;fte'
             ),
             'incidentType' => array(
                 'name' => 'Einsatzart'
@@ -381,5 +383,23 @@ class ReportList
                 'longName' => 'Laufende Nummer'
             )
         );
+    }
+
+    /**
+     * Generiert CSS-Code, der von Einstellungen abhängt oder nicht gut von Hand zu pflegen ist
+     *
+     * @return string
+     */
+    public static function getDynamicCss()
+    {
+        $string = '';
+
+        // Bei der responsiven Ansicht die selben Begriffe voranstellen wie im Tabellenkopf
+        foreach (self::getListColumns() as $colId => $colInfo) {
+            $string .= "." . self::TABLECLASS . " td.einsatz-column-$colId:before ";
+            $string .= "{content: \"{$colInfo['name']}:\";}\n";
+        }
+
+        return $string;
     }
 }

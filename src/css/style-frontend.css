@@ -56,47 +56,4 @@
 		font-weight: bold;
 		margin-right: 5px;
 	}
-	.einsatzverwaltung-reportlist td.einsatz-column-number:before {
-		content: "Einsatznummer:";
-	}
-	.einsatzverwaltung-reportlist td.einsatz-column-date:before {
-		content: "Datum:";
-	}
-	.einsatzverwaltung-reportlist td.einsatz-column-time:before {
-		content: "Zeit:";
-	}
-	.einsatzverwaltung-reportlist td.einsatz-column-title:before {
-		content: "Einsatzmeldung:";
-	}
-	.einsatzverwaltung-reportlist td.einsatz-column-location:before {
-		content: "Einsatzort:";
-	}
-	.einsatzverwaltung-reportlist td.einsatz-column-incidentCommander:before {
-		content: "Einsatzleiter:";
-	}
-	.einsatzverwaltung-reportlist td.einsatz-column-duration:before {
-		content: "Einsatzdauer:";
-	}
-	.einsatzverwaltung-reportlist td.einsatz-column-vehicles:before {
-		content: "Einsatzfahrzeuge:";
-	}
-	.einsatzverwaltung-reportlist td.einsatz-column-incidentType:before {
-		content: "Einsatzart:";
-	}
-	.einsatzverwaltung-reportlist td.einsatz-column-workforce:before {
-		content: "Mannschaftsstr&auml;ke:";
-	}
-	.einsatzverwaltung-reportlist td.einsatz-column-datetime:before {
-		content: "Datum:";
-	}
-	.einsatzverwaltung-reportlist td.einsatz-column-alarmType:before {
-		content: "Alarmierungsart:";
-	}
-	.einsatzverwaltung-reportlist td.einsatz-column-seqNum:before {
-		content: "Lfd.-Nummer:";
-	}
-	.einsatzverwaltung-reportlist td.einsatz-column-additionalForces:before {
-		content: "Weitere Kr&auml;te:";
-	}
-
 }

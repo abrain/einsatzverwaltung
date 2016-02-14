@@ -395,10 +395,12 @@ class ReportList
         $string = '';
 
         // Bei der responsiven Ansicht die selben Begriffe voranstellen wie im Tabellenkopf
+        $string .= '@media (max-width: 767px) {';
         foreach (self::getListColumns() as $colId => $colInfo) {
             $string .= "." . self::TABLECLASS . " td.einsatz-column-$colId:before ";
             $string .= "{content: \"{$colInfo['name']}:\";}\n";
         }
+        $string .= '}';
 
         return $string;
     }

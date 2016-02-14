@@ -9,8 +9,6 @@ use WP_Post;
 /**
  * Datenmodellklasse für Einsatzberichte
  *
- * TODO Rückgabetypen festlegen und sicherstellen
- *
  * @author Andreas Brain
  */
 class IncidentReport
@@ -171,31 +169,31 @@ class IncidentReport
     /**
      * TODO Methodenname überdenken
      *
-     * @return array|bool|\WP_Error
+     * @return array
      */
     public function getAdditionalForces()
     {
-        return get_the_terms($this->post->ID, 'exteinsatzmittel');
+        return $this->getTheTerms('exteinsatzmittel');
     }
 
     /**
      * Gibt den eingetragenen Einsatzleiter zurück
      *
-     * @return mixed
+     * @return string
      */
     public function getIncidentCommander()
     {
-        return get_post_meta($this->post->ID, 'einsatz_einsatzleiter', true);
+        return $this->getPostMeta('einsatz_einsatzleiter');
     }
 
     /**
      * Gibt den eingetragenen Einsatzort zurück
      *
-     * @return mixed
+     * @return string
      */
     public function getLocation()
     {
-        return get_post_meta($this->post->ID, 'einsatz_einsatzort', true);
+        return $this->getPostMeta('einsatz_einsatzort');
     }
 
     /**
@@ -217,13 +215,33 @@ class IncidentReport
     }
 
     /**
+     * @param $key
+     *
+     * @return string
+     */
+    private function getPostMeta($key)
+    {
+        if (empty($this->post)) {
+            return '';
+        }
+
+        $meta = get_post_meta($this->post->ID, $key, true);
+
+        if (empty($meta)) {
+            return '';
+        }
+
+        return $meta;
+    }
+
+    /**
      * Gibt die laufende Nummer des Einsatzberichts bezogen auf das Kalenderjahr zurück
      *
      * @return mixed
      */
     public function getSequentialNumber()
     {
-        return get_post_meta($this->post->ID, 'einsatz_seqNum', true);
+        return $this->getPostMeta('einsatz_seqNum');
     }
 
     /**
@@ -244,48 +262,72 @@ class IncidentReport
     /**
      * Gibt Datum und Zeit des Einsatzendes zurück
      *
-     * @return mixed
+     * @return string
      */
     public function getTimeOfEnding()
     {
-        return get_post_meta($this->post->ID, 'einsatz_einsatzende', true);
+        return $this->getPostMeta('einsatz_einsatzende');
     }
 
     /**
      * Gibt das Term-Objekt der Alarmierungsart zurück
      *
-     * @return array|bool|\WP_Error
+     * @return array
      */
     public function getTypesOfAlerting()
     {
-        return get_the_terms($this->post->ID, 'alarmierungsart');
+        return $this->getTheTerms('alarmierungsart');
     }
 
     /**
-     * Bestimmt die Einsatzart eines bestimmten Einsatzes. Ist nötig, weil die Taxonomie
-     * 'einsatzart' mehrere Werte speichern kann, aber nur einer genutzt werden soll
+     * Holt die Terms einer bestimmten Taxonomie für den aktuellen Einsatzbericht aus der Datenbank und fängt dabei
+     * alle Fehlerfälle ab
      *
-     * @return object|bool
+     * @param string $taxonomy Der eindeutige Bezeichner der Taxonomie
+     *
+     * @return array Die Terms oder ein leeres Array
+     */
+    private function getTheTerms($taxonomy)
+    {
+        if (empty($this->post)) {
+            return array();
+        }
+
+        $terms = get_the_terms($this->post->ID, $taxonomy);
+
+        if (is_wp_error($terms) || empty($terms)) {
+            return array();
+        }
+
+        return $terms;
+    }
+
+    /**
+     * Gibt die Einsatzart eines bestimmten Einsatzes zurück. Auch wenn die Taxonomie 'einsatzart' mehrere Werte
+     * speichern kann, wird nur der erste zurückgegeben.
+     *
+     * @return object|false
      */
     public function getTypeOfIncident()
     {
-        $einsatzarten = get_the_terms($this->post->ID, 'einsatzart');
-        if ($einsatzarten && !is_wp_error($einsatzarten) && !empty($einsatzarten)) {
-            $keys = array_keys($einsatzarten);
-            return $einsatzarten[$keys[0]];
+        $terms = $this->getTheTerms('einsatzart');
+
+        if (empty($terms)) {
+            return false;
         }
 
-        return false;
+        $keys = array_keys($terms);
+        return $terms[$keys[0]];
     }
 
     /**
      * Gibt die Fahrzeuge eines Einsatzberichts aus
      *
-     * @return array|bool|\WP_Error
+     * @return array
      */
     public function getVehicles()
     {
-        $vehicles = get_the_terms($this->post->ID, 'fahrzeug');
+        $vehicles = $this->getTheTerms('fahrzeug');
 
         if (empty($vehicles)) {
             return array();
@@ -312,19 +354,21 @@ class IncidentReport
     /**
      * Gibt die eingetragene Mannschaftsstärke zurück
      *
-     * @return mixed
+     * @return string
      */
     public function getWorkforce()
     {
-        return get_post_meta($this->post->ID, 'einsatz_mannschaft', true);
+        return $this->getPostMeta('einsatz_mannschaft');
     }
 
     /**
-     * @return mixed
+     * Gibt zurück, ob es sich um einen Fehlalarm handelte
+     *
+     * @return bool
      */
     public function isFalseAlarm()
     {
-        return get_post_meta($this->post->ID, 'einsatz_fehlalarm', true);
+        return ($this->getPostMeta('einsatz_fehlalarm') == 1);
     }
 
     /**
@@ -334,6 +378,6 @@ class IncidentReport
      */
     public function isSpecial()
     {
-        return get_post_meta($this->post->ID, 'einsatz_special', true);
+        return ($this->getPostMeta('einsatz_special') == 1);
     }
 }

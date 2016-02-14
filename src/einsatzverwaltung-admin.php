@@ -1,6 +1,7 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
+use abrain\Einsatzverwaltung\Model\IncidentReport;
 use WP_Post;
 
 /**
@@ -110,20 +111,19 @@ class Admin
      */
     public function displayMetaBoxAnnotations($post)
     {
-        $fehlalarm = Data::getFehlalarm($post->ID);
-        $isSpecial = Data::isSpecial($post->ID);
+        $report = new IncidentReport($post);
 
         $this->echoInputCheckbox(
             __("Fehlalarm", 'einsatzverwaltung'),
             'einsatzverwaltung_fehlalarm',
-            $fehlalarm
+            $report->isFalseAlarm()
         );
         echo '<br>';
 
         $this->echoInputCheckbox(
             __("Besonderer Einsatz", 'einsatzverwaltung'),
             'einsatzverwaltung_special',
-            $isSpecial
+            $report->isSpecial()
         );
     }
 
@@ -137,12 +137,14 @@ class Admin
         // Use nonce for verification
         wp_nonce_field('save_einsatz_details', 'einsatzverwaltung_nonce');
 
-        $nummer = Data::getEinsatznummer($post->ID);
-        $alarmzeit = Data::getAlarmzeit($post->ID);
-        $einsatzende = Data::getEinsatzende($post->ID);
-        $einsatzort = Data::getEinsatzort($post->ID);
-        $einsatzleiter = Data::getEinsatzleiter($post->ID);
-        $mannschaftsstaerke = Data::getMannschaftsstaerke($post->ID);
+        $report = new IncidentReport($post);
+
+        $nummer = $report->getNumber();
+        $alarmzeit = $report->getTimeOfAlerting();
+        $einsatzende = $report->getTimeOfEnding();
+        $einsatzort = $report->getLocation();
+        $einsatzleiter = $report->getIncidentCommander();
+        $mannschaftsstaerke = $report->getWorkforce();
 
         $names = Data::getEinsatzleiterNamen();
         echo '<input type="hidden" id="einsatzleiter_used_values" value="' . implode(',', $names) . '" />';
@@ -159,7 +161,7 @@ class Admin
         $this->echoInputText(
             __("Alarmzeit", 'einsatzverwaltung'),
             'einsatzverwaltung_alarmzeit',
-            esc_attr($alarmzeit),
+            esc_attr($alarmzeit->format('Y-m-d H:i')),
             'JJJJ-MM-TT hh:mm'
         );
 
@@ -217,7 +219,7 @@ class Admin
      *
      * @param string $label Beschriftung
      * @param string $name Feld-ID
-     * @param mixed $state Zustandswert
+     * @param bool $state Zustandswert
      */
     private function echoInputCheckbox($label, $name, $state)
     {
@@ -232,8 +234,9 @@ class Admin
      */
     public static function displayMetaBoxEinsatzart($post)
     {
-        $einsatzart = Data::getEinsatzart($post->ID);
-        Frontend::dropdownEinsatzart($einsatzart ? $einsatzart->term_id : 0);
+        $report = new IncidentReport($post);
+        $typeOfIncident = $report->getTypeOfIncident();
+        Frontend::dropdownEinsatzart($typeOfIncident ? $typeOfIncident->term_id : 0);
     }
 
     /**
@@ -269,13 +272,15 @@ class Admin
     {
         global $post;
 
+        $report = new IncidentReport($postId);
+
         switch ($column) {
             case 'e_nummer':
-                $einsatz_nummer = Data::getEinsatznummer($postId);
+                $einsatz_nummer = $report->getNumber();
                 echo (empty($einsatz_nummer) ? '-' : $einsatz_nummer);
                 break;
             case 'e_einsatzende':
-                $einsatz_einsatzende = Data::getEinsatzende($postId);
+                $einsatz_einsatzende = $report->getTimeOfEnding();
                 if (empty($einsatz_einsatzende)) {
                     echo '-';
                 } else {
@@ -284,17 +289,16 @@ class Admin
                 }
                 break;
             case 'e_alarmzeit':
-                $einsatz_alarmzeit = Data::getAlarmzeit($postId);
+                $timeOfAlerting = $report->getTimeOfAlerting();
 
-                if (empty($einsatz_alarmzeit)) {
+                if (empty($timeOfAlerting)) {
                     echo '-';
                 } else {
-                    $timestamp = strtotime($einsatz_alarmzeit);
-                    echo date("d.m.Y", $timestamp)."<br>".date("H:i", $timestamp);
+                    echo $timeOfAlerting->format('d.m.Y') . '<br>' . $timeOfAlerting->format('H:i');
                 }
                 break;
             case 'e_art':
-                $term = Data::getEinsatzart($postId);
+                $term = $report->getTypeOfIncident();
                 if ($term) {
                     $url = esc_url(
                         add_query_arg(
@@ -309,7 +313,7 @@ class Admin
                 }
                 break;
             case 'e_fzg':
-                $fahrzeuge = Data::getFahrzeuge($postId);
+                $fahrzeuge = $report->getVehicles();
 
                 if (!empty($fahrzeuge)) {
                     $out = array();

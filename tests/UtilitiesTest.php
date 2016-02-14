@@ -1,12 +1,14 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
+use abrain\Einsatzverwaltung\Model\IncidentReport;
 use WP_UnitTestCase;
 
 /**
  * Tests für diverse Hilfsfunktionen
  *
  * @author Andreas Brain
+ * @coversDefaultClass abrain\Einsatzverwaltung\Utilities
  */
 class UtilitiesTest extends WP_UnitTestCase
 {
@@ -24,6 +26,9 @@ class UtilitiesTest extends WP_UnitTestCase
         $this->utilities = new Utilities(null);
     }
 
+    /**
+     * @covers ::addPostToCategory
+     */
     public function testAddPostToCategory()
     {
         // Einsatzbericht anlegen und mehreren Kategorien zuweisen
@@ -42,6 +47,25 @@ class UtilitiesTest extends WP_UnitTestCase
         $this->assertEquals($categoryIds, wp_get_post_categories($postId));
     }
 
+    /**
+     * @covers ::postsToIncidentReports
+     */
+    public function testPostsToIncidentReports()
+    {
+        $posts = $this->factory->post->create_many(5, array('post_type' => 'einsatz'));
+
+        $reports = $this->utilities->postsToIncidentReports($posts);
+        $this->assertCount(5, $reports);
+
+        foreach ($reports as $key => $report) {
+            /** @var IncidentReport $report */
+            $this->assertEquals($posts[$key], $report->getPostId());
+        }
+    }
+
+    /**
+     * @covers ::removePostFromCategory
+     */
     public function testRemovePostFromCategory()
     {
         // Einsatzbericht anlegen und allen Kategorien zuweisen

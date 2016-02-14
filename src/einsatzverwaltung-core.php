@@ -15,6 +15,7 @@ require_once dirname(__FILE__) . '/einsatzverwaltung-settings.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-tools.php';
 require_once dirname(__FILE__) . '/Import/Tool.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-taxonomies.php';
+require_once dirname(__FILE__) . '/Frontend/ReportList.php';
 
 use abrain\Einsatzverwaltung\Import\Tool as ImportTool;
 use abrain\Einsatzverwaltung\Util\Formatter;
@@ -247,9 +248,9 @@ class Core
 
         new Admin($this, $this->utilities);
         $this->data = new Data($this, $this->utilities, $this->options);
-        $frontend = new Frontend($this, $this->options, $this->utilities);
+        new Frontend($this, $this->options, $this->utilities);
         new Settings($this, $this->options, $this->utilities, $this->data);
-        new Shortcodes($frontend);
+        new Shortcodes($this->utilities, $this, $this->options);
         new Taxonomies($this->utilities);
 
         // Tools
@@ -399,66 +400,6 @@ class Core
         } else {
             return $jahr.str_pad($nummer, $stellen, "0", STR_PAD_LEFT);
         }
-    }
-
-    /**
-     * Gibt die möglichen Spalten für die Einsatzübersicht zurück
-     *
-     * @return array
-     */
-    public function getListColumns()
-    {
-        return array(
-            'number' => array(
-                'name' => 'Nummer',
-                'nowrap' => true
-            ),
-            'date' => array(
-                'name' => 'Datum',
-                'nowrap' => true
-            ),
-            'time' => array(
-                'name' => 'Zeit',
-                'nowrap' => true
-            ),
-            'datetime' => array(
-                'name' => 'Datum',
-                'longName' => 'Datum + Zeit',
-                'nowrap' => true
-            ),
-            'title' => array(
-                'name' => 'Einsatzmeldung'
-            ),
-            'incidentCommander' => array(
-                'name' => 'Einsatzleiter'
-            ),
-            'location' => array(
-                'name' => 'Einsatzort'
-            ),
-            'workforce' => array(
-                'name' => 'Mannschaftsst&auml;rke'
-            ),
-            'duration' => array(
-                'name' => 'Dauer',
-                'nowrap' => true
-            ),
-            'vehicles' => array(
-                'name' => 'Fahrzeuge'
-            ),
-            'alarmType' => array(
-                'name' => 'Alarmierungsart'
-            ),
-            'additionalForces' => array(
-                'name' => 'Weitere Kräfte'
-            ),
-            'incidentType' => array(
-                'name' => 'Einsatzart'
-            ),
-            'seqNum' => array(
-                'name' => 'Lfd.',
-                'longName' => 'Laufende Nummer'
-            )
-        );
     }
 
     /**

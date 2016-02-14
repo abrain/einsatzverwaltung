@@ -1,6 +1,9 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
+use abrain\Einsatzverwaltung\Frontend\ReportList;
+use abrain\Einsatzverwaltung\Model\IncidentReport;
+
 /**
  * Stellt nützliche Helferlein zur Verfügung
  *
@@ -210,6 +213,22 @@ class Utilities
         return true;
     }
 
+    /**
+     * Wandelt ein Array von WP_Post-Objekten in ein Array von IncidentReport-Objekten um
+     *
+     * @param array $arr Array mit WP_Post-Objekten
+     *
+     * @return array Array mit IncidentReport-Objekten
+     */
+    public function postsToIncidentReports($arr)
+    {
+        $reports = array();
+        foreach ($arr as $post) {
+            $reports[] = new IncidentReport($post);
+        }
+
+        return $reports;
+    }
 
     /**
      * Gibt eine Fehlermeldung aus
@@ -362,10 +381,28 @@ class Utilities
             return $this->options->getDefaultColumns();
         }
 
-        $columns = $this->core->getListColumns();
+        $inputArray = explode(',', $input);
+        $validColumnIds = $this->sanitizeColumnsArray($inputArray);
+
+        if (empty($validColumnIds)) {
+            return $this->options->getDefaultColumns();
+        }
+
+        return implode(',', $validColumnIds);
+    }
+
+    /**
+     * Bereinigt ein Array von Spalten-Ids, sodass nur gültige Ids darin verbleiben
+     *
+     * @param $inputArray
+     *
+     * @return array
+     */
+    public function sanitizeColumnsArray($inputArray)
+    {
+        $columns = ReportList::getListColumns();
         $columnIds = array_keys($columns);
 
-        $inputArray = explode(',', $input);
         $validColumnIds = array();
         foreach ($inputArray as $colId) {
             $colId = trim($colId);
@@ -375,9 +412,10 @@ class Utilities
         }
 
         if (empty($validColumnIds)) {
-            return $this->options->getDefaultColumns();
+            $defaultColumns = $this->options->getDefaultColumns();
+            $validColumnIds = explode(',', $defaultColumns);
         }
 
-        return implode(',', $validColumnIds);
+        return $validColumnIds;
     }
 }

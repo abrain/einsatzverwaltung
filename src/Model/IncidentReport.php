@@ -96,6 +96,33 @@ class IncidentReport
     }
 
     /**
+     * Komparator für Fahrzeuge
+     *
+     * @param object $vehicle1
+     * @param object $vehicle2
+     *
+     * @return int
+     */
+    private function compareVehicles($vehicle1, $vehicle2)
+    {
+        if (empty($vehicle1->vehicle_order) && !empty($vehicle2->vehicle_order)) {
+            return 1;
+        }
+
+        if (!empty($vehicle1->vehicle_order) && empty($vehicle2->vehicle_order)) {
+            return -1;
+        }
+
+        if (empty($vehicle1->vehicle_order) && empty($vehicle2->vehicle_order) ||
+            $vehicle1->vehicle_order == $vehicle2->vehicle_order
+        ) {
+            return strcasecmp($vehicle1->name, $vehicle2->name);
+        }
+
+        return ($vehicle1->vehicle_order < $vehicle2->vehicle_order) ? -1 : 1;
+    }
+
+    /**
      * Gibt die slugs und Namen der Taxonomien zurück
      *
      * @return array
@@ -261,7 +288,7 @@ class IncidentReport
         $vehicles = get_the_terms($this->post->ID, 'fahrzeug');
 
         if (empty($vehicles)) {
-            return $vehicles;
+            return array();
         }
 
         // Reihenfolge abfragen
@@ -277,23 +304,7 @@ class IncidentReport
         }
 
         // Fahrzeuge vor Rückgabe sortieren
-        usort($vehicles, function ($vehicle1, $vehicle2) {
-            if (empty($vehicle1->vehicle_order) && !empty($vehicle2->vehicle_order)) {
-                return 1;
-            }
-
-            if (!empty($vehicle1->vehicle_order) && empty($vehicle2->vehicle_order)) {
-                return -1;
-            }
-
-            if (empty($vehicle1->vehicle_order) && empty($vehicle2->vehicle_order) ||
-                $vehicle1->vehicle_order == $vehicle2->vehicle_order
-            ) {
-                return strcasecmp($vehicle1->name, $vehicle2->name);
-            }
-
-            return ($vehicle1->vehicle_order < $vehicle2->vehicle_order) ? -1 : 1;
-        });
+        usort($vehicles, 'compareVehicles');
 
         return $vehicles;
     }

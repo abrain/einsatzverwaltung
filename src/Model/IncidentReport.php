@@ -304,7 +304,7 @@ class IncidentReport
         }
 
         // Fahrzeuge vor Rückgabe sortieren
-        usort($vehicles, 'compareVehicles');
+        usort($vehicles, array($this, 'compareVehicles'));
 
         return $vehicles;
     }

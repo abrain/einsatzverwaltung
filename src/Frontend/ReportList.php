@@ -105,6 +105,7 @@ class ReportList
             return;
         }
 
+        // Arguemnte auswerten
         $defaults = array(
             'splitMonths' => false,
             'columns' => array(),
@@ -113,13 +114,14 @@ class ReportList
         );
         $parsedArgs = wp_parse_args($args, $defaults);
 
+        // Variablen setzen
         $this->splitMonths = boolval($parsedArgs['splitMonths']);
         $this->columns = $this->utilities->sanitizeColumnsArray($parsedArgs['columns']);
         $this->numberOfColumns = count($this->columns);
         $this->linkToVehicles = boolval($parsedArgs['linkToVehicles']);
         $this->linkToAddForces = boolval($parsedArgs['linkToAddForces']);
 
-        $veryFirstReport = true;
+        // Berichte abarbeiten
         $currentYear = null;
         $currentMonth = null;
         $previousYear = null;
@@ -130,27 +132,30 @@ class ReportList
             $currentYear = intval($timeOfAlerting->format('Y'));
             $currentMonth = intval($timeOfAlerting->format('m'));
 
-            if ($veryFirstReport) {
-                $this->beginTable($currentYear);
-                $veryFirstReport = false;
-            }
+            // Ein neues Jahr beginnt
+            if ($currentYear != $previousYear) {
+                // Wenn mindestens schon ein Jahr ausgegeben wurde
+                if ($previousYear != null) {
+                    $previousMonth = null;
+                    $this->endTable();
+                }
 
-            if ($previousYear != null && $currentYear != $previousYear) {
-                $previousMonth = null;
-                $this->endTable();
                 $this->beginTable($currentYear);
                 if (!$this->splitMonths) {
                     $this->insertTableHeader();
                 }
             }
 
+            // Monatswechsel bei aktivierter Monatstrennung
             if ($this->splitMonths && $currentMonth != $previousMonth) {
                 $this->insertMonthSeparator($timeOfAlerting);
                 $this->insertTableHeader();
             }
 
+            // Zeile für den aktuellen Bericht ausgeben
             $this->insertRow($report);
 
+            // Variablen für den nächsten Durchgang setzen
             $previousYear = $currentYear;
             $previousMonth = $currentMonth;
         }

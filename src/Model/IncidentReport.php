@@ -167,8 +167,6 @@ class IncidentReport
     }
 
     /**
-     * TODO Methodenname überdenken
-     *
      * @return array
      */
     public function getAdditionalForces()

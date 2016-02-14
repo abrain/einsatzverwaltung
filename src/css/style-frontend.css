@@ -1,105 +1,101 @@
-.responsive-stacked-table {
+.einsatzverwaltung-reportlist {
 	width: 100%;
 	border-collapse: collapse;
 }
-.responsive-stacked-table th,
-.responsive-stacked-table td {
+.einsatzverwaltung-reportlist th,
+.einsatzverwaltung-reportlist td {
 	padding: 3px 5px;
 }
-.responsive-stacked-table thead {
+.einsatzverwaltung-reportlist thead {
 	background: #eee;
 	border-bottom: 3px solid #ddd;
 }
-.responsive-stacked-table .einsatz-header {
+.einsatzverwaltung-reportlist .einsatz-header {
 	background: #eee;
 	border-bottom: 2px solid #ddd;
 }
-.responsive-stacked-table tr:nth-child(even) {
+.einsatzverwaltung-reportlist tr:nth-child(even) {
 	background: #f0f0f0;
 }
 
-.responsive-stacked-table .einsatz-title-month td {
+.einsatzverwaltung-reportlist .einsatz-title-month td {
 	border: none;
 	font-size: 1.3em;
     padding: 3px 8px;
 	background: #ddd none repeat scroll 0 0;
 }
 
-.responsive-stacked-table.with-mobile-labels {
-	font-size: 1em;
-}
-
 @media (max-width: 767px) {
-	.responsive-stacked-table thead {
+	.einsatzverwaltung-reportlist thead {
 		display: none;
 	}
-	.responsive-stacked-table tr,
-	.responsive-stacked-table th,
-	.responsive-stacked-table td {
+	.einsatzverwaltung-reportlist tr,
+	.einsatzverwaltung-reportlist th,
+	.einsatzverwaltung-reportlist td {
 		display: block;
 	}
 
-    .responsive-stacked-table tr {
+    .einsatzverwaltung-reportlist tr {
         padding-top: 5px;
         padding-bottom: 5px;
     }
 
-    .responsive-stacked-table tr.einsatz-title-month {
+    .einsatzverwaltung-reportlist tr.einsatz-title-month {
         padding-top: 0;
         padding-bottom: 0;
     }
 
-	.responsive-stacked-table td {
+	.einsatzverwaltung-reportlist td {
         padding: 0 10px;
 		border: none;
 	}
-	.responsive-stacked-table .einsatz-header {
+	.einsatzverwaltung-reportlist .einsatz-header {
 		display: none;
 	}
-	.responsive-stacked-table.with-mobile-labels td:before {
+	.einsatzverwaltung-reportlist td:before {
 		font-weight: bold;
 		margin-right: 5px;
 	}
-	.responsive-stacked-table.with-mobile-labels td.einsatz-column-number:before {
+	.einsatzverwaltung-reportlist td.einsatz-column-number:before {
 		content: "Einsatznummer:";
 	}
-	.responsive-stacked-table.with-mobile-labels td.einsatz-column-date:before {
+	.einsatzverwaltung-reportlist td.einsatz-column-date:before {
 		content: "Datum:";
 	}
-	.responsive-stacked-table.with-mobile-labels td.einsatz-column-time:before {
+	.einsatzverwaltung-reportlist td.einsatz-column-time:before {
 		content: "Zeit:";
 	}
-	.responsive-stacked-table.with-mobile-labels td.einsatz-column-title:before {
+	.einsatzverwaltung-reportlist td.einsatz-column-title:before {
 		content: "Einsatzmeldung:";
 	}
-	.responsive-stacked-table.with-mobile-labels td.einsatz-column-location:before {
+	.einsatzverwaltung-reportlist td.einsatz-column-location:before {
 		content: "Einsatzort:";
 	}
-	.responsive-stacked-table.with-mobile-labels td.einsatz-column-incidentCommander:before {
+	.einsatzverwaltung-reportlist td.einsatz-column-incidentCommander:before {
 		content: "Einsatzleiter:";
 	}
-	.responsive-stacked-table.with-mobile-labels td.einsatz-column-duration:before {
+	.einsatzverwaltung-reportlist td.einsatz-column-duration:before {
 		content: "Einsatzdauer:";
 	}
-	.responsive-stacked-table.with-mobile-labels td.einsatz-column-vehicles:before {
+	.einsatzverwaltung-reportlist td.einsatz-column-vehicles:before {
 		content: "Einsatzfahrzeuge:";
 	}
-	.responsive-stacked-table.with-mobile-labels td.einsatz-column-incidentType:before {
+	.einsatzverwaltung-reportlist td.einsatz-column-incidentType:before {
 		content: "Einsatzart:";
 	}
-	.responsive-stacked-table.with-mobile-labels td.einsatz-column-workforce:before {
+	.einsatzverwaltung-reportlist td.einsatz-column-workforce:before {
 		content: "Mannschaftsstr&auml;ke:";
 	}
-	.responsive-stacked-table.with-mobile-labels td.einsatz-column-datetime:before {
+	.einsatzverwaltung-reportlist td.einsatz-column-datetime:before {
 		content: "Datum:";
 	}
-	.responsive-stacked-table.with-mobile-labels td.einsatz-column-alarmType:before {
+	.einsatzverwaltung-reportlist td.einsatz-column-alarmType:before {
 		content: "Alarmierungsart:";
 	}
-	.responsive-stacked-table.with-mobile-labels td.einsatz-column-seqNum:before {
+	.einsatzverwaltung-reportlist td.einsatz-column-seqNum:before {
 		content: "Lfd.-Nummer:";
 	}
-	.responsive-stacked-table.with-mobile-labels td.einsatz-column-additionalForces:before {
+	.einsatzverwaltung-reportlist td.einsatz-column-additionalForces:before {
 		content: "Weitere Kr&auml;te:";
 	}
 

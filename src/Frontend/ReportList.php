@@ -196,7 +196,7 @@ class ReportList
     private function beginTable($year)
     {
         $this->string .= '<h2>Eins&auml;tze '.$year.'</h2>';
-        $this->string .= '<table class="responsive-stacked-table with-mobile-labels"><tbody>';
+        $this->string .= '<table class="einsatzverwaltung-reportlist"><tbody>';
     }
 
     private function endTable()

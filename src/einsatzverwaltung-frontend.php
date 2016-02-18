@@ -118,11 +118,7 @@ class Frontend
             $showEinsatzartArchiveLink = $showArchiveLinks && $this->options->isShowEinsatzartArchive();
             $art = $formatter->getTypeOfIncident($report, $make_links, $showEinsatzartArchiveLink);
 
-            $fehlalarm = $report->isFalseAlarm();
-            if (empty($fehlalarm)) {
-                $fehlalarm = 0;
-            }
-            if ($fehlalarm == 1) {
+            if ($report->isFalseAlarm()) {
                 $art = (empty($art) ? 'Fehlalarm' : $art.' (Fehlalarm)');
             }
 

@@ -155,7 +155,7 @@ class ReportList
             }
 
             // Zeile für den aktuellen Bericht ausgeben
-            $this->insertRow($report);
+            $this->insertRow($report, array('title'));
 
             // Variablen für den nächsten Durchgang setzen
             $previousYear = $currentYear;
@@ -235,13 +235,21 @@ class ReportList
 
     /**
      * @param IncidentReport $report Der Einsatzbericht
+     * @param array $linkColIds Array mit Spalten-IDs, die mit einem Link zum Einsatzbericht versehen werden sollen
      */
-    private function insertRow($report)
+    private function insertRow($report, $linkColIds)
     {
         $this->string .= '<tr>';
         foreach ($this->columns as $colId) {
             $this->string .= '<td class="einsatz-column-' . $colId . '">';
+            $linkThisColumn = in_array($colId, $linkColIds);
+            if ($linkThisColumn) {
+                $this->string .= '<a href="' . get_permalink($report->getPostId()) . '" rel="bookmark">';
+            }
             $this->string .= $this->getCellContent($report, $colId);
+            if ($linkThisColumn) {
+                $this->string .= '</a>';
+            }
             $this->string .= '</td>';
         }
         $this->string .= '</tr>';
@@ -278,11 +286,7 @@ class ReportList
                 break;
             case 'title':
                 $postTitle = get_the_title($report->getPostId());
-                if (empty($postTitle)) {
-                    $postTitle = '(kein Titel)';
-                }
-                $url = get_permalink($report->getPostId());
-                $cellContent = '<a href="' . $url . '" rel="bookmark">' . $postTitle . '</a>';
+                $cellContent =  empty($postTitle) ? '(kein Titel)' : $postTitle;
                 break;
             case 'incidentCommander':
                 $cellContent = $report->getIncidentCommander();

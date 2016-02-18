@@ -97,26 +97,24 @@ class Frontend
      * Erzeugt den Kopf eines Einsatzberichts
      *
      * @param WP_Post $post Das Post-Objekt
-     * @param bool $may_contain_links True, wenn Links generiert werden dürfen
+     * @param bool $mayContainLinks True, wenn Links generiert werden dürfen
      * @param bool $showArchiveLinks Bestimmt, ob Links zu Archivseiten generiert werden dürfen
      *
      * @return string Auflistung der Einsatzdetails
      */
-    public function getEinsatzberichtHeader($post, $may_contain_links = true, $showArchiveLinks = true)
+    public function getEinsatzberichtHeader($post, $mayContainLinks = true, $showArchiveLinks = true)
     {
         if (get_post_type($post) == "einsatz") {
             $report = new IncidentReport($post);
             $formatter = new Formatter($this->options, $this->utilities);
 
-            $make_links = $may_contain_links;
-
-            $alarm_string = $formatter->getTypesOfAlerting($report);
+            $typesOfAlerting = $formatter->getTypesOfAlerting($report);
 
             $duration = Data::getDauer($report);
-            $dauerstring = ($duration === false ? '' : $this->utilities->getDurationString($duration));
+            $durationString = ($duration === false ? '' : $this->utilities->getDurationString($duration));
 
             $showEinsatzartArchiveLink = $showArchiveLinks && $this->options->isShowEinsatzartArchive();
-            $art = $formatter->getTypeOfIncident($report, $make_links, $showEinsatzartArchiveLink);
+            $art = $formatter->getTypeOfIncident($report, $mayContainLinks, $showEinsatzartArchiveLink);
 
             if ($report->isFalseAlarm()) {
                 $art = (empty($art) ? 'Fehlalarm' : $art.' (Fehlalarm)');
@@ -126,9 +124,8 @@ class Frontend
             $einsatzleiter = $report->getIncidentCommander();
             $mannschaft = $report->getWorkforce();
 
-            $fzg_string = $formatter->getVehicles($report, $make_links, $showArchiveLinks);
-
-            $ext_string = $formatter->getAdditionalForces($report, $make_links, $showArchiveLinks);
+            $vehicles = $formatter->getVehicles($report, $mayContainLinks, $showArchiveLinks);
+            $additionalForces = $formatter->getAdditionalForces($report, $mayContainLinks, $showArchiveLinks);
 
             $timeOfAlerting = $report->getTimeOfAlerting();
             $datumsformat = $this->options->getDateFormat();
@@ -138,14 +135,14 @@ class Frontend
 
             $headerstring = "<strong>Datum:</strong> ".$einsatz_datum."&nbsp;<br>";
             $headerstring .= "<strong>Alarmzeit:</strong> ".$einsatz_zeit."&nbsp;<br>";
-            $headerstring .= $this->getDetailString('Alarmierungsart:', $alarm_string);
-            $headerstring .= $this->getDetailString('Dauer:', $dauerstring);
+            $headerstring .= $this->getDetailString('Alarmierungsart:', $typesOfAlerting);
+            $headerstring .= $this->getDetailString('Dauer:', $durationString);
             $headerstring .= $this->getDetailString('Art:', $art);
             $headerstring .= $this->getDetailString('Einsatzort:', $einsatzort);
             $headerstring .= $this->getDetailString('Einsatzleiter:', $einsatzleiter);
             $headerstring .= $this->getDetailString('Mannschaftsst&auml;rke:', $mannschaft);
-            $headerstring .= $this->getDetailString('Fahrzeuge:', $fzg_string);
-            $headerstring .= $this->getDetailString('Weitere Kr&auml;fte:', $ext_string);
+            $headerstring .= $this->getDetailString('Fahrzeuge:', $vehicles);
+            $headerstring .= $this->getDetailString('Weitere Kr&auml;fte:', $additionalForces);
 
             return "<p>$headerstring</p>";
         }
@@ -244,10 +241,10 @@ class Frontend
         }
 
         $excerptType = $this->options->getExcerptTypeFeed();
-        $get_excerpt = $this->getEinsatzExcerpt($post, $excerptType, true, false);
-        $get_excerpt = str_replace('<strong>', '', $get_excerpt);
-        $get_excerpt = str_replace('</strong>', '', $get_excerpt);
-        return $get_excerpt;
+        $getExcerpt = $this->getEinsatzExcerpt($post, $excerptType, true, false);
+        $getExcerpt = str_replace('<strong>', '', $getExcerpt);
+        $getExcerpt = str_replace('</strong>', '', $getExcerpt);
+        return $getExcerpt;
     }
 
     /**
@@ -291,12 +288,12 @@ class Frontend
             )
         ) {
             if (isset($query->query_vars['post_type'])) {
-                $post_types = (array) $query->query_vars['post_type'];
+                $postTypes = (array) $query->query_vars['post_type'];
             } else {
-                $post_types = array('post');
+                $postTypes = array('post');
             }
-            $post_types[] = 'einsatz';
-            $query->set('post_type', $post_types);
+            $postTypes[] = 'einsatz';
+            $query->set('post_type', $postTypes);
         }
     }
 }

@@ -276,15 +276,15 @@ class Admin
 
         switch ($column) {
             case 'e_nummer':
-                $einsatz_nummer = $report->getNumber();
-                echo (empty($einsatz_nummer) ? '-' : $einsatz_nummer);
+                $einsatznummer = $report->getNumber();
+                echo (empty($einsatznummer) ? '-' : $einsatznummer);
                 break;
             case 'e_einsatzende':
-                $einsatz_einsatzende = $report->getTimeOfEnding();
-                if (empty($einsatz_einsatzende)) {
+                $timeOfEnding = $report->getTimeOfEnding();
+                if (empty($timeOfEnding)) {
                     echo '-';
                 } else {
-                    $timestamp = strtotime($einsatz_einsatzende);
+                    $timestamp = strtotime($timeOfEnding);
                     echo date("d.m.Y", $timestamp)."<br>".date("H:i", $timestamp);
                 }
                 break;
@@ -350,12 +350,12 @@ class Admin
     {
         $postType = 'einsatz';
         if (post_type_exists($postType)) {
-            $pt_info = get_post_type_object($postType); // get a specific CPT's details
-            $num_posts = wp_count_posts($postType); // retrieve number of posts associated with this CPT
-            $num = number_format_i18n($num_posts->publish); // number of published posts for this CPT
+            $ptInfo = get_post_type_object($postType); // get a specific CPT's details
+            $numberOfPosts = wp_count_posts($postType); // retrieve number of posts associated with this CPT
+            $num = number_format_i18n($numberOfPosts->publish); // number of published posts for this CPT
             // singular/plural text label for CPT
-            $text = _n($pt_info->labels->singular_name, $pt_info->labels->name, intval($num_posts->publish));
-            echo '<li class="'.$pt_info->name.'-count page-count">';
+            $text = _n($ptInfo->labels->singular_name, $ptInfo->labels->name, intval($numberOfPosts->publish));
+            echo '<li class="'.$ptInfo->name.'-count page-count">';
             if (current_user_can('edit_einsatzberichte')) {
                 echo '<a href="edit.php?post_type='.$postType.'">'.$num.' '.$text.'</a>';
             } else {
@@ -374,11 +374,11 @@ class Admin
     {
         if (post_type_exists('einsatz')) {
             $postType = 'einsatz';
-            $pt_info = get_post_type_object($postType); // get a specific CPT's details
-            $num_posts = wp_count_posts($postType); // retrieve number of posts associated with this CPT
-            $num = number_format_i18n($num_posts->publish); // number of published posts for this CPT
+            $ptInfo = get_post_type_object($postType); // get a specific CPT's details
+            $numberOfPosts = wp_count_posts($postType); // retrieve number of posts associated with this CPT
+            $num = number_format_i18n($numberOfPosts->publish); // number of published posts for this CPT
             // singular/plural text label for CPT
-            $text = _n($pt_info->labels->singular_name, $pt_info->labels->name, intval($num_posts->publish));
+            $text = _n($ptInfo->labels->singular_name, $ptInfo->labels->name, intval($numberOfPosts->publish));
             echo '<tr><td class="first b">';
             if (current_user_can('edit_einsatzberichte')) {
                 echo '<a href="edit.php?post_type='.$postType.'">'.$num.'</a>';

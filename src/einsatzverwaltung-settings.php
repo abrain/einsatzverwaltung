@@ -175,15 +175,15 @@ class Settings
 
         $roles = get_editable_roles();
         if (!empty($roles)) {
-            foreach (array_keys($roles) as $role_slug) {
+            foreach (array_keys($roles) as $roleSlug) {
                 // Administratoren haben immer Zugriff, deshalb ist keine Einstellung nötig
-                if ('administrator' === $role_slug) {
+                if ('administrator' === $roleSlug) {
                     continue;
                 }
 
                 register_setting(
                     'einsatzvw_settings',
-                    'einsatzvw_cap_roles_' . $role_slug,
+                    'einsatzvw_cap_roles_' . $roleSlug,
                     array($this->utilities, 'sanitizeCheckbox')
                 );
             }
@@ -559,14 +559,14 @@ class Settings
         if (empty($roles)) {
             echo "Es konnten keine Rollen gefunden werden.";
         } else {
-            foreach ($roles as $role_slug => $role) {
+            foreach ($roles as $roleSlug => $role) {
                 // Administratoren haben immer Zugriff, deshalb ist keine Einstellung nötig
-                if ('administrator' === $role_slug) {
+                if ('administrator' === $roleSlug) {
                     continue;
                 }
 
                 $this->echoSettingsCheckbox(
-                    'einsatzvw_cap_roles_' . $role_slug,
+                    'einsatzvw_cap_roles_' . $roleSlug,
                     translate_user_role($role['name'])
                 );
                 echo '<br>';
@@ -618,17 +618,17 @@ class Settings
      * Prüft, ob sich die Basis für die Links zu Einsatzberichten ändert und veranlasst gegebenenfalls ein Erneuern der
      * Permalinkstruktur
      *
-     * @param string $new_value Der neue Wert
-     * @param string $old_value Der alte Wert
+     * @param string $newValue Der neue Wert
+     * @param string $oldValue Der alte Wert
      * @return string Der zu speichernde Wert
      */
-    public function maybeRewriteSlugChanged($new_value, $old_value)
+    public function maybeRewriteSlugChanged($newValue, $oldValue)
     {
-        if ($new_value != $old_value) {
+        if ($newValue != $oldValue) {
             $this->options->setFlushRewriteRules(true);
         }
 
-        return $new_value;
+        return $newValue;
     }
 
     /**

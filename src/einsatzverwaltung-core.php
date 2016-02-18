@@ -39,7 +39,7 @@ class Core
     public $scriptUrl;
     public $styleUrl;
 
-    private $args_einsatz = array(
+    private $argsEinsatz = array(
         'labels' => array(
             'name' => 'Einsatzberichte',
             'singular_name' => 'Einsatzbericht',
@@ -91,7 +91,7 @@ class Core
         'delete_with_user' => false,
     );
 
-    private $args_einsatzart = array(
+    private $argsEinsatzart = array(
         'label' => 'Einsatzarten',
         'labels' => array(
             'name' => 'Einsatzarten',
@@ -123,7 +123,7 @@ class Core
         'hierarchical' => true
     );
 
-    private $args_fahrzeug = array(
+    private $argsFahrzeug = array(
         'label' => 'Fahrzeuge',
         'labels' => array(
             'name' => 'Fahrzeuge',
@@ -185,7 +185,7 @@ class Core
         )
     );
 
-    private $args_alarmierungsart = array(
+    private $argsAlarmierungsart = array(
         'label' => 'Alarmierungsart',
         'labels' => array(
             'name' => 'Alarmierungsarten',
@@ -328,15 +328,15 @@ class Core
     {
         // Anpassungen der Parameter
         if ($this->utilities->isMinWPVersion("3.9")) {
-            $this->args_einsatz['menu_icon'] = 'dashicons-media-document';
+            $this->argsEinsatz['menu_icon'] = 'dashicons-media-document';
         }
-        $this->args_einsatz['rewrite']['slug'] = $this->options->getRewriteSlug();
+        $this->argsEinsatz['rewrite']['slug'] = $this->options->getRewriteSlug();
 
-        register_post_type('einsatz', $this->args_einsatz);
-        register_taxonomy('einsatzart', 'einsatz', $this->args_einsatzart);
-        register_taxonomy('fahrzeug', 'einsatz', $this->args_fahrzeug);
+        register_post_type('einsatz', $this->argsEinsatz);
+        register_taxonomy('einsatzart', 'einsatz', $this->argsEinsatzart);
+        register_taxonomy('fahrzeug', 'einsatz', $this->argsFahrzeug);
         register_taxonomy('exteinsatzmittel', 'einsatz', $this->argsExteinsatzmittel);
-        register_taxonomy('alarmierungsart', 'einsatz', $this->args_alarmierungsart);
+        register_taxonomy('alarmierungsart', 'einsatz', $this->argsAlarmierungsart);
     }
 
     private function addRewriteRules()

@@ -69,7 +69,7 @@ class Shortcodes
         $linkColIds = $shortcodeParams['link'];
 
         // Optionen auswerten
-        $rawOptions = explode(',', $shortcodeParams['options']);
+        $rawOptions = array_map('trim', explode(',', $shortcodeParams['options']));
         $possibleOptions = array('special');
         $filteredOptions = array_intersect($possibleOptions, $rawOptions);
         $showOnlySpecialReports = in_array('special', $filteredOptions);

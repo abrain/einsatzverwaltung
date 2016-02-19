@@ -56,10 +56,16 @@ class Shortcodes
         $aktuelles_jahr = date('Y');
 
         // Shortcodeparameter auslesen
-        $shortcodeParams = shortcode_atts(array('jahr' => date('Y'), 'sort' => 'ab', 'monatetrennen' => 'nein'), $atts);
+        $shortcodeParams = shortcode_atts(array(
+            'jahr' => date('Y'),
+            'sort' => 'ab',
+            'monatetrennen' => 'nein',
+            'link' => 'title',
+        ), $atts);
         $jahr = $shortcodeParams['jahr'];
         $sort = $shortcodeParams['sort'];
         $monateTrennen = $shortcodeParams['monatetrennen'];
+        $linkColIds = $shortcodeParams['link'];
 
         $dateQuery = array();
         if ($jahr == '*') {
@@ -81,6 +87,8 @@ class Shortcodes
             $dateQuery = array('year' => $jahr);
         }
 
+        $columnsWithLink = $this->utilities->sanitizeColumnsArray(explode(',', $linkColIds));
+
         // TODO Für diese Art von Anfragen eine eigene Klasse wie WP_Query bauen
         $posts = get_posts(array(
             'post_type' => 'einsatz',
@@ -98,6 +106,7 @@ class Shortcodes
             array(
                 'splitMonths' => ($monateTrennen == 'ja'),
                 'columns' => $this->options->getEinsatzlisteEnabledColumns(),
+                'columnsWithLink' => $columnsWithLink,
             )
         );
     }

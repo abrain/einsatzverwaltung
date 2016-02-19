@@ -26,6 +26,13 @@ class ReportList
     private $columns;
 
     /**
+     * Array mit Spalten-IDs, die mit einem Link zum Einsatzbericht versehen werden sollen
+     *
+     * @var array
+     */
+    private $columnsWithLink;
+
+    /**
      * @var Core
      */
     private $core;
@@ -113,6 +120,7 @@ class ReportList
             'columns' => array(),
             'linkToVehicles' => $this->options->getBoolOption('einsatzvw_list_fahrzeuge_link'),
             'linkToAddForces' => $this->options->getBoolOption('einsatzvw_list_ext_link'),
+            'columnsWithLink' => array('title'),
         );
         $parsedArgs = wp_parse_args($args, $defaults);
 
@@ -122,6 +130,7 @@ class ReportList
         $this->numberOfColumns = count($this->columns);
         $this->linkToVehicles = boolval($parsedArgs['linkToVehicles']);
         $this->linkToAddForces = boolval($parsedArgs['linkToAddForces']);
+        $this->columnsWithLink = $this->utilities->sanitizeColumnsArray($parsedArgs['columnsWithLink']);
 
         // Berichte abarbeiten
         $currentYear = null;
@@ -155,7 +164,7 @@ class ReportList
             }
 
             // Zeile für den aktuellen Bericht ausgeben
-            $this->insertRow($report, array('title'));
+            $this->insertRow($report);
 
             // Variablen für den nächsten Durchgang setzen
             $previousYear = $currentYear;
@@ -235,14 +244,13 @@ class ReportList
 
     /**
      * @param IncidentReport $report Der Einsatzbericht
-     * @param array $linkColIds Array mit Spalten-IDs, die mit einem Link zum Einsatzbericht versehen werden sollen
      */
-    private function insertRow($report, $linkColIds)
+    private function insertRow($report)
     {
         $this->string .= '<tr>';
         foreach ($this->columns as $colId) {
             $this->string .= '<td class="einsatz-column-' . $colId . '">';
-            $linkThisColumn = in_array($colId, $linkColIds);
+            $linkThisColumn = in_array($colId, $this->columnsWithLink);
             if ($linkThisColumn) {
                 $this->string .= '<a href="' . get_permalink($report->getPostId()) . '" rel="bookmark">';
             }

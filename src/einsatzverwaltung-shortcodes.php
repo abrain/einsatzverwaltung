@@ -61,12 +61,20 @@ class Shortcodes
             'sort' => 'ab',
             'monatetrennen' => 'nein',
             'link' => 'title',
+            'options' => ''
         ), $atts);
         $jahr = $shortcodeParams['jahr'];
         $sort = $shortcodeParams['sort'];
         $monateTrennen = $shortcodeParams['monatetrennen'];
         $linkColIds = $shortcodeParams['link'];
 
+        // Optionen auswerten
+        $rawOptions = explode(',', $shortcodeParams['options']);
+        $possibleOptions = array('special');
+        $filteredOptions = array_intersect($possibleOptions, $rawOptions);
+        $showOnlySpecialReports = in_array('special', $filteredOptions);
+
+        // Datumsabfrage zusammenbasteln
         $dateQuery = array();
         if ($jahr == '*') {
             $jahreMitEinsatz = Data::getJahreMitEinsatz();
@@ -87,6 +95,12 @@ class Shortcodes
             $dateQuery = array('year' => $jahr);
         }
 
+        // Metaabfrage zusammenbasteln
+        $metaQuery = array();
+        if ($showOnlySpecialReports) {
+            $metaQuery[] = array('key' => 'einsatz_special', 'value' => '1');
+        }
+
         $columnsWithLink = $this->utilities->sanitizeColumnsArray(explode(',', $linkColIds));
 
         // TODO Für diese Art von Anfragen eine eigene Klasse wie WP_Query bauen
@@ -96,7 +110,8 @@ class Shortcodes
             'orderby' => 'date',
             'order' => ($sort == 'auf' ? 'ASC' : 'DESC'),
             'nopaging' => true,
-            'date_query' => $dateQuery
+            'date_query' => $dateQuery,
+            'meta_query' => $metaQuery,
         ));
         $reports = $this->utilities->postsToIncidentReports($posts);
 

@@ -43,6 +43,13 @@ class ReportList
     private $formatter;
 
     /**
+     * Gibt an, ob ein Link für Einsatzberichte ohne Beitragstext erzeugt werden soll
+     *
+     * @var bool
+     */
+    private $linkEmptyReports;
+
+    /**
      * Gibt an, ob die zusätzlichen Kräfte mit einem Link zu der ggf. gesetzten Adresse versehen werden sollen
      *
      * @var bool
@@ -121,6 +128,7 @@ class ReportList
             'linkToVehicles' => $this->options->getBoolOption('einsatzvw_list_fahrzeuge_link'),
             'linkToAddForces' => $this->options->getBoolOption('einsatzvw_list_ext_link'),
             'columnsWithLink' => array('title'),
+            'linkEmptyReports' => true,
         );
         $parsedArgs = wp_parse_args($args, $defaults);
 
@@ -131,6 +139,7 @@ class ReportList
         $this->linkToVehicles = boolval($parsedArgs['linkToVehicles']);
         $this->linkToAddForces = boolval($parsedArgs['linkToAddForces']);
         $this->columnsWithLink = $this->utilities->sanitizeColumnsArray($parsedArgs['columnsWithLink']);
+        $this->linkEmptyReports = boolval($parsedArgs['linkEmptyReports']);
 
         // Berichte abarbeiten
         $currentYear = null;
@@ -250,7 +259,8 @@ class ReportList
         $this->string .= '<tr>';
         foreach ($this->columns as $colId) {
             $this->string .= '<td class="einsatz-column-' . $colId . '">';
-            $linkThisColumn = in_array($colId, $this->columnsWithLink);
+            $linkToReport = $this->linkEmptyReports || $report->hasContent();
+            $linkThisColumn = $linkToReport && in_array($colId, $this->columnsWithLink);
             if ($linkThisColumn) {
                 $this->string .= '<a href="' . get_permalink($report->getPostId()) . '" rel="bookmark">';
             }

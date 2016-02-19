@@ -70,9 +70,10 @@ class Shortcodes
 
         // Optionen auswerten
         $rawOptions = array_map('trim', explode(',', $shortcodeParams['options']));
-        $possibleOptions = array('special');
+        $possibleOptions = array('special', 'noLinkWithoutContent');
         $filteredOptions = array_intersect($possibleOptions, $rawOptions);
         $showOnlySpecialReports = in_array('special', $filteredOptions);
+        $linkEmptyReports = !in_array('noLinkWithoutContent', $filteredOptions);
 
         // Datumsabfrage zusammenbasteln
         $dateQuery = array();
@@ -122,6 +123,7 @@ class Shortcodes
                 'splitMonths' => ($monateTrennen == 'ja'),
                 'columns' => $this->options->getEinsatzlisteEnabledColumns(),
                 'columnsWithLink' => $columnsWithLink,
+                'linkEmptyReports' => $linkEmptyReports
             )
         );
     }

@@ -360,6 +360,16 @@ class IncidentReport
     }
 
     /**
+     * Gibt zurück, ob der Einsatzbericht über einen Beitragstext verfügt
+     *
+     * @return bool
+     */
+    public function hasContent()
+    {
+        return !empty($this->post->post_content);
+    }
+
+    /**
      * Gibt zurück, ob es sich um einen Fehlalarm handelte
      *
      * @return bool

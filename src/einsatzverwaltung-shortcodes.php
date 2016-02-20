@@ -53,11 +53,11 @@ class Shortcodes
      */
     public function einsatzliste($atts)
     {
-        $aktuelles_jahr = date('Y');
+        $currentYear = date('Y');
 
         // Shortcodeparameter auslesen
         $shortcodeParams = shortcode_atts(array(
-            'jahr' => date('Y'),
+            'jahr' => $currentYear,
             'sort' => 'ab',
             'monatetrennen' => 'nein',
             'link' => 'title',
@@ -86,13 +86,13 @@ class Shortcodes
             }
             $dateQuery['relation'] = 'OR';
         } elseif (is_numeric($jahr) && $jahr < 0) {
-            for ($i=0; $i < abs(intval($jahr)) && $i < $aktuelles_jahr; $i++) {
-                $dateQuery[] = array('year' => $aktuelles_jahr - $i);
+            for ($i=0; $i < abs(intval($jahr)) && $i < $currentYear; $i++) {
+                $dateQuery[] = array('year' => $currentYear - $i);
             }
             $dateQuery['relation'] = 'OR';
         } elseif (empty($jahr) || strlen($jahr)!=4 || !is_numeric($jahr)) {
-            echo '<p>' . sprintf('INFO: Jahreszahl %s ung&uuml;ltig, verwende %s', $jahr, $aktuelles_jahr) . '</p>';
-            $dateQuery = array('year' => $aktuelles_jahr);
+            echo '<p>' . sprintf('INFO: Jahreszahl %s ung&uuml;ltig, verwende %s', $jahr, $currentYear) . '</p>';
+            $dateQuery = array('year' => $currentYear);
         } else {
             // FIXME hier sind noch keine Fehlerfälle abgefangen
             $dateQuery = array('year' => $jahr);

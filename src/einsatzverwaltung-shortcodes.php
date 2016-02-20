@@ -61,12 +61,14 @@ class Shortcodes
             'sort' => 'ab',
             'monatetrennen' => 'nein',
             'link' => 'title',
+            'limit' => -1,
             'options' => ''
         ), $atts);
         $jahr = $shortcodeParams['jahr'];
         $sort = $shortcodeParams['sort'];
         $monateTrennen = $shortcodeParams['monatetrennen'];
         $linkColIds = $shortcodeParams['link'];
+        $limit = is_numeric($shortcodeParams['limit']) ? abs(intval($shortcodeParams['limit'])) : -1;
 
         // Optionen auswerten
         $rawOptions = array_map('trim', explode(',', $shortcodeParams['options']));
@@ -110,7 +112,7 @@ class Shortcodes
             'post_status' => 'publish',
             'orderby' => 'date',
             'order' => ($sort == 'auf' ? 'ASC' : 'DESC'),
-            'nopaging' => true,
+            'posts_per_page' => $limit,
             'date_query' => $dateQuery,
             'meta_query' => $metaQuery,
         ));

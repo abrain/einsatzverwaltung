@@ -64,11 +64,7 @@ class Shortcodes
             'limit' => -1,
             'options' => ''
         ), $atts);
-        $jahr = $shortcodeParams['jahr'];
-        $sort = $shortcodeParams['sort'];
-        $monateTrennen = $shortcodeParams['monatetrennen'];
-        $linkColIds = $shortcodeParams['link'];
-        $limit = is_numeric($shortcodeParams['limit']) ? abs(intval($shortcodeParams['limit'])) : -1;
+        $limit = $shortcodeParams['limit'];
 
         // Optionen auswerten
         $rawOptions = array_map('trim', explode(',', $shortcodeParams['options']));
@@ -76,53 +72,27 @@ class Shortcodes
         $filteredOptions = array_intersect($possibleOptions, $rawOptions);
         $showOnlySpecialReports = in_array('special', $filteredOptions);
         $linkEmptyReports = !in_array('noLinkWithoutContent', $filteredOptions);
+        $columnsWithLink = $this->utilities->sanitizeColumnsArray(explode(',', $shortcodeParams['link']));
 
-        // Datumsabfrage zusammenbasteln
-        $dateQuery = array();
-        if ($jahr == '*') {
-            $jahreMitEinsatz = Data::getJahreMitEinsatz();
-            foreach ($jahreMitEinsatz as $year) {
-                $dateQuery[] = array('year' => $year);
-            }
-            $dateQuery['relation'] = 'OR';
-        } elseif (is_numeric($jahr) && $jahr < 0) {
-            for ($i=0; $i < abs(intval($jahr)) && $i < $currentYear; $i++) {
-                $dateQuery[] = array('year' => $currentYear - $i);
-            }
-            $dateQuery['relation'] = 'OR';
-        } elseif (empty($jahr) || strlen($jahr)!=4 || !is_numeric($jahr)) {
-            echo '<p>' . sprintf('INFO: Jahreszahl %s ung&uuml;ltig, verwende %s', $jahr, $currentYear) . '</p>';
-            $dateQuery = array('year' => $currentYear);
-        } else {
-            // FIXME hier sind noch keine Fehlerfälle abgefangen
-            $dateQuery = array('year' => $jahr);
+        // Berichte abfragen
+        $reportQuery = new ReportQuery();
+        if (is_numeric($limit) && $limit > 0) {
+            $reportQuery->setLimit(intval($limit));
+        }
+        $reportQuery->setOnlySpecialReports($showOnlySpecialReports);
+        $reportQuery->setOrderAsc($shortcodeParams['sort'] == 'auf');
+
+        if (is_numeric($shortcodeParams['jahr'])) {
+            $reportQuery->setYear($shortcodeParams['jahr']);
         }
 
-        // Metaabfrage zusammenbasteln
-        $metaQuery = array();
-        if ($showOnlySpecialReports) {
-            $metaQuery[] = array('key' => 'einsatz_special', 'value' => '1');
-        }
-
-        $columnsWithLink = $this->utilities->sanitizeColumnsArray(explode(',', $linkColIds));
-
-        // TODO Für diese Art von Anfragen eine eigene Klasse wie WP_Query bauen
-        $posts = get_posts(array(
-            'post_type' => 'einsatz',
-            'post_status' => 'publish',
-            'orderby' => 'date',
-            'order' => ($sort == 'auf' ? 'ASC' : 'DESC'),
-            'posts_per_page' => $limit,
-            'date_query' => $dateQuery,
-            'meta_query' => $metaQuery,
-        ));
-        $reports = $this->utilities->postsToIncidentReports($posts);
+        $reports = $reportQuery->getReports();
 
         $reportList = new ReportList($this->utilities, $this->core, $this->options);
         return $reportList->getList(
             $reports,
             array(
-                'splitMonths' => ($monateTrennen == 'ja'),
+                'splitMonths' => ($shortcodeParams['monatetrennen'] == 'ja'),
                 'columns' => $this->options->getEinsatzlisteEnabledColumns(),
                 'columnsWithLink' => $columnsWithLink,
                 'linkEmptyReports' => $linkEmptyReports

@@ -38,6 +38,11 @@ class ReportQuery
     private $orderAsc;
 
     /**
+     * @var int
+     */
+    private $year;
+
+    /**
      * ReportQuery constructor.
      */
     public function __construct()
@@ -72,6 +77,22 @@ class ReportQuery
             $metaQuery[] = array('key' => 'einsatz_special', 'value' => '1');
         }
 
+        // Abfrage basierend auf Datumsparametern zusammenbasteln
+        $dateQuery = array();
+        if (is_numeric($this->year)) {
+            if ($this->year < 0) {
+                $currentYear = date('Y');
+                for ($i = 0; $i < abs(intval($this->year)) && $i < $currentYear; $i++) {
+                    $dateQuery[] = array('year' => $currentYear - $i);
+                }
+                $dateQuery['relation'] = 'OR';
+            }
+
+            if ($this->year > 0) {
+                $dateQuery = array('year' => $this->year);
+            }
+        }
+
         $postArgs = array(
             'order' => $this->orderAsc ? 'ASC' : 'DESC',
             'orderby' => 'post_date',
@@ -82,6 +103,10 @@ class ReportQuery
 
         if (!empty($metaQuery)) {
             $postArgs['meta_query'] = $metaQuery;
+        }
+
+        if (!empty($dateQuery)) {
+            $postArgs['date_query'] = $dateQuery;
         }
 
         $posts = get_posts($postArgs);
@@ -126,5 +151,13 @@ class ReportQuery
     public function setOrderAsc($orderAsc)
     {
         $this->orderAsc = $orderAsc;
+    }
+
+    /**
+     * @param int $year
+     */
+    public function setYear($year)
+    {
+        $this->year = $year;
     }
 }

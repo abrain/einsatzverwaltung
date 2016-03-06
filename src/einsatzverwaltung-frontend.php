@@ -183,6 +183,11 @@ class Frontend
             return $content;
         }
 
+        // Wenn Beiträge durch ein Passwort geschützt sind, werden auch keine Einsatzdetails preisgegeben
+        if (post_password_required()) {
+            return $content;
+        }
+
         $header = $this->getEinsatzberichtHeader($post, true, true);
         $content = $this->prepareContent($content);
 

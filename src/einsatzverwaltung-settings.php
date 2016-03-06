@@ -400,7 +400,7 @@ class Settings
         );
 
         echo '<p><label for="einsatzvw_category">';
-        _e('Davon unabh&auml;ngig Einsatzberichte folgender Kategorie zuordnen:', 'einsatzverwaltung');
+        _e('Davon unabh&auml;ngig Einsatzberichte immer in folgender Kategorie anzeigen:', 'einsatzverwaltung');
         echo '&nbsp;</label>';
         wp_dropdown_categories(array(
             'show_option_none' => '- keine -',
@@ -415,7 +415,7 @@ class Settings
 
         $this->echoSettingsCheckbox(
             'einsatzvw_category_only_special',
-            'Nur als besonders markierte Einsatzberichte der Kategorie zuordnen'
+            'Nur als besonders markierte Einsatzberichte in der Kategorie anzeigen'
         );
     }
 

@@ -284,13 +284,8 @@ class Frontend
     {
         $categoryId = $this->options->getEinsatzberichteCategory();
         if (!is_admin() &&
-            $query->is_main_query() &&
             empty($query->query_vars['suppress_filters']) &&
-            (
-                $query->is_home() && $this->options->isShowEinsatzberichteInMainloop() ||
-                $query->is_tag() ||
-                $categoryId != -1 && $query->is_category($categoryId)
-            )
+            ($this->options->isShowEinsatzberichteInMainloop() || $query->is_category($categoryId))
         ) {
             if (isset($query->query_vars['post_type'])) {
                 $postTypes = (array) $query->query_vars['post_type'];

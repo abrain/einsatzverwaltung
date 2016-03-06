@@ -14,6 +14,11 @@ class Update
     private $core;
 
     /**
+     * @var Data
+     */
+    private $data;
+
+    /**
      * @var Options
      */
     private $options;
@@ -28,12 +33,14 @@ class Update
      * @param Core $core
      * @param Options $options
      * @param Utilities $utilities
+     * @param Data $data
      */
-    public function __construct($core, $options, $utilities)
+    public function __construct($core, $options, $utilities, $data)
     {
         $this->core = $core;
         $this->options = $options;
         $this->utilities = $utilities;
+        $this->data = $data;
     }
 
     /**
@@ -198,5 +205,13 @@ class Update
                 $this->utilities->addPostToCategory($post->ID, $categoryId);
             }
         }
+    }
+
+    /**
+     * Aktualisiert sämtliche laufenden Nummern der Einsatzberichte
+     */
+    private function updateTo9()
+    {
+        $this->data->updateSequenceNumbers();
     }
 }

@@ -133,13 +133,13 @@ class ReportList
         $parsedArgs = wp_parse_args($args, $defaults);
 
         // Variablen setzen
-        $this->splitMonths = boolval($parsedArgs['splitMonths']);
+        $this->splitMonths = (true === $parsedArgs['splitMonths']);
         $this->columns = $this->utilities->sanitizeColumnsArray($parsedArgs['columns']);
         $this->numberOfColumns = count($this->columns);
-        $this->linkToVehicles = boolval($parsedArgs['linkToVehicles']);
-        $this->linkToAddForces = boolval($parsedArgs['linkToAddForces']);
+        $this->linkToVehicles = (true === $parsedArgs['linkToVehicles']);
+        $this->linkToAddForces = (true === $parsedArgs['linkToAddForces']);
         $this->columnsWithLink = $this->utilities->sanitizeColumnsArray($parsedArgs['columnsWithLink']);
-        $this->linkEmptyReports = boolval($parsedArgs['linkEmptyReports']);
+        $this->linkEmptyReports = (true === $parsedArgs['linkEmptyReports']);
 
         // Berichte abarbeiten
         $currentYear = null;

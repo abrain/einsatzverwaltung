@@ -226,6 +226,12 @@ class Frontend
         }
 
         $excerptType = $this->options->getExcerptType();
+
+        // Kein Eingriff in das normale Verhalten von WordPress
+        if ('default' == $excerptType) {
+            return $excerpt;
+        }
+
         return $this->getEinsatzExcerpt($post, $excerptType, true, true);
     }
 
@@ -246,6 +252,12 @@ class Frontend
         }
 
         $excerptType = $this->options->getExcerptTypeFeed();
+
+        // Kein Eingriff in das normale Verhalten von WordPress
+        if ('default' == $excerptType) {
+            return $excerpt;
+        }
+
         $getExcerpt = $this->getEinsatzExcerpt($post, $excerptType, true, false);
         $getExcerpt = str_replace('<strong>', '', $getExcerpt);
         $getExcerpt = str_replace('</strong>', '', $getExcerpt);

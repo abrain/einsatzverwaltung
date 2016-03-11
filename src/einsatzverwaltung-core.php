@@ -417,6 +417,7 @@ class Core
     public function getExcerptTypes()
     {
         return array(
+            'default' => 'WordPress-Standard',
             'none' => 'Leer',
             'details' => 'Einsatzdetails',
             'text' => 'Berichtstext'

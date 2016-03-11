@@ -26,6 +26,14 @@ class ReportList
     private $columns;
 
     /**
+     * Array mit Spalten-IDs, die nicht mit einem Link zum Einsatzbericht versehen werden dürfen
+     *
+     * @var array
+     */
+    private $columnsLinkBlacklist = array('incidentCommander', 'location', 'vehicles', 'alarmType', 'additionalForces',
+        'incidentType');
+
+    /**
      * Array mit Spalten-IDs, die mit einem Link zum Einsatzbericht versehen werden sollen
      *
      * @var array
@@ -263,7 +271,8 @@ class ReportList
         foreach ($this->columns as $colId) {
             $this->string .= '<td class="einsatz-column-' . $colId . '">';
             $linkToReport = $this->linkEmptyReports || $report->hasContent();
-            $linkThisColumn = $linkToReport && !empty($this->columnsWithLink) && in_array($colId, $this->columnsWithLink);
+            $linkThisColumn = $linkToReport && !empty($this->columnsWithLink) &&
+                in_array($colId, $this->columnsWithLink) && !in_array($colId, $this->columnsLinkBlacklist);
             if ($linkThisColumn) {
                 $this->string .= '<a href="' . get_permalink($report->getPostId()) . '" rel="bookmark">';
             }

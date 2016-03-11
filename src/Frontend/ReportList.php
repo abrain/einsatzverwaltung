@@ -138,7 +138,10 @@ class ReportList
         $this->numberOfColumns = count($this->columns);
         $this->linkToVehicles = (true === $parsedArgs['linkToVehicles']);
         $this->linkToAddForces = (true === $parsedArgs['linkToAddForces']);
-        $this->columnsWithLink = $this->utilities->sanitizeColumnsArray($parsedArgs['columnsWithLink']);
+        $this->columnsWithLink = $parsedArgs['columnsWithLink'];
+        if ($this->columnsWithLink !== false) {
+            $this->columnsWithLink = $this->utilities->sanitizeColumnsArray($this->columnsWithLink);
+        }
         $this->linkEmptyReports = (true === $parsedArgs['linkEmptyReports']);
 
         // Berichte abarbeiten
@@ -260,7 +263,7 @@ class ReportList
         foreach ($this->columns as $colId) {
             $this->string .= '<td class="einsatz-column-' . $colId . '">';
             $linkToReport = $this->linkEmptyReports || $report->hasContent();
-            $linkThisColumn = $linkToReport && in_array($colId, $this->columnsWithLink);
+            $linkThisColumn = $linkToReport && !empty($this->columnsWithLink) && in_array($colId, $this->columnsWithLink);
             if ($linkThisColumn) {
                 $this->string .= '<a href="' . get_permalink($report->getPostId()) . '" rel="bookmark">';
             }

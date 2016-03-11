@@ -72,7 +72,13 @@ class Shortcodes
         $filteredOptions = array_intersect($possibleOptions, $rawOptions);
         $showOnlySpecialReports = in_array('special', $filteredOptions);
         $linkEmptyReports = !in_array('noLinkWithoutContent', $filteredOptions);
-        $columnsWithLink = $this->utilities->sanitizeColumnsArray(explode(',', $shortcodeParams['link']));
+        $columnsWithLink = explode(',', $shortcodeParams['link']);
+        if (in_array('none', $columnsWithLink)) {
+            $columnsWithLink = false;
+        }
+        if ($columnsWithLink !== false) {
+            $columnsWithLink = $this->utilities->sanitizeColumnsArray($columnsWithLink);
+        }
 
         // Berichte abfragen
         $reportQuery = new ReportQuery();

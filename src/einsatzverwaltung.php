@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Einsatzverwaltung
-Plugin URI: https://www.abrain.de/software/einsatzverwaltung/
+Plugin URI: https://einsatzverwaltung.abrain.de
 Description: Verwaltung und Darstellung von Einsatzberichten der Feuerwehr und anderer Hilfsorganisationen
 Version: 1.1.5
 Author: Andreas Brain

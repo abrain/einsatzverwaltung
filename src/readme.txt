@@ -1,6 +1,6 @@
 === Einsatzverwaltung ===
 Contributors: abrain
-Donate link: https://www.abrain.de/software/unterstuetzen/
+Donate link: https://einsatzverwaltung.abrain.de/unterstuetzen/
 Tags: Feuerwehr, Einsatz, Rettung, Rettungsdienst, THW, HiOrg, Wasserwacht, Bergrettung
 Requires at least: 3.7.0
 Tested up to: 4.4
@@ -46,7 +46,7 @@ Nein, dieses Plugin hat nichts mit einsatzverwaltung.eu zu tun.
 
 = Wo finde ich die Anleitung bzw. Dokumentation? =
 
-Die Dokumentation gibt es [hier](https://www.abrain.de/software/einsatzverwaltung/anleitung/), wenn etwas fehlt oder missverst&auml;ndlich erkl&auml;rt ist, bitte melden.
+Die Dokumentation gibt es [hier](https://einsatzverwaltung.abrain.de/dokumentation/), wenn etwas fehlt oder missverst&auml;ndlich erkl&auml;rt ist, bitte melden.
 
 = Ich f&auml;nde es gut, wenn Funktionalit&auml;t X hinzugef&uuml;gt / verbessert werden k&ouml;nnte =
 
@@ -155,7 +155,7 @@ Das Du halte ich f&uuml;r die angenehmere Arbeitsgrundlage, aber man darf mich g
 = 0.7.0 =
 * Neu: Berechtigung zur Verwaltung von Einsatzberichten kann nun allen Benutzerrollen von WordPress zugeordnet werden
 * Verbesserung: Shortcode einsatzliste kann Tabelle nach Monaten getrennt darstellen
-* Hinweis: Der neue Shortcode-Parameter kann in der [Anleitung](https://www.abrain.de/software/einsatzverwaltung/anleitung/) nachgelesen werden
+* Hinweis: Der neue Shortcode-Parameter kann in der [Anleitung](https://einsatzverwaltung.abrain.de/dokumentation/) nachgelesen werden
 * Hinweis (subtil): Es gibt mittlerweile auch eine [Facebook-Seite](https://www.facebook.com/einsatzverwaltung)
 
 = 0.6.0 =
@@ -170,7 +170,7 @@ Das Du halte ich f&uuml;r die angenehmere Arbeitsgrundlage, aber man darf mich g
 * Verbesserung: Icons werden mit Font Awesome dargestellt
 * Fehlerbehebung: Shortcode einsatzjahre erzeugte falsche Links bei deaktivierten Permalinks
 * Fehlerbehebung: Seitennavigation im Jahresarchiv war defekt
-* Hinweis: Die neuen Shortcode-Parameter k&ouml;nnen in der [Anleitung](https://www.abrain.de/software/einsatzverwaltung/anleitung/) nachgelesen werden
+* Hinweis: Die neuen Shortcode-Parameter k&ouml;nnen in der [Anleitung](https://einsatzverwaltung.abrain.de/dokumentation/) nachgelesen werden
 
 = 0.5.4 =
 * Fehlerbehebung: Datum f&uuml;r Feed wurde falsch gespeichert

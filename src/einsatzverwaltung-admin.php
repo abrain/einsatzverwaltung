@@ -405,7 +405,7 @@ class Admin
     public function pluginMetaLinks($links, $file)
     {
         if ($this->core->pluginBasename === $file) {
-            $links[] = '<a href="https://www.abrain.de/category/software/einsatzverwaltung/feed/">Newsfeed</a>';
+            $links[] = '<a href="https://einsatzverwaltung.abrain.de/feed/">Newsfeed</a>';
         }
 
         return $links;

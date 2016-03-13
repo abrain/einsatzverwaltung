@@ -64,6 +64,10 @@ F&uuml;r eMails von/an [kontakt@abrain.de](mailto:kontakt@abrain.de) kann ich PG
 
 Das Du halte ich f&uuml;r die angenehmere Arbeitsgrundlage, aber man darf mich gerne auch siezen ohne dass ich mich alt f&uuml;hle.
 
+= Sind das hier die ganzen FAQ? =
+
+Nein, mehr gibt es [hier](https://einsatzverwaltung.abrain.de/faq/).
+
 == Changelog ==
 
 = 1.1.5 =

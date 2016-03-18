@@ -294,11 +294,24 @@ class Frontend
      */
     public function addReportsToQuery($query)
     {
+        // Nur, wenn Filter erlaubt sind, soll weitergemacht werden
+        if (!empty($query->query_vars['suppress_filters'])) {
+            return;
+        }
+
+        // Im Adminbereich wird nicht herumgepfuscht!
+        if (is_admin()) {
+            return;
+        }
+
+        // Bei Abfragen einzelner Posts gibt es auch nichts zu ändern
+        if ($query->is_singular()) {
+            return;
+        }
+
         $categoryId = $this->options->getEinsatzberichteCategory();
-        if (!is_admin() &&
-            empty($query->query_vars['suppress_filters']) &&
-            ($this->options->isShowEinsatzberichteInMainloop() || $query->is_category($categoryId))
-        ) {
+        if ($this->options->isShowEinsatzberichteInMainloop() || $query->is_category($categoryId)) {
+            // Einsatzberichte mit abfragen
             if (isset($query->query_vars['post_type'])) {
                 $postTypes = (array) $query->query_vars['post_type'];
             } else {
@@ -306,6 +319,25 @@ class Frontend
             }
             $postTypes[] = 'einsatz';
             $query->set('post_type', $postTypes);
+
+            if ($this->options->isOnlySpecialInCategory()) {
+                // Nur als besonders markierte Einsatzberichte abfragen
+                $metaQuery = $query->get('meta_query');
+                if (empty($metaQuery)) {
+                    $metaQuery = array();
+                }
+                $metaQuery['relation'] = 'OR';
+                $metaQuery[] = array(
+                    'key' => 'einsatz_special',
+                    'value' => '1'
+                );
+                $metaQuery[] = array(
+                    'key' => 'einsatz_special',
+                    'value' => '1',
+                    'compare' => 'NOT EXISTS'
+                );
+                $query->set('meta_query', $metaQuery);
+            }
         }
     }
 }

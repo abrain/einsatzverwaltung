@@ -214,4 +214,20 @@ class Update
     {
         $this->data->updateSequenceNumbers();
     }
+
+    /**
+     * Setzt alle alten Einsatzberichte auf 'nicht als besonders markiert', wichtig für das Einfügen in die Mainloop.
+     */
+    private function updateTo10()
+    {
+        $posts = get_posts(array(
+            'post_type' => 'einsatz',
+            'post_status' => array('publish', 'private'),
+            'numberposts' => -1
+        ));
+
+        foreach ($posts as $post) {
+            add_post_meta($post->ID, 'einsatz_special', '0', true);
+        }
+    }
 }

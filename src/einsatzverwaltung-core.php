@@ -31,7 +31,7 @@ use WP_User;
 class Core
 {
     const VERSION = '1.1.5';
-    const DB_VERSION = 9;
+    const DB_VERSION = 10;
 
     public $pluginFile;
     public $pluginBasename;

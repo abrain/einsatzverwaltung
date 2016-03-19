@@ -56,7 +56,7 @@ class Settings
         add_action('admin_init', array($this, 'registerSettings'));
         add_filter('pre_update_option_einsatzvw_rewrite_slug', array($this, 'maybeRewriteSlugChanged'), 10, 2);
         add_filter('pre_update_option_einsatzvw_category', array($this, 'maybeCategoryChanged'), 10, 2);
-        add_filter('pre_update_option_einsatzvw_category_only_special', array($this, 'maybeCategorySpecialChanged'), 10, 2);
+        add_filter('pre_update_option_einsatzvw_loop_only_special', array($this, 'maybeCategorySpecialChanged'), 10, 2);
     }
 
 
@@ -114,7 +114,7 @@ class Settings
         );
         register_setting(
             'einsatzvw_settings',
-            'einsatzvw_category_only_special',
+            'einsatzvw_loop_only_special',
             array($this->utilities, 'sanitizeCheckbox')
         );
         register_setting(
@@ -396,8 +396,9 @@ class Settings
     {
         $this->echoSettingsCheckbox(
             'einsatzvw_show_einsatzberichte_mainloop',
-            'Einsatzberichte zwischen den regul&auml;ren WordPress-Beitr&auml;gen (z.B. auf der Startseite) anzeigen'
+            'Einsatzberichte zwischen den regul&auml;ren WordPress-Beitr&auml;gen anzeigen'
         );
+        echo '<p class="description">L&auml;sst die Einsatzberichte z.B. auf der Startseite, im Widget &quot;Letzte Beitr&auml;ge&quot; oder auch im Beitragsfeed erscheinen</p>';
 
         echo '<p><label for="einsatzvw_category">';
         _e('Davon unabh&auml;ngig Einsatzberichte immer in folgender Kategorie anzeigen:', 'einsatzverwaltung');
@@ -414,9 +415,10 @@ class Settings
 
 
         $this->echoSettingsCheckbox(
-            'einsatzvw_category_only_special',
-            'Nur als besonders markierte Einsatzberichte in der Kategorie anzeigen'
+            'einsatzvw_loop_only_special',
+            'Nur als besonders markierte Einsatzberichte zwischen den regul&auml;ren WordPress-Beitr&auml;gen bzw. in der Kategorie anzeigen.'
         );
+        echo '<p class="description">Mit dieser Einstellung gelten die beiden oberen Einstellungen nur f&uuml;r als besonders markierte Einsatzberichte. Kann erst ab WordPress 4.1 verwendet werden.</p>';
     }
 
 
@@ -664,7 +666,7 @@ class Settings
 
         // Wenn eine neue Kategorie gesetzt wird, müssen Einsatzberichte dieser zugeordnet werden
         if ($newValue != -1) {
-            $onlySpecialInCategory = $this->options->isOnlySpecialInCategory();
+            $onlySpecialInCategory = $this->options->isOnlySpecialInLoop();
             /** @var IncidentReport $report */
             foreach ($reports as $report) {
                 if (!$onlySpecialInCategory || $report->isSpecial()) {

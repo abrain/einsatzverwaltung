@@ -26,7 +26,7 @@ class Options
         'einsatzvw_rewrite_slug' => 'einsatzberichte',
         'einsatzvw_flush_rewrite_rules' => false,
         'einsatzvw_category' => false,
-        'einsatzvw_category_only_special' => false,
+        'einsatzvw_loop_only_special' => false,
     );
 
     /**
@@ -203,14 +203,14 @@ class Options
     }
 
     /**
-     * Gibt zurück, ob nur als besonders markierte Einsatzberichte der Kategorie in einsatzvw_category zugeordnet
+     * Gibt zurück, ob nur als besonders markierte Einsatzberichte zwischen normalen WordPress-Beiträgen angezeigt
      * werden sollen
      *
      * @return bool
      */
-    public function isOnlySpecialInCategory()
+    public function isOnlySpecialInLoop()
     {
-        return $this->getBoolOption('einsatzvw_category_only_special');
+        return $this->getBoolOption('einsatzvw_loop_only_special');
     }
 
 
@@ -250,7 +250,7 @@ class Options
     /**
      * @return bool
      */
-    public function isShowEinsatzberichteInMainloop()
+    public function isShowReportsInLoop()
     {
         $option = $this->getOption('einsatzvw_show_einsatzberichte_mainloop');
         return $this->toBoolean($option);

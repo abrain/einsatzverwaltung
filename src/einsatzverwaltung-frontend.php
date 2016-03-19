@@ -310,7 +310,7 @@ class Frontend
         }
 
         $categoryId = $this->options->getEinsatzberichteCategory();
-        if ($this->options->isShowEinsatzberichteInMainloop() || $query->is_category($categoryId)) {
+        if ($this->options->isShowReportsInLoop() || $query->is_category($categoryId)) {
             // Einsatzberichte mit abfragen
             if (isset($query->query_vars['post_type'])) {
                 $postTypes = (array) $query->query_vars['post_type'];
@@ -320,7 +320,7 @@ class Frontend
             $postTypes[] = 'einsatz';
             $query->set('post_type', $postTypes);
 
-            if ($this->options->isOnlySpecialInCategory()) {
+            if ($this->options->isOnlySpecialInLoop()) {
                 // Nur als besonders markierte Einsatzberichte abfragen
                 $metaQuery = $query->get('meta_query');
                 if (empty($metaQuery)) {

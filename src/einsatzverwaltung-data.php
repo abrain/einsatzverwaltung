@@ -272,7 +272,7 @@ class Data
         // Kategoriezugehörigkeit aktualisieren
         $category = $this->options->getEinsatzberichteCategory();
         if ($category != -1) {
-            if (!($this->options->isOnlySpecialInCategory()) || $report->isSpecial()) {
+            if (!($this->options->isOnlySpecialInLoop()) || $report->isSpecial()) {
                 $this->utilities->addPostToCategory($postId, $category);
             }
         }

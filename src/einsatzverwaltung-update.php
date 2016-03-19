@@ -217,6 +217,8 @@ class Update
 
     /**
      * Setzt alle alten Einsatzberichte auf 'nicht als besonders markiert', wichtig für das Einfügen in die Mainloop.
+     * Außerdem wird die Option, ob nur besondere Einsatzberichte zwischen den WordPress-Beiträgen auftauchen sollen,
+     * umbenannt.
      */
     private function updateTo10()
     {
@@ -229,5 +231,12 @@ class Update
         foreach ($posts as $post) {
             add_post_meta($post->ID, 'einsatz_special', '0', true);
         }
+
+        // Option umbenennen, betrifft nur Nutzer der Betaversionen von Version 1.2.0
+        $option = get_option('einsatzvw_category_only_special');
+        if ($option !== false) {
+            add_option('einsatzvw_loop_only_special', $option);
+        }
+        delete_option('einsatzvw_category_only_special');
     }
 }

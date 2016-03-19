@@ -394,7 +394,8 @@ class ReportList
                 'name' => 'Einsatzort'
             ),
             'workforce' => array(
-                'name' => 'Mannschaftsst&auml;rke'
+                'name' => 'Mannschaftsst&auml;rke',
+                'cssname' => 'Mannschaftsst\0000E4rke',
             ),
             'duration' => array(
                 'name' => 'Dauer',
@@ -407,7 +408,8 @@ class ReportList
                 'name' => 'Alarmierungsart'
             ),
             'additionalForces' => array(
-                'name' => 'Weitere Kr&auml;fte'
+                'name' => 'Weitere Kr&auml;fte',
+                'cssname' => 'Weitere Kr\0000E4fte',
             ),
             'incidentType' => array(
                 'name' => 'Einsatzart'
@@ -432,7 +434,7 @@ class ReportList
         $string .= '@media (max-width: 767px) {';
         foreach (self::getListColumns() as $colId => $colInfo) {
             $string .= "." . self::TABLECLASS . " td.einsatz-column-$colId:before ";
-            $string .= "{content: \"{$colInfo['name']}:\";}\n";
+            $string .= '{content: "' . (array_key_exists('cssname', $colInfo) ? $colInfo['cssname'] : $colInfo['name']) . ':";}';
         }
         $string .= '}';
 

@@ -2,14 +2,12 @@
 	width: 100%;
 	border-collapse: collapse;
 }
+
 .einsatzverwaltung-reportlist th,
 .einsatzverwaltung-reportlist td {
 	padding: 3px 5px;
 }
-.einsatzverwaltung-reportlist thead {
-	background: #eee;
-	border-bottom: 3px solid #ddd;
-}
+
 .einsatzverwaltung-reportlist .einsatz-header {
 	background: #eee;
 	border-bottom: 2px solid #ddd;
@@ -26,9 +24,6 @@
 }
 
 @media (max-width: 767px) {
-	.einsatzverwaltung-reportlist thead {
-		display: none;
-	}
 	.einsatzverwaltung-reportlist tr,
 	.einsatzverwaltung-reportlist th,
 	.einsatzverwaltung-reportlist td {

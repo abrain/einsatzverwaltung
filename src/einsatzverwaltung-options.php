@@ -13,8 +13,8 @@ class Options
         'einsatzvw_show_exteinsatzmittel_archive' => false,
         'einsatzvw_show_fahrzeug_archive' => false,
         'einsatzvw_open_ext_in_new' => false,
-        'einsatzvw_excerpt_type' => 'details',
-        'einsatzvw_excerpt_type_feed' => 'details',
+        'einsatzvw_excerpt_type' => 'default',
+        'einsatzvw_excerpt_type_feed' => 'default',
         'einsatzvw_show_einsatzberichte_mainloop' => false,
         'einsatzvw_einsatz_hideemptydetails' => true,
         'einsatzvw_einsatznummer_lfdvorne' => false,
@@ -25,7 +25,8 @@ class Options
         'einsatzvw_list_fahrzeuge_link' => false,
         'einsatzvw_rewrite_slug' => 'einsatzberichte',
         'einsatzvw_flush_rewrite_rules' => false,
-        'einsatzvw_category' => false
+        'einsatzvw_category' => false,
+        'einsatzvw_loop_only_special' => false,
     );
 
     /**
@@ -103,12 +104,12 @@ class Options
      *
      * @since 1.0.0
      *
-     * @return int Die ID der Kategorie oder 0, wenn nicht gesetzt
+     * @return int Die ID der Kategorie oder -1, wenn nicht gesetzt
      */
     public function getEinsatzberichteCategory()
     {
         $categoryId = $this->getOption('einsatzvw_category');
-        return (false === $categoryId ? 0 : intval($categoryId));
+        return (false === $categoryId ? -1 : intval($categoryId));
     }
 
     /**
@@ -202,6 +203,18 @@ class Options
     }
 
     /**
+     * Gibt zurück, ob nur als besonders markierte Einsatzberichte zwischen normalen WordPress-Beiträgen angezeigt
+     * werden sollen
+     *
+     * @return bool
+     */
+    public function isOnlySpecialInLoop()
+    {
+        return $this->getBoolOption('einsatzvw_loop_only_special');
+    }
+
+
+    /**
      * @return bool
      */
     public function isOpenExtEinsatzmittelNewWindow()
@@ -237,7 +250,7 @@ class Options
     /**
      * @return bool
      */
-    public function isShowEinsatzberichteInMainloop()
+    public function isShowReportsInLoop()
     {
         $option = $this->getOption('einsatzvw_show_einsatzberichte_mainloop');
         return $this->toBoolean($option);

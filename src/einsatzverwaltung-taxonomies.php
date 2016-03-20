@@ -147,16 +147,16 @@ class Taxonomies
      * Filterfunktion für den Inhalt der selbst angelegten Spalten
      *
      * @param string $string Leerer String.
-     * @param string $column_name Name der Spalte
-     * @param int $term_id Term ID
+     * @param string $columnName Name der Spalte
+     * @param int $termId Term ID
      *
      * @return string Inhalt der Spalte
      */
-    public function columnContentFahrzeug($string, $column_name, $term_id)
+    public function columnContentFahrzeug($string, $columnName, $termId)
     {
-        switch ($column_name) {
+        switch ($columnName) {
             case 'fahrzeugpage':
-                $fahrzeugpid = self::getTermField($term_id, 'fahrzeug', 'fahrzeugpid');
+                $fahrzeugpid = self::getTermField($termId, 'fahrzeug', 'fahrzeugpid');
                 if (false === $fahrzeugpid) {
                     return '&nbsp;';
                 } else {
@@ -171,7 +171,7 @@ class Taxonomies
                 }
                 break;
             case 'vehicleorder':
-                $vehicleOrder = self::getTermField($term_id, 'fahrzeug', 'vehicleorder');
+                $vehicleOrder = self::getTermField($termId, 'fahrzeug', 'vehicleorder');
                 return (empty($vehicleOrder) ? '&nbsp;' : esc_html($vehicleOrder));
                 break;
             default:
@@ -207,14 +207,14 @@ class Taxonomies
      * Filterfunktion für den Inhalt der selbst angelegten Spalten
      *
      * @param string $string Leerer String.
-     * @param string $column_name Name der Spalte
-     * @param int $term_id Term ID
+     * @param string $columnName Name der Spalte
+     * @param int $termId Term ID
      *
      * @return string Inhalt der Spalte
      */
-    public function columnContentExteinsatzmittel($string, $column_name, $term_id)
+    public function columnContentExteinsatzmittel($string, $columnName, $termId)
     {
-        $url = self::getTermField($term_id, 'exteinsatzmittel', 'url');
+        $url = self::getTermField($termId, 'exteinsatzmittel', 'url');
         if (false === $url) {
             return '&nbsp;';
         } else {
@@ -229,11 +229,11 @@ class Taxonomies
     /**
      * Speichert zusätzliche Infos zu Terms als options ab
      *
-     * @param int $term_id Term ID
-     * @param int $tt_id Term taxonomy ID
+     * @param int $termId Term ID
+     * @param int $ttId Term taxonomy ID
      * @param string $taxonomy Taxonomy slug
      */
-    public function saveTerm($term_id, $tt_id, $taxonomy)
+    public function saveTerm($termId, $ttId, $taxonomy)
     {
         $evw_taxonomies = $this->getTaxonomies();
 
@@ -244,7 +244,7 @@ class Taxonomies
         foreach ($evw_taxonomies[$taxonomy] as $field) {
             if (isset($field) && !empty($field) && isset($_POST[$field])) {
                 $value = $_POST[$field]; //FIXME sanitize
-                $key = self::getTermOptionKey($term_id, $taxonomy, $field);
+                $key = self::getTermOptionKey($termId, $taxonomy, $field);
                 if (empty($value)) {
                     delete_option($key);
                 } else {
@@ -257,12 +257,12 @@ class Taxonomies
     /**
      * Löscht zusätzlich angelegte Felder nach dem Löschen eines Terms
      *
-     * @param int $term_id Term ID
-     * @param int $tt_id Term taxonomy ID
+     * @param int $termId Term ID
+     * @param int $ttId Term taxonomy ID
      * @param string $taxonomy Taxonomy slug
-     * @param mixed $deleted_term Kopie des bereits gelöschten Terms
+     * @param mixed $deletedTerm Kopie des bereits gelöschten Terms
      */
-    public function deleteTerm($term_id, $tt_id, $taxonomy, $deleted_term)
+    public function deleteTerm($termId, $ttId, $taxonomy, $deletedTerm)
     {
         if (!isset($taxonomy)) {
             return;
@@ -276,7 +276,7 @@ class Taxonomies
 
         foreach ($evw_taxonomies[$taxonomy] as $field) {
             if (isset($field) && !empty($field)) {
-                delete_option(self::getTermOptionKey($term_id, $taxonomy, $field));
+                delete_option(self::getTermOptionKey($termId, $taxonomy, $field));
             }
         }
     }
@@ -284,31 +284,31 @@ class Taxonomies
     /**
      * Liefert den Wert eines zusätzlich angelegten Feldes zurück
      *
-     * @param $term_id
+     * @param $termId
      * @param $taxonomy
      * @param $field
      * @param mixed $default
      *
      * @return mixed|void
      */
-    public static function getTermField($term_id, $taxonomy, $field, $default = false)
+    public static function getTermField($termId, $taxonomy, $field, $default = false)
     {
-        $key = self::getTermOptionKey($term_id, $taxonomy, $field);
+        $key = self::getTermOptionKey($termId, $taxonomy, $field);
         return get_option($key, $default);
     }
 
     /**
      * Liefert den Schlüssel eines zusätzlich angelegten Feldes zurück
      *
-     * @param $term_id
+     * @param $termId
      * @param $taxonomy
      * @param $field
      *
      * @return string
      */
-    private static function getTermOptionKey($term_id, $taxonomy, $field)
+    private static function getTermOptionKey($termId, $taxonomy, $field)
     {
-        return 'evw_tax_'.$taxonomy.'_'.$term_id.'_'.$field;
+        return 'evw_tax_'.$taxonomy.'_'.$termId.'_'.$field;
     }
 
     /**
@@ -326,25 +326,25 @@ class Taxonomies
      * Datenbank, die IDs von Terms enthalten, zu aktualisieren.
      * Siehe auch https://make.wordpress.org/core/2015/02/16/taxonomy-term-splitting-in-4-2-a-developer-guide/
      *
-     * @param $old_term_id
-     * @param $new_term_id
-     * @param $term_taxonomy_id
+     * @param $oldTermId
+     * @param $newTermId
+     * @param $termTaxonomyId
      * @param $taxonomy
      */
-    public function splitSharedTerms($old_term_id, $new_term_id, $term_taxonomy_id, $taxonomy)
+    public function splitSharedTerms($oldTermId, $newTermId, $termTaxonomyId, $taxonomy)
     {
         if (!array_key_exists($taxonomy, self::$taxonomies)) {
             return;
         }
 
-        error_log("split_shared_term for $taxonomy: ttid $term_taxonomy_id from $old_term_id to $new_term_id");
+        error_log("split_shared_term for $taxonomy: ttid $termTaxonomyId from $oldTermId to $newTermId");
 
         global $wpdb; /** @var wpdb $wpdb */
         $fields = self::$taxonomies[$taxonomy];
 
         foreach ($fields as $field) {
-            $oldKey = self::getTermOptionKey($old_term_id, $taxonomy, $field);
-            $newKey = self::getTermOptionKey($new_term_id, $taxonomy, $field);
+            $oldKey = self::getTermOptionKey($oldTermId, $taxonomy, $field);
+            $newKey = self::getTermOptionKey($newTermId, $taxonomy, $field);
             $result = $wpdb->update($wpdb->options, array('option_name' => $newKey), array('option_name' => $oldKey));
             if (false === $result) {
                 error_log('Fehler beim Termsplit ' . $taxonomy . ': ' . $wpdb->last_error);

@@ -2,6 +2,10 @@
 
 namespace abrain\Einsatzverwaltung\Model;
 
+use abrain\Einsatzverwaltung\Taxonomies;
+use DateTime;
+use WP_Post;
+
 /**
  * Datenmodellklasse für Einsatzberichte
  *
@@ -9,6 +13,35 @@ namespace abrain\Einsatzverwaltung\Model;
  */
 class IncidentReport
 {
+    /**
+     * Wenn es sich um einen bestehenden Beitrag handelt, ist hier das WordPress-Beitragsobjekt gespeichert.
+     *
+     * @var WP_Post
+     */
+    private $post;
+
+    /**
+     * IncidentReport constructor.
+     *
+     * @param int|WP_Post $post
+     */
+    public function __construct($post = null)
+    {
+        if (!empty($post) && !is_int($post) && !is_a($post, 'WP_Post')) {
+            _doing_it_wrong(__FUNCTION__, 'Parameter post muss null oder vom Typ Integer oder WP_Post sein', null);
+            return;
+        }
+
+        if (!empty($post)) {
+            if (get_post_type($post) != 'einsatz') {
+                _doing_it_wrong(__FUNCTION__, 'WP_Post-Objekt ist kein Einsatzbericht', null);
+                return;
+            }
+
+            $this->post = get_post($post);
+        }
+    }
+
     /**
      * Gibt die Beschriftung für ein Feld zurück
      *
@@ -53,8 +86,38 @@ class IncidentReport
             ),
             'einsatz_mannschaft' => array(
                 'label' => 'Mannschaftsstärke'
-            )
+            ),
+            'einsatz_special' => array(
+                'label' => 'Besonderer Einsatz'
+            ),
         );
+    }
+
+    /**
+     * Komparator für Fahrzeuge
+     *
+     * @param object $vehicle1
+     * @param object $vehicle2
+     *
+     * @return int
+     */
+    private function compareVehicles($vehicle1, $vehicle2)
+    {
+        if (empty($vehicle1->vehicle_order) && !empty($vehicle2->vehicle_order)) {
+            return 1;
+        }
+
+        if (!empty($vehicle1->vehicle_order) && empty($vehicle2->vehicle_order)) {
+            return -1;
+        }
+
+        if (empty($vehicle1->vehicle_order) && empty($vehicle2->vehicle_order) ||
+            $vehicle1->vehicle_order == $vehicle2->vehicle_order
+        ) {
+            return strcasecmp($vehicle1->name, $vehicle2->name);
+        }
+
+        return ($vehicle1->vehicle_order < $vehicle2->vehicle_order) ? -1 : 1;
     }
 
     /**
@@ -101,5 +164,228 @@ class IncidentReport
                 'label' => 'Berichtstitel'
             )
         );
+    }
+
+    /**
+     * @return array
+     */
+    public function getAdditionalForces()
+    {
+        return $this->getTheTerms('exteinsatzmittel');
+    }
+
+    /**
+     * Gibt den eingetragenen Einsatzleiter zurück
+     *
+     * @return string
+     */
+    public function getIncidentCommander()
+    {
+        return $this->getPostMeta('einsatz_einsatzleiter');
+    }
+
+    /**
+     * Gibt den eingetragenen Einsatzort zurück
+     *
+     * @return string
+     */
+    public function getLocation()
+    {
+        return $this->getPostMeta('einsatz_einsatzort');
+    }
+
+    /**
+     * Gibt die Einsatznummer zurück
+     *
+     * @return string
+     */
+    public function getNumber()
+    {
+        return get_post_field('post_name', $this->post->ID);
+    }
+
+    /**
+     * @return bool|int
+     */
+    public function getPostId()
+    {
+        return $this->post ? $this->post->ID : false;
+    }
+
+    /**
+     * @param $key
+     *
+     * @return string
+     */
+    private function getPostMeta($key)
+    {
+        if (empty($this->post)) {
+            return '';
+        }
+
+        $meta = get_post_meta($this->post->ID, $key, true);
+
+        if (empty($meta)) {
+            return '';
+        }
+
+        return $meta;
+    }
+
+    /**
+     * Gibt die laufende Nummer des Einsatzberichts bezogen auf das Kalenderjahr zurück
+     *
+     * @return mixed
+     */
+    public function getSequentialNumber()
+    {
+        return $this->getPostMeta('einsatz_seqNum');
+    }
+
+    /**
+     * Gibt Alarmdatum und -zeit zurück
+     *
+     * @return DateTime|false
+     */
+    public function getTimeOfAlerting()
+    {
+        if (empty($this->post)) {
+            return false;
+        }
+
+        $time = $this->post->post_date;
+        return DateTime::createFromFormat('Y-m-d H:i:s', $time);
+    }
+
+    /**
+     * Gibt Datum und Zeit des Einsatzendes zurück
+     *
+     * @return string
+     */
+    public function getTimeOfEnding()
+    {
+        return $this->getPostMeta('einsatz_einsatzende');
+    }
+
+    /**
+     * Gibt das Term-Objekt der Alarmierungsart zurück
+     *
+     * @return array
+     */
+    public function getTypesOfAlerting()
+    {
+        return $this->getTheTerms('alarmierungsart');
+    }
+
+    /**
+     * Holt die Terms einer bestimmten Taxonomie für den aktuellen Einsatzbericht aus der Datenbank und fängt dabei
+     * alle Fehlerfälle ab
+     *
+     * @param string $taxonomy Der eindeutige Bezeichner der Taxonomie
+     *
+     * @return array Die Terms oder ein leeres Array
+     */
+    private function getTheTerms($taxonomy)
+    {
+        if (empty($this->post)) {
+            return array();
+        }
+
+        $terms = get_the_terms($this->post->ID, $taxonomy);
+
+        if (is_wp_error($terms) || empty($terms)) {
+            return array();
+        }
+
+        return $terms;
+    }
+
+    /**
+     * Gibt die Einsatzart eines bestimmten Einsatzes zurück. Auch wenn die Taxonomie 'einsatzart' mehrere Werte
+     * speichern kann, wird nur der erste zurückgegeben.
+     *
+     * @return object|false
+     */
+    public function getTypeOfIncident()
+    {
+        $terms = $this->getTheTerms('einsatzart');
+
+        if (empty($terms)) {
+            return false;
+        }
+
+        $keys = array_keys($terms);
+        return $terms[$keys[0]];
+    }
+
+    /**
+     * Gibt die Fahrzeuge eines Einsatzberichts aus
+     *
+     * @return array
+     */
+    public function getVehicles()
+    {
+        $vehicles = $this->getTheTerms('fahrzeug');
+
+        if (empty($vehicles)) {
+            return array();
+        }
+
+        // Reihenfolge abfragen
+        foreach ($vehicles as $vehicle) {
+            if (!isset($vehicle->term_id)) {
+                continue;
+            }
+
+            $vehicleOrder = Taxonomies::getTermField($vehicle->term_id, 'fahrzeug', 'vehicleorder');
+            if (!empty($vehicleOrder)) {
+                $vehicle->vehicle_order = $vehicleOrder;
+            }
+        }
+
+        // Fahrzeuge vor Rückgabe sortieren
+        usort($vehicles, array($this, 'compareVehicles'));
+
+        return $vehicles;
+    }
+
+    /**
+     * Gibt die eingetragene Mannschaftsstärke zurück
+     *
+     * @return string
+     */
+    public function getWorkforce()
+    {
+        return $this->getPostMeta('einsatz_mannschaft');
+    }
+
+    /**
+     * Gibt zurück, ob der Einsatzbericht über einen Beitragstext verfügt
+     *
+     * @return bool
+     */
+    public function hasContent()
+    {
+        return !empty($this->post->post_content);
+    }
+
+    /**
+     * Gibt zurück, ob es sich um einen Fehlalarm handelte
+     *
+     * @return bool
+     */
+    public function isFalseAlarm()
+    {
+        return ($this->getPostMeta('einsatz_fehlalarm') == 1);
+    }
+
+    /**
+     * Gibt zurück, ob ein Einsatzbericht als besonders markiert wurde oder nicht
+     *
+     * @return bool
+     */
+    public function isSpecial()
+    {
+        return ($this->getPostMeta('einsatz_special') == 1);
     }
 }

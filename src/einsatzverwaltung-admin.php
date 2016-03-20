@@ -1,6 +1,7 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
+use abrain\Einsatzverwaltung\Model\IncidentReport;
 use WP_Post;
 
 /**
@@ -56,6 +57,13 @@ class Admin
             'normal',
             'high'
         );
+        add_meta_box(
+            'einsatzverwaltung_meta_annotations',
+            'Vermerke',
+            array($this, 'displayMetaBoxAnnotations'),
+            'einsatz',
+            'side'
+        );
     }
 
     /**
@@ -70,17 +78,21 @@ class Admin
             wp_enqueue_script(
                 'einsatzverwaltung-edit-script',
                 $this->core->scriptUrl . 'einsatzverwaltung-edit.js',
-                array('jquery', 'jquery-ui-autocomplete')
+                array('jquery', 'jquery-ui-autocomplete'),
+                Core::VERSION
             );
             wp_enqueue_style(
                 'einsatzverwaltung-edit',
-                $this->core->styleUrl . 'style-edit.css'
+                $this->core->styleUrl . 'style-edit.css',
+                array(),
+                Core::VERSION
             );
         } elseif ('settings_page_einsatzvw-settings' == $hook) {
             wp_enqueue_script(
                 'einsatzverwaltung-settings-script',
                 $this->core->scriptUrl . 'einsatzverwaltung-settings.js',
-                array('jquery-ui-draggable', 'jquery-ui-droppable', 'jquery-ui-sortable')
+                array('jquery-ui-draggable', 'jquery-ui-droppable', 'jquery-ui-sortable'),
+                Core::VERSION
             );
         }
 
@@ -92,7 +104,32 @@ class Admin
         );
         wp_enqueue_style(
             'einsatzverwaltung-admin',
-            $this->core->styleUrl . 'style-admin.css'
+            $this->core->styleUrl . 'style-admin.css',
+            array(),
+            Core::VERSION
+        );
+    }
+
+    /**
+     * Inhalt der Metabox für Vermerke zum Einsatzbericht
+     *
+     * @param WP_Post $post Das Post-Objekt des aktuell bearbeiteten Einsatzberichts
+     */
+    public function displayMetaBoxAnnotations($post)
+    {
+        $report = new IncidentReport($post);
+
+        $this->echoInputCheckbox(
+            __("Fehlalarm", 'einsatzverwaltung'),
+            'einsatzverwaltung_fehlalarm',
+            $report->isFalseAlarm()
+        );
+        echo '<br>';
+
+        $this->echoInputCheckbox(
+            __("Besonderer Einsatz", 'einsatzverwaltung'),
+            'einsatzverwaltung_special',
+            $report->isSpecial()
         );
     }
 
@@ -106,13 +143,14 @@ class Admin
         // Use nonce for verification
         wp_nonce_field('save_einsatz_details', 'einsatzverwaltung_nonce');
 
-        $nummer = Data::getEinsatznummer($post->ID);
-        $alarmzeit = Data::getAlarmzeit($post->ID);
-        $einsatzende = Data::getEinsatzende($post->ID);
-        $einsatzort = Data::getEinsatzort($post->ID);
-        $einsatzleiter = Data::getEinsatzleiter($post->ID);
-        $fehlalarm = Data::getFehlalarm($post->ID);
-        $mannschaftsstaerke = Data::getMannschaftsstaerke($post->ID);
+        $report = new IncidentReport($post);
+
+        $nummer = $report->getNumber();
+        $alarmzeit = $report->getTimeOfAlerting();
+        $einsatzende = $report->getTimeOfEnding();
+        $einsatzort = $report->getLocation();
+        $einsatzleiter = $report->getIncidentCommander();
+        $mannschaftsstaerke = $report->getWorkforce();
 
         $names = Data::getEinsatzleiterNamen();
         echo '<input type="hidden" id="einsatzleiter_used_values" value="' . implode(',', $names) . '" />';
@@ -129,7 +167,7 @@ class Admin
         $this->echoInputText(
             __("Alarmzeit", 'einsatzverwaltung'),
             'einsatzverwaltung_alarmzeit',
-            esc_attr($alarmzeit),
+            esc_attr($alarmzeit->format('Y-m-d H:i')),
             'JJJJ-MM-TT hh:mm'
         );
 
@@ -138,12 +176,6 @@ class Admin
             'einsatzverwaltung_einsatzende',
             esc_attr($einsatzende),
             'JJJJ-MM-TT hh:mm'
-        );
-
-        $this->echoInputCheckbox(
-            __("Fehlalarm", 'einsatzverwaltung'),
-            'einsatzverwaltung_fehlalarm',
-            $fehlalarm
         );
 
         echo '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';
@@ -193,13 +225,12 @@ class Admin
      *
      * @param string $label Beschriftung
      * @param string $name Feld-ID
-     * @param mixed $state Zustandswert
+     * @param bool $state Zustandswert
      */
     private function echoInputCheckbox($label, $name, $state)
     {
-        echo '<tr><td><label for="' . $name . '">' . $label . '</label></td>';
-        echo '<td><input type="checkbox" id="' . $name . '" name="' . $name . '" value="1" ';
-        echo $this->utilities->checked($state) . '/></td></tr>';
+        echo '<input type="checkbox" id="' . $name . '" name="' . $name . '" value="1" ';
+        echo $this->utilities->checked($state) . '/><label for="' . $name . '">' . $label . '</label>';
     }
 
     /**
@@ -209,8 +240,9 @@ class Admin
      */
     public static function displayMetaBoxEinsatzart($post)
     {
-        $einsatzart = Data::getEinsatzart($post->ID);
-        Frontend::dropdownEinsatzart($einsatzart ? $einsatzart->term_id : 0);
+        $report = new IncidentReport($post);
+        $typeOfIncident = $report->getTypeOfIncident();
+        Frontend::dropdownEinsatzart($typeOfIncident ? $typeOfIncident->term_id : 0);
     }
 
     /**
@@ -240,38 +272,39 @@ class Admin
      * Einsatzberichte im Adminbereich
      *
      * @param string $column
-     * @param int $post_id
+     * @param int $postId
      */
-    public function filterColumnContentEinsatz($column, $post_id)
+    public function filterColumnContentEinsatz($column, $postId)
     {
         global $post;
 
+        $report = new IncidentReport($postId);
+
         switch ($column) {
             case 'e_nummer':
-                $einsatz_nummer = Data::getEinsatznummer($post_id);
-                echo (empty($einsatz_nummer) ? '-' : $einsatz_nummer);
+                $einsatznummer = $report->getNumber();
+                echo (empty($einsatznummer) ? '-' : $einsatznummer);
                 break;
             case 'e_einsatzende':
-                $einsatz_einsatzende = Data::getEinsatzende($post_id);
-                if (empty($einsatz_einsatzende)) {
+                $timeOfEnding = $report->getTimeOfEnding();
+                if (empty($timeOfEnding)) {
                     echo '-';
                 } else {
-                    $timestamp = strtotime($einsatz_einsatzende);
+                    $timestamp = strtotime($timeOfEnding);
                     echo date("d.m.Y", $timestamp)."<br>".date("H:i", $timestamp);
                 }
                 break;
             case 'e_alarmzeit':
-                $einsatz_alarmzeit = Data::getAlarmzeit($post_id);
+                $timeOfAlerting = $report->getTimeOfAlerting();
 
-                if (empty($einsatz_alarmzeit)) {
+                if (empty($timeOfAlerting)) {
                     echo '-';
                 } else {
-                    $timestamp = strtotime($einsatz_alarmzeit);
-                    echo date("d.m.Y", $timestamp)."<br>".date("H:i", $timestamp);
+                    echo $timeOfAlerting->format('d.m.Y') . '<br>' . $timeOfAlerting->format('H:i');
                 }
                 break;
             case 'e_art':
-                $term = Data::getEinsatzart($post_id);
+                $term = $report->getTypeOfIncident();
                 if ($term) {
                     $url = esc_url(
                         add_query_arg(
@@ -286,7 +319,7 @@ class Admin
                 }
                 break;
             case 'e_fzg':
-                $fahrzeuge = Data::getFahrzeuge($post_id);
+                $fahrzeuge = $report->getVehicles();
 
                 if (!empty($fahrzeuge)) {
                     $out = array();
@@ -323,12 +356,12 @@ class Admin
     {
         $postType = 'einsatz';
         if (post_type_exists($postType)) {
-            $pt_info = get_post_type_object($postType); // get a specific CPT's details
-            $num_posts = wp_count_posts($postType); // retrieve number of posts associated with this CPT
-            $num = number_format_i18n($num_posts->publish); // number of published posts for this CPT
+            $ptInfo = get_post_type_object($postType); // get a specific CPT's details
+            $numberOfPosts = wp_count_posts($postType); // retrieve number of posts associated with this CPT
+            $num = number_format_i18n($numberOfPosts->publish); // number of published posts for this CPT
             // singular/plural text label for CPT
-            $text = _n($pt_info->labels->singular_name, $pt_info->labels->name, intval($num_posts->publish));
-            echo '<li class="'.$pt_info->name.'-count page-count">';
+            $text = _n($ptInfo->labels->singular_name, $ptInfo->labels->name, intval($numberOfPosts->publish));
+            echo '<li class="'.$ptInfo->name.'-count page-count">';
             if (current_user_can('edit_einsatzberichte')) {
                 echo '<a href="edit.php?post_type='.$postType.'">'.$num.' '.$text.'</a>';
             } else {
@@ -347,11 +380,11 @@ class Admin
     {
         if (post_type_exists('einsatz')) {
             $postType = 'einsatz';
-            $pt_info = get_post_type_object($postType); // get a specific CPT's details
-            $num_posts = wp_count_posts($postType); // retrieve number of posts associated with this CPT
-            $num = number_format_i18n($num_posts->publish); // number of published posts for this CPT
+            $ptInfo = get_post_type_object($postType); // get a specific CPT's details
+            $numberOfPosts = wp_count_posts($postType); // retrieve number of posts associated with this CPT
+            $num = number_format_i18n($numberOfPosts->publish); // number of published posts for this CPT
             // singular/plural text label for CPT
-            $text = _n($pt_info->labels->singular_name, $pt_info->labels->name, intval($num_posts->publish));
+            $text = _n($ptInfo->labels->singular_name, $ptInfo->labels->name, intval($numberOfPosts->publish));
             echo '<tr><td class="first b">';
             if (current_user_can('edit_einsatzberichte')) {
                 echo '<a href="edit.php?post_type='.$postType.'">'.$num.'</a>';
@@ -378,7 +411,7 @@ class Admin
     public function pluginMetaLinks($links, $file)
     {
         if ($this->core->pluginBasename === $file) {
-            $links[] = '<a href="https://www.abrain.de/category/software/einsatzverwaltung/feed/">Newsfeed</a>';
+            $links[] = '<a href="https://einsatzverwaltung.abrain.de/feed/">Newsfeed</a>';
         }
 
         return $links;

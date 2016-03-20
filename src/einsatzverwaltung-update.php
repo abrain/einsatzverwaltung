@@ -14,30 +14,44 @@ class Update
     private $core;
 
     /**
+     * @var Data
+     */
+    private $data;
+
+    /**
      * @var Options
      */
     private $options;
 
     /**
+     * @var Utilities
+     */
+    private $utilities;
+
+    /**
      * Update constructor.
      * @param Core $core
      * @param Options $options
+     * @param Utilities $utilities
+     * @param Data $data
      */
-    public function __construct($core, $options)
+    public function __construct($core, $options, $utilities, $data)
     {
         $this->core = $core;
         $this->options = $options;
+        $this->utilities = $utilities;
+        $this->data = $data;
     }
 
     /**
      * Fürt ein Update der Datenbank duch
      *
-     * @param int $current_db_ver derzeitige Version der Datenbank
-     * @param int $target_db_ver Zielversion der Datenbank
+     * @param int $currentDbVersion derzeitige Version der Datenbank
+     * @param int $targetDbVersion Zielversion der Datenbank
      */
-    public function doUpdate($current_db_ver, $target_db_ver)
+    public function doUpdate($currentDbVersion, $targetDbVersion)
     {
-        if (empty($current_db_ver) || empty($target_db_ver)) {
+        if (empty($currentDbVersion) || empty($targetDbVersion)) {
             error_log('Parameter für Datenbank-Update unvollständig');
             return;
         }
@@ -45,22 +59,22 @@ class Update
         // Kein Timeout während des Updates
         set_time_limit(0);
 
-        while ($current_db_ver < $target_db_ver) {
-            $current_db_ver ++;
-            error_log("Update auf DB-Version {$current_db_ver}...");
-            $func = array($this, "updateTo{$current_db_ver}");
+        while ($currentDbVersion < $targetDbVersion) {
+            $currentDbVersion ++;
+            error_log("Update auf DB-Version {$currentDbVersion}...");
+            $func = array($this, "updateTo{$currentDbVersion}");
             if (!is_callable($func)) {
-                error_log("Keine Update-Methode für Datenbankversion {$current_db_ver} gefunden!");
+                error_log("Keine Update-Methode für Datenbankversion {$currentDbVersion} gefunden!");
                 break;
             }
 
             $result = call_user_func($func);
             if ($result === false) {
-                error_log("Datenbankupdate auf Version {$current_db_ver} ist fehlgeschlagen");
+                error_log("Datenbankupdate auf Version {$currentDbVersion} ist fehlgeschlagen");
                 break;
             }
 
-            update_option('einsatzvw_db_version', $current_db_ver);
+            update_option('einsatzvw_db_version', $currentDbVersion);
         }
 
         error_log("Datenbank-Update beendet");
@@ -167,5 +181,62 @@ class Update
     private function updateTo7()
     {
         $this->options->setFlushRewriteRules(true);
+    }
+
+    /**
+     * Fügt alle veröffentlichten Einsatzberichte einer Kategorie hinzu, wenn diese in den Einstellungen für die
+     * Einsatzberichte gesetzt wurde
+     */
+    private function updateTo8()
+    {
+        if (!function_exists('category_exists')) {
+            require_once(ABSPATH . 'wp-admin/includes/taxonomy.php');
+        }
+
+        $categoryId = $this->options->getEinsatzberichteCategory();
+        if (category_exists($categoryId)) {
+            $posts = get_posts(array(
+                'post_type' => 'einsatz',
+                'post_status' => array('publish', 'private'),
+                'numberposts' => -1
+            ));
+
+            foreach ($posts as $post) {
+                $this->utilities->addPostToCategory($post->ID, $categoryId);
+            }
+        }
+    }
+
+    /**
+     * Aktualisiert sämtliche laufenden Nummern der Einsatzberichte
+     */
+    private function updateTo9()
+    {
+        $this->data->updateSequenceNumbers();
+    }
+
+    /**
+     * Setzt alle alten Einsatzberichte auf 'nicht als besonders markiert', wichtig für das Einfügen in die Mainloop.
+     * Außerdem wird die Option, ob nur besondere Einsatzberichte zwischen den WordPress-Beiträgen auftauchen sollen,
+     * umbenannt.
+     */
+    private function updateTo10()
+    {
+        $posts = get_posts(array(
+            'post_type' => 'einsatz',
+            'post_status' => array('publish', 'private'),
+            'numberposts' => -1
+        ));
+
+        foreach ($posts as $post) {
+            add_post_meta($post->ID, 'einsatz_special', '0', true);
+        }
+
+        // Option umbenennen, betrifft nur Nutzer der Betaversionen von Version 1.2.0
+        $option = get_option('einsatzvw_category_only_special');
+        if ($option !== false) {
+            add_option('einsatzvw_loop_only_special', $option);
+        }
+        delete_option('einsatzvw_category_only_special');
     }
 }

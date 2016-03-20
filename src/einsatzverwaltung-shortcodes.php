@@ -1,22 +1,41 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
+use abrain\Einsatzverwaltung\Frontend\ReportList;
+
 /**
  * Ersetzt die Shortcodes durch Inhalte
  */
 class Shortcodes
 {
-    private $frontend;
+    /**
+     * @var Utilities
+     */
+    private $utilities;
+
+    /**
+     * @var Core
+     */
+    private $core;
+
+    /**
+     * @var Options
+     */
+    private $options;
 
     /**
      * Constructor
      *
-     * @param Frontend $frontend
+     * @param Utilities $utilities
+     * @param Core $core
+     * @param Options $options
      */
-    public function __construct($frontend)
+    public function __construct($utilities, $core, $options)
     {
         $this->addHooks();
-        $this->frontend = $frontend;
+        $this->utilities = $utilities;
+        $this->core = $core;
+        $this->options = $options;
     }
 
     private function addHooks()
@@ -34,29 +53,57 @@ class Shortcodes
      */
     public function einsatzliste($atts)
     {
-        $aktuelles_jahr = date('Y');
+        $currentYear = date('Y');
 
         // Shortcodeparameter auslesen
-        $shortcodeParams = shortcode_atts(array('jahr' => date('Y'), 'sort' => 'ab', 'monatetrennen' => 'nein'), $atts);
-        $jahr = $shortcodeParams['jahr'];
-        $sort = $shortcodeParams['sort'];
-        $monateTrennen = $shortcodeParams['monatetrennen'];
+        $shortcodeParams = shortcode_atts(array(
+            'jahr' => $currentYear,
+            'sort' => 'ab',
+            'monatetrennen' => 'nein',
+            'link' => 'title',
+            'limit' => -1,
+            'options' => ''
+        ), $atts);
+        $limit = $shortcodeParams['limit'];
 
-        $einsatzjahre = array();
-        if ($jahr == '*') {
-            $einsatzjahre = Data::getJahreMitEinsatz();
-        } elseif (is_numeric($jahr) && $jahr < 0) {
-            for ($i=0; $i < abs(intval($jahr)) && $i < $aktuelles_jahr; $i++) {
-                $einsatzjahre[] = $aktuelles_jahr - $i;
-            }
-        } elseif (empty($jahr) || strlen($jahr)!=4 || !is_numeric($jahr)) {
-            echo '<p>' . sprintf('INFO: Jahreszahl %s ung&uuml;ltig, verwende %s', $jahr, $aktuelles_jahr) . '</p>';
-            $einsatzjahre = array($aktuelles_jahr);
-        } else {
-            $einsatzjahre = array($jahr);
+        // Optionen auswerten
+        $rawOptions = array_map('trim', explode(',', $shortcodeParams['options']));
+        $possibleOptions = array('special', 'noLinkWithoutContent');
+        $filteredOptions = array_intersect($possibleOptions, $rawOptions);
+        $showOnlySpecialReports = in_array('special', $filteredOptions);
+        $linkEmptyReports = !in_array('noLinkWithoutContent', $filteredOptions);
+        $columnsWithLink = explode(',', $shortcodeParams['link']);
+        if (in_array('none', $columnsWithLink)) {
+            $columnsWithLink = false;
+        }
+        if ($columnsWithLink !== false) {
+            $columnsWithLink = $this->utilities->sanitizeColumnsArray($columnsWithLink);
         }
 
-        return $this->frontend->printEinsatzliste($einsatzjahre, !($sort == 'auf'), ($monateTrennen == 'ja'));
+        // Berichte abfragen
+        $reportQuery = new ReportQuery();
+        if (is_numeric($limit) && $limit > 0) {
+            $reportQuery->setLimit(intval($limit));
+        }
+        $reportQuery->setOnlySpecialReports($showOnlySpecialReports);
+        $reportQuery->setOrderAsc($shortcodeParams['sort'] == 'auf');
+
+        if (is_numeric($shortcodeParams['jahr'])) {
+            $reportQuery->setYear($shortcodeParams['jahr']);
+        }
+
+        $reports = $reportQuery->getReports();
+
+        $reportList = new ReportList($this->utilities, $this->core, $this->options);
+        return $reportList->getList(
+            $reports,
+            array(
+                'splitMonths' => ($shortcodeParams['monatetrennen'] == 'ja'),
+                'columns' => $this->options->getEinsatzlisteEnabledColumns(),
+                'columnsWithLink' => $columnsWithLink,
+                'linkEmptyReports' => $linkEmptyReports
+            )
+        );
     }
 
     /**

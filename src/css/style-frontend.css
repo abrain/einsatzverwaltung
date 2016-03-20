@@ -1,40 +1,54 @@
-table.einsatzliste {
-    width: 100%;
-    border: none;
-    background: none;
+.einsatzverwaltung-reportlist {
+	width: 100%;
+	border-collapse: collapse;
 }
 
-.einsatzliste th {
-    text-align: left;
+.einsatzverwaltung-reportlist th,
+.einsatzverwaltung-reportlist td {
+	padding: 3px 5px;
 }
 
-.einsatzliste-title td.einsatzliste-title-year {
-    border: none;
-    font-size: large;
-    padding: 20px 0 8px 0;
+.einsatzverwaltung-reportlist .einsatz-header {
+	background: #eee;
+	border-bottom: 2px solid #ddd;
+}
+.einsatzverwaltung-reportlist tr:nth-child(even) {
+	background: #eee;
 }
 
-.einsatzliste-title td.einsatzliste-title-month {
-    border: none;
-    font-size: medium;
-    padding: 12px 8px 8px 8px;
+.einsatzverwaltung-reportlist .einsatz-title-month td {
+	border: none;
+	font-size: 1.3em;
+    padding: 3px 8px;
+	background: #ddd none repeat scroll 0 0;
 }
 
-.einsatzliste-header th {
-    border-top: 1px solid #d3d3d3;
-    border-right: 1px solid #d3d3d3;
-    border-bottom: 1px solid #d3d3d3;
-}
+@media (max-width: 767px) {
+	.einsatzverwaltung-reportlist tr,
+	.einsatzverwaltung-reportlist th,
+	.einsatzverwaltung-reportlist td {
+		display: block;
+	}
 
-.einsatzliste-row td {
-    border-right: 1px solid #d3d3d3;
-    border-bottom: 1px solid #d3d3d3;
-}
+    .einsatzverwaltung-reportlist tr {
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
 
-.einsatzliste-row-noresult td {
-    border: none;
-}
+    .einsatzverwaltung-reportlist tr.einsatz-title-month {
+        padding-top: 0;
+        padding-bottom: 0;
+    }
 
-.einsatzliste-row td:first-child, .einsatzliste th:first-child {
-    border-left: 1px solid #d3d3d3;
+	.einsatzverwaltung-reportlist td {
+        padding: 0 10px;
+		border: none;
+	}
+	.einsatzverwaltung-reportlist .einsatz-header {
+		display: none;
+	}
+	.einsatzverwaltung-reportlist td:before {
+		font-weight: bold;
+		margin-right: 5px;
+	}
 }

@@ -1,6 +1,9 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
+use abrain\Einsatzverwaltung\Frontend\ReportList;
+use abrain\Einsatzverwaltung\Model\IncidentReport;
+
 /**
  * Erzeugt die Einstellungsseite
  *
@@ -25,17 +28,24 @@ class Settings
     private $utilities;
 
     /**
+     * @var Data
+     */
+    private $data;
+
+    /**
      * Konstruktor
      *
      * @param Core $core
      * @param Options $options
      * @param Utilities $utilities
+     * @param Data $data
      */
-    public function __construct($core, $options, $utilities)
+    public function __construct($core, $options, $utilities, $data)
     {
         $this->core = $core;
         $this->options = $options;
         $this->utilities = $utilities;
+        $this->data = $data;
         $this->addHooks();
     }
 
@@ -45,6 +55,8 @@ class Settings
         add_action('admin_menu', array($this, 'addToSettingsMenu'));
         add_action('admin_init', array($this, 'registerSettings'));
         add_filter('pre_update_option_einsatzvw_rewrite_slug', array($this, 'maybeRewriteSlugChanged'), 10, 2);
+        add_filter('pre_update_option_einsatzvw_category', array($this, 'maybeCategoryChanged'), 10, 2);
+        add_filter('pre_update_option_einsatzvw_loop_only_special', array($this, 'maybeCategorySpecialChanged'), 10, 2);
     }
 
 
@@ -99,6 +111,11 @@ class Settings
             'einsatzvw_settings',
             'einsatzvw_category',
             'intval'
+        );
+        register_setting(
+            'einsatzvw_settings',
+            'einsatzvw_loop_only_special',
+            array($this->utilities, 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings',
@@ -158,15 +175,15 @@ class Settings
 
         $roles = get_editable_roles();
         if (!empty($roles)) {
-            foreach (array_keys($roles) as $role_slug) {
+            foreach (array_keys($roles) as $roleSlug) {
                 // Administratoren haben immer Zugriff, deshalb ist keine Einstellung nötig
-                if ('administrator' === $role_slug) {
+                if ('administrator' === $roleSlug) {
                     continue;
                 }
 
                 register_setting(
                     'einsatzvw_settings',
-                    'einsatzvw_cap_roles_' . $role_slug,
+                    'einsatzvw_cap_roles_' . $roleSlug,
                     array($this->utilities, 'sanitizeCheckbox')
                 );
             }
@@ -197,7 +214,7 @@ class Settings
             'einsatzvw_settings_einsatzliste',
             'Einsatzliste',
             function () {
-                echo '<p>Mit diesen Einstellungen kann das Aussehen der Einsatzlisten beeinflusst werden.</p>';
+                echo '<p>Mit diesen Einstellungen kann das Aussehen der Einsatzlisten beeinflusst werden. Einsatzlisten k&ouml;nnen &uuml;ber den <a href="https://einsatzverwaltung.abrain.de/dokumentation/shortcodes/shortcode-einsatzliste/">Shortcode [einsatzliste]</a> in Seiten und Beitr&auml;ge eingebunden werden.</p>';
             },
             self::EVW_SETTINGS_SLUG
         );
@@ -351,9 +368,9 @@ class Settings
             'einsatzvw_rewrite_slug',
             sprintf(
                 'Basis f&uuml;r Links zu Einsatzberichten, zum %1$sArchiv%2$s und zum %3$sFeed%2$s.',
-                '<a href="'.get_post_type_archive_link('einsatz').'">',
+                '<a href="' . get_post_type_archive_link('einsatz') . '">',
                 '</a>',
-                '<a href="'.get_post_type_archive_feed_link('einsatz').'">'
+                '<a href="' . get_post_type_archive_feed_link('einsatz') . '">'
             ),
             $this->options->getRewriteSlug()
         );
@@ -367,7 +384,7 @@ class Settings
         printf('Jahreszahl + jahresbezogene, fortlaufende Nummer mit <input type="text" value="%2$s" size="2" id="%1$s" name="%1$s" /> Stellen<p class="description">Beispiel f&uuml;r den f&uuml;nften Einsatz in 2014:<br>bei 2 Stellen: 201405<br>bei 4 Stellen: 20140005</p><br>', 'einsatzvw_einsatznummer_stellen', $this->options->getEinsatznummerStellen());
         $this->echoSettingsCheckbox('einsatzvw_einsatznummer_lfdvorne', 'Laufende Nummer vor das Jahr stellen');
 
-        echo '<br><br><strong>Hinweis:</strong> Nach einer &Auml;nderung des Formats erhalten die bestehenden Einsatzberichte nicht automatisch aktualisierte Nummern. Nutzen Sie daf&uuml;r das Werkzeug <a href="'.admin_url('tools.php?page=einsatzvw-tool-enr').'">Einsatznummern reparieren</a>.';
+        echo '<br><br><strong>Hinweis:</strong> Nach einer &Auml;nderung des Formats erhalten die bestehenden Einsatzberichte nicht automatisch aktualisierte Nummern. Nutzen Sie daf&uuml;r das Werkzeug <a href="' . admin_url('tools.php?page=einsatzvw-tool-enr') . '">Einsatznummern reparieren</a>.';
     }
 
 
@@ -379,11 +396,12 @@ class Settings
     {
         $this->echoSettingsCheckbox(
             'einsatzvw_show_einsatzberichte_mainloop',
-            'Einsatzberichte zwischen den regul&auml;ren WordPress-Beitr&auml;gen (z.B. auf der Startseite) anzeigen'
+            'Einsatzberichte zwischen den regul&auml;ren WordPress-Beitr&auml;gen anzeigen'
         );
+        echo '<p class="description">L&auml;sst die Einsatzberichte z.B. auf der Startseite, im Widget &quot;Letzte Beitr&auml;ge&quot; oder auch im Beitragsfeed erscheinen</p>';
 
         echo '<p><label for="einsatzvw_category">';
-        _e('Davon unabh&auml;ngig Einsatzberichte in folgender Kategorie einblenden:', 'einsatzverwaltung');
+        _e('Davon unabh&auml;ngig Einsatzberichte immer in folgender Kategorie anzeigen:', 'einsatzverwaltung');
         echo '&nbsp;</label>';
         wp_dropdown_categories(array(
             'show_option_none' => '- keine -',
@@ -394,6 +412,13 @@ class Settings
             'hierarchical' => true
         ));
         echo '</p>';
+
+
+        $this->echoSettingsCheckbox(
+            'einsatzvw_loop_only_special',
+            'Nur als besonders markierte Einsatzberichte zwischen den regul&auml;ren WordPress-Beitr&auml;gen bzw. in der Kategorie anzeigen.'
+        );
+        echo '<p class="description">Mit dieser Einstellung gelten die beiden oberen Einstellungen nur f&uuml;r als besonders markierte Einsatzberichte. Kann erst ab WordPress 4.1 verwendet werden.</p>';
     }
 
 
@@ -476,7 +501,7 @@ class Settings
      */
     public function echoEinsatzlisteColumns()
     {
-        $columns = $this->core->getListColumns();
+        $columns = ReportList::getListColumns();
         $enabledColumns = $this->options->getEinsatzlisteEnabledColumns();
 
         echo '<table id="columns-available"><tr><td style="width: 250px;">';
@@ -488,7 +513,7 @@ class Settings
                 continue;
             }
             $name = $this->utilities->getArrayValueIfKey($colInfo, 'longName', $colInfo['name']);
-            echo '<li id="'.$colId.'" class="evw-column"><span>'. $name .'</span></li>';
+            echo '<li id="' . $colId . '" class="evw-column"><span>' . $name . '</span></li>';
         }
         echo '</ul></td></tr></table>';
 
@@ -503,10 +528,10 @@ class Settings
 
             $colInfo = $columns[$colId];
             $name = $this->utilities->getArrayValueIfKey($colInfo, 'longName', $colInfo['name']);
-            echo '<li id="'.$colId.'" class="evw-column"><span>'. $name .'</span></li>';
+            echo '<li id="' . $colId . '" class="evw-column"><span>' . $name . '</span></li>';
         }
         echo '</ul></td></tr></table>';
-        echo '<input name="einsatzvw_list_columns" id="einsatzvw_list_columns" type="hidden" value="'.implode(',', $enabledColumns).'">';
+        echo '<input name="einsatzvw_list_columns" id="einsatzvw_list_columns" type="hidden" value="' . implode(',', $enabledColumns) . '">';
     }
 
     public function echoEinsatzlisteColumnSettings()
@@ -536,14 +561,14 @@ class Settings
         if (empty($roles)) {
             echo "Es konnten keine Rollen gefunden werden.";
         } else {
-            foreach ($roles as $role_slug => $role) {
+            foreach ($roles as $roleSlug => $role) {
                 // Administratoren haben immer Zugriff, deshalb ist keine Einstellung nötig
-                if ('administrator' === $role_slug) {
+                if ('administrator' === $roleSlug) {
                     continue;
                 }
 
                 $this->echoSettingsCheckbox(
-                    'einsatzvw_cap_roles_' . $role_slug,
+                    'einsatzvw_cap_roles_' . $roleSlug,
                     translate_user_role($role['name'])
                 );
                 echo '<br>';
@@ -568,7 +593,7 @@ class Settings
         echo '<p align="center"><a href="https://www.facebook.com/einsatzverwaltung/" title="Einsatzverwaltung auf Facebook"><i class="fa fa-facebook-official fa-2x"></i></a>&nbsp;&nbsp;';
         echo '<a href="https://twitter.com/einsatzvw" title="Einsatzverwaltung auf Twitter"><i class="fa fa-twitter fa-2x"></i></a>&nbsp;&nbsp;';
         echo '<a href="https://alpha.app.net/einsatzverwaltung" title="Einsatzverwaltung auf Alpha by App.net"><i class="fa fa-adn fa-2x"></i></a>&nbsp;&nbsp;';
-        echo '<a href="https://www.abrain.de/category/software/einsatzverwaltung/feed/" title="RSS-Feed mit Neuigkeiten zu Einsatzverwaltung"><i class="fa fa-rss-square fa-2x"></i></a>';
+        echo '<a href="https://einsatzverwaltung.abrain.de/feed/" title="RSS-Feed mit Neuigkeiten zu Einsatzverwaltung"><i class="fa fa-rss-square fa-2x"></i></a>';
         echo '</p></div>';
 
         echo '<div class="wrap">';
@@ -595,15 +620,114 @@ class Settings
      * Prüft, ob sich die Basis für die Links zu Einsatzberichten ändert und veranlasst gegebenenfalls ein Erneuern der
      * Permalinkstruktur
      *
-     * @param string $new_value Der neue Wert
-     * @param string $old_value Der alte Wert
+     * @param string $newValue Der neue Wert
+     * @param string $oldValue Der alte Wert
      * @return string Der zu speichernde Wert
      */
-    public function maybeRewriteSlugChanged($new_value, $old_value)
+    public function maybeRewriteSlugChanged($newValue, $oldValue)
     {
-        if ($new_value != $old_value) {
+        if ($newValue != $oldValue) {
             $this->options->setFlushRewriteRules(true);
         }
-        return $new_value;
+
+        return $newValue;
+    }
+
+    /**
+     * Prüft, ob sich die Kategorie der Einsatzberichte ändert und veranlasst gegebenenfalls ein Erneuern der
+     * Kategoriezuordnung
+     *
+     * @param string $newValue Der neue Wert
+     * @param string $oldValue Der alte Wert
+     *
+     * @return string Der zu speichernde Wert
+     */
+    public function maybeCategoryChanged($newValue, $oldValue)
+    {
+        // Nur Änderungen sind interessant
+        if ($newValue == $oldValue) {
+            return $newValue;
+        }
+
+        $posts = get_posts(array(
+            'post_type' => 'einsatz',
+            'post_status' => array('publish', 'private'),
+            'numberposts' => -1
+        ));
+        $reports = $this->utilities->postsToIncidentReports($posts);
+
+        // Wenn zuvor eine Kategorie gesetzt war, müssen die Einsatzberichte aus dieser entfernt werden
+        if ($oldValue != -1) {
+            /** @var IncidentReport $report */
+            foreach ($reports as $report) {
+                $this->utilities->removePostFromCategory($report->getPostId(), $oldValue);
+            }
+        }
+
+        // Wenn eine neue Kategorie gesetzt wird, müssen Einsatzberichte dieser zugeordnet werden
+        if ($newValue != -1) {
+            $onlySpecialInCategory = $this->options->isOnlySpecialInLoop();
+            /** @var IncidentReport $report */
+            foreach ($reports as $report) {
+                if (!$onlySpecialInCategory || $report->isSpecial()) {
+                    $this->utilities->addPostToCategory($report->getPostId(), $newValue);
+                }
+            }
+        }
+
+        return $newValue;
+    }
+
+    /**
+     * Prüft, ob sich die Beschränkung, nur als besonders markierte Einsatzberichte der Kategorie zuzuordnen, ändert
+     * und veranlasst gegebenenfalls ein Erneuern der Kategoriezuordnung
+     *
+     * @param string $newValue Der neue Wert
+     * @param string $oldValue Der alte Wert
+     *
+     * @return string Der zu speichernde Wert
+     */
+    public function maybeCategorySpecialChanged($newValue, $oldValue)
+    {
+        // Nur Änderungen sind interessant
+        if ($newValue == $oldValue) {
+            return $newValue;
+        }
+
+        // Ohne gesetzte Kategorie brauchen wir nicht weitermachen
+        $categoryId = $this->options->getEinsatzberichteCategory();
+        if (-1 === $categoryId) {
+            return $newValue;
+        }
+
+        $posts = get_posts(array(
+            'post_type' => 'einsatz',
+            'post_status' => array('publish', 'private'),
+            'numberposts' => -1
+        ));
+        $reports = $this->utilities->postsToIncidentReports($posts);
+
+        // Wenn die Einstellung abgewählt wurde, werden alle Einsatzberichte zur Kategorie hinzugefügt
+        if ($newValue == 0) {
+            /** @var IncidentReport $report */
+            foreach ($reports as $report) {
+                $this->utilities->addPostToCategory($report->getPostId(), $categoryId);
+            }
+        }
+
+        // Wenn die Einstellung aktiviert wurde, werden nur die als besonders markierten Einsatzberichte zur Kategorie
+        // hinzugefügt, alle anderen daraus entfernt
+        if ($newValue == 1) {
+            /** @var IncidentReport $report */
+            foreach ($reports as $report) {
+                if ($report->isSpecial()) {
+                    $this->utilities->addPostToCategory($report->getPostId(), $categoryId);
+                } else {
+                    $this->utilities->removePostFromCategory($report->getPostId(), $categoryId);
+                }
+            }
+        }
+
+        return $newValue;
     }
 }

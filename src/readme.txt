@@ -1,10 +1,10 @@
 === Einsatzverwaltung ===
 Contributors: abrain
-Donate link: https://www.abrain.de/software/unterstuetzen/
+Donate link: https://einsatzverwaltung.abrain.de/unterstuetzen/
 Tags: Feuerwehr, Einsatz, Rettung, Rettungsdienst, THW, HiOrg, Wasserwacht, Bergrettung
 Requires at least: 3.7.0
 Tested up to: 4.4
-Stable tag: 1.1.5
+Stable tag: 1.2.0
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -46,7 +46,7 @@ Nein, dieses Plugin hat nichts mit einsatzverwaltung.eu zu tun.
 
 = Wo finde ich die Anleitung bzw. Dokumentation? =
 
-Die Dokumentation gibt es [hier](https://www.abrain.de/software/einsatzverwaltung/anleitung/), wenn etwas fehlt oder missverst&auml;ndlich erkl&auml;rt ist, bitte melden.
+Die Dokumentation gibt es [hier](https://einsatzverwaltung.abrain.de/dokumentation/), wenn etwas fehlt oder missverst&auml;ndlich erkl&auml;rt ist, bitte melden.
 
 = Ich f&auml;nde es gut, wenn Funktionalit&auml;t X hinzugef&uuml;gt / verbessert werden k&ouml;nnte =
 
@@ -64,7 +64,23 @@ F&uuml;r eMails von/an [kontakt@abrain.de](mailto:kontakt@abrain.de) kann ich PG
 
 Das Du halte ich f&uuml;r die angenehmere Arbeitsgrundlage, aber man darf mich gerne auch siezen ohne dass ich mich alt f&uuml;hle.
 
+= Sind das hier die ganzen FAQ? =
+
+Nein, mehr gibt es [hier](https://einsatzverwaltung.abrain.de/faq/).
+
 == Changelog ==
+
+= 1.2.0 =
+* Die tabellarische &Uuml;bersicht passt sich nun Mobilger&auml;ten an
+* Einsatzberichte k&ouml;nnen als besonders markiert werden
+* Neue Optionen f&uuml;r Shortcode einsatzliste: Nur besondere Eins&auml;tze anzeigen, Anzahl der Berichte limitieren, Link zum Bericht muss nicht mehr der Titel sein, kein Link bei fehlendem Beitragstext, Links generell abschaltbar
+* Beim Anlegen neuer Einsatzberichte wird die Alarmzeit vorbelegt
+* Anweisungen beim CSV-Import klarer formuliert
+* Einsatzberichte werden nun tats&auml;chlich der eingestellten Kategorie zugeordnet
+* Anzeige der Einsatzberichte zwischen normalen Beitr&auml;gen ist an mehr Stellen m&ouml;glich und kann auf besondere Eins&auml;tze beschr&auml;nkt werden
+* Beschriftungen (u.a. f&uuml;r die Barrierefreiheit) &uuml;berarbeitet
+* Der Inhalt der Kurzfassung kann auch wieder WordPress selbst &uuml;berlassen werden
+* Bei gesch&uuml;tzten Beitr&auml;gen wurden die Einsatzdetails auch ohne Eingabe des Passworts angezeigt
 
 = 1.1.5 =
 * CSV-Import: Leerzeichen zu Beginn des Feldes verhinderte Auswertung des Datums
@@ -155,7 +171,7 @@ Das Du halte ich f&uuml;r die angenehmere Arbeitsgrundlage, aber man darf mich g
 = 0.7.0 =
 * Neu: Berechtigung zur Verwaltung von Einsatzberichten kann nun allen Benutzerrollen von WordPress zugeordnet werden
 * Verbesserung: Shortcode einsatzliste kann Tabelle nach Monaten getrennt darstellen
-* Hinweis: Der neue Shortcode-Parameter kann in der [Anleitung](https://www.abrain.de/software/einsatzverwaltung/anleitung/) nachgelesen werden
+* Hinweis: Der neue Shortcode-Parameter kann in der [Anleitung](https://einsatzverwaltung.abrain.de/dokumentation/) nachgelesen werden
 * Hinweis (subtil): Es gibt mittlerweile auch eine [Facebook-Seite](https://www.facebook.com/einsatzverwaltung)
 
 = 0.6.0 =
@@ -170,7 +186,7 @@ Das Du halte ich f&uuml;r die angenehmere Arbeitsgrundlage, aber man darf mich g
 * Verbesserung: Icons werden mit Font Awesome dargestellt
 * Fehlerbehebung: Shortcode einsatzjahre erzeugte falsche Links bei deaktivierten Permalinks
 * Fehlerbehebung: Seitennavigation im Jahresarchiv war defekt
-* Hinweis: Die neuen Shortcode-Parameter k&ouml;nnen in der [Anleitung](https://www.abrain.de/software/einsatzverwaltung/anleitung/) nachgelesen werden
+* Hinweis: Die neuen Shortcode-Parameter k&ouml;nnen in der [Anleitung](https://einsatzverwaltung.abrain.de/dokumentation/) nachgelesen werden
 
 = 0.5.4 =
 * Fehlerbehebung: Datum f&uuml;r Feed wurde falsch gespeichert

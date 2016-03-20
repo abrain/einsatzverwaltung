@@ -15,6 +15,8 @@ require_once dirname(__FILE__) . '/einsatzverwaltung-settings.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-tools.php';
 require_once dirname(__FILE__) . '/Import/Tool.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-taxonomies.php';
+require_once dirname(__FILE__) . '/Frontend/ReportList.php';
+require_once dirname(__FILE__) . '/ReportQuery.php';
 
 use abrain\Einsatzverwaltung\Import\Tool as ImportTool;
 use abrain\Einsatzverwaltung\Util\Formatter;
@@ -28,8 +30,8 @@ use WP_User;
  */
 class Core
 {
-    const VERSION = '1.1.5';
-    const DB_VERSION = 7;
+    const VERSION = '1.2.0';
+    const DB_VERSION = 10;
 
     public $pluginFile;
     public $pluginBasename;
@@ -38,7 +40,7 @@ class Core
     public $scriptUrl;
     public $styleUrl;
 
-    private $args_einsatz = array(
+    private $argsEinsatz = array(
         'labels' => array(
             'name' => 'Einsatzberichte',
             'singular_name' => 'Einsatzbericht',
@@ -56,6 +58,8 @@ class Core
             'filter_items_list' => 'Liste der Einsatzberichte filtern',
             'items_list_navigation' => 'Navigation der Liste der Einsatzberichte',
             'items_list' => 'Liste der Einsatzberichte',
+            'insert_into_item' => 'In den Einsatzbericht einf&uuml;gen',
+            'uploaded_to_this_item' => 'Zu diesem Einsatzbericht hochgeladen',
         ),
         'public' => true,
         'has_archive' => true,
@@ -90,23 +94,27 @@ class Core
         'delete_with_user' => false,
     );
 
-    private $args_einsatzart = array(
+    private $argsEinsatzart = array(
         'label' => 'Einsatzarten',
         'labels' => array(
             'name' => 'Einsatzarten',
             'singular_name' => 'Einsatzart',
             'menu_name' => 'Einsatzarten',
+            'search_items' => 'Einsatzarten suchen',
+            'popular_items' => 'H&auml;ufige Einsatzarten',
             'all_items' => 'Alle Einsatzarten',
+            'parent_item' => '&Uuml;bergeordnete Einsatzart',
+            'parent_item_colon' => '&Uuml;bergeordnete Einsatzart:',
             'edit_item' => 'Einsatzart bearbeiten',
             'view_item' => 'Einsatzart ansehen',
             'update_item' => 'Einsatzart aktualisieren',
             'add_new_item' => 'Neue Einsatzart',
             'new_item_name' => 'Einsatzart hinzuf&uuml;gen',
-            'search_items' => 'Einsatzarten suchen',
-            'popular_items' => 'H&auml;ufige Einsatzarten',
-            'separate_items_with_commas' => 'Einsatzarten mit Kommata trennen',
+            'separate_items_with_commas' => 'Einsatzarten mit Kommas trennen',
             'add_or_remove_items' => 'Einsatzarten hinzuf&uuml;gen oder entfernen',
             'choose_from_most_used' => 'Aus h&auml;ufigen Einsatzarten w&auml;hlen',
+            'not_found' => 'Keine Einsatzarten gefunden.',
+            'no_terms' => 'Keine Einsatzarten',
             'items_list_navigation' => 'Navigation der Liste der Einsatzarten',
             'items_list' => 'Liste der Einsatzarten',
         ),
@@ -122,21 +130,24 @@ class Core
         'hierarchical' => true
     );
 
-    private $args_fahrzeug = array(
+    private $argsFahrzeug = array(
         'label' => 'Fahrzeuge',
         'labels' => array(
             'name' => 'Fahrzeuge',
             'singular_name' => 'Fahrzeug',
             'menu_name' => 'Fahrzeuge',
+            'search_items' => 'Fahrzeuge suchen',
+            'popular_items' => 'H&auml;ufig eingesetzte Fahrzeuge',
             'all_items' => 'Alle Fahrzeuge',
+            'parent_item' => '&Uuml;bergeordnete Einheit',
+            'parent_item_colon' => '&Uuml;bergeordnete Einheit:',
             'edit_item' => 'Fahrzeug bearbeiten',
             'view_item' => 'Fahrzeug ansehen',
             'update_item' => 'Fahrzeug aktualisieren',
             'add_new_item' => 'Neues Fahrzeug',
             'new_item_name' => 'Fahrzeug hinzuf&uuml;gen',
-            'search_items' => 'Fahrzeuge suchen',
-            'parent_item' => '&Uuml;bergeordnete Einheit',
-            'parent_item_colon' => '&Uuml;bergeordnete Einheit:',
+            'not_found' => 'Keine Fahrzeuge gefunden.',
+            'no_terms' => 'Keine Fahrzeuge',
             'items_list_navigation' => 'Navigation der Fahrzeugliste',
             'items_list' => 'Fahrzeugliste',
         ),
@@ -157,17 +168,19 @@ class Core
             'name' => 'Externe Einsatzmittel',
             'singular_name' => 'Externes Einsatzmittel',
             'menu_name' => 'Externe Einsatzmittel',
+            'search_items' => 'Externe Einsatzmittel suchen',
+            'popular_items' => 'H&auml;ufig eingesetzte externe Einsatzmittel',
             'all_items' => 'Alle externen Einsatzmittel',
             'edit_item' => 'Externes Einsatzmittel bearbeiten',
             'view_item' => 'Externes Einsatzmittel ansehen',
             'update_item' => 'Externes Einsatzmittel aktualisieren',
             'add_new_item' => 'Neues externes Einsatzmittel',
             'new_item_name' => 'Externes Einsatzmittel hinzuf&uuml;gen',
-            'search_items' => 'Externe Einsatzmittel suchen',
-            'popular_items' => 'Oft eingesetzte externe Einsatzmittel',
-            'separate_items_with_commas' => 'Externe Einsatzmittel mit Kommata trennen',
+            'separate_items_with_commas' => 'Externe Einsatzmittel mit Kommas trennen',
             'add_or_remove_items' => 'Externe Einsatzmittel hinzuf&uuml;gen oder entfernen',
             'choose_from_most_used' => 'Aus h&auml;ufig eingesetzten externen Einsatzmitteln w&auml;hlen',
+            'not_found' => 'Keine externen Einsatzmittel gefunden.',
+            'no_terms' => 'Keine externen Einsatzmittel',
             'items_list_navigation' => 'Navigation der Liste der externen Einsatzmittel',
             'items_list' => 'Liste der externen Einsatzmittel',
         ),
@@ -184,23 +197,25 @@ class Core
         )
     );
 
-    private $args_alarmierungsart = array(
+    private $argsAlarmierungsart = array(
         'label' => 'Alarmierungsart',
         'labels' => array(
             'name' => 'Alarmierungsarten',
             'singular_name' => 'Alarmierungsart',
             'menu_name' => 'Alarmierungsarten',
+            'search_items' => 'Alarmierungsart suchen',
+            'popular_items' => 'H&auml;ufige Alarmierungsarten',
             'all_items' => 'Alle Alarmierungsarten',
             'edit_item' => 'Alarmierungsart bearbeiten',
             'view_item' => 'Alarmierungsart ansehen',
             'update_item' => 'Alarmierungsart aktualisieren',
             'add_new_item' => 'Neue Alarmierungsart',
             'new_item_name' => 'Alarmierungsart hinzuf&uuml;gen',
-            'search_items' => 'Alarmierungsart suchen',
-            'popular_items' => 'H&auml;ufige Alarmierungsarten',
-            'separate_items_with_commas' => 'Alarmierungsarten mit Kommata trennen',
+            'separate_items_with_commas' => 'Alarmierungsarten mit Kommas trennen',
             'add_or_remove_items' => 'Alarmierungsarten hinzuf&uuml;gen oder entfernen',
             'choose_from_most_used' => 'Aus h&auml;ufigen Alarmierungsarten w&auml;hlen',
+            'not_found' => 'Keine Alarmierungsarten gefunden.',
+            'no_terms' => 'Keine Alarmierungsarten',
             'items_list_navigation' => 'Navigation der Liste der Alarmierungsarten',
             'items_list' => 'Liste der Alarmierungsarten',
         ),
@@ -246,10 +261,10 @@ class Core
         $this->utilities->setDependencies($this->options);
 
         new Admin($this, $this->utilities);
-        $this->data = new Data($this, $this->utilities);
-        $frontend = new Frontend($this, $this->options, $this->utilities);
-        new Settings($this, $this->options, $this->utilities);
-        new Shortcodes($frontend);
+        $this->data = new Data($this, $this->utilities, $this->options);
+        new Frontend($this, $this->options, $this->utilities);
+        new Settings($this, $this->options, $this->utilities, $this->data);
+        new Shortcodes($this->utilities, $this, $this->options);
         new Taxonomies($this->utilities);
 
         // Tools
@@ -268,10 +283,8 @@ class Core
     {
         add_action('init', array($this, 'onInit'));
         add_action('plugins_loaded', array($this, 'onPluginsLoaded'));
-        add_action('save_post', array($this->data, 'savePostdata'));
         register_activation_hook($this->pluginFile, array($this, 'onActivation'));
         register_deactivation_hook($this->pluginFile, array($this, 'onDeactivation'));
-        add_filter('posts_where', array($this, 'postsWhere'), 10, 2);
         add_action('widgets_init', array($this, 'registerWidgets'));
         add_filter('user_has_cap', array($this, 'userHasCap'), 10, 4);
     }
@@ -329,15 +342,15 @@ class Core
     {
         // Anpassungen der Parameter
         if ($this->utilities->isMinWPVersion("3.9")) {
-            $this->args_einsatz['menu_icon'] = 'dashicons-media-document';
+            $this->argsEinsatz['menu_icon'] = 'dashicons-media-document';
         }
-        $this->args_einsatz['rewrite']['slug'] = $this->options->getRewriteSlug();
+        $this->argsEinsatz['rewrite']['slug'] = $this->options->getRewriteSlug();
 
-        register_post_type('einsatz', $this->args_einsatz);
-        register_taxonomy('einsatzart', 'einsatz', $this->args_einsatzart);
-        register_taxonomy('fahrzeug', 'einsatz', $this->args_fahrzeug);
+        register_post_type('einsatz', $this->argsEinsatz);
+        register_taxonomy('einsatzart', 'einsatz', $this->argsEinsatzart);
+        register_taxonomy('fahrzeug', 'einsatz', $this->argsFahrzeug);
         register_taxonomy('exteinsatzmittel', 'einsatz', $this->argsExteinsatzmittel);
-        register_taxonomy('alarmierungsart', 'einsatz', $this->args_alarmierungsart);
+        register_taxonomy('alarmierungsart', 'einsatz', $this->argsAlarmierungsart);
     }
 
     private function addRewriteRules()
@@ -358,26 +371,6 @@ class Core
     {
         register_widget('abrain\Einsatzverwaltung\Widgets\RecentIncidents');
         register_widget('abrain\Einsatzverwaltung\Widgets\RecentIncidentsFormatted');
-    }
-
-    /**
-     * Modifiziert die WHERE-Klausel bei bestimmten Datenbankabfragen
-     *
-     * @since 1.0.0
-     *
-     * @param string $where Die original WHERE-Klausel
-     * @param WP_Query $wpq Die verwendete WP-Query-Instanz
-     *
-     * @return string Die zu verwendende WHERE-Klausel
-     */
-    public function postsWhere($where, $wpq)
-    {
-        if ($wpq->is_category && $wpq->get_queried_object_id() === $this->options->getEinsatzberichteCategory()) {
-            // Einsatzberichte in die eingestellte Kategorie einblenden
-            global $wpdb;
-            return $where . " OR {$wpdb->posts}.post_type = 'einsatz' AND ({$wpdb->posts}.post_status = 'publish' OR {$wpdb->posts}.post_status = 'private')";
-        }
-        return $where;
     }
 
     /**
@@ -424,66 +417,6 @@ class Core
     }
 
     /**
-     * Gibt die möglichen Spalten für die Einsatzübersicht zurück
-     *
-     * @return array
-     */
-    public function getListColumns()
-    {
-        return array(
-            'number' => array(
-                'name' => 'Nummer',
-                'nowrap' => true
-            ),
-            'date' => array(
-                'name' => 'Datum',
-                'nowrap' => true
-            ),
-            'time' => array(
-                'name' => 'Zeit',
-                'nowrap' => true
-            ),
-            'datetime' => array(
-                'name' => 'Datum',
-                'longName' => 'Datum + Zeit',
-                'nowrap' => true
-            ),
-            'title' => array(
-                'name' => 'Einsatzmeldung'
-            ),
-            'incidentCommander' => array(
-                'name' => 'Einsatzleiter'
-            ),
-            'location' => array(
-                'name' => 'Einsatzort'
-            ),
-            'workforce' => array(
-                'name' => 'Mannschaftsst&auml;rke'
-            ),
-            'duration' => array(
-                'name' => 'Dauer',
-                'nowrap' => true
-            ),
-            'vehicles' => array(
-                'name' => 'Fahrzeuge'
-            ),
-            'alarmType' => array(
-                'name' => 'Alarmierungsart'
-            ),
-            'additionalForces' => array(
-                'name' => 'Weitere Kräfte'
-            ),
-            'incidentType' => array(
-                'name' => 'Einsatzart'
-            ),
-            'seqNum' => array(
-                'name' => 'Lfd.',
-                'longName' => 'Laufende Nummer'
-            )
-        );
-    }
-
-    /**
      * Gibt die möglichen Kurzfassungstypen zurück
      *
      * @return array
@@ -491,6 +424,7 @@ class Core
     public function getExcerptTypes()
     {
         return array(
+            'default' => 'WordPress-Standard',
             'none' => 'Leer',
             'details' => 'Einsatzdetails',
             'text' => 'Berichtstext'
@@ -556,7 +490,7 @@ class Core
         }
 
         require_once(__DIR__ . '/einsatzverwaltung-update.php');
-        $update = new Update($this, $this->options);
+        $update = new Update($this, $this->options, $this->utilities, $this->data);
         $update->doUpdate($currentDbVersion, self::DB_VERSION);
     }
 }

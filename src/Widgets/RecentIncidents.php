@@ -1,9 +1,10 @@
 <?php
 namespace abrain\Einsatzverwaltung\Widgets;
 
-use abrain\Einsatzverwaltung\Data;
 use abrain\Einsatzverwaltung\Frontend;
+use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Options;
+use abrain\Einsatzverwaltung\Util\Formatter;
 use abrain\Einsatzverwaltung\Utilities;
 use WP_Widget;
 use WP_Query;
@@ -57,6 +58,8 @@ class RecentIncidents extends WP_Widget
      */
     public function widget($args, $instance)
     {
+        $formatter = new Formatter(self::$options, self::$utilities);
+
         $title = apply_filters('widget_title', $instance['title']);
         $anzahl = self::$utilities->getArrayValueIfKey($instance, 'anzahl', 3);
         $zeigeDatum = self::$utilities->getArrayValueIfKey($instance, 'zeigeDatum', false);
@@ -78,6 +81,7 @@ class RecentIncidents extends WP_Widget
         $query = new WP_Query('&post_type=einsatz&post_status=publish&posts_per_page='.$anzahl);
         while ($query->have_posts()) {
             $nextPost = $query->next_post();
+            $report = new IncidentReport($nextPost);
             $letzteEinsaetze .= '<li class="einsatzbericht">';
 
             $letzteEinsaetze .= "<a href=\"".get_permalink($nextPost->ID)."\" rel=\"bookmark\" class=\"einsatzmeldung\">";
@@ -100,17 +104,16 @@ class RecentIncidents extends WP_Widget
             }
 
             if ($zeigeArt) {
-                $einsatzart = Data::getEinsatzart($nextPost->ID);
-                if ($einsatzart !== false) {
-                    $einsatzart_str = Frontend::getEinsatzartString($einsatzart, false, false, $zeigeArtHierarchie);
-                    $letzteEinsaetze .= sprintf('<br><span class="einsatzart">%s</span>', $einsatzart_str);
+                $typeOfIncident = $formatter->getTypeOfIncident($report, false, false, $zeigeArtHierarchie);
+                if (!empty($typeOfIncident)) {
+                    $letzteEinsaetze .= sprintf('<br><span class="einsatzart">%s</span>', $typeOfIncident);
                 }
             }
 
             if ($zeigeOrt) {
-                $einsatzort = Data::getEinsatzort($nextPost->ID);
-                if ($einsatzort != "") {
-                    $letzteEinsaetze .= "<br><span class=\"einsatzort\">Ort:&nbsp;".$einsatzort."</span>";
+                $location = $report->getLocation();
+                if (!empty($location)) {
+                    $letzteEinsaetze .= "<br><span class=\"einsatzort\">Ort:&nbsp;".$location."</span>";
                 }
             }
 
@@ -137,29 +140,29 @@ class RecentIncidents extends WP_Widget
      *
      * @see WP_Widget::update()
      *
-     * @param array $new_instance Values just sent to be saved.
-     * @param array $old_instance Previously saved values from database.
+     * @param array $newInstance Values just sent to be saved.
+     * @param array $oldInstance Previously saved values from database.
      *
      * @return array Updated safe values to be saved.
      */
-    public function update($new_instance, $old_instance)
+    public function update($newInstance, $oldInstance)
     {
         $instance = array();
-        $instance['title'] = strip_tags($new_instance['title']);
+        $instance['title'] = strip_tags($newInstance['title']);
 
-        $anzahl = $new_instance['anzahl'];
+        $anzahl = $newInstance['anzahl'];
         if (empty($anzahl) || !is_numeric($anzahl) || $anzahl < 1) {
-            $instance['anzahl'] = $old_instance['anzahl'];
+            $instance['anzahl'] = $oldInstance['anzahl'];
         } else {
-            $instance['anzahl'] = $new_instance['anzahl'];
+            $instance['anzahl'] = $newInstance['anzahl'];
         }
 
-        $instance['zeigeDatum'] = self::$utilities->getArrayValueIfKey($new_instance, 'zeigeDatum', false);
-        $instance['zeigeZeit'] = self::$utilities->getArrayValueIfKey($new_instance, 'zeigeZeit', false);
-        $instance['zeigeOrt'] = self::$utilities->getArrayValueIfKey($new_instance, 'zeigeOrt', false);
-        $instance['zeigeArt'] = self::$utilities->getArrayValueIfKey($new_instance, 'zeigeArt', false);
-        $instance['zeigeArtHierarchie'] = self::$utilities->getArrayValueIfKey($new_instance, 'zeigeArtHierarchie', false);
-        $instance['zeigeFeedlink'] = self::$utilities->getArrayValueIfKey($new_instance, 'zeigeFeedlink', false);
+        $instance['zeigeDatum'] = self::$utilities->getArrayValueIfKey($newInstance, 'zeigeDatum', false);
+        $instance['zeigeZeit'] = self::$utilities->getArrayValueIfKey($newInstance, 'zeigeZeit', false);
+        $instance['zeigeOrt'] = self::$utilities->getArrayValueIfKey($newInstance, 'zeigeOrt', false);
+        $instance['zeigeArt'] = self::$utilities->getArrayValueIfKey($newInstance, 'zeigeArt', false);
+        $instance['zeigeArtHierarchie'] = self::$utilities->getArrayValueIfKey($newInstance, 'zeigeArtHierarchie', false);
+        $instance['zeigeFeedlink'] = self::$utilities->getArrayValueIfKey($newInstance, 'zeigeFeedlink', false);
 
         return $instance;
     }

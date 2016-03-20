@@ -190,7 +190,6 @@ class Helper
             $einsatzjahr = $alarmzeit->format('Y');
             $insertArgs['post_date'] = $alarmzeit->format('Y-m-d H:i');
             $insertArgs['post_date_gmt'] = get_gmt_from_date($insertArgs['post_date']);
-            $metaValues['einsatz_alarmzeit'] = $insertArgs['post_date'];
 
             // Einsatzende korrekt formatieren
             if (array_key_exists('einsatz_einsatzende', $metaValues) && !empty($metaValues['einsatz_einsatzende'])) {

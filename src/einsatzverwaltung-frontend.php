@@ -64,7 +64,9 @@ class Frontend
         );
         wp_enqueue_style(
             'einsatzverwaltung-frontend',
-            $this->core->styleUrl . 'style-frontend.css'
+            $this->core->styleUrl . 'style-frontend.css',
+            array(),
+            Core::VERSION
         );
         wp_add_inline_style('einsatzverwaltung-frontend', ReportList::getDynamicCss());
     }

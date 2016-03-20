@@ -4,7 +4,7 @@ Donate link: https://einsatzverwaltung.abrain.de/unterstuetzen/
 Tags: Feuerwehr, Einsatz, Rettung, Rettungsdienst, THW, HiOrg, Wasserwacht, Bergrettung
 Requires at least: 3.7.0
 Tested up to: 4.4
-Stable tag: 1.1.5
+Stable tag: 1.2.0
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -69,6 +69,18 @@ Das Du halte ich f&uuml;r die angenehmere Arbeitsgrundlage, aber man darf mich g
 Nein, mehr gibt es [hier](https://einsatzverwaltung.abrain.de/faq/).
 
 == Changelog ==
+
+= 1.2.0 =
+* Die tabellarische &Uuml;bersicht passt sich nun Mobilger&auml;ten an
+* Einsatzberichte k&ouml;nnen als besonders markiert werden
+* Neue Optionen f&uuml;r Shortcode einsatzliste: Nur besondere Eins&auml;tze anzeigen, Anzahl der Berichte limitieren, Link zum Bericht muss nicht mehr der Titel sein, kein Link bei fehlendem Beitragstext, Links generell abschaltbar
+* Beim Anlegen neuer Einsatzberichte wird die Alarmzeit vorbelegt
+* Anweisungen beim CSV-Import klarer formuliert
+* Einsatzberichte werden nun tats&auml;chlich der eingestellten Kategorie zugeordnet
+* Anzeige der Einsatzberichte zwischen normalen Beitr&auml;gen ist an mehr Stellen m&ouml;glich und kann auf besondere Eins&auml;tze beschr&auml;nkt werden
+* Beschriftungen (u.a. f&uuml;r die Barrierefreiheit) &uuml;berarbeitet
+* Der Inhalt der Kurzfassung kann auch wieder WordPress selbst &uuml;berlassen werden
+* Bei gesch&uuml;tzten Beitr&auml;gen wurden die Einsatzdetails auch ohne Eingabe des Passworts angezeigt
 
 = 1.1.5 =
 * CSV-Import: Leerzeichen zu Beginn des Feldes verhinderte Auswertung des Datums

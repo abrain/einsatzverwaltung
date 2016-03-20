@@ -13,7 +13,7 @@
 	border-bottom: 2px solid #ddd;
 }
 .einsatzverwaltung-reportlist tr:nth-child(even) {
-	background: #f0f0f0;
+	background: #eee;
 }
 
 .einsatzverwaltung-reportlist .einsatz-title-month td {

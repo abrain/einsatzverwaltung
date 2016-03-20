@@ -206,7 +206,6 @@ class Data
         $isSpecial = $this->utilities->sanitizeCheckbox(array($_POST, 'einsatzverwaltung_special'));
 
         // Metadaten schreiben
-        update_post_meta($postId, 'einsatz_alarmzeit', date_format($alarmzeit, 'Y-m-d H:i'));
         update_post_meta($postId, 'einsatz_einsatzende', $einsatzende);
         update_post_meta($postId, 'einsatz_einsatzort', $einsatzort);
         update_post_meta($postId, 'einsatz_einsatzleiter', $einsatzleiter);

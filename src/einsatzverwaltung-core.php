@@ -16,6 +16,7 @@ require_once dirname(__FILE__) . '/einsatzverwaltung-tools.php';
 require_once dirname(__FILE__) . '/Import/Tool.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-taxonomies.php';
 require_once dirname(__FILE__) . '/Frontend/ReportList.php';
+require_once dirname(__FILE__) . '/Frontend/ReportListSettings.php';
 require_once dirname(__FILE__) . '/ReportQuery.php';
 
 use abrain\Einsatzverwaltung\Import\Tool as ImportTool;

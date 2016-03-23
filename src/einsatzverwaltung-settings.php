@@ -2,6 +2,7 @@
 namespace abrain\Einsatzverwaltung;
 
 use abrain\Einsatzverwaltung\Frontend\ReportList;
+use abrain\Einsatzverwaltung\Frontend\ReportListSettings;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 
 /**
@@ -31,6 +32,11 @@ class Settings
      * @var Data
      */
     private $data;
+
+    /**
+     * @var ReportListSettings
+     */
+    private $reportListSettings;
 
     /**
      * Konstruktor
@@ -172,6 +178,11 @@ class Settings
             'einsatzvw_list_ext_link',
             array($this->utilities, 'sanitizeCheckbox')
         );
+        register_setting(
+            'einsatzvw_settings',
+            'einsatzvw_list_zebra',
+            array($this->utilities, 'sanitizeCheckbox')
+        );
 
         $roles = get_editable_roles();
         if (!empty($roles)) {
@@ -298,6 +309,13 @@ class Settings
             'einsatzvw_settings_einsatzliste'
         );
         add_settings_field(
+            'einsatzvw_settings_zebralist',
+            'Zebrastreifen',
+            array($this, 'echoEinsatzlisteZebraSettings'),
+            self::EVW_SETTINGS_SLUG,
+            'einsatzvw_settings_einsatzliste'
+        );
+        add_settings_field(
             'einsatzvw_settings_caps_roles',
             'Rollen',
             array($this, 'echoSettingsCapsRoles'),
@@ -312,11 +330,13 @@ class Settings
      *
      * @param string $checkboxId Id der Option
      * @param string $text Beschriftung der Checkbox
+     * @internal param bool $state Optional, gibt den Zustand der Checkbox an.
      */
     private function echoSettingsCheckbox($checkboxId, $text)
     {
         echo '<input type="checkbox" value="1" id="' . $checkboxId . '" name="' . $checkboxId . '" ';
-        echo $this->utilities->checked($this->options->getBoolOption($checkboxId)) . '/><label for="' . $checkboxId . '">';
+        $state = (func_num_args() > 2 ? func_get_arg(2) : $this->options->getBoolOption($checkboxId));
+        echo $this->utilities->checked($state) . '/><label for="' . $checkboxId . '">';
         echo $text . '</label>';
     }
 
@@ -552,6 +572,16 @@ class Settings
         );
     }
 
+    public function echoEinsatzlisteZebraSettings()
+    {
+        $this->echoSettingsCheckbox(
+            'einsatzvw_list_zebra',
+            'Zebrastreifen anzeigen',
+            $this->reportListSettings->isZebraTable()
+        );
+        echo '<p class="description">Die Zeilen der Tabelle werden abwechselnd eingef&auml;rbt, um die Lesbarkeit zu verbessern. Wenn das Theme das ebenfalls tut, sollte diese Option deaktiviert werden, um Probleme bei der Darstellung zu vermeiden.</p>';
+    }
+
     /**
      * Gibt die Einstellmöglichkeiten für die Berechtigungen aus
      */
@@ -607,6 +637,9 @@ class Settings
             $message = sprintf('Die Seite %s und das Archiv der Einsatzberichte haben einen identischen Permalink (%s). &Auml;ndere einen der beiden Permalinks, um beide Seiten erreichen zu k&ouml;nnen.', $pageEditLink, $rewriteSlug);
             echo '<div class="error"><p>' . $message . '</p></div>';
         }
+
+        // Einstellungsobjekte laden
+        $this->reportListSettings = new ReportListSettings();
 
         // Einstellungen ausgeben
         echo '<form method="post" action="options.php">';

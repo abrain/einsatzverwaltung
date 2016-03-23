@@ -82,6 +82,11 @@ class ReportList
     private $options;
 
     /**
+     * @var ReportListSettings
+     */
+    private static $settings;
+
+    /**
      * Gibt an, ob nach jedem Monat eine Trennung eingefügt werden soll
      *
      * @var bool
@@ -129,7 +134,7 @@ class ReportList
             return;
         }
 
-        // Arguemnte auswerten
+        // Argumente auswerten
         $defaults = array(
             'splitMonths' => false,
             'columns' => array(),
@@ -428,7 +433,16 @@ class ReportList
      */
     public static function getDynamicCss()
     {
+        if (empty(self::$settings)) {
+            self::$settings = new ReportListSettings();
+        }
+
         $string = '';
+
+        // Sollen Zebrastreifen angezeigt werden?
+        if (self::$settings->isZebraTable()) {
+            $string .= '.einsatzverwaltung-reportlist tr:nth-child(even) { background-color: #eee; }';
+        }
 
         // Bei der responsiven Ansicht die selben Begriffe voranstellen wie im Tabellenkopf
         $string .= '@media (max-width: 767px) {';

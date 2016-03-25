@@ -82,6 +82,11 @@ class ReportList
     private $options;
 
     /**
+     * @var ReportListSettings
+     */
+    private static $settings;
+
+    /**
      * Gibt an, ob nach jedem Monat eine Trennung eingefügt werden soll
      *
      * @var bool
@@ -129,7 +134,7 @@ class ReportList
             return;
         }
 
-        // Arguemnte auswerten
+        // Argumente auswerten
         $defaults = array(
             'splitMonths' => false,
             'columns' => array(),
@@ -157,6 +162,7 @@ class ReportList
         $currentMonth = null;
         $previousYear = null;
         $previousMonth = null;
+        $monthlyCounter = 0;
         /** @var IncidentReport $report */
         foreach ($reports as $report) {
             $timeOfAlerting = $report->getTimeOfAlerting();
@@ -174,17 +180,25 @@ class ReportList
                 $this->beginTable($currentYear);
                 if (!$this->splitMonths) {
                     $this->insertTableHeader();
+                    $this->insertZebraCorrection();
                 }
+
+                $monthlyCounter = 0;
             }
 
             // Monatswechsel bei aktivierter Monatstrennung
             if ($this->splitMonths && $currentMonth != $previousMonth) {
+                if ($monthlyCounter > 0 && $monthlyCounter % 2 != 0) {
+                    $this->insertZebraCorrection();
+                }
                 $this->insertMonthSeparator($timeOfAlerting);
                 $this->insertTableHeader();
+                $monthlyCounter = 0;
             }
 
             // Zeile für den aktuellen Bericht ausgeben
             $this->insertRow($report);
+            $monthlyCounter++;
 
             // Variablen für den nächsten Durchgang setzen
             $previousYear = $currentYear;
@@ -267,7 +281,7 @@ class ReportList
      */
     private function insertRow($report)
     {
-        $this->string .= '<tr>';
+        $this->string .= '<tr class="report">';
         foreach ($this->columns as $colId) {
             $this->string .= '<td class="einsatz-column-' . $colId . '">';
             $linkToReport = $this->linkEmptyReports || $report->hasContent();
@@ -283,6 +297,14 @@ class ReportList
             $this->string .= '</td>';
         }
         $this->string .= '</tr>';
+    }
+
+    /**
+     * Fügt eine unsichtbare Zeile ein, um das Zebramuster in bestimmten Fällen zu erhalten
+     */
+    private function insertZebraCorrection()
+    {
+        $this->string .= '<tr class="zebracorrection"><td colspan="'.$this->numberOfColumns.'">&nbsp;</td></tr>';
     }
 
     /**
@@ -428,7 +450,17 @@ class ReportList
      */
     public static function getDynamicCss()
     {
+        if (empty(self::$settings)) {
+            self::$settings = new ReportListSettings();
+        }
+
         $string = '';
+
+        // Sollen Zebrastreifen angezeigt werden?
+        if (self::$settings->isZebraTable()) {
+            $string .= '.einsatzverwaltung-reportlist tr.report:nth-child(' . self::$settings->getZebraNthChildArg() . ') {';
+            $string .= 'background-color: ' . self::$settings->getZebraColor() . '; }';
+        }
 
         // Bei der responsiven Ansicht die selben Begriffe voranstellen wie im Tabellenkopf
         $string .= '@media (max-width: 767px) {';

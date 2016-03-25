@@ -4,7 +4,7 @@ Donate link: https://einsatzverwaltung.abrain.de/unterstuetzen/
 Tags: Feuerwehr, Einsatz, Rettung, Rettungsdienst, THW, HiOrg, Wasserwacht, Bergrettung
 Requires at least: 3.7.0
 Tested up to: 4.4
-Stable tag: 1.2.0
+Stable tag: 1.2.1
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -69,6 +69,17 @@ Das Du halte ich f&uuml;r die angenehmere Arbeitsgrundlage, aber man darf mich g
 Nein, mehr gibt es [hier](https://einsatzverwaltung.abrain.de/faq/).
 
 == Changelog ==
+
+= 1.2.1 =
+Verbesserungen:
+
+* Die Zebrastreifen der tabellarischen &Uuml;bersicht k&ouml;nnen jetzt abgeschalten werden
+* Farbe f&uuml;r Zebrastreifen ist einstellbar, ebenso die betroffenen Zeilen (gerade/ungerade)
+
+Fehlerbehebungen:
+
+* Widget zeigte bei bestimmten Einstellungen nur als besonders markierte Eins&auml;tze an
+* Kategoriezuordnung von Einsatzberichten wurde nicht aufgehoben, wenn Markierung f&uuml;r besonderen Einsatz entfernt wurde
 
 = 1.2.0 =
 * Die tabellarische &Uuml;bersicht passt sich nun Mobilger&auml;ten an

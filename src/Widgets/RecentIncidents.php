@@ -7,7 +7,6 @@ use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use abrain\Einsatzverwaltung\Utilities;
 use WP_Widget;
-use WP_Query;
 
 /**
  * WordPress-Widget für die letzten X Einsätze
@@ -78,14 +77,17 @@ class RecentIncidents extends WP_Widget
         }
 
         $letzteEinsaetze = "";
-        $query = new WP_Query('&post_type=einsatz&post_status=publish&posts_per_page='.$anzahl);
-        while ($query->have_posts()) {
-            $nextPost = $query->next_post();
-            $report = new IncidentReport($nextPost);
+        $posts = get_posts(array(
+            'post_type' => 'einsatz',
+            'post_status' => 'publish',
+            'posts_per_page' => $anzahl
+        ));
+        foreach ($posts as $post) {
+            $report = new IncidentReport($post);
             $letzteEinsaetze .= '<li class="einsatzbericht">';
 
-            $letzteEinsaetze .= "<a href=\"".get_permalink($nextPost->ID)."\" rel=\"bookmark\" class=\"einsatzmeldung\">";
-            $meldung = get_the_title($nextPost->ID);
+            $letzteEinsaetze .= "<a href=\"".get_permalink($post->ID)."\" rel=\"bookmark\" class=\"einsatzmeldung\">";
+            $meldung = get_the_title($post->ID);
             if (!empty($meldung)) {
                 $letzteEinsaetze .= $meldung;
             } else {
@@ -94,7 +96,7 @@ class RecentIncidents extends WP_Widget
             $letzteEinsaetze .= "</a>";
 
             if ($zeigeDatum) {
-                $timestamp = strtotime($nextPost->post_date);
+                $timestamp = strtotime($post->post_date);
                 $datumsformat = self::$options->getDateFormat();
                 $letzteEinsaetze .= "<br><span class=\"einsatzdatum\">".date_i18n($datumsformat, $timestamp)."</span>";
                 if ($zeigeZeit) {

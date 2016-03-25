@@ -793,6 +793,6 @@ class Settings
      */
     public function sanitizeZebraColor($input)
     {
-        return $this->utilities->sanitizeHexColor($input, $this->reportListSettings->getZebraColor());
+        return $this->utilities->sanitizeHexColor($input, ReportListSettings::DEFAULT_ZEBRACOLOR);
     }
 }

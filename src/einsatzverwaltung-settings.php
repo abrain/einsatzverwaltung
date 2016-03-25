@@ -52,6 +52,10 @@ class Settings
         $this->options = $options;
         $this->utilities = $utilities;
         $this->data = $data;
+
+        // Einstellungsobjekte laden
+        $this->reportListSettings = new ReportListSettings();
+
         $this->addHooks();
     }
 
@@ -182,6 +186,11 @@ class Settings
             'einsatzvw_settings',
             'einsatzvw_list_zebra',
             array($this->utilities, 'sanitizeCheckbox')
+        );
+        register_setting(
+            'einsatzvw_settings',
+            'einsatzvw_list_zebracolor',
+            array($this, 'sanitizeZebraColor')
         );
 
         $roles = get_editable_roles();
@@ -580,6 +589,9 @@ class Settings
             $this->reportListSettings->isZebraTable()
         );
         echo '<p class="description">Die Zeilen der Tabelle werden abwechselnd eingef&auml;rbt, um die Lesbarkeit zu verbessern. Wenn das Theme das ebenfalls tut, sollte diese Option deaktiviert werden, um Probleme bei der Darstellung zu vermeiden.</p>';
+
+        echo '<p>Farbe f&uuml;r Zebrastreifen: <input type="text" size="7" id="zebra-color-picker" name="einsatzvw_list_zebracolor" value="' . $this->reportListSettings->getZebraColor() . '" /></p>';
+        echo '<p class="description">Diese Farbe wird f&uuml;r jede zweite Zeile verwendet, die jeweils andere Zeile wird vom Theme eingef&auml;rbt. Anzugeben ist der Farbwert in Hexadezimalschreibweise (3- oder 6-stellig) mit f&uuml;hrendem #-Zeichen.</p>';
     }
 
     /**
@@ -637,9 +649,6 @@ class Settings
             $message = sprintf('Die Seite %s und das Archiv der Einsatzberichte haben einen identischen Permalink (%s). &Auml;ndere einen der beiden Permalinks, um beide Seiten erreichen zu k&ouml;nnen.', $pageEditLink, $rewriteSlug);
             echo '<div class="error"><p>' . $message . '</p></div>';
         }
-
-        // Einstellungsobjekte laden
-        $this->reportListSettings = new ReportListSettings();
 
         // Einstellungen ausgeben
         echo '<form method="post" action="options.php">';
@@ -762,5 +771,17 @@ class Settings
         }
 
         return $newValue;
+    }
+
+    /**
+     * Stellt sicher, dass die Farbe für die Zebrastreifen gültig ist
+     *
+     * @param string $input Der zu prüfende Farbwert
+     *
+     * @return string Der übergebene Farbwert, wenn er gültig ist, ansonsten die Standardeinstellung
+     */
+    public function sanitizeZebraColor($input)
+    {
+        return $this->utilities->sanitizeHexColor($input, $this->reportListSettings->getZebraColor());
     }
 }

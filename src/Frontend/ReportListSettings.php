@@ -10,6 +10,13 @@ namespace abrain\Einsatzverwaltung\Frontend;
 class ReportListSettings
 {
     /**
+     * Eine Farbe der Zebrastreifen, die nicht vom Theme vorgegeben wird
+     *
+     * @var string
+     */
+    private $zebraColor;
+
+    /**
      * Gibt an, ob die Zeilen der Tabelle abwechselnd eingefärbt werden sollen
      *
      * @var boolean
@@ -22,7 +29,16 @@ class ReportListSettings
      */
     public function __construct()
     {
+        $this->zebraColor = get_option('einsatzvw_list_zebracolor', '#eee');
         $this->zebraTable = (bool) get_option('einsatzvw_list_zebra', true);
+    }
+
+    /**
+     * @return string
+     */
+    public function getZebraColor()
+    {
+        return $this->zebraColor;
     }
 
     /**
@@ -31,13 +47,5 @@ class ReportListSettings
     public function isZebraTable()
     {
         return $this->zebraTable;
-    }
-
-    /**
-     * @param boolean $zebraTable
-     */
-    public function setZebraTable($zebraTable)
-    {
-        $this->zebraTable = $zebraTable;
     }
 }

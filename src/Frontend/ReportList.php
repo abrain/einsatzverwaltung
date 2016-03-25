@@ -441,7 +441,8 @@ class ReportList
 
         // Sollen Zebrastreifen angezeigt werden?
         if (self::$settings->isZebraTable()) {
-            $string .= '.einsatzverwaltung-reportlist tr:nth-child(even) { background-color: #eee; }';
+            $string .= '.einsatzverwaltung-reportlist tr:nth-child(even) {';
+            $string .= 'background-color: ' . self::$settings->getZebraColor() . '; }';
         }
 
         // Bei der responsiven Ansicht die selben Begriffe voranstellen wie im Tabellenkopf

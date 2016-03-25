@@ -91,7 +91,7 @@ class Admin
             wp_enqueue_script(
                 'einsatzverwaltung-settings-script',
                 $this->core->scriptUrl . 'einsatzverwaltung-settings.js',
-                array('jquery-ui-draggable', 'jquery-ui-droppable', 'jquery-ui-sortable'),
+                array('jquery-ui-draggable', 'jquery-ui-droppable', 'jquery-ui-sortable', 'iris'),
                 Core::VERSION
             );
         }

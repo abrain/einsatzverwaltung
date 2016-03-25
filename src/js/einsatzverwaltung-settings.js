@@ -20,4 +20,7 @@ jQuery(document).ready(function() {
             jQuery("#einsatzvw_list_columns").val($columnsEnabled.sortable('toArray'));
         }
     });
+
+    // Color picker für die Zebrastreifen initialisieren
+    jQuery('#zebra-color-picker').iris();
 });

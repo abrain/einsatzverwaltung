@@ -9,8 +9,13 @@
 }
 
 .einsatzverwaltung-reportlist .einsatz-header {
-	background: #eee;
+	background-color: #eee;
 	border-bottom: 2px solid #ddd;
+}
+
+.einsatzverwaltung-reportlist .zebracorrection {
+	visibility: hidden;
+    display: none;
 }
 
 .einsatzverwaltung-reportlist .einsatz-title-month td {

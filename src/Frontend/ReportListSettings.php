@@ -9,6 +9,8 @@ namespace abrain\Einsatzverwaltung\Frontend;
  */
 class ReportListSettings
 {
+    const DEFAULT_NTHCHILD = 'even';
+
     /**
      * Eine Farbe der Zebrastreifen, die nicht vom Theme vorgegeben wird
      *
@@ -42,10 +44,37 @@ class ReportListSettings
     }
 
     /**
+     * Gibt das Argument für den :nth-child()-Selektor für die Zebrastreifen zurück
+     *
+     * @return string
+     */
+    public function getZebraNthChildArg()
+    {
+        $option = get_option('einsatzvw_list_zebra_nth', self::DEFAULT_NTHCHILD);
+        return $this->sanitizeZebraNthChildArg($option);
+    }
+
+    /**
      * @return boolean
      */
     public function isZebraTable()
     {
         return $this->zebraTable;
+    }
+
+    /**
+     * Stellt sicher, dass das Argument für den :nth-child()-Selektor für die Zebrastreifen gültig ist
+     *
+     * @param string $input Der zu prüfende Wert
+     *
+     * @return string
+     */
+    public function sanitizeZebraNthChildArg($input)
+    {
+        if (!in_array($input, array('odd', 'even'))) {
+            return self::DEFAULT_NTHCHILD;
+        }
+
+        return $input;
     }
 }

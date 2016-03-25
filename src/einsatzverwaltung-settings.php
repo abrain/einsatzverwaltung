@@ -192,6 +192,11 @@ class Settings
             'einsatzvw_list_zebracolor',
             array($this, 'sanitizeZebraColor')
         );
+        register_setting(
+            'einsatzvw_settings',
+            'einsatzvw_list_zebra_nth',
+            array($this->reportListSettings, 'sanitizeZebraNthChildArg')
+        );
 
         $roles = get_editable_roles();
         if (!empty($roles)) {
@@ -592,6 +597,12 @@ class Settings
 
         echo '<p>Farbe f&uuml;r Zebrastreifen: <input type="text" size="7" id="zebra-color-picker" name="einsatzvw_list_zebracolor" value="' . $this->reportListSettings->getZebraColor() . '" /></p>';
         echo '<p class="description">Diese Farbe wird f&uuml;r jede zweite Zeile verwendet, die jeweils andere Zeile wird vom Theme eingef&auml;rbt. Anzugeben ist der Farbwert in Hexadezimalschreibweise (3- oder 6-stellig) mit f&uuml;hrendem #-Zeichen.</p>';
+
+        echo '<p><fieldset><label><input type="radio" name="einsatzvw_list_zebra_nth" value="even" ';
+        checked($this->reportListSettings->getZebraNthChildArg(), 'even');
+        echo '>Gerade Zeilen einf&auml;rben</label> <label><input type="radio" name="einsatzvw_list_zebra_nth" value="odd" ';
+        checked($this->reportListSettings->getZebraNthChildArg(), 'odd');
+        echo '>Ungerade Zeilen einf&auml;rben</label></fieldset></p>';
     }
 
     /**

@@ -441,7 +441,7 @@ class ReportList
 
         // Sollen Zebrastreifen angezeigt werden?
         if (self::$settings->isZebraTable()) {
-            $string .= '.einsatzverwaltung-reportlist tr:nth-child(even) {';
+            $string .= '.einsatzverwaltung-reportlist tr:nth-child(' . self::$settings->getZebraNthChildArg() . ') {';
             $string .= 'background-color: ' . self::$settings->getZebraColor() . '; }';
         }
 

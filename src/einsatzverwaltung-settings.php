@@ -2,6 +2,7 @@
 namespace abrain\Einsatzverwaltung;
 
 use abrain\Einsatzverwaltung\Frontend\ReportList;
+use abrain\Einsatzverwaltung\Frontend\ReportListSettings;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 
 /**
@@ -33,6 +34,11 @@ class Settings
     private $data;
 
     /**
+     * @var ReportListSettings
+     */
+    private $reportListSettings;
+
+    /**
      * Konstruktor
      *
      * @param Core $core
@@ -46,6 +52,10 @@ class Settings
         $this->options = $options;
         $this->utilities = $utilities;
         $this->data = $data;
+
+        // Einstellungsobjekte laden
+        $this->reportListSettings = new ReportListSettings();
+
         $this->addHooks();
     }
 
@@ -171,6 +181,21 @@ class Settings
             'einsatzvw_settings',
             'einsatzvw_list_ext_link',
             array($this->utilities, 'sanitizeCheckbox')
+        );
+        register_setting(
+            'einsatzvw_settings',
+            'einsatzvw_list_zebra',
+            array($this->utilities, 'sanitizeCheckbox')
+        );
+        register_setting(
+            'einsatzvw_settings',
+            'einsatzvw_list_zebracolor',
+            array($this, 'sanitizeZebraColor')
+        );
+        register_setting(
+            'einsatzvw_settings',
+            'einsatzvw_list_zebra_nth',
+            array($this->reportListSettings, 'sanitizeZebraNthChildArg')
         );
 
         $roles = get_editable_roles();
@@ -298,6 +323,13 @@ class Settings
             'einsatzvw_settings_einsatzliste'
         );
         add_settings_field(
+            'einsatzvw_settings_zebralist',
+            'Zebrastreifen',
+            array($this, 'echoEinsatzlisteZebraSettings'),
+            self::EVW_SETTINGS_SLUG,
+            'einsatzvw_settings_einsatzliste'
+        );
+        add_settings_field(
             'einsatzvw_settings_caps_roles',
             'Rollen',
             array($this, 'echoSettingsCapsRoles'),
@@ -312,11 +344,13 @@ class Settings
      *
      * @param string $checkboxId Id der Option
      * @param string $text Beschriftung der Checkbox
+     * @internal param bool $state Optional, gibt den Zustand der Checkbox an.
      */
     private function echoSettingsCheckbox($checkboxId, $text)
     {
         echo '<input type="checkbox" value="1" id="' . $checkboxId . '" name="' . $checkboxId . '" ';
-        echo $this->utilities->checked($this->options->getBoolOption($checkboxId)) . '/><label for="' . $checkboxId . '">';
+        $state = (func_num_args() > 2 ? func_get_arg(2) : $this->options->getBoolOption($checkboxId));
+        echo $this->utilities->checked($state) . '/><label for="' . $checkboxId . '">';
         echo $text . '</label>';
     }
 
@@ -552,6 +586,25 @@ class Settings
         );
     }
 
+    public function echoEinsatzlisteZebraSettings()
+    {
+        $this->echoSettingsCheckbox(
+            'einsatzvw_list_zebra',
+            'Zebrastreifen anzeigen',
+            $this->reportListSettings->isZebraTable()
+        );
+        echo '<p class="description">Die Zeilen der Tabelle werden abwechselnd eingef&auml;rbt, um die Lesbarkeit zu verbessern. Wenn das Theme das ebenfalls tut, sollte diese Option deaktiviert werden, um Probleme bei der Darstellung zu vermeiden.</p>';
+
+        echo '<p>Farbe f&uuml;r Zebrastreifen: <input type="text" size="7" id="zebra-color-picker" name="einsatzvw_list_zebracolor" value="' . $this->reportListSettings->getZebraColor() . '" /></p>';
+        echo '<p class="description">Diese Farbe wird f&uuml;r jede zweite Zeile verwendet, die jeweils andere Zeile wird vom Theme eingef&auml;rbt. Anzugeben ist der Farbwert in Hexadezimalschreibweise (3- oder 6-stellig) mit f&uuml;hrendem #-Zeichen.</p>';
+
+        echo '<p><fieldset><label><input type="radio" name="einsatzvw_list_zebra_nth" value="even" ';
+        checked($this->reportListSettings->getZebraNthChildArg(), 'even');
+        echo '>Gerade Zeilen einf&auml;rben</label> <label><input type="radio" name="einsatzvw_list_zebra_nth" value="odd" ';
+        checked($this->reportListSettings->getZebraNthChildArg(), 'odd');
+        echo '>Ungerade Zeilen einf&auml;rben</label></fieldset></p>';
+    }
+
     /**
      * Gibt die Einstellmöglichkeiten für die Berechtigungen aus
      */
@@ -729,5 +782,17 @@ class Settings
         }
 
         return $newValue;
+    }
+
+    /**
+     * Stellt sicher, dass die Farbe für die Zebrastreifen gültig ist
+     *
+     * @param string $input Der zu prüfende Farbwert
+     *
+     * @return string Der übergebene Farbwert, wenn er gültig ist, ansonsten die Standardeinstellung
+     */
+    public function sanitizeZebraColor($input)
+    {
+        return $this->utilities->sanitizeHexColor($input, ReportListSettings::DEFAULT_ZEBRACOLOR);
     }
 }

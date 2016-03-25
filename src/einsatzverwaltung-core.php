@@ -16,6 +16,7 @@ require_once dirname(__FILE__) . '/einsatzverwaltung-tools.php';
 require_once dirname(__FILE__) . '/Import/Tool.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-taxonomies.php';
 require_once dirname(__FILE__) . '/Frontend/ReportList.php';
+require_once dirname(__FILE__) . '/Frontend/ReportListSettings.php';
 require_once dirname(__FILE__) . '/ReportQuery.php';
 
 use abrain\Einsatzverwaltung\Import\Tool as ImportTool;
@@ -30,7 +31,7 @@ use WP_User;
  */
 class Core
 {
-    const VERSION = '1.2.0';
+    const VERSION = '1.2.1';
     const DB_VERSION = 10;
 
     public $pluginFile;

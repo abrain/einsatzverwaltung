@@ -273,6 +273,8 @@ class Data
         if ($category != -1) {
             if (!($this->options->isOnlySpecialInLoop()) || $report->isSpecial()) {
                 $this->utilities->addPostToCategory($postId, $category);
+            } else {
+                $this->utilities->removePostFromCategory($postId, $category);
             }
         }
     }

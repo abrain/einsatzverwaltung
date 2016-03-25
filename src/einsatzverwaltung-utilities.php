@@ -348,6 +348,27 @@ class Utilities
         }
     }
 
+    /**
+     * Stellt sicher, dass es sich um einen validen Farbwert im Hexformat handelt
+     *
+     * @param string $color Die Farbe, die überprüft werden soll
+     * @param string $default Standardwert, der bei einem Fehler zurückgegeben wird
+     *
+     * @return string Den übergebenen Farbwert, wenn er korrekt ist, ansonsten den Standardwert
+     */
+    public function sanitizeHexColor($color, $default)
+    {
+        if (empty($color)) {
+            return $default;
+        }
+        
+        // Es muss ein Gartenzaun mit 3 oder 6 Hexziffern sein
+        if (preg_match('|^#([A-Fa-f0-9]{3}){1,2}$|', $color)) {
+            return $color;
+        }
+        
+        return $default;
+    }
 
     /**
      * Stellt sicher, dass eine Zahl positiv ist

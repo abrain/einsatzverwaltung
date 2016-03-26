@@ -87,6 +87,13 @@ class ReportList
     private static $settings;
 
     /**
+     * Gibt an, ob oberhalb einer Tabelle die Überschrift mit der Jahreszahl angezeigt werden soll
+     *
+     * @var bool
+     */
+    private $showHeading;
+
+    /**
      * Gibt an, ob nach jedem Monat eine Trennung eingefügt werden soll
      *
      * @var bool
@@ -142,6 +149,7 @@ class ReportList
             'linkToAddForces' => $this->options->getBoolOption('einsatzvw_list_ext_link'),
             'columnsWithLink' => array('title'),
             'linkEmptyReports' => true,
+            'showHeading' => true,
         );
         $parsedArgs = wp_parse_args($args, $defaults);
 
@@ -156,6 +164,7 @@ class ReportList
             $this->columnsWithLink = $this->utilities->sanitizeColumnsArray($this->columnsWithLink);
         }
         $this->linkEmptyReports = (true === $parsedArgs['linkEmptyReports']);
+        $this->showHeading = (bool) $parsedArgs['showHeading'];
 
         // Berichte abarbeiten
         $currentYear = null;
@@ -240,7 +249,9 @@ class ReportList
      */
     private function beginTable($year)
     {
-        $this->string .= '<h2>Eins&auml;tze '.$year.'</h2>';
+        if ($this->showHeading) {
+            $this->string .= '<h2>Eins&auml;tze '.$year.'</h2>';
+        }
         $this->string .= '<table class="' . self::TABLECLASS . '"><tbody>';
     }
 

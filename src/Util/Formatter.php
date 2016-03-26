@@ -79,32 +79,40 @@ class Formatter
 
         switch ($tag) {
             case '%title%':
-                return str_replace('%title%', get_the_title($post), $pattern);
+                $replace = get_the_title($post);
+                break;
             case '%date%':
-                return str_replace('%date%', date_i18n($this->options->getDateFormat(), $timeOfAlerting->getTimestamp()), $pattern);
+                $replace = date_i18n($this->options->getDateFormat(), $timeOfAlerting->getTimestamp());
+                break;
             case '%time%':
-                return str_replace('%time%', date_i18n($this->options->getTimeFormat(), $timeOfAlerting->getTimestamp()), $pattern);
+                $replace = date_i18n($this->options->getTimeFormat(), $timeOfAlerting->getTimestamp());
+                break;
             case '%duration%':
-                return str_replace('%duration%', $this->utilities->getDurationString(Data::getDauer($incidentReport)), $pattern);
+                $replace = $this->utilities->getDurationString(Data::getDauer($incidentReport));
+                break;
             case '%incidentType%':
-                return str_replace(
-                    '%incidentType%',
-                    $this->getTypeOfIncident($incidentReport, false, false, false),
-                    $pattern
-                );
+                $replace = $this->getTypeOfIncident($incidentReport, false, false, false);
+                break;
             case '%url%':
-                return str_replace('%url%', get_permalink($post->ID), $pattern);
+                $replace = get_permalink($post->ID);
+                break;
             case '%location%':
-                return str_replace('%location%', $incidentReport->getLocation(), $pattern);
+                $replace = $incidentReport->getLocation();
+                break;
             case '%feedUrl%':
-                return str_replace('%feedUrl%', get_post_type_archive_feed_link('einsatz'), $pattern);
+                $replace = get_post_type_archive_feed_link('einsatz');
+                break;
             case '%number%':
-                return str_replace('%number%', $incidentReport->getNumber(), $pattern);
+                $replace = $incidentReport->getNumber();
+                break;
             case '%seqNum%':
-                return str_replace('%seqNum%', $incidentReport->getSequentialNumber(), $pattern);
+                $replace = $incidentReport->getSequentialNumber();
+                break;
             default:
                 return $pattern;
         }
+
+        return str_replace($tag, $replace, $pattern);
     }
 
     /**

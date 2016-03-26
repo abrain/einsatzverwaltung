@@ -41,7 +41,7 @@ class Taxonomies
         add_action('manage_exteinsatzmittel_custom_column', array($this, 'columnContentExteinsatzmittel'), 10, 3);
         add_action('edited_term', array($this, 'saveTerm'), 10, 3);
         add_action('created_term', array($this, 'saveTerm'), 10, 3);
-        add_action('delete_term', array($this, 'deleteTerm'), 10, 4);
+        add_action('delete_term', array($this, 'deleteTerm'), 10, 3);
         add_action('split_shared_term', array($this, 'splitSharedTerms'), 10, 4);
     }
 
@@ -267,21 +267,20 @@ class Taxonomies
      * @param int $termId Term ID
      * @param int $ttId Term taxonomy ID
      * @param string $taxonomy Taxonomy slug
-     * @param mixed $deletedTerm Kopie des bereits gelöschten Terms
      */
-    public function deleteTerm($termId, $ttId, $taxonomy, $deletedTerm)
+    public function deleteTerm($termId, $ttId, $taxonomy)
     {
         if (!isset($taxonomy)) {
             return;
         }
 
-        $evw_taxonomies = $this->getTaxonomies();
+        $evwTaxonomies = $this->getTaxonomies();
 
-        if (!array_key_exists($taxonomy, $evw_taxonomies) || !is_array($evw_taxonomies[$taxonomy])) {
+        if (!array_key_exists($taxonomy, $evwTaxonomies) || !is_array($evwTaxonomies[$taxonomy])) {
             return;
         }
 
-        foreach ($evw_taxonomies[$taxonomy] as $field) {
+        foreach ($evwTaxonomies[$taxonomy] as $field) {
             if (isset($field) && !empty($field)) {
                 delete_option(self::getTermOptionKey($termId, $taxonomy, $field));
             }

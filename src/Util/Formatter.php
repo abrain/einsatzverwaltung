@@ -100,6 +100,8 @@ class Formatter
                 return str_replace('%feedUrl%', get_post_type_archive_feed_link('einsatz'), $pattern);
             case '%number%':
                 return str_replace('%number%', $incidentReport->getNumber(), $pattern);
+            case '%seqNum%':
+                return str_replace('%seqNum%', $incidentReport->getSequentialNumber(), $pattern);
             default:
                 return $pattern;
         }
@@ -120,6 +122,7 @@ class Formatter
             '%location%' => __('Ort des Einsatzes', 'einsatzverwaltung'),
             '%feedUrl%' => __('URL zum Feed', 'einsatzverwaltung'),
             '%number%' => __('Einsatznummer', 'einsatzverwaltung'),
+            '%seqNum%' => 'Laufende Nummer',
         );
     }
 

@@ -33,7 +33,10 @@ class RecentIncidents extends WP_Widget
         parent::__construct(
             'einsatzverwaltung_widget', // Base ID
             'Letzte Eins&auml;tze', // Name
-            array('description' => __('Zeigt die neuesten Eins&auml;tze an.', 'einsatzverwaltung'),) // Args
+            array(
+                'description' => __('Zeigt die neuesten Eins&auml;tze an.', 'einsatzverwaltung'),
+                'customize_selective_refresh' => true,
+            ) // Args
         );
     }
 

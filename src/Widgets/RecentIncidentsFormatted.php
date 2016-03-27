@@ -120,7 +120,8 @@ class RecentIncidentsFormatted extends WP_Widget
             'Letzte Eins&auml;tze (eigenes Format)',
             array(
                 'description' => __('Zeigt die neuesten Eins&auml;tze an.', 'einsatzverwaltung') . ' ' .
-                    __('Das Aussehen kann vollst&auml;ndig mit eigenem HTML bestimmt werden.', 'einsatzverwaltung')
+                    __('Das Aussehen kann vollst&auml;ndig mit eigenem HTML bestimmt werden.', 'einsatzverwaltung'),
+                'customize_selective_refresh' => true,
             )
         );
     }

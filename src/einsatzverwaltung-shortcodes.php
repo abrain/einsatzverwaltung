@@ -68,11 +68,12 @@ class Shortcodes
 
         // Optionen auswerten
         $rawOptions = array_map('trim', explode(',', $shortcodeParams['options']));
-        $possibleOptions = array('special', 'noLinkWithoutContent', 'noHeading');
+        $possibleOptions = array('special', 'noLinkWithoutContent', 'noHeading', 'compact');
         $filteredOptions = array_intersect($possibleOptions, $rawOptions);
         $showOnlySpecialReports = in_array('special', $filteredOptions);
         $linkEmptyReports = !in_array('noLinkWithoutContent', $filteredOptions);
         $showHeading = !in_array('noHeading', $filteredOptions);
+        $compact = in_array('compact', $filteredOptions);
 
         $columnsWithLink = explode(',', $shortcodeParams['link']);
         if (in_array('none', $columnsWithLink)) {
@@ -105,6 +106,7 @@ class Shortcodes
                 'columnsWithLink' => $columnsWithLink,
                 'linkEmptyReports' => $linkEmptyReports,
                 'showHeading' => $showHeading,
+                'compact' => $compact,
             )
         );
     }

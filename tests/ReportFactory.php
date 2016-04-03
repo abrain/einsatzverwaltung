@@ -47,12 +47,34 @@ class ReportFactory extends WP_UnitTest_Factory_For_Post
             return $generatedArgs;
         }
 
-        if (!in_array('meta_input', $generatedArgs)) {
+        if (!array_key_exists('meta_input', $generatedArgs)) {
             $generatedArgs['meta_input'] = array();
         }
 
         $generatedArgs['meta_input'] = wp_parse_args($generatedArgs['meta_input'], $this->defaultMetaInput);
 
         return $generatedArgs;
+    }
+
+    /**
+     * @param $args
+     * @return int|\WP_Error
+     */
+    public function create_object($args)
+    {
+        $post = parent::create_object($args);
+
+        if (is_wp_error($post) || 0 === $post) {
+            return $post;
+        }
+
+        // meta_input ist erst ab WP 4.4 nutzbar
+        if (version_compare(bloginfo('version'), '4.4', '<')) {
+            foreach ($this->defaultMetaInput as $metaKey => $metaValue) {
+                add_post_meta((int) $post, $metaKey, $metaValue);
+            }
+        }
+
+        return $post;
     }
 }

@@ -15,6 +15,13 @@ use WP_User;
  */
 class ReportEditTest extends WP_UnitTestCase
 {
+    public static function tearDownAfterClass()
+    {
+        parent::tearDownAfterClass();
+
+        wp_set_current_user(0);
+    }
+
     public function testTimeOfAlertingSurvivesDraftState()
     {
         /** @var WP_User $userAuthor */

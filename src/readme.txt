@@ -4,7 +4,7 @@ Donate link: https://einsatzverwaltung.abrain.de/unterstuetzen/
 Tags: Feuerwehr, Einsatz, Rettung, Rettungsdienst, THW, HiOrg, Wasserwacht, Bergrettung
 Requires at least: 3.7.0
 Tested up to: 4.5
-Stable tag: 1.2.1
+Stable tag: 1.2.2
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -69,6 +69,23 @@ Das Du halte ich f&uuml;r die angenehmere Arbeitsgrundlage, aber man darf mich g
 Nein, mehr gibt es [hier](https://einsatzverwaltung.abrain.de/faq/).
 
 == Changelog ==
+
+= 1.2.2 =
+Verbesserungen:
+
+* Einsatzliste: Trennung zwischen den Kalenderjahren kann abgeschalten werden
+* Einsatzliste: Jahres&uuml;berschrift kann ausgeblendet werden
+* Widget Letzte Eins&auml;tze (eigenes Format): Neuer Tag f&uuml;r laufende Nummer
+* Widgets unterst&uuml;tzen Selective Refresh (neues Feature in der Live-Vorschau)
+
+Fehlerbehebungen:
+
+* Einsatzberichte konnten im Frontend anderer Plugins auftauchen
+* Alarmzeit wurde bei Entw&uuml;rfen falsch gespeichert
+
+Sonstiges:
+
+* Getestet mit WordPress 4.5
 
 = 1.2.1 =
 Verbesserungen:

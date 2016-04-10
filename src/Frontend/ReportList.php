@@ -26,6 +26,13 @@ class ReportList
     private $columns;
 
     /**
+     * Gibt an, ob die Tabelle in kompakter Form, also ohne Trennung zwischen den Jahren angezeigt werden soll
+     *
+     * @var bool
+     */
+    private $compact;
+
+    /**
      * Array mit Spalten-IDs, die nicht mit einem Link zum Einsatzbericht versehen werden dürfen
      *
      * @var array
@@ -87,6 +94,13 @@ class ReportList
     private static $settings;
 
     /**
+     * Gibt an, ob oberhalb einer Tabelle die Überschrift mit der Jahreszahl angezeigt werden soll
+     *
+     * @var bool
+     */
+    private $showHeading;
+
+    /**
      * Gibt an, ob nach jedem Monat eine Trennung eingefügt werden soll
      *
      * @var bool
@@ -142,11 +156,14 @@ class ReportList
             'linkToAddForces' => $this->options->getBoolOption('einsatzvw_list_ext_link'),
             'columnsWithLink' => array('title'),
             'linkEmptyReports' => true,
+            'showHeading' => true,
+            'compact' => false,
         );
         $parsedArgs = wp_parse_args($args, $defaults);
 
         // Variablen setzen
-        $this->splitMonths = (true === $parsedArgs['splitMonths']);
+        $this->compact = (bool) $parsedArgs['compact'];
+        $this->splitMonths = (bool) $parsedArgs['splitMonths'] && !$this->compact;
         $this->columns = $this->utilities->sanitizeColumnsArray($parsedArgs['columns']);
         $this->numberOfColumns = count($this->columns);
         $this->linkToVehicles = (true === $parsedArgs['linkToVehicles']);
@@ -156,6 +173,7 @@ class ReportList
             $this->columnsWithLink = $this->utilities->sanitizeColumnsArray($this->columnsWithLink);
         }
         $this->linkEmptyReports = (true === $parsedArgs['linkEmptyReports']);
+        $this->showHeading = (bool) $parsedArgs['showHeading'];
 
         // Berichte abarbeiten
         $currentYear = null;
@@ -163,6 +181,10 @@ class ReportList
         $previousYear = null;
         $previousMonth = null;
         $monthlyCounter = 0;
+        if ($this->compact) {
+            $this->beginTable(false);
+            $this->insertTableHeader();
+        }
         /** @var IncidentReport $report */
         foreach ($reports as $report) {
             $timeOfAlerting = $report->getTimeOfAlerting();
@@ -170,7 +192,7 @@ class ReportList
             $currentMonth = intval($timeOfAlerting->format('m'));
 
             // Ein neues Jahr beginnt
-            if ($currentYear != $previousYear) {
+            if (!$this->compact && $currentYear != $previousYear) {
                 // Wenn mindestens schon ein Jahr ausgegeben wurde
                 if ($previousYear != null) {
                     $previousMonth = null;
@@ -236,11 +258,13 @@ class ReportList
     /**
      * Beginnt eine neue Tabelle für ein bestimmtes Jahr
      *
-     * @param int $year Das Kalenderjahr für die Überschrift
+     * @param bool|int $year Das Kalenderjahr für die Überschrift oder false um keine Überschrift auszugeben
      */
     private function beginTable($year)
     {
-        $this->string .= '<h2>Eins&auml;tze '.$year.'</h2>';
+        if ($this->showHeading && $year !== false) {
+            $this->string .= '<h2>Eins&auml;tze '.$year.'</h2>';
+        }
         $this->string .= '<table class="' . self::TABLECLASS . '"><tbody>';
     }
 

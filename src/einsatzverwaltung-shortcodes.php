@@ -68,10 +68,13 @@ class Shortcodes
 
         // Optionen auswerten
         $rawOptions = array_map('trim', explode(',', $shortcodeParams['options']));
-        $possibleOptions = array('special', 'noLinkWithoutContent');
+        $possibleOptions = array('special', 'noLinkWithoutContent', 'noHeading', 'compact');
         $filteredOptions = array_intersect($possibleOptions, $rawOptions);
         $showOnlySpecialReports = in_array('special', $filteredOptions);
         $linkEmptyReports = !in_array('noLinkWithoutContent', $filteredOptions);
+        $showHeading = !in_array('noHeading', $filteredOptions);
+        $compact = in_array('compact', $filteredOptions);
+
         $columnsWithLink = explode(',', $shortcodeParams['link']);
         if (in_array('none', $columnsWithLink)) {
             $columnsWithLink = false;
@@ -101,7 +104,9 @@ class Shortcodes
                 'splitMonths' => ($shortcodeParams['monatetrennen'] == 'ja'),
                 'columns' => $this->options->getEinsatzlisteEnabledColumns(),
                 'columnsWithLink' => $columnsWithLink,
-                'linkEmptyReports' => $linkEmptyReports
+                'linkEmptyReports' => $linkEmptyReports,
+                'showHeading' => $showHeading,
+                'compact' => $compact,
             )
         );
     }

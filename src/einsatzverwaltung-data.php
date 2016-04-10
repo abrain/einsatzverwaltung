@@ -147,15 +147,15 @@ class Data
             return;
         }
 
+        // Schreibrechte prüfen
+        if (!current_user_can('edit_einsatzbericht', $postId)) {
+            return;
+        }
+
         // Prüfen, ob Aufruf über das Formular erfolgt ist
         if (!array_key_exists('einsatzverwaltung_nonce', $_POST) ||
             !wp_verify_nonce($_POST['einsatzverwaltung_nonce'], 'save_einsatz_details')
         ) {
-            return;
-        }
-
-        // Schreibrechte prüfen
-        if (!current_user_can('edit_einsatzbericht', $postId)) {
             return;
         }
 
@@ -168,6 +168,12 @@ class Data
         }
         if (empty($alarmzeit)) {
             $alarmzeit = date_create($post->post_date);
+        }
+
+        // Solange der Einsatzbericht ein Entwurf ist, soll kein Datum gesetzt werden (vgl. wp_update_post()).
+        if (in_array($post->post_status, array('draft', 'pending', 'auto-draft'))) {
+            // Wird bis zur Veröffentlichung in Postmeta zwischengespeichert.
+            update_post_meta($postId, '_einsatz_timeofalerting', date_format($alarmzeit, 'Y-m-d H:i:s'));
         } else {
             $updateArgs['post_date'] = date_format($alarmzeit, 'Y-m-d H:i:s');
             $updateArgs['post_date_gmt'] = get_gmt_from_date($updateArgs['post_date']);
@@ -277,6 +283,9 @@ class Data
                 $this->utilities->removePostFromCategory($postId, $category);
             }
         }
+        
+        // Zwischenspeicher wird nur in der Entwurfsphase benötigt
+        delete_post_meta($postId, '_einsatz_timeofalerting');
     }
 
     /**

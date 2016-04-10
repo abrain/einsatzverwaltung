@@ -253,7 +253,15 @@ class IncidentReport
             return false;
         }
 
-        $time = $this->post->post_date;
+        // Solange der Einsatzbericht ein Entwurf ist, wird die Alarmzeit in Postmeta vorgehalten
+        if ($this->isDraft()) {
+            $time = $this->getPostMeta('_einsatz_timeofalerting');
+        }
+
+        if (empty($time)) {
+            $time = $this->post->post_date;
+        }
+
         return DateTime::createFromFormat('Y-m-d H:i:s', $time);
     }
 
@@ -367,6 +375,16 @@ class IncidentReport
     public function hasContent()
     {
         return !empty($this->post->post_content);
+    }
+
+    /**
+     * Gibt zurück, ob der Einsatzbericht noch im Entwurfsstadium ist
+     *
+     * @return bool
+     */
+    private function isDraft()
+    {
+        return in_array($this->post->post_status, array('draft', 'pending', 'auto-draft'));
     }
 
     /**

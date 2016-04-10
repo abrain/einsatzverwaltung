@@ -319,6 +319,12 @@ class Frontend
             } else {
                 $postTypes = array('post');
             }
+            
+            // Einsatzberichte nur zusammen mit Beiträgen abfragen
+            if (!in_array('post', $postTypes)) {
+                return;
+            }
+
             $postTypes[] = 'einsatz';
             $query->set('post_type', $postTypes);
 

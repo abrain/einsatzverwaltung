@@ -22,6 +22,7 @@ env:
   - WP_VERSION=4.2.7 WP_MULTISITE=0
   - WP_VERSION=4.3.3 WP_MULTISITE=0
   - WP_VERSION=4.4.2 WP_MULTISITE=0
+  - WP_VERSION=nightly WP_MULTISITE=0
 
 matrix:
   exclude:
@@ -43,6 +44,7 @@ matrix:
       env: WP_VERSION=4.2.7 WP_MULTISITE=0
   allow_failures:
     - php: hhvm
+    - env: WP_VERSION=nightly WP_MULTISITE=0
   fast_finish: true
 
 before_script:

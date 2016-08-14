@@ -35,6 +35,7 @@ class Admin
     private function addHooks()
     {
         add_action('add_meta_boxes_einsatz', array($this, 'addMetaBoxes'));
+        add_action('admin_menu', array($this, 'removeMetaBoxes'));
         add_action('admin_enqueue_scripts', array($this, 'enqueueEditScripts'));
         add_filter('manage_edit-einsatz_columns', array($this, 'filterColumnsEinsatz'));
         add_action('manage_einsatz_posts_custom_column', array($this, 'filterColumnContentEinsatz'), 10, 2);
@@ -64,6 +65,15 @@ class Admin
             'einsatz',
             'side'
         );
+    }
+
+    /**
+     * Entfernt unerwünschte Metaboxen
+     */
+    public function removeMetaBoxes()
+    {
+        // Kategorieauswahl beim Bearbeiten von Einsatzberichten
+        remove_meta_box('categorydiv', 'einsatz', 'side');
     }
 
     /**

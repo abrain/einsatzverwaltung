@@ -91,7 +91,7 @@ class Core
             'edit_published_posts' => 'edit_published_einsatzberichte'
         ),
         'menu_position' => 5,
-        'taxonomies' => array('post_tag'),
+        'taxonomies' => array('post_tag', 'category'),
         'delete_with_user' => false,
     );
 

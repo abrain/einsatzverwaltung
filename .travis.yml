@@ -2,7 +2,7 @@ language: php
 
 notifications:
   email:
-    on_success: change
+    on_success: never
     on_failure: always
 
 php:
@@ -14,34 +14,35 @@ php:
   - hhvm
 
 env:
-  - WP_VERSION=3.7.13 WP_MULTISITE=0
-  - WP_VERSION=3.8.13 WP_MULTISITE=0
-  - WP_VERSION=3.9.11 WP_MULTISITE=0
-  - WP_VERSION=4.0.10 WP_MULTISITE=0
-  - WP_VERSION=4.1.10 WP_MULTISITE=0
-  - WP_VERSION=4.2.7 WP_MULTISITE=0
-  - WP_VERSION=4.3.3 WP_MULTISITE=0
-  - WP_VERSION=4.4.2 WP_MULTISITE=0
+  - WP_VERSION=3.7.15 WP_MULTISITE=0
+  - WP_VERSION=3.8.15 WP_MULTISITE=0
+  - WP_VERSION=3.9.13 WP_MULTISITE=0
+  - WP_VERSION=4.0.12 WP_MULTISITE=0
+  - WP_VERSION=4.1.12 WP_MULTISITE=0
+  - WP_VERSION=4.2.9 WP_MULTISITE=0
+  - WP_VERSION=4.3.5 WP_MULTISITE=0
+  - WP_VERSION=4.4.4 WP_MULTISITE=0
+  - WP_VERSION=4.5.3 WP_MULTISITE=0
   - WP_VERSION=nightly WP_MULTISITE=0
 
 matrix:
   exclude:
     - php: '5.5'
-      env: WP_VERSION=3.7.13 WP_MULTISITE=0
+      env: WP_VERSION=3.7.15 WP_MULTISITE=0
     - php: '5.6'
-      env: WP_VERSION=3.7.13 WP_MULTISITE=0
+      env: WP_VERSION=3.7.15 WP_MULTISITE=0
     - php: '7.0'
-      env: WP_VERSION=3.7.13 WP_MULTISITE=0
+      env: WP_VERSION=3.7.15 WP_MULTISITE=0
     - php: '7.0'
-      env: WP_VERSION=3.8.13 WP_MULTISITE=0
+      env: WP_VERSION=3.8.15 WP_MULTISITE=0
     - php: '7.0'
-      env: WP_VERSION=3.9.11 WP_MULTISITE=0
+      env: WP_VERSION=3.9.13 WP_MULTISITE=0
     - php: '7.0'
-      env: WP_VERSION=4.0.10 WP_MULTISITE=0
+      env: WP_VERSION=4.0.12 WP_MULTISITE=0
     - php: '7.0'
-      env: WP_VERSION=4.1.10 WP_MULTISITE=0
+      env: WP_VERSION=4.1.12 WP_MULTISITE=0
     - php: '7.0'
-      env: WP_VERSION=4.2.7 WP_MULTISITE=0
+      env: WP_VERSION=4.2.9 WP_MULTISITE=0
   allow_failures:
     - php: hhvm
     - env: WP_VERSION=nightly WP_MULTISITE=0

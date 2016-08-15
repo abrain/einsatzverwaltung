@@ -273,6 +273,7 @@ class Admin
     {
         unset($columns['author']);
         unset($columns['date']);
+        unset($columns['categories']);
         $columns['title'] = __('Einsatzbericht', 'einsatzverwaltung');
         $columns['e_nummer'] = __('Nummer', 'einsatzverwaltung');
         $columns['e_alarmzeit'] = __('Alarmzeit', 'einsatzverwaltung');

@@ -41,7 +41,7 @@ class Taxonomies
         add_action('manage_exteinsatzmittel_custom_column', array($this, 'columnContentExteinsatzmittel'), 10, 3);
         add_action('edited_term', array($this, 'saveTerm'), 10, 3);
         add_action('created_term', array($this, 'saveTerm'), 10, 3);
-        add_action('delete_term', array($this, 'deleteTerm'), 10, 4);
+        add_action('delete_term', array($this, 'deleteTerm'), 10, 3);
         add_action('split_shared_term', array($this, 'splitSharedTerms'), 10, 4);
     }
 
@@ -64,11 +64,11 @@ class Taxonomies
      */
     public function addFieldsExteinsatzmittelEdit($tag)
     {
-        $exteinsatzmittel_url = self::getTermField($tag->term_id, 'exteinsatzmittel', 'url', '');
+        $exteinsatzmittelUrl = self::getTermField($tag->term_id, 'exteinsatzmittel', 'url', '');
 
         echo '<tr class="form-field">';
         echo '<th scope="row"><label for="url">URL</label></th>';
-        echo '<td><input name="url" id="url" type="text" value="'.esc_attr($exteinsatzmittel_url).'" size="40" />';
+        echo '<td><input name="url" id="url" type="text" value="'.esc_attr($exteinsatzmittelUrl).'" size="40" />';
         echo '<p class="description">URL zu mehr Informationen &uuml;ber ein externes Einsatzmittel, beispielsweise dessen Webseite.</p></td>';
         echo '</tr>';
     }
@@ -99,12 +99,12 @@ class Taxonomies
      */
     public function addFieldsFahrzeugEdit($tag)
     {
-        $fahrzeug_pid = self::getTermField($tag->term_id, 'fahrzeug', 'fahrzeugpid', '');
+        $fahrzeugPid = self::getTermField($tag->term_id, 'fahrzeug', 'fahrzeugpid', '');
 
         echo '<tr class="form-field">';
         echo '<th scope="row"><label for="fahrzeugpid">Fahrzeugseite</label></th><td>';
         $this->utilities->dropdownPosts(array(
-            'selected' => $fahrzeug_pid,
+            'selected' => $fahrzeugPid,
             'name' => 'fahrzeugpid',
             'post_type' => $this->getFahrzeugPostTypes()
         ));
@@ -126,20 +126,23 @@ class Taxonomies
      */
     public function customColumnsFahrzeug($columns)
     {
-        // Fahrzeugseite nach der Spalte 'Beschreibung' einblenden, ansonsten am Ende
         $filteredColumns = array();
-        if (array_key_exists('description', $columns)) {
-            foreach ($columns as $slug => $name) {
-                $filteredColumns[$slug] = $name;
-                if ($slug == 'description') {
-                    $filteredColumns['fahrzeugpage'] = 'Fahrzeugseite';
-                    $filteredColumns['vehicleorder'] = 'Reihenfolge';
-                }
-            }
-        } else {
+
+        // Fahrzeugseite nach der Spalte 'Beschreibung' einblenden, ansonsten am Ende
+        if (!array_key_exists('description', $columns)) {
             $filteredColumns['fahrzeugpage'] = 'Fahrzeugseite';
             $filteredColumns['vehicleorder'] = 'Reihenfolge';
+            return $filteredColumns;
         }
+
+        foreach ($columns as $slug => $name) {
+            $filteredColumns[$slug] = $name;
+            if ($slug == 'description') {
+                $filteredColumns['fahrzeugpage'] = 'Fahrzeugseite';
+                $filteredColumns['vehicleorder'] = 'Reihenfolge';
+            }
+        }
+
         return $filteredColumns;
     }
 
@@ -159,16 +162,16 @@ class Taxonomies
                 $fahrzeugpid = self::getTermField($termId, 'fahrzeug', 'fahrzeugpid');
                 if (false === $fahrzeugpid) {
                     return '&nbsp;';
-                } else {
-                    $url = get_permalink($fahrzeugpid);
-                    $title = get_the_title($fahrzeugpid);
-                    return sprintf(
-                        '<a href="%1$s" title="&quot;%2$s&quot; ansehen" target="_blank">%3$s</a>',
-                        esc_attr($url),
-                        esc_attr($title),
-                        esc_html($title)
-                    );
                 }
+
+                $url = get_permalink($fahrzeugpid);
+                $title = get_the_title($fahrzeugpid);
+                return sprintf(
+                    '<a href="%1$s" title="&quot;%2$s&quot; ansehen" target="_blank">%3$s</a>',
+                    esc_attr($url),
+                    esc_attr($title),
+                    esc_html($title)
+                );
                 break;
             case 'vehicleorder':
                 $vehicleOrder = self::getTermField($termId, 'fahrzeug', 'vehicleorder');
@@ -190,16 +193,18 @@ class Taxonomies
     {
         // URL nach der Spalte 'Beschreibung' einblenden, ansonsten am Ende
         $filteredColumns = array();
-        if (array_key_exists('description', $columns)) {
-            foreach ($columns as $slug => $name) {
-                $filteredColumns[$slug] = $name;
-                if ($slug == 'description') {
-                    $filteredColumns['exturl'] = 'URL';
-                }
-            }
-        } else {
+        if (!array_key_exists('description', $columns)) {
             $filteredColumns['exturl'] = 'URL';
+            return $filteredColumns;
         }
+
+        foreach ($columns as $slug => $name) {
+            $filteredColumns[$slug] = $name;
+            if ($slug == 'description') {
+                $filteredColumns['exturl'] = 'URL';
+            }
+        }
+
         return $filteredColumns;
     }
 
@@ -217,13 +222,13 @@ class Taxonomies
         $url = self::getTermField($termId, 'exteinsatzmittel', 'url');
         if (false === $url) {
             return '&nbsp;';
-        } else {
-            return sprintf(
-                '<a href="%1$s" title="%1$s besuchen" target="_blank">%2$s</a>',
-                esc_attr($url),
-                esc_html($url)
-            );
         }
+
+        return sprintf(
+            '<a href="%1$s" title="%1$s besuchen" target="_blank">%2$s</a>',
+            esc_attr($url),
+            esc_html($url)
+        );
     }
 
     /**
@@ -235,21 +240,23 @@ class Taxonomies
      */
     public function saveTerm($termId, $ttId, $taxonomy)
     {
-        $evw_taxonomies = $this->getTaxonomies();
+        $evwTaxonomies = $this->getTaxonomies();
 
-        if (!array_key_exists($taxonomy, $evw_taxonomies) || !is_array($evw_taxonomies[$taxonomy])) {
+        if (!array_key_exists($taxonomy, $evwTaxonomies) || !is_array($evwTaxonomies[$taxonomy])) {
             return;
         }
 
-        foreach ($evw_taxonomies[$taxonomy] as $field) {
+        foreach ($evwTaxonomies[$taxonomy] as $field) {
             if (isset($field) && !empty($field) && isset($_POST[$field])) {
                 $value = $_POST[$field]; //FIXME sanitize
                 $key = self::getTermOptionKey($termId, $taxonomy, $field);
+
                 if (empty($value)) {
                     delete_option($key);
-                } else {
-                    update_option($key, $value);
+                    continue;
                 }
+
+                update_option($key, $value);
             }
         }
     }
@@ -260,21 +267,20 @@ class Taxonomies
      * @param int $termId Term ID
      * @param int $ttId Term taxonomy ID
      * @param string $taxonomy Taxonomy slug
-     * @param mixed $deletedTerm Kopie des bereits gelöschten Terms
      */
-    public function deleteTerm($termId, $ttId, $taxonomy, $deletedTerm)
+    public function deleteTerm($termId, $ttId, $taxonomy)
     {
         if (!isset($taxonomy)) {
             return;
         }
 
-        $evw_taxonomies = $this->getTaxonomies();
+        $evwTaxonomies = $this->getTaxonomies();
 
-        if (!array_key_exists($taxonomy, $evw_taxonomies) || !is_array($evw_taxonomies[$taxonomy])) {
+        if (!array_key_exists($taxonomy, $evwTaxonomies) || !is_array($evwTaxonomies[$taxonomy])) {
             return;
         }
 
-        foreach ($evw_taxonomies[$taxonomy] as $field) {
+        foreach ($evwTaxonomies[$taxonomy] as $field) {
             if (isset($field) && !empty($field)) {
                 delete_option(self::getTermOptionKey($termId, $taxonomy, $field));
             }

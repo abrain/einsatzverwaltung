@@ -31,7 +31,7 @@ use WP_User;
  */
 class Core
 {
-    const VERSION = '1.2.2';
+    const VERSION = '1.2.3';
     const DB_VERSION = 10;
 
     public $pluginFile;
@@ -91,7 +91,7 @@ class Core
             'edit_published_posts' => 'edit_published_einsatzberichte'
         ),
         'menu_position' => 5,
-        'taxonomies' => array('post_tag'),
+        'taxonomies' => array('post_tag', 'category'),
         'delete_with_user' => false,
     );
 

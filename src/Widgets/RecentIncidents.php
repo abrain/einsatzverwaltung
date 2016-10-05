@@ -34,7 +34,7 @@ class RecentIncidents extends WP_Widget
             'einsatzverwaltung_widget', // Base ID
             'Letzte Eins&auml;tze', // Name
             array(
-                'description' => __('Zeigt die neuesten Eins&auml;tze an.', 'einsatzverwaltung'),
+                'description' => 'Zeigt die neuesten Eins&auml;tze an.',
                 'customize_selective_refresh' => true,
             ) // Args
         );
@@ -182,7 +182,7 @@ class RecentIncidents extends WP_Widget
      */
     public function form($instance)
     {
-        $title = self::$utilities->getArrayValueIfKey($instance, 'title', __('Letzte Eins&auml;tze', 'einsatzverwaltung'));
+        $title = self::$utilities->getArrayValueIfKey($instance, 'title', 'Letzte Eins&auml;tze');
         $anzahl = self::$utilities->getArrayValueIfKey($instance, 'anzahl', 3);
         $zeigeDatum = self::$utilities->getArrayValueIfKey($instance, 'zeigeDatum', false);
         $zeigeZeit = self::$utilities->getArrayValueIfKey($instance, 'zeigeZeit', false);
@@ -191,30 +191,30 @@ class RecentIncidents extends WP_Widget
         $zeigeArt = self::$utilities->getArrayValueIfKey($instance, 'zeigeArt', false);
         $zeigeArtHierarchie = self::$utilities->getArrayValueIfKey($instance, 'zeigeArtHierarchie', false);
 
-        echo '<p><label for="'.$this->get_field_id('title').'">' . __('Titel:', 'einsatzverwaltung') . '</label>';
+        echo '<p><label for="'.$this->get_field_id('title').'">' . 'Titel:' . '</label>';
         echo '<input class="widefat" id="' . $this->get_field_id('title') . '" name="' . $this->get_field_name('title') . '" type="text" value="' . esc_attr($title).'" /></p>';
 
-        echo '<p><label for="'.$this->get_field_id('anzahl').'">' . __('Anzahl der Einsatzberichte, die angezeigt werden:', 'einsatzverwaltung') . '</label>&nbsp;';
+        echo '<p><label for="'.$this->get_field_id('anzahl').'">' . 'Anzahl der Einsatzberichte, die angezeigt werden:' . '</label>&nbsp;';
         echo '<input id="'.$this->get_field_id('anzahl').'" name="'.$this->get_field_name('anzahl').'" type="text" value="'.$anzahl.'" size="3" /></p>';
 
         echo '<p><input id="'.$this->get_field_id('zeigeFeedlink').'" name="'.$this->get_field_name('zeigeFeedlink').'" type="checkbox" '.($zeigeFeedlink ? 'checked="checked" ' : '').'/>';
-        echo '&nbsp;<label for="'.$this->get_field_id('zeigeFeedlink').'">' . __('Link zum Feed anzeigen', 'einsatzverwaltung') . '</label></p>';
+        echo '&nbsp;<label for="'.$this->get_field_id('zeigeFeedlink').'">' . 'Link zum Feed anzeigen' . '</label></p>';
 
         echo '<p><strong>Einsatzdaten:</strong></p>';
 
         echo '<p><input id="'.$this->get_field_id('zeigeDatum').'" name="'.$this->get_field_name('zeigeDatum').'" type="checkbox" '.($zeigeDatum ? 'checked="checked" ' : '').'/>';
-        echo '&nbsp;<label for="'.$this->get_field_id('zeigeDatum').'">' . __('Datum anzeigen', 'einsatzverwaltung') . '</label></p>';
+        echo '&nbsp;<label for="'.$this->get_field_id('zeigeDatum').'">' . 'Datum anzeigen' . '</label></p>';
 
         echo '<p style="text-indent:1em;"><input id="'.$this->get_field_id('zeigeZeit').'" name="'.$this->get_field_name('zeigeZeit').'" type="checkbox" '.($zeigeZeit ? 'checked="checked" ' : '').'/>';
-        echo '&nbsp;<label for="'.$this->get_field_id('zeigeZeit').'">' . __('Zeit anzeigen (nur in Kombination mit Datum)', 'einsatzverwaltung') . '</label></p>';
+        echo '&nbsp;<label for="'.$this->get_field_id('zeigeZeit').'">' . 'Zeit anzeigen (nur in Kombination mit Datum)' . '</label></p>';
 
         echo '<p><input id="'.$this->get_field_id('zeigeArt').'" name="'.$this->get_field_name('zeigeArt').'" type="checkbox" '.($zeigeArt ? 'checked="checked" ' : '').'/>';
-        echo '&nbsp;<label for="'.$this->get_field_id('zeigeArt').'">' . __('Einsatzart anzeigen', 'einsatzverwaltung') . '</label></p>';
+        echo '&nbsp;<label for="'.$this->get_field_id('zeigeArt').'">' . 'Einsatzart anzeigen' . '</label></p>';
 
         echo '<p style="text-indent:1em;"><input id="'.$this->get_field_id('zeigeArtHierarchie').'" name="'.$this->get_field_name('zeigeArtHierarchie').'" type="checkbox" '.($zeigeArtHierarchie ? 'checked="checked" ' : '').'/>';
-        echo '&nbsp;<label for="'.$this->get_field_id('zeigeArtHierarchie').'">' . __('Hierarchie der Einsatzart anzeigen', 'einsatzverwaltung') . '</label></p>';
+        echo '&nbsp;<label for="'.$this->get_field_id('zeigeArtHierarchie').'">' . 'Hierarchie der Einsatzart anzeigen' . '</label></p>';
 
         echo '<p><input id="'.$this->get_field_id('zeigeOrt').'" name="'.$this->get_field_name('zeigeOrt').'" type="checkbox" '.($zeigeOrt ? 'checked="checked" ' : '').'/>';
-        echo '&nbsp;<label for="'.$this->get_field_id('zeigeOrt').'">' . __('Ort anzeigen', 'einsatzverwaltung') . '</label></p>';
+        echo '&nbsp;<label for="'.$this->get_field_id('zeigeOrt').'">' . 'Ort anzeigen' . '</label></p>';
     }
 }

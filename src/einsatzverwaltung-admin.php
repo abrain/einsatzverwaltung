@@ -136,14 +136,14 @@ class Admin
         $report = new IncidentReport($post);
 
         $this->echoInputCheckbox(
-            __("Fehlalarm", 'einsatzverwaltung'),
+            'Fehlalarm',
             'einsatzverwaltung_fehlalarm',
             $report->isFalseAlarm()
         );
         echo '<br>';
 
         $this->echoInputCheckbox(
-            __("Besonderer Einsatz", 'einsatzverwaltung'),
+            'Besonderer Einsatz',
             'einsatzverwaltung_special',
             $report->isSpecial()
         );
@@ -173,7 +173,7 @@ class Admin
         echo '<table><tbody>';
 
         $this->echoInputText(
-            __("Einsatznummer", 'einsatzverwaltung'),
+            'Einsatznummer',
             'einsatzverwaltung_nummer',
             esc_attr($nummer),
             $this->core->getNextEinsatznummer(date('Y')),
@@ -181,14 +181,14 @@ class Admin
         );
 
         $this->echoInputText(
-            __("Alarmzeit", 'einsatzverwaltung'),
+            'Alarmzeit',
             'einsatzverwaltung_alarmzeit',
             esc_attr($alarmzeit->format('Y-m-d H:i')),
             'JJJJ-MM-TT hh:mm'
         );
 
         $this->echoInputText(
-            __("Einsatzende", 'einsatzverwaltung'),
+            'Einsatzende',
             'einsatzverwaltung_einsatzende',
             esc_attr($einsatzende),
             'JJJJ-MM-TT hh:mm'
@@ -197,19 +197,19 @@ class Admin
         echo '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';
 
         $this->echoInputText(
-            __("Einsatzort", 'einsatzverwaltung'),
+            'Einsatzort',
             'einsatzverwaltung_einsatzort',
             esc_attr($einsatzort)
         );
 
         $this->echoInputText(
-            __("Einsatzleiter", 'einsatzverwaltung'),
+            'Einsatzleiter',
             'einsatzverwaltung_einsatzleiter',
             esc_attr($einsatzleiter)
         );
 
         $this->echoInputText(
-            __("Mannschaftsst&auml;rke", 'einsatzverwaltung'),
+            'Mannschaftsst&auml;rke',
             'einsatzverwaltung_mannschaft',
             esc_attr($mannschaftsstaerke)
         );
@@ -274,12 +274,12 @@ class Admin
         unset($columns['author']);
         unset($columns['date']);
         unset($columns['categories']);
-        $columns['title'] = __('Einsatzbericht', 'einsatzverwaltung');
-        $columns['e_nummer'] = __('Nummer', 'einsatzverwaltung');
-        $columns['e_alarmzeit'] = __('Alarmzeit', 'einsatzverwaltung');
-        $columns['e_einsatzende'] = __('Einsatzende', 'einsatzverwaltung');
-        $columns['e_art'] = __('Art', 'einsatzverwaltung');
-        $columns['e_fzg'] = __('Fahrzeuge', 'einsatzverwaltung');
+        $columns['title'] = 'Einsatzbericht';
+        $columns['e_nummer'] = 'Nummer';
+        $columns['e_alarmzeit'] = 'Alarmzeit';
+        $columns['e_einsatzende'] = 'Einsatzende';
+        $columns['e_art'] = 'Art';
+        $columns['e_fzg'] = 'Fahrzeuge';
 
         return $columns;
     }

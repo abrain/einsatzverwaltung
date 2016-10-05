@@ -435,7 +435,7 @@ class Settings
         echo '<p class="description">L&auml;sst die Einsatzberichte z.B. auf der Startseite, im Widget &quot;Letzte Beitr&auml;ge&quot; oder auch im Beitragsfeed erscheinen</p>';
 
         echo '<p><label for="einsatzvw_category">';
-        _e('Davon unabh&auml;ngig Einsatzberichte immer in folgender Kategorie anzeigen:', 'einsatzverwaltung');
+        echo 'Davon unabh&auml;ngig Einsatzberichte immer in folgender Kategorie anzeigen:';
         echo '&nbsp;</label>';
         wp_dropdown_categories(array(
             'show_option_none' => '- keine -',

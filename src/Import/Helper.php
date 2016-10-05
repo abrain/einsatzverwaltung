@@ -70,7 +70,7 @@ class Helper
         });
         $string = '<select name="' . $parsedArgs['name'] . '">';
         $string .= '<option value="-"' . ($parsedArgs['selected'] == '-' ? ' selected="selected"' : '') . '>';
-        $string .= __('nicht importieren', 'einsatzverwaltung') . '</option>';
+        $string .= 'nicht importieren' . '</option>';
         foreach ($fields as $slug => $fieldProperties) {
             $string .= '<option value="' . $slug . '"' . ($parsedArgs['selected'] == $slug ? ' selected="selected"' : '') . '>';
             $string .= $fieldProperties['label'] . '</option>';
@@ -268,7 +268,7 @@ class Helper
             'next_action' => null,
             'nonce_action' => '',
             'action_value' => '',
-            'submit_button_text' => __('Import starten', 'einsatzverwaltung')
+            'submit_button_text' => 'Import starten'
         );
 
         $parsedArgs = wp_parse_args($args, $defaults);
@@ -278,12 +278,12 @@ class Helper
         wp_nonce_field($parsedArgs['nonce_action']);
         echo '<input type="hidden" name="aktion" value="' . $parsedArgs['action_value'] . '" />';
         echo '<table class="evw_match_fields"><tr><th>';
-        printf(__('Feld in %s', 'einsatzverwaltung'), $source->getName());
-        echo '</th><th>' . __('Feld in Einsatzverwaltung', 'einsatzverwaltung') . '</th></tr><tbody>';
+        printf('Feld in %s', $source->getName());
+        echo '</th><th>' . 'Feld in Einsatzverwaltung' . '</th></tr><tbody>';
         foreach ($fields as $field) {
             echo '<tr><td><strong>' . $field . '</strong></td><td>';
             if (array_key_exists($field, $source->getAutoMatchFields())) {
-                _e('wird automatisch zugeordnet', 'einsatzverwaltung');
+                echo 'wird automatisch zugeordnet';
             } elseif (in_array($field, $source->getProblematicFields())) {
                 $this->utilities->printWarning(sprintf('Probleme mit Feld %s, siehe Analyse', $field));
             } else {

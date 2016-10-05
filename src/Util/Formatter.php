@@ -121,15 +121,15 @@ class Formatter
     public function getTags()
     {
         return array(
-            '%title%' => __('Titel des Einsatzberichts', 'einsatzverwaltung'),
-            '%date%' => __('Datum der Alarmierung', 'einsatzverwaltung'),
-            '%time%' => __('Zeitpunkt der Alarmierung', 'einsatzverwaltung'),
-            '%duration%' => __('Dauer des Einsatzes', 'einsatzverwaltung'),
-            '%incidentType%' => __('Art des Einsatzes', 'einsatzverwaltung'),
-            '%url%' => __('URL zum Einsatzbericht', 'einsatzverwaltung'),
-            '%location%' => __('Ort des Einsatzes', 'einsatzverwaltung'),
-            '%feedUrl%' => __('URL zum Feed', 'einsatzverwaltung'),
-            '%number%' => __('Einsatznummer', 'einsatzverwaltung'),
+            '%title%' => 'Titel des Einsatzberichts',
+            '%date%' => 'Datum der Alarmierung',
+            '%time%' => 'Zeitpunkt der Alarmierung',
+            '%duration%' => 'Dauer des Einsatzes',
+            '%incidentType%' => 'Art des Einsatzes',
+            '%url%' => 'URL zum Einsatzbericht',
+            '%location%' => 'Ort des Einsatzes',
+            '%feedUrl%' => 'URL zum Feed',
+            '%number%' => 'Einsatznummer',
             '%seqNum%' => 'Laufende Nummer',
         );
     }

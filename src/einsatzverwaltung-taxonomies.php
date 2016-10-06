@@ -265,8 +265,8 @@ class Taxonomies
      */
     public static function getTermField($termId, $taxonomy, $field, $default = false)
     {
-        $term_meta = get_term_meta($termId, $field, true);
-        return (false === $term_meta ? $default : $term_meta);
+        $termMeta = get_term_meta($termId, $field, true);
+        return (false === $termMeta ? $default : $termMeta);
     }
 
     /**

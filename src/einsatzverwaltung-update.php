@@ -268,8 +268,8 @@ class Update
                     $termId = $termIdAfterSplit;
                 }
 
-                $add_term_meta = add_term_meta($termId, $metakey, $metavalue, true);
-                if (!is_wp_error($add_term_meta) && false !== $add_term_meta) {
+                $addTermMeta = add_term_meta($termId, $metakey, $metavalue, true);
+                if (!is_wp_error($addTermMeta) && false !== $addTermMeta) {
                     delete_option($key);
                 }
             }

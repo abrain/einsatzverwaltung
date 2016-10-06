@@ -1,6 +1,7 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
+use WP_Term;
 use wpdb;
 
 /**
@@ -238,5 +239,40 @@ class Update
             add_option('einsatzvw_loop_only_special', $option);
         }
         delete_option('einsatzvw_category_only_special');
+    }
+
+    private function updateTo11()
+    {
+        /** @var wpdb $wpdb */
+        global $wpdb;
+
+        $taxonomies = array(
+            'exteinsatzmittel' => array('url'),
+            'fahrzeug' => array('fahrzeugpid', 'vehicleorder')
+        );
+
+        foreach ($taxonomies as $taxonomy => $metakeys) {
+            $rows = $wpdb->get_results("SELECT option_name, option_value FROM $wpdb->options WHERE option_name LIKE 'evw_tax_{$taxonomy}_%'");
+
+            foreach ($rows as $row) {
+                $key = $row->option_name;
+                preg_match('/evw_tax_' . $taxonomy . '_(\d+)_([a-z]+)/', $key, $matches);
+                $termId = $matches[1];
+                $metakey = $matches[2];
+                $metavalue = $row->option_value;
+
+                // Prüfen, ob ein Term-Split stattfand, der noch nicht behandelt wurde
+                $termIdAfterSplit = wp_get_split_term($termId, $taxonomy);
+                if (false !== $termIdAfterSplit) {
+                    error_log("Unbehandelter Term-Split: $termId => $termIdAfterSplit");
+                    $termId = $termIdAfterSplit;
+                }
+
+                $add_term_meta = add_term_meta($termId, $metakey, $metavalue, true);
+                if (!is_wp_error($add_term_meta) && false !== $add_term_meta) {
+                    delete_option($key);
+                }
+            }
+        }
     }
 }

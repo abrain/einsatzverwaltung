@@ -3,8 +3,8 @@ Contributors: abrain
 Donate link: https://einsatzverwaltung.abrain.de/unterstuetzen/
 Tags: Feuerwehr, Einsatz, Rettung, Rettungsdienst, THW, HiOrg, Wasserwacht, Bergrettung
 Requires at least: 3.7.0
-Tested up to: 4.5
-Stable tag: 1.2.2
+Tested up to: 4.6
+Stable tag: 1.2.3
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -69,6 +69,15 @@ Das Du halte ich f&uuml;r die angenehmere Arbeitsgrundlage, aber man darf mich g
 Nein, mehr gibt es [hier](https://einsatzverwaltung.abrain.de/faq/).
 
 == Changelog ==
+
+= 1.2.3 =
+Verbesserungen:
+
+* Kompatibilit&auml;t von Einsatzberichten und Kategorien verbessert
+
+Sonstiges:
+
+* Getestet mit WordPress 4.6
 
 = 1.2.2 =
 Verbesserungen:

@@ -31,20 +31,20 @@ class Csv extends AbstractSource
         $this->actionOrder = array(
             array(
                 'slug' => 'selectcsvfile',
-                'name' => __('Dateiauswahl', 'einsatzverwaltung'),
-                'button_text' => __('Datei ausw&auml;hlen', 'einsatzverwaltung'),
+                'name' => 'Dateiauswahl',
+                'button_text' => 'Datei ausw&auml;hlen',
                 'args' => array()
             ),
             array(
                 'slug' => 'analysis',
-                'name' => __('Analyse', 'einsatzverwaltung'),
-                'button_text' => __('Datei analysieren', 'einsatzverwaltung'),
+                'name' => 'Analyse',
+                'button_text' => 'Datei analysieren',
                 'args' => array('csv_file_id', 'has_headlines', 'delimiter')
             ),
             array(
                 'slug' => 'import',
-                'name' => __('Import', 'einsatzverwaltung'),
-                'button_text' => __('Import starten', 'einsatzverwaltung'),
+                'name' => 'Import',
+                'button_text' => 'Import starten',
                 'args' => array('csv_file_id', 'has_headlines', 'delimiter')
             )
         );

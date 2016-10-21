@@ -72,8 +72,8 @@ class Tool
     public function addToolToMenu()
     {
         add_management_page(
-            __('Einsatzberichte importieren', 'einsatzverwaltung'),
-            __('Einsatzberichte importieren', 'einsatzverwaltung'),
+            'Einsatzberichte importieren',
+            'Einsatzberichte importieren',
             'manage_options',
             self::EVW_TOOL_IMPORT_SLUG,
             array($this, 'renderToolPage')
@@ -120,7 +120,7 @@ class Tool
         $this->helper = new Helper($this->utilities, $this->core);
 
         echo '<div class="wrap">';
-        echo '<h1>' . __('Einsatzberichte importieren', 'einsatzverwaltung') . '</h1>';
+        echo '<h1>' . 'Einsatzberichte importieren' . '</h1>';
 
         $aktion = null;
         if (array_key_exists('aktion', $_POST)) {

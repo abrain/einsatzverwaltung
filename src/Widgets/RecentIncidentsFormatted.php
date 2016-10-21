@@ -119,8 +119,8 @@ class RecentIncidentsFormatted extends WP_Widget
             'recent-incidents-formatted',
             'Letzte Eins&auml;tze (eigenes Format)',
             array(
-                'description' => __('Zeigt die neuesten Eins&auml;tze an.', 'einsatzverwaltung') . ' ' .
-                    __('Das Aussehen kann vollst&auml;ndig mit eigenem HTML bestimmt werden.', 'einsatzverwaltung'),
+                'description' => 'Zeigt die neuesten Eins&auml;tze an.' . ' ' .
+                    'Das Aussehen kann vollst&auml;ndig mit eigenem HTML bestimmt werden.',
                 'customize_selective_refresh' => true,
             )
         );
@@ -147,7 +147,7 @@ class RecentIncidentsFormatted extends WP_Widget
         $settings = wp_parse_args($instance, $this->defaults);
 
         if (empty($settings['title'])) {
-            $settings['title'] = __('Letzte Eins&auml;tze', 'einsatzverwaltung');
+            $settings['title'] = 'Letzte Eins&auml;tze';
         }
 
         if (empty($settings['numIncidents'])) {
@@ -209,7 +209,7 @@ class RecentIncidentsFormatted extends WP_Widget
         printf(
             '<label for="%1$s">%2$s</label><input class="widefat" id="%1$s" name="%3$s" type="text" value="%4$s" />',
             $this->get_field_id('title'),
-            __('Titel:', 'einsatzverwaltung'),
+            'Titel:',
             $this->get_field_name('title'),
             esc_attr(self::$utilities->getArrayValueIfKey($instance, 'title', ''))
         );
@@ -220,7 +220,7 @@ class RecentIncidentsFormatted extends WP_Widget
         printf(
             '<label for="%1$s">%2$s</label>&nbsp;<input id="%1$s" name="%3$s" type="text" value="%4$s" size="3" />',
             $this->get_field_id('numIncidents'),
-            __('Anzahl der Einsatzberichte, die angezeigt werden:', 'einsatzverwaltung'),
+            'Anzahl der Einsatzberichte, die angezeigt werden:',
             $this->get_field_name('numIncidents'),
             empty($numIncidents) ? $this->defaults['numIncidents'] : esc_attr($numIncidents)
         );
@@ -230,7 +230,7 @@ class RecentIncidentsFormatted extends WP_Widget
         printf(
             '<label for="%1$s">%2$s</label><textarea class="widefat" id="%1$s" name="%3$s">%4$s</textarea>',
             $this->get_field_id('beforeContent'),
-            __('HTML-Code vor den Einsatzberichten:', 'einsatzverwaltung'),
+            'HTML-Code vor den Einsatzberichten:',
             $this->get_field_name('beforeContent'),
             self::$utilities->getArrayValueIfKey($instance, 'beforeContent', '')
         );
@@ -240,11 +240,11 @@ class RecentIncidentsFormatted extends WP_Widget
         printf(
             '<label for="%1$s">%2$s</label><textarea class="widefat" id="%1$s" name="%3$s">%4$s</textarea>',
             $this->get_field_id('pattern'),
-            __('HTML-Template pro Einsatzbericht:', 'einsatzverwaltung'),
+            'HTML-Template pro Einsatzbericht:',
             $this->get_field_name('pattern'),
             self::$utilities->getArrayValueIfKey($instance, 'pattern', '')
         );
-        echo '</p><p class="description">' . __('Folgende Tags werden ersetzt:', 'einsatzverwaltung');
+        echo '</p><p class="description">' . 'Folgende Tags werden ersetzt:';
         $formatterTags = self::$formatter->getTags();
         foreach ($this->allowedTagsPattern as $tag) {
             echo '<br>' . $tag . ' (' . $formatterTags[$tag] . ')';
@@ -255,11 +255,11 @@ class RecentIncidentsFormatted extends WP_Widget
         printf(
             '<label for="%1$s">%2$s</label><textarea class="widefat" id="%1$s" name="%3$s">%4$s</textarea>',
             $this->get_field_id('afterContent'),
-            __('HTML-Code nach den Einsatzberichten:', 'einsatzverwaltung'),
+            'HTML-Code nach den Einsatzberichten:',
             $this->get_field_name('afterContent'),
             self::$utilities->getArrayValueIfKey($instance, 'afterContent', '')
         );
-        echo '</p><p class="description">' . __('Folgende Tags werden ersetzt:', 'einsatzverwaltung');
+        echo '</p><p class="description">' . 'Folgende Tags werden ersetzt:';
         foreach ($this->allowedTagsAfter as $tag) {
             echo '<br>' . $tag . ' (' . $formatterTags[$tag] . ')';
         }

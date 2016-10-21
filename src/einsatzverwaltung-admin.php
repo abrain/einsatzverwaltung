@@ -35,6 +35,7 @@ class Admin
     private function addHooks()
     {
         add_action('add_meta_boxes_einsatz', array($this, 'addMetaBoxes'));
+        add_action('admin_menu', array($this, 'adjustTaxonomies'));
         add_action('admin_enqueue_scripts', array($this, 'enqueueEditScripts'));
         add_filter('manage_edit-einsatz_columns', array($this, 'filterColumnsEinsatz'));
         add_action('manage_einsatz_posts_custom_column', array($this, 'filterColumnContentEinsatz'), 10, 2);
@@ -63,6 +64,21 @@ class Admin
             array($this, 'displayMetaBoxAnnotations'),
             'einsatz',
             'side'
+        );
+    }
+
+    /**
+     * Nimmt Anpassungen in Bezug auf Taxonomien vor
+     */
+    public function adjustTaxonomies()
+    {
+        // Kategorieauswahl beim Bearbeiten von Einsatzberichten entfernen
+        remove_meta_box('categorydiv', 'einsatz', 'side');
+
+        // Kategorien als Untermenüpunkt von Einsatzberichten verstecken
+        remove_submenu_page(
+            'edit.php?post_type=einsatz',
+            'edit-tags.php?taxonomy=category&amp;post_type=einsatz'
         );
     }
 
@@ -120,14 +136,14 @@ class Admin
         $report = new IncidentReport($post);
 
         $this->echoInputCheckbox(
-            __("Fehlalarm", 'einsatzverwaltung'),
+            'Fehlalarm',
             'einsatzverwaltung_fehlalarm',
             $report->isFalseAlarm()
         );
         echo '<br>';
 
         $this->echoInputCheckbox(
-            __("Besonderer Einsatz", 'einsatzverwaltung'),
+            'Besonderer Einsatz',
             'einsatzverwaltung_special',
             $report->isSpecial()
         );
@@ -157,7 +173,7 @@ class Admin
         echo '<table><tbody>';
 
         $this->echoInputText(
-            __("Einsatznummer", 'einsatzverwaltung'),
+            'Einsatznummer',
             'einsatzverwaltung_nummer',
             esc_attr($nummer),
             $this->core->getNextEinsatznummer(date('Y')),
@@ -165,14 +181,14 @@ class Admin
         );
 
         $this->echoInputText(
-            __("Alarmzeit", 'einsatzverwaltung'),
+            'Alarmzeit',
             'einsatzverwaltung_alarmzeit',
             esc_attr($alarmzeit->format('Y-m-d H:i')),
             'JJJJ-MM-TT hh:mm'
         );
 
         $this->echoInputText(
-            __("Einsatzende", 'einsatzverwaltung'),
+            'Einsatzende',
             'einsatzverwaltung_einsatzende',
             esc_attr($einsatzende),
             'JJJJ-MM-TT hh:mm'
@@ -181,19 +197,19 @@ class Admin
         echo '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';
 
         $this->echoInputText(
-            __("Einsatzort", 'einsatzverwaltung'),
+            'Einsatzort',
             'einsatzverwaltung_einsatzort',
             esc_attr($einsatzort)
         );
 
         $this->echoInputText(
-            __("Einsatzleiter", 'einsatzverwaltung'),
+            'Einsatzleiter',
             'einsatzverwaltung_einsatzleiter',
             esc_attr($einsatzleiter)
         );
 
         $this->echoInputText(
-            __("Mannschaftsst&auml;rke", 'einsatzverwaltung'),
+            'Mannschaftsst&auml;rke',
             'einsatzverwaltung_mannschaft',
             esc_attr($mannschaftsstaerke)
         );
@@ -257,12 +273,13 @@ class Admin
     {
         unset($columns['author']);
         unset($columns['date']);
-        $columns['title'] = __('Einsatzbericht', 'einsatzverwaltung');
-        $columns['e_nummer'] = __('Nummer', 'einsatzverwaltung');
-        $columns['e_alarmzeit'] = __('Alarmzeit', 'einsatzverwaltung');
-        $columns['e_einsatzende'] = __('Einsatzende', 'einsatzverwaltung');
-        $columns['e_art'] = __('Art', 'einsatzverwaltung');
-        $columns['e_fzg'] = __('Fahrzeuge', 'einsatzverwaltung');
+        unset($columns['categories']);
+        $columns['title'] = 'Einsatzbericht';
+        $columns['e_nummer'] = 'Nummer';
+        $columns['e_alarmzeit'] = 'Alarmzeit';
+        $columns['e_einsatzende'] = 'Einsatzende';
+        $columns['e_art'] = 'Art';
+        $columns['e_fzg'] = 'Fahrzeuge';
 
         return $columns;
     }

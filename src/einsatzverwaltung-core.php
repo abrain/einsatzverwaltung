@@ -234,12 +234,12 @@ class Core
      * @var Data
      */
     private $data;
-    
+
     /**
      * @var Options
      */
     private $options;
-    
+
     /**
      * @var Utilities
      */
@@ -261,7 +261,7 @@ class Core
         $this->options = new Options($this->utilities);
         $this->utilities->setDependencies($this->options);
 
-        new Admin($this, $this->utilities);
+        new Admin($this, $this->options, $this->utilities);
         $this->data = new Data($this, $this->utilities, $this->options);
         new Frontend($this, $this->options, $this->utilities);
         new Settings($this, $this->options, $this->utilities, $this->data);
@@ -323,6 +323,7 @@ class Core
     public function onInit()
     {
         $this->registerTypes();
+        $this->registerScripts();
         $this->addRewriteRules();
         if ($this->options->isFlushRewriteRules()) {
             flush_rewrite_rules();
@@ -352,6 +353,21 @@ class Core
         register_taxonomy('fahrzeug', 'einsatz', $this->argsFahrzeug);
         register_taxonomy('exteinsatzmittel', 'einsatz', $this->argsExteinsatzmittel);
         register_taxonomy('alarmierungsart', 'einsatz', $this->argsAlarmierungsart);
+    }
+
+    /**
+     * Registriert externe Scripts
+     */
+    private function registerScripts()
+    {
+        if( $this->options->isGMapActivate() ) {
+            /* Google Maps */
+            $protocal = is_ssl() ? 'https://' : 'http://';
+            $url      = add_query_arg( array(
+                'key'      => $this->options->getGMapAPI(),
+            ), "{$protocal}maps.googleapis.com/maps/api/js");
+            wp_register_script( 'einsatzvw_GoogleMap', $url );
+        }
     }
 
     private function addRewriteRules()

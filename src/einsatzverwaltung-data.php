@@ -201,6 +201,9 @@ class Data
         // Einsatzort validieren
         $einsatzort = sanitize_text_field($_POST['einsatzverwaltung_einsatzort']);
 
+        // Einsatzposition validieren
+        $location = sanitize_text_field($_POST['einsatzverwaltung_location']);
+
         // Einsatzleiter validieren
         $einsatzleiter = sanitize_text_field($_POST['einsatzverwaltung_einsatzleiter']);
 
@@ -214,6 +217,7 @@ class Data
         // Metadaten schreiben
         update_post_meta($postId, 'einsatz_einsatzende', $einsatzende);
         update_post_meta($postId, 'einsatz_einsatzort', $einsatzort);
+        update_post_meta($postId, 'einsatz_location', $location);
         update_post_meta($postId, 'einsatz_einsatzleiter', $einsatzleiter);
         update_post_meta($postId, 'einsatz_mannschaft', $mannschaftsstaerke);
         update_post_meta($postId, 'einsatz_fehlalarm', $fehlalarm);
@@ -283,7 +287,7 @@ class Data
                 $this->utilities->removePostFromCategory($postId, $category);
             }
         }
-        
+
         // Zwischenspeicher wird nur in der Entwurfsphase benötigt
         delete_post_meta($postId, '_einsatz_timeofalerting');
     }

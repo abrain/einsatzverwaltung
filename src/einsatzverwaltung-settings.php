@@ -184,6 +184,19 @@ class Settings
         );
         register_setting(
             'einsatzvw_settings',
+            'einsatzvw_gmap',
+            array($this->utilities, 'sanitizeCheckbox')
+        );
+        register_setting(
+            'einsatzvw_settings',
+            'einsatzvw_gmap_api'
+        );
+        register_setting(
+            'einsatzvw_settings',
+            'einsatzvw_gmap_default_pos'
+        );
+        register_setting(
+            'einsatzvw_settings',
             'einsatzvw_list_zebra',
             array($this->utilities, 'sanitizeCheckbox')
         );
@@ -305,6 +318,13 @@ class Settings
             'einsatzvw_settings_excerpt',
             'Kurzfassung',
             array($this, 'echoSettingsExcerpt'),
+            self::EVW_SETTINGS_SLUG,
+            'einsatzvw_settings_einsatzberichte'
+        );
+        add_settings_field(
+            'einsatzvw_settings_gmap',
+            'Google Maps',
+            array($this, 'echoSettingsGmap'),
             self::EVW_SETTINGS_SLUG,
             'einsatzvw_settings_einsatzberichte'
         );
@@ -527,6 +547,30 @@ class Settings
             $this->options->getExcerptTypeFeed()
         );
         echo '<p class="description">Bitte auch die Einstellung zum Umfang der Eintr&auml;ge im Feed (Einstellungen &gt; Lesen) beachten!<br/>Im Feed werden bei den Einsatzdetails aus technischen Gr&uuml;nden keine Links zu gefilterten Einsatzlisten angezeigt.</p>';
+    }
+
+    /**
+     * Gibt die Einstellmöglichkeiten für den Auszug aus
+     */
+    public function echoSettingsGmap()
+    {
+        $this->echoSettingsCheckbox(
+            'einsatzvw_gmap',
+            'Googel Maps aktivieren',
+            $this->options->isGMapActivate()
+        );
+        echo '<p>Googel Maps JavaScript API-Key:&nbsp;';
+        $this->echoSettingsInput(
+            'einsatzvw_gmap_api',
+            'Wie generiere ich einen <a href="https://developers.google.com/maps/documentation/javascript/get-api-key" target="_blank">API-Key</a>',
+            $this->options->getGMapAPI()
+        );
+        echo '<p>Standartposition der Karte:&nbsp;';
+        $this->echoSettingsInput(
+            'einsatzvw_gmap_default_pos',
+            'Als Lat,Lon: 53.523463,9.482329',
+            $this->options->getGMapDefaultPos()
+        );
     }
 
 

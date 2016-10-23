@@ -15,6 +15,11 @@ class Admin
     private $core;
 
     /**
+     * @var Options
+     */
+    private $options;
+
+    /**
      * @var Utilities
      */
     private $utilities;
@@ -23,11 +28,13 @@ class Admin
      * Constructor
      *
      * @param Core $core
+     * @param Options $options
      * @param Utilities $utilities
      */
-    public function __construct($core, $utilities)
+    public function __construct($core, $options, $utilities)
     {
         $this->core = $core;
+        $this->options = $options;
         $this->utilities = $utilities;
         $this->addHooks();
     }
@@ -124,6 +131,8 @@ class Admin
             array(),
             Core::VERSION
         );
+
+        wp_enqueue_script( 'einsatzvw_GoogleMap' );
     }
 
     /**
@@ -167,10 +176,11 @@ class Admin
         $einsatzort = $report->getLocation();
         $einsatzleiter = $report->getIncidentCommander();
         $mannschaftsstaerke = $report->getWorkforce();
+        $gmapslocation = $report->getGmapsLocation();
 
         $names = Data::getEinsatzleiterNamen();
         echo '<input type="hidden" id="einsatzleiter_used_values" value="' . implode(',', $names) . '" />';
-        echo '<table><tbody>';
+        echo '<table style="width: 100%;"><tbody>';
 
         $this->echoInputText(
             'Einsatznummer',
@@ -201,6 +211,11 @@ class Admin
             'einsatzverwaltung_einsatzort',
             esc_attr($einsatzort)
         );
+
+        if($this->options->isGMapActivate())
+      	{
+            $this->echoGMap($gmapslocation);
+        }
 
         $this->echoInputText(
             'Einsatzleiter',
@@ -234,6 +249,84 @@ class Admin
             echo 'placeholder="'.$placeholder.'" ';
         }
         echo '/></td></tr>';
+    }
+
+    /**
+     * Generiert eine Googlemaps Karte zur bestimmung der Koordinate
+     */
+    private function echoGMap($location)
+    {
+        if($location != "")
+        {
+            $latLon = explode(",",$location);
+        }
+        else
+        {
+            $latLon = array("","");
+        }
+        $DeflatLon = explode(",",$this->options->getGMapDefaultPos());
+
+        echo '<tr><td>';
+        echo '<label for="einsatzverwaltung_location">Koordinate</label>';
+        echo '</td><td style="width: 100%;">';
+        echo '<input type="text" id="einsatzverwaltung_location" name="einsatzverwaltung_location" value="' . $location . '" size="20" readonly/>';
+        echo '<a class="button" id="einsatzverwaltung_get_location"><i class="fa fa-map-marker"></i></a>';
+        echo '</td></tr>';
+        echo '<tr><td colspan="2">';
+        echo '<div id="map-canvas" style="height: 400px;"></div>';
+        echo '</td></tr>';
+        echo '<script>';
+        echo 'function initializeMap() {';
+        echo 'var defLat = "' . $DeflatLon[0] . '";';
+        echo 'var defLon = "' . $DeflatLon[1] . '";';
+        echo 'var latlon = new google.maps.LatLng(defLat, defLon);';
+        echo 'var mapOptions = {';
+        echo 'zoom: 13,';
+        echo 'center: latlon,';
+        echo 'scaleControl: true';
+        echo '};';
+        echo 'map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);';
+        echo 'var lat = "' . $latLon[0] . '";';
+        echo 'var lon = "' . $latLon[1] . '";';
+        echo 'if( lat != "" && lon != "" ) {';
+        echo 'setMarker( new google.maps.LatLng(lat, lon), map );';
+        echo '}';
+        echo 'var geocoder = new google.maps.Geocoder();';
+        echo 'document.getElementById("einsatzverwaltung_get_location").addEventListener("click", function() {';
+        echo 'var address = document.getElementById("einsatzverwaltung_einsatzort").value;';
+        echo 'if( address ) {';
+        echo 'geocodeAddress(geocoder, map, address);';
+        echo '} else {';
+        echo 'alert("Keine Addresse angegebenen: " + status);';
+        echo '}';
+        echo '});';
+        echo '}';
+        echo 'function setMarker( position, resultsMap ) {';
+        echo 'var marker = new google.maps.Marker({';
+        echo 'map: resultsMap,';
+        echo 'position: position,';
+        echo 'draggable: true,';
+        echo 'scaleControl:true';
+        echo '});';
+        echo 'resultsMap.setCenter(marker.getPosition());';
+        echo 'document.getElementById("einsatzverwaltung_location").value=marker.getPosition().toUrlValue();';
+        echo 'marker.addListener("drag", function(){';
+        echo 'document.getElementById("einsatzverwaltung_location").value=marker.getPosition().toUrlValue();';
+        echo '});';
+        echo '}';
+        echo 'function geocodeAddress(geocoder, resultsMap, address) {';
+        echo 'geocoder.geocode({"address": address}, function(results, status) {';
+        echo 'if (status === google.maps.GeocoderStatus.OK) {';
+        echo 'var location = results[0].geometry.location;';
+        echo 'setMarker( location, resultsMap);';
+        echo 'resultsMap.setZoom(16);';
+        echo '} else {';
+        echo 'alert("Konnte Position nicht ermitteln: " + status);';
+        echo '}';
+        echo '});';
+        echo '}';
+        echo 'google.maps.event.addDomListener(window, "load", initializeMap);';
+        echo '</script>';
     }
 
     /**

@@ -123,6 +123,8 @@ class Update
     }
 
     /**
+     * @since 0.9.0
+     *
      * @return bool True bei Erfolg, False bei Fehler
      */
     private function updateTo4()
@@ -154,6 +156,8 @@ class Update
     /**
      * Entfernt die Berechtigungen aus den Benutzerrollen und die unnötige Option für Administratoren
      *
+     * @since 1.1.3
+     *
      * @return bool Gibt immer True zurück
      */
     private function updateTo6()
@@ -178,6 +182,8 @@ class Update
 
     /**
      * Aktualisiert die Rewrite Rules nach einer Änderung
+     *
+     * @since 1.1.4
      */
     private function updateTo7()
     {
@@ -187,6 +193,8 @@ class Update
     /**
      * Fügt alle veröffentlichten Einsatzberichte einer Kategorie hinzu, wenn diese in den Einstellungen für die
      * Einsatzberichte gesetzt wurde
+     *
+     * @since 1.2.0
      */
     private function updateTo8()
     {
@@ -210,6 +218,8 @@ class Update
 
     /**
      * Aktualisiert sämtliche laufenden Nummern der Einsatzberichte
+     *
+     * @since 1.2.0
      */
     private function updateTo9()
     {
@@ -220,6 +230,8 @@ class Update
      * Setzt alle alten Einsatzberichte auf 'nicht als besonders markiert', wichtig für das Einfügen in die Mainloop.
      * Außerdem wird die Option, ob nur besondere Einsatzberichte zwischen den WordPress-Beiträgen auftauchen sollen,
      * umbenannt.
+     *
+     * @since 1.2.0
      */
     private function updateTo10()
     {

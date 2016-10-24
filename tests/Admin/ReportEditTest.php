@@ -52,6 +52,7 @@ class ReportEditTest extends WP_UnitTestCase
             'einsatzverwaltung_einsatzort' => '',
             'einsatzverwaltung_einsatzleiter' => '',
             'einsatzverwaltung_mannschaft' => '',
+            'einsatzverwaltung_location' => '',
         );
         wp_update_post(array(
             'ID' => $post->ID,
@@ -101,6 +102,7 @@ class ReportEditTest extends WP_UnitTestCase
             'einsatzverwaltung_einsatzort' => '',
             'einsatzverwaltung_einsatzleiter' => '',
             'einsatzverwaltung_mannschaft' => '',
+            'einsatzverwaltung_location' => '',
         );
         wp_update_post(array(
             'ID' => $post->ID,
@@ -125,6 +127,7 @@ class ReportEditTest extends WP_UnitTestCase
             'einsatzverwaltung_einsatzort' => '',
             'einsatzverwaltung_einsatzleiter' => '',
             'einsatzverwaltung_mannschaft' => '',
+            'einsatzverwaltung_location' => '',
         );
         wp_update_post(array(
             'ID' => $post->ID,

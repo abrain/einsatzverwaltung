@@ -108,6 +108,13 @@ class ReportList
     private $splitMonths;
 
     /**
+     * Gibt an, ob eine Google-Map mit den Einsätzen angezeigt wird
+     *
+     * @var bool
+     */
+    private $showMap;
+
+    /**
      * In diesem String wird der HTML-Code für die Liste aufgebaut
      *
      * @var string
@@ -151,6 +158,7 @@ class ReportList
         // Argumente auswerten
         $defaults = array(
             'splitMonths' => false,
+            'showMap' => false,
             'columns' => array(),
             'linkToVehicles' => $this->options->getBoolOption('einsatzvw_list_fahrzeuge_link'),
             'linkToAddForces' => $this->options->getBoolOption('einsatzvw_list_ext_link'),
@@ -159,11 +167,13 @@ class ReportList
             'showHeading' => true,
             'compact' => false,
         );
+
         $parsedArgs = wp_parse_args($args, $defaults);
 
         // Variablen setzen
         $this->compact = (bool) $parsedArgs['compact'];
         $this->splitMonths = (bool) $parsedArgs['splitMonths'] && !$this->compact;
+        $this->showMap = (bool) $parsedArgs['showMap'] && !$this->compact;
         $this->columns = $this->utilities->sanitizeColumnsArray($parsedArgs['columns']);
         $this->numberOfColumns = count($this->columns);
         $this->linkToVehicles = (true === $parsedArgs['linkToVehicles']);
@@ -185,6 +195,21 @@ class ReportList
             $this->beginTable(false);
             $this->insertTableHeader();
         }
+
+        if( $this->options->isGMapActivate() != "" && $this->showMap)   {
+          $latLon = explode(",", $this->options->getGMapDefaultPos() );
+          $mapstring = "<style>#map-canvas {height: 300px; margin-bottom: 30px; position: relative; overflow: hidden; transform: translateZ(0px); background-color: rgb(229, 227, 223);}</style>";
+          $mapstring .= "<div class='einsatzliste-map'>";
+          $mapstring .= "<div id='map-canvas'></div>";
+          $mapstring .= "</div>";
+          $mapstring .= "<div style='clear:both'></div>";
+          $mapstring .= "<script>";
+          $mapstring .= "google.maps.event.addDomListener(window, 'load', initializeMap(" . $latLon[0] . ", " . $latLon[1] . ", 10));";
+          $mapstring .= "</script>";
+
+          echo "$mapstring";
+        }
+
         /** @var IncidentReport $report */
         foreach ($reports as $report) {
             $timeOfAlerting = $report->getTimeOfAlerting();
@@ -265,6 +290,7 @@ class ReportList
         if ($this->showHeading && $year !== false) {
             $this->string .= '<h2>Eins&auml;tze '.$year.'</h2>';
         }
+
         $this->string .= '<table class="' . self::TABLECLASS . '"><tbody>';
     }
 
@@ -320,7 +346,17 @@ class ReportList
             }
             $this->string .= '</td>';
         }
+        if( $this->options->isGMapActivate() && $this->showMap && $report->getGmapsLocation() != "") {
+          $latLon = explode(",", $report->getGmapsLocation());
+          $timeOfAlerting = $report->getTimeOfAlerting();
+          $infoContent = '<h1>' . get_the_title($report->getPostId()) . '</h1><p>' . $timeOfAlerting->format('d.m.Y H:i') . '</p><p>' . $report->getLocation() . '</p>';
+          $marker = '<script>';
+          $marker .= 'addMarker( ' . $latLon[0] . ', ' . $latLon[1] . ' , "' . $infoContent . '" )';
+          $marker .= '</script>';
+          $this->string .= $marker;
+        }
         $this->string .= '</tr>';
+
     }
 
     /**

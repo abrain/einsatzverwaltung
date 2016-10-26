@@ -132,7 +132,14 @@ class Admin
             Core::VERSION
         );
 
-        wp_enqueue_script( 'einsatzvw_GoogleMap' );
+        if($this->options->isGMapActivate())
+      	{
+          wp_enqueue_script( 'einsatzvw_GoogleMap' );
+          wp_enqueue_script(
+              'einsatzverwaltung-gmap',
+              $this->core->scriptUrl . 'einsatzverwaltung-gmaps.js'
+          );
+        }
     }
 
     /**
@@ -262,70 +269,20 @@ class Admin
         }
         else
         {
-            $latLon = array("","");
+            $latLon = explode(",",$this->options->getGMapDefaultPos());
         }
-        $DeflatLon = explode(",",$this->options->getGMapDefaultPos());
 
         echo '<tr><td>';
         echo '<label for="einsatzverwaltung_location">Koordinate</label>';
         echo '</td><td style="width: 100%;">';
         echo '<input type="text" id="einsatzverwaltung_location" name="einsatzverwaltung_location" value="' . $location . '" size="20" readonly/>';
-        echo '<a class="button" id="einsatzverwaltung_get_location"><i class="fa fa-map-marker"></i></a>';
+        echo '<a class="button" id="einsatzverwaltung_get_location" onClick="geocodeAddress(document.getElementById(\'einsatzverwaltung_einsatzort\').value , \'einsatzverwaltung_location\')"><i class="fa fa-map-marker"></i></a>';
         echo '</td></tr>';
         echo '<tr><td colspan="2">';
         echo '<div id="map-canvas" style="height: 400px;"></div>';
         echo '</td></tr>';
         echo '<script>';
-        echo 'function initializeMap() {';
-        echo 'var defLat = "' . $DeflatLon[0] . '";';
-        echo 'var defLon = "' . $DeflatLon[1] . '";';
-        echo 'var latlon = new google.maps.LatLng(defLat, defLon);';
-        echo 'var mapOptions = {';
-        echo 'zoom: 13,';
-        echo 'center: latlon,';
-        echo 'scaleControl: true';
-        echo '};';
-        echo 'map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);';
-        echo 'var lat = "' . $latLon[0] . '";';
-        echo 'var lon = "' . $latLon[1] . '";';
-        echo 'if( lat != "" && lon != "" ) {';
-        echo 'setMarker( new google.maps.LatLng(lat, lon), map );';
-        echo '}';
-        echo 'var geocoder = new google.maps.Geocoder();';
-        echo 'document.getElementById("einsatzverwaltung_get_location").addEventListener("click", function() {';
-        echo 'var address = document.getElementById("einsatzverwaltung_einsatzort").value;';
-        echo 'if( address ) {';
-        echo 'geocodeAddress(geocoder, map, address);';
-        echo '} else {';
-        echo 'alert("Keine Addresse angegebenen: " + status);';
-        echo '}';
-        echo '});';
-        echo '}';
-        echo 'function setMarker( position, resultsMap ) {';
-        echo 'var marker = new google.maps.Marker({';
-        echo 'map: resultsMap,';
-        echo 'position: position,';
-        echo 'draggable: true,';
-        echo 'scaleControl:true';
-        echo '});';
-        echo 'resultsMap.setCenter(marker.getPosition());';
-        echo 'document.getElementById("einsatzverwaltung_location").value=marker.getPosition().toUrlValue();';
-        echo 'marker.addListener("drag", function(){';
-        echo 'document.getElementById("einsatzverwaltung_location").value=marker.getPosition().toUrlValue();';
-        echo '});';
-        echo '}';
-        echo 'function geocodeAddress(geocoder, resultsMap, address) {';
-        echo 'geocoder.geocode({"address": address}, function(results, status) {';
-        echo 'if (status === google.maps.GeocoderStatus.OK) {';
-        echo 'var location = results[0].geometry.location;';
-        echo 'setMarker( location, resultsMap);';
-        echo 'resultsMap.setZoom(16);';
-        echo '} else {';
-        echo 'alert("Konnte Position nicht ermitteln: " + status);';
-        echo '}';
-        echo '});';
-        echo '}';
-        echo 'google.maps.event.addDomListener(window, "load", initializeMap);';
+        echo ' google.maps.event.addDomListener(window, "load", initializeMap(' . $latLon[0] . ', ' . $latLon[1] . '));';
         echo '</script>';
     }
 

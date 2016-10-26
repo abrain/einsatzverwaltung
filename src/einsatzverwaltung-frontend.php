@@ -69,7 +69,15 @@ class Frontend
             Core::VERSION
         );
         wp_add_inline_style('einsatzverwaltung-frontend', ReportList::getDynamicCss());
-        wp_enqueue_script( 'einsatzvw_GoogleMap' );
+
+        if($this->options->isGMapActivate())
+      	{
+          wp_enqueue_script( 'einsatzvw_GoogleMap' );
+          wp_enqueue_script(
+              'einsatzverwaltung-gmap',
+              $this->core->scriptUrl . 'einsatzverwaltung-gmaps.js'
+          );
+        }
     }
 
     /**
@@ -164,36 +172,16 @@ class Frontend
       	if($this->options->isGMapActivate() && $location)
       	{
             $latLon = explode(",",$location);
+
             $mapstring = "<style>#map-canvas {height: 300px; position: relative; overflow: hidden; transform: translateZ(0px); background-color: rgb(229, 227, 223);}</style>";
-            //$mapstring .= "<script type='text/javascript' src='https://maps.googleapis.com/maps/api/js?key=AIzaSyD2R-hm2pLaedH1YOlBs2uQwQn8xfK_hgo'></script>";
-            $mapstring .= "<script>";
-            $mapstring .= "var map;";
-            $mapstring .= "function initialize() {";
-            $mapstring .= "  var latLon = new google.maps.LatLng(" . $latLon[0] . "," . $latLon[1] . ");";
-            $mapstring .= "  var mapOptions = {";
-            $mapstring .= "    zoom: 13,";
-            $mapstring .= "    center: latLon";
-            $mapstring .= "  };";
-            $mapstring .= "  map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions); ";
-            $mapstring .= "  var marker = new google.maps.Marker({";
-            $mapstring .= "      map: map,";
-            $mapstring .= "      position: latLon";
-            $mapstring .= "  });";
-            $mapstring .= "  var contentString = '" . $report->getLocation() . "';";
-            $mapstring .= "  var infowindow = new google.maps.InfoWindow({";
-            $mapstring .= "    content: contentString";
-            $mapstring .= "  });";
-            $mapstring .= "  marker.addListener('click', function() {";
-            $mapstring .= "    infowindow.open(map, marker);";
-            $mapstring .= "  });";
-            $mapstring .= "  infowindow.open(map, marker);";
-            $mapstring .= "}";
-            $mapstring .= "google.maps.event.addDomListener(window, 'load', initialize);";
-            $mapstring .= "</script>";
             $mapstring .= "<div class='einsatzliste-map'>";
             $mapstring .= "<div id='map-canvas'></div>";
             $mapstring .= "</div>";
             $mapstring .= "<div style='clear:both'></div>";
+            $mapstring .= "<script>";
+            $mapstring .= "google.maps.event.addDomListener(window, 'load', initializeMap(" . $latLon[0] . ", " . $latLon[1] . "));";
+            $mapstring .= "addMarker( " . $latLon[0] . ", " . $latLon[1] . ", '" . $report->getLocation() . "', true )";
+            $mapstring .= "</script>";
 
             return "<p>$mapstring</p>";
         }
@@ -239,8 +227,13 @@ class Frontend
 
         $header = $this->getEinsatzberichtHeader($post, true, true);
         $content = $this->prepareContent($content);
+        $map = "";
+        if($this->options->isGMapActivate())
+      	{
+          $map = $this->getEinsatzberichtMap($post);
+        }
 
-        return $header . $this->getEinsatzberichtMap($post) . '<hr>' . $content;
+        return $header . $map . '<hr>' . $content;
     }
 
 

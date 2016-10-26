@@ -60,6 +60,7 @@ class Shortcodes
             'jahr' => $currentYear,
             'sort' => 'ab',
             'monatetrennen' => 'nein',
+            'googlemaps' => 'nein',
             'link' => 'title',
             'limit' => -1,
             'options' => ''
@@ -102,6 +103,7 @@ class Shortcodes
             $reports,
             array(
                 'splitMonths' => ($shortcodeParams['monatetrennen'] == 'ja'),
+                'showMap' => ($shortcodeParams['googlemaps'] == 'ja'),
                 'columns' => $this->options->getEinsatzlisteEnabledColumns(),
                 'columnsWithLink' => $columnsWithLink,
                 'linkEmptyReports' => $linkEmptyReports,

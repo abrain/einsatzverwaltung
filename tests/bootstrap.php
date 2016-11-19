@@ -9,6 +9,10 @@ require_once $_tests_dir . '/includes/functions.php';
 
 tests_add_filter('muplugins_loaded', function () {
     require dirname(dirname(__FILE__)) . '/src/einsatzverwaltung.php';
+
+    // DB-Version setzen, damit der Upgrade-Prozess nicht unnötig anläuft
+    // Wird normal bei der Aktivierung des Plugins gemacht, aber diese Action wird bei den Tests nicht aufgerufen
+    add_option('einsatzvw_db_version', \abrain\Einsatzverwaltung\Core::DB_VERSION);
 });
 
 require $_tests_dir . '/includes/bootstrap.php';

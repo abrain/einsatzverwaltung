@@ -23,7 +23,7 @@ Der PHP-Code wird gem&auml;&szlig; dem Coding Style Guide [PSR-2](http://www.php
 
 ### Mindestvoraussetzungen
 * PHP: 5.3.0
-* WordPress: 3.7
+* WordPress: 4.4
 
 ### Social Media
 

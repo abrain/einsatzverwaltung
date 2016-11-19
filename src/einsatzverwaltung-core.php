@@ -485,15 +485,27 @@ class Core
 
     private function maybeUpdate()
     {
-        $currentDbVersion = get_option('einsatzvw_db_version', self::DB_VERSION);
-        if ($currentDbVersion >= self::DB_VERSION) {
+        $currentDbVersion = get_option('einsatzvw_db_version');
+        if (!empty($currentDbVersion) && $currentDbVersion >= self::DB_VERSION) {
             return;
         }
 
+        $update = $this->getUpdater();
+        $updateResult = $update->doUpdate($currentDbVersion, self::DB_VERSION);
+        if (is_wp_error($updateResult)) {
+            error_log("Das Datenbank-Upgrade wurde mit folgendem Fehler beendet: {$updateResult->get_error_message()}");
+        }
+    }
+
+    /**
+     * @return Update
+     */
+    public function getUpdater()
+    {
         require_once(__DIR__ . '/einsatzverwaltung-update.php');
-        $update = new Update($this, $this->options, $this->utilities, $this->data);
-        $update->doUpdate($currentDbVersion, self::DB_VERSION);
+        return new Update($this, $this->options, $this->utilities, $this->data);
     }
 }
 
-new Core();
+// Die globale Variable wird nur bei den Unit-Test benötigt
+$GLOBALS['einsatzverwaltung_core'] = new Core();

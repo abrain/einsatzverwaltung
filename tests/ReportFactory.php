@@ -55,26 +55,4 @@ class ReportFactory extends WP_UnitTest_Factory_For_Post
 
         return $generatedArgs;
     }
-
-    /**
-     * @param $args
-     * @return int|\WP_Error
-     */
-    public function create_object($args)
-    {
-        $post = parent::create_object($args);
-
-        if (is_wp_error($post) || 0 === $post) {
-            return $post;
-        }
-
-        // meta_input ist erst ab WP 4.4 nutzbar
-        if (version_compare(get_bloginfo('version'), '4.4', '<')) {
-            foreach ($this->defaultMetaInput as $metaKey => $metaValue) {
-                add_post_meta((int) $post, $metaKey, $metaValue);
-            }
-        }
-
-        return $post;
-    }
 }

@@ -127,9 +127,9 @@ class Update
     private function upgrade070()
     {
         update_option('einsatzvw_cap_roles_administrator', 1);
-        $role_obj = get_role('administrator');
+        $roleObject = get_role('administrator');
         foreach ($this->core->getCapabilities() as $cap) {
-            $role_obj->add_cap($cap);
+            $roleObject->add_cap($cap);
         }
 
         update_option('einsatzvw_db_version', 2);
@@ -181,10 +181,10 @@ class Update
         }
         $roles = get_editable_roles();
         if (!empty($roles)) {
-            foreach (array_keys($roles) as $role_slug) {
-                $role_obj = get_role($role_slug);
+            foreach (array_keys($roles) as $roleSlug) {
+                $roleObject = get_role($roleSlug);
                 foreach ($this->core->getCapabilities() as $cap) {
-                    $role_obj->remove_cap($cap);
+                    $roleObject->remove_cap($cap);
                 }
             }
         }

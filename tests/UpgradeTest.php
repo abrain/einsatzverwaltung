@@ -29,20 +29,20 @@ class UpgradeTest extends WP_UnitTestCase
      * Führt ein Datenbank-Upgrade von einer bestimmten Version auf eine andere durch und überprüft das korrekte Setzen
      * der Versionsnummer
      *
-     * @param int $from Datenbankversionsnummer von der ausgegangen werden soll
-     * @param int $to Datenbankversionsnummer auf die aktualisiert werden soll
+     * @param int $fromVersion Datenbankversionsnummer von der ausgegangen werden soll
+     * @param int $toVersion Datenbankversionsnummer auf die aktualisiert werden soll
      */
-    private function runUpgrade($from, $to)
+    private function runUpgrade($fromVersion, $toVersion)
     {
-        if ($from === false) {
+        if ($fromVersion === false) {
             delete_option('einsatzvw_db_version');
         } else {
-            update_option('einsatzvw_db_version', $from);
+            update_option('einsatzvw_db_version', $fromVersion);
         }
 
-        self::assertEquals($from, get_option('einsatzvw_db_version'));
-        $this->updater->doUpdate($from, $to);
-        self::assertEquals($to, get_option('einsatzvw_db_version'));
+        self::assertEquals($fromVersion, get_option('einsatzvw_db_version'));
+        $this->updater->doUpdate($fromVersion, $toVersion);
+        self::assertEquals($toVersion, get_option('einsatzvw_db_version'));
     }
 
     public function testInsufficientParameters()
@@ -107,16 +107,16 @@ class UpgradeTest extends WP_UnitTestCase
         );
 
         update_option('einsatzvw_cap_roles_administrator', 0);
-        $role_obj = get_role('administrator');
+        $roleObject = get_role('administrator');
         foreach ($capabilities as $cap) {
-            self::assertFalse($role_obj->has_cap($cap));
+            self::assertFalse($roleObject->has_cap($cap));
         }
 
         $this->runUpgrade(1, 2);
 
         self::assertEquals(1, get_option('einsatzvw_cap_roles_administrator'));
         foreach ($capabilities as $cap) {
-            self::assertTrue($role_obj->has_cap($cap));
+            self::assertTrue($roleObject->has_cap($cap));
         }
     }
 
@@ -166,10 +166,10 @@ class UpgradeTest extends WP_UnitTestCase
 
         $roles = get_editable_roles();
         if (!empty($roles)) {
-            foreach (array_keys($roles) as $role_slug) {
-                $role_obj = get_role($role_slug);
+            foreach (array_keys($roles) as $roleSlug) {
+                $roleObject = get_role($roleSlug);
                 foreach ($capabilities as $cap) {
-                    $role_obj->add_cap($cap);
+                    $roleObject->add_cap($cap);
                 }
             }
         }
@@ -179,10 +179,10 @@ class UpgradeTest extends WP_UnitTestCase
 
         $roles = get_editable_roles();
         if (!empty($roles)) {
-            foreach (array_keys($roles) as $role_slug) {
-                $role_obj = get_role($role_slug);
+            foreach (array_keys($roles) as $roleSlug) {
+                $roleObject = get_role($roleSlug);
                 foreach ($capabilities as $cap) {
-                    self::assertFalse($role_obj->has_cap($cap));
+                    self::assertFalse($roleObject->has_cap($cap));
                 }
             }
         }

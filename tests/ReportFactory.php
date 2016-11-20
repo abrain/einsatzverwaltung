@@ -55,4 +55,35 @@ class ReportFactory extends WP_UnitTest_Factory_For_Post
 
         return $generatedArgs;
     }
+
+    public function generateManyForYear($year, $count, $args = array(), $generationDefinitions = null)
+    {
+        if ($count < 1) {
+            return array();
+        }
+
+        $dates = array();
+
+        $firstDate = strtotime('1 January ' . $year . ' 03:00:00');
+        $lastDate = strtotime($year == date('Y') ? '24 hours ago' : '31 December ' . $year . ' 20:59:59');
+
+        $dates[] = date('Y-m-d H:i:s', $firstDate);
+
+        if ($count > 2) {
+            $timestampDistance = ($lastDate - $firstDate) / ($count - 1);
+            for ($i = 1; $i < $count - 1; $i++) {
+                $dates[] = date('Y-m-d H:i:s', $firstDate + $timestampDistance * $i);
+            }
+        }
+
+        if ($count > 1) {
+            $dates[] = date('Y-m-d H:i:s', $lastDate);
+        }
+
+        $reportIds = array();
+        foreach ($dates as $index => $date) {
+            $reportIds[] = $this->create(array('post_date' => $date));
+        }
+        return $reportIds;
+    }
 }

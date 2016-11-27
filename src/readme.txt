@@ -2,7 +2,7 @@
 Contributors: abrain
 Donate link: https://einsatzverwaltung.abrain.de/unterstuetzen/
 Tags: Feuerwehr, Einsatz, Rettung, Rettungsdienst, THW, HiOrg, Wasserwacht, Bergrettung
-Requires at least: 3.7.0
+Requires at least: 4.4.0
 Tested up to: 4.6
 Stable tag: 1.2.3
 License: GPLv2

@@ -143,9 +143,7 @@ class ReportQueryTest extends WP_UnitTestCase
         $reports = $query->getReports();
         $this->assertCount(6, $reports);
         $queriedPostIds = array_map(array($this, 'extractPostId'), $reports);
-        $expectedPostIds = array_filter($this->postIds, function ($key) {
-            return !in_array($key, array(0,1,4,7));
-        }, ARRAY_FILTER_USE_KEY);
+        $expectedPostIds = array_diff_key($this->postIds, array_flip(array(0,1,4,7)));
         self::assertEmpty(array_diff($queriedPostIds, $expectedPostIds));
     }
 

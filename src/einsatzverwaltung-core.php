@@ -389,13 +389,8 @@ class Core
         if (empty($jahr) || !is_numeric($jahr)) {
             $jahr = date('Y');
         }
-        $query = new WP_Query(array(
-            'year' =>  $jahr,
-            'post_type' => 'einsatz',
-            'post_status' => array('publish', 'private'),
-            'nopaging' => true
-        ));
-        return $this->formatEinsatznummer($jahr, $query->found_posts + ($minuseins ? 0 : 1));
+
+        return $this->formatEinsatznummer($jahr, $this->data->getNumberOfIncidentReports($jahr) + ($minuseins ? 0 : 1));
     }
 
     /**

@@ -130,6 +130,30 @@ class Data
     }
 
     /**
+     * Gibt die Anzahl der veröffentlichten Einsatzberichte zurück
+     *
+     * @param int|null $year Das Jahr für das die Anfrage gestellt werden soll. Wird dieser Parameter weggelassen,
+     * werden alle Jahre berücksichtigt.
+     *
+     * @return int Die Anzahl der veröffentlichten Einsatzberichte
+     */
+    public function getNumberOfIncidentReports($year = null)
+    {
+        $args = array(
+            'post_type' => 'einsatz',
+            'post_status' => array('publish', 'private'),
+            'nopaging' => true
+        );
+
+        if (!empty($year) && is_numeric($year)) {
+            $args['year'] = $year;
+        }
+
+        $query = new WP_Query($args);
+        return $query->found_posts;
+    }
+
+    /**
      * Zusätzliche Metadaten des Einsatzberichts speichern
      *
      * @param int $postId ID des Posts
@@ -254,9 +278,42 @@ class Data
 
             $counter = 1;
             foreach ($posts as $post) {
-                update_post_meta($post->ID, 'einsatz_seqNum', $counter);
+                $this->setSequenceNumber($post->ID, $counter);
                 $counter++;
             }
+        }
+    }
+
+    /**
+     * Setzt die laufende Nummer des hinzugefügten Einsatzberichts und passt ggf. die Nummern der anderen Berichte aus
+     * dem gleichen Kalenderjahr an.
+     *
+     * @param IncidentReport $report Der neu hinzugefügte Einsatzbericht
+     */
+    private function maybeUpdateSequenceNumbers($report)
+    {
+        $date = $report->getTimeOfAlerting();
+        $year = $date->format('Y');
+
+        $reportQuery = new ReportQuery();
+        $reportQuery->setExcludePostIds(array($report->getPostId()));
+        $reportQuery->setIncludePrivateReports(true);
+        $reportQuery->setLimit(1);
+        $reportQuery->setOrderAsc(false);
+        $reportQuery->setYear($year);
+        $mostRecentReports = $reportQuery->getReports();
+
+        if (!empty($mostRecentReports)) {
+            /** @var IncidentReport $mostRecentReport */
+            $mostRecentReport = $mostRecentReports[0];
+            if ($date->getTimestamp() > $mostRecentReport->getTimeOfAlerting()->getTimestamp()) {
+                $numberOfIncidentReports = $this->getNumberOfIncidentReports($year);
+                $this->setSequenceNumber($report->getPostId(), $numberOfIncidentReports);
+            } else {
+                $this->updateSequenceNumbers($year);
+            }
+        } else {
+            $this->setSequenceNumber($report->getPostId(), 1);
         }
     }
 
@@ -271,8 +328,7 @@ class Data
         $report = new IncidentReport($post);
 
         // Laufende Nummern aktualisieren
-        $date = $report->getTimeOfAlerting();
-        $this->updateSequenceNumbers($date->format('Y'));
+        $this->maybeUpdateSequenceNumbers($report);
 
         // Kategoriezugehörigkeit aktualisieren
         $category = $this->options->getEinsatzberichteCategory();
@@ -328,5 +384,20 @@ class Data
         remove_action('save_post_einsatz', array($this, 'savePostdata'));
         wp_update_post($updateArgs);
         add_action('save_post_einsatz', array($this, 'savePostdata'), 10, 2);
+    }
+
+    /**
+     * Ändert die laufende Nummer eines bestehenden Einsatzes
+     *
+     * @param int $postId ID des Einsatzberichts
+     * @param string $seqNum Zu setzende laufende Nummer
+     */
+    public function setSequenceNumber($postId, $seqNum)
+    {
+        if (empty($postId) || empty($seqNum)) {
+            return;
+        }
+
+        update_post_meta($postId, 'einsatz_seqNum', $seqNum);
     }
 }

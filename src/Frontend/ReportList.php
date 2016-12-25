@@ -393,6 +393,14 @@ class ReportList
             case 'seqNum':
                 $cellContent = $report->getSequentialNumber();
                 break;
+            case 'annotations':
+                $cellContent = '';
+                $cellContent .= $this->getAnnotationIcon(
+                    'camera',
+                    array('Einsatzbericht enthält keine Bilder', 'Einsatzbericht enthält Bilder'),
+                    $report->hasImages()
+                );
+                break;
             default:
                 $cellContent = '';
         }
@@ -403,6 +411,19 @@ class ReportList
         }
 
         return $cellContent;
+    }
+
+    /**
+     * @param $icon
+     * @param $titles
+     * @param $state
+     * @return string
+     */
+    private function getAnnotationIcon($icon, $titles, $state)
+    {
+        $title = $titles[$state ? 1 : 0];
+        $style = $state ? '' : 'color: #bbb;';
+        return '<i class="fa fa-' . $icon . '" aria-hidden="true" title="' . $title . '" style="' . $style . '"></i>';
     }
 
     /**
@@ -463,6 +484,11 @@ class ReportList
             'seqNum' => array(
                 'name' => 'Lfd.',
                 'longName' => 'Laufende Nummer'
+            ),
+            'annotations' => array(
+                'name' => '',
+                'longName' => 'Vermerke',
+                'cssname' => 'Vermerke'
             )
         );
     }

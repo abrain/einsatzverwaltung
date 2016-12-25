@@ -147,6 +147,13 @@ class Admin
             'einsatzverwaltung_special',
             $report->isSpecial()
         );
+        echo '<br>';
+
+        $this->echoInputCheckbox(
+            'Bilder im Bericht',
+            'einsatzverwaltung_hasimages',
+            $report->hasImages()
+        );
     }
 
     /**

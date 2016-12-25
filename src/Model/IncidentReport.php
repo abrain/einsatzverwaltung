@@ -378,6 +378,16 @@ class IncidentReport
     }
 
     /**
+     * Gibt zurück, ob der Einsatzbericht Bilder beinhaltet.
+     *
+     * @return bool
+     */
+    public function hasImages()
+    {
+        return ($this->getPostMeta('einsatz_hasimages') == 1);
+    }
+
+    /**
      * Gibt zurück, ob der Einsatzbericht noch im Entwurfsstadium ist
      *
      * @return bool

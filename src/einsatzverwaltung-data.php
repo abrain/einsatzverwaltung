@@ -233,6 +233,7 @@ class Data
 
         // Vermerke validieren
         $fehlalarm = $this->utilities->sanitizeCheckbox(array($_POST, 'einsatzverwaltung_fehlalarm'));
+        $hasImages = $this->utilities->sanitizeCheckbox(array($_POST, 'einsatzverwaltung_hasimages'));
         $isSpecial = $this->utilities->sanitizeCheckbox(array($_POST, 'einsatzverwaltung_special'));
 
         // Metadaten schreiben
@@ -241,6 +242,7 @@ class Data
         update_post_meta($postId, 'einsatz_einsatzleiter', $einsatzleiter);
         update_post_meta($postId, 'einsatz_mannschaft', $mannschaftsstaerke);
         update_post_meta($postId, 'einsatz_fehlalarm', $fehlalarm);
+        update_post_meta($postId, 'einsatz_hasimages', $hasImages);
         update_post_meta($postId, 'einsatz_special', $isSpecial);
 
         if (!empty($updateArgs)) {

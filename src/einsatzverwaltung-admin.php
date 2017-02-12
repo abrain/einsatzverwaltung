@@ -1,6 +1,7 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
+use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use WP_Post;
 
@@ -9,6 +10,11 @@ use WP_Post;
  */
 class Admin
 {
+    /**
+     * @var AnnotationIconBar
+     */
+    private $annotationIconBar;
+
     /**
      * @var Core
      */
@@ -283,6 +289,7 @@ class Admin
         unset($columns['categories']);
         $columns['title'] = 'Einsatzbericht';
         $columns['e_nummer'] = 'Nummer';
+        $columns['einsatzverwaltung_annotations'] = 'Vermerke';
         $columns['e_alarmzeit'] = 'Alarmzeit';
         $columns['e_einsatzende'] = 'Einsatzende';
         $columns['e_art'] = 'Art';
@@ -363,6 +370,13 @@ class Admin
                 } else {
                     echo '-';
                 }
+                break;
+            case 'einsatzverwaltung_annotations':
+                if (empty($this->annotationIconBar)) {
+                    require_once dirname(__FILE__) . '/Frontend/AnnotationIconBar.php';
+                    $this->annotationIconBar = new AnnotationIconBar();
+                }
+                echo $this->annotationIconBar->render($report);
                 break;
             default:
                 break;

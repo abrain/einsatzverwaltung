@@ -21,6 +21,11 @@ class ReportList
     const TABLECLASS = 'einsatzverwaltung-reportlist';
 
     /**
+     * @var AnnotationIconBar
+     */
+    private $annotationIconBar;
+
+    /**
      * @var array
      */
     private $columns;
@@ -174,6 +179,11 @@ class ReportList
         }
         $this->linkEmptyReports = (true === $parsedArgs['linkEmptyReports']);
         $this->showHeading = (bool) $parsedArgs['showHeading'];
+
+        if (in_array('annotations', $this->columns)) {
+            require_once dirname(__FILE__) . '/AnnotationIconBar.php';
+            $this->annotationIconBar = new AnnotationIconBar();
+        }
 
         // Berichte abarbeiten
         $currentYear = null;
@@ -394,12 +404,7 @@ class ReportList
                 $cellContent = $report->getSequentialNumber();
                 break;
             case 'annotations':
-                $cellContent = '';
-                $cellContent .= $this->getAnnotationIcon(
-                    'camera',
-                    array('Einsatzbericht enthält keine Bilder', 'Einsatzbericht enthält Bilder'),
-                    $report->hasImages()
-                );
+                $cellContent = $this->annotationIconBar->render($report);
                 break;
             default:
                 $cellContent = '';
@@ -411,19 +416,6 @@ class ReportList
         }
 
         return $cellContent;
-    }
-
-    /**
-     * @param $icon
-     * @param $titles
-     * @param $state
-     * @return string
-     */
-    private function getAnnotationIcon($icon, $titles, $state)
-    {
-        $title = $titles[$state ? 1 : 0];
-        $style = $state ? '' : 'color: #bbb;';
-        return '<i class="fa fa-' . $icon . '" aria-hidden="true" title="' . $title . '" style="' . $style . '"></i>';
     }
 
     /**

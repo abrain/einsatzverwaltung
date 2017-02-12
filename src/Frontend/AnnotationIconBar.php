@@ -1,7 +1,10 @@
 <?php
 namespace abrain\Einsatzverwaltung\Frontend;
 
+use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
+use abrain\Einsatzverwaltung\Model\ReportAnnotation;
+use abrain\Einsatzverwaltung\ReportAnnotationRepository;
 
 /**
  * Darstellung von Vermerken als Icons
@@ -10,6 +13,21 @@ use abrain\Einsatzverwaltung\Model\IncidentReport;
  */
 class AnnotationIconBar
 {
+    /**
+     * @var ReportAnnotationRepository
+     */
+    private $annotationRepository;
+
+    /**
+     * AnnotationIconBar constructor.
+     *
+     * @param Core $core
+     */
+    public function __construct(Core $core)
+    {
+        $this->annotationRepository = $core->getAnnotationRepository();
+    }
+
     /**
      * Generiert HTML-Code, der die Vermerke eines Einsatzberichts je nach Zustand des Vermerks als helle oder dunkle
      * Icons anzeigt
@@ -20,11 +38,25 @@ class AnnotationIconBar
      */
     public function render($report)
     {
-        return $this->getAnnotationIcon(
+        $string = '';
+        /** @var ReportAnnotation $annotation */
+        foreach ($this->annotationRepository->getAnnotations() as $annotation) {
+            if (!empty($string)) {
+                $string .= '&nbsp;';
+            }
+
+            $string .= $this->getAnnotationIcon(
+                $annotation->getIcon(),
+                array($annotation->getLabelWhenInactive(), $annotation->getLabelWhenActive()),
+                $annotation->getStateForReport($report)
+            );
+        }
+        return $string;
+        /*return $this->getAnnotationIcon(
             'camera',
             array('Einsatzbericht enthält keine Bilder', 'Einsatzbericht enthält Bilder'),
             $report->hasImages()
-        );
+        );*/
     }
 
     /**

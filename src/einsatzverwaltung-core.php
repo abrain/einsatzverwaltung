@@ -5,6 +5,8 @@ require_once dirname(__FILE__) . '/einsatzverwaltung-admin.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-data.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-utilities.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-frontend.php';
+require_once dirname(__FILE__) . '/Model/ReportAnnotation.php';
+require_once dirname(__FILE__) . '/ReportAnnotationRepository.php';
 require_once dirname(__FILE__) . '/Model/IncidentReport.php';
 require_once dirname(__FILE__) . '/Util/Formatter.php';
 require_once dirname(__FILE__) . '/Widgets/RecentIncidents.php';
@@ -20,6 +22,7 @@ require_once dirname(__FILE__) . '/Frontend/ReportListSettings.php';
 require_once dirname(__FILE__) . '/ReportQuery.php';
 
 use abrain\Einsatzverwaltung\Import\Tool as ImportTool;
+use abrain\Einsatzverwaltung\Model\ReportAnnotation;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use abrain\Einsatzverwaltung\Widgets\RecentIncidents;
 use abrain\Einsatzverwaltung\Widgets\RecentIncidentsFormatted;
@@ -231,6 +234,11 @@ class Core
     );
 
     /**
+     * @var ReportAnnotationRepository
+     */
+    private $annotationRepository;
+
+    /**
      * @var Data
      */
     private $data;
@@ -352,6 +360,17 @@ class Core
         register_taxonomy('fahrzeug', 'einsatz', $this->argsFahrzeug);
         register_taxonomy('exteinsatzmittel', 'einsatz', $this->argsExteinsatzmittel);
         register_taxonomy('alarmierungsart', 'einsatz', $this->argsAlarmierungsart);
+
+        // Vermerke registrieren
+        $this->annotationRepository = new ReportAnnotationRepository();
+        $this->annotationRepository->addAnnotation(new ReportAnnotation(
+            'images',
+            'Bilder im Bericht',
+            'einsatz_hasimages',
+            'camera',
+            'Einsatzbericht enthält Bilder',
+            'Einsatzbericht enthält keine Bilder'
+        ));
     }
 
     private function addRewriteRules()
@@ -499,6 +518,14 @@ class Core
     {
         require_once(__DIR__ . '/einsatzverwaltung-update.php');
         return new Update($this, $this->options, $this->utilities, $this->data);
+    }
+
+    /**
+     * @return ReportAnnotationRepository
+     */
+    public function getAnnotationRepository()
+    {
+        return $this->annotationRepository;
     }
 }
 

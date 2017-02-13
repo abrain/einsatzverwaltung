@@ -33,19 +33,38 @@ class AnnotationIconBar
      * Icons anzeigt
      *
      * @param IncidentReport $report Der Einsatzbericht, dessen Vermerke angezeigt werden sollen
+     * @param array $annotationIds Liste von Bezeichnern von Vermerken, die in dieser Reihenfolge gerendert werden
+     * sollen. Bei einer leeren Liste werden alle bekannten Vermerke ausgegeben.
      *
      * @return string Der generierte HTML-Code
      */
-    public function render($report)
+    public function render($report, $annotationIds = array())
     {
         $string = '';
+        $annotations = array();
+
+        // Wenn eine Auswahl von Vermerken vorgegeben ist, diese in dieser Reihenfolge holen
+        if (!empty($annotationIds)) {
+            foreach ($annotationIds as $annotationId) {
+                $reportAnnotation = $this->annotationRepository->getAnnotationById($annotationId);
+                if (false !== $reportAnnotation) {
+                    $annotations[] = $reportAnnotation;
+                }
+            }
+        }
+
+        // Keine Vermerke vorgegeben oder alle angegebenen waren ungültig
+        if (empty($annotations)) {
+            $annotations = $this->annotationRepository->getAnnotations();
+        }
+
         /** @var ReportAnnotation $annotation */
-        foreach ($this->annotationRepository->getAnnotations() as $annotation) {
+        foreach ($annotations as $annotation) {
             $icon = $annotation->getIcon();
             if (empty($icon)) {
                 continue;
             }
-            
+
             if (!empty($string)) {
                 $string .= '&nbsp;';
             }

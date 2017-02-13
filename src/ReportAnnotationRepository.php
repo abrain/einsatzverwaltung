@@ -43,4 +43,17 @@ class ReportAnnotationRepository
     {
         return array_keys($this->annotations);
     }
+
+    /**
+     * @param $identifier
+     * @return bool|ReportAnnotation
+     */
+    public function getAnnotationById($identifier)
+    {
+        if (!key_exists($identifier, $this->annotations)) {
+            return false;
+        }
+
+        return $this->annotations[$identifier];
+    }
 }

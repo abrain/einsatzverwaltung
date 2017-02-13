@@ -371,6 +371,22 @@ class Core
             'Einsatzbericht enthält Bilder',
             'Einsatzbericht enthält keine Bilder'
         ));
+        $this->annotationRepository->addAnnotation(new ReportAnnotation(
+            'special',
+            'Besonderer Einsatz',
+            'einsatz_special',
+            'star',
+            'Besonderer Einsatz',
+            'Kein besonderer Einsatz'
+        ));
+        $this->annotationRepository->addAnnotation(new ReportAnnotation(
+            'falseAlarm',
+            'Fehlalarm',
+            'einsatz_fehlalarm',
+            '',
+            'Fehlalarm',
+            'Kein Fehlalarm'
+        ));
     }
 
     private function addRewriteRules()

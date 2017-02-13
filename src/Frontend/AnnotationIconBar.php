@@ -41,12 +41,17 @@ class AnnotationIconBar
         $string = '';
         /** @var ReportAnnotation $annotation */
         foreach ($this->annotationRepository->getAnnotations() as $annotation) {
+            $icon = $annotation->getIcon();
+            if (empty($icon)) {
+                continue;
+            }
+            
             if (!empty($string)) {
                 $string .= '&nbsp;';
             }
 
             $string .= $this->getAnnotationIcon(
-                $annotation->getIcon(),
+                $icon,
                 array($annotation->getLabelWhenInactive(), $annotation->getLabelWhenActive()),
                 $annotation->getStateForReport($report)
             );

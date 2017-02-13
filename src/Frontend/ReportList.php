@@ -180,7 +180,7 @@ class ReportList
         $this->linkEmptyReports = (true === $parsedArgs['linkEmptyReports']);
         $this->showHeading = (bool) $parsedArgs['showHeading'];
 
-        if (in_array('annotations', $this->columns)) {
+        if (in_array('annotationImages', $this->columns) || in_array('annotationSpecial', $this->columns)) {
             require_once dirname(__FILE__) . '/AnnotationIconBar.php';
             $this->annotationIconBar = new AnnotationIconBar($this->core);
         }
@@ -403,8 +403,11 @@ class ReportList
             case 'seqNum':
                 $cellContent = $report->getSequentialNumber();
                 break;
-            case 'annotations':
-                $cellContent = $this->annotationIconBar->render($report);
+            case 'annotationImages':
+                $cellContent = $this->annotationIconBar->render($report,  array('images'));
+                break;
+            case 'annotationSpecial':
+                $cellContent = $this->annotationIconBar->render($report, array('special'));
                 break;
             default:
                 $cellContent = '';
@@ -477,10 +480,13 @@ class ReportList
                 'name' => 'Lfd.',
                 'longName' => 'Laufende Nummer'
             ),
-            'annotations' => array(
+            'annotationImages' => array(
                 'name' => '',
-                'longName' => 'Vermerke',
-                'cssname' => 'Vermerke'
+                'longName' => 'Vermerk &quot;Bilder im Bericht&quot;'
+            ),
+            'annotationSpecial' => array(
+                'name' => '',
+                'longName' => 'Vermerk &quot;Besonderer Einsatz&quot;'
             )
         );
     }

@@ -54,7 +54,7 @@ Entweder einen Issue auf [GitHub](https://github.com/abrain/einsatzverwaltung/is
 
 = Wie kann ich den Entwickler erreichen? =
 
-Entweder [per Mail](mailto:kontakt@abrain.de), per PN auf [Facebook](https://www.facebook.com/einsatzverwaltung), auf [Twitter](https://twitter.com/einsatzvw) oder [App.net](https://alpha.app.net/einsatzverwaltung). Bugs und Verbesserungsvorschl&auml;ge gerne auch als [Issue auf GitHub](https://github.com/abrain/einsatzverwaltung/issues).
+Entweder [per Mail](mailto:kontakt@abrain.de), per PN auf [Facebook](https://www.facebook.com/einsatzverwaltung) oder über [Twitter](https://twitter.com/einsatzvw). Bugs und Verbesserungsvorschl&auml;ge gerne auch als [Issue auf GitHub](https://github.com/abrain/einsatzverwaltung/issues).
 
 = Meine eMails mag ich am liebsten verschl&uuml;sselt und signiert, hast Du da was? =
 
@@ -389,6 +389,5 @@ Kein Upgrade, sondern die erste Version
 == Social Media ==
 
 * Twitter: [@einsatzvw](https://twitter.com/einsatzvw)
-* App.net: [@einsatzverwaltung](https://alpha.app.net/einsatzverwaltung)
 * Facebook: [Einsatzverwaltung](https://www.facebook.com/einsatzverwaltung/)
 * GNU social: [@einsatzverwaltung](https://gnusocial.abrain.de/einsatzverwaltung)

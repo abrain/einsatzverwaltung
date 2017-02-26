@@ -295,6 +295,17 @@ class Update
             }
         }
 
+        // Einsatznummern in Postmeta kopieren
+        $posts = get_posts(array(
+            'nopaging' => true,
+            'post_type' => 'einsatz',
+            'post_status' => array('publish', 'private'),
+        ));
+        foreach ($posts as $post) {
+            update_post_meta($post->ID, 'einsatz_incidentNumber', get_post_field('post_name', $post->ID));
+        }
+
+        // Admin Notice aktivieren
         $this->addAdminNotice('regenerateSlugs');
 
         update_option('einsatzvw_db_version', 20);

@@ -20,6 +20,7 @@ require_once dirname(__FILE__) . '/einsatzverwaltung-taxonomies.php';
 require_once dirname(__FILE__) . '/Frontend/ReportList.php';
 require_once dirname(__FILE__) . '/Frontend/ReportListSettings.php';
 require_once dirname(__FILE__) . '/ReportQuery.php';
+require_once dirname(__FILE__) . '/TasksPage.php';
 
 use abrain\Einsatzverwaltung\Import\Tool as ImportTool;
 use abrain\Einsatzverwaltung\Model\ReportAnnotation;
@@ -279,6 +280,7 @@ class Core
         // Tools
         new ToolEinsatznummernReparieren($this, $this->data, $this->options);
         new ImportTool($this, $this->utilities);
+        new TasksPage($this->utilities);
 
         // Widgets
         RecentIncidents::setDependencies($this->options, $this->utilities);

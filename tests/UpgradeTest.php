@@ -328,5 +328,8 @@ class UpgradeTest extends WP_UnitTestCase
         self::assertEmpty(get_term_meta($vehicle1['term_id'], 'something', true));
         self::assertNotFalse(get_option('evw_tax_fahrzeug_'.$vehicle2['term_id'].'_rubbish'));
         self::assertEmpty(get_term_meta($vehicle2['term_id'], 'rubbish', true));
+
+        self::assertInternalType('array', get_option('einsatzverwaltung_admin_notices'));
+        self::assertContains('regenerateSlugs', get_option('einsatzverwaltung_admin_notices'));
     }
 }

@@ -295,6 +295,30 @@ class Update
             }
         }
 
+        $this->addAdminNotice('regenerateSlugs');
+
         update_option('einsatzvw_db_version', 20);
+    }
+
+    /**
+     * Fügt einen Bezeichner für eine Admin Notice der Liste der noch anzuzeigenden Notices hinzu
+     *
+     * @param string $slug Bezeichner für die Notice
+     */
+    private function addAdminNotice($slug)
+    {
+        $notices = get_option('einsatzverwaltung_admin_notices');
+
+        if (!is_array($notices)) {
+            $notices = array();
+        }
+
+        // Slug soll maximal einmal auftauchen
+        if (in_array($slug, $notices)) {
+            return;
+        }
+
+        $notices[] = $slug;
+        update_option('einsatzverwaltung_admin_notices', $notices);
     }
 }

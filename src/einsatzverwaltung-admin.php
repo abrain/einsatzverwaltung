@@ -189,7 +189,7 @@ class Admin
             'Einsatznummer',
             'einsatzverwaltung_nummer',
             esc_attr($nummer),
-            $this->core->getNextEinsatznummer(date('Y')),
+            '',
             10
         );
 

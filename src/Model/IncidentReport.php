@@ -201,7 +201,7 @@ class IncidentReport
      */
     public function getNumber()
     {
-        return get_post_field('post_name', $this->post->ID);
+        return $this->getPostMeta('einsatz_incidentNumber');
     }
 
     /**

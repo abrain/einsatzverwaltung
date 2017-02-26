@@ -204,11 +204,9 @@ class Data
         }
 
         // Einsatznummer validieren
-        $einsatzjahr = date_format($alarmzeit, 'Y');
-        $einsatzNrFallback = $this->core->getNextEinsatznummer($einsatzjahr, $einsatzjahr == date('Y'));
-        $einsatznummer = sanitize_title($_POST['einsatzverwaltung_nummer'], $einsatzNrFallback, 'save');
-        if (!empty($einsatznummer)) {
-            $updateArgs['post_name'] = $einsatznummer; // Slug setzen
+        $inputIncidentNumber = sanitize_text_field($_POST['einsatzverwaltung_nummer']);
+        if (!empty($inputIncidentNumber)) {
+            $this->setEinsatznummer($postId, $inputIncidentNumber);
         }
 
         // Einsatzende validieren
@@ -378,14 +376,7 @@ class Data
             return;
         }
 
-        $updateArgs = array();
-        $updateArgs['post_name'] = $einsatznummer;
-        $updateArgs['ID'] = $postId;
-
-        // keine Sonderbehandlung beim Speichern
-        remove_action('save_post_einsatz', array($this, 'savePostdata'));
-        wp_update_post($updateArgs);
-        add_action('save_post_einsatz', array($this, 'savePostdata'), 10, 2);
+        update_post_meta($postId, 'einsatz_incidentNumber', $einsatznummer);
     }
 
     /**

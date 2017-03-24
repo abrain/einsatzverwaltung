@@ -67,6 +67,12 @@ class Settings
         add_filter('pre_update_option_einsatzvw_rewrite_slug', array($this, 'maybeRewriteSlugChanged'), 10, 2);
         add_filter('pre_update_option_einsatzvw_category', array($this, 'maybeCategoryChanged'), 10, 2);
         add_filter('pre_update_option_einsatzvw_loop_only_special', array($this, 'maybeCategorySpecialChanged'), 10, 2);
+        add_filter(
+            'pre_update_option_einsatzverwaltung_incidentnumbers_auto',
+            array($this, 'maybeAutoIncidentNumbersChanged'),
+            10,
+            2
+        );
     }
 
 
@@ -101,6 +107,11 @@ class Settings
             'einsatzvw_settings',
             'einsatzvw_rewrite_slug',
             'sanitize_title'
+        );
+        register_setting(
+            'einsatzvw_settings',
+            'einsatzverwaltung_incidentnumbers_auto',
+            array($this->utilities, 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings',
@@ -228,6 +239,14 @@ class Settings
             self::EVW_SETTINGS_SLUG
         );
         add_settings_section(
+            'einsatzvw_settings_numbers',
+            'Einsatznummern',
+            function () {
+                echo '<p>Die Einsatznummern k&ouml;nnen wahlweise manuell oder automatisch verwaltet werden.</p>';
+            },
+            self::EVW_SETTINGS_SLUG
+        );
+        add_settings_section(
             'einsatzvw_settings_einsatzberichte',
             'Einsatzberichte',
             function () {
@@ -267,18 +286,25 @@ class Settings
             'einsatzvw_settings_general'
         );
         add_settings_field(
-            'einsatzvw_einsatznummer_stellen',
-            'Format der Einsatznummer',
-            array($this, 'echoSettingsEinsatznummerFormat'),
-            self::EVW_SETTINGS_SLUG,
-            'einsatzvw_settings_general'
-        );
-        add_settings_field(
             'einsatzvw_einsatznummer_mainloop',
             'Einsatzbericht als Beitrag',
             array($this, 'echoEinsatzberichteMainloop'),
             self::EVW_SETTINGS_SLUG,
             'einsatzvw_settings_general'
+        );
+        add_settings_field(
+            'einsatzvw_einsatznummer_auto',
+            'Einsatznummern automatisch verwalten',
+            array($this, 'echoSettingsEinsatznummerAuto'),
+            self::EVW_SETTINGS_SLUG,
+            'einsatzvw_settings_numbers'
+        );
+        add_settings_field(
+            'einsatzvw_einsatznummer_stellen',
+            'Format der Einsatznummer',
+            array($this, 'echoSettingsEinsatznummerFormat'),
+            self::EVW_SETTINGS_SLUG,
+            'einsatzvw_settings_numbers'
         );
         add_settings_field(
             'einsatzvw_einsatz_hideemptydetails',
@@ -421,6 +447,14 @@ class Settings
         echo '<br><br><strong>Hinweis:</strong> Nach einer &Auml;nderung des Formats erhalten die bestehenden Einsatzberichte nicht automatisch aktualisierte Nummern. Nutzen Sie daf&uuml;r das Werkzeug <a href="' . admin_url('tools.php?page=einsatzvw-tool-enr') . '">Einsatznummern reparieren</a>.';
     }
 
+    public function echoSettingsEinsatznummerAuto()
+    {
+        $this->echoSettingsCheckbox(
+            'einsatzverwaltung_incidentnumbers_auto',
+            'Einsatznummern automatisch verwalten'
+        );
+        echo '<p class="description">Ist diese Option aktiv, kann die Einsatznummer nicht mehr manuell geändert werden. Sie wird automatisch gem&auml;&szlig; den nachfolgenden Regeln generiert und aktualisiert.</p>';
+    }
 
     /**
      * Gibt die Einstellmöglichkeit aus, ob und wie Einsatzberichte zusammen mit anderen Beiträgen ausgegeben werden
@@ -778,6 +812,31 @@ class Settings
                     $this->utilities->removePostFromCategory($report->getPostId(), $categoryId);
                 }
             }
+        }
+
+        return $newValue;
+    }
+
+    /**
+     * Prüft, ob die automatische Verwaltung der Einsatznummern aktiviert wurde, und deshalb alle Einsatznummern
+     * aktualisiert werden müssen
+     *
+     * @param string $newValue Der neue Wert
+     * @param string $oldValue Der alte Wert
+     *
+     * @return string Der zu speichernde Wert
+     */
+    public function maybeAutoIncidentNumbersChanged($newValue, $oldValue)
+    {
+        // Nur Änderungen sind interessant
+        if ($newValue == $oldValue) {
+            return $newValue;
+        }
+
+        // Die automatische Verwaltung wurde aktiviert
+        if ($newValue == 1) {
+            // TODO alle Einsatznummern aktualisieren
+            error_log('Auto an');
         }
 
         return $newValue;

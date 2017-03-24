@@ -27,6 +27,7 @@ class Options
         'einsatzvw_flush_rewrite_rules' => false,
         'einsatzvw_category' => false,
         'einsatzvw_loop_only_special' => false,
+        'einsatzverwaltung_incidentnumbers_auto' => false,
     );
 
     /**

@@ -834,8 +834,7 @@ class Settings
 
         // Die automatische Verwaltung wurde aktiviert
         if ($newValue == 1) {
-            // TODO alle Einsatznummern aktualisieren
-            error_log('Auto an');
+            $this->data->updateAllIncidentNumbers();
         }
     }
 

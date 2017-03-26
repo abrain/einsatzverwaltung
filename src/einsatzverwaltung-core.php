@@ -270,7 +270,7 @@ class Core
         $this->options = new Options($this->utilities);
         $this->utilities->setDependencies($this->options);
 
-        new Admin($this, $this->utilities);
+        new Admin($this, $this->options, $this->utilities);
         $this->data = new Data($this, $this->utilities, $this->options);
         new Frontend($this, $this->options, $this->utilities);
         new Settings($this, $this->options, $this->utilities, $this->data);

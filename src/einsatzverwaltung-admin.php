@@ -21,6 +21,11 @@ class Admin
     private $core;
 
     /**
+     * @var Options
+     */
+    private $options;
+
+    /**
      * @var Utilities
      */
     private $utilities;
@@ -29,11 +34,13 @@ class Admin
      * Constructor
      *
      * @param Core $core
+     * @param Options $options
      * @param Utilities $utilities
      */
-    public function __construct($core, $utilities)
+    public function __construct($core, $options, $utilities)
     {
         $this->core = $core;
+        $this->options = $options;
         $this->utilities = $utilities;
         $this->addHooks();
     }
@@ -186,13 +193,17 @@ class Admin
         echo '<input type="hidden" id="einsatzleiter_used_values" value="' . implode(',', $names) . '" />';
         echo '<table><tbody>';
 
-        $this->echoInputText(
-            'Einsatznummer',
-            'einsatzverwaltung_nummer',
-            esc_attr($nummer),
-            '',
-            10
-        );
+        if ($this->options->isAutoIncidentNumbers()) {
+            echo '<tr><td>Einsatznummer</td><td>' . esc_html($nummer) . '</td></tr>';
+        } else {
+            $this->echoInputText(
+                'Einsatznummer',
+                'einsatzverwaltung_nummer',
+                esc_attr($nummer),
+                '',
+                10
+            );
+        }
 
         $this->echoInputText(
             'Alarmzeit',

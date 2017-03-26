@@ -176,6 +176,14 @@ class Options
     /**
      * @return bool
      */
+    public function isAutoIncidentNumbers()
+    {
+        return $this->getBoolOption('einsatzverwaltung_incidentnumbers_auto');
+    }
+
+    /**
+     * @return bool
+     */
     public function isEinsatznummerLfdVorne()
     {
         $option = $this->getOption('einsatzvw_einsatznummer_lfdvorne');

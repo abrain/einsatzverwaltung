@@ -497,7 +497,9 @@ class ReportList
      */
     public static function getDynamicCss()
     {
-        if (empty(self::$settings)) {
+        $reportListSettings = self::$settings; // FIXME Verrenkung, um PHP 5.3.0 als Minimum zu ermöglichen, solange das
+                                               // Ende der Untersützung nicht im Blog angekündigt wurde.
+        if (empty($reportListSettings)) {
             self::$settings = new ReportListSettings();
         }
 

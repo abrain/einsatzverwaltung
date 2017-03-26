@@ -285,39 +285,6 @@ class Data
     }
 
     /**
-     * Setzt die laufende Nummer des hinzugefügten Einsatzberichts und passt ggf. die Nummern der anderen Berichte aus
-     * dem gleichen Kalenderjahr an.
-     *
-     * @param IncidentReport $report Der neu hinzugefügte Einsatzbericht
-     */
-    private function maybeUpdateSequenceNumbers($report)
-    {
-        $date = $report->getTimeOfAlerting();
-        $year = $date->format('Y');
-
-        $reportQuery = new ReportQuery();
-        $reportQuery->setExcludePostIds(array($report->getPostId()));
-        $reportQuery->setIncludePrivateReports(true);
-        $reportQuery->setLimit(1);
-        $reportQuery->setOrderAsc(false);
-        $reportQuery->setYear($year);
-        $mostRecentReports = $reportQuery->getReports();
-
-        if (!empty($mostRecentReports)) {
-            /** @var IncidentReport $mostRecentReport */
-            $mostRecentReport = $mostRecentReports[0];
-            if ($date->getTimestamp() > $mostRecentReport->getTimeOfAlerting()->getTimestamp()) {
-                $numberOfIncidentReports = $this->getNumberOfIncidentReports($year);
-                $this->setSequenceNumber($report->getPostId(), $numberOfIncidentReports);
-            } else {
-                $this->updateSequenceNumbers($year);
-            }
-        } else {
-            $this->setSequenceNumber($report->getPostId(), 1);
-        }
-    }
-
-    /**
      * Wird aufgerufen, sobald ein Einsatzbericht veröffentlicht wird
      *
      * @param int $postId Die ID des Einsatzberichts
@@ -328,7 +295,8 @@ class Data
         $report = new IncidentReport($post);
 
         // Laufende Nummern aktualisieren
-        $this->maybeUpdateSequenceNumbers($report);
+        $date = $report->getTimeOfAlerting();
+        $this->updateSequenceNumbers($date->format('Y'));
 
         // Kategoriezugehörigkeit aktualisieren
         $category = $this->options->getEinsatzberichteCategory();

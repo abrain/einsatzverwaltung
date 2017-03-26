@@ -2,7 +2,6 @@
 namespace abrain\Einsatzverwaltung\Util;
 
 use abrain\Einsatzverwaltung\Data;
-use abrain\Einsatzverwaltung\Frontend;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\Taxonomies;

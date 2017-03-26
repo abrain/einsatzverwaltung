@@ -1,7 +1,6 @@
 <?php
 namespace abrain\Einsatzverwaltung\Widgets;
 
-use abrain\Einsatzverwaltung\Frontend;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\Util\Formatter;

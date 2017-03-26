@@ -26,7 +26,6 @@ use abrain\Einsatzverwaltung\Model\ReportAnnotation;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use abrain\Einsatzverwaltung\Widgets\RecentIncidents;
 use abrain\Einsatzverwaltung\Widgets\RecentIncidentsFormatted;
-use WP_Query;
 use WP_User;
 
 /**

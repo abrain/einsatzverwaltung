@@ -3,7 +3,6 @@ namespace abrain\Einsatzverwaltung\Frontend;
 
 use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\Data;
-use abrain\Einsatzverwaltung\Frontend;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\Util\Formatter;
@@ -404,7 +403,7 @@ class ReportList
                 $cellContent = $report->getSequentialNumber();
                 break;
             case 'annotationImages':
-                $cellContent = $this->annotationIconBar->render($report,  array('images'));
+                $cellContent = $this->annotationIconBar->render($report, array('images'));
                 break;
             case 'annotationSpecial':
                 $cellContent = $this->annotationIconBar->render($report, array('special'));

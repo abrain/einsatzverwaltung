@@ -28,8 +28,6 @@ before_script:
   - bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
   - composer install --prefer-source
 
-script: phpunit
-
 after_script:
   - CODECLIMATE_REPO_TOKEN=c0e18ea554a37a7495947a34c818939c0599bde7c1efa3ee136989c053dde9da ./vendor/bin/test-reporter
 

@@ -97,16 +97,34 @@ class SequenceNumberTest extends WP_UnitTestCase
     {
         $reportIds = $this->reportFactory->generateManyForYear($year, 5);
 
+        // Datum austauschen
         $date1 = get_post_field('post_date', $reportIds[2]);
         $date2 = get_post_field('post_date', $reportIds[3]);
         wp_update_post(array('ID' => $reportIds[2], 'post_date' => $date2));
         wp_update_post(array('ID' => $reportIds[3], 'post_date' => $date1));
-
         $this->assertSequenceNumber(1, $reportIds[0]);
         $this->assertSequenceNumber(2, $reportIds[1]);
         $this->assertSequenceNumber(4, $reportIds[2]);
         $this->assertSequenceNumber(3, $reportIds[3]);
         $this->assertSequenceNumber(5, $reportIds[4]);
+
+        // Älteren Bericht zum neuesten Bericht machen
+        $lastDate = strtotime($year == date('Y') ? '3 hours ago' : '31 December ' . $year . ' 22:30:00');
+        wp_update_post(array('ID' => $reportIds[1], 'post_date' => date('Y-m-d H:i:s', $lastDate)));
+        $this->assertSequenceNumber(1, $reportIds[0]);
+        $this->assertSequenceNumber(2, $reportIds[3]);
+        $this->assertSequenceNumber(3, $reportIds[2]);
+        $this->assertSequenceNumber(4, $reportIds[4]);
+        $this->assertSequenceNumber(5, $reportIds[1]);
+
+        // Älteren Bericht zum ältesten Bericht machen
+        $firstDate = strtotime('1 January ' . $year . ' 01:30:00');
+        wp_update_post(array('ID' => $reportIds[2], 'post_date' => date('Y-m-d H:i:s', $firstDate)));
+        $this->assertSequenceNumber(1, $reportIds[2]);
+        $this->assertSequenceNumber(2, $reportIds[0]);
+        $this->assertSequenceNumber(3, $reportIds[3]);
+        $this->assertSequenceNumber(4, $reportIds[4]);
+        $this->assertSequenceNumber(5, $reportIds[1]);
     }
 
     /**

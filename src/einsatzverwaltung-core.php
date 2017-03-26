@@ -14,19 +14,18 @@ require_once dirname(__FILE__) . '/Widgets/RecentIncidentsFormatted.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-options.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-shortcodes.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-settings.php';
-require_once dirname(__FILE__) . '/einsatzverwaltung-tools.php';
 require_once dirname(__FILE__) . '/Import/Tool.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-taxonomies.php';
 require_once dirname(__FILE__) . '/Frontend/ReportList.php';
 require_once dirname(__FILE__) . '/Frontend/ReportListSettings.php';
 require_once dirname(__FILE__) . '/ReportQuery.php';
+require_once dirname(__FILE__) . '/TasksPage.php';
 
 use abrain\Einsatzverwaltung\Import\Tool as ImportTool;
 use abrain\Einsatzverwaltung\Model\ReportAnnotation;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use abrain\Einsatzverwaltung\Widgets\RecentIncidents;
 use abrain\Einsatzverwaltung\Widgets\RecentIncidentsFormatted;
-use WP_Query;
 use WP_User;
 
 /**
@@ -269,7 +268,7 @@ class Core
         $this->options = new Options($this->utilities);
         $this->utilities->setDependencies($this->options);
 
-        new Admin($this, $this->utilities);
+        new Admin($this, $this->options, $this->utilities);
         $this->data = new Data($this, $this->utilities, $this->options);
         new Frontend($this, $this->options, $this->utilities);
         new Settings($this, $this->options, $this->utilities, $this->data);
@@ -277,8 +276,8 @@ class Core
         new Taxonomies($this->utilities);
 
         // Tools
-        new ToolEinsatznummernReparieren($this, $this->data, $this->options);
-        new ImportTool($this, $this->utilities);
+        new ImportTool($this, $this->utilities, $this->options);
+        new TasksPage($this->utilities);
 
         // Widgets
         RecentIncidents::setDependencies($this->options, $this->utilities);

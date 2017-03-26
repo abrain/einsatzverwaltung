@@ -21,6 +21,11 @@ class Admin
     private $core;
 
     /**
+     * @var Options
+     */
+    private $options;
+
+    /**
      * @var Utilities
      */
     private $utilities;
@@ -29,11 +34,13 @@ class Admin
      * Constructor
      *
      * @param Core $core
+     * @param Options $options
      * @param Utilities $utilities
      */
-    public function __construct($core, $utilities)
+    public function __construct($core, $options, $utilities)
     {
         $this->core = $core;
+        $this->options = $options;
         $this->utilities = $utilities;
         $this->addHooks();
     }
@@ -42,6 +49,7 @@ class Admin
     {
         add_action('add_meta_boxes_einsatz', array($this, 'addMetaBoxes'));
         add_action('admin_menu', array($this, 'adjustTaxonomies'));
+        add_action('admin_notices', array($this, 'displayAdminNotices'));
         add_action('admin_enqueue_scripts', array($this, 'enqueueEditScripts'));
         add_filter('manage_edit-einsatz_columns', array($this, 'filterColumnsEinsatz'));
         add_action('manage_einsatz_posts_custom_column', array($this, 'filterColumnContentEinsatz'), 10, 2);
@@ -185,13 +193,17 @@ class Admin
         echo '<input type="hidden" id="einsatzleiter_used_values" value="' . implode(',', $names) . '" />';
         echo '<table><tbody>';
 
-        $this->echoInputText(
-            'Einsatznummer',
-            'einsatzverwaltung_nummer',
-            esc_attr($nummer),
-            $this->core->getNextEinsatznummer(date('Y')),
-            10
-        );
+        if ($this->options->isAutoIncidentNumbers()) {
+            echo '<tr><td>Einsatznummer</td><td>' . esc_html($nummer) . '</td></tr>';
+        } else {
+            $this->echoInputText(
+                'Einsatznummer',
+                'einsatzverwaltung_nummer',
+                esc_attr($nummer),
+                '',
+                10
+            );
+        }
 
         $this->echoInputText(
             'Alarmzeit',
@@ -467,5 +479,29 @@ class Admin
         $settingsPage = 'options-general.php?page=' . Settings::EVW_SETTINGS_SLUG;
         $actionLinks = array('<a href="' . admin_url($settingsPage) . '">Einstellungen</a>');
         return array_merge($links, $actionLinks);
+    }
+
+    public function displayAdminNotices()
+    {
+        // Keine Notices auf der TaskPage anzeigen
+        $currentScreen = get_current_screen();
+        if ('tools_page_einsatzverwaltung-tasks' === $currentScreen->id) {
+            return;
+        }
+
+        $notices = get_option('einsatzverwaltung_admin_notices');
+
+        if (empty($notices) || !is_array($notices)) {
+            return;
+        }
+
+        if (in_array('regenerateSlugs', $notices)) {
+            $url = admin_url('tools.php?page=' . TasksPage::PAGE_SLUG . '&action=regenerate-slugs');
+            echo '<div class="notice notice-info"><p>Die Links zu den einzelnen Einsatzberichten ';
+            echo 'werden ab jetzt aus dem Berichtstitel generiert (wie bei gew&ouml;hnlichen WordPress-Beitr&auml;gen)';
+            echo ' und nicht mehr aus der Einsatznummer. Dazu ist eine Anpassung der bestehenden Berichte ';
+            echo 'notwendig, die alten Links mit der Einsatznummer funktionieren weiterhin.<br>';
+            echo '<a href="' . $url . '" class="button button-primary">Anpassung durchf&uuml;hren</a></p></div>';
+        }
     }
 }

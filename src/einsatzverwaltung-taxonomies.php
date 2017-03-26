@@ -1,8 +1,6 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
-use wpdb;
-
 /**
  * Kümmert sich um die an Taxonomien angehängten Zusatzfelder
  */

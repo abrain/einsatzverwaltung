@@ -303,6 +303,15 @@ class UpgradeTest extends WP_UnitTestCase
         add_option('evw_tax_fahrzeug_'.$vehicle1['term_id'].'_something', 'dontcare');
         add_option('evw_tax_fahrzeug_'.$vehicle2['term_id'].'_rubbish', 'dontcare');
 
+        // Einsatzbericht mit altem post_name
+        $reportFactory = new ReportFactory();
+        $reportId1 = $reportFactory->create(array('post_name' => '1234'));
+        $reportId2 = $reportFactory->create(array('post_name' => '4567'));
+        $reportId3 = $reportFactory->create(array('post_name' => '7890'));
+        self::assertEmpty(get_post_meta($reportId1, 'einsatz_incidentNumber', true));
+        self::assertEmpty(get_post_meta($reportId2, 'einsatz_incidentNumber', true));
+        self::assertEmpty(get_post_meta($reportId3, 'einsatz_incidentNumber', true));
+
         $this->runUpgrade(10, 20);
 
         self::assertFalse(get_option('evw_tax_exteinsatzmittel_'.$ee1['term_id'].'_url'));
@@ -328,5 +337,14 @@ class UpgradeTest extends WP_UnitTestCase
         self::assertEmpty(get_term_meta($vehicle1['term_id'], 'something', true));
         self::assertNotFalse(get_option('evw_tax_fahrzeug_'.$vehicle2['term_id'].'_rubbish'));
         self::assertEmpty(get_term_meta($vehicle2['term_id'], 'rubbish', true));
+
+        // Einsatznummern sollten jetzt in Postmeta gespeichert sein
+        self::assertEquals('1234', get_post_meta($reportId1, 'einsatz_incidentNumber', true));
+        self::assertEquals('4567', get_post_meta($reportId2, 'einsatz_incidentNumber', true));
+        self::assertEquals('7890', get_post_meta($reportId3, 'einsatz_incidentNumber', true));
+
+        // Prüfe auf aktivierte Admin Notice
+        self::assertInternalType('array', get_option('einsatzverwaltung_admin_notices'));
+        self::assertContains('regenerateSlugs', get_option('einsatzverwaltung_admin_notices'));
     }
 }

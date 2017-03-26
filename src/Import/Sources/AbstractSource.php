@@ -15,7 +15,7 @@ abstract class AbstractSource
     protected $actionOrder = array();
     protected $args = array();
     protected $autoMatchFields = array();
-    protected $internalFields = array('post_name');
+    protected $internalFields = array();
     protected $problematicFields = array();
     protected $cachedFields;
 

@@ -277,7 +277,7 @@ class Core
         new Taxonomies($this->utilities);
 
         // Tools
-        new ImportTool($this, $this->utilities);
+        new ImportTool($this, $this->utilities, $this->options);
         new TasksPage($this->utilities);
 
         // Widgets

@@ -90,6 +90,9 @@ class IncidentReport
             'einsatz_special' => array(
                 'label' => 'Besonderer Einsatz'
             ),
+            'einsatz_incidentNumber' => array(
+                'label' => 'Einsatznummer'
+            ),
         );
     }
 
@@ -153,9 +156,6 @@ class IncidentReport
         return array(
             'post_date' => array(
                 'label' => 'Alarmzeit'
-            ),
-            'post_name' => array(
-                'label' => 'Einsatznummer'
             ),
             'post_content' => array(
                 'label' => 'Berichtstext'

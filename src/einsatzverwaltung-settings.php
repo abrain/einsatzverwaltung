@@ -67,12 +67,7 @@ class Settings
         add_filter('pre_update_option_einsatzvw_rewrite_slug', array($this, 'maybeRewriteSlugChanged'), 10, 2);
         add_filter('pre_update_option_einsatzvw_category', array($this, 'maybeCategoryChanged'), 10, 2);
         add_filter('pre_update_option_einsatzvw_loop_only_special', array($this, 'maybeCategorySpecialChanged'), 10, 2);
-        add_filter(
-            'pre_update_option_einsatzverwaltung_incidentnumbers_auto',
-            array($this, 'maybeAutoIncidentNumbersChanged'),
-            10,
-            2
-        );
+        add_action('updated_option', array($this, 'maybeAutoIncidentNumbersChanged'), 10, 3);
     }
 
 
@@ -821,16 +816,20 @@ class Settings
      * Prüft, ob die automatische Verwaltung der Einsatznummern aktiviert wurde, und deshalb alle Einsatznummern
      * aktualisiert werden müssen
      *
-     * @param string $newValue Der neue Wert
+     * @param string $option Name der Option
      * @param string $oldValue Der alte Wert
-     *
-     * @return string Der zu speichernde Wert
+     * @param string $newValue Der neue Wert
      */
-    public function maybeAutoIncidentNumbersChanged($newValue, $oldValue)
+    public function maybeAutoIncidentNumbersChanged($option, $oldValue, $newValue)
     {
+        // Wir sind nur an einer bestimmten Option interessiert
+        if ('einsatzverwaltung_incidentnumbers_auto' != $option) {
+            return;
+        }
+
         // Nur Änderungen sind interessant
         if ($newValue == $oldValue) {
-            return $newValue;
+            return;
         }
 
         // Die automatische Verwaltung wurde aktiviert
@@ -838,8 +837,6 @@ class Settings
             // TODO alle Einsatznummern aktualisieren
             error_log('Auto an');
         }
-
-        return $newValue;
     }
 
     /**

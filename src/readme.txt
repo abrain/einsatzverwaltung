@@ -3,8 +3,8 @@ Contributors: abrain
 Donate link: https://einsatzverwaltung.abrain.de/unterstuetzen/
 Tags: Feuerwehr, Einsatz, Rettung, Rettungsdienst, THW, HiOrg, Wasserwacht, Bergrettung
 Requires at least: 4.4.0
-Tested up to: 4.6
-Stable tag: 1.2.3
+Tested up to: 4.7
+Stable tag: 1.3.0
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -69,6 +69,17 @@ Das Du halte ich f&uuml;r die angenehmere Arbeitsgrundlage, aber man darf mich g
 Nein, mehr gibt es [hier](https://einsatzverwaltung.abrain.de/faq/).
 
 == Changelog ==
+
+= 1.3.0 =
+* Neuer Vermerk 'Bilder im Bericht'
+* Einsatzliste: Neue Spalten für Vermerke 'Bilder im Bericht' und 'Besonderer Einsatz'
+* Vermerke werden in der Übersicht im Adminbereich angezeigt
+* Einsatznummer ist nun nicht mehr Teil der URL
+* Import: Einsatznummer kann importiert werden
+* Einsatznummern können wahlweise automatisch oder manuell verwaltet werden
+* Werkzeug zum Reparieren der Einsatznummern entfernt
+* Mindestanforderung auf WordPress 4.4 angehoben
+* Getestet mit WordPress 4.7
 
 = 1.2.3 =
 Verbesserungen:

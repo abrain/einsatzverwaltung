@@ -5,6 +5,8 @@ require_once dirname(__FILE__) . '/einsatzverwaltung-admin.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-data.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-utilities.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-frontend.php';
+require_once dirname(__FILE__) . '/Model/ReportAnnotation.php';
+require_once dirname(__FILE__) . '/ReportAnnotationRepository.php';
 require_once dirname(__FILE__) . '/Model/IncidentReport.php';
 require_once dirname(__FILE__) . '/Util/Formatter.php';
 require_once dirname(__FILE__) . '/Widgets/RecentIncidents.php';
@@ -12,18 +14,18 @@ require_once dirname(__FILE__) . '/Widgets/RecentIncidentsFormatted.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-options.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-shortcodes.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-settings.php';
-require_once dirname(__FILE__) . '/einsatzverwaltung-tools.php';
 require_once dirname(__FILE__) . '/Import/Tool.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-taxonomies.php';
 require_once dirname(__FILE__) . '/Frontend/ReportList.php';
 require_once dirname(__FILE__) . '/Frontend/ReportListSettings.php';
 require_once dirname(__FILE__) . '/ReportQuery.php';
+require_once dirname(__FILE__) . '/TasksPage.php';
 
 use abrain\Einsatzverwaltung\Import\Tool as ImportTool;
+use abrain\Einsatzverwaltung\Model\ReportAnnotation;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use abrain\Einsatzverwaltung\Widgets\RecentIncidents;
 use abrain\Einsatzverwaltung\Widgets\RecentIncidentsFormatted;
-use WP_Query;
 use WP_User;
 
 /**
@@ -31,8 +33,8 @@ use WP_User;
  */
 class Core
 {
-    const VERSION = '1.2.3';
-    const DB_VERSION = 10;
+    const VERSION = '1.3.0';
+    const DB_VERSION = 20;
 
     public $pluginFile;
     public $pluginBasename;
@@ -91,6 +93,7 @@ class Core
             'edit_published_posts' => 'edit_published_einsatzberichte'
         ),
         'menu_position' => 5,
+        'menu_icon' => 'dashicons-media-document',
         'taxonomies' => array('post_tag', 'category'),
         'delete_with_user' => false,
     );
@@ -231,6 +234,11 @@ class Core
     );
 
     /**
+     * @var ReportAnnotationRepository
+     */
+    private $annotationRepository;
+
+    /**
      * @var Data
      */
     private $data;
@@ -261,7 +269,7 @@ class Core
         $this->options = new Options($this->utilities);
         $this->utilities->setDependencies($this->options);
 
-        new Admin($this, $this->utilities);
+        new Admin($this, $this->options, $this->utilities);
         $this->data = new Data($this, $this->utilities, $this->options);
         new Frontend($this, $this->options, $this->utilities);
         new Settings($this, $this->options, $this->utilities, $this->data);
@@ -269,8 +277,8 @@ class Core
         new Taxonomies($this->utilities);
 
         // Tools
-        new ToolEinsatznummernReparieren($this, $this->data, $this->options);
-        new ImportTool($this, $this->utilities);
+        new ImportTool($this, $this->utilities, $this->options);
+        new TasksPage($this->utilities, $this->data);
 
         // Widgets
         RecentIncidents::setDependencies($this->options, $this->utilities);
@@ -342,9 +350,6 @@ class Core
     private function registerTypes()
     {
         // Anpassungen der Parameter
-        if ($this->utilities->isMinWPVersion("3.9")) {
-            $this->argsEinsatz['menu_icon'] = 'dashicons-media-document';
-        }
         $this->argsEinsatz['rewrite']['slug'] = $this->options->getRewriteSlug();
 
         register_post_type('einsatz', $this->argsEinsatz);
@@ -352,6 +357,33 @@ class Core
         register_taxonomy('fahrzeug', 'einsatz', $this->argsFahrzeug);
         register_taxonomy('exteinsatzmittel', 'einsatz', $this->argsExteinsatzmittel);
         register_taxonomy('alarmierungsart', 'einsatz', $this->argsAlarmierungsart);
+
+        // Vermerke registrieren
+        $this->annotationRepository = new ReportAnnotationRepository();
+        $this->annotationRepository->addAnnotation(new ReportAnnotation(
+            'images',
+            'Bilder im Bericht',
+            'einsatz_hasimages',
+            'camera',
+            'Einsatzbericht enthält Bilder',
+            'Einsatzbericht enthält keine Bilder'
+        ));
+        $this->annotationRepository->addAnnotation(new ReportAnnotation(
+            'special',
+            'Besonderer Einsatz',
+            'einsatz_special',
+            'star',
+            'Besonderer Einsatz',
+            'Kein besonderer Einsatz'
+        ));
+        $this->annotationRepository->addAnnotation(new ReportAnnotation(
+            'falseAlarm',
+            'Fehlalarm',
+            'einsatz_fehlalarm',
+            '',
+            'Fehlalarm',
+            'Kein Fehlalarm'
+        ));
     }
 
     private function addRewriteRules()
@@ -389,13 +421,8 @@ class Core
         if (empty($jahr) || !is_numeric($jahr)) {
             $jahr = date('Y');
         }
-        $query = new WP_Query(array(
-            'year' =>  $jahr,
-            'post_type' => 'einsatz',
-            'post_status' => array('publish', 'private'),
-            'nopaging' => true
-        ));
-        return $this->formatEinsatznummer($jahr, $query->found_posts + ($minuseins ? 0 : 1));
+
+        return $this->formatEinsatznummer($jahr, $this->data->getNumberOfIncidentReports($jahr) + ($minuseins ? 0 : 1));
     }
 
     /**
@@ -485,15 +512,35 @@ class Core
 
     private function maybeUpdate()
     {
-        $currentDbVersion = get_option('einsatzvw_db_version', self::DB_VERSION);
-        if ($currentDbVersion >= self::DB_VERSION) {
+        $currentDbVersion = get_option('einsatzvw_db_version');
+        if (!empty($currentDbVersion) && $currentDbVersion >= self::DB_VERSION) {
             return;
         }
 
+        $update = $this->getUpdater();
+        $updateResult = $update->doUpdate($currentDbVersion, self::DB_VERSION);
+        if (is_wp_error($updateResult)) {
+            error_log("Das Datenbank-Upgrade wurde mit folgendem Fehler beendet: {$updateResult->get_error_message()}");
+        }
+    }
+
+    /**
+     * @return Update
+     */
+    public function getUpdater()
+    {
         require_once(__DIR__ . '/einsatzverwaltung-update.php');
-        $update = new Update($this, $this->options, $this->utilities, $this->data);
-        $update->doUpdate($currentDbVersion, self::DB_VERSION);
+        return new Update($this, $this->options, $this->utilities, $this->data);
+    }
+
+    /**
+     * @return ReportAnnotationRepository
+     */
+    public function getAnnotationRepository()
+    {
+        return $this->annotationRepository;
     }
 }
 
-new Core();
+// Die globale Variable wird nur bei den Unit-Test benötigt
+$GLOBALS['einsatzverwaltung_core'] = new Core();

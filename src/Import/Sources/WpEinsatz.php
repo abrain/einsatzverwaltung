@@ -35,14 +35,14 @@ class WpEinsatz extends AbstractSource
         $this->actionOrder = array(
             array(
                 'slug' => 'analysis',
-                'name' => __('Analyse', 'einsatzverwaltung'),
-                'button_text' => __('Datenbank analysieren', 'einsatzverwaltung'),
+                'name' => 'Analyse',
+                'button_text' => 'Datenbank analysieren',
                 'args' => array()
             ),
             array(
                 'slug' => 'import',
-                'name' => __('Import', 'einsatzverwaltung'),
-                'button_text' => __('Import starten', 'einsatzverwaltung'),
+                'name' => 'Import',
+                'button_text' => 'Import starten',
                 'args' => array()
             )
         );
@@ -76,7 +76,7 @@ class WpEinsatz extends AbstractSource
      */
     public function getDescription()
     {
-        return __('Importiert Einsätze aus dem WordPress-Plugin wp-einsatz.', 'einsatzverwaltung');
+        return 'Importiert Einsätze aus dem WordPress-Plugin wp-einsatz.';
     }
 
     /**

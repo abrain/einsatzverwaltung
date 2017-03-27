@@ -90,6 +90,9 @@ class IncidentReport
             'einsatz_special' => array(
                 'label' => 'Besonderer Einsatz'
             ),
+            'einsatz_incidentNumber' => array(
+                'label' => 'Einsatznummer'
+            ),
         );
     }
 
@@ -154,9 +157,6 @@ class IncidentReport
             'post_date' => array(
                 'label' => 'Alarmzeit'
             ),
-            'post_name' => array(
-                'label' => 'Einsatznummer'
-            ),
             'post_content' => array(
                 'label' => 'Berichtstext'
             ),
@@ -201,7 +201,7 @@ class IncidentReport
      */
     public function getNumber()
     {
-        return get_post_field('post_name', $this->post->ID);
+        return $this->getPostMeta('einsatz_incidentNumber');
     }
 
     /**
@@ -375,6 +375,16 @@ class IncidentReport
     public function hasContent()
     {
         return !empty($this->post->post_content);
+    }
+
+    /**
+     * Gibt zurück, ob der Einsatzbericht Bilder beinhaltet.
+     *
+     * @return bool
+     */
+    public function hasImages()
+    {
+        return ($this->getPostMeta('einsatz_hasimages') == 1);
     }
 
     /**

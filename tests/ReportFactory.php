@@ -15,6 +15,7 @@ class ReportFactory extends WP_UnitTest_Factory_For_Post
         'einsatz_einsatzleiter' => '',
         'einsatz_einsatzort' => '',
         'einsatz_fehlalarm' => 0,
+        'einsatz_incidentNumber' => '',
         'einsatz_mannschaft' => '',
         'einsatz_special' => 0,
     );
@@ -56,25 +57,34 @@ class ReportFactory extends WP_UnitTest_Factory_For_Post
         return $generatedArgs;
     }
 
-    /**
-     * @param $args
-     * @return int|\WP_Error
-     */
-    public function create_object($args)
+    public function generateManyForYear($year, $count, $args = array(), $generationDefinitions = null)
     {
-        $post = parent::create_object($args);
-
-        if (is_wp_error($post) || 0 === $post) {
-            return $post;
+        if ($count < 1) {
+            return array();
         }
 
-        // meta_input ist erst ab WP 4.4 nutzbar
-        if (version_compare(get_bloginfo('version'), '4.4', '<')) {
-            foreach ($this->defaultMetaInput as $metaKey => $metaValue) {
-                add_post_meta((int) $post, $metaKey, $metaValue);
+        $dates = array();
+
+        $firstDate = strtotime('1 January ' . $year . ' 03:00:00');
+        $lastDate = strtotime($year == date('Y') ? '24 hours ago' : '31 December ' . $year . ' 20:59:59');
+
+        $dates[] = date('Y-m-d H:i:s', $firstDate);
+
+        if ($count > 2) {
+            $timestampDistance = ($lastDate - $firstDate) / ($count - 1);
+            for ($i = 1; $i < $count - 1; $i++) {
+                $dates[] = date('Y-m-d H:i:s', $firstDate + $timestampDistance * $i);
             }
         }
 
-        return $post;
+        if ($count > 1) {
+            $dates[] = date('Y-m-d H:i:s', $lastDate);
+        }
+
+        $reportIds = array();
+        foreach ($dates as $index => $date) {
+            $reportIds[] = $this->create(array('post_date' => $date));
+        }
+        return $reportIds;
     }
 }

@@ -67,6 +67,7 @@ class Settings
         add_filter('pre_update_option_einsatzvw_rewrite_slug', array($this, 'maybeRewriteSlugChanged'), 10, 2);
         add_filter('pre_update_option_einsatzvw_category', array($this, 'maybeCategoryChanged'), 10, 2);
         add_filter('pre_update_option_einsatzvw_loop_only_special', array($this, 'maybeCategorySpecialChanged'), 10, 2);
+        add_action('updated_option', array($this, 'maybeAutoIncidentNumbersChanged'), 10, 3);
     }
 
 
@@ -101,6 +102,11 @@ class Settings
             'einsatzvw_settings',
             'einsatzvw_rewrite_slug',
             'sanitize_title'
+        );
+        register_setting(
+            'einsatzvw_settings',
+            'einsatzverwaltung_incidentnumbers_auto',
+            array($this->utilities, 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings',
@@ -228,6 +234,14 @@ class Settings
             self::EVW_SETTINGS_SLUG
         );
         add_settings_section(
+            'einsatzvw_settings_numbers',
+            'Einsatznummern',
+            function () {
+                echo '<p>Die Einsatznummern k&ouml;nnen wahlweise manuell oder automatisch verwaltet werden.</p>';
+            },
+            self::EVW_SETTINGS_SLUG
+        );
+        add_settings_section(
             'einsatzvw_settings_einsatzberichte',
             'Einsatzberichte',
             function () {
@@ -267,18 +281,25 @@ class Settings
             'einsatzvw_settings_general'
         );
         add_settings_field(
-            'einsatzvw_einsatznummer_stellen',
-            'Format der Einsatznummer',
-            array($this, 'echoSettingsEinsatznummerFormat'),
-            self::EVW_SETTINGS_SLUG,
-            'einsatzvw_settings_general'
-        );
-        add_settings_field(
             'einsatzvw_einsatznummer_mainloop',
             'Einsatzbericht als Beitrag',
             array($this, 'echoEinsatzberichteMainloop'),
             self::EVW_SETTINGS_SLUG,
             'einsatzvw_settings_general'
+        );
+        add_settings_field(
+            'einsatzvw_einsatznummer_auto',
+            'Einsatznummern automatisch verwalten',
+            array($this, 'echoSettingsEinsatznummerAuto'),
+            self::EVW_SETTINGS_SLUG,
+            'einsatzvw_settings_numbers'
+        );
+        add_settings_field(
+            'einsatzvw_einsatznummer_stellen',
+            'Format der Einsatznummer',
+            array($this, 'echoSettingsEinsatznummerFormat'),
+            self::EVW_SETTINGS_SLUG,
+            'einsatzvw_settings_numbers'
         );
         add_settings_field(
             'einsatzvw_einsatz_hideemptydetails',
@@ -421,6 +442,14 @@ class Settings
         echo '<br><br><strong>Hinweis:</strong> Nach einer &Auml;nderung des Formats erhalten die bestehenden Einsatzberichte nicht automatisch aktualisierte Nummern. Nutzen Sie daf&uuml;r das Werkzeug <a href="' . admin_url('tools.php?page=einsatzvw-tool-enr') . '">Einsatznummern reparieren</a>.';
     }
 
+    public function echoSettingsEinsatznummerAuto()
+    {
+        $this->echoSettingsCheckbox(
+            'einsatzverwaltung_incidentnumbers_auto',
+            'Einsatznummern automatisch verwalten'
+        );
+        echo '<p class="description">Ist diese Option aktiv, kann die Einsatznummer nicht mehr manuell geändert werden. Sie wird automatisch gem&auml;&szlig; den nachfolgenden Regeln generiert und aktualisiert.</p>';
+    }
 
     /**
      * Gibt die Einstellmöglichkeit aus, ob und wie Einsatzberichte zusammen mit anderen Beiträgen ausgegeben werden
@@ -435,7 +464,7 @@ class Settings
         echo '<p class="description">L&auml;sst die Einsatzberichte z.B. auf der Startseite, im Widget &quot;Letzte Beitr&auml;ge&quot; oder auch im Beitragsfeed erscheinen</p>';
 
         echo '<p><label for="einsatzvw_category">';
-        _e('Davon unabh&auml;ngig Einsatzberichte immer in folgender Kategorie anzeigen:', 'einsatzverwaltung');
+        echo 'Davon unabh&auml;ngig Einsatzberichte immer in folgender Kategorie anzeigen:';
         echo '&nbsp;</label>';
         wp_dropdown_categories(array(
             'show_option_none' => '- keine -',
@@ -645,7 +674,6 @@ class Settings
         echo '<p>eMail: <a href="mailto:kontakt@abrain.de">kontakt@abrain.de</a> <span title="PGP Schl&uuml;ssel-ID: 8752EB8F" class="pgpbadge"><i class="fa fa-lock"></i>&nbsp;PGP</span></p>';
         echo '<p align="center"><a href="https://www.facebook.com/einsatzverwaltung/" title="Einsatzverwaltung auf Facebook"><i class="fa fa-facebook-official fa-2x"></i></a>&nbsp;&nbsp;';
         echo '<a href="https://twitter.com/einsatzvw" title="Einsatzverwaltung auf Twitter"><i class="fa fa-twitter fa-2x"></i></a>&nbsp;&nbsp;';
-        echo '<a href="https://alpha.app.net/einsatzverwaltung" title="Einsatzverwaltung auf Alpha by App.net"><i class="fa fa-adn fa-2x"></i></a>&nbsp;&nbsp;';
         echo '<a href="https://einsatzverwaltung.abrain.de/feed/" title="RSS-Feed mit Neuigkeiten zu Einsatzverwaltung"><i class="fa fa-rss-square fa-2x"></i></a>';
         echo '</p></div>';
 
@@ -782,6 +810,32 @@ class Settings
         }
 
         return $newValue;
+    }
+
+    /**
+     * Prüft, ob die automatische Verwaltung der Einsatznummern aktiviert wurde, und deshalb alle Einsatznummern
+     * aktualisiert werden müssen
+     *
+     * @param string $option Name der Option
+     * @param string $oldValue Der alte Wert
+     * @param string $newValue Der neue Wert
+     */
+    public function maybeAutoIncidentNumbersChanged($option, $oldValue, $newValue)
+    {
+        // Wir sind nur an einer bestimmten Option interessiert
+        if ('einsatzverwaltung_incidentnumbers_auto' != $option) {
+            return;
+        }
+
+        // Nur Änderungen sind interessant
+        if ($newValue == $oldValue) {
+            return;
+        }
+
+        // Die automatische Verwaltung wurde aktiviert
+        if ($newValue == 1) {
+            $this->data->updateAllIncidentNumbers();
+        }
     }
 
     /**

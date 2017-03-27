@@ -1,6 +1,7 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
+use WP_Error;
 use wpdb;
 
 /**
@@ -48,42 +49,60 @@ class Update
      *
      * @param int $currentDbVersion derzeitige Version der Datenbank
      * @param int $targetDbVersion Zielversion der Datenbank
+     *
+     * @return void|WP_Error
      */
     public function doUpdate($currentDbVersion, $targetDbVersion)
     {
-        if (empty($currentDbVersion) || empty($targetDbVersion)) {
-            error_log('Parameter für Datenbank-Update unvollständig');
-            return;
+        if (empty($targetDbVersion)) {
+            return new WP_Error('', 'Zieldatenbankversion darf nicht leer sein');
         }
 
         // Kein Timeout während des Updates
         set_time_limit(0);
 
-        while ($currentDbVersion < $targetDbVersion) {
-            $currentDbVersion ++;
-            error_log("Update auf DB-Version {$currentDbVersion}...");
-            $func = array($this, "updateTo{$currentDbVersion}");
-            if (!is_callable($func)) {
-                error_log("Keine Update-Methode für Datenbankversion {$currentDbVersion} gefunden!");
-                break;
-            }
-
-            $result = call_user_func($func);
-            if ($result === false) {
-                error_log("Datenbankupdate auf Version {$currentDbVersion} ist fehlgeschlagen");
-                break;
-            }
-
-            update_option('einsatzvw_db_version', $currentDbVersion);
+        if (empty($currentDbVersion) && $targetDbVersion >= 1) {
+            $currentDbVersion = 0;
+            $this->upgrade054();
         }
 
-        error_log("Datenbank-Update beendet");
+        if ($currentDbVersion < 2 && $targetDbVersion >= 2) {
+            $this->upgrade070();
+        }
+
+        if ($currentDbVersion < 3 && $targetDbVersion >= 3) {
+            $this->upgrade082();
+        }
+
+        if ($currentDbVersion < 4 && $targetDbVersion >= 4) {
+            $this->upgrade090();
+        }
+
+        if ($currentDbVersion < 5 && $targetDbVersion >= 5) {
+            $this->upgrade100();
+        }
+
+        if ($currentDbVersion < 6 && $targetDbVersion >= 6) {
+            $this->upgrade113();
+        }
+
+        if ($currentDbVersion < 7 && $targetDbVersion >= 7) {
+            $this->upgrade114();
+        }
+
+        if ($currentDbVersion < 10 && $targetDbVersion >= 10) {
+            $this->upgrade120();
+        }
+
+        if ($currentDbVersion < 20 && $targetDbVersion >= 20) {
+            $this->upgrade130();
+        }
     }
 
     /**
      * GMT-Datum wurde nicht gespeichert EVW-58
      */
-    private function updateTo1()
+    private function upgrade054()
     {
         /** @var wpdb $wpdb */
         global $wpdb;
@@ -101,94 +120,100 @@ class Update
                 error_log('Problem beim Aktualisieren des GMT-Datums bei Post-ID ' . $bericht->ID);
             }
         }
+
+        update_option('einsatzvw_db_version', 1);
     }
 
-    private function updateTo2()
+    private function upgrade070()
     {
         update_option('einsatzvw_cap_roles_administrator', 1);
-        $role_obj = get_role('administrator');
+        $roleObject = get_role('administrator');
         foreach ($this->core->getCapabilities() as $cap) {
-            $role_obj->add_cap($cap);
+            $roleObject->add_cap($cap);
         }
+
+        update_option('einsatzvw_db_version', 2);
     }
 
-    /**
-     * @return bool True bei Erfolg, False bei Fehler
-     */
-    private function updateTo3()
+    private function upgrade082()
     {
         delete_option('einsatzvw_show_links_in_excerpt');
-        return true;
+        update_option('einsatzvw_db_version', 3);
     }
 
     /**
-     * @return bool True bei Erfolg, False bei Fehler
+     * @since 0.9.0
      */
-    private function updateTo4()
+    private function upgrade090()
     {
         /** @var wpdb $wpdb */
         global $wpdb;
 
-        $result = $wpdb->delete(
+        $wpdb->delete(
             $wpdb->postmeta,
             array(
                 'meta_key' => 'einsatz_mannschaft',
                 'meta_value' => '0'
             )
         );
-        return (false !== $result);
+
+        update_option('einsatzvw_db_version', 4);
     }
 
     /**
      * @since 1.0.0
-     *
-     * @return bool Gibt immer True zurück
      */
-    private function updateTo5()
+    private function upgrade100()
     {
         add_option('einsatzvw_rewrite_slug', 'einsaetze');
-        return true;
+        update_option('einsatzvw_db_version', 5);
     }
 
     /**
      * Entfernt die Berechtigungen aus den Benutzerrollen und die unnötige Option für Administratoren
      *
-     * @return bool Gibt immer True zurück
+     * @since 1.1.3
      */
-    private function updateTo6()
+    private function upgrade113()
     {
         if (!function_exists('get_editable_roles')) {
             require_once(ABSPATH . 'wp-admin/includes/user.php');
         }
         $roles = get_editable_roles();
         if (!empty($roles)) {
-            foreach (array_keys($roles) as $role_slug) {
-                $role_obj = get_role($role_slug);
+            foreach (array_keys($roles) as $roleSlug) {
+                $roleObject = get_role($roleSlug);
                 foreach ($this->core->getCapabilities() as $cap) {
-                    error_log("Remove $cap from $role_slug");
-                    $role_obj->remove_cap($cap);
+                    $roleObject->remove_cap($cap);
                 }
             }
         }
 
         delete_option('einsatzvw_cap_roles_administrator');
-        return true;
+        update_option('einsatzvw_db_version', 6);
     }
 
     /**
      * Aktualisiert die Rewrite Rules nach einer Änderung
+     *
+     * @since 1.1.4
      */
-    private function updateTo7()
+    private function upgrade114()
     {
         $this->options->setFlushRewriteRules(true);
+        update_option('einsatzvw_db_version', 7);
     }
 
     /**
      * Fügt alle veröffentlichten Einsatzberichte einer Kategorie hinzu, wenn diese in den Einstellungen für die
      * Einsatzberichte gesetzt wurde
+     *
+     * @since 1.2.0
      */
-    private function updateTo8()
+    private function upgrade120()
     {
+        // Alle veröffentlichten Einsatzberichte einer Kategorie hinzufügen, wenn diese in den Einstellungen für die
+        // Einsatzberichte gesetzt wurde
         if (!function_exists('category_exists')) {
             require_once(ABSPATH . 'wp-admin/includes/taxonomy.php');
         }
@@ -205,23 +230,13 @@ class Update
                 $this->utilities->addPostToCategory($post->ID, $categoryId);
             }
         }
-    }
 
-    /**
-     * Aktualisiert sämtliche laufenden Nummern der Einsatzberichte
-     */
-    private function updateTo9()
-    {
+        // Aktualisiert sämtliche laufenden Nummern der Einsatzberichte
         $this->data->updateSequenceNumbers();
-    }
 
-    /**
-     * Setzt alle alten Einsatzberichte auf 'nicht als besonders markiert', wichtig für das Einfügen in die Mainloop.
-     * Außerdem wird die Option, ob nur besondere Einsatzberichte zwischen den WordPress-Beiträgen auftauchen sollen,
-     * umbenannt.
-     */
-    private function updateTo10()
-    {
+        // Setzt alle alten Einsatzberichte auf 'nicht als besonders markiert', wichtig für das Einfügen in die
+        // Mainloop. Außerdem wird die Option, ob nur besondere Einsatzberichte zwischen den WordPress-Beiträgen
+        // auftauchen sollen, umbenannt.
         $posts = get_posts(array(
             'post_type' => 'einsatz',
             'post_status' => array('publish', 'private'),
@@ -238,5 +253,83 @@ class Update
             add_option('einsatzvw_loop_only_special', $option);
         }
         delete_option('einsatzvw_category_only_special');
+
+        update_option('einsatzvw_db_version', 10);
+    }
+
+    private function upgrade130()
+    {
+        /** @var wpdb $wpdb */
+        global $wpdb;
+
+        $taxonomies = array(
+            'exteinsatzmittel' => array('url'),
+            'fahrzeug' => array('fahrzeugpid', 'vehicleorder')
+        );
+
+        foreach ($taxonomies as $taxonomy => $metakeys) {
+            $rows = $wpdb->get_results("SELECT option_name, option_value FROM $wpdb->options WHERE option_name LIKE 'evw_tax_{$taxonomy}_%'");
+
+            foreach ($rows as $row) {
+                $key = $row->option_name;
+                preg_match('/evw_tax_' . $taxonomy . '_(\d+)_([a-z]+)/', $key, $matches);
+                $termId = $matches[1];
+                $metakey = $matches[2];
+                $metavalue = $row->option_value;
+
+                // nur bekannte metakeys umwandeln
+                if (!in_array($metakey, $metakeys)) {
+                    continue;
+                }
+
+                // Prüfen, ob ein Term-Split stattfand, der noch nicht behandelt wurde
+                $termIdAfterSplit = wp_get_split_term($termId, $taxonomy);
+                if (false !== $termIdAfterSplit) {
+                    $termId = $termIdAfterSplit;
+                }
+
+                $addTermMeta = add_term_meta($termId, $metakey, $metavalue, true);
+                if (!is_wp_error($addTermMeta) && false !== $addTermMeta) {
+                    delete_option($key);
+                }
+            }
+        }
+
+        // Einsatznummern in Postmeta kopieren
+        $posts = get_posts(array(
+            'nopaging' => true,
+            'post_type' => 'einsatz',
+            'post_status' => array('publish', 'private'),
+        ));
+        foreach ($posts as $post) {
+            update_post_meta($post->ID, 'einsatz_incidentNumber', get_post_field('post_name', $post->ID));
+        }
+
+        // Admin Notice aktivieren
+        $this->addAdminNotice('regenerateSlugs');
+
+        update_option('einsatzvw_db_version', 20);
+    }
+
+    /**
+     * Fügt einen Bezeichner für eine Admin Notice der Liste der noch anzuzeigenden Notices hinzu
+     *
+     * @param string $slug Bezeichner für die Notice
+     */
+    private function addAdminNotice($slug)
+    {
+        $notices = get_option('einsatzverwaltung_admin_notices');
+
+        if (!is_array($notices)) {
+            $notices = array();
+        }
+
+        // Slug soll maximal einmal auftauchen
+        if (in_array($slug, $notices)) {
+            return;
+        }
+
+        $notices[] = $slug;
+        update_option('einsatzverwaltung_admin_notices', $notices);
     }
 }

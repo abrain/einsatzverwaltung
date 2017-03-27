@@ -70,7 +70,7 @@ install_wp() {
 install_test_suite() {
 	# portable in-place argument for both GNU sed and Mac OSX sed
 	if [[ $(uname -s) == 'Darwin' ]]; then
-		local ioption='-i .bak'
+		local ioption='-i.bak'
 	else
 		local ioption='-i'
 	fi
@@ -80,6 +80,7 @@ install_test_suite() {
 		# set up testing suite
 		mkdir -p $WP_TESTS_DIR
 		svn co --quiet https://develop.svn.wordpress.org/${WP_TESTS_TAG}/tests/phpunit/includes/ $WP_TESTS_DIR/includes
+		svn co --quiet https://develop.svn.wordpress.org/${WP_TESTS_TAG}/tests/phpunit/data/ $WP_TESTS_DIR/data
 	fi
 
 	if [ ! -f wp-tests-config.php ]; then

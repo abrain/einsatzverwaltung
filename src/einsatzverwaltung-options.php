@@ -27,6 +27,7 @@ class Options
         'einsatzvw_flush_rewrite_rules' => false,
         'einsatzvw_category' => false,
         'einsatzvw_loop_only_special' => false,
+        'einsatzverwaltung_incidentnumbers_auto' => false,
     );
 
     /**
@@ -170,6 +171,14 @@ class Options
     public function getTimeFormat()
     {
         return $this->getOption('time_format');
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAutoIncidentNumbers()
+    {
+        return $this->getBoolOption('einsatzverwaltung_incidentnumbers_auto');
     }
 
     /**

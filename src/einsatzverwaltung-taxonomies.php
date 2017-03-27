@@ -1,8 +1,6 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
-use wpdb;
-
 /**
  * Kümmert sich um die an Taxonomien angehängten Zusatzfelder
  */
@@ -41,7 +39,6 @@ class Taxonomies
         add_action('manage_exteinsatzmittel_custom_column', array($this, 'columnContentExteinsatzmittel'), 10, 3);
         add_action('edited_term', array($this, 'saveTerm'), 10, 3);
         add_action('created_term', array($this, 'saveTerm'), 10, 3);
-        add_action('delete_term', array($this, 'deleteTerm'), 10, 3);
         add_action('split_shared_term', array($this, 'splitSharedTerms'), 10, 4);
     }
 
@@ -160,7 +157,7 @@ class Taxonomies
         switch ($columnName) {
             case 'fahrzeugpage':
                 $fahrzeugpid = self::getTermField($termId, 'fahrzeug', 'fahrzeugpid');
-                if (false === $fahrzeugpid) {
+                if (empty($fahrzeugpid)) {
                     return '&nbsp;';
                 }
 
@@ -220,7 +217,7 @@ class Taxonomies
     public function columnContentExteinsatzmittel($string, $columnName, $termId)
     {
         $url = self::getTermField($termId, 'exteinsatzmittel', 'url');
-        if (false === $url) {
+        if (empty($url)) {
             return '&nbsp;';
         }
 
@@ -249,40 +246,7 @@ class Taxonomies
         foreach ($evwTaxonomies[$taxonomy] as $field) {
             if (isset($field) && !empty($field) && isset($_POST[$field])) {
                 $value = $_POST[$field]; //FIXME sanitize
-                $key = self::getTermOptionKey($termId, $taxonomy, $field);
-
-                if (empty($value)) {
-                    delete_option($key);
-                    continue;
-                }
-
-                update_option($key, $value);
-            }
-        }
-    }
-
-    /**
-     * Löscht zusätzlich angelegte Felder nach dem Löschen eines Terms
-     *
-     * @param int $termId Term ID
-     * @param int $ttId Term taxonomy ID
-     * @param string $taxonomy Taxonomy slug
-     */
-    public function deleteTerm($termId, $ttId, $taxonomy)
-    {
-        if (!isset($taxonomy)) {
-            return;
-        }
-
-        $evwTaxonomies = $this->getTaxonomies();
-
-        if (!array_key_exists($taxonomy, $evwTaxonomies) || !is_array($evwTaxonomies[$taxonomy])) {
-            return;
-        }
-
-        foreach ($evwTaxonomies[$taxonomy] as $field) {
-            if (isset($field) && !empty($field)) {
-                delete_option(self::getTermOptionKey($termId, $taxonomy, $field));
+                update_term_meta($termId, $field, $value);
             }
         }
     }
@@ -299,22 +263,8 @@ class Taxonomies
      */
     public static function getTermField($termId, $taxonomy, $field, $default = false)
     {
-        $key = self::getTermOptionKey($termId, $taxonomy, $field);
-        return get_option($key, $default);
-    }
-
-    /**
-     * Liefert den Schlüssel eines zusätzlich angelegten Feldes zurück
-     *
-     * @param $termId
-     * @param $taxonomy
-     * @param $field
-     *
-     * @return string
-     */
-    private static function getTermOptionKey($termId, $taxonomy, $field)
-    {
-        return 'evw_tax_'.$taxonomy.'_'.$termId.'_'.$field;
+        $termMeta = get_term_meta($termId, $field, true);
+        return (false === $termMeta ? $default : $termMeta);
     }
 
     /**
@@ -323,39 +273,6 @@ class Taxonomies
     public static function getTaxonomies()
     {
         return self::$taxonomies;
-    }
-
-    /**
-     * Terms, die von mehreren Taxonimien genutzt werden, bekommen ab WordPress 4.2 verschiedene IDs. Bestehende doppelt
-     * genutzte Terms werden beim erneuten Speichern in zwei Terms mit dem gleichen Namen aber verschiedenen IDs
-     * aufgespalten. Danach wird diese Methode über den Filter split_shared_term aufgerufen, um Einträge in der
-     * Datenbank, die IDs von Terms enthalten, zu aktualisieren.
-     * Siehe auch https://make.wordpress.org/core/2015/02/16/taxonomy-term-splitting-in-4-2-a-developer-guide/
-     *
-     * @param $oldTermId
-     * @param $newTermId
-     * @param $termTaxonomyId
-     * @param $taxonomy
-     */
-    public function splitSharedTerms($oldTermId, $newTermId, $termTaxonomyId, $taxonomy)
-    {
-        if (!array_key_exists($taxonomy, self::$taxonomies)) {
-            return;
-        }
-
-        error_log("split_shared_term for $taxonomy: ttid $termTaxonomyId from $oldTermId to $newTermId");
-
-        global $wpdb; /** @var wpdb $wpdb */
-        $fields = self::$taxonomies[$taxonomy];
-
-        foreach ($fields as $field) {
-            $oldKey = self::getTermOptionKey($oldTermId, $taxonomy, $field);
-            $newKey = self::getTermOptionKey($newTermId, $taxonomy, $field);
-            $result = $wpdb->update($wpdb->options, array('option_name' => $newKey), array('option_name' => $oldKey));
-            if (false === $result) {
-                error_log('Fehler beim Termsplit ' . $taxonomy . ': ' . $wpdb->last_error);
-            }
-        }
     }
 
     /**

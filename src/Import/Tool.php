@@ -6,6 +6,7 @@ use abrain\Einsatzverwaltung\Import\Sources\AbstractSource;
 use abrain\Einsatzverwaltung\Import\Sources\Csv;
 use abrain\Einsatzverwaltung\Import\Sources\WpEinsatz;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
+use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\Utilities;
 
 /**
@@ -48,15 +49,22 @@ class Tool
     private $core;
 
     /**
+     * @var Options
+     */
+    private $options;
+
+    /**
      * Konstruktor
      *
      * @param Core $core
      * @param Utilities $utilities
+     * @param Options $options
      */
-    public function __construct($core, $utilities)
+    public function __construct($core, $utilities, $options)
     {
         $this->core = $core;
         $this->utilities = $utilities;
+        $this->options = $options;
         $this->addHooks();
         $this->loadSources();
     }
@@ -72,8 +80,8 @@ class Tool
     public function addToolToMenu()
     {
         add_management_page(
-            __('Einsatzberichte importieren', 'einsatzverwaltung'),
-            __('Einsatzberichte importieren', 'einsatzverwaltung'),
+            'Einsatzberichte importieren',
+            'Einsatzberichte importieren',
             'manage_options',
             self::EVW_TOOL_IMPORT_SLUG,
             array($this, 'renderToolPage')
@@ -117,10 +125,10 @@ class Tool
     public function renderToolPage()
     {
         require_once dirname(__FILE__) . '/Helper.php';
-        $this->helper = new Helper($this->utilities, $this->core);
+        $this->helper = new Helper($this->utilities, $this->core, $this->options);
 
         echo '<div class="wrap">';
-        echo '<h1>' . __('Einsatzberichte importieren', 'einsatzverwaltung') . '</h1>';
+        echo '<h1>' . 'Einsatzberichte importieren' . '</h1>';
 
         $aktion = null;
         if (array_key_exists('aktion', $_POST)) {
@@ -308,7 +316,7 @@ class Tool
         $mapping = $this->currentSource->getMapping($sourceFields, IncidentReport::getFields());
 
         // Prüfen, ob mehrere Felder das gleiche Zielfeld haben
-        if (!$this->helper->validateMapping($mapping)) {
+        if (!$this->helper->validateMapping($mapping, $this->currentSource)) {
             // Und gleich nochmal...
             $this->nextAction = $this->currentAction;
 

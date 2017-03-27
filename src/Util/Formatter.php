@@ -2,7 +2,6 @@
 namespace abrain\Einsatzverwaltung\Util;
 
 use abrain\Einsatzverwaltung\Data;
-use abrain\Einsatzverwaltung\Frontend;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\Taxonomies;
@@ -121,15 +120,15 @@ class Formatter
     public function getTags()
     {
         return array(
-            '%title%' => __('Titel des Einsatzberichts', 'einsatzverwaltung'),
-            '%date%' => __('Datum der Alarmierung', 'einsatzverwaltung'),
-            '%time%' => __('Zeitpunkt der Alarmierung', 'einsatzverwaltung'),
-            '%duration%' => __('Dauer des Einsatzes', 'einsatzverwaltung'),
-            '%incidentType%' => __('Art des Einsatzes', 'einsatzverwaltung'),
-            '%url%' => __('URL zum Einsatzbericht', 'einsatzverwaltung'),
-            '%location%' => __('Ort des Einsatzes', 'einsatzverwaltung'),
-            '%feedUrl%' => __('URL zum Feed', 'einsatzverwaltung'),
-            '%number%' => __('Einsatznummer', 'einsatzverwaltung'),
+            '%title%' => 'Titel des Einsatzberichts',
+            '%date%' => 'Datum der Alarmierung',
+            '%time%' => 'Zeitpunkt der Alarmierung',
+            '%duration%' => 'Dauer des Einsatzes',
+            '%incidentType%' => 'Art des Einsatzes',
+            '%url%' => 'URL zum Einsatzbericht',
+            '%location%' => 'Ort des Einsatzes',
+            '%feedUrl%' => 'URL zum Feed',
+            '%number%' => 'Einsatznummer',
             '%seqNum%' => 'Laufende Nummer',
         );
     }
@@ -225,7 +224,7 @@ class Formatter
 
             if ($makeLinks) {
                 $pageid = Taxonomies::getTermField($vehicle->term_id, 'fahrzeug', 'fahrzeugpid');
-                if ($pageid !== false) {
+                if (!empty($pageid)) {
                     $pageurl = get_permalink($pageid);
                     if ($pageurl !== false) {
                         $name = '<a href="'.$pageurl.'" title="Mehr Informationen zu '.$vehicle->name.'">'.$vehicle->name.'</a>';
@@ -267,7 +266,7 @@ class Formatter
 
             if ($makeLinks) {
                 $url = Taxonomies::getTermField($force->term_id, 'exteinsatzmittel', 'url');
-                if ($url !== false) {
+                if (!empty($url)) {
                     $openInNewWindow = $this->options->isOpenExtEinsatzmittelNewWindow();
                     $name = '<a href="'.$url.'" title="Mehr Informationen zu '.$force->name.'"';
                     $name .= ($openInNewWindow ? ' target="_blank"' : '') . '>'.$force->name.'</a>';

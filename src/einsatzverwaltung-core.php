@@ -93,6 +93,7 @@ class Core
             'edit_published_posts' => 'edit_published_einsatzberichte'
         ),
         'menu_position' => 5,
+        'menu_icon' => 'dashicons-media-document',
         'taxonomies' => array('post_tag', 'category'),
         'delete_with_user' => false,
     );
@@ -349,9 +350,6 @@ class Core
     private function registerTypes()
     {
         // Anpassungen der Parameter
-        if ($this->utilities->isMinWPVersion("3.9")) {
-            $this->argsEinsatz['menu_icon'] = 'dashicons-media-document';
-        }
         $this->argsEinsatz['rewrite']['slug'] = $this->options->getRewriteSlug();
 
         register_post_type('einsatz', $this->argsEinsatz);

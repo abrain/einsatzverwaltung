@@ -14,13 +14,20 @@ class TasksPage
     private $utilities;
 
     /**
+     * @var Data
+     */
+    private $data;
+
+    /**
      * TasksPage constructor.
      *
      * @param Utilities $utilities
+     * @param Data $data
      */
-    public function __construct(Utilities $utilities)
+    public function __construct(Utilities $utilities, Data $data)
     {
         $this->utilities = $utilities;
+        $this->data = $data;
 
         add_action('admin_menu', array($this, 'registerPage'));
         add_action('admin_menu', array($this, 'hidePage'), 999);
@@ -71,6 +78,10 @@ class TasksPage
 
                 echo '<p>Permalinks von ' . count($posts) . ' Einsatzberichten werden angepasst...</p>';
 
+                // Da nur die Titelform geändert wird, muss keine Aktualisierung der laufenden Nummern etc. anlaufen
+                remove_action('private_einsatz', array($this->data, 'onPublish'), 10);
+                remove_action('publish_einsatz', array($this->data, 'onPublish'), 10);
+
                 $processed = 0;
                 foreach ($posts as $post) {
                     wp_update_post(array(
@@ -84,6 +95,11 @@ class TasksPage
                         flush();
                     }
                 }
+
+                // Hooks wieder einhängen
+                add_action('private_einsatz', array($this->data, 'onPublish'), 10, 2);
+                add_action('publish_einsatz', array($this->data, 'onPublish'), 10, 2);
+
                 echo $processed . ' Einsatzberichte verarbeitet<br>';
                 $this->utilities->printSuccess('Die Permalinks wurden angepasst');
                 $this->removeAdminNotice('regenerateSlugs');

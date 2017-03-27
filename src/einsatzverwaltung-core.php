@@ -278,7 +278,7 @@ class Core
 
         // Tools
         new ImportTool($this, $this->utilities, $this->options);
-        new TasksPage($this->utilities);
+        new TasksPage($this->utilities, $this->data);
 
         // Widgets
         RecentIncidents::setDependencies($this->options, $this->utilities);

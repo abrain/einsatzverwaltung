@@ -63,6 +63,8 @@ class Core
             'items_list' => 'Liste der Einsatzberichte',
             'insert_into_item' => 'In den Einsatzbericht einf&uuml;gen',
             'uploaded_to_this_item' => 'Zu diesem Einsatzbericht hochgeladen',
+            'view_items' => 'Einsatzberichte ansehen',
+            //'attributes' => 'Attribute', // In WP 4.7 eingeführtes Label, für Einsatzberichte derzeit nicht relevant
         ),
         'public' => true,
         'has_archive' => true,

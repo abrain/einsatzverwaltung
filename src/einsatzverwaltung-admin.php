@@ -1,6 +1,7 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
+use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use WP_Post;
 
@@ -9,6 +10,11 @@ use WP_Post;
  */
 class Admin
 {
+    /**
+     * @var AnnotationIconBar
+     */
+    private $annotationIconBar;
+
     /**
      * @var Core
      */
@@ -43,6 +49,7 @@ class Admin
     {
         add_action('add_meta_boxes_einsatz', array($this, 'addMetaBoxes'));
         add_action('admin_menu', array($this, 'adjustTaxonomies'));
+        add_action('admin_notices', array($this, 'displayAdminNotices'));
         add_action('admin_enqueue_scripts', array($this, 'enqueueEditScripts'));
         add_filter('manage_edit-einsatz_columns', array($this, 'filterColumnsEinsatz'));
         add_action('manage_einsatz_posts_custom_column', array($this, 'filterColumnContentEinsatz'), 10, 2);
@@ -163,6 +170,13 @@ class Admin
             'einsatzverwaltung_special',
             $report->isSpecial()
         );
+        echo '<br>';
+
+        $this->echoInputCheckbox(
+            'Bilder im Bericht',
+            'einsatzverwaltung_hasimages',
+            $report->hasImages()
+        );
     }
 
     /**
@@ -189,13 +203,17 @@ class Admin
         echo '<input type="hidden" id="einsatzleiter_used_values" value="' . implode(',', $names) . '" />';
         echo '<table style="width: 100%;"><tbody>';
 
-        $this->echoInputText(
-            'Einsatznummer',
-            'einsatzverwaltung_nummer',
-            esc_attr($nummer),
-            $this->core->getNextEinsatznummer(date('Y')),
-            10
-        );
+        if ($this->options->isAutoIncidentNumbers()) {
+            echo '<tr><td>Einsatznummer</td><td>' . esc_html($nummer) . '</td></tr>';
+        } else {
+            $this->echoInputText(
+                'Einsatznummer',
+                'einsatzverwaltung_nummer',
+                esc_attr($nummer),
+                '',
+                10
+            );
+        }
 
         $this->echoInputText(
             'Alarmzeit',
@@ -326,6 +344,7 @@ class Admin
         unset($columns['categories']);
         $columns['title'] = 'Einsatzbericht';
         $columns['e_nummer'] = 'Nummer';
+        $columns['einsatzverwaltung_annotations'] = 'Vermerke';
         $columns['e_alarmzeit'] = 'Alarmzeit';
         $columns['e_einsatzende'] = 'Einsatzende';
         $columns['e_art'] = 'Art';
@@ -406,6 +425,13 @@ class Admin
                 } else {
                     echo '-';
                 }
+                break;
+            case 'einsatzverwaltung_annotations':
+                if (empty($this->annotationIconBar)) {
+                    require_once dirname(__FILE__) . '/Frontend/AnnotationIconBar.php';
+                    $this->annotationIconBar = new AnnotationIconBar($this->core);
+                }
+                echo $this->annotationIconBar->render($report);
                 break;
             default:
                 break;
@@ -496,5 +522,31 @@ class Admin
         $settingsPage = 'options-general.php?page=' . Settings::EVW_SETTINGS_SLUG;
         $actionLinks = array('<a href="' . admin_url($settingsPage) . '">Einstellungen</a>');
         return array_merge($links, $actionLinks);
+    }
+
+    public function displayAdminNotices()
+    {
+        // Keine Notices auf der TaskPage anzeigen
+        $currentScreen = get_current_screen();
+        if ('tools_page_einsatzverwaltung-tasks' === $currentScreen->id) {
+            return;
+        }
+
+        $notices = get_option('einsatzverwaltung_admin_notices');
+
+        if (empty($notices) || !is_array($notices)) {
+            return;
+        }
+
+        if (in_array('regenerateSlugs', $notices)) {
+            $url = admin_url('tools.php?page=' . TasksPage::PAGE_SLUG . '&action=regenerate-slugs');
+            echo '<div class="notice notice-info"><p>Die Links zu den einzelnen Einsatzberichten ';
+            echo 'werden ab jetzt aus dem Berichtstitel generiert (wie bei gew&ouml;hnlichen WordPress-Beitr&auml;gen)';
+            echo ' und nicht mehr aus der Einsatznummer. Dazu ist eine Anpassung der bestehenden Berichte ';
+            echo 'notwendig. Die alten Links mit der Einsatznummer funktionieren f&uuml;r die bisherigen Berichte auch';
+            echo ' nach der Anpassung, k&uuml;nftige Berichte erhalten nur noch den neuen Link.<br>';
+            echo '<strong>Die Anpassung kann durchaus eine Minute dauern, bitte nur einmal klicken.</strong><br>';
+            echo '<a href="' . $url . '" class="button button-primary">Anpassung durchf&uuml;hren</a></p></div>';
+        }
     }
 }

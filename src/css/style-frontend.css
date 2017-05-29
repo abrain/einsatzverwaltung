@@ -53,4 +53,9 @@
 		font-weight: bold;
 		margin-right: 5px;
 	}
+
+	.einsatzverwaltung-reportlist td.einsatz-column-annotationImages,
+	.einsatzverwaltung-reportlist td.einsatz-column-annotationSpecial {
+		display: none;
+	}
 }

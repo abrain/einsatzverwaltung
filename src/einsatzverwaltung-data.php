@@ -36,9 +36,9 @@ class Data
     {
         $this->core = $core;
         $this->utilities = $utilities;
+        $this->options = $options;
 
         $this->addHooks();
-        $this->options = $options;
     }
 
     private function addHooks()
@@ -49,6 +49,10 @@ class Data
         add_action('trash_einsatz', array($this, 'onTrash'), 10, 2);
         add_filter('sanitize_post_meta_einsatz_fehlalarm', array($this->utilities, 'sanitizeCheckbox'));
         add_filter('sanitize_post_meta_einsatz_special', array($this->utilities, 'sanitizeCheckbox'));
+        if ($this->options->isAutoIncidentNumbers()) {
+            add_action('updated_postmeta', array($this, 'adjustIncidentNumber'), 10, 4);
+            add_action('added_post_meta', array($this, 'adjustIncidentNumber'), 10, 4);
+        }
     }
 
     /**
@@ -130,6 +134,30 @@ class Data
     }
 
     /**
+     * Gibt die Anzahl der veröffentlichten Einsatzberichte zurück
+     *
+     * @param int|null $year Das Jahr für das die Anfrage gestellt werden soll. Wird dieser Parameter weggelassen,
+     * werden alle Jahre berücksichtigt.
+     *
+     * @return int Die Anzahl der veröffentlichten Einsatzberichte
+     */
+    public function getNumberOfIncidentReports($year = null)
+    {
+        $args = array(
+            'post_type' => 'einsatz',
+            'post_status' => array('publish', 'private'),
+            'nopaging' => true
+        );
+
+        if (!empty($year) && is_numeric($year)) {
+            $args['year'] = $year;
+        }
+
+        $query = new WP_Query($args);
+        return $query->found_posts;
+    }
+
+    /**
      * Zusätzliche Metadaten des Einsatzberichts speichern
      *
      * @param int $postId ID des Posts
@@ -179,12 +207,12 @@ class Data
             $updateArgs['post_date_gmt'] = get_gmt_from_date($updateArgs['post_date']);
         }
 
-        // Einsatznummer validieren
-        $einsatzjahr = date_format($alarmzeit, 'Y');
-        $einsatzNrFallback = $this->core->getNextEinsatznummer($einsatzjahr, $einsatzjahr == date('Y'));
-        $einsatznummer = sanitize_title($_POST['einsatzverwaltung_nummer'], $einsatzNrFallback, 'save');
-        if (!empty($einsatznummer)) {
-            $updateArgs['post_name'] = $einsatznummer; // Slug setzen
+        // Einsatznummer setzen, sofern sie nicht automatisch verwaltet wird
+        if (!$this->options->isAutoIncidentNumbers()) {
+            $inputIncidentNumber = sanitize_text_field($_POST['einsatzverwaltung_nummer']);
+            if (!empty($inputIncidentNumber)) {
+                $this->setEinsatznummer($postId, $inputIncidentNumber);
+            }
         }
 
         // Einsatzende validieren
@@ -212,6 +240,7 @@ class Data
 
         // Vermerke validieren
         $fehlalarm = $this->utilities->sanitizeCheckbox(array($_POST, 'einsatzverwaltung_fehlalarm'));
+        $hasImages = $this->utilities->sanitizeCheckbox(array($_POST, 'einsatzverwaltung_hasimages'));
         $isSpecial = $this->utilities->sanitizeCheckbox(array($_POST, 'einsatzverwaltung_special'));
 
         // Metadaten schreiben
@@ -221,6 +250,7 @@ class Data
         update_post_meta($postId, 'einsatz_einsatzleiter', $einsatzleiter);
         update_post_meta($postId, 'einsatz_mannschaft', $mannschaftsstaerke);
         update_post_meta($postId, 'einsatz_fehlalarm', $fehlalarm);
+        update_post_meta($postId, 'einsatz_hasimages', $hasImages);
         update_post_meta($postId, 'einsatz_special', $isSpecial);
 
         if (!empty($updateArgs)) {
@@ -258,7 +288,7 @@ class Data
 
             $counter = 1;
             foreach ($posts as $post) {
-                update_post_meta($post->ID, 'einsatz_seqNum', $counter);
+                $this->setSequenceNumber($post->ID, $counter);
                 $counter++;
             }
         }
@@ -313,6 +343,32 @@ class Data
     }
 
     /**
+     * Sobald die laufende Nummer aktualisiert wird, muss die Einsatznummer neu generiert werden.
+     *
+     * @param int $metaId ID des postmeta-Eintrags
+     * @param int $objectId Post-ID
+     * @param string $metaKey Der Key des postmeta-Eintrags
+     * @param string $metaValue Der Wert des postmeta-Eintrags
+     */
+    public function adjustIncidentNumber($metaId, $objectId, $metaKey, $metaValue)
+    {
+        // Nur Änderungen an der laufenden Nummer sind interessant
+        if ('einsatz_seqNum' != $metaKey) {
+            return;
+        }
+
+        // Für den unwahrscheinlichen Fall, dass der Metakey bei anderen Beitragstypen verwendet wird, ist hier Schluss
+        $postType = get_post_type($objectId);
+        if ('einsatz' != $postType) {
+            return;
+        }
+
+        $date = date_create(get_post_field('post_date', $objectId));
+        $newIncidentNumber = $this->core->formatEinsatznummer(date_format($date, 'Y'), $metaValue);
+        $this->setEinsatznummer($objectId, $newIncidentNumber);
+    }
+
+    /**
      * Ändert die Einsatznummer eines bestehenden Einsatzes
      *
      * @param int $postId ID des Einsatzberichts
@@ -324,13 +380,38 @@ class Data
             return;
         }
 
-        $updateArgs = array();
-        $updateArgs['post_name'] = $einsatznummer;
-        $updateArgs['ID'] = $postId;
+        update_post_meta($postId, 'einsatz_incidentNumber', $einsatznummer);
+    }
 
-        // keine Sonderbehandlung beim Speichern
-        remove_action('save_post_einsatz', array($this, 'savePostdata'));
-        wp_update_post($updateArgs);
-        add_action('save_post_einsatz', array($this, 'savePostdata'), 10, 2);
+    /**
+     * Ändert die laufende Nummer eines bestehenden Einsatzes
+     *
+     * @param int $postId ID des Einsatzberichts
+     * @param string $seqNum Zu setzende laufende Nummer
+     */
+    public function setSequenceNumber($postId, $seqNum)
+    {
+        if (empty($postId) || empty($seqNum)) {
+            return;
+        }
+
+        update_post_meta($postId, 'einsatz_seqNum', $seqNum);
+    }
+
+    /**
+     * Generiert für alle Einsatzberichte eine Einsatznummer gemäß dem aktuell konfigurierten Format.
+     */
+    public function updateAllIncidentNumbers()
+    {
+        $years = self::getJahreMitEinsatz();
+        foreach ($years as $year) {
+            $posts = self::getEinsatzberichte($year);
+            foreach ($posts as $post) {
+                $incidentReport = new IncidentReport($post);
+                $seqNum = $incidentReport->getSequentialNumber();
+                $newIncidentNumber = $this->core->formatEinsatznummer($year, $seqNum);
+                $this->setEinsatznummer($post->ID, $newIncidentNumber);
+            }
+        }
     }
 }

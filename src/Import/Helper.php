@@ -4,7 +4,7 @@ namespace abrain\Einsatzverwaltung\Import;
 use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\Import\Sources\AbstractSource;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
-use abrain\Einsatzverwaltung\ToolEinsatznummernReparieren;
+use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\Utilities;
 use DateTime;
 
@@ -24,14 +24,21 @@ class Helper
     private $core;
 
     /**
+     * @var Options
+     */
+    private $options;
+
+    /**
      * Helper constructor.
      * @param Utilities $utilities
      * @param Core $core
+     * @param Options $options
      */
-    public function __construct(Utilities $utilities, Core $core)
+    public function __construct(Utilities $utilities, Core $core, Options $options)
     {
         $this->utilities = $utilities;
         $this->core = $core;
+        $this->options = $options;
     }
 
 
@@ -187,7 +194,6 @@ class Helper
                 continue;
             }
 
-            $einsatzjahr = $alarmzeit->format('Y');
             $insertArgs['post_date'] = $alarmzeit->format('Y-m-d H:i');
             $insertArgs['post_date_gmt'] = get_gmt_from_date($insertArgs['post_date']);
 
@@ -208,8 +214,6 @@ class Helper
                 $metaValues['einsatz_einsatzende'] = $einsatzende->format('Y-m-d H:i');
             }
 
-            $einsatznummer = $this->core->getNextEinsatznummer($einsatzjahr);
-            $insertArgs['post_name'] = $einsatznummer;
             $insertArgs['post_type'] = 'einsatz';
             $insertArgs['post_status'] = 'publish';
 
@@ -235,12 +239,6 @@ class Helper
                 $this->utilities->printInfo('Einsatz importiert, ID ' . $postId);
                 foreach ($metaValues as $mkey => $mval) {
                     update_post_meta($postId, $mkey, $mval);
-                }
-
-                // Einsatznummer prüfen
-                $gespeicherteEnr = get_post_field('post_name', $postId);
-                if ($gespeicherteEnr != $einsatznummer) {
-                    $this->utilities->printWarning('WordPress hat diesem Einsatz nicht die vorgesehene Einsatznummer erteilt.<br>Verwendung des Werkzeugs <a href="'.admin_url('tools.php?page='.ToolEinsatznummernReparieren::EVW_TOOL_ENR_SLUG).'">Einsatznummern reparieren</a> wird empfohlen.');
                 }
             }
         }
@@ -274,6 +272,13 @@ class Helper
         $parsedArgs = wp_parse_args($args, $defaults);
         $fields = $source->getFields();
 
+        $unmatchableFields = $source->getUnmatchableFields();
+        if ($this->options->isAutoIncidentNumbers()) {
+            $this->utilities->printInfo('Einsatznummern können nur importiert werden, wenn die automatische Verwaltung deaktiviert ist.');
+
+            $unmatchableFields[] = 'einsatz_incidentNumber';
+        }
+
         echo '<form method="post">';
         wp_nonce_field($parsedArgs['nonce_action']);
         echo '<input type="hidden" name="aktion" value="' . $parsedArgs['action_value'] . '" />';
@@ -294,10 +299,11 @@ class Helper
                 ) {
                     $selected = $parsedArgs['mapping'][$field];
                 }
+
                 $this->dropdownEigeneFelder(array(
                     'name' => $source->getInputName($field),
                     'selected' => $selected,
-                    'unmatchableFields' => $source->getUnmatchableFields()
+                    'unmatchableFields' => $unmatchableFields
                 ));
             }
             echo '</td></tr>';
@@ -314,10 +320,11 @@ class Helper
      * Prüft, ob das Mapping stimmig ist und gibt Warnungen oder Fehlermeldungen aus
      *
      * @param array $mapping Das zu prüfende Mapping
+     * @param AbstractSource $source
      *
      * @return bool True bei bestandener Prüfung, false bei Unstimmigkeiten
      */
-    public function validateMapping($mapping)
+    public function validateMapping($mapping, $source)
     {
         $valid = true;
 
@@ -325,6 +332,20 @@ class Helper
         if (!in_array('post_date', $mapping)) {
             $this->utilities->printError('Pflichtfeld Alarmzeit wurde nicht zugeordnet');
             $valid = false;
+        }
+
+        $unmatchableFields = $source->getUnmatchableFields();
+        if ($this->options->isAutoIncidentNumbers()) {
+            $unmatchableFields[] = 'einsatz_incidentNumber';
+        }
+        foreach ($unmatchableFields as $unmatchableField) {
+            if (in_array($unmatchableField, $mapping)) {
+                $this->utilities->printError(sprintf(
+                    'Feld %s kann nicht f&uuml;r ein zu importierendes Feld als Ziel angegeben werden',
+                    esc_html($unmatchableField)
+                ));
+                $valid = false;
+            }
         }
 
         // Mehrfache Zuweisungen prüfen

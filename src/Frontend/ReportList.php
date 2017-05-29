@@ -3,7 +3,6 @@ namespace abrain\Einsatzverwaltung\Frontend;
 
 use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\Data;
-use abrain\Einsatzverwaltung\Frontend;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\Util\Formatter;
@@ -19,6 +18,11 @@ use DateTime;
 class ReportList
 {
     const TABLECLASS = 'einsatzverwaltung-reportlist';
+
+    /**
+     * @var AnnotationIconBar
+     */
+    private $annotationIconBar;
 
     /**
      * @var array
@@ -184,6 +188,11 @@ class ReportList
         }
         $this->linkEmptyReports = (true === $parsedArgs['linkEmptyReports']);
         $this->showHeading = (bool) $parsedArgs['showHeading'];
+
+        if (in_array('annotationImages', $this->columns) || in_array('annotationSpecial', $this->columns)) {
+            require_once dirname(__FILE__) . '/AnnotationIconBar.php';
+            $this->annotationIconBar = new AnnotationIconBar($this->core);
+        }
 
         // Berichte abarbeiten
         $currentYear = null;
@@ -429,6 +438,12 @@ class ReportList
             case 'seqNum':
                 $cellContent = $report->getSequentialNumber();
                 break;
+            case 'annotationImages':
+                $cellContent = $this->annotationIconBar->render($report, array('images'));
+                break;
+            case 'annotationSpecial':
+                $cellContent = $this->annotationIconBar->render($report, array('special'));
+                break;
             default:
                 $cellContent = '';
         }
@@ -499,6 +514,14 @@ class ReportList
             'seqNum' => array(
                 'name' => 'Lfd.',
                 'longName' => 'Laufende Nummer'
+            ),
+            'annotationImages' => array(
+                'name' => '',
+                'longName' => 'Vermerk &quot;Bilder im Bericht&quot;'
+            ),
+            'annotationSpecial' => array(
+                'name' => '',
+                'longName' => 'Vermerk &quot;Besonderer Einsatz&quot;'
             )
         );
     }
@@ -510,7 +533,9 @@ class ReportList
      */
     public static function getDynamicCss()
     {
-        if (empty(self::$settings)) {
+        $reportListSettings = self::$settings; // FIXME Verrenkung, um PHP 5.3.0 als Minimum zu ermöglichen, solange das
+                                               // Ende der Untersützung nicht im Blog angekündigt wurde.
+        if (empty($reportListSettings)) {
             self::$settings = new ReportListSettings();
         }
 

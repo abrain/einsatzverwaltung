@@ -10,6 +10,13 @@ use abrain\Einsatzverwaltung\Model\IncidentReport;
 class ReportQuery
 {
     /**
+     * Beinhaltet Post-IDs, die nicht im Ergebnis auftauchen sollen
+     *
+     * @var array
+     */
+    private $excludePostId;
+
+    /**
      * Zeigt an, ob als privat markierte Berichte mit abgefragt werden sollen
      *
      * @var bool
@@ -55,6 +62,7 @@ class ReportQuery
      */
     private function initQueryVars()
     {
+        $this->excludePostId = array();
         $this->includePrivateReports = false;
         $this->limit = -1;
         $this->onlySpecialReports = false;
@@ -109,6 +117,10 @@ class ReportQuery
             $postArgs['date_query'] = $dateQuery;
         }
 
+        if (!empty($this->excludePostId)) {
+            $postArgs['post__not_in'] = $this->excludePostId;
+        }
+
         $posts = get_posts($postArgs);
 
         $reports = array();
@@ -117,6 +129,14 @@ class ReportQuery
         }
 
         return $reports;
+    }
+
+    /**
+     * @param array $postIds
+     */
+    public function setExcludePostIds($postIds)
+    {
+        $this->excludePostId = $postIds;
     }
 
     /**

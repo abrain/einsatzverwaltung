@@ -28,9 +28,6 @@ class Options
         'einsatzvw_category' => false,
         'einsatzvw_loop_only_special' => false,
         'einsatzverwaltung_incidentnumbers_auto' => false,
-        'einsatzvw_gmap' => false,
-        'einsatzvw_gmap_api' => '',
-        'einsatzvw_gmap_default_pos' => '53.523463,9.482329',
     );
 
     /**
@@ -153,33 +150,6 @@ class Options
     {
         $option = $this->getOption('einsatzvw_excerpt_type_feed');
         return $this->utilities->sanitizeExcerptType($option);
-    }
-
-    /**
-     * @return string
-     */
-    public function getGMapAPI()
-    {
-        $option = $this->getOption('einsatzvw_gmap_api');
-        return $option;
-    }
-
-    /**
-     * @return string
-     */
-    public function getGMapDefaultPos()
-    {
-        $option = $this->getOption('einsatzvw_gmap_default_pos');
-        return $option;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isGMapActivate()
-    {
-        $option = $this->getOption('einsatzvw_gmap');
-        return $this->toBoolean($option);
     }
 
     /**

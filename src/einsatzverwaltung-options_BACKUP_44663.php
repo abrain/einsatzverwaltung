@@ -27,10 +27,13 @@ class Options
         'einsatzvw_flush_rewrite_rules' => false,
         'einsatzvw_category' => false,
         'einsatzvw_loop_only_special' => false,
-        'einsatzverwaltung_incidentnumbers_auto' => false,
+<<<<<<< HEAD
         'einsatzvw_gmap' => false,
         'einsatzvw_gmap_api' => '',
         'einsatzvw_gmap_default_pos' => '53.523463,9.482329',
+=======
+        'einsatzverwaltung_incidentnumbers_auto' => false,
+>>>>>>> f48eba8482fea0509a601b2c8dac20436d83333e
     );
 
     /**

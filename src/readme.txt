@@ -3,8 +3,8 @@ Contributors: abrain
 Donate link: https://einsatzverwaltung.abrain.de/unterstuetzen/
 Tags: Feuerwehr, Einsatz, Rettung, Rettungsdienst, THW, HiOrg, Wasserwacht, Bergrettung
 Requires at least: 4.4.0
-Tested up to: 4.6
-Stable tag: 1.2.3
+Tested up to: 4.7
+Stable tag: 1.3.0
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,7 +54,7 @@ Entweder einen Issue auf [GitHub](https://github.com/abrain/einsatzverwaltung/is
 
 = Wie kann ich den Entwickler erreichen? =
 
-Entweder [per Mail](mailto:kontakt@abrain.de), per PN auf [Facebook](https://www.facebook.com/einsatzverwaltung), auf [Twitter](https://twitter.com/einsatzvw) oder [App.net](https://alpha.app.net/einsatzverwaltung). Bugs und Verbesserungsvorschl&auml;ge gerne auch als [Issue auf GitHub](https://github.com/abrain/einsatzverwaltung/issues).
+Entweder [per Mail](mailto:kontakt@abrain.de), per PN auf [Facebook](https://www.facebook.com/einsatzverwaltung) oder über [Twitter](https://twitter.com/einsatzvw). Bugs und Verbesserungsvorschl&auml;ge gerne auch als [Issue auf GitHub](https://github.com/abrain/einsatzverwaltung/issues).
 
 = Meine eMails mag ich am liebsten verschl&uuml;sselt und signiert, hast Du da was? =
 
@@ -69,6 +69,17 @@ Das Du halte ich f&uuml;r die angenehmere Arbeitsgrundlage, aber man darf mich g
 Nein, mehr gibt es [hier](https://einsatzverwaltung.abrain.de/faq/).
 
 == Changelog ==
+
+= 1.3.0 =
+* Neuer Vermerk 'Bilder im Bericht'
+* Einsatzliste: Neue Spalten für Vermerke 'Bilder im Bericht' und 'Besonderer Einsatz'
+* Vermerke werden in der Übersicht im Adminbereich angezeigt
+* Einsatznummer ist nun nicht mehr Teil der URL
+* Import: Einsatznummer kann importiert werden
+* Einsatznummern können wahlweise automatisch oder manuell verwaltet werden
+* Werkzeug zum Reparieren der Einsatznummern entfernt
+* Mindestanforderung auf WordPress 4.4 angehoben
+* Getestet mit WordPress 4.7
 
 = 1.2.3 =
 Verbesserungen:
@@ -389,6 +400,5 @@ Kein Upgrade, sondern die erste Version
 == Social Media ==
 
 * Twitter: [@einsatzvw](https://twitter.com/einsatzvw)
-* App.net: [@einsatzverwaltung](https://alpha.app.net/einsatzverwaltung)
 * Facebook: [Einsatzverwaltung](https://www.facebook.com/einsatzverwaltung/)
 * GNU social: [@einsatzverwaltung](https://gnusocial.abrain.de/einsatzverwaltung)

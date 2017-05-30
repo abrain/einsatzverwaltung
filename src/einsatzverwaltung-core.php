@@ -15,6 +15,7 @@ require_once dirname(__FILE__) . '/einsatzverwaltung-options.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-shortcodes.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-settings.php';
 require_once dirname(__FILE__) . '/Import/Tool.php';
+require_once dirname(__FILE__) . '/Export/Tool.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-taxonomies.php';
 require_once dirname(__FILE__) . '/Frontend/ReportList.php';
 require_once dirname(__FILE__) . '/Frontend/ReportListSettings.php';
@@ -22,6 +23,7 @@ require_once dirname(__FILE__) . '/ReportQuery.php';
 require_once dirname(__FILE__) . '/TasksPage.php';
 
 use abrain\Einsatzverwaltung\Import\Tool as ImportTool;
+use abrain\Einsatzverwaltung\Export\Tool as ExportTool;
 use abrain\Einsatzverwaltung\Model\ReportAnnotation;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use abrain\Einsatzverwaltung\Widgets\RecentIncidents;
@@ -272,6 +274,11 @@ class Core
     private $importTool;
     
     /**
+     * @var ExportTool
+     */
+    private $exportTool;
+    
+    /**
      * @var TasksPage
      */
     private $tasksPage;
@@ -308,6 +315,7 @@ class Core
 
         // Tools
         $this->importTool = new ImportTool($this, $this->utilities, $this->options, $this->data);
+        $this->exportTool = new ExportTool($this, $this->utilities, $this->options);
         $this->tasksPage = new TasksPage($this->utilities, $this->data);
 
         // Widgets
@@ -633,6 +641,14 @@ class Core
     public function getImportTool()
     {
         return $this->importTool;
+    }
+
+    /**
+     * @return ImportTool
+     */
+    public function getExportTool()
+    {
+        return $this->exportTool;
     }
 
     /**

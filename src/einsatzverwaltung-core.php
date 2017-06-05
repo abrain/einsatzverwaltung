@@ -133,7 +133,7 @@ class Core
         'public' => true,
         'show_in_nav_menus' => false,
         'meta_box_cb' => 'abrain\Einsatzverwaltung\Admin::displayMetaBoxEinsatzart',
-        'capabilities' => array (
+        'capabilities' => array(
             'manage_terms' => 'edit_einsatzberichte',
             'edit_terms' => 'edit_einsatzberichte',
             'delete_terms' => 'edit_einsatzberichte',
@@ -166,7 +166,7 @@ class Core
         'public' => true,
         'show_in_nav_menus' => false,
         'hierarchical' => true,
-        'capabilities' => array (
+        'capabilities' => array(
             'manage_terms' => 'edit_einsatzberichte',
             'edit_terms' => 'edit_einsatzberichte',
             'delete_terms' => 'edit_einsatzberichte',
@@ -198,7 +198,7 @@ class Core
         ),
         'public' => true,
         'show_in_nav_menus' => false,
-        'capabilities' => array (
+        'capabilities' => array(
             'manage_terms' => 'edit_einsatzberichte',
             'edit_terms' => 'edit_einsatzberichte',
             'delete_terms' => 'edit_einsatzberichte',
@@ -233,7 +233,7 @@ class Core
         ),
         'public' => true,
         'show_in_nav_menus' => false,
-        'capabilities' => array (
+        'capabilities' => array(
             'manage_terms' => 'edit_einsatzberichte',
             'edit_terms' => 'edit_einsatzberichte',
             'delete_terms' => 'edit_einsatzberichte',
@@ -646,8 +646,7 @@ class Core
      */
     public static function getInstance()
     {
-        if (null === self::$instance)
-        {
+        if (null === self::$instance) {
             self::$instance = new Core();
         }
         return self::$instance;

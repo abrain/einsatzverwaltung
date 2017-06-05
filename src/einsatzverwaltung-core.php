@@ -36,6 +36,12 @@ class Core
     const VERSION = '1.3.0';
     const DB_VERSION = 20;
 
+   /**
+    * Statische Variable, um die aktuelle (einzige!) Instanz dieser Klasse zu halten
+    * @var Core
+    */
+    private static $instance = null;
+
     public $pluginFile;
     public $pluginBasename;
     public $pluginDir;
@@ -241,14 +247,39 @@ class Core
     private $annotationRepository;
 
     /**
+     * @var Admin
+     */
+    private $admin;
+
+    /**
      * @var Data
      */
     private $data;
+
+    /**
+     * @var Frontend
+     */
+    private $frontend;
+
+    /**
+     * @var Settings
+     */
+    private $settings;
     
     /**
      * @var Options
      */
     private $options;
+    
+    /**
+     * @var ImportTool
+     */
+    private $importTool;
+    
+    /**
+     * @var TasksPage
+     */
+    private $tasksPage;
     
     /**
      * @var Utilities
@@ -258,7 +289,7 @@ class Core
     /**
      * Constructor
      */
-    public function __construct()
+    private function __construct()
     {
         $this->pluginFile = einsatzverwaltung_plugin_file();
         $this->pluginBasename = plugin_basename($this->pluginFile);
@@ -271,16 +302,16 @@ class Core
         $this->options = new Options($this->utilities);
         $this->utilities->setDependencies($this->options);
 
-        new Admin($this, $this->options, $this->utilities);
+        $this->admin = new Admin($this, $this->options, $this->utilities);
         $this->data = new Data($this, $this->utilities, $this->options);
-        new Frontend($this, $this->options, $this->utilities);
-        new Settings($this, $this->options, $this->utilities, $this->data);
-        new Shortcodes($this->utilities, $this, $this->options);
-        new Taxonomies($this->utilities);
+        $this->frontend = new Frontend($this, $this->options, $this->utilities);
+        $this->settings = new Settings($this, $this->options, $this->utilities, $this->data);
+        $this->shortcodes = new Shortcodes($this->utilities, $this, $this->options);
+        $this->taxonomies = new Taxonomies($this->utilities);
 
         // Tools
-        new ImportTool($this, $this->utilities, $this->options);
-        new TasksPage($this->utilities, $this->data);
+        $this->importTool = new ImportTool($this, $this->utilities, $this->options);
+        $this->tasksPage = new TasksPage($this->utilities, $this->data);
 
         // Widgets
         RecentIncidents::setDependencies($this->options, $this->utilities);
@@ -542,7 +573,78 @@ class Core
     {
         return $this->annotationRepository;
     }
+
+    /**
+     * @return Admin
+     */
+    public function getAdmin() {
+        return $this->admin;
+    }
+
+    /**
+     * @return Data
+     */
+    public function getData() {
+        return $this->data;
+    }
+
+    /**
+     * @return Frontend
+     */
+    public function getFrontend() {
+        return $this->frontend;
+    }
+
+    /**
+     * @return Settings
+     */
+    public function getSettings() {
+        return $this->settings;
+    }
+
+    /**
+     * @return Shortcodes
+     */
+    public function getShortcodes() {
+        return $this->shortcodes;
+    }
+
+    /**
+     * @return Settings
+     */
+    public function getTaxonomies() {
+        return $this->taxonomies;
+    }
+
+    /**
+     * @return ImportTool
+     */
+    public function getImportTool() {
+        return $this->importTool;
+    }
+
+    /**
+     * @return TasksPage
+     */
+    public function getTasksPage() {
+        return $this->tasksPage;
+    }
+
+    /**
+     * Falls die einzige Instanz noch nicht existiert, erstelle sie
+     * Gebe die einzige Instanz dann zurück
+     *
+     * @return   Core
+     */
+    public static function getInstance()
+    {
+       if (null === self::$instance)
+       {
+           self::$instance = new Core();
+       }
+       return self::$instance;
+    }
 }
 
 // Die globale Variable wird nur bei den Unit-Test benötigt
-$GLOBALS['einsatzverwaltung_core'] = new Core();
+$GLOBALS['einsatzverwaltung_core'] = Core::getInstance();

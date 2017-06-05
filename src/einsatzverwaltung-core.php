@@ -577,56 +577,64 @@ class Core
     /**
      * @return Admin
      */
-    public function getAdmin() {
+    public function getAdmin()
+    {
         return $this->admin;
     }
 
     /**
      * @return Data
      */
-    public function getData() {
+    public function getData()
+    {
         return $this->data;
     }
 
     /**
      * @return Frontend
      */
-    public function getFrontend() {
+    public function getFrontend()
+    {
         return $this->frontend;
     }
 
     /**
      * @return Settings
      */
-    public function getSettings() {
+    public function getSettings()
+    {
         return $this->settings;
     }
 
     /**
      * @return Shortcodes
      */
-    public function getShortcodes() {
+    public function getShortcodes()
+    {
         return $this->shortcodes;
     }
 
     /**
      * @return Settings
      */
-    public function getTaxonomies() {
+    public function getTaxonomies()
+    {
         return $this->taxonomies;
     }
 
     /**
      * @return ImportTool
      */
-    public function getImportTool() {
+    public function getImportTool()
+    {
         return $this->importTool;
     }
 
     /**
      * @return TasksPage
      */
-    public function getTasksPage() {
+    public function getTasksPage()
+    {
         return $this->tasksPage;
     }
 
@@ -638,11 +646,11 @@ class Core
      */
     public static function getInstance()
     {
-       if (null === self::$instance)
-       {
-           self::$instance = new Core();
-       }
-       return self::$instance;
+        if (null === self::$instance)
+        {
+            self::$instance = new Core();
+        }
+        return self::$instance;
     }
 }
 

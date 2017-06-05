@@ -18,7 +18,7 @@ class CoreTest extends WP_UnitTestCase
     public function setUp()
     {
         parent::setUp();
-        $this->core = new Core();
+        $this->core = Core::getInstance();
     }
 
     /**

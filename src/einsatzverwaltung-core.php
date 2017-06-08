@@ -652,6 +652,3 @@ class Core
         return self::$instance;
     }
 }
-
-// Die globale Variable wird nur bei den Unit-Test benötigt
-$GLOBALS['einsatzverwaltung_core'] = Core::getInstance();

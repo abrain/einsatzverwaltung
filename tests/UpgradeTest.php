@@ -21,7 +21,7 @@ class UpgradeTest extends WP_UnitTestCase
     {
         parent::setUp();
 
-        $core = $GLOBALS['einsatzverwaltung_core'];
+        $core = Core::getInstance();
         $this->updater = $core->getUpdater();
     }
 

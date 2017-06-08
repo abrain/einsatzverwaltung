@@ -652,3 +652,5 @@ class Core
         return self::$instance;
     }
 }
+
+Core::getInstance();

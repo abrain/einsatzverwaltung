@@ -615,7 +615,7 @@ class Core
     }
 
     /**
-     * @return Settings
+     * @return Taxonomies
      */
     public function getTaxonomies()
     {

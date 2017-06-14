@@ -1,13 +1,12 @@
 <?php
 namespace abrain\Einsatzverwaltung\Export;
 
-//use abrain\Einsatzverwaltung\Core;
-//use abrain\Einsatzverwaltung\Import\Sources\AbstractSource;
-//use abrain\Einsatzverwaltung\Import\Sources\Csv;
-//use abrain\Einsatzverwaltung\Import\Sources\WpEinsatz;
-//use abrain\Einsatzverwaltung\Model\IncidentReport;
-//use abrain\Einsatzverwaltung\Options;
-//use abrain\Einsatzverwaltung\Utilities;
+use abrain\Einsatzverwaltung\Core;
+use abrain\Einsatzverwaltung\Options;
+use abrain\Einsatzverwaltung\Utilities;
+use abrain\Einsatzverwaltung\Export\Formats\Csv;
+use abrain\Einsatzverwaltung\Export\Formats\Excel;
+use abrain\Einsatzverwaltung\Export\Formats\Json;
 
 /**
  * Werkzeug für den Export von Einsatzberichten in verschiedenen Formaten
@@ -16,42 +15,10 @@ class Tool
 {
     const EVW_TOOL_EXPORT_SLUG = 'einsatzvw-tool-export';
 
-    private $sources = array();
-
     /**
-     * @var AbstractSource
+     * @var Formats\Format
      */
-    private $currentSource;
-
-    /**
-     * @var array
-     */
-    private $currentAction;
-
-    /**
-     * @var array
-     */
-    private $nextAction;
-
-    /**
-     * @var Helper
-     */
-    private $helper;
-
-    /**
-     * @var Utilities
-     */
-    private $utilities;
-
-    /**
-     * @var Core
-     */
-    private $core;
-
-    /**
-     * @var Options
-     */
-    private $options;
+    private $formats = array();
 
     /**
      * Konstruktor
@@ -60,18 +27,16 @@ class Tool
      * @param Utilities $utilities
      * @param Options $options
      */
-    public function __construct($core, $utilities, $options)
+    public function __construct()
     {
-        $this->core = $core;
-        $this->utilities = $utilities;
-        $this->options = $options;
         $this->addHooks();
-        $this->loadSources();
+        $this->loadFormats();
     }
 
     private function addHooks()
     {
         add_action('admin_menu', array($this, 'addToolToMenu'));
+        add_action('plugins_loaded', array($this, 'startExport'));
     }
 
     /**
@@ -88,35 +53,41 @@ class Tool
         );
     }
 
-    // /**
-    //  * @param AbstractSource $source
-    //  * @param string $action
-    //  */
-    // private function checkNonce($source, $action)
-    // {
-    //     check_admin_referer($this->getNonceAction($source, $action));
-    // }
-
-    // /**
-    //  * @param AbstractSource $source
-    //  * @param string $action
-    //  * @return string
-    //  */
-    // private function getNonceAction($source, $action)
-    // {
-    //     return $source->getIdentifier() . '_' . $action;
-    // }
-
-    private function loadSources()
+    /**
+     * Bietet die zu exportierenden Einsatzberichte als Download an.
+     */
+    public function startExport()
     {
-        // require_once dirname(__FILE__) . '/Sources/AbstractSource.php';
-        // require_once dirname(__FILE__) . '/Sources/WpEinsatz.php';
-        // $wpEinsatz = new WpEinsatz($this->utilities);
-        // $this->sources[$wpEinsatz->getIdentifier()] = $wpEinsatz;
+        // stelle sicher, dass wir uns im Adminbereich befindet und der Benutzer über ausreichend Berechtigungen verfügt
+        if (current_user_can('manage_options') && is_admin() && @$_GET['page'] == self::EVW_TOOL_EXPORT_SLUG && @$_GET['download'] == true) {
+            $format = @$this->formats[$_GET['format']];
+ 
+            if ($format) {
+                $start_date = @$_GET['export_filters']['start_date'];
+                $end_date = @$_GET['export_filters']['end_date'];
+                $export_options = (array)@$_GET['export_options'][$_GET['format']];
 
-        // require_once dirname(__FILE__) . '/Sources/Csv.php';
-        // $csv = new Csv($this->utilities);
-        // $this->sources[$csv->getIdentifier()] = $csv;
+                $format->setFilters($start_date, $end_date);
+                $format->setOptions($export_options);
+
+                header('Content-Description: File Transfer');
+                header('Content-Disposition: attachment; filename=' . $format->getFilename());
+                $format->export();
+                die();
+            }
+        }
+    }
+
+    private function loadFormats()
+    {
+        require_once dirname(__FILE__) . '/Formats/Csv.php';
+        $this->formats['csv'] = new Csv();
+
+        require_once dirname(__FILE__) . '/Formats/Excel.php';
+        $this->formats['excel'] = new Excel();
+
+        require_once dirname(__FILE__) . '/Formats/Json.php';
+        $this->formats['json'] = new Json();
     }
 
     /**
@@ -126,9 +97,10 @@ class Tool
     {
         echo '<div class="wrap">';
         echo '<h1>' . 'Einsatzberichte exportieren' . '</h1>';
-        echo '<p>Dieses Werkzeug exportiert Einsatzberichte in verschiedenen Formaten.</p>';
-?>
+        echo '<p>Dieses Werkzeug exportiert Einsatzberichte in verschiedenen Formaten.</p>'; ?>
 <form method="get" id="export-form">
+    <input type="hidden" name="page" value="einsatzvw-tool-export">
+    <input type="hidden" name="download" value="true">
     <h2>Wähle, welche Einsatzberichte du exportieren möchtest</h2>
     <fieldset>
         <legend class="screen-reader-text">Wähle, welche Einsatzberichte du exportieren möchtest</legend>
@@ -137,14 +109,14 @@ class Tool
                 <fieldset>
                     <legend class="screen-reader-text">Zeitraum:</legend>
                     <label for="post-start-date" class="label-responsive">Alarmzeit von:</label>
-                    <select name="post_start_date" id="post-start-date">
+                    <select name="export_filters[start_date]" id="post-start-date">
                         <option value="0">— Auswählen —</option>
-                        <option value="2017-05">Mai 2017</option>
+                        <?php $this->renderDateOptions(); ?>
                     </select>
                     <label for="post-end-date" class="label-responsive">bis:</label>
-                    <select name="post_end_date" id="post-end-date">
+                    <select name="export_filters[end_date]" id="post-end-date">
                         <option value="0">— Auswählen —</option>
-                        <option value="2017-06">Juni 2017</option>
+                        <?php $this->renderDateOptions(); ?>
                     </select>
                 </fieldset>
             </li>
@@ -159,9 +131,11 @@ class Tool
             form.find('input[name="format"]').change(function() {
                 options.slideUp('fast');
                 switch ( $(this).val() ) {
-                    case 'csv': $('#csv-options').slideDown(); break;
-                    case 'excel': $('#excel-options').slideDown(); break;
-                    case 'json': $('#json-options').slideDown(); break;
+                    <?php foreach (array_keys($this->formats) as $format_key) {
+            ?>
+                        case '<?php echo $format_key; ?>': $('#<?php echo $format_key; ?>-options').slideDown(); break;
+                    <?php
+        } ?>
                 }
             });
         });
@@ -169,167 +143,48 @@ class Tool
     <h2>Wähle, in welches Format du exportieren möchtest</h2>
     <fieldset>
         <legend class="screen-reader-text">Wähle, in welches Format du exportieren möchtest</legend>
-        <input type="hidden" name="download" value="true">
-        <p>
-            <label><input type="radio" name="format" value="csv"> CSV</label>
-        </p>
-        <ul id="csv-options" class="export-options export-filters">
-            <li>
-                <label>
-                    <span class="label-responsive">Spalten getrennt mit:</span>
-                    <input name="csv_separator" type="text" value="," required="required">
-                </label>
-            </li>
-            <li>
-                <label>
-                    <span class="label-responsive">Spalten eingeschlossen von:</span>
-                    <input name="csv_enclosed" type="text" value=";" required="required">
-                </label>
-            </li>
-            <li>
-                <label>
-                    <span class="label-responsive">Spalten escaped mit:</span>
-                    <input name="csv_escaped" type="text" value=";" required="required">
-                </label>
-            </li>
-            <li>
-                <input type="checkbox" name="csv_columns" id="csv_columns" value="1" checked="checked">
-                <label for="csv_columns">Spaltennamen in die erste Zeile setzen</label>
-            </li>
-        </ul>
-        
-        <p>
-            <label><input type="radio" name="format" value="excel"> CSV für Microsoft Excel</label>
-        </p>
-        <ul id="excel-options" class="export-options export-filters">
-            <li>
-                <input type="checkbox" name="csv_columns" id="csv_columns" value="1" checked="checked">
-                <label for="csv_columns">Spaltennamen in die erste Zeile setzen</label>
-            </li>
-        </ul>
-
-        <p>
-            <label><input type="radio" name="format" value="json"> JSON</label>
-        </p>
-        <ul id="json-options" class="export-options export-filters">
-            <li>
-                <input type="checkbox" name="csv_columns" id="csv_columns" value="1">
-                <label for="json_pretty_print">Mit Whitespace formatiertes JSON ausgeben (Menschenlesbares Format verwenden)</label>
-            </li>
-        </ul>
+        <?php foreach ($this->formats as $format_key => $format) {
+            ?>
+            <p>
+                <label><input type="radio" name="format" value="<?php echo $format_key; ?>"> <?php echo $format->getTitle(); ?></label>
+            </p>
+            <ul id="<?php echo $format_key; ?>-options" class="export-options export-filters">
+                <?php $format->renderOptions(); ?>
+            </ul>
+        <?php
+        } ?>
     </fieldset>
 
-    <p class="submit">
-        <input type="submit" name="submit" id="submit" class="button button-primary" value="Export-Datei herunterladen">
-    </p>
+    <?php submit_button('Export-Datei herunterladen'); ?>
 </form>
 
 <?php
         echo '</div>';
     }
 
-    // private function analysisPage()
-    // {
-    //     if (!$this->currentSource->checkPreconditions()) {
-    //         return;
-    //     }
+    private function renderDateOptions()
+    {
+        global $wpdb, $wp_locale;
 
-    //     $felder = $this->currentSource->getFields();
-    //     if (empty($felder)) {
-    //         $this->utilities->printError('Es wurden keine Felder gefunden');
-    //         return;
-    //     }
-    //     $this->utilities->printSuccess('Es wurden folgende Felder gefunden: ' . implode($felder, ', '));
+        $months = $wpdb->get_results($wpdb->prepare("
+            SELECT DISTINCT YEAR( post_date ) AS year, MONTH( post_date ) AS month
+            FROM $wpdb->posts
+            WHERE post_type = %s AND post_status = 'publish'
+            ORDER BY post_date DESC
+        ", 'einsatz'));
 
-    //     // Auf Pflichtfelder prüfen
-    //     $mandatoryFieldsOk = true;
-    //     foreach (array_keys($this->currentSource->getAutoMatchFields()) as $autoMatchField) {
-    //         if (!in_array($autoMatchField, $felder)) {
-    //             $this->utilities->printError(
-    //                 sprintf('Das automatisch zu importierende Feld %s konnte nicht gefunden werden!', $autoMatchField)
-    //             );
-    //             $mandatoryFieldsOk = false;
-    //         }
-    //     }
-    //     if (!$mandatoryFieldsOk) {
-    //         return;
-    //     }
+        $month_count = count($months);
+        if (!$month_count || (1 == $month_count && 0 == $months[0]->month)) {
+            return;
+        }
 
-    //     // Einsätze zählen
-    //     $entries = $this->currentSource->getEntries(null);
-    //     if (false === $entries) {
-    //         return;
-    //     }
-    //     if (empty($entries)) {
-    //         $this->utilities->printWarning('Es wurden keine Eins&auml;tze gefunden.');
-    //         return;
-    //     }
-    //     $this->utilities->printSuccess(sprintf("Es wurden %s Eins&auml;tze gefunden", count($entries)));
+        foreach ($months as $date) {
+            if (0 == $date->year) {
+                continue;
+            }
 
-    //     if ('evw_wpe' == $this->currentSource->getIdentifier()) {
-    //         $this->printDataNotice();
-    //     }
-
-    //     // Felder matchen
-    //     echo "<h3>Felder zuordnen</h3>";
-    //     if (false === $this->nextAction) {
-    //         $this->utilities->printError('Keine Nachfolgeaktion gefunden!');
-    //         return;
-    //     }
-
-    //     $this->helper->renderMatchForm($this->currentSource, array(
-    //         'nonce_action' => $this->getNonceAction($this->currentSource, $this->nextAction['slug']),
-    //         'action_value' => $this->currentSource->getActionAttribute($this->nextAction['slug']),
-    //         'next_action' => $this->nextAction
-    //     ));
-    // }
-
-    // private function importPage()
-    // {
-    //     if (!$this->currentSource->checkPreconditions()) {
-    //         return;
-    //     }
-
-    //     $sourceFields = $this->currentSource->getFields();
-    //     if (empty($sourceFields)) {
-    //         $this->utilities->printError('Es wurden keine Felder gefunden');
-    //         return;
-    //     }
-
-    //     // Mapping einlesen
-    //     $mapping = $this->currentSource->getMapping($sourceFields, IncidentReport::getFields());
-
-    //     // Prüfen, ob mehrere Felder das gleiche Zielfeld haben
-    //     if (!$this->helper->validateMapping($mapping, $this->currentSource)) {
-    //         // Und gleich nochmal...
-    //         $this->nextAction = $this->currentAction;
-
-    //         $this->helper->renderMatchForm($this->currentSource, array(
-    //             'mapping' => $mapping,
-    //             'nonce_action' => $this->getNonceAction($this->currentSource, $this->nextAction['slug']),
-    //             'action_value' => $this->currentSource->getActionAttribute($this->nextAction['slug']),
-    //             'next_action' => $this->nextAction
-    //         ));
-    //         return;
-    //     }
-
-    //     // Import starten
-    //     echo '<p>Die Daten werden eingelesen, das kann einen Moment dauern.</p>';
-    //     $this->helper->import($this->currentSource, $mapping);
-    // }
-
-    // private function printDataNotice()
-    // {
-    //     // Hinweise ausgeben
-    //     echo '<h3>Hinweise zu den erwarteten Daten</h3>';
-    //     echo '<p>Die Felder <strong>Berichtstext, Berichtstitel, Einsatzleiter, Einsatzort</strong> und <strong>Mannschaftsst&auml;rke</strong> sind Freitextfelder.</p>';
-    //     echo '<p>F&uuml;r die Felder <strong>Alarmierungsart, Einsatzart, Externe Einsatzmittel</strong> und <strong>Fahrzeuge</strong> wird eine kommagetrennte Liste erwartet.<br>Bisher unbekannte Eintr&auml;ge werden automatisch angelegt, die Einsatzart sollte nur ein einzelner Wert sein.</p>';
-    //     if ('evw_wpe' == $this->currentSource->getIdentifier()) {
-    //         echo '<p>Das Feld <strong>Einsatzende</strong> erwartet eine Datums- und Zeitangabe im Format <code>JJJJ-MM-TT hh:mm:ss</code> (z.B. 2014-04-21 21:48:06). Die Sekundenangabe ist optional.</p>';
-    //     }
-    //     if ('evw_csv' == $this->currentSource->getIdentifier()) {
-    //         echo '<p>Die Felder <strong>Alarmzeit</strong> und <strong>Einsatzende</strong> erwarten eine Datums- und Zeitangabe, das Format kann bei der Zuordnung der Felder angegeben werden.</p>';
-    //     }
-    //     echo '<p>Die Felder <strong>Besonderer Einsatz</strong> und <strong>Fehlalarm</strong> erwarten den Wert <code>1</code> (= ja) oder <code>0</code> (= nein). Sie d&uuml;rfen auch leer bleiben, was als 0 (= nein) zählt.</p>';
-    // }
+            $month = zeroise($date->month, 2);
+            echo '<option value="' . $date->year . '-' . $month . '">' . $wp_locale->get_month($month) . ' ' . $date->year . '</option>';
+        }
+    }
 }

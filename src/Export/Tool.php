@@ -82,8 +82,8 @@ class Tool
 
     private function loadFormats()
     {
-        require_once dirname(__FILE__) . '/Format.php';
-        require_once dirname(__FILE__) . '/AbstractFormat.php';
+        require_once dirname(__FILE__) . '/Formats/Format.php';
+        require_once dirname(__FILE__) . '/Formats/AbstractFormat.php';
 
         require_once dirname(__FILE__) . '/Formats/Csv.php';
         $this->formats['csv'] = new Csv();
@@ -157,8 +157,7 @@ class Tool
             <ul id="<?php echo $formatKey; ?>-options" class="export-options export-filters">
                 <?php $format->renderOptions(); ?>
             </ul>
-        <?php
-        } ?>
+        <?php } ?>
     </fieldset>
 
     <?php submit_button('Export-Datei herunterladen'); ?>

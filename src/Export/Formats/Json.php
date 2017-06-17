@@ -4,8 +4,6 @@ namespace abrain\Einsatzverwaltung\Export\Formats;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Data;
 
-require_once dirname(__FILE__) . '/AbstractFormat.php';
-
 /**
  * Exportiert Einsatzberichte in eine JSON-Datei.
  */
@@ -32,7 +30,9 @@ class Json extends AbstractFormat
         ?>
         <li>
             <input type="checkbox" name="export_options[json][prettyPrint]" id="json_pretty_print" value="1">
-            <label for="json_pretty_print">Mit Whitespace formatiertes JSON ausgeben (Menschenlesbares Format verwenden)</label>
+            <label for="json_pretty_print">
+                Mit Whitespace formatiertes JSON ausgeben (Menschenlesbares Format verwenden)
+            </label>
         </li>
 <?php
     }
@@ -64,14 +64,12 @@ class Json extends AbstractFormat
      */
     public function export()
     {
+        $options = 0;
         // verwende ggf. menschenlesbares Format für die Ausgabe
         if ($this->prettyPrint) {
             $options = JSON_PRETTY_PRINT;
-        } else {
-            $options = 0;
         }
 
-        $fh = fopen('php://output', 'w');
         echo '[';
         if ($this->prettyPrint) {
             echo "\n";

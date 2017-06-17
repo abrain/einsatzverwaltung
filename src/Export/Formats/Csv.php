@@ -4,8 +4,6 @@ namespace abrain\Einsatzverwaltung\Export\Formats;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Data;
 
-require_once dirname(__FILE__) . '/AbstractFormat.php';
-
 /**
  * Exportiert Einsatzberichte in eine CSV-Datei.
  */
@@ -103,31 +101,31 @@ class Csv extends AbstractFormat
      */
     public function export()
     {
-        $fh = fopen('php://output', 'w');
+        $handle = fopen('php://output', 'w');
         // füge BOM hinzu, damit UTF-8-formatierte Inhalte in Excel funktionieren.
         // siehe: http://php.net/manual/de/function.fputcsv.php#118252
-        fputs($fh, chr(0xEF) . chr(0xBB) . chr(0xBF));
+        fputs($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
         // füge ggf. Spaltennamen als die erste Zeile ein
         if ($this->headers) {
             $data = array(
-             'Einsatznummer',
-             'Alarmierungsart',
-             'Alarmzeit',
-             'Einsatzende',
-             'Dauer (Minuten)',
-             'Einsatzort',
-             'Einsatzart',
-             'Fahrzeuge',
-             'Externe Einsatzmittel',
-             'Mannschaftsstärke',
-             'Einsatzleiter',
-             'Berichtstitel',
-             'Berichtstext',
-             'Besonderer Einsatz',
-             'Fehlalarm'
-          );
-            fputcsv($fh, $data, $this->delimiter, $this->enclosure, $this->escapeChar);
+                'Einsatznummer',
+                'Alarmierungsart',
+                'Alarmzeit',
+                'Einsatzende',
+                'Dauer (Minuten)',
+                'Einsatzort',
+                'Einsatzart',
+                'Fahrzeuge',
+                'Externe Einsatzmittel',
+                'Mannschaftsstärke',
+                'Einsatzleiter',
+                'Berichtstitel',
+                'Berichtstext',
+                'Besonderer Einsatz',
+                'Fehlalarm'
+            );
+            fputcsv($handle, $data, $this->delimiter, $this->enclosure, $this->escapeChar);
         }
 
         $query = $this->getQuery();
@@ -162,9 +160,9 @@ class Csv extends AbstractFormat
                ($report->isSpecial() ? 'Ja' : 'Nein'),
                ($report->isFalseAlarm() ? 'Ja' : 'Nein'),
             );
-            fputcsv($fh, $data, $this->delimiter, $this->enclosure, $this->escapeChar);
+            fputcsv($handle, $data, $this->delimiter, $this->enclosure, $this->escapeChar);
         }
 
-        fclose($fh);
+        fclose($handle);
     }
 }

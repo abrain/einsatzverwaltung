@@ -1,8 +1,6 @@
 <?php
 namespace abrain\Einsatzverwaltung\Export\Formats;
 
-require_once dirname(__FILE__) . '/Csv.php';
-
 /**
  * Exportiert Einsatzberichte in eine für Excel formatierte CSV-Datei.
  */

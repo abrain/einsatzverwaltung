@@ -1,8 +1,6 @@
 <?php
 namespace abrain\Einsatzverwaltung\Export\Formats;
 
-require_once dirname(__FILE__) . '/Format.php';
-
 /**
  * Abstraktion für Exportformate
  */

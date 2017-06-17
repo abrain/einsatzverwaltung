@@ -58,17 +58,19 @@ class Tool
      */
     public function startExport()
     {
-        // stelle sicher, dass wir uns im Adminbereich befindet und der Benutzer über ausreichend Berechtigungen verfügt
-        if (current_user_can('manage_options') && is_admin() && @$_GET['page'] == self::EVW_TOOL_EXPORT_SLUG && @$_GET['download'] == true) {
+        // stelle sicher, dass wir uns im Adminbereich befindet und der Benutzer über ausreichend Berechtigungen
+        // verfügt
+        if (current_user_can('manage_options') && is_admin() && @$_GET['page'] == self::EVW_TOOL_EXPORT_SLUG &&
+            @$_GET['download'] == true) {
             $format = @$this->formats[$_GET['format']];
  
             if ($format) {
-                $start_date = @$_GET['export_filters']['start_date'];
-                $end_date = @$_GET['export_filters']['end_date'];
-                $export_options = (array)@$_GET['export_options'][$_GET['format']];
+                $startDate = @$_GET['export_filters']['start_date'];
+                $endDate = @$_GET['export_filters']['end_date'];
+                $exportOptions = (array)@$_GET['export_options'][$_GET['format']];
 
-                $format->setFilters($start_date, $end_date);
-                $format->setOptions($export_options);
+                $format->setFilters($startDate, $endDate);
+                $format->setOptions($exportOptions);
 
                 header('Content-Description: File Transfer');
                 header('Content-Disposition: attachment; filename=' . $format->getFilename());
@@ -80,6 +82,9 @@ class Tool
 
     private function loadFormats()
     {
+        require_once dirname(__FILE__) . '/Format.php';
+        require_once dirname(__FILE__) . '/AbstractFormat.php';
+
         require_once dirname(__FILE__) . '/Formats/Csv.php';
         $this->formats['csv'] = new Csv();
 
@@ -131,11 +136,9 @@ class Tool
             form.find('input[name="format"]').change(function() {
                 options.slideUp('fast');
                 switch ( $(this).val() ) {
-                    <?php foreach (array_keys($this->formats) as $format_key) {
-            ?>
-                        case '<?php echo $format_key; ?>': $('#<?php echo $format_key; ?>-options').slideDown(); break;
-                    <?php
-        } ?>
+                    <?php foreach (array_keys($this->formats) as $formatKey) { ?>
+                        case '<?php echo $formatKey; ?>': $('#<?php echo $formatKey; ?>-options').slideDown(); break;
+                    <?php } ?>
                 }
             });
         });
@@ -143,12 +146,15 @@ class Tool
     <h2>Wähle, in welches Format du exportieren möchtest</h2>
     <fieldset>
         <legend class="screen-reader-text">Wähle, in welches Format du exportieren möchtest</legend>
-        <?php foreach ($this->formats as $format_key => $format) {
+        <?php foreach ($this->formats as $formatKey => $format) {
             ?>
             <p>
-                <label><input type="radio" name="format" value="<?php echo $format_key; ?>"> <?php echo $format->getTitle(); ?></label>
+                <label>
+                    <input type="radio" name="format" value="<?php echo $formatKey; ?>">
+                    <?php echo $format->getTitle(); ?>
+                </label>
             </p>
-            <ul id="<?php echo $format_key; ?>-options" class="export-options export-filters">
+            <ul id="<?php echo $formatKey; ?>-options" class="export-options export-filters">
                 <?php $format->renderOptions(); ?>
             </ul>
         <?php
@@ -173,8 +179,8 @@ class Tool
             ORDER BY post_date DESC
         ", 'einsatz'));
 
-        $month_count = count($months);
-        if (!$month_count || (1 == $month_count && 0 == $months[0]->month)) {
+        $monthCount = count($months);
+        if (!$monthCount || (1 == $monthCount && 0 == $months[0]->month)) {
             return;
         }
 
@@ -184,7 +190,9 @@ class Tool
             }
 
             $month = zeroise($date->month, 2);
-            echo '<option value="' . $date->year . '-' . $month . '">' . $wp_locale->get_month($month) . ' ' . $date->year . '</option>';
+            $value = $date->year . '-' . $month;
+            $text = $wp_locale->get_month($month) . ' ' . $date->year;
+            echo '<option value="' . $value . '">' . $text . '</option>';
         }
     }
 }

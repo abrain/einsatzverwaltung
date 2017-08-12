@@ -25,6 +25,8 @@ Der PHP-Code wird gem&auml;&szlig; dem Coding Style Guide [PSR-2](http://www.php
 * PHP: 5.3.0
 * WordPress: 4.4
 
+Auch wenn PHP 5.3 vorausgesetzt und derzeit noch als Minimum erhalten wird, werden die automatisierten Tests nur mit den [aktuellen PHP-Versionen](https://secure.php.net/supported-versions.php) durchgef&uuml;hrt.
+
 ### Social Media
 
 * Twitter: [@einsatzvw](https://twitter.com/einsatzvw)

@@ -37,6 +37,7 @@ Das Plugin kann entweder aus WordPress heraus aus dem [Pluginverzeichnis](https:
 In beiden F&auml;llen muss das Plugin erst aktiviert werden, bevor es benutzt werden kann.
 
 __Es wird PHP 5.3.0 oder neuer ben&ouml;tigt__
+(Getestet wird jedoch nur mit den [aktuellen PHP-Versionen](https://secure.php.net/supported-versions.php))
 
 == Frequently Asked Questions ==
 

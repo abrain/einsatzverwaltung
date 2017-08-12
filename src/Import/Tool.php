@@ -177,7 +177,7 @@ class Tool
         $this->currentAction = $this->currentSource->getAction($aktion);
         $this->nextAction = $this->currentSource->getNextAction($this->currentAction);
 
-        // Einstellungen an die Imortquelle übergeben
+        // Einstellungen an die Importquelle übergeben
         if (array_key_exists('args', $this->currentAction) && is_array($this->currentAction['args'])) {
             foreach ($this->currentAction['args'] as $arg) {
                 $value = (array_key_exists($arg, $_POST) ? sanitize_text_field($_POST[$arg]) : null);
@@ -195,6 +195,12 @@ class Tool
                 $this->currentSource->putArg('import_time_format', sanitize_text_field($_POST['import_time_format']));
             }
         }
+
+        // Datums- und Zeitformat für CSV-Import übernehmen
+        $this->currentSource->putArg(
+                'import_publish_reports',
+                $this->utilities->sanitizeCheckbox(array($_POST, 'import_publish_reports'))
+        );
 
         echo "<h2>{$this->currentAction['name']}</h2>";
 

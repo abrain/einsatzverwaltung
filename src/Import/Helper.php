@@ -109,9 +109,14 @@ class Helper
             return;
         }
 
+        // Der Veröffentlichungsstatus der importierten Berichte
+        $postStatus = $source->isPublishReports() ? 'publish' : 'draft';
+
         // Für die Dauer des Imports sollen die laufenden Nummern nicht aktuell gehalten werden, da dies die Performance
         // stark beeinträchtigt
-        $this->data->pauseAutoSequenceNumbers();
+        if ('publish' === $postStatus) {
+            $this->data->pauseAutoSequenceNumbers();
+        }
         $yearsImported = array();
 
         $dateFormat = $source->getDateFormat();
@@ -128,7 +133,6 @@ class Helper
         $postFields = IncidentReport::getPostFields();
 
         foreach ($sourceEntries as $sourceEntry) {
-            $tsStartEntry = microtime(true);
             $metaValues = array();
             $insertArgs = array();
             $insertArgs['post_content'] = '';
@@ -233,7 +237,7 @@ class Helper
             }
 
             $insertArgs['post_type'] = 'einsatz';
-            $insertArgs['post_status'] = 'publish';
+            $insertArgs['post_status'] = $postStatus;
 
             // Titel sicherstellen
             if (!array_key_exists('post_title', $insertArgs)) {
@@ -261,10 +265,15 @@ class Helper
             }
         }
 
-        // Die automatische Aktualisierung der laufenden Nummern wird wieder aufgenommen
-        $this->data->resumeAutoSequenceNumbers();
-        foreach (array_keys($yearsImported) as $year) {
-            $this->data->updateSequenceNumbers(strval($year));
+        if ('publish' === $postStatus) {
+            // Die automatische Aktualisierung der laufenden Nummern wird wieder aufgenommen
+            $this->utilities->printSuccess('Die Berichte wurden importiert');
+            $this->utilities->printInfo('Metadaten werden aktualisiert ...');
+            flush();
+            $this->data->resumeAutoSequenceNumbers();
+            foreach (array_keys($yearsImported) as $year) {
+                $this->data->updateSequenceNumbers(strval($year));
+            }
         }
 
         $this->utilities->printSuccess('Der Import ist abgeschlossen');

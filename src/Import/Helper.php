@@ -123,74 +123,78 @@ class Helper
             $dateTimeFormat = 'Y-m-d H:i';
         }
 
+        $metaFields = IncidentReport::getMetaFields();
+        $ownTerms = IncidentReport::getTerms();
+        $postFields = IncidentReport::getPostFields();
+
         foreach ($sourceEntries as $sourceEntry) {
+            $tsStartEntry = microtime(true);
             $metaValues = array();
             $insertArgs = array();
             $insertArgs['post_content'] = '';
             $insertArgs['tax_input'] = array();
-            $ownTerms = IncidentReport::getTerms();
-            $postFields = IncidentReport::getPostFields();
 
             foreach ($mapping as $sourceField => $ownField) {
-                if (!empty($ownField) && is_string($ownField)) {
-                    $sourceValue = trim($sourceEntry[$sourceField]);
-                    if (array_key_exists($ownField, IncidentReport::getMetaFields())) {
-                        // Wert gehört in ein Metafeld
-                        $metaValues[$ownField] = $sourceValue;
-                    } elseif (array_key_exists($ownField, $ownTerms)) {
-                        // Wert gehört zu einer Taxonomie
-                        if (empty($sourceValue)) {
-                            // Leere Terms überspringen
-                            continue;
-                        }
-                        if (is_taxonomy_hierarchical($ownField)) {
-                            // Bei hierarchischen Taxonomien muss die ID statt des Namens verwendet werden
-                            $termIds = array();
+                if (empty($ownField) || !is_string($ownField)) {
+                    $this->utilities->printError("Feld '$ownField' ung&uuml;ltig");
+                    continue;
+                }
 
-                            $termNames = explode(',', $sourceValue);
-                            foreach ($termNames as $termName) {
-                                $termName = trim($termName);
-                                $term = get_term_by('name', $termName, $ownField);
+                $sourceValue = trim($sourceEntry[$sourceField]);
+                if (array_key_exists($ownField, $metaFields)) {
+                    // Wert gehört in ein Metafeld
+                    $metaValues[$ownField] = $sourceValue;
+                } elseif (array_key_exists($ownField, $ownTerms)) {
+                    // Wert gehört zu einer Taxonomie
+                    if (empty($sourceValue)) {
+                        // Leere Terms überspringen
+                        continue;
+                    }
+                    if (is_taxonomy_hierarchical($ownField)) {
+                        // Bei hierarchischen Taxonomien muss die ID statt des Namens verwendet werden
+                        $termIds = array();
 
-                                if ($term !== false) {
-                                    // Term existiert bereits, ID verwenden
-                                    $termIds[] = $term->term_id;
-                                    continue;
-                                }
+                        $termNames = explode(',', $sourceValue);
+                        foreach ($termNames as $termName) {
+                            $termName = trim($termName);
+                            $term = get_term_by('name', $termName, $ownField);
 
-                                // Term existiert in dieser Taxonomie noch nicht, neu anlegen
-                                $newterm = wp_insert_term($termName, $ownField);
-                                if (is_wp_error($newterm)) {
-                                    $this->utilities->printError(
-                                        sprintf(
-                                            "Konnte %s '%s' nicht anlegen: %s",
-                                            $ownTerms[$ownField]['label'],
-                                            $termName,
-                                            $newterm->get_error_message()
-                                        )
-                                    );
-                                    continue;
-                                }
-
-                                // Anlegen erfolgreich, zurückgegebene ID verwenden
-                                $termIds[] = $newterm['term_id'];
+                            if ($term !== false) {
+                                // Term existiert bereits, ID verwenden
+                                $termIds[] = $term->term_id;
+                                continue;
                             }
 
-                            $insertArgs['tax_input'][$ownField] = implode(',', $termIds);
-                        } else {
-                            // Name kann direkt verwendet werden
-                            $insertArgs['tax_input'][$ownField] = $sourceValue;
+                            // Term existiert in dieser Taxonomie noch nicht, neu anlegen
+                            $newterm = wp_insert_term($termName, $ownField);
+                            if (is_wp_error($newterm)) {
+                                $this->utilities->printError(
+                                    sprintf(
+                                        "Konnte %s '%s' nicht anlegen: %s",
+                                        $ownTerms[$ownField]['label'],
+                                        $termName,
+                                        $newterm->get_error_message()
+                                    )
+                                );
+                                continue;
+                            }
+
+                            // Anlegen erfolgreich, zurückgegebene ID verwenden
+                            $termIds[] = $newterm['term_id'];
                         }
-                    } elseif (array_key_exists($ownField, $postFields)) {
-                        // Wert gehört direkt zum Post
-                        $insertArgs[$ownField] = $sourceValue;
-                    } elseif ($ownField == '-') {
-                        $this->utilities->printWarning("Feld '$sourceField' nicht zugeordnet");
+
+                        $insertArgs['tax_input'][$ownField] = implode(',', $termIds);
                     } else {
-                        $this->utilities->printError("Feld '$ownField' unbekannt");
+                        // Name kann direkt verwendet werden
+                        $insertArgs['tax_input'][$ownField] = $sourceValue;
                     }
+                } elseif (array_key_exists($ownField, $postFields)) {
+                    // Wert gehört direkt zum Post
+                    $insertArgs[$ownField] = $sourceValue;
+                } elseif ($ownField == '-') {
+                    $this->utilities->printWarning("Feld '$sourceField' nicht zugeordnet");
                 } else {
-                    $this->utilities->printError("Feld '$ownField' ung&uuml;ltig");
+                    $this->utilities->printError("Feld '$ownField' unbekannt");
                 }
             }
 

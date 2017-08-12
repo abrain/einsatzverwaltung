@@ -103,6 +103,8 @@ class Helper
      */
     public function import($source, $mapping)
     {
+        set_time_limit(0); // Zeitlimit deaktivieren
+        
         $sourceEntries = $source->getEntries(array_keys($mapping));
         if (empty($sourceEntries)) {
             $this->utilities->printError('Die Importquelle lieferte keine Ergebnisse. Entweder sind dort keine Eins&auml;tze gespeichert oder es gab ein Problem bei der Abfrage.');

@@ -2,6 +2,7 @@
 namespace abrain\Einsatzverwaltung\Import;
 
 use abrain\Einsatzverwaltung\Core;
+use abrain\Einsatzverwaltung\Data;
 use abrain\Einsatzverwaltung\Import\Sources\AbstractSource;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Options;
@@ -29,16 +30,23 @@ class Helper
     private $options;
 
     /**
+     * @var Data
+     */
+    private $data;
+
+    /**
      * Helper constructor.
      * @param Utilities $utilities
      * @param Core $core
      * @param Options $options
+     * @param Data $data
      */
-    public function __construct(Utilities $utilities, Core $core, Options $options)
+    public function __construct(Utilities $utilities, Core $core, Options $options, Data $data)
     {
         $this->utilities = $utilities;
         $this->core = $core;
         $this->options = $options;
+        $this->data = $data;
     }
 
 
@@ -100,6 +108,11 @@ class Helper
             $this->utilities->printError('Die Importquelle lieferte keine Ergebnisse. Entweder sind dort keine Eins&auml;tze gespeichert oder es gab ein Problem bei der Abfrage.');
             return;
         }
+
+        // Für die Dauer des Imports sollen die laufenden Nummern nicht aktuell gehalten werden, da dies die Performance
+        // stark beeinträchtigt
+        $this->data->pauseAutoSequenceNumbers();
+        $yearsImported = array();
 
         $dateFormat = $source->getDateFormat();
         $timeFormat = $source->getTimeFormat();
@@ -193,6 +206,7 @@ class Helper
                 );
                 continue;
             }
+            $yearsImported[$alarmzeit->format('Y')] = 1;
 
             $insertArgs['post_date'] = $alarmzeit->format('Y-m-d H:i');
             $insertArgs['post_date_gmt'] = get_gmt_from_date($insertArgs['post_date']);
@@ -241,6 +255,12 @@ class Helper
                     update_post_meta($postId, $mkey, $mval);
                 }
             }
+        }
+
+        // Die automatische Aktualisierung der laufenden Nummern wird wieder aufgenommen
+        $this->data->resumeAutoSequenceNumbers();
+        foreach (array_keys($yearsImported) as $year) {
+            $this->data->updateSequenceNumbers(strval($year));
         }
 
         $this->utilities->printSuccess('Der Import ist abgeschlossen');

@@ -52,6 +52,7 @@
     .einsatzverwaltung-reportlist td:before {
         font-weight: bold;
         margin-right: 5px;
+        display: inline-block;
     }
 
     .einsatzverwaltung-reportlist td.einsatz-column-annotationImages,

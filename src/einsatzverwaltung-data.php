@@ -282,10 +282,13 @@ class Data
         foreach ($years as $year) {
             $posts = self::getEinsatzberichte($year);
 
-            $counter = 1;
+            $expectedNumber = 1;
             foreach ($posts as $post) {
-                $this->setSequenceNumber($post->ID, $counter);
-                $counter++;
+                $actualNumber = get_post_meta($post->ID, 'einsatz_seqNum', true);
+                if ($expectedNumber != $actualNumber) {
+                    $this->setSequenceNumber($post->ID, $expectedNumber);
+                }
+                $expectedNumber++;
             }
         }
     }

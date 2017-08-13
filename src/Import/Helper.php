@@ -370,11 +370,12 @@ class Helper
         }
 
         $unmatchableFields = $source->getUnmatchableFields();
+        $autoMatchFields = $source->getAutoMatchFields();
         if ($this->options->isAutoIncidentNumbers()) {
             $unmatchableFields[] = 'einsatz_incidentNumber';
         }
         foreach ($unmatchableFields as $unmatchableField) {
-            if (in_array($unmatchableField, $mapping)) {
+            if (in_array($unmatchableField, $mapping) && !in_array($unmatchableField, $autoMatchFields)) {
                 $this->utilities->printError(sprintf(
                     'Feld %s kann nicht f&uuml;r ein zu importierendes Feld als Ziel angegeben werden',
                     esc_html($unmatchableField)

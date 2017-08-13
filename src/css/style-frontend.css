@@ -1,36 +1,36 @@
 .einsatzverwaltung-reportlist {
-	width: 100%;
-	border-collapse: collapse;
+    width: 100%;
+    border-collapse: collapse;
 }
 
 .einsatzverwaltung-reportlist th,
 .einsatzverwaltung-reportlist td {
-	padding: 3px 5px;
+    padding: 3px 5px;
 }
 
 .einsatzverwaltung-reportlist .einsatz-header {
-	background-color: #eee;
-	border-bottom: 2px solid #ddd;
+    background-color: #eee;
+    border-bottom: 2px solid #ddd;
 }
 
 .einsatzverwaltung-reportlist .zebracorrection {
-	visibility: hidden;
+    visibility: hidden;
     display: none;
 }
 
 .einsatzverwaltung-reportlist .einsatz-title-month td {
-	border: none;
-	font-size: 1.3em;
+    border: none;
+    font-size: 1.3em;
     padding: 3px 8px;
-	background: #ddd none repeat scroll 0 0;
+    background: #ddd none repeat scroll 0 0;
 }
 
 @media (max-width: 767px) {
-	.einsatzverwaltung-reportlist tr,
-	.einsatzverwaltung-reportlist th,
-	.einsatzverwaltung-reportlist td {
-		display: block;
-	}
+    .einsatzverwaltung-reportlist tr,
+    .einsatzverwaltung-reportlist th,
+    .einsatzverwaltung-reportlist td {
+        display: block;
+    }
 
     .einsatzverwaltung-reportlist tr {
         padding-top: 5px;
@@ -42,20 +42,21 @@
         padding-bottom: 0;
     }
 
-	.einsatzverwaltung-reportlist td {
+    .einsatzverwaltung-reportlist td {
         padding: 0 10px;
-		border: none;
-	}
-	.einsatzverwaltung-reportlist .einsatz-header {
-		display: none;
-	}
-	.einsatzverwaltung-reportlist td:before {
-		font-weight: bold;
-		margin-right: 5px;
-	}
+        border: none;
+    }
+    .einsatzverwaltung-reportlist .einsatz-header {
+        display: none;
+    }
+    .einsatzverwaltung-reportlist td:before {
+        font-weight: bold;
+        margin-right: 5px;
+        display: inline-block;
+    }
 
-	.einsatzverwaltung-reportlist td.einsatz-column-annotationImages,
-	.einsatzverwaltung-reportlist td.einsatz-column-annotationSpecial {
-		display: none;
-	}
+    .einsatzverwaltung-reportlist td.einsatz-column-annotationImages,
+    .einsatzverwaltung-reportlist td.einsatz-column-annotationSpecial {
+        display: none;
+    }
 }

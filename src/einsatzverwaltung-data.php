@@ -26,6 +26,14 @@ class Data
     private $options;
 
     /**
+     * Regelt, ob automatisch die laufenden Nummern aktualisiert werden sollen. Es ist aus Gründen der Performance
+     * vereinzelt sinnvoll, diesen Automatismus temporär abzuschalten.
+     *
+     * @var bool
+     */
+    private $assignSequenceNumbers = true;
+
+    /**
      * Constructor
      *
      * @param Core $core
@@ -282,10 +290,13 @@ class Data
         foreach ($years as $year) {
             $posts = self::getEinsatzberichte($year);
 
-            $counter = 1;
+            $expectedNumber = 1;
             foreach ($posts as $post) {
-                $this->setSequenceNumber($post->ID, $counter);
-                $counter++;
+                $actualNumber = get_post_meta($post->ID, 'einsatz_seqNum', true);
+                if ($expectedNumber != $actualNumber) {
+                    $this->setSequenceNumber($post->ID, $expectedNumber);
+                }
+                $expectedNumber++;
             }
         }
     }
@@ -301,8 +312,10 @@ class Data
         $report = new IncidentReport($post);
 
         // Laufende Nummern aktualisieren
-        $date = $report->getTimeOfAlerting();
-        $this->updateSequenceNumbers($date->format('Y'));
+        if (true === $this->assignSequenceNumbers) {
+            $date = $report->getTimeOfAlerting();
+            $this->updateSequenceNumbers($date->format('Y'));
+        }
 
         // Kategoriezugehörigkeit aktualisieren
         $category = $this->options->getEinsatzberichteCategory();
@@ -327,8 +340,10 @@ class Data
     public function onTrash($postId, $post)
     {
         // Laufende Nummern aktualisieren
-        $date = date_create($post->post_date);
-        $this->updateSequenceNumbers(date_format($date, 'Y'));
+        if (true === $this->assignSequenceNumbers) {
+            $date = date_create($post->post_date);
+            $this->updateSequenceNumbers(date_format($date, 'Y'));
+        }
         delete_post_meta($postId, 'einsatz_seqNum');
 
         // Kategoriezugehörigkeit aktualisieren
@@ -362,6 +377,16 @@ class Data
         $date = date_create(get_post_field('post_date', $objectId));
         $newIncidentNumber = $this->core->formatEinsatznummer(date_format($date, 'Y'), $metaValue);
         $this->setEinsatznummer($objectId, $newIncidentNumber);
+    }
+
+    public function pauseAutoSequenceNumbers()
+    {
+        $this->assignSequenceNumbers = false;
+    }
+
+    public function resumeAutoSequenceNumbers()
+    {
+        $this->assignSequenceNumbers = true;
     }
 
     /**

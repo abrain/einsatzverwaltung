@@ -2,6 +2,7 @@
 namespace abrain\Einsatzverwaltung\Import;
 
 use abrain\Einsatzverwaltung\Core;
+use abrain\Einsatzverwaltung\Data;
 use abrain\Einsatzverwaltung\Import\Sources\AbstractSource;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Options;
@@ -29,16 +30,23 @@ class Helper
     private $options;
 
     /**
+     * @var Data
+     */
+    private $data;
+
+    /**
      * Helper constructor.
      * @param Utilities $utilities
      * @param Core $core
      * @param Options $options
+     * @param Data $data
      */
-    public function __construct(Utilities $utilities, Core $core, Options $options)
+    public function __construct(Utilities $utilities, Core $core, Options $options, Data $data)
     {
         $this->utilities = $utilities;
         $this->core = $core;
         $this->options = $options;
+        $this->data = $data;
     }
 
 
@@ -95,11 +103,23 @@ class Helper
      */
     public function import($source, $mapping)
     {
+        set_time_limit(0); // Zeitlimit deaktivieren
+        
         $sourceEntries = $source->getEntries(array_keys($mapping));
         if (empty($sourceEntries)) {
             $this->utilities->printError('Die Importquelle lieferte keine Ergebnisse. Entweder sind dort keine Eins&auml;tze gespeichert oder es gab ein Problem bei der Abfrage.');
             return;
         }
+
+        // Der Veröffentlichungsstatus der importierten Berichte
+        $postStatus = $source->isPublishReports() ? 'publish' : 'draft';
+
+        // Für die Dauer des Imports sollen die laufenden Nummern nicht aktuell gehalten werden, da dies die Performance
+        // stark beeinträchtigt
+        if ('publish' === $postStatus) {
+            $this->data->pauseAutoSequenceNumbers();
+        }
+        $yearsImported = array();
 
         $dateFormat = $source->getDateFormat();
         $timeFormat = $source->getTimeFormat();
@@ -110,74 +130,77 @@ class Helper
             $dateTimeFormat = 'Y-m-d H:i';
         }
 
+        $metaFields = IncidentReport::getMetaFields();
+        $ownTerms = IncidentReport::getTerms();
+        $postFields = IncidentReport::getPostFields();
+
         foreach ($sourceEntries as $sourceEntry) {
             $metaValues = array();
             $insertArgs = array();
             $insertArgs['post_content'] = '';
             $insertArgs['tax_input'] = array();
-            $ownTerms = IncidentReport::getTerms();
-            $postFields = IncidentReport::getPostFields();
 
             foreach ($mapping as $sourceField => $ownField) {
-                if (!empty($ownField) && is_string($ownField)) {
-                    $sourceValue = trim($sourceEntry[$sourceField]);
-                    if (array_key_exists($ownField, IncidentReport::getMetaFields())) {
-                        // Wert gehört in ein Metafeld
-                        $metaValues[$ownField] = $sourceValue;
-                    } elseif (array_key_exists($ownField, $ownTerms)) {
-                        // Wert gehört zu einer Taxonomie
-                        if (empty($sourceValue)) {
-                            // Leere Terms überspringen
-                            continue;
-                        }
-                        if (is_taxonomy_hierarchical($ownField)) {
-                            // Bei hierarchischen Taxonomien muss die ID statt des Namens verwendet werden
-                            $termIds = array();
+                if (empty($ownField) || !is_string($ownField)) {
+                    $this->utilities->printError("Feld '$ownField' ung&uuml;ltig");
+                    continue;
+                }
 
-                            $termNames = explode(',', $sourceValue);
-                            foreach ($termNames as $termName) {
-                                $termName = trim($termName);
-                                $term = get_term_by('name', $termName, $ownField);
+                $sourceValue = trim($sourceEntry[$sourceField]);
+                if (array_key_exists($ownField, $metaFields)) {
+                    // Wert gehört in ein Metafeld
+                    $metaValues[$ownField] = $sourceValue;
+                } elseif (array_key_exists($ownField, $ownTerms)) {
+                    // Wert gehört zu einer Taxonomie
+                    if (empty($sourceValue)) {
+                        // Leere Terms überspringen
+                        continue;
+                    }
+                    if (is_taxonomy_hierarchical($ownField)) {
+                        // Bei hierarchischen Taxonomien muss die ID statt des Namens verwendet werden
+                        $termIds = array();
 
-                                if ($term !== false) {
-                                    // Term existiert bereits, ID verwenden
-                                    $termIds[] = $term->term_id;
-                                    continue;
-                                }
+                        $termNames = explode(',', $sourceValue);
+                        foreach ($termNames as $termName) {
+                            $termName = trim($termName);
+                            $term = get_term_by('name', $termName, $ownField);
 
-                                // Term existiert in dieser Taxonomie noch nicht, neu anlegen
-                                $newterm = wp_insert_term($termName, $ownField);
-                                if (is_wp_error($newterm)) {
-                                    $this->utilities->printError(
-                                        sprintf(
-                                            "Konnte %s '%s' nicht anlegen: %s",
-                                            $ownTerms[$ownField]['label'],
-                                            $termName,
-                                            $newterm->get_error_message()
-                                        )
-                                    );
-                                    continue;
-                                }
-
-                                // Anlegen erfolgreich, zurückgegebene ID verwenden
-                                $termIds[] = $newterm['term_id'];
+                            if ($term !== false) {
+                                // Term existiert bereits, ID verwenden
+                                $termIds[] = $term->term_id;
+                                continue;
                             }
 
-                            $insertArgs['tax_input'][$ownField] = implode(',', $termIds);
-                        } else {
-                            // Name kann direkt verwendet werden
-                            $insertArgs['tax_input'][$ownField] = $sourceValue;
+                            // Term existiert in dieser Taxonomie noch nicht, neu anlegen
+                            $newterm = wp_insert_term($termName, $ownField);
+                            if (is_wp_error($newterm)) {
+                                $this->utilities->printError(
+                                    sprintf(
+                                        "Konnte %s '%s' nicht anlegen: %s",
+                                        $ownTerms[$ownField]['label'],
+                                        $termName,
+                                        $newterm->get_error_message()
+                                    )
+                                );
+                                continue;
+                            }
+
+                            // Anlegen erfolgreich, zurückgegebene ID verwenden
+                            $termIds[] = $newterm['term_id'];
                         }
-                    } elseif (array_key_exists($ownField, $postFields)) {
-                        // Wert gehört direkt zum Post
-                        $insertArgs[$ownField] = $sourceValue;
-                    } elseif ($ownField == '-') {
-                        $this->utilities->printWarning("Feld '$sourceField' nicht zugeordnet");
+
+                        $insertArgs['tax_input'][$ownField] = implode(',', $termIds);
                     } else {
-                        $this->utilities->printError("Feld '$ownField' unbekannt");
+                        // Name kann direkt verwendet werden
+                        $insertArgs['tax_input'][$ownField] = $sourceValue;
                     }
+                } elseif (array_key_exists($ownField, $postFields)) {
+                    // Wert gehört direkt zum Post
+                    $insertArgs[$ownField] = $sourceValue;
+                } elseif ($ownField == '-') {
+                    $this->utilities->printWarning("Feld '$sourceField' nicht zugeordnet");
                 } else {
-                    $this->utilities->printError("Feld '$ownField' ung&uuml;ltig");
+                    $this->utilities->printError("Feld '$ownField' unbekannt");
                 }
             }
 
@@ -193,6 +216,7 @@ class Helper
                 );
                 continue;
             }
+            $yearsImported[$alarmzeit->format('Y')] = 1;
 
             $insertArgs['post_date'] = $alarmzeit->format('Y-m-d H:i');
             $insertArgs['post_date_gmt'] = get_gmt_from_date($insertArgs['post_date']);
@@ -215,7 +239,7 @@ class Helper
             }
 
             $insertArgs['post_type'] = 'einsatz';
-            $insertArgs['post_status'] = 'publish';
+            $insertArgs['post_status'] = $postStatus;
 
             // Titel sicherstellen
             if (!array_key_exists('post_title', $insertArgs)) {
@@ -240,6 +264,17 @@ class Helper
                 foreach ($metaValues as $mkey => $mval) {
                     update_post_meta($postId, $mkey, $mval);
                 }
+            }
+        }
+
+        if ('publish' === $postStatus) {
+            // Die automatische Aktualisierung der laufenden Nummern wird wieder aufgenommen
+            $this->utilities->printSuccess('Die Berichte wurden importiert');
+            $this->utilities->printInfo('Metadaten werden aktualisiert ...');
+            flush();
+            $this->data->resumeAutoSequenceNumbers();
+            foreach (array_keys($yearsImported) as $year) {
+                $this->data->updateSequenceNumbers(strval($year));
             }
         }
 
@@ -335,11 +370,12 @@ class Helper
         }
 
         $unmatchableFields = $source->getUnmatchableFields();
+        $autoMatchFields = $source->getAutoMatchFields();
         if ($this->options->isAutoIncidentNumbers()) {
             $unmatchableFields[] = 'einsatz_incidentNumber';
         }
         foreach ($unmatchableFields as $unmatchableField) {
-            if (in_array($unmatchableField, $mapping)) {
+            if (in_array($unmatchableField, $mapping) && !in_array($unmatchableField, $autoMatchFields)) {
                 $this->utilities->printError(sprintf(
                     'Feld %s kann nicht f&uuml;r ein zu importierendes Feld als Ziel angegeben werden',
                     esc_html($unmatchableField)

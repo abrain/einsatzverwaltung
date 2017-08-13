@@ -33,8 +33,14 @@ use WP_User;
  */
 class Core
 {
-    const VERSION = '1.3.0';
+    const VERSION = '1.3.1';
     const DB_VERSION = 20;
+
+   /**
+    * Statische Variable, um die aktuelle (einzige!) Instanz dieser Klasse zu halten
+    * @var Core
+    */
+    private static $instance = null;
 
     public $pluginFile;
     public $pluginBasename;
@@ -63,6 +69,8 @@ class Core
             'items_list' => 'Liste der Einsatzberichte',
             'insert_into_item' => 'In den Einsatzbericht einf&uuml;gen',
             'uploaded_to_this_item' => 'Zu diesem Einsatzbericht hochgeladen',
+            'view_items' => 'Einsatzberichte ansehen',
+            //'attributes' => 'Attribute', // In WP 4.7 eingeführtes Label, für Einsatzberichte derzeit nicht relevant
         ),
         'public' => true,
         'has_archive' => true,
@@ -125,7 +133,7 @@ class Core
         'public' => true,
         'show_in_nav_menus' => false,
         'meta_box_cb' => 'abrain\Einsatzverwaltung\Admin::displayMetaBoxEinsatzart',
-        'capabilities' => array (
+        'capabilities' => array(
             'manage_terms' => 'edit_einsatzberichte',
             'edit_terms' => 'edit_einsatzberichte',
             'delete_terms' => 'edit_einsatzberichte',
@@ -158,7 +166,7 @@ class Core
         'public' => true,
         'show_in_nav_menus' => false,
         'hierarchical' => true,
-        'capabilities' => array (
+        'capabilities' => array(
             'manage_terms' => 'edit_einsatzberichte',
             'edit_terms' => 'edit_einsatzberichte',
             'delete_terms' => 'edit_einsatzberichte',
@@ -190,7 +198,7 @@ class Core
         ),
         'public' => true,
         'show_in_nav_menus' => false,
-        'capabilities' => array (
+        'capabilities' => array(
             'manage_terms' => 'edit_einsatzberichte',
             'edit_terms' => 'edit_einsatzberichte',
             'delete_terms' => 'edit_einsatzberichte',
@@ -225,7 +233,7 @@ class Core
         ),
         'public' => true,
         'show_in_nav_menus' => false,
-        'capabilities' => array (
+        'capabilities' => array(
             'manage_terms' => 'edit_einsatzberichte',
             'edit_terms' => 'edit_einsatzberichte',
             'delete_terms' => 'edit_einsatzberichte',
@@ -239,14 +247,39 @@ class Core
     private $annotationRepository;
 
     /**
+     * @var Admin
+     */
+    private $admin;
+
+    /**
      * @var Data
      */
     private $data;
+
+    /**
+     * @var Frontend
+     */
+    private $frontend;
+
+    /**
+     * @var Settings
+     */
+    private $settings;
     
     /**
      * @var Options
      */
     private $options;
+    
+    /**
+     * @var ImportTool
+     */
+    private $importTool;
+    
+    /**
+     * @var TasksPage
+     */
+    private $tasksPage;
     
     /**
      * @var Utilities
@@ -256,7 +289,7 @@ class Core
     /**
      * Constructor
      */
-    public function __construct()
+    private function __construct()
     {
         $this->pluginFile = einsatzverwaltung_plugin_file();
         $this->pluginBasename = plugin_basename($this->pluginFile);
@@ -269,16 +302,16 @@ class Core
         $this->options = new Options($this->utilities);
         $this->utilities->setDependencies($this->options);
 
-        new Admin($this, $this->options, $this->utilities);
+        $this->admin = new Admin($this, $this->options, $this->utilities);
         $this->data = new Data($this, $this->utilities, $this->options);
-        new Frontend($this, $this->options, $this->utilities);
-        new Settings($this, $this->options, $this->utilities, $this->data);
-        new Shortcodes($this->utilities, $this, $this->options);
-        new Taxonomies($this->utilities);
+        $this->frontend = new Frontend($this, $this->options, $this->utilities);
+        $this->settings = new Settings($this, $this->options, $this->utilities, $this->data);
+        $this->shortcodes = new Shortcodes($this->utilities, $this, $this->options);
+        $this->taxonomies = new Taxonomies($this->utilities);
 
         // Tools
-        new ImportTool($this, $this->utilities, $this->options);
-        new TasksPage($this->utilities, $this->data);
+        $this->importTool = new ImportTool($this, $this->utilities, $this->options, $this->data);
+        $this->tasksPage = new TasksPage($this->utilities, $this->data);
 
         // Widgets
         RecentIncidents::setDependencies($this->options, $this->utilities);
@@ -296,6 +329,7 @@ class Core
         register_deactivation_hook($this->pluginFile, array($this, 'onDeactivation'));
         add_action('widgets_init', array($this, 'registerWidgets'));
         add_filter('user_has_cap', array($this, 'userHasCap'), 10, 4);
+        add_action('parse_query', array($this, 'einsatznummerMetaQuery'));
     }
 
     /**
@@ -397,6 +431,21 @@ class Core
                 'top'
             );
             add_rewrite_rule($base . '/(\d{4})/?$', 'index.php?post_type=einsatz&year=$matches[1]', 'top');
+        }
+
+        add_rewrite_tag('%einsatznummer%', '([^&]+)');
+    }
+
+    /**
+     * @param \WP_Query $query
+     */
+    public function einsatznummerMetaQuery($query)
+    {
+        $enr = $query->get('einsatznummer');
+        if (!empty($enr)) {
+            $query->set('post_type', 'einsatz');
+            $query->set('meta_key', 'einsatz_incidentNumber');
+            $query->set('meta_value', $enr);
         }
     }
 
@@ -540,7 +589,84 @@ class Core
     {
         return $this->annotationRepository;
     }
+
+    /**
+     * @return Admin
+     */
+    public function getAdmin()
+    {
+        return $this->admin;
+    }
+
+    /**
+     * @return Data
+     */
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    /**
+     * @return Frontend
+     */
+    public function getFrontend()
+    {
+        return $this->frontend;
+    }
+
+    /**
+     * @return Settings
+     */
+    public function getSettings()
+    {
+        return $this->settings;
+    }
+
+    /**
+     * @return Shortcodes
+     */
+    public function getShortcodes()
+    {
+        return $this->shortcodes;
+    }
+
+    /**
+     * @return Taxonomies
+     */
+    public function getTaxonomies()
+    {
+        return $this->taxonomies;
+    }
+
+    /**
+     * @return ImportTool
+     */
+    public function getImportTool()
+    {
+        return $this->importTool;
+    }
+
+    /**
+     * @return TasksPage
+     */
+    public function getTasksPage()
+    {
+        return $this->tasksPage;
+    }
+
+    /**
+     * Falls die einzige Instanz noch nicht existiert, erstelle sie
+     * Gebe die einzige Instanz dann zurück
+     *
+     * @return   Core
+     */
+    public static function getInstance()
+    {
+        if (null === self::$instance) {
+            self::$instance = new Core();
+        }
+        return self::$instance;
+    }
 }
 
-// Die globale Variable wird nur bei den Unit-Test benötigt
-$GLOBALS['einsatzverwaltung_core'] = new Core();
+Core::getInstance();

@@ -1,7 +1,7 @@
 # Einsatzverwaltung
 ## Plugin zur Verwaltung von Feuerwehreins&auml;tzen
 
-[![Flattr](https://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/thing/2638688/abraineinsatzverwaltung-on-GitHub) [![Build Status](https://travis-ci.org/abrain/einsatzverwaltung.svg)](https://travis-ci.org/abrain/einsatzverwaltung) [![Code Climate](https://codeclimate.com/github/abrain/einsatzverwaltung/badges/gpa.svg)](https://codeclimate.com/github/abrain/einsatzverwaltung) [![Test Coverage](https://codeclimate.com/github/abrain/einsatzverwaltung/badges/coverage.svg)](https://codeclimate.com/github/abrain/einsatzverwaltung/coverage)
+[![Build Status](https://travis-ci.org/abrain/einsatzverwaltung.svg)](https://travis-ci.org/abrain/einsatzverwaltung) [![Code Climate](https://codeclimate.com/github/abrain/einsatzverwaltung/badges/gpa.svg)](https://codeclimate.com/github/abrain/einsatzverwaltung) [![Test Coverage](https://codeclimate.com/github/abrain/einsatzverwaltung/badges/coverage.svg)](https://codeclimate.com/github/abrain/einsatzverwaltung/coverage)
 
 Dieses Plugin f&uuml;gt WordPress eine neue Beitragsart "Einsatzbericht" hinzu. Diese Einsatzberichte werden wie gew&ouml;hnliche WordPress-Beitr&auml;ge erstellt, es k&ouml;nnen aber zus&auml;tzliche Informationen wie Alarmzeit, Art des Einsatzes, eingesetzte Fahrzeuge und vieles mehr angegeben werden. Zudem stellt das Plugin verschiedene M&ouml;glichkeiten zur Darstellung der Einsatzberichte zur Verf&uuml;gung.
 

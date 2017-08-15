@@ -668,18 +668,30 @@ class Settings
         if (!current_user_can('manage_options')) {
             wp_die(__('You do not have sufficient permissions to manage options for this site.'));
         }
+        ?>
 
-        echo '<div id="einsatzverwaltung_contactinfo">';
-        echo '<h2>Entwicklerkontakt &amp; Social Media</h2>';
-        echo '<p>eMail: <a href="mailto:kontakt@abrain.de">kontakt@abrain.de</a> <span title="PGP Schl&uuml;ssel-ID: 8752EB8F" class="pgpbadge"><i class="fa fa-lock"></i>&nbsp;PGP</span></p>';
-        echo '<p align="center"><a href="https://www.facebook.com/einsatzverwaltung/" title="Einsatzverwaltung auf Facebook"><i class="fa fa-facebook-official fa-2x"></i></a>&nbsp;&nbsp;';
-        echo '<a href="https://twitter.com/einsatzvw" title="Einsatzverwaltung auf Twitter"><i class="fa fa-twitter fa-2x"></i></a>&nbsp;&nbsp;';
-        echo '<a href="https://einsatzverwaltung.abrain.de/feed/" title="RSS-Feed mit Neuigkeiten zu Einsatzverwaltung"><i class="fa fa-rss-square fa-2x"></i></a>';
-        echo '</p></div>';
+        <div id="einsatzverwaltung_contactinfo">
+        <h2>Entwicklerkontakt &amp; Social Media</h2>
+        <p>
+            eMail: <a href="mailto:kontakt@abrain.de">kontakt@abrain.de</a>
+            <span title="PGP Schl&uuml;ssel-ID: 8752EB8F" class="pgpbadge"><i class="fa fa-lock"></i>&nbsp;PGP</span>
+        </p>
+        <p align="center">
+            <a href="https://github.com/abrain/einsatzverwaltung/issues" title="Bring Dich ein auf GitHub">
+                <i class="fa fa-github fa-2x"></i></a>&nbsp;&nbsp;
+            <a href="https://www.facebook.com/einsatzverwaltung/" title="Einsatzverwaltung auf Facebook">
+                <i class="fa fa-facebook-official fa-2x"></i></a>&nbsp;&nbsp;
+            <a href="https://twitter.com/einsatzvw" title="Einsatzverwaltung auf Twitter">
+                <i class="fa fa-twitter fa-2x"></i></a>&nbsp;&nbsp;
+            <a href="https://einsatzverwaltung.abrain.de/feed/" title="RSS-Feed mit Neuigkeiten zu Einsatzverwaltung">
+                <i class="fa fa-rss-square fa-2x"></i></a>
+        </p>
+        </div>
 
-        echo '<div class="wrap">';
-        echo '<h1>Einstellungen &rsaquo; Einsatzverwaltung</h1>';
+        <div class="wrap">
+        <h1>Einstellungen &rsaquo; Einsatzverwaltung</h1>
 
+        <?php
         // Prüfen, ob Rewrite Slug von einer Seite genutzt wird
         $rewriteSlug = $this->options->getRewriteSlug();
         $conflictingPage = get_page_by_path($rewriteSlug);

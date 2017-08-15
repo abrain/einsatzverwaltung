@@ -21,6 +21,7 @@ jQuery(document).ready(function() {
         }
     });
 
-    // Color picker für die Zebrastreifen initialisieren
+    // Color picker initialisieren
     jQuery('#zebra-color-picker').iris();
+    jQuery('#annotationoff-color-picker').iris();
 });

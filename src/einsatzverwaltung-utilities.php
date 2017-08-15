@@ -351,6 +351,8 @@ class Utilities
     /**
      * Stellt sicher, dass es sich um einen validen Farbwert im Hexformat handelt
      *
+     * TODO NEEDS_WP4.6 das globale sanitize_hex_color() verwenden
+     *
      * @param string $color Die Farbe, die überprüft werden soll
      * @param string $default Standardwert, der bei einem Fehler zurückgegeben wird
      *

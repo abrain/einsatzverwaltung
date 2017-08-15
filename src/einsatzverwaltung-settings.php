@@ -1,6 +1,7 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
+use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Frontend\ReportList;
 use abrain\Einsatzverwaltung\Frontend\ReportListSettings;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
@@ -56,6 +57,8 @@ class Settings
         // Einstellungsobjekte laden
         $this->reportListSettings = new ReportListSettings();
 
+        require_once dirname(__FILE__) . '/Frontend/AnnotationIconBar.php';
+
         $this->addHooks();
     }
 
@@ -98,6 +101,7 @@ class Settings
         $this->addSettingsFields();
 
         // Registration
+        // NEEDS_WP4.7 Standardwerte in register_setting() mitgeben
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_rewrite_slug',
@@ -190,13 +194,18 @@ class Settings
         );
         register_setting(
             'einsatzvw_settings',
+            'einsatzvw_list_annotations_color_off',
+            array($this, 'sanitizeAnnotationOffColor') // NEEDS_WP4.6 das globale sanitize_hex_color() verwenden
+        );
+        register_setting(
+            'einsatzvw_settings',
             'einsatzvw_list_zebra',
             array($this->utilities, 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_list_zebracolor',
-            array($this, 'sanitizeZebraColor')
+            array($this, 'sanitizeZebraColor') // NEEDS_WP4.6 das globale sanitize_hex_color() verwenden
         );
         register_setting(
             'einsatzvw_settings',
@@ -340,6 +349,13 @@ class Settings
             'einsatzvw_settings_column_settings',
             'Einstellungen zu einzelnen Spalten',
             array($this, 'echoEinsatzlisteColumnSettings'),
+            self::EVW_SETTINGS_SLUG,
+            'einsatzvw_settings_einsatzliste'
+        );
+        add_settings_field(
+            'einsatzvw_settings_listannotations',
+            'Vermerke',
+            array($this, 'echoEinsatzlisteAnnotationsSettings'),
             self::EVW_SETTINGS_SLUG,
             'einsatzvw_settings_einsatzliste'
         );
@@ -615,6 +631,12 @@ class Settings
         );
     }
 
+    public function echoEinsatzlisteAnnotationsSettings()
+    {
+        echo '<p>Farbe f&uuml;r inaktive Vermerke: <input type="text" size="7" id="annotationoff-color-picker" name="einsatzvw_list_annotations_color_off" value="' . esc_attr(get_option('einsatzvw_list_annotations_color_off', AnnotationIconBar::DEFAULT_COLOR_OFF)) . '" /></p>';
+        echo '<p class="description">Diese Farbe wird f&uuml;r die Symbole von inaktiven Vermerken verwendet, die von aktiven werden in der Textfarbe Deines Themes dargestellt. Anzugeben ist der Farbwert in Hexadezimalschreibweise (3- oder 6-stellig) mit f&uuml;hrendem #-Zeichen.</p>';
+    }
+
     public function echoEinsatzlisteZebraSettings()
     {
         $this->echoSettingsCheckbox(
@@ -861,5 +883,17 @@ class Settings
     public function sanitizeZebraColor($input)
     {
         return $this->utilities->sanitizeHexColor($input, ReportListSettings::DEFAULT_ZEBRACOLOR);
+    }
+
+    /**
+     * Stellt sicher, dass die Farbe für die inaktiven Vermerke gültig ist
+     *
+     * @param string $input Der zu prüfende Farbwert
+     *
+     * @return string Der übergebene Farbwert, wenn er gültig ist, ansonsten die Standardeinstellung
+     */
+    public function sanitizeAnnotationOffColor($input)
+    {
+        return $this->utilities->sanitizeHexColor($input, AnnotationIconBar::DEFAULT_COLOR_OFF);
     }
 }

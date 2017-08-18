@@ -1,10 +1,10 @@
 === Einsatzverwaltung ===
 Contributors: abrain
 Donate link: https://einsatzverwaltung.abrain.de/unterstuetzen/
-Tags: Feuerwehr, Einsatz, Rettung, Rettungsdienst, THW, HiOrg, Wasserwacht, Bergrettung
+Tags: Feuerwehr, Hilfsorganisation, Öffentlichkeitsarbeit
 Requires at least: 4.4.0
-Tested up to: 4.7
-Stable tag: 1.3.0
+Tested up to: 4.8
+Stable tag: 1.3.1
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -37,6 +37,7 @@ Das Plugin kann entweder aus WordPress heraus aus dem [Pluginverzeichnis](https:
 In beiden F&auml;llen muss das Plugin erst aktiviert werden, bevor es benutzt werden kann.
 
 __Es wird PHP 5.3.0 oder neuer ben&ouml;tigt__
+(Getestet wird jedoch nur mit den [aktuellen PHP-Versionen](https://secure.php.net/supported-versions.php))
 
 == Frequently Asked Questions ==
 
@@ -69,6 +70,13 @@ Das Du halte ich f&uuml;r die angenehmere Arbeitsgrundlage, aber man darf mich g
 Nein, mehr gibt es [hier](https://einsatzverwaltung.abrain.de/faq/).
 
 == Changelog ==
+
+= 1.3.1 =
+* Anpassung der URLs: Zeitlimit entfernt
+* Einsatzliste: Text kann in der mobilen Ansicht auch direkt nach der Spalten&uuml;berschrift umbrechen
+* Import: Performance verbessert
+* Import aus wp-einsatz repariert
+* Getestet mit WordPress 4.8
 
 = 1.3.0 =
 * Neuer Vermerk 'Bilder im Bericht'

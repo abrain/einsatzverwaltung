@@ -33,7 +33,7 @@ use WP_User;
  */
 class Core
 {
-    const VERSION = '1.3.0';
+    const VERSION = '1.3.1';
     const DB_VERSION = 20;
 
    /**
@@ -310,7 +310,7 @@ class Core
         $this->taxonomies = new Taxonomies($this->utilities);
 
         // Tools
-        $this->importTool = new ImportTool($this, $this->utilities, $this->options);
+        $this->importTool = new ImportTool($this, $this->utilities, $this->options, $this->data);
         $this->tasksPage = new TasksPage($this->utilities, $this->data);
 
         // Widgets
@@ -329,6 +329,7 @@ class Core
         register_deactivation_hook($this->pluginFile, array($this, 'onDeactivation'));
         add_action('widgets_init', array($this, 'registerWidgets'));
         add_filter('user_has_cap', array($this, 'userHasCap'), 10, 4);
+        add_action('parse_query', array($this, 'einsatznummerMetaQuery'));
     }
 
     /**
@@ -430,6 +431,21 @@ class Core
                 'top'
             );
             add_rewrite_rule($base . '/(\d{4})/?$', 'index.php?post_type=einsatz&year=$matches[1]', 'top');
+        }
+
+        add_rewrite_tag('%einsatznummer%', '([^&]+)');
+    }
+
+    /**
+     * @param \WP_Query $query
+     */
+    public function einsatznummerMetaQuery($query)
+    {
+        $enr = $query->get('einsatznummer');
+        if (!empty($enr)) {
+            $query->set('post_type', 'einsatz');
+            $query->set('meta_key', 'einsatz_incidentNumber');
+            $query->set('meta_value', $enr);
         }
     }
 
@@ -615,7 +631,7 @@ class Core
     }
 
     /**
-     * @return Settings
+     * @return Taxonomies
      */
     public function getTaxonomies()
     {
@@ -653,5 +669,4 @@ class Core
     }
 }
 
-// Die globale Variable wird nur bei den Unit-Test benötigt
-$GLOBALS['einsatzverwaltung_core'] = Core::getInstance();
+Core::getInstance();

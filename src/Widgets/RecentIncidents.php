@@ -234,7 +234,6 @@ class RecentIncidents extends WP_Widget
         echo '<p><input id="'.$this->get_field_id('zeigeOrt').'" name="'.$this->get_field_name('zeigeOrt').'" type="checkbox" '.($zeigeOrt ? 'checked="checked" ' : '').'/>';
         echo '&nbsp;<label for="'.$this->get_field_id('zeigeOrt').'">' . 'Ort anzeigen' . '</label></p>';
 
-        error_log($showAnnotations);
         printf(
             '<p><input id="%1$s" name="%2$s" type="checkbox" value="1" %3$s />&nbsp;<label for="%1$s">%4$s</label></p>',
             esc_attr($this->get_field_id('showAnnotations')),

@@ -152,6 +152,8 @@ class Utilities
     /**
      * Gibt eine lesbare Angabe einer Dauer zurück (z.B. 2 Stunden 12 Minuten)
      *
+     * TODO In die Klasse Formatter verschieben
+     *
      * @param int $minutes Dauer in Minuten
      * @param bool $abbreviated
      *

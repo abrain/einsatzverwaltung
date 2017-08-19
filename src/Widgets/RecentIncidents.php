@@ -1,6 +1,8 @@
 <?php
 namespace abrain\Einsatzverwaltung\Widgets;
 
+use abrain\Einsatzverwaltung\Core;
+use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\Util\Formatter;
@@ -14,6 +16,11 @@ use WP_Widget;
  */
 class RecentIncidents extends WP_Widget
 {
+    /**
+     * @var Formatter
+     */
+    private static $formatter;
+
     /**
      * @var Options
      */
@@ -42,9 +49,11 @@ class RecentIncidents extends WP_Widget
     /**
      * @param Options $options
      * @param Utilities $utilities
+     * @param Formatter $formatter
      */
-    public static function setDependencies($options, $utilities)
+    public static function setDependencies($options, $utilities, $formatter)
     {
+        self::$formatter = $formatter;
         self::$options = $options;
         self::$utilities = $utilities;
     }
@@ -59,9 +68,9 @@ class RecentIncidents extends WP_Widget
      */
     public function widget($args, $instance)
     {
-        $formatter = new Formatter(self::$options, self::$utilities);
-
         $title = apply_filters('widget_title', $instance['title']);
+
+        // TODO mit wp_parse_args() vereinfachen
         $anzahl = self::$utilities->getArrayValueIfKey($instance, 'anzahl', 3);
         $zeigeDatum = self::$utilities->getArrayValueIfKey($instance, 'zeigeDatum', false);
         $zeigeZeit = self::$utilities->getArrayValueIfKey($instance, 'zeigeZeit', false);
@@ -69,6 +78,7 @@ class RecentIncidents extends WP_Widget
         $zeigeOrt = self::$utilities->getArrayValueIfKey($instance, 'zeigeOrt', false);
         $zeigeArt = self::$utilities->getArrayValueIfKey($instance, 'zeigeArt', false);
         $zeigeArtHierarchie = self::$utilities->getArrayValueIfKey($instance, 'zeigeArtHierarchie', false);
+        $showAnnotations = self::$utilities->getArrayValueIfKey($instance, 'showAnnotations', false);
 
         if (empty($title)) {
             $title = "Letzte Eins&auml;tze";
@@ -87,6 +97,12 @@ class RecentIncidents extends WP_Widget
         foreach ($posts as $post) {
             $report = new IncidentReport($post);
             $letzteEinsaetze .= '<li class="einsatzbericht">';
+
+            if (true === $showAnnotations) {
+                $core = Core::getInstance();
+                $annotationIconBar = new AnnotationIconBar($core);
+                $letzteEinsaetze .= '<div class="annotation-icon-bar">' . $annotationIconBar->render($report) . '</div>';
+            }
 
             $letzteEinsaetze .= "<a href=\"".get_permalink($post->ID)."\" rel=\"bookmark\" class=\"einsatzmeldung\">";
             $meldung = get_the_title($post->ID);
@@ -108,7 +124,7 @@ class RecentIncidents extends WP_Widget
             }
 
             if ($zeigeArt) {
-                $typeOfIncident = $formatter->getTypeOfIncident($report, false, false, $zeigeArtHierarchie);
+                $typeOfIncident = self::$formatter->getTypeOfIncident($report, false, false, $zeigeArtHierarchie);
                 if (!empty($typeOfIncident)) {
                     $letzteEinsaetze .= sprintf('<br><span class="einsatzart">%s</span>', $typeOfIncident);
                 }
@@ -167,6 +183,7 @@ class RecentIncidents extends WP_Widget
         $instance['zeigeArt'] = self::$utilities->getArrayValueIfKey($newInstance, 'zeigeArt', false);
         $instance['zeigeArtHierarchie'] = self::$utilities->getArrayValueIfKey($newInstance, 'zeigeArtHierarchie', false);
         $instance['zeigeFeedlink'] = self::$utilities->getArrayValueIfKey($newInstance, 'zeigeFeedlink', false);
+        $instance['showAnnotations'] = '1' === self::$utilities->getArrayValueIfKey($newInstance, 'showAnnotations', false);
 
         return $instance;
     }
@@ -189,6 +206,7 @@ class RecentIncidents extends WP_Widget
         $zeigeOrt = self::$utilities->getArrayValueIfKey($instance, 'zeigeOrt', false);
         $zeigeArt = self::$utilities->getArrayValueIfKey($instance, 'zeigeArt', false);
         $zeigeArtHierarchie = self::$utilities->getArrayValueIfKey($instance, 'zeigeArtHierarchie', false);
+        $showAnnotations = self::$utilities->getArrayValueIfKey($instance, 'showAnnotations', false);
 
         echo '<p><label for="'.$this->get_field_id('title').'">' . 'Titel:' . '</label>';
         echo '<input class="widefat" id="' . $this->get_field_id('title') . '" name="' . $this->get_field_name('title') . '" type="text" value="' . esc_attr($title).'" /></p>';
@@ -215,5 +233,14 @@ class RecentIncidents extends WP_Widget
 
         echo '<p><input id="'.$this->get_field_id('zeigeOrt').'" name="'.$this->get_field_name('zeigeOrt').'" type="checkbox" '.($zeigeOrt ? 'checked="checked" ' : '').'/>';
         echo '&nbsp;<label for="'.$this->get_field_id('zeigeOrt').'">' . 'Ort anzeigen' . '</label></p>';
+
+        error_log($showAnnotations);
+        printf(
+            '<p><input id="%1$s" name="%2$s" type="checkbox" value="1" %3$s />&nbsp;<label for="%1$s">%4$s</label></p>',
+            esc_attr($this->get_field_id('showAnnotations')),
+            esc_attr($this->get_field_name('showAnnotations')),
+            checked($showAnnotations, '1', false),
+            'Vermerke anzeigen'
+        );
     }
 }

@@ -16,9 +16,9 @@ class AnnotationIconBar
     const DEFAULT_COLOR_OFF = '#bbb';
 
     /**
-     * @var ReportAnnotationRepository
+     * @var Core
      */
-    private $annotationRepository;
+    private $core;
 
     /**
      * AnnotationIconBar constructor.
@@ -27,7 +27,7 @@ class AnnotationIconBar
      */
     public function __construct(Core $core)
     {
-        $this->annotationRepository = $core->getAnnotationRepository();
+        $this->core = $core;
     }
 
     /**
@@ -42,13 +42,14 @@ class AnnotationIconBar
      */
     public function render($report, $annotationIds = array())
     {
+        $annotationRepository = $this->core->getAnnotationRepository();
         $string = '';
         $annotations = array();
 
         // Wenn eine Auswahl von Vermerken vorgegeben ist, diese in dieser Reihenfolge holen
         if (!empty($annotationIds)) {
             foreach ($annotationIds as $annotationId) {
-                $reportAnnotation = $this->annotationRepository->getAnnotationById($annotationId);
+                $reportAnnotation = $annotationRepository->getAnnotationById($annotationId);
                 if (false !== $reportAnnotation) {
                     $annotations[] = $reportAnnotation;
                 }
@@ -57,7 +58,7 @@ class AnnotationIconBar
 
         // Keine Vermerke vorgegeben oder alle angegebenen waren ungültig
         if (empty($annotations)) {
-            $annotations = $this->annotationRepository->getAnnotations();
+            $annotations = $annotationRepository->getAnnotations();
         }
 
         /** @var ReportAnnotation $annotation */

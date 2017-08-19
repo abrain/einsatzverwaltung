@@ -300,13 +300,15 @@ class Core
 
         $this->utilities = new Utilities($this);
         $this->options = new Options($this->utilities);
-        $this->utilities->setDependencies($this->options);
+        $this->utilities->setDependencies($this->options); // FIXME Yay, zirkuläre Abhängigkeiten!
+
+        $formatter = new Formatter($this->options, $this->utilities, $this); // TODO In Singleton umwandeln
 
         $this->admin = new Admin($this, $this->options, $this->utilities);
         $this->data = new Data($this, $this->utilities, $this->options);
-        $this->frontend = new Frontend($this, $this->options, $this->utilities);
+        $this->frontend = new Frontend($this, $this->options, $this->utilities, $formatter);
         $this->settings = new Settings($this, $this->options, $this->utilities, $this->data);
-        $this->shortcodes = new Shortcodes($this->utilities, $this, $this->options);
+        $this->shortcodes = new Shortcodes($this->utilities, $this, $this->options, $formatter);
         $this->taxonomies = new Taxonomies($this->utilities);
 
         // Tools
@@ -314,8 +316,7 @@ class Core
         $this->tasksPage = new TasksPage($this->utilities, $this->data);
 
         // Widgets
-        RecentIncidents::setDependencies($this->options, $this->utilities);
-        $formatter = new Formatter($this->options, $this->utilities);
+        RecentIncidents::setDependencies($this->options, $this->utilities, $formatter);
         RecentIncidentsFormatted::setDependencies($formatter, $this->utilities);
 
         $this->addHooks();
@@ -451,6 +452,7 @@ class Core
 
     public function registerWidgets()
     {
+        // NEEDS_WP4.6 Instanziierte Widgets übergeben
         register_widget('abrain\Einsatzverwaltung\Widgets\RecentIncidents');
         register_widget('abrain\Einsatzverwaltung\Widgets\RecentIncidentsFormatted');
     }

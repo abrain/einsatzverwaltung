@@ -208,31 +208,71 @@ class RecentIncidents extends WP_Widget
         $zeigeArtHierarchie = self::$utilities->getArrayValueIfKey($instance, 'zeigeArtHierarchie', false);
         $showAnnotations = self::$utilities->getArrayValueIfKey($instance, 'showAnnotations', false);
 
-        echo '<p><label for="'.$this->get_field_id('title').'">' . 'Titel:' . '</label>';
-        echo '<input class="widefat" id="' . $this->get_field_id('title') . '" name="' . $this->get_field_name('title') . '" type="text" value="' . esc_attr($title).'" /></p>';
+        printf(
+            '<p><label for="%1$s">%2$s</label><input class="widefat" id="%1$s" name="%3$s" value="%4$s" /></p>',
+            $this->get_field_id('title'),
+            'Titel:',
+            $this->get_field_name('title'),
+            esc_attr($title)
+        );
 
-        echo '<p><label for="'.$this->get_field_id('anzahl').'">' . 'Anzahl der Einsatzberichte, die angezeigt werden:' . '</label>&nbsp;';
-        echo '<input id="'.$this->get_field_id('anzahl').'" name="'.$this->get_field_name('anzahl').'" type="text" value="'.$anzahl.'" size="3" /></p>';
+        printf(
+            '<p><label for="%1$s">%2$s</label>&nbsp;<input id="%1$s" name="%3$s" value="%4$s" size="3" /></p>',
+            $this->get_field_id('anzahl'),
+            'Anzahl der Einsatzberichte, die angezeigt werden:',
+            $this->get_field_name('anzahl'),
+            esc_attr($anzahl)
+        );
 
-        echo '<p><input id="'.$this->get_field_id('zeigeFeedlink').'" name="'.$this->get_field_name('zeigeFeedlink').'" type="checkbox" '.($zeigeFeedlink ? 'checked="checked" ' : '').'/>';
-        echo '&nbsp;<label for="'.$this->get_field_id('zeigeFeedlink').'">' . 'Link zum Feed anzeigen' . '</label></p>';
+        printf(
+            '<p><input id="%1$s" name="%2$s" type="checkbox" %3$s />&nbsp;<label for="%1$s">%4$s</label></p>',
+            esc_attr($this->get_field_id('zeigeFeedlink')),
+            esc_attr($this->get_field_name('zeigeFeedlink')),
+            checked($zeigeFeedlink, 'on', false),
+            'Link zum Feed anzeigen'
+        );
 
         echo '<p><strong>Einsatzdaten:</strong></p>';
 
-        echo '<p><input id="'.$this->get_field_id('zeigeDatum').'" name="'.$this->get_field_name('zeigeDatum').'" type="checkbox" '.($zeigeDatum ? 'checked="checked" ' : '').'/>';
-        echo '&nbsp;<label for="'.$this->get_field_id('zeigeDatum').'">' . 'Datum anzeigen' . '</label></p>';
+        printf(
+            '<p><input id="%1$s" name="%2$s" type="checkbox" %3$s />&nbsp;<label for="%1$s">%4$s</label></p>',
+            esc_attr($this->get_field_id('zeigeDatum')),
+            esc_attr($this->get_field_name('zeigeDatum')),
+            checked($zeigeDatum, 'on', false),
+            'Datum anzeigen'
+        );
 
-        echo '<p style="text-indent:1em;"><input id="'.$this->get_field_id('zeigeZeit').'" name="'.$this->get_field_name('zeigeZeit').'" type="checkbox" '.($zeigeZeit ? 'checked="checked" ' : '').'/>';
-        echo '&nbsp;<label for="'.$this->get_field_id('zeigeZeit').'">' . 'Zeit anzeigen (nur in Kombination mit Datum)' . '</label></p>';
+        printf(
+            '<p style="text-indent:1em;"><input id="%1$s" name="%2$s" type="checkbox" %3$s />&nbsp;<label for="%1$s">%4$s</label></p>',
+            esc_attr($this->get_field_id('zeigeZeit')),
+            esc_attr($this->get_field_name('zeigeZeit')),
+            checked($zeigeZeit, 'on', false),
+            'Zeit anzeigen (nur in Kombination mit Datum)'
+        );
 
-        echo '<p><input id="'.$this->get_field_id('zeigeArt').'" name="'.$this->get_field_name('zeigeArt').'" type="checkbox" '.($zeigeArt ? 'checked="checked" ' : '').'/>';
-        echo '&nbsp;<label for="'.$this->get_field_id('zeigeArt').'">' . 'Einsatzart anzeigen' . '</label></p>';
+        printf(
+            '<p><input id="%1$s" name="%2$s" type="checkbox" %3$s />&nbsp;<label for="%1$s">%4$s</label></p>',
+            esc_attr($this->get_field_id('zeigeArt')),
+            esc_attr($this->get_field_name('zeigeArt')),
+            checked($zeigeArt, 'on', false),
+            'Einsatzart anzeigen'
+        );
 
-        echo '<p style="text-indent:1em;"><input id="'.$this->get_field_id('zeigeArtHierarchie').'" name="'.$this->get_field_name('zeigeArtHierarchie').'" type="checkbox" '.($zeigeArtHierarchie ? 'checked="checked" ' : '').'/>';
-        echo '&nbsp;<label for="'.$this->get_field_id('zeigeArtHierarchie').'">' . 'Hierarchie der Einsatzart anzeigen' . '</label></p>';
+        printf(
+            '<p><input id="%1$s" name="%2$s" type="checkbox" %3$s />&nbsp;<label for="%1$s">%4$s</label></p>',
+            esc_attr($this->get_field_id('zeigeArtHierarchie')),
+            esc_attr($this->get_field_name('zeigeArtHierarchie')),
+            checked($zeigeArtHierarchie, 'on', false),
+            'Hierarchie der Einsatzart anzeigen'
+        );
 
-        echo '<p><input id="'.$this->get_field_id('zeigeOrt').'" name="'.$this->get_field_name('zeigeOrt').'" type="checkbox" '.($zeigeOrt ? 'checked="checked" ' : '').'/>';
-        echo '&nbsp;<label for="'.$this->get_field_id('zeigeOrt').'">' . 'Ort anzeigen' . '</label></p>';
+        printf(
+            '<p><input id="%1$s" name="%2$s" type="checkbox" %3$s />&nbsp;<label for="%1$s">%4$s</label></p>',
+            esc_attr($this->get_field_id('zeigeOrt')),
+            esc_attr($this->get_field_name('zeigeOrt')),
+            checked($zeigeOrt, 'on', false),
+            'Ort anzeigen'
+        );
 
         printf(
             '<p><input id="%1$s" name="%2$s" type="checkbox" value="1" %3$s />&nbsp;<label for="%1$s">%4$s</label></p>',

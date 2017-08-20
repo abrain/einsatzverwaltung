@@ -209,7 +209,7 @@ class RecentIncidents extends WP_Widget
         $showAnnotations = self::$utilities->getArrayValueIfKey($instance, 'showAnnotations', false);
 
         printf(
-            '<p><label for="%1$s">%2$s</label><input class="widefat" id="%1$s" name="%3$s" value="%4$s" /></p>',
+            '<p><label for="%1$s">%2$s</label><input class="widefat" id="%1$s" name="%3$s" type="text" value="%4$s" /></p>',
             $this->get_field_id('title'),
             'Titel:',
             $this->get_field_name('title'),
@@ -217,7 +217,7 @@ class RecentIncidents extends WP_Widget
         );
 
         printf(
-            '<p><label for="%1$s">%2$s</label>&nbsp;<input id="%1$s" name="%3$s" value="%4$s" size="3" /></p>',
+            '<p><label for="%1$s">%2$s</label>&nbsp;<input class="tiny-text" id="%1$s" name="%3$s" type="number" min="1" value="%4$s" size="3" /></p>',
             $this->get_field_id('anzahl'),
             'Anzahl der Einsatzberichte, die angezeigt werden:',
             $this->get_field_name('anzahl'),

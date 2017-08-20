@@ -60,3 +60,8 @@
         display: none;
     }
 }
+
+.widget_einsatzverwaltung_widget .annotation-icon-bar {
+    float: right;
+    margin-left: 10px;
+}

@@ -1,7 +1,9 @@
 <?php
 namespace abrain\Einsatzverwaltung\Util;
 
+use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\Data;
+use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\Taxonomies;
@@ -18,6 +20,11 @@ class Formatter
     private $tagsNotNeedingPost = array('%feedUrl%');
 
     /**
+     * @var AnnotationIconBar
+     */
+    private $annotationIconBar;
+
+    /**
      * @var Options
      */
     private $options;
@@ -31,11 +38,14 @@ class Formatter
      * Formatter constructor.
      * @param Options $options
      * @param Utilities $utilities
+     * @param Core $core
      */
-    public function __construct($options, $utilities)
+    public function __construct($options, $utilities, $core)
     {
+        require_once dirname(__FILE__) . '/../Frontend/AnnotationIconBar.php';
         $this->options = $options;
         $this->utilities = $utilities;
+        $this->annotationIconBar = new AnnotationIconBar($core);
     }
 
 
@@ -107,6 +117,9 @@ class Formatter
             case '%seqNum%':
                 $replace = $incidentReport->getSequentialNumber();
                 break;
+            case '%annotations%':
+                $replace = $this->annotationIconBar->render($incidentReport);
+                break;
             default:
                 return $pattern;
         }
@@ -130,6 +143,7 @@ class Formatter
             '%feedUrl%' => 'URL zum Feed',
             '%number%' => 'Einsatznummer',
             '%seqNum%' => 'Laufende Nummer',
+            '%annotations%' => 'Vermerke'
         );
     }
 

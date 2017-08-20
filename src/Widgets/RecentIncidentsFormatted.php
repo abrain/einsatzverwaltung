@@ -58,6 +58,11 @@ class RecentIncidentsFormatted extends WP_Widget
             'size' => true,
             'width' => true,
         ),
+        'i' => array(
+            'class' => true,
+            'title'=> true,
+            'style' => true
+        ),
         'img' => array(
             'alt' => true,
             'align' => true,
@@ -107,7 +112,7 @@ class RecentIncidentsFormatted extends WP_Widget
         'afterContent' => ''
     );
     private $allowedTagsPattern = array('%title%', '%date%', '%time%', '%location%', '%duration%', '%incidentType%',
-        '%url%', '%number%', '%seqNum%');
+        '%url%', '%number%', '%seqNum%', '%annotations%');
     private $allowedTagsAfter = array('%feedUrl%');
 
     /**

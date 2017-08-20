@@ -4,7 +4,7 @@ Donate link: https://einsatzverwaltung.abrain.de/unterstuetzen/
 Tags: Feuerwehr, Hilfsorganisation, Öffentlichkeitsarbeit
 Requires at least: 4.4.0
 Tested up to: 4.8
-Stable tag: 1.3.1
+Stable tag: 1.3.2
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -70,6 +70,10 @@ Das Du halte ich f&uuml;r die angenehmere Arbeitsgrundlage, aber man darf mich g
 Nein, mehr gibt es [hier](https://einsatzverwaltung.abrain.de/faq/).
 
 == Changelog ==
+
+= 1.3.2 =
+* Widgets: Die Symbole f&uuml;r die Vermerke k&ouml;nnen nun angezeigt werden
+* Die Farbe f&uuml;r inaktive Vermerke kann nun eingestellt werden
 
 = 1.3.1 =
 * Anpassung der URLs: Zeitlimit entfernt

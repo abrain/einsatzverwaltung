@@ -130,13 +130,14 @@ class ReportList
      * @param Utilities $utilities
      * @param Core $core
      * @param Options $options
+     * @param Formatter $formatter
      */
-    public function __construct($utilities, $core, $options)
+    public function __construct($utilities, $core, $options, $formatter)
     {
         $this->utilities = $utilities;
         $this->core = $core;
         $this->options = $options;
-        $this->formatter = new Formatter($options, $utilities);
+        $this->formatter = $formatter;
     }
 
     /**

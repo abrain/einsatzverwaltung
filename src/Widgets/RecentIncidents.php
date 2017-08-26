@@ -1,7 +1,6 @@
 <?php
 namespace abrain\Einsatzverwaltung\Widgets;
 
-use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Options;
@@ -99,8 +98,7 @@ class RecentIncidents extends WP_Widget
             $letzteEinsaetze .= '<li class="einsatzbericht">';
 
             if (true === $showAnnotations) {
-                $core = Core::getInstance();
-                $annotationIconBar = new AnnotationIconBar($core);
+                $annotationIconBar = AnnotationIconBar::getInstance();
                 $letzteEinsaetze .= '<div class="annotation-icon-bar">' . $annotationIconBar->render($report) . '</div>';
             }
 

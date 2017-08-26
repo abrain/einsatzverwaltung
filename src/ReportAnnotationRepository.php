@@ -10,14 +10,35 @@ use abrain\Einsatzverwaltung\Model\ReportAnnotation;
  */
 class ReportAnnotationRepository
 {
+    /**
+     * Hält die einzige Instanz dieser Klasse (Singleton)
+     *
+     * @var ReportAnnotationRepository
+     */
+    private static $instance;
+
     private $annotations;
 
     /**
      * ReportAnnotationRepository constructor.
      */
-    public function __construct()
+    private function __construct()
     {
         $this->annotations = array();
+    }
+
+    /**
+     * Gibt die global einzigartige Instanz dieser Klasse zurück
+     *
+     * @return ReportAnnotationRepository
+     */
+    public static function getInstance()
+    {
+        if (null === self::$instance) {
+            self::$instance = new ReportAnnotationRepository();
+        }
+
+        return self::$instance;
     }
 
     /**

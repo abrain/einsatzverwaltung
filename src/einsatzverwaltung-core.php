@@ -361,7 +361,7 @@ class Core
     public function onInit()
     {
         $this->registerTypes();
-        $this->registerScripts();        
+        $this->registerScripts();
         $this->addRewriteRules();
         if ($this->options->isFlushRewriteRules()) {
             flush_rewrite_rules();
@@ -422,15 +422,15 @@ class Core
      */
     private function registerScripts()
     {
-        if( $this->options->isGMapActivate() ) {
+        if ($this->options->isGMapActivate()) {
             /* Google Maps */
             $protocal = is_ssl() ? 'https://' : 'http://';
-            $url      = add_query_arg( array(
+            $url      = add_query_arg(array(
                 'key'      => $this->options->getGMapAPI(),
             ), "{$protocal}maps.googleapis.com/maps/api/js");
-            wp_register_script( 'einsatzvw_GoogleMap', $url );
+            wp_register_script('einsatzvw_GoogleMap', $url);
         }
-    }    
+    }
     
     private function addRewriteRules()
     {

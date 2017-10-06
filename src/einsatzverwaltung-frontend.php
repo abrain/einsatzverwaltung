@@ -77,13 +77,12 @@ class Frontend
         );
         wp_add_inline_style('einsatzverwaltung-frontend', ReportList::getDynamicCss());
 
-        if($this->options->isGMapActivate())
-      	{
-          wp_enqueue_script( 'einsatzvw_GoogleMap' );
-          wp_enqueue_script(
-              'einsatzverwaltung-gmap',
-              $this->core->scriptUrl . 'einsatzverwaltung-gmaps.js'
-          );
+        if ($this->options->isGMapActivate()) {
+            wp_enqueue_script('einsatzvw_GoogleMap');
+            wp_enqueue_script(
+                'einsatzverwaltung-gmap',
+                $this->core->scriptUrl . 'einsatzverwaltung-gmaps.js'
+            );
         }
     }
 
@@ -175,17 +174,18 @@ class Frontend
     {
         $report = new IncidentReport($post);
         $location = $report->getGmapsLocation();
-      	if($this->options->isGMapActivate() && $location)
-      	{
-            $latLon = explode(",",$location);
+        if ($this->options->isGMapActivate() && $location) {
+            $latLon = explode(",", $location);
 
-            $mapstring = "<style>#map-canvas {height: 300px; position: relative; overflow: hidden; transform: translateZ(0px); background-color: rgb(229, 227, 223);}</style>";
+            $mapstring = "<style>#map-canvas {height: 300px; position: relative; overflow: hidden;";
+            $mapstring .= " transform: translateZ(0px); background-color: rgb(229, 227, 223);}</style>";
             $mapstring .= "<div class='einsatzliste-map'>";
             $mapstring .= "<div id='map-canvas'></div>";
             $mapstring .= "</div>";
             $mapstring .= "<div style='clear:both'></div>";
             $mapstring .= "<script>";
-            $mapstring .= "google.maps.event.addDomListener(window, 'load', initializeMap(" . $latLon[0] . ", " . $latLon[1] . "));";
+            $mapstring .= "google.maps.event.addDomListener(window, 'load', initializeMap(";
+            $mapstring .= $latLon[0] . ", " . $latLon[1] . "));";
             $mapstring .= "addMarker( " . $latLon[0] . ", " . $latLon[1] . ", '" . $report->getLocation() . "', true )";
             $mapstring .= "</script>";
 
@@ -234,9 +234,8 @@ class Frontend
         $header = $this->getEinsatzberichtHeader($post, true, true);
         $content = $this->prepareContent($content);
         $map = "";
-        if($this->options->isGMapActivate())
-      	{
-          $map = $this->getEinsatzberichtMap($post);
+        if ($this->options->isGMapActivate()) {
+            $map = $this->getEinsatzberichtMap($post);
         }
 
         return $header . $map . '<hr>' . $content;

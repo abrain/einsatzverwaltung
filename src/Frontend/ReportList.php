@@ -206,16 +206,19 @@ class ReportList
             $this->insertTableHeader();
         }
 
-        if( $this->options->isGMapActivate() && $this->showMap)   {
-          $latLon = explode(",", $this->options->getGMapDefaultPos() );
-          $mapstring = "<style>#map-canvas {height: 300px; margin-bottom: 30px; position: relative; overflow: hidden; transform: translateZ(0px); background-color: rgb(229, 227, 223);}</style>";
-          $mapstring .= "<div class='einsatzliste-map'>";
-          $mapstring .= "<div id='map-canvas'></div>";
-          $mapstring .= "</div>";
-          $mapstring .= "<div style='clear:both'></div>";
-          $mapstring .= "<script>";
-          $mapstring .= "google.maps.event.addDomListener(window, 'load', initializeMap(" . $latLon[0] . ", " . $latLon[1] . ", 10));";
-          $mapstring .= "</script>";
+        if ($this->options->isGMapActivate() && $this->showMap) {
+            $latLon = explode(",", $this->options->getGMapDefaultPos());
+            $mapstring = "<style>#map-canvas {height: 300px; margin-bottom: 30px; position: relative;";
+            $mapstring .= " overflow: hidden; transform: translateZ(0px); background-color: rgb(229, 227, 223);}";
+            $mapstring .= "</style>";
+            $mapstring .= "<div class='einsatzliste-map'>";
+            $mapstring .= "<div id='map-canvas'></div>";
+            $mapstring .= "</div>";
+            $mapstring .= "<div style='clear:both'></div>";
+            $mapstring .= "<script>";
+            $mapstring .= "google.maps.event.addDomListener(window, 'load', initializeMap(" . $latLon[0] . ", ";
+            $mapstring .= $latLon[1] . ", 10));";
+            $mapstring .= "</script>";
 
           echo "$mapstring";
         }
@@ -356,17 +359,18 @@ class ReportList
             }
             $this->string .= '</td>';
         }
-        if( $this->options->isGMapActivate() && $this->showMap && $report->getGmapsLocation() != "") {
-          $latLon = explode(",", $report->getGmapsLocation());
-          $timeOfAlerting = $report->getTimeOfAlerting();
-          $infoContent = '<h1>' . get_the_title($report->getPostId()) . '</h1><p>' . $timeOfAlerting->format('d.m.Y H:i') . '</p><p>' . $report->getLocation() . '</p>';
-          $marker = '<script>';
-          $marker .= 'addMarker( ' . $latLon[0] . ', ' . $latLon[1] . ' , "' . $infoContent . '" )';
-          $marker .= '</script>';
-          $this->string .= $marker;
+        if ($this->options->isGMapActivate() && $this->showMap && $report->getGmapsLocation() != "") {
+            $latLon = explode(",", $report->getGmapsLocation());
+            $timeOfAlerting = $report->getTimeOfAlerting();
+            $infoContent = '<h1>' . get_the_title($report->getPostId()) . '</h1><p>';
+            $infoContent .= $timeOfAlerting->format('d.m.Y H:i') . '</p><p>';
+            $infoContent .= $report->getLocation() . '</p>';
+            $marker = '<script>';
+            $marker .= 'addMarker( ' . $latLon[0] . ', ' . $latLon[1] . ' , "' . $infoContent . '" )';
+            $marker .= '</script>';
+            $this->string .= $marker;
         }
         $this->string .= '</tr>';
-
     }
 
     /**

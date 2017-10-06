@@ -139,13 +139,12 @@ class Admin
             Core::VERSION
         );
 
-        if($this->options->isGMapActivate())
-      	{
-          wp_enqueue_script( 'einsatzvw_GoogleMap' );
-          wp_enqueue_script(
-              'einsatzverwaltung-gmap',
-              $this->core->scriptUrl . 'einsatzverwaltung-gmaps.js'
-          );
+        if ($this->options->isGMapActivate()) {
+            wp_enqueue_script('einsatzvw_GoogleMap');
+            wp_enqueue_script(
+                'einsatzverwaltung-gmap',
+                $this->core->scriptUrl . 'einsatzverwaltung-gmaps.js'
+            );
         }
     }
 
@@ -237,8 +236,7 @@ class Admin
             esc_attr($einsatzort)
         );
 
-        if($this->options->isGMapActivate())
-      	{
+        if ($this->options->isGMapActivate()) {
             $this->echoGMap($gmapslocation);
         }
 
@@ -281,26 +279,27 @@ class Admin
      */
     private function echoGMap($location)
     {
-        if(!empty($location ))
-        {
-            $latLon = explode(",",$location);
-        }
-        else
-        {
-            $latLon = explode(",",$this->options->getGMapDefaultPos());
+        if (!empty($location )) {
+            $latLon = explode(",", $location);
+        } else {
+            $latLon = explode(",", $this->options->getGMapDefaultPos());
         }
 
         echo '<tr><td>';
         echo '<label for="einsatzverwaltung_location">Koordinate</label>';
         echo '</td><td style="width: 100%;">';
-        echo '<input type="text" id="einsatzverwaltung_location" name="einsatzverwaltung_location" value="' . $location . '" size="20" readonly/>';
-        echo '<a class="button" id="einsatzverwaltung_get_location" onClick="geocodeAddress(document.getElementById(\'einsatzverwaltung_einsatzort\').value , \'einsatzverwaltung_location\')"><i class="fa fa-map-marker"></i></a>';
+        echo '<input type="text" id="einsatzverwaltung_location" name="einsatzverwaltung_location" value="';
+        echo $location . '" size="20" readonly/>';
+        echo '<a class="button" id="einsatzverwaltung_get_location"';
+        echo 'onClick="geocodeAddress(document.getElementById(\'einsatzverwaltung_einsatzort\').value ,';
+        echo ' \'einsatzverwaltung_location\')"><i class="fa fa-map-marker"></i></a>';
         echo '</td></tr>';
         echo '<tr><td colspan="2">';
         echo '<div id="map-canvas" style="height: 400px;"></div>';
         echo '</td></tr>';
         echo '<script>';
-        echo ' google.maps.event.addDomListener(window, "load", initializeMap(' . $latLon[0] . ', ' . $latLon[1] . '));';
+        echo ' google.maps.event.addDomListener(window, "load", initializeMap(';
+        echo $latLon[0] . ', ' . $latLon[1] . '));';
         echo '</script>';
     }
 

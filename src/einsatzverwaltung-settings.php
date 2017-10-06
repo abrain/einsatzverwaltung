@@ -204,7 +204,7 @@ class Settings
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_gmap_default_pos'
-        );        
+        ); 
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_list_annotations_color_off',
@@ -357,7 +357,7 @@ class Settings
             array($this, 'echoSettingsGmap'),
             self::EVW_SETTINGS_SLUG,
             'einsatzvw_settings_einsatzberichte'
-        );        
+        );
         add_settings_field(
             'einsatzvw_settings_columns',
             'Spalten der Einsatzliste',

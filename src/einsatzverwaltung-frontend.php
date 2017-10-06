@@ -18,6 +18,11 @@ class Frontend
     private $core;
 
     /**
+     * @var Formatter
+     */
+    private $formatter;
+
+    /**
      * @var Options
      */
     private $options;
@@ -33,10 +38,12 @@ class Frontend
      * @param Core $core
      * @param Options $options
      * @param Utilities $utilities
+     * @param Formatter $formatter
      */
-    public function __construct($core, $options, $utilities)
+    public function __construct($core, $options, $utilities, $formatter)
     {
         $this->core = $core;
+        $this->formatter = $formatter;
         $this->options = $options;
         $this->utilities = $utilities;
         $this->addHooks();
@@ -117,15 +124,14 @@ class Frontend
     {
         if (get_post_type($post) == "einsatz") {
             $report = new IncidentReport($post);
-            $formatter = new Formatter($this->options, $this->utilities);
 
-            $typesOfAlerting = $formatter->getTypesOfAlerting($report);
+            $typesOfAlerting = $this->formatter->getTypesOfAlerting($report);
 
             $duration = Data::getDauer($report);
             $durationString = ($duration === false ? '' : $this->utilities->getDurationString($duration));
 
             $showEinsatzartArchiveLink = $showArchiveLinks && $this->options->isShowEinsatzartArchive();
-            $art = $formatter->getTypeOfIncident($report, $mayContainLinks, $showEinsatzartArchiveLink);
+            $art = $this->formatter->getTypeOfIncident($report, $mayContainLinks, $showEinsatzartArchiveLink);
 
             if ($report->isFalseAlarm()) {
                 $art = (empty($art) ? 'Fehlalarm' : $art.' (Fehlalarm)');
@@ -135,8 +141,8 @@ class Frontend
             $einsatzleiter = $report->getIncidentCommander();
             $mannschaft = $report->getWorkforce();
 
-            $vehicles = $formatter->getVehicles($report, $mayContainLinks, $showArchiveLinks);
-            $additionalForces = $formatter->getAdditionalForces($report, $mayContainLinks, $showArchiveLinks);
+            $vehicles = $this->formatter->getVehicles($report, $mayContainLinks, $showArchiveLinks);
+            $additionalForces = $this->formatter->getAdditionalForces($report, $mayContainLinks, $showArchiveLinks);
 
             $timeOfAlerting = $report->getTimeOfAlerting();
             $datumsformat = $this->options->getDateFormat();

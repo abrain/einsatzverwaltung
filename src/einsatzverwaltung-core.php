@@ -33,8 +33,14 @@ use WP_User;
  */
 class Core
 {
-    const VERSION = '1.3.0';
+    const VERSION = '1.3.2';
     const DB_VERSION = 20;
+
+   /**
+    * Statische Variable, um die aktuelle (einzige!) Instanz dieser Klasse zu halten
+    * @var Core
+    */
+    private static $instance = null;
 
     public $pluginFile;
     public $pluginBasename;
@@ -127,7 +133,7 @@ class Core
         'public' => true,
         'show_in_nav_menus' => false,
         'meta_box_cb' => 'abrain\Einsatzverwaltung\Admin::displayMetaBoxEinsatzart',
-        'capabilities' => array (
+        'capabilities' => array(
             'manage_terms' => 'edit_einsatzberichte',
             'edit_terms' => 'edit_einsatzberichte',
             'delete_terms' => 'edit_einsatzberichte',
@@ -160,7 +166,7 @@ class Core
         'public' => true,
         'show_in_nav_menus' => false,
         'hierarchical' => true,
-        'capabilities' => array (
+        'capabilities' => array(
             'manage_terms' => 'edit_einsatzberichte',
             'edit_terms' => 'edit_einsatzberichte',
             'delete_terms' => 'edit_einsatzberichte',
@@ -192,7 +198,7 @@ class Core
         ),
         'public' => true,
         'show_in_nav_menus' => false,
-        'capabilities' => array (
+        'capabilities' => array(
             'manage_terms' => 'edit_einsatzberichte',
             'edit_terms' => 'edit_einsatzberichte',
             'delete_terms' => 'edit_einsatzberichte',
@@ -227,7 +233,7 @@ class Core
         ),
         'public' => true,
         'show_in_nav_menus' => false,
-        'capabilities' => array (
+        'capabilities' => array(
             'manage_terms' => 'edit_einsatzberichte',
             'edit_terms' => 'edit_einsatzberichte',
             'delete_terms' => 'edit_einsatzberichte',
@@ -236,9 +242,9 @@ class Core
     );
 
     /**
-     * @var ReportAnnotationRepository
+     * @var Admin
      */
-    private $annotationRepository;
+    private $admin;
 
     /**
      * @var Data
@@ -246,10 +252,30 @@ class Core
     private $data;
 
     /**
+     * @var Frontend
+     */
+    private $frontend;
+
+    /**
+     * @var Settings
+     */
+    private $settings;
+    
+    /**
      * @var Options
      */
     private $options;
-
+    
+    /**
+     * @var ImportTool
+     */
+    private $importTool;
+    
+    /**
+     * @var TasksPage
+     */
+    private $tasksPage;
+    
     /**
      * @var Utilities
      */
@@ -258,7 +284,7 @@ class Core
     /**
      * Constructor
      */
-    public function __construct()
+    private function __construct()
     {
         $this->pluginFile = einsatzverwaltung_plugin_file();
         $this->pluginBasename = plugin_basename($this->pluginFile);
@@ -269,22 +295,23 @@ class Core
 
         $this->utilities = new Utilities($this);
         $this->options = new Options($this->utilities);
-        $this->utilities->setDependencies($this->options);
+        $this->utilities->setDependencies($this->options); // FIXME Yay, zirkuläre Abhängigkeiten!
 
-        new Admin($this, $this->options, $this->utilities);
+        $formatter = new Formatter($this->options, $this->utilities, $this); // TODO In Singleton umwandeln
+
+        $this->admin = new Admin($this, $this->options, $this->utilities);
         $this->data = new Data($this, $this->utilities, $this->options);
-        new Frontend($this, $this->options, $this->utilities);
-        new Settings($this, $this->options, $this->utilities, $this->data);
-        new Shortcodes($this->utilities, $this, $this->options);
-        new Taxonomies($this->utilities);
+        $this->frontend = new Frontend($this, $this->options, $this->utilities, $formatter);
+        $this->settings = new Settings($this, $this->options, $this->utilities, $this->data);
+        $this->shortcodes = new Shortcodes($this->utilities, $this, $this->options, $formatter);
+        $this->taxonomies = new Taxonomies($this->utilities);
 
         // Tools
-        new ImportTool($this, $this->utilities, $this->options);
-        new TasksPage($this->utilities, $this->data);
+        $this->importTool = new ImportTool($this, $this->utilities, $this->options, $this->data);
+        $this->tasksPage = new TasksPage($this->utilities, $this->data);
 
         // Widgets
-        RecentIncidents::setDependencies($this->options, $this->utilities);
-        $formatter = new Formatter($this->options, $this->utilities);
+        RecentIncidents::setDependencies($this->options, $this->utilities, $formatter);
         RecentIncidentsFormatted::setDependencies($formatter, $this->utilities);
 
         $this->addHooks();
@@ -298,6 +325,7 @@ class Core
         register_deactivation_hook($this->pluginFile, array($this, 'onDeactivation'));
         add_action('widgets_init', array($this, 'registerWidgets'));
         add_filter('user_has_cap', array($this, 'userHasCap'), 10, 4);
+        add_action('parse_query', array($this, 'einsatznummerMetaQuery'));
     }
 
     /**
@@ -333,7 +361,6 @@ class Core
     public function onInit()
     {
         $this->registerTypes();
-        $this->registerScripts();
         $this->addRewriteRules();
         if ($this->options->isFlushRewriteRules()) {
             flush_rewrite_rules();
@@ -362,8 +389,8 @@ class Core
         register_taxonomy('alarmierungsart', 'einsatz', $this->argsAlarmierungsart);
 
         // Vermerke registrieren
-        $this->annotationRepository = new ReportAnnotationRepository();
-        $this->annotationRepository->addAnnotation(new ReportAnnotation(
+        $annotationRepository = ReportAnnotationRepository::getInstance();
+        $annotationRepository->addAnnotation(new ReportAnnotation(
             'images',
             'Bilder im Bericht',
             'einsatz_hasimages',
@@ -371,7 +398,7 @@ class Core
             'Einsatzbericht enthält Bilder',
             'Einsatzbericht enthält keine Bilder'
         ));
-        $this->annotationRepository->addAnnotation(new ReportAnnotation(
+        $annotationRepository->addAnnotation(new ReportAnnotation(
             'special',
             'Besonderer Einsatz',
             'einsatz_special',
@@ -379,7 +406,7 @@ class Core
             'Besonderer Einsatz',
             'Kein besonderer Einsatz'
         ));
-        $this->annotationRepository->addAnnotation(new ReportAnnotation(
+        $annotationRepository->addAnnotation(new ReportAnnotation(
             'falseAlarm',
             'Fehlalarm',
             'einsatz_fehlalarm',
@@ -387,21 +414,6 @@ class Core
             'Fehlalarm',
             'Kein Fehlalarm'
         ));
-    }
-
-    /**
-     * Registriert externe Scripts
-     */
-    private function registerScripts()
-    {
-        if( $this->options->isGMapActivate() ) {
-            /* Google Maps */
-            $protocal = is_ssl() ? 'https://' : 'http://';
-            $url      = add_query_arg( array(
-                'key'      => $this->options->getGMapAPI(),
-            ), "{$protocal}maps.googleapis.com/maps/api/js");
-            wp_register_script( 'einsatzvw_GoogleMap', $url );
-        }
     }
 
     private function addRewriteRules()
@@ -416,10 +428,26 @@ class Core
             );
             add_rewrite_rule($base . '/(\d{4})/?$', 'index.php?post_type=einsatz&year=$matches[1]', 'top');
         }
+
+        add_rewrite_tag('%einsatznummer%', '([^&]+)');
+    }
+
+    /**
+     * @param \WP_Query $query
+     */
+    public function einsatznummerMetaQuery($query)
+    {
+        $enr = $query->get('einsatznummer');
+        if (!empty($enr)) {
+            $query->set('post_type', 'einsatz');
+            $query->set('meta_key', 'einsatz_incidentNumber');
+            $query->set('meta_value', $enr);
+        }
     }
 
     public function registerWidgets()
     {
+        // NEEDS_WP4.6 Instanziierte Widgets übergeben
         register_widget('abrain\Einsatzverwaltung\Widgets\RecentIncidents');
         register_widget('abrain\Einsatzverwaltung\Widgets\RecentIncidentsFormatted');
     }
@@ -552,13 +580,82 @@ class Core
     }
 
     /**
-     * @return ReportAnnotationRepository
+     * @return Admin
      */
-    public function getAnnotationRepository()
+    public function getAdmin()
     {
-        return $this->annotationRepository;
+        return $this->admin;
+    }
+
+    /**
+     * @return Data
+     */
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    /**
+     * @return Frontend
+     */
+    public function getFrontend()
+    {
+        return $this->frontend;
+    }
+
+    /**
+     * @return Settings
+     */
+    public function getSettings()
+    {
+        return $this->settings;
+    }
+
+    /**
+     * @return Shortcodes
+     */
+    public function getShortcodes()
+    {
+        return $this->shortcodes;
+    }
+
+    /**
+     * @return Taxonomies
+     */
+    public function getTaxonomies()
+    {
+        return $this->taxonomies;
+    }
+
+    /**
+     * @return ImportTool
+     */
+    public function getImportTool()
+    {
+        return $this->importTool;
+    }
+
+    /**
+     * @return TasksPage
+     */
+    public function getTasksPage()
+    {
+        return $this->tasksPage;
+    }
+
+    /**
+     * Falls die einzige Instanz noch nicht existiert, erstelle sie
+     * Gebe die einzige Instanz dann zurück
+     *
+     * @return   Core
+     */
+    public static function getInstance()
+    {
+        if (null === self::$instance) {
+            self::$instance = new Core();
+        }
+        return self::$instance;
     }
 }
 
-// Die globale Variable wird nur bei den Unit-Test benötigt
-$GLOBALS['einsatzverwaltung_core'] = new Core();
+Core::getInstance();

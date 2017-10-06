@@ -43,6 +43,12 @@ abstract class AbstractSource
             return;
         }
 
+        echo '<h3>Allgemeine Einstellungen</h3>';
+        echo '<label><input type="checkbox" name="import_publish_reports" value="1" ';
+        checked($this->args['import_publish_reports'], '1');
+        echo ' /> Einsatzberichte sofort ver&ouml;ffentlichen</label>';
+        echo '<p class="description">Das Setzen dieser Option verl&auml;ngert die Importzeit deutlich, Benutzung auf eigene Gefahr. Standardm&auml;&szlig;ig werden die Berichte als Entwurf importiert.</p>';
+
         foreach ($nextAction['args'] as $arg) {
             if (array_key_exists($arg, $this->args)) {
                 echo '<input type="hidden" name="'.$arg.'" value="' . $this->args[$arg] . '" />';
@@ -225,6 +231,18 @@ abstract class AbstractSource
     public function getUnmatchableFields()
     {
         return array_merge(array_values($this->autoMatchFields), $this->internalFields);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPublishReports()
+    {
+        if (!array_key_exists('import_publish_reports', $this->args)) {
+            return false;
+        }
+
+        return 1 === $this->args['import_publish_reports'];
     }
 
     /**

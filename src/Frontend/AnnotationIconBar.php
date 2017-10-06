@@ -1,7 +1,6 @@
 <?php
 namespace abrain\Einsatzverwaltung\Frontend;
 
-use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Model\ReportAnnotation;
 use abrain\Einsatzverwaltung\ReportAnnotationRepository;
@@ -13,19 +12,34 @@ use abrain\Einsatzverwaltung\ReportAnnotationRepository;
  */
 class AnnotationIconBar
 {
+    const DEFAULT_COLOR_OFF = '#bbb';
+
     /**
-     * @var ReportAnnotationRepository
+     * Hält die einzige Instanz dieser Klasse (Singleton)
+     *
+     * @var AnnotationIconBar
      */
-    private $annotationRepository;
+    private static $instance;
 
     /**
      * AnnotationIconBar constructor.
-     *
-     * @param Core $core
      */
-    public function __construct(Core $core)
+    private function __construct()
     {
-        $this->annotationRepository = $core->getAnnotationRepository();
+        //
+    }
+
+    /**
+     * Gibt die global einzigartige Instanz dieser Klasse zurück
+     *
+     * @return AnnotationIconBar
+     */
+    public static function getInstance()
+    {
+        if (null === self::$instance) {
+            self::$instance = new AnnotationIconBar();
+        }
+        return self::$instance;
     }
 
     /**
@@ -40,13 +54,14 @@ class AnnotationIconBar
      */
     public function render($report, $annotationIds = array())
     {
+        $annotationRepository = ReportAnnotationRepository::getInstance();
         $string = '';
         $annotations = array();
 
         // Wenn eine Auswahl von Vermerken vorgegeben ist, diese in dieser Reihenfolge holen
         if (!empty($annotationIds)) {
             foreach ($annotationIds as $annotationId) {
-                $reportAnnotation = $this->annotationRepository->getAnnotationById($annotationId);
+                $reportAnnotation = $annotationRepository->getAnnotationById($annotationId);
                 if (false !== $reportAnnotation) {
                     $annotations[] = $reportAnnotation;
                 }
@@ -55,7 +70,7 @@ class AnnotationIconBar
 
         // Keine Vermerke vorgegeben oder alle angegebenen waren ungültig
         if (empty($annotations)) {
-            $annotations = $this->annotationRepository->getAnnotations();
+            $annotations = $annotationRepository->getAnnotations();
         }
 
         /** @var ReportAnnotation $annotation */
@@ -76,11 +91,6 @@ class AnnotationIconBar
             );
         }
         return $string;
-        /*return $this->getAnnotationIcon(
-            'camera',
-            array('Einsatzbericht enthält keine Bilder', 'Einsatzbericht enthält Bilder'),
-            $report->hasImages()
-        );*/
     }
 
     /**
@@ -92,8 +102,17 @@ class AnnotationIconBar
      */
     private function getAnnotationIcon($icon, $titles, $state)
     {
-        $title = $titles[$state ? 1 : 0];
-        $style = $state ? '' : 'color: #bbb;';
-        return '<i class="fa fa-' . $icon . '" aria-hidden="true" title="' . $title . '" style="' . $style . '"></i>';
+        if (is_admin()) {
+            $colorOff = self::DEFAULT_COLOR_OFF;
+        } else {
+            $colorOff = get_option('einsatzvw_list_annotations_color_off', self::DEFAULT_COLOR_OFF);
+        }
+
+        return sprintf(
+            '<i class="%s" aria-hidden="true" title="%s" style="%s"></i>',
+            esc_attr('fa fa-' . $icon),
+            esc_attr($titles[$state ? 1 : 0]),
+            esc_attr($state ? '' : 'color: ' . $colorOff . ';')
+        );
     }
 }

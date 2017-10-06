@@ -2,6 +2,7 @@
 namespace abrain\Einsatzverwaltung;
 
 use abrain\Einsatzverwaltung\Frontend\ReportList;
+use abrain\Einsatzverwaltung\Util\Formatter;
 
 /**
  * Ersetzt die Shortcodes durch Inhalte
@@ -24,18 +25,25 @@ class Shortcodes
     private $options;
 
     /**
+     * @var Formatter
+     */
+    private $formatter;
+
+    /**
      * Constructor
      *
      * @param Utilities $utilities
      * @param Core $core
      * @param Options $options
+     * @param Formatter $formatter
      */
-    public function __construct($utilities, $core, $options)
+    public function __construct($utilities, $core, $options, $formatter)
     {
         $this->addHooks();
         $this->utilities = $utilities;
         $this->core = $core;
         $this->options = $options;
+        $this->formatter = $formatter;
     }
 
     private function addHooks()
@@ -98,7 +106,7 @@ class Shortcodes
 
         $reports = $reportQuery->getReports();
 
-        $reportList = new ReportList($this->utilities, $this->core, $this->options);
+        $reportList = new ReportList($this->utilities, $this->core, $this->options, $this->formatter);
         return $reportList->getList(
             $reports,
             array(

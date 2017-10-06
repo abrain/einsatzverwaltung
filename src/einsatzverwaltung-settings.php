@@ -1,6 +1,7 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
+use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Frontend\ReportList;
 use abrain\Einsatzverwaltung\Frontend\ReportListSettings;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
@@ -56,6 +57,8 @@ class Settings
         // Einstellungsobjekte laden
         $this->reportListSettings = new ReportListSettings();
 
+        require_once dirname(__FILE__) . '/Frontend/AnnotationIconBar.php';
+
         $this->addHooks();
     }
 
@@ -98,6 +101,7 @@ class Settings
         $this->addSettingsFields();
 
         // Registration
+        // NEEDS_WP4.7 Standardwerte in register_setting() mitgeben
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_rewrite_slug',
@@ -190,16 +194,8 @@ class Settings
         );
         register_setting(
             'einsatzvw_settings',
-            'einsatzvw_gmap',
-            array($this->utilities, 'sanitizeCheckbox')
-        );
-        register_setting(
-            'einsatzvw_settings',
-            'einsatzvw_gmap_api'
-        );
-        register_setting(
-            'einsatzvw_settings',
-            'einsatzvw_gmap_default_pos'
+            'einsatzvw_list_annotations_color_off',
+            array($this, 'sanitizeAnnotationOffColor') // NEEDS_WP4.6 das globale sanitize_hex_color() verwenden
         );
         register_setting(
             'einsatzvw_settings',
@@ -209,7 +205,7 @@ class Settings
         register_setting(
             'einsatzvw_settings',
             'einsatzvw_list_zebracolor',
-            array($this, 'sanitizeZebraColor')
+            array($this, 'sanitizeZebraColor') // NEEDS_WP4.6 das globale sanitize_hex_color() verwenden
         );
         register_setting(
             'einsatzvw_settings',
@@ -343,13 +339,6 @@ class Settings
             'einsatzvw_settings_einsatzberichte'
         );
         add_settings_field(
-            'einsatzvw_settings_gmap',
-            'Google Maps',
-            array($this, 'echoSettingsGmap'),
-            self::EVW_SETTINGS_SLUG,
-            'einsatzvw_settings_einsatzberichte'
-        );
-        add_settings_field(
             'einsatzvw_settings_columns',
             'Spalten der Einsatzliste',
             array($this, 'echoEinsatzlisteColumns'),
@@ -360,6 +349,13 @@ class Settings
             'einsatzvw_settings_column_settings',
             'Einstellungen zu einzelnen Spalten',
             array($this, 'echoEinsatzlisteColumnSettings'),
+            self::EVW_SETTINGS_SLUG,
+            'einsatzvw_settings_einsatzliste'
+        );
+        add_settings_field(
+            'einsatzvw_settings_listannotations',
+            'Vermerke',
+            array($this, 'echoEinsatzlisteAnnotationsSettings'),
             self::EVW_SETTINGS_SLUG,
             'einsatzvw_settings_einsatzliste'
         );
@@ -459,7 +455,7 @@ class Settings
         printf('Jahreszahl + jahresbezogene, fortlaufende Nummer mit <input type="text" value="%2$s" size="2" id="%1$s" name="%1$s" /> Stellen<p class="description">Beispiel f&uuml;r den f&uuml;nften Einsatz in 2014:<br>bei 2 Stellen: 201405<br>bei 4 Stellen: 20140005</p><br>', 'einsatzvw_einsatznummer_stellen', $this->options->getEinsatznummerStellen());
         $this->echoSettingsCheckbox('einsatzvw_einsatznummer_lfdvorne', 'Laufende Nummer vor das Jahr stellen');
 
-        echo '<br><br><strong>Hinweis:</strong> Nach einer &Auml;nderung des Formats erhalten die bestehenden Einsatzberichte nicht automatisch aktualisierte Nummern. Nutzen Sie daf&uuml;r das Werkzeug <a href="' . admin_url('tools.php?page=einsatzvw-tool-enr') . '">Einsatznummern reparieren</a>.';
+        echo '<br><br><strong>Hinweis:</strong> Nach einer &Auml;nderung des Formats erhalten die bestehenden Einsatzberichte automatisch aktualisierte Nummern.';
     }
 
     public function echoSettingsEinsatznummerAuto()
@@ -501,7 +497,7 @@ class Settings
             'einsatzvw_loop_only_special',
             'Nur als besonders markierte Einsatzberichte zwischen den regul&auml;ren WordPress-Beitr&auml;gen bzw. in der Kategorie anzeigen.'
         );
-        echo '<p class="description">Mit dieser Einstellung gelten die beiden oberen Einstellungen nur f&uuml;r als besonders markierte Einsatzberichte. Kann erst ab WordPress 4.1 verwendet werden.</p>';
+        echo '<p class="description">Mit dieser Einstellung gelten die beiden oberen Einstellungen nur f&uuml;r als besonders markierte Einsatzberichte.</p>';
     }
 
 
@@ -578,30 +574,6 @@ class Settings
         echo '<p class="description">Bitte auch die Einstellung zum Umfang der Eintr&auml;ge im Feed (Einstellungen &gt; Lesen) beachten!<br/>Im Feed werden bei den Einsatzdetails aus technischen Gr&uuml;nden keine Links zu gefilterten Einsatzlisten angezeigt.</p>';
     }
 
-    /**
-     * Gibt die Einstellmöglichkeiten für den Auszug aus
-     */
-    public function echoSettingsGmap()
-    {
-        $this->echoSettingsCheckbox(
-            'einsatzvw_gmap',
-            'Googel Maps aktivieren',
-            $this->options->isGMapActivate()
-        );
-        echo '<p>Googel Maps JavaScript API-Key:&nbsp;';
-        $this->echoSettingsInput(
-            'einsatzvw_gmap_api',
-            'Wie generiere ich einen <a href="https://developers.google.com/maps/documentation/javascript/get-api-key" target="_blank">API-Key</a>',
-            $this->options->getGMapAPI()
-        );
-        echo '<p>Standartposition der Karte:&nbsp;';
-        $this->echoSettingsInput(
-            'einsatzvw_gmap_default_pos',
-            'Als Lat,Lon: 53.523463,9.482329',
-            $this->options->getGMapDefaultPos()
-        );
-    }
-
 
     /**
      *
@@ -659,6 +631,12 @@ class Settings
         );
     }
 
+    public function echoEinsatzlisteAnnotationsSettings()
+    {
+        echo '<p>Farbe f&uuml;r inaktive Vermerke: <input type="text" size="7" id="annotationoff-color-picker" name="einsatzvw_list_annotations_color_off" value="' . esc_attr(get_option('einsatzvw_list_annotations_color_off', AnnotationIconBar::DEFAULT_COLOR_OFF)) . '" /></p>';
+        echo '<p class="description">Diese Farbe wird f&uuml;r die Symbole von inaktiven Vermerken verwendet, die von aktiven werden in der Textfarbe Deines Themes dargestellt. Anzugeben ist der Farbwert in Hexadezimalschreibweise (3- oder 6-stellig) mit f&uuml;hrendem #-Zeichen.</p>';
+    }
+
     public function echoEinsatzlisteZebraSettings()
     {
         $this->echoSettingsCheckbox(
@@ -700,6 +678,7 @@ class Settings
                 echo '<br>';
             }
             echo '<p class="description">Die Benutzer mit den hier ausgew&auml;hlten Rollen haben alle Rechte, um die Einsatzberichte und die zugeh&ouml;rigen Eigenschaften (z.B. Einsatzarten) zu verwalten. Zu dieser Einstellungsseite und den Werkzeugen haben in jedem Fall nur Administratoren Zugang.</p>';
+            echo '<p class="description">Die Berechtigungen können mit speziellen Plugins deutlich feingranularer eingestellt werden.</p>';
         }
     }
 
@@ -712,18 +691,30 @@ class Settings
         if (!current_user_can('manage_options')) {
             wp_die(__('You do not have sufficient permissions to manage options for this site.'));
         }
+        ?>
 
-        echo '<div id="einsatzverwaltung_contactinfo">';
-        echo '<h2>Entwicklerkontakt &amp; Social Media</h2>';
-        echo '<p>eMail: <a href="mailto:kontakt@abrain.de">kontakt@abrain.de</a> <span title="PGP Schl&uuml;ssel-ID: 8752EB8F" class="pgpbadge"><i class="fa fa-lock"></i>&nbsp;PGP</span></p>';
-        echo '<p align="center"><a href="https://www.facebook.com/einsatzverwaltung/" title="Einsatzverwaltung auf Facebook"><i class="fa fa-facebook-official fa-2x"></i></a>&nbsp;&nbsp;';
-        echo '<a href="https://twitter.com/einsatzvw" title="Einsatzverwaltung auf Twitter"><i class="fa fa-twitter fa-2x"></i></a>&nbsp;&nbsp;';
-        echo '<a href="https://einsatzverwaltung.abrain.de/feed/" title="RSS-Feed mit Neuigkeiten zu Einsatzverwaltung"><i class="fa fa-rss-square fa-2x"></i></a>';
-        echo '</p></div>';
+        <div id="einsatzverwaltung_contactinfo">
+        <h2>Entwicklerkontakt &amp; Social Media</h2>
+        <p>
+            eMail: <a href="mailto:kontakt@abrain.de">kontakt@abrain.de</a>
+            <span title="PGP Schl&uuml;ssel-ID: 8752EB8F" class="pgpbadge"><i class="fa fa-lock"></i>&nbsp;PGP</span>
+        </p>
+        <p align="center">
+            <a href="https://github.com/abrain/einsatzverwaltung/issues" title="Bring Dich ein auf GitHub">
+                <i class="fa fa-github fa-2x"></i></a>&nbsp;&nbsp;
+            <a href="https://www.facebook.com/einsatzverwaltung/" title="Einsatzverwaltung auf Facebook">
+                <i class="fa fa-facebook-official fa-2x"></i></a>&nbsp;&nbsp;
+            <a href="https://twitter.com/einsatzvw" title="Einsatzverwaltung auf Twitter">
+                <i class="fa fa-twitter fa-2x"></i></a>&nbsp;&nbsp;
+            <a href="https://einsatzverwaltung.abrain.de/feed/" title="RSS-Feed mit Neuigkeiten zu Einsatzverwaltung">
+                <i class="fa fa-rss-square fa-2x"></i></a>
+        </p>
+        </div>
 
-        echo '<div class="wrap">';
-        echo '<h1>Einstellungen &rsaquo; Einsatzverwaltung</h1>';
+        <div class="wrap">
+        <h1>Einstellungen &rsaquo; Einsatzverwaltung</h1>
 
+        <?php
         // Prüfen, ob Rewrite Slug von einer Seite genutzt wird
         $rewriteSlug = $this->options->getRewriteSlug();
         $conflictingPage = get_page_by_path($rewriteSlug);
@@ -892,5 +883,17 @@ class Settings
     public function sanitizeZebraColor($input)
     {
         return $this->utilities->sanitizeHexColor($input, ReportListSettings::DEFAULT_ZEBRACOLOR);
+    }
+
+    /**
+     * Stellt sicher, dass die Farbe für die inaktiven Vermerke gültig ist
+     *
+     * @param string $input Der zu prüfende Farbwert
+     *
+     * @return string Der übergebene Farbwert, wenn er gültig ist, ansonsten die Standardeinstellung
+     */
+    public function sanitizeAnnotationOffColor($input)
+    {
+        return $this->utilities->sanitizeHexColor($input, AnnotationIconBar::DEFAULT_COLOR_OFF);
     }
 }

@@ -76,7 +76,7 @@ class IncidentReport
                 'label' => 'Einsatzort'
             ),
             'einsatz_location' => array(
-                'label' => 'Goolemaps Position'
+                'label' => 'Google Maps Position'
             ),
             'einsatz_einsatzleiter' => array(
                 'label' => 'Einsatzleiter'

@@ -281,7 +281,7 @@ class Admin
      */
     private function echoGMap($location)
     {
-        if($location != "")
+        if(!empty($location ))
         {
             $latLon = explode(",",$location);
         }

@@ -206,7 +206,7 @@ class ReportList
             $this->insertTableHeader();
         }
 
-        if( $this->options->isGMapActivate() != "" && $this->showMap)   {
+        if( $this->options->isGMapActivate() && $this->showMap)   {
           $latLon = explode(",", $this->options->getGMapDefaultPos() );
           $mapstring = "<style>#map-canvas {height: 300px; margin-bottom: 30px; position: relative; overflow: hidden; transform: translateZ(0px); background-color: rgb(229, 227, 223);}</style>";
           $mapstring .= "<div class='einsatzliste-map'>";

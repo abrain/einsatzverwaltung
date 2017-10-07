@@ -602,10 +602,10 @@ class Settings
     {
         $this->echoSettingsCheckbox(
             'einsatzvw_gmap',
-            'Googel Maps aktivieren',
+            'Google Maps aktivieren',
             $this->options->isGMapActivate()
         );
-        echo '<p>Googel Maps JavaScript API-Key:&nbsp;';
+        echo '<p>Google Maps JavaScript API-Key:&nbsp;';
         $this->echoSettingsInput(
             'einsatzvw_gmap_api',
             'Wie generiere ich einen <a href="https://developers.google.com/maps/documentation/javascript/get-api-key" target="_blank">API-Key</a>',

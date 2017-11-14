@@ -3,9 +3,9 @@ Contributors: abrain
 Donate link: https://einsatzverwaltung.abrain.de/unterstuetzen/
 Tags: Feuerwehr, Hilfsorganisation, Öffentlichkeitsarbeit
 Requires at least: 4.4.0
-Tested up to: 4.8
+Tested up to: 4.9
 Requires PHP: 5.3
-Stable tag: 1.3.2
+Stable tag: 1.3.3
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -71,6 +71,10 @@ Das Du halte ich f&uuml;r die angenehmere Arbeitsgrundlage, aber man darf mich g
 Nein, mehr gibt es [hier](https://einsatzverwaltung.abrain.de/faq/).
 
 == Changelog ==
+
+= 1.3.3 =
+* Kompatibilit&auml;tsproblem mit "Page Builder by SiteOrigin" behoben
+* Getestet mit WordPress 4.9
 
 = 1.3.2 =
 * Widgets: Die Symbole f&uuml;r die Vermerke k&ouml;nnen nun angezeigt werden

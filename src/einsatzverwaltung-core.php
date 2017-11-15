@@ -33,7 +33,7 @@ use WP_User;
  */
 class Core
 {
-    const VERSION = '1.3.2';
+    const VERSION = '1.3.3';
     const DB_VERSION = 20;
 
    /**
@@ -242,11 +242,6 @@ class Core
     );
 
     /**
-     * @var ReportAnnotationRepository
-     */
-    private $annotationRepository;
-
-    /**
      * @var Admin
      */
     private $admin;
@@ -394,8 +389,8 @@ class Core
         register_taxonomy('alarmierungsart', 'einsatz', $this->argsAlarmierungsart);
 
         // Vermerke registrieren
-        $this->annotationRepository = new ReportAnnotationRepository();
-        $this->annotationRepository->addAnnotation(new ReportAnnotation(
+        $annotationRepository = ReportAnnotationRepository::getInstance();
+        $annotationRepository->addAnnotation(new ReportAnnotation(
             'images',
             'Bilder im Bericht',
             'einsatz_hasimages',
@@ -403,7 +398,7 @@ class Core
             'Einsatzbericht enthält Bilder',
             'Einsatzbericht enthält keine Bilder'
         ));
-        $this->annotationRepository->addAnnotation(new ReportAnnotation(
+        $annotationRepository->addAnnotation(new ReportAnnotation(
             'special',
             'Besonderer Einsatz',
             'einsatz_special',
@@ -411,7 +406,7 @@ class Core
             'Besonderer Einsatz',
             'Kein besonderer Einsatz'
         ));
-        $this->annotationRepository->addAnnotation(new ReportAnnotation(
+        $annotationRepository->addAnnotation(new ReportAnnotation(
             'falseAlarm',
             'Fehlalarm',
             'einsatz_fehlalarm',
@@ -582,14 +577,6 @@ class Core
     {
         require_once(__DIR__ . '/einsatzverwaltung-update.php');
         return new Update($this, $this->options, $this->utilities, $this->data);
-    }
-
-    /**
-     * @return ReportAnnotationRepository
-     */
-    public function getAnnotationRepository()
-    {
-        return $this->annotationRepository;
     }
 
     /**

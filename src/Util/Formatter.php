@@ -45,7 +45,7 @@ class Formatter
         require_once dirname(__FILE__) . '/../Frontend/AnnotationIconBar.php';
         $this->options = $options;
         $this->utilities = $utilities;
-        $this->annotationIconBar = new AnnotationIconBar($core);
+        $this->annotationIconBar = AnnotationIconBar::getInstance();
     }
 
 

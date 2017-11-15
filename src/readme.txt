@@ -2,7 +2,7 @@
 Contributors: abrain
 Donate link: https://einsatzverwaltung.abrain.de/unterstuetzen/
 Tags: Feuerwehr, Hilfsorganisation, Öffentlichkeitsarbeit
-Requires at least: 4.4.0
+Requires at least: 4.6.0
 Tested up to: 4.9
 Requires PHP: 5.3
 Stable tag: 1.3.3

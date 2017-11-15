@@ -1,7 +1,6 @@
 <?php
 namespace abrain\Einsatzverwaltung\Frontend;
 
-use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Model\ReportAnnotation;
 use abrain\Einsatzverwaltung\ReportAnnotationRepository;
@@ -16,18 +15,31 @@ class AnnotationIconBar
     const DEFAULT_COLOR_OFF = '#bbb';
 
     /**
-     * @var Core
+     * Hält die einzige Instanz dieser Klasse (Singleton)
+     *
+     * @var AnnotationIconBar
      */
-    private $core;
+    private static $instance;
 
     /**
      * AnnotationIconBar constructor.
-     *
-     * @param Core $core
      */
-    public function __construct(Core $core)
+    private function __construct()
     {
-        $this->core = $core;
+        //
+    }
+
+    /**
+     * Gibt die global einzigartige Instanz dieser Klasse zurück
+     *
+     * @return AnnotationIconBar
+     */
+    public static function getInstance()
+    {
+        if (null === self::$instance) {
+            self::$instance = new AnnotationIconBar();
+        }
+        return self::$instance;
     }
 
     /**
@@ -42,7 +54,7 @@ class AnnotationIconBar
      */
     public function render($report, $annotationIds = array())
     {
-        $annotationRepository = $this->core->getAnnotationRepository();
+        $annotationRepository = ReportAnnotationRepository::getInstance();
         $string = '';
         $annotations = array();
 

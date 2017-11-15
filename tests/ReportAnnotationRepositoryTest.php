@@ -6,23 +6,13 @@ use abrain\Einsatzverwaltung\ReportAnnotationRepository;
 
 class ReportAnnotationRepositoryTest extends \WP_UnitTestCase
 {
-    /**
-     * @var ReportAnnotationRepository
-     */
-    private $repository;
-
-    function setUp()
-    {
-        parent::setUp();
-        $this->repository = new ReportAnnotationRepository();
-    }
-
     public function testCreateReportAnnotation()
     {
-        self::assertCount(0, $this->repository->getAnnotations());
-        $this->repository->addAnnotation(new ReportAnnotation('dings', 'Dings', '', 'camera', 'aktiv', 'inaktiv'));
-        self::assertCount(1, $this->repository->getAnnotations());
-        self::assertArrayHasKey('dings', $this->repository->getAnnotations());
-        self::assertContains('dings', $this->repository->getAnnotationIdentifiers());
+        $repository = ReportAnnotationRepository::getInstance();
+        self::assertCount(3, $repository->getAnnotations());
+        $repository->addAnnotation(new ReportAnnotation('dings', 'Dings', '', 'camera', 'aktiv', 'inaktiv'));
+        self::assertCount(4, $repository->getAnnotations());
+        self::assertArrayHasKey('dings', $repository->getAnnotations());
+        self::assertContains('dings', $repository->getAnnotationIdentifiers());
     }
 }

@@ -182,7 +182,7 @@ class ReportList
 
         if (in_array('annotationImages', $this->columns) || in_array('annotationSpecial', $this->columns)) {
             require_once dirname(__FILE__) . '/AnnotationIconBar.php';
-            $this->annotationIconBar = new AnnotationIconBar($this->core);
+            $this->annotationIconBar = AnnotationIconBar::getInstance();
         }
 
         // Berichte abarbeiten

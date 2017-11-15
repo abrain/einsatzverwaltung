@@ -166,13 +166,17 @@ class Utilities
         }
 
         if ($minutes < 60) {
-            $dauerstring = $minutes . ' ' . ($abbreviated ? 'min' : _n('Minute', 'Minuten', $minutes));
+            $dauerstring = sprintf(
+                '%d %s',
+                $minutes,
+                ($abbreviated ? 'min' : _n('minute', 'minutes', $minutes, 'einsatzverwaltung'))
+            );
         } else {
             $hours = intval($minutes / 60);
             $remainingMinutes = $minutes % 60;
-            $dauerstring = $hours . ' ' . ($abbreviated ? 'h' : _n('Stunde', 'Stunden', $hours));
+            $dauerstring = $hours . ' ' . ($abbreviated ? 'h' : _n('hour', 'hours', $hours, 'einsatzverwaltung'));
             if ($remainingMinutes > 0) {
-                $unit = $abbreviated ? 'min' : _n('Minute', 'Minuten', $remainingMinutes);
+                $unit = $abbreviated ? 'min' : _n('minute', 'minutes', $remainingMinutes, 'einsatzverwaltung');
                 $dauerstring .= sprintf(' %d %s', $remainingMinutes, $unit);
             }
         }

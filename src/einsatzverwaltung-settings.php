@@ -103,112 +103,112 @@ class Settings
         // Registration
         // NEEDS_WP4.7 Standardwerte in register_setting() mitgeben
         register_setting(
-            'einsatzvw_settings',
+            'einsatzvw_settings_general',
             'einsatzvw_rewrite_slug',
             'sanitize_title'
         );
         register_setting(
-            'einsatzvw_settings',
+            'einsatzvw_settings_general',
             'einsatzverwaltung_incidentnumbers_auto',
             array($this->utilities, 'sanitizeCheckbox')
         );
         register_setting(
-            'einsatzvw_settings',
+            'einsatzvw_settings_numbers',
             'einsatzvw_einsatznummer_stellen',
             array($this->utilities, 'sanitizeEinsatznummerStellen')
         );
         register_setting(
-            'einsatzvw_settings',
+            'einsatzvw_settings_numbers',
             'einsatzvw_einsatznummer_lfdvorne',
             array($this->utilities, 'sanitizeCheckbox')
         );
         register_setting(
-            'einsatzvw_settings',
+            'einsatzvw_settings_general',
             'einsatzvw_show_einsatzberichte_mainloop',
             array($this->utilities, 'sanitizeCheckbox')
         );
         register_setting(
-            'einsatzvw_settings',
+            'einsatzvw_settings_general',
             'einsatzvw_category',
             'intval'
         );
         register_setting(
-            'einsatzvw_settings',
+            'einsatzvw_settings_general',
             'einsatzvw_loop_only_special',
             array($this->utilities, 'sanitizeCheckbox')
         );
         register_setting(
-            'einsatzvw_settings',
+            'einsatzvw_settings_report',
             'einsatzvw_einsatz_hideemptydetails',
             array($this->utilities, 'sanitizeCheckbox')
         );
         register_setting(
-            'einsatzvw_settings',
+            'einsatzvw_settings_report',
             'einsatzvw_show_exteinsatzmittel_archive',
             array($this->utilities, 'sanitizeCheckbox')
         );
         register_setting(
-            'einsatzvw_settings',
+            'einsatzvw_settings_report',
             'einsatzvw_show_einsatzart_archive',
             array($this->utilities, 'sanitizeCheckbox')
         );
         register_setting(
-            'einsatzvw_settings',
+            'einsatzvw_settings_report',
             'einsatzvw_show_fahrzeug_archive',
             array($this->utilities, 'sanitizeCheckbox')
         );
         register_setting(
-            'einsatzvw_settings',
+            'einsatzvw_settings_report',
             'einsatzvw_open_ext_in_new',
             array($this->utilities, 'sanitizeCheckbox')
         );
         register_setting(
-            'einsatzvw_settings',
+            'einsatzvw_settings_general',
             'einsatzvw_excerpt_type',
             array($this->utilities, 'sanitizeExcerptType')
         );
         register_setting(
-            'einsatzvw_settings',
+            'einsatzvw_settings_general',
             'einsatzvw_excerpt_type_feed',
             array($this->utilities, 'sanitizeExcerptType')
         );
         register_setting(
-            'einsatzvw_settings',
+            'einsatzvw_settings_list',
             'einsatzvw_list_columns',
             array($this->utilities, 'sanitizeColumns')
         );
         register_setting(
-            'einsatzvw_settings',
+            'einsatzvw_settings_list',
             'einsatzvw_list_art_hierarchy',
             array($this->utilities, 'sanitizeCheckbox')
         );
         register_setting(
-            'einsatzvw_settings',
+            'einsatzvw_settings_list',
             'einsatzvw_list_fahrzeuge_link',
             array($this->utilities, 'sanitizeCheckbox')
         );
         register_setting(
-            'einsatzvw_settings',
+            'einsatzvw_settings_list',
             'einsatzvw_list_ext_link',
             array($this->utilities, 'sanitizeCheckbox')
         );
         register_setting(
-            'einsatzvw_settings',
+            'einsatzvw_settings_list',
             'einsatzvw_list_annotations_color_off',
             array($this, 'sanitizeAnnotationOffColor') // NEEDS_WP4.6 das globale sanitize_hex_color() verwenden
         );
         register_setting(
-            'einsatzvw_settings',
+            'einsatzvw_settings_list',
             'einsatzvw_list_zebra',
             array($this->utilities, 'sanitizeCheckbox')
         );
         register_setting(
-            'einsatzvw_settings',
+            'einsatzvw_settings_list',
             'einsatzvw_list_zebracolor',
             array($this, 'sanitizeZebraColor') // NEEDS_WP4.6 das globale sanitize_hex_color() verwenden
         );
         register_setting(
-            'einsatzvw_settings',
+            'einsatzvw_settings_list',
             'einsatzvw_list_zebra_nth',
             array($this->reportListSettings, 'sanitizeZebraNthChildArg')
         );
@@ -222,7 +222,7 @@ class Settings
                 }
 
                 register_setting(
-                    'einsatzvw_settings',
+                    'einsatzvw_settings_capabilities',
                     'einsatzvw_cap_roles_' . $roleSlug,
                     array($this->utilities, 'sanitizeCheckbox')
                 );
@@ -240,7 +240,7 @@ class Settings
             'einsatzvw_settings_general',
             'Allgemein',
             null,
-            self::EVW_SETTINGS_SLUG
+            self::EVW_SETTINGS_SLUG . '-general'
         );
         add_settings_section(
             'einsatzvw_settings_numbers',
@@ -248,7 +248,7 @@ class Settings
             function () {
                 echo '<p>Die Einsatznummern k&ouml;nnen wahlweise manuell oder automatisch verwaltet werden.</p>';
             },
-            self::EVW_SETTINGS_SLUG
+            self::EVW_SETTINGS_SLUG . '-numbers'
         );
         add_settings_section(
             'einsatzvw_settings_einsatzberichte',
@@ -256,7 +256,7 @@ class Settings
             function () {
                 echo '<p>Mit diesen Einstellungen kann das Aussehen der Einsatzberichte beeinflusst werden.</p>';
             },
-            self::EVW_SETTINGS_SLUG
+            self::EVW_SETTINGS_SLUG . '-report'
         );
         add_settings_section(
             'einsatzvw_settings_einsatzliste',
@@ -264,7 +264,7 @@ class Settings
             function () {
                 echo '<p>Mit diesen Einstellungen kann das Aussehen der Einsatzlisten beeinflusst werden. Einsatzlisten k&ouml;nnen &uuml;ber den <a href="https://einsatzverwaltung.abrain.de/dokumentation/shortcodes/shortcode-einsatzliste/">Shortcode [einsatzliste]</a> in Seiten und Beitr&auml;ge eingebunden werden.</p>';
             },
-            self::EVW_SETTINGS_SLUG
+            self::EVW_SETTINGS_SLUG . '-list'
         );
         add_settings_section(
             'einsatzvw_settings_caps',
@@ -272,7 +272,7 @@ class Settings
             function () {
                 echo '<p>Hier kann festgelegt werden, welche Benutzer die Einsatzberichte verwalten k&ouml;nnen.</p>';
             },
-            self::EVW_SETTINGS_SLUG
+            self::EVW_SETTINGS_SLUG . '-capabilities'
         );
     }
 
@@ -286,91 +286,91 @@ class Settings
             'einsatzvw_permalinks',
             'Permalinks',
             array($this, 'echoSettingsPermalinks'),
-            self::EVW_SETTINGS_SLUG,
+            self::EVW_SETTINGS_SLUG . '-general',
             'einsatzvw_settings_general'
         );
         add_settings_field(
             'einsatzvw_einsatznummer_mainloop',
             'Einsatzbericht als Beitrag',
             array($this, 'echoEinsatzberichteMainloop'),
-            self::EVW_SETTINGS_SLUG,
+            self::EVW_SETTINGS_SLUG . '-general',
             'einsatzvw_settings_general'
         );
         add_settings_field(
             'einsatzvw_einsatznummer_auto',
             'Einsatznummern automatisch verwalten',
             array($this, 'echoSettingsEinsatznummerAuto'),
-            self::EVW_SETTINGS_SLUG,
+            self::EVW_SETTINGS_SLUG . '-numbers',
             'einsatzvw_settings_numbers'
         );
         add_settings_field(
             'einsatzvw_einsatznummer_stellen',
             'Format der Einsatznummer',
             array($this, 'echoSettingsEinsatznummerFormat'),
-            self::EVW_SETTINGS_SLUG,
+            self::EVW_SETTINGS_SLUG . '-numbers',
             'einsatzvw_settings_numbers'
         );
         add_settings_field(
             'einsatzvw_einsatz_hideemptydetails',
             'Einsatzdetails',
             array($this, 'echoSettingsEmptyDetails'),
-            self::EVW_SETTINGS_SLUG,
+            self::EVW_SETTINGS_SLUG . '-report',
             'einsatzvw_settings_einsatzberichte'
         );
         add_settings_field(
             'einsatzvw_settings_archivelinks',
             'Gefilterte Einsatzübersicht verlinken',
             array($this, 'echoSettingsArchive'),
-            self::EVW_SETTINGS_SLUG,
+            self::EVW_SETTINGS_SLUG . '-report',
             'einsatzvw_settings_einsatzberichte'
         );
         add_settings_field(
             'einsatzvw_settings_ext_newwindow',
             'Links zu externen Einsatzmitteln',
             array($this, 'echoSettingsExtNew'),
-            self::EVW_SETTINGS_SLUG,
+            self::EVW_SETTINGS_SLUG . '-report',
             'einsatzvw_settings_einsatzberichte'
         );
         add_settings_field(
             'einsatzvw_settings_excerpt',
             'Kurzfassung',
             array($this, 'echoSettingsExcerpt'),
-            self::EVW_SETTINGS_SLUG,
-            'einsatzvw_settings_einsatzberichte'
+            self::EVW_SETTINGS_SLUG . '-general',
+            'einsatzvw_settings_general'
         );
         add_settings_field(
             'einsatzvw_settings_columns',
             'Spalten der Einsatzliste',
             array($this, 'echoEinsatzlisteColumns'),
-            self::EVW_SETTINGS_SLUG,
+            self::EVW_SETTINGS_SLUG . '-list',
             'einsatzvw_settings_einsatzliste'
         );
         add_settings_field(
             'einsatzvw_settings_column_settings',
             'Einstellungen zu einzelnen Spalten',
             array($this, 'echoEinsatzlisteColumnSettings'),
-            self::EVW_SETTINGS_SLUG,
+            self::EVW_SETTINGS_SLUG . '-list',
             'einsatzvw_settings_einsatzliste'
         );
         add_settings_field(
             'einsatzvw_settings_listannotations',
             'Vermerke',
             array($this, 'echoEinsatzlisteAnnotationsSettings'),
-            self::EVW_SETTINGS_SLUG,
+            self::EVW_SETTINGS_SLUG . '-list',
             'einsatzvw_settings_einsatzliste'
         );
         add_settings_field(
             'einsatzvw_settings_zebralist',
             'Zebrastreifen',
             array($this, 'echoEinsatzlisteZebraSettings'),
-            self::EVW_SETTINGS_SLUG,
+            self::EVW_SETTINGS_SLUG . '-list',
             'einsatzvw_settings_einsatzliste'
         );
         add_settings_field(
             'einsatzvw_settings_caps_roles',
             'Rollen',
             array($this, 'echoSettingsCapsRoles'),
-            self::EVW_SETTINGS_SLUG,
+            self::EVW_SETTINGS_SLUG . '-capabilities',
             'einsatzvw_settings_caps'
         );
     }
@@ -693,28 +693,12 @@ class Settings
         }
         ?>
 
-        <div id="einsatzverwaltung_contactinfo">
-        <h2>Entwicklerkontakt &amp; Social Media</h2>
-        <p>
-            eMail: <a href="mailto:kontakt@abrain.de">kontakt@abrain.de</a>
-            <span title="PGP Schl&uuml;ssel-ID: 8752EB8F" class="pgpbadge"><i class="fa fa-lock"></i>&nbsp;PGP</span>
-        </p>
-        <p align="center">
-            <a href="https://github.com/abrain/einsatzverwaltung/issues" title="Bring Dich ein auf GitHub">
-                <i class="fa fa-github fa-2x"></i></a>&nbsp;&nbsp;
-            <a href="https://www.facebook.com/einsatzverwaltung/" title="Einsatzverwaltung auf Facebook">
-                <i class="fa fa-facebook-official fa-2x"></i></a>&nbsp;&nbsp;
-            <a href="https://twitter.com/einsatzvw" title="Einsatzverwaltung auf Twitter">
-                <i class="fa fa-twitter fa-2x"></i></a>&nbsp;&nbsp;
-            <a href="https://einsatzverwaltung.abrain.de/feed/" title="RSS-Feed mit Neuigkeiten zu Einsatzverwaltung">
-                <i class="fa fa-rss-square fa-2x"></i></a>
-        </p>
-        </div>
-
         <div class="wrap">
         <h1>Einstellungen &rsaquo; Einsatzverwaltung</h1>
 
         <?php
+        settings_errors();
+
         // Prüfen, ob Rewrite Slug von einer Seite genutzt wird
         $rewriteSlug = $this->options->getRewriteSlug();
         $conflictingPage = get_page_by_path($rewriteSlug);
@@ -724,10 +708,61 @@ class Settings
             echo '<div class="error"><p>' . $message . '</p></div>';
         }
 
+        $tabs = array(
+            'general' => __('Allgemein', 'einsatzverwaltung'),
+            'numbers' => __('Einsatznummern', 'einsatzverwaltung'),
+            'report' => __('Einsatzberichte', 'einsatzverwaltung'),
+            'list' => __('Einsatzliste', 'einsatzverwaltung'),
+            'capabilities' => __('Berechtigungen', 'einsatzverwaltung'),
+            'about' => __('Kontakt', 'einsatzverwaltung'),
+        );
+
+        $flags = FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH;
+        $currentTab = filter_input(INPUT_GET, 'tab', FILTER_SANITIZE_STRING, $flags);
+
+        if (empty($currentTab) || !array_key_exists($currentTab, $tabs)) {
+            $tabIds = array_keys($tabs);
+            $currentTab = $tabIds[0]; // NEEDS_PHP5.4 array_keys($tabs)[0]
+        }
+
+        echo "<h2 class=\"nav-tab-wrapper\">";
+        foreach ($tabs as $identifier => $label) {
+            $class = $currentTab === $identifier ? "nav-tab nav-tab-active" : "nav-tab";
+            printf(
+                '<a href="?page=%s&tab=%s" class="%s">%s</a>',
+                self::EVW_SETTINGS_SLUG,
+                $identifier,
+                $class,
+                $label
+            );
+        }
+        echo "</h2>";
+
+        if ('about' === $currentTab) {
+            ?>
+            <h2>Entwicklerkontakt &amp; Social Media</h2>
+            <p>
+                eMail: <a href="mailto:kontakt@abrain.de">kontakt@abrain.de</a>
+                <span title="PGP Schl&uuml;ssel-ID: 8752EB8F" class="pgpbadge"><i class="fa fa-lock"></i>&nbsp;PGP</span>
+            </p>
+            <p align="center">
+                <a href="https://github.com/abrain/einsatzverwaltung/issues" title="Bring Dich ein auf GitHub">
+                    <i class="fa fa-github fa-2x"></i></a>&nbsp;&nbsp;
+                <a href="https://www.facebook.com/einsatzverwaltung/" title="Einsatzverwaltung auf Facebook">
+                    <i class="fa fa-facebook-official fa-2x"></i></a>&nbsp;&nbsp;
+                <a href="https://twitter.com/einsatzvw" title="Einsatzverwaltung auf Twitter">
+                    <i class="fa fa-twitter fa-2x"></i></a>&nbsp;&nbsp;
+                <a href="https://einsatzverwaltung.abrain.de/feed/" title="RSS-Feed mit Neuigkeiten zu Einsatzverwaltung">
+                    <i class="fa fa-rss-square fa-2x"></i></a>
+            </p>
+            <?php
+            return;
+        }
+
         // Einstellungen ausgeben
         echo '<form method="post" action="options.php">';
-        settings_fields('einsatzvw_settings');
-        do_settings_sections(self::EVW_SETTINGS_SLUG);
+        settings_fields('einsatzvw_settings_' . $currentTab);
+        do_settings_sections(self::EVW_SETTINGS_SLUG . '-' . $currentTab);
         submit_button();
         echo '</form>';
     }

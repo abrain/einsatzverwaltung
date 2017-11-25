@@ -644,7 +644,7 @@ class Core
     }
 
     /**
-     * @return ImportTool
+     * @return ExportTool
      */
     public function getExportTool()
     {

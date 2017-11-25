@@ -36,7 +36,11 @@ class Tool
     private function addHooks()
     {
         add_action('admin_menu', array($this, 'addToolToMenu'));
-        add_action('plugins_loaded', array($this, 'startExport'));
+
+        // stelle sicher, dass der Benutzer über ausreichend Berechtigungen verfügt
+        if (is_admin()) {
+            add_action('plugins_loaded', array($this, 'startExport'));
+        }
     }
 
     /**
@@ -58,9 +62,7 @@ class Tool
      */
     public function startExport()
     {
-        // stelle sicher, dass wir uns im Adminbereich befindet und der Benutzer über ausreichend Berechtigungen
-        // verfügt
-        if (current_user_can('manage_options') && is_admin() && @$_GET['page'] == self::EVW_TOOL_EXPORT_SLUG &&
+        if (@$_GET['page'] == self::EVW_TOOL_EXPORT_SLUG &&
             @$_GET['download'] == true) {
             $format = @$this->formats[$_GET['format']];
  

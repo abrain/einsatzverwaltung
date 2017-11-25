@@ -39,7 +39,7 @@ class Tool
 
         // stelle sicher, dass der Benutzer über ausreichend Berechtigungen verfügt
         if (is_admin()) {
-            add_action('plugins_loaded', array($this, 'startExport'));
+            add_action('init', array($this, 'startExport'));
         }
     }
 

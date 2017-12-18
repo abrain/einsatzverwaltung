@@ -707,12 +707,12 @@ class Settings
         }
 
         $tabs = array(
-            'general' => __('Allgemein', 'einsatzverwaltung'),
-            'numbers' => __('Einsatznummern', 'einsatzverwaltung'),
-            'report' => __('Einsatzberichte', 'einsatzverwaltung'),
-            'list' => __('Einsatzliste', 'einsatzverwaltung'),
-            'capabilities' => __('Berechtigungen', 'einsatzverwaltung'),
-            'about' => __('Kontakt', 'einsatzverwaltung'),
+            'general' => 'Allgemein',
+            'numbers' => 'Einsatznummern',
+            'report' => 'Einsatzberichte',
+            'list' => 'Einsatzliste',
+            'capabilities' => 'Berechtigungen',
+            'about' => '&Uuml;ber',
         );
 
         $flags = FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH;

@@ -82,13 +82,6 @@ li.dropzone {
     margin-bottom: 15px;
 }
 
-.pgpbadge {
-    background-color: darkgray;
-    padding: 0 5px;
-    border-radius: 6px;
-    font-weight: bold;
-}
-
 .import-date-formats {
     display: inline-block;
     vertical-align: top;
@@ -98,4 +91,18 @@ li.dropzone {
     display: inline-block;
     vertical-align: top;
     margin-left: 20px;
+}
+
+.aboutpage-icons {
+    text-align: center;
+    margin: 25px 0;
+}
+
+.aboutpage-icon {
+    width: 24%;
+    display: inline-block;
+}
+
+.aboutpage-icon a {
+    text-decoration: none;
 }

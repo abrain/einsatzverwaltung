@@ -695,8 +695,6 @@ class Settings
         <h1>Einstellungen &rsaquo; Einsatzverwaltung</h1>
 
         <?php
-        settings_errors();
-
         // Prüfen, ob Rewrite Slug von einer Seite genutzt wird
         $rewriteSlug = $this->options->getRewriteSlug();
         $conflictingPage = get_page_by_path($rewriteSlug);

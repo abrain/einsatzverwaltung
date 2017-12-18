@@ -746,7 +746,7 @@ class Settings
             </div>
 
             <h2>Support</h2>
-            <p>Solltest Du ein Problem bei der Benutzung des Plugin haben, schaue bitte erst auf <a href="https://github.com/abrain/einsatzverwaltung/issues">GitHub</a> und im <a href="https://wordpress.org/support/plugin/einsatzverwaltung">Forum auf wordpress.org</a> nach, ob andere das Problem auch haben bzw. hatten. Wenn es noch keinen passenden Eintrag gibt, lege bitte einen entsprechenden Issue bzw. Thread an. Du kannst aber auch einfach eine <a href="mailto:kontakt@abrain.de">E-Mail</a> schreiben.</p>
+            <p>Solltest Du ein Problem bei der Benutzung des Plugins haben, schaue bitte erst auf <a href="https://github.com/abrain/einsatzverwaltung/issues">GitHub</a> und im <a href="https://wordpress.org/support/plugin/einsatzverwaltung">Forum auf wordpress.org</a> nach, ob andere das Problem auch haben bzw. hatten. Wenn es noch keinen passenden Eintrag gibt, lege bitte einen entsprechenden Issue bzw. Thread an. Du kannst aber auch einfach eine <a href="mailto:kontakt@abrain.de">E-Mail</a> schreiben.</p>
             <p>Gib bitte immer die folgenden Versionen mit an:&nbsp;<code style="border: 1px solid grey;">
             <?php printf('Plugin: %s, WordPress: %s, PHP: %s', Core::VERSION, get_bloginfo('version'), phpversion()); ?>
             </code></p>

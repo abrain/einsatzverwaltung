@@ -238,29 +238,27 @@ class Settings
     {
         add_settings_section(
             'einsatzvw_settings_general',
-            'Allgemein',
+            '',
             null,
             self::EVW_SETTINGS_SLUG . '-general'
         );
         add_settings_section(
             'einsatzvw_settings_numbers',
-            'Einsatznummern',
-            function () {
-                echo '<p>Die Einsatznummern k&ouml;nnen wahlweise manuell oder automatisch verwaltet werden.</p>';
-            },
+            '',
+            null,
             self::EVW_SETTINGS_SLUG . '-numbers'
         );
         add_settings_section(
             'einsatzvw_settings_einsatzberichte',
-            'Einsatzberichte',
+            '',
             function () {
-                echo '<p>Mit diesen Einstellungen kann das Aussehen der Einsatzberichte beeinflusst werden.</p>';
+                echo '<p>Mit diesen Einstellungen kann das Aussehen der einzelnen Einsatzberichte beeinflusst werden.</p>';
             },
             self::EVW_SETTINGS_SLUG . '-report'
         );
         add_settings_section(
             'einsatzvw_settings_einsatzliste',
-            'Einsatzliste',
+            '',
             function () {
                 echo '<p>Mit diesen Einstellungen kann das Aussehen der Einsatzlisten beeinflusst werden. Einsatzlisten k&ouml;nnen &uuml;ber den <a href="https://einsatzverwaltung.abrain.de/dokumentation/shortcodes/shortcode-einsatzliste/">Shortcode [einsatzliste]</a> in Seiten und Beitr&auml;ge eingebunden werden.</p>';
             },
@@ -268,7 +266,7 @@ class Settings
         );
         add_settings_section(
             'einsatzvw_settings_caps',
-            'Berechtigungen',
+            '',
             function () {
                 echo '<p>Hier kann festgelegt werden, welche Benutzer die Einsatzberichte verwalten k&ouml;nnen.</p>';
             },

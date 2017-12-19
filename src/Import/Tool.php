@@ -249,6 +249,7 @@ class Tool
             <label><input type="radio" name="delimiter" value=";" checked="checked"><code>;</code> Semikolon</label>
             &nbsp;<label><input type="radio" name="delimiter" value=","><code>,</code> Komma</label>
             <p class="description">Meist werden die Spalten mit einem Semikolon voneinander getrennt. Wenn du unsicher bist, solltest du die CSV-Datei mit einem Texteditor &ouml;ffnen und nachsehen.</p>
+            <p class="description">Als Feldbegrenzerzeichen (umschlie&szlig;t ggf. den Inhalt einer Spalte) wird das Anf&uuml;hrungszeichen <code>&quot;</code> erwartet.</p>
             <?php
             echo '<input type="hidden" name="aktion" value="' . $this->currentSource->getActionAttribute($this->nextAction['slug']) . '" />';
             submit_button($this->nextAction['button_text']);

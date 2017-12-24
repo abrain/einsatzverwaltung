@@ -1,8 +1,8 @@
 <?php
-namespace abrain\Einsatzverwaltung;
+namespace abrain\Einsatzverwaltung\Import;
 
-use abrain\Einsatzverwaltung\Import\Helper;
-use Error;
+use abrain\Einsatzverwaltung\Core;
+use Exception;
 
 /**
  * Class HelperTest
@@ -81,7 +81,7 @@ class HelperTest extends \WP_UnitTestCase
 
         try {
             $returnedTermId = self::$helper->getTermId($termName, 'hierarchy');
-        } catch (Error $e) {
+        } catch (Exception $e) {
             $this->fail($e->getMessage());
             return;
         }
@@ -99,7 +99,7 @@ class HelperTest extends \WP_UnitTestCase
 
         try {
             $returnedTermId = self::$helper->getTermId($termName, 'hierarchy');
-        } catch (Error $e) {
+        } catch (Exception $e) {
             $this->fail($e->getMessage());
             return;
         }

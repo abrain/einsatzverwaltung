@@ -7,7 +7,7 @@ use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\Utilities;
 use DateTime;
-use Error;
+use Exception;
 
 /**
  * Verschiedene Funktionen für den Import von Einsatzberichten
@@ -113,7 +113,7 @@ class Helper
         foreach ($termNames as $termName) {
             try {
                 $termIds[] = $this->getTermId($termName, $taxonomy);
-            } catch (Error $e) {
+            } catch (Exception $e) {
                 $this->utilities->printError($e->getMessage());
             }
         }
@@ -127,12 +127,12 @@ class Helper
      * @param string $termName
      * @param string $taxonomy
      * @return int
-     * @throws Error
+     * @throws Exception
      */
     public function getTermId($termName, $taxonomy)
     {
         if (is_taxonomy_hierarchical($taxonomy) === false) {
-            throw new Error("Die Taxonomie $taxonomy ist nicht hierarchisch!");
+            throw new Exception("Die Taxonomie $taxonomy ist nicht hierarchisch!");
         }
 
         $termName = trim($termName);
@@ -147,7 +147,7 @@ class Helper
         $newterm = wp_insert_term($termName, $taxonomy);
 
         if (is_wp_error($newterm)) {
-            throw new Error(sprintf(
+            throw new Exception(sprintf(
                 "Konnte %s '%s' nicht anlegen: %s",
                 $this->ownTerms[$taxonomy]['label'],
                 $termName,

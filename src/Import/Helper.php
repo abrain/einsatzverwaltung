@@ -8,6 +8,7 @@ use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\Utilities;
 use DateTime;
+use Error;
 
 /**
  * Verschiedene Funktionen für den Import von Einsatzberichten
@@ -33,6 +34,10 @@ class Helper
      * @var Data
      */
     private $data;
+
+    private $metaFields;
+    private $ownTerms;
+    private $postFields;
 
     /**
      * Helper constructor.
@@ -96,6 +101,74 @@ class Helper
     }
 
     /**
+     * Bereitet eine kommaseparierte Auflistung von Terms einer bestimmten Taxonomie so, dass sie beim Anlegen eines
+     * Einsatzberichts für die gegebene Taxonomie als tax_input verwendet werden kann.
+     *
+     * @param string $taxonomy
+     * @param string $terms
+     * @return string
+     */
+    public function getTaxInputString($taxonomy, $terms)
+    {
+        if (is_taxonomy_hierarchical($taxonomy) === false) {
+            // Termnamen können direkt verwendet werden
+            return $terms;
+        }
+
+        // Bei hierarchischen Taxonomien muss die ID statt des Namens verwendet werden
+        $termIds = array();
+
+        $termNames = explode(',', $terms);
+        foreach ($termNames as $termName) {
+            try {
+                $termIds[] = $this->getTermId($termName, $taxonomy);
+            } catch (Error $e) {
+                $this->utilities->printError($e->getMessage());
+            }
+        }
+
+        return implode(',', $termIds);
+    }
+
+    /**
+     * Bestimmt die ID eines Terms einer hierarchischen Taxonomie. Existiert dieser noch nicht, wird er angelegt.
+     *
+     * @param string $termName
+     * @param string $taxonomy
+     * @return int
+     * @throws Error
+     */
+    public function getTermId($termName, $taxonomy)
+    {
+        if (is_taxonomy_hierarchical($taxonomy) === false) {
+            throw new Error("Die Taxonomie $taxonomy ist nicht hierarchisch!");
+        }
+
+        $termName = trim($termName);
+        $term = get_term_by('name', $termName, $taxonomy);
+
+        if ($term !== false) {
+            // Term existiert bereits, ID verwenden
+            return $term->term_id;
+        }
+
+        // Term existiert in dieser Taxonomie noch nicht, neu anlegen
+        $newterm = wp_insert_term($termName, $taxonomy);
+
+        if (is_wp_error($newterm)) {
+            throw new Error(sprintf(
+                "Konnte %s '%s' nicht anlegen: %s",
+                $this->ownTerms[$taxonomy]['label'],
+                $termName,
+                $newterm->get_error_message()
+            ));
+        }
+
+        // Anlegen erfolgreich, zurückgegebene ID verwenden
+        return $newterm['term_id'];
+    }
+
+    /**
      * Importiert Einsätze aus der wp-einsatz-Tabelle
      *
      * @param AbstractSource $source
@@ -130,9 +203,9 @@ class Helper
             $dateTimeFormat = 'Y-m-d H:i';
         }
 
-        $metaFields = IncidentReport::getMetaFields();
-        $ownTerms = IncidentReport::getTerms();
-        $postFields = IncidentReport::getPostFields();
+        $this->metaFields = IncidentReport::getMetaFields();
+        $this->ownTerms = IncidentReport::getTerms();
+        $this->postFields = IncidentReport::getPostFields();
 
         foreach ($sourceEntries as $sourceEntry) {
             $metaValues = array();
@@ -147,54 +220,18 @@ class Helper
                 }
 
                 $sourceValue = trim($sourceEntry[$sourceField]);
-                if (array_key_exists($ownField, $metaFields)) {
+                if (array_key_exists($ownField, $this->metaFields)) {
                     // Wert gehört in ein Metafeld
                     $metaValues[$ownField] = $sourceValue;
-                } elseif (array_key_exists($ownField, $ownTerms)) {
+                } elseif (array_key_exists($ownField, $this->ownTerms)) {
                     // Wert gehört zu einer Taxonomie
                     if (empty($sourceValue)) {
                         // Leere Terms überspringen
                         continue;
                     }
-                    if (is_taxonomy_hierarchical($ownField)) {
-                        // Bei hierarchischen Taxonomien muss die ID statt des Namens verwendet werden
-                        $termIds = array();
 
-                        $termNames = explode(',', $sourceValue);
-                        foreach ($termNames as $termName) {
-                            $termName = trim($termName);
-                            $term = get_term_by('name', $termName, $ownField);
-
-                            if ($term !== false) {
-                                // Term existiert bereits, ID verwenden
-                                $termIds[] = $term->term_id;
-                                continue;
-                            }
-
-                            // Term existiert in dieser Taxonomie noch nicht, neu anlegen
-                            $newterm = wp_insert_term($termName, $ownField);
-                            if (is_wp_error($newterm)) {
-                                $this->utilities->printError(
-                                    sprintf(
-                                        "Konnte %s '%s' nicht anlegen: %s",
-                                        $ownTerms[$ownField]['label'],
-                                        $termName,
-                                        $newterm->get_error_message()
-                                    )
-                                );
-                                continue;
-                            }
-
-                            // Anlegen erfolgreich, zurückgegebene ID verwenden
-                            $termIds[] = $newterm['term_id'];
-                        }
-
-                        $insertArgs['tax_input'][$ownField] = implode(',', $termIds);
-                    } else {
-                        // Name kann direkt verwendet werden
-                        $insertArgs['tax_input'][$ownField] = $sourceValue;
-                    }
-                } elseif (array_key_exists($ownField, $postFields)) {
+                    $insertArgs['tax_input'][$ownField] = $this->getTaxInputString($ownField, $sourceValue);
+                } elseif (array_key_exists($ownField, $this->postFields)) {
                     // Wert gehört direkt zum Post
                     $insertArgs[$ownField] = $sourceValue;
                 } elseif ($ownField == '-') {

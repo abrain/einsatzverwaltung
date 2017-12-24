@@ -264,7 +264,7 @@ class Core
     /**
      * @var Options
      */
-    private $options;
+    public $options;
     
     /**
      * @var ImportTool
@@ -279,7 +279,7 @@ class Core
     /**
      * @var Utilities
      */
-    private $utilities;
+    public $utilities;
 
     /**
      * Constructor

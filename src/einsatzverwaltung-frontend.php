@@ -345,6 +345,7 @@ class Frontend
                     'key' => 'einsatz_special',
                     'value' => '1'
                 );
+                // normale Beiträge haben diesen Metaeintrag nicht, sollen aber trotzdem angezeigt werden
                 $metaQuery[] = array(
                     'key' => 'einsatz_special',
                     'value' => '1',

@@ -307,7 +307,7 @@ class Core
         $this->taxonomies = new Taxonomies($this->utilities);
 
         // Tools
-        $this->importTool = new ImportTool($this, $this->utilities, $this->options, $this->data);
+        $this->importTool = new ImportTool($this->utilities, $this->options, $this->data);
         $this->tasksPage = new TasksPage($this->utilities, $this->data);
 
         // Widgets

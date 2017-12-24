@@ -1,7 +1,6 @@
 <?php
 namespace abrain\Einsatzverwaltung\Import;
 
-use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\Data;
 use abrain\Einsatzverwaltung\Import\Sources\AbstractSource;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
@@ -21,11 +20,6 @@ class Helper
     private $utilities;
 
     /**
-     * @var Core
-     */
-    private $core;
-
-    /**
      * @var Options
      */
     private $options;
@@ -42,18 +36,15 @@ class Helper
     /**
      * Helper constructor.
      * @param Utilities $utilities
-     * @param Core $core
      * @param Options $options
      * @param Data $data
      */
-    public function __construct(Utilities $utilities, Core $core, Options $options, Data $data)
+    public function __construct(Utilities $utilities, Options $options, Data $data)
     {
         $this->utilities = $utilities;
-        $this->core = $core;
         $this->options = $options;
         $this->data = $data;
     }
-
 
     /**
      * Gibt ein Auswahlfeld zur Zuordnung der Felder in Einsatzverwaltung aus

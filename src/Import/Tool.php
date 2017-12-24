@@ -1,7 +1,6 @@
 <?php
 namespace abrain\Einsatzverwaltung\Import;
 
-use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\Data;
 use abrain\Einsatzverwaltung\Import\Sources\AbstractSource;
 use abrain\Einsatzverwaltung\Import\Sources\Csv;
@@ -45,11 +44,6 @@ class Tool
     private $utilities;
 
     /**
-     * @var Core
-     */
-    private $core;
-
-    /**
      * @var Options
      */
     private $options;
@@ -62,14 +56,12 @@ class Tool
     /**
      * Konstruktor
      *
-     * @param Core $core
      * @param Utilities $utilities
      * @param Options $options
      * @param Data $data
      */
-    public function __construct($core, $utilities, $options, $data)
+    public function __construct($utilities, $options, $data)
     {
-        $this->core = $core;
         $this->utilities = $utilities;
         $this->options = $options;
         $this->addHooks();
@@ -133,7 +125,7 @@ class Tool
     public function renderToolPage()
     {
         require_once dirname(__FILE__) . '/Helper.php';
-        $this->helper = new Helper($this->utilities, $this->core, $this->options, $this->data);
+        $this->helper = new Helper($this->utilities, $this->options, $this->data);
 
         echo '<div class="wrap">';
         echo '<h1>' . 'Einsatzberichte importieren' . '</h1>';

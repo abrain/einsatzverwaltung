@@ -199,10 +199,10 @@ class Helper
         $this->postFields = IncidentReport::getPostFields();
 
         foreach ($sourceEntries as $sourceEntry) {
-            $metaValues = array();
             $insertArgs = array();
             $insertArgs['post_content'] = '';
             $insertArgs['tax_input'] = array();
+            $insertArgs['meta_input'] = array();
 
             foreach ($mapping as $sourceField => $ownField) {
                 if (empty($ownField) || !is_string($ownField)) {
@@ -213,7 +213,7 @@ class Helper
                 $sourceValue = trim($sourceEntry[$sourceField]);
                 if (array_key_exists($ownField, $this->metaFields)) {
                     // Wert gehört in ein Metafeld
-                    $metaValues[$ownField] = $sourceValue;
+                    $insertArgs['meta_input'][$ownField] = $sourceValue;
                 } elseif (array_key_exists($ownField, $this->ownTerms)) {
                     // Wert gehört zu einer Taxonomie
                     if (empty($sourceValue)) {
@@ -250,20 +250,20 @@ class Helper
             $insertArgs['post_date_gmt'] = get_gmt_from_date($insertArgs['post_date']);
 
             // Einsatzende korrekt formatieren
-            if (array_key_exists('einsatz_einsatzende', $metaValues) && !empty($metaValues['einsatz_einsatzende'])) {
-                $einsatzende = DateTime::createFromFormat($dateTimeFormat, $metaValues['einsatz_einsatzende']);
+            if (array_key_exists('einsatz_einsatzende', $insertArgs['meta_input']) && !empty($insertArgs['meta_input']['einsatz_einsatzende'])) {
+                $einsatzende = DateTime::createFromFormat($dateTimeFormat, $insertArgs['meta_input']['einsatz_einsatzende']);
                 if (false === $einsatzende) {
                     $this->utilities->printError(
                         sprintf(
                             'Das Einsatzende %s konnte mit dem angegebenen Format %s nicht eingelesen werden',
-                            esc_html($metaValues['einsatz_einsatzende']),
+                            esc_html($insertArgs['meta_input']['einsatz_einsatzende']),
                             esc_html($dateTimeFormat)
                         )
                     );
                     continue;
                 }
 
-                $metaValues['einsatz_einsatzende'] = $einsatzende->format('Y-m-d H:i');
+                $insertArgs['meta_input']['einsatz_einsatzende'] = $einsatzende->format('Y-m-d H:i');
             }
 
             $insertArgs['post_type'] = 'einsatz';
@@ -279,8 +279,8 @@ class Helper
             }
 
             // Mannschaftsstärke validieren
-            if (array_key_exists('einsatz_mannschaft', $metaValues)) {
-                $metaValues['einsatz_mannschaft'] = sanitize_text_field($metaValues['einsatz_mannschaft']);
+            if (array_key_exists('einsatz_mannschaft', $insertArgs['meta_input'])) {
+                $insertArgs['meta_input']['einsatz_mannschaft'] = sanitize_text_field($insertArgs['meta_input']['einsatz_mannschaft']);
             }
 
             // Neuen Beitrag anlegen
@@ -289,9 +289,6 @@ class Helper
                 $this->utilities->printError('Konnte Einsatz nicht importieren: ' . $postId->get_error_message());
             } else {
                 $this->utilities->printInfo('Einsatz importiert, ID ' . $postId);
-                foreach ($metaValues as $mkey => $mval) {
-                    update_post_meta($postId, $mkey, $mval);
-                }
             }
         }
 

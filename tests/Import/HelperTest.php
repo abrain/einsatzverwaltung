@@ -28,10 +28,25 @@ class HelperTest extends \WP_UnitTestCase
 
         register_taxonomy('hierarchy', array(), array('hierarchical' => true));
         register_taxonomy('nohierarchy', array(), array('hierarchical' => false));
+        register_taxonomy('someTax', array(), array('hierarchical' => false));
+
+        self::$helper->setMetaFields(array('someMetaField' => array('label' => 'Some meta field')));
+        self::$helper->setPostFields(array(
+            'somePostField' => array('label' => 'Some post field'),
+            'anotherPostField' => array('label' => 'Another post field')
+        ));
+        self::$helper->setTaxonomies(array(
+            'hierarchy' => array('label' => 'Hierarchical taxonomy'),
+            'nohierarchy' => array('label' => 'Non-hierarchical taxonomy'),
+            'someTax' => array('label' => 'Another non-hierarchical taxonomy')
+        ));
 
         parent::setUpBeforeClass();
     }
 
+    /**
+     * Checks the generated string for tax_input for a non-hierarchical taxonomy.
+     */
     public function testGetTaxInputStringForNT()
     {
         $input = 'term1, term78, term99';
@@ -39,6 +54,9 @@ class HelperTest extends \WP_UnitTestCase
         $this->assertEquals($input, $result);
     }
 
+    /**
+     * Checks the generated string for tax_input for a hierarchical taxonomy.
+     */
     public function testGetTaxInputStringForHT()
     {
         $terms = array('hterm6', 'hterm123', 'hterm777');
@@ -111,5 +129,56 @@ class HelperTest extends \WP_UnitTestCase
         $termId = $wpterm->term_id;
         $this->assertEquals($termId, $returnedTermId);
         $this->assertNotEquals($termId, $termName);
+    }
+
+    public function testFillInsertArgs()
+    {
+        $insertArgs = array();
+        $valuesTaxonomy1 = array('aValue', 'another value');
+        $valuesTaxonomy2 = array('some string', 'even another value');
+
+        $mapping = array(
+            'f1' => 'hierarchy',
+            'f2' => 'somePostField',
+            'f3' => 'anotherPostField',
+            'f4' => 'someMetaField',
+            'f5' => 'nohierarchy',
+            'f6' => 'someTax'
+        );
+
+        $entry = array(
+            'f1' => implode(',', $valuesTaxonomy1),
+            'f2' => 'post field content',
+            'f3' => 'lorem ipsum',
+            'f4' => 'so meta!',
+            'f5' => implode(',', $valuesTaxonomy2),
+            'f6' => ''
+        );
+
+        self::$helper->fillInsertArgs($mapping, $entry, $insertArgs);
+
+        // Check post fields
+        $this->assertArrayHasKey('somePostField', $insertArgs);
+        $this->assertEquals('post field content', $insertArgs['somePostField']);
+        $this->assertArrayHasKey('anotherPostField', $insertArgs);
+        $this->assertEquals('lorem ipsum', $insertArgs['anotherPostField']);
+
+        // Check taxonomies
+        $this->assertArrayHasKey('tax_input', $insertArgs);
+        $this->assertArrayHasKey('hierarchy', $insertArgs['tax_input']);
+        $inputTaxonomy1 = explode(',', $insertArgs['tax_input']['hierarchy']);
+        $this->assertCount(count($valuesTaxonomy1), $inputTaxonomy1);
+        foreach ($inputTaxonomy1 as $value) {
+            $this->assertTrue(is_numeric($value));
+        }
+        $this->assertArrayHasKey('nohierarchy', $insertArgs['tax_input']);
+        $inputTaxonomy2 = explode(',', $insertArgs['tax_input']['nohierarchy']);
+        $this->assertEquals($valuesTaxonomy2, $inputTaxonomy2);
+        $this->assertArrayNotHasKey('someTax', $insertArgs['tax_input']); // empty value should have been ignored
+
+        // Check meta data
+        $this->assertArrayHasKey('meta_input', $insertArgs);
+        $this->assertArrayHasKey('someMetaField', $insertArgs['meta_input']);
+        $this->assertEquals('so meta!', $insertArgs['meta_input']['someMetaField']);
     }
 }

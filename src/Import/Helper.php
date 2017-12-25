@@ -29,9 +29,20 @@ class Helper
      */
     private $data;
 
+    /**
+     * @var array
+     */
     private $metaFields;
-    private $ownTerms;
+
+    /**
+     * @var array
+     */
     private $postFields;
+
+    /**
+     * @var array
+     */
+    private $taxonomies;
 
     /**
      * Helper constructor.
@@ -92,6 +103,42 @@ class Helper
     }
 
     /**
+     * @param array $mapping
+     * @param array $sourceEntry
+     * @param array $insertArgs
+     */
+    public function fillInsertArgs($mapping, $sourceEntry, &$insertArgs)
+    {
+        foreach ($mapping as $sourceField => $ownField) {
+            if (empty($ownField) || !is_string($ownField)) {
+                $this->utilities->printError("Feld '$ownField' ung&uuml;ltig");
+                continue;
+            }
+
+            $sourceValue = trim($sourceEntry[$sourceField]);
+            if (array_key_exists($ownField, $this->metaFields)) {
+                // Wert gehört in ein Metafeld
+                $insertArgs['meta_input'][$ownField] = $sourceValue;
+            } elseif (array_key_exists($ownField, $this->taxonomies)) {
+                // Wert gehört zu einer Taxonomie
+                if (empty($sourceValue)) {
+                    // Leere Terms überspringen
+                    continue;
+                }
+
+                $insertArgs['tax_input'][$ownField] = $this->getTaxInputString($ownField, $sourceValue);
+            } elseif (array_key_exists($ownField, $this->postFields)) {
+                // Wert gehört direkt zum Post
+                $insertArgs[$ownField] = $sourceValue;
+            } elseif ($ownField == '-') {
+                $this->utilities->printWarning("Feld '$sourceField' nicht zugeordnet");
+            } else {
+                $this->utilities->printError("Feld '$ownField' unbekannt");
+            }
+        }
+    }
+
+    /**
      * Bereitet eine kommaseparierte Auflistung von Terms einer bestimmten Taxonomie so, dass sie beim Anlegen eines
      * Einsatzberichts für die gegebene Taxonomie als tax_input verwendet werden kann.
      *
@@ -149,7 +196,7 @@ class Helper
         if (is_wp_error($newterm)) {
             throw new Exception(sprintf(
                 "Konnte %s '%s' nicht anlegen: %s",
-                $this->ownTerms[$taxonomy]['label'],
+                $this->taxonomies[$taxonomy]['label'],
                 $termName,
                 $newterm->get_error_message()
             ));
@@ -194,43 +241,13 @@ class Helper
             $dateTimeFormat = 'Y-m-d H:i';
         }
 
-        $this->metaFields = IncidentReport::getMetaFields();
-        $this->ownTerms = IncidentReport::getTerms();
-        $this->postFields = IncidentReport::getPostFields();
-
         foreach ($sourceEntries as $sourceEntry) {
             $insertArgs = array();
             $insertArgs['post_content'] = '';
             $insertArgs['tax_input'] = array();
             $insertArgs['meta_input'] = array();
 
-            foreach ($mapping as $sourceField => $ownField) {
-                if (empty($ownField) || !is_string($ownField)) {
-                    $this->utilities->printError("Feld '$ownField' ung&uuml;ltig");
-                    continue;
-                }
-
-                $sourceValue = trim($sourceEntry[$sourceField]);
-                if (array_key_exists($ownField, $this->metaFields)) {
-                    // Wert gehört in ein Metafeld
-                    $insertArgs['meta_input'][$ownField] = $sourceValue;
-                } elseif (array_key_exists($ownField, $this->ownTerms)) {
-                    // Wert gehört zu einer Taxonomie
-                    if (empty($sourceValue)) {
-                        // Leere Terms überspringen
-                        continue;
-                    }
-
-                    $insertArgs['tax_input'][$ownField] = $this->getTaxInputString($ownField, $sourceValue);
-                } elseif (array_key_exists($ownField, $this->postFields)) {
-                    // Wert gehört direkt zum Post
-                    $insertArgs[$ownField] = $sourceValue;
-                } elseif ($ownField == '-') {
-                    $this->utilities->printWarning("Feld '$sourceField' nicht zugeordnet");
-                } else {
-                    $this->utilities->printError("Feld '$ownField' unbekannt");
-                }
-            }
+            $this->fillInsertArgs($mapping, $sourceEntry, $insertArgs);
 
             // Datum des Einsatzes prüfen
             $alarmzeit = DateTime::createFromFormat($dateTimeFormat, $insertArgs['post_date']);
@@ -374,6 +391,30 @@ class Helper
         }
         submit_button($parsedArgs['submit_button_text']);
         echo '</form>';
+    }
+
+    /**
+     * @param array $metaFields
+     */
+    public function setMetaFields($metaFields)
+    {
+        $this->metaFields = $metaFields;
+    }
+
+    /**
+     * @param array $postFields
+     */
+    public function setPostFields($postFields)
+    {
+        $this->postFields = $postFields;
+    }
+
+    /**
+     * @param array $taxonomies
+     */
+    public function setTaxonomies($taxonomies)
+    {
+        $this->taxonomies = $taxonomies;
     }
 
     /**

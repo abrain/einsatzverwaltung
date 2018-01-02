@@ -2,6 +2,7 @@
 namespace abrain\Einsatzverwaltung\Import;
 
 use abrain\Einsatzverwaltung\Core;
+use DateTime;
 use Exception;
 
 /**
@@ -131,7 +132,7 @@ class HelperTest extends \WP_UnitTestCase
         $this->assertNotEquals($termId, $termName);
     }
 
-    public function testFillInsertArgs()
+    public function testMapEntryToInsertArgs()
     {
         $insertArgs = array();
         $valuesTaxonomy1 = array('aValue', 'another value');
@@ -155,7 +156,7 @@ class HelperTest extends \WP_UnitTestCase
             'f6' => ''
         );
 
-        self::$helper->fillInsertArgs($mapping, $entry, $insertArgs);
+        self::$helper->mapEntryToInsertArgs($mapping, $entry, $insertArgs);
 
         // Check post fields
         $this->assertArrayHasKey('somePostField', $insertArgs);
@@ -180,5 +181,76 @@ class HelperTest extends \WP_UnitTestCase
         $this->assertArrayHasKey('meta_input', $insertArgs);
         $this->assertArrayHasKey('someMetaField', $insertArgs['meta_input']);
         $this->assertEquals('so meta!', $insertArgs['meta_input']['someMetaField']);
+    }
+
+    public function testPrepareArgsForInsertPost()
+    {
+        $insertArgs = array(
+            'post_date' => '29.12.2017 18:24',
+            'meta_input' => array(
+                'einsatz_einsatzende' => '2017/12-29 23 42'
+            ),
+            'post_title' => 'Nr. 112 - Technische Hilfeleistung'
+        );
+        try {
+            $postStatus = 'draft';
+            $alarmzeit = DateTime::createFromFormat('d.m.Y H:i', $insertArgs['post_date']);
+            self::$helper->prepareArgsForInsertPost($insertArgs, 'Y/m-d H i', $postStatus, $alarmzeit);
+        } catch (Exception $e) {
+            $this->fail($e->getMessage());
+        }
+
+        // It's not an update, a new post shall be created
+        $this->assertArrayNotHasKey('ID', $insertArgs);
+
+        // Date should be correctly formatted for the database
+        $this->assertArrayHasKey('post_date', $insertArgs);
+        $this->assertEquals('2017-12-29 18:24', $insertArgs['post_date']);
+
+        // Same goes for the GMT date
+        $this->assertArrayHasKey('post_date_gmt', $insertArgs);
+        $this->assertEquals('2017-12-29 17:24:00', $insertArgs['post_date_gmt']);
+
+        // Check if the post title has not been modified
+        $this->assertArrayHasKey('post_title', $insertArgs);
+        $this->assertEquals('Nr. 112 - Technische Hilfeleistung', $insertArgs['post_title']);
+
+        // The given post status should have been preserved
+        $this->assertArrayHasKey('post_status', $insertArgs);
+        $this->assertEquals($postStatus, $insertArgs['post_status']);
+
+        // The correct post_type must have been set
+        $this->assertArrayHasKey('post_type', $insertArgs);
+        $this->assertEquals('einsatz', $insertArgs['post_type']);
+
+        // The date and time of ending should be formatted according to the given format
+        $this->assertArrayHasKey('meta_input', $insertArgs);
+        $this->assertArrayHasKey('einsatz_einsatzende', $insertArgs['meta_input']);
+        $this->assertEquals('2017-12-29 23:42', $insertArgs['meta_input']['einsatz_einsatzende']);
+    }
+
+    public function testDefaultTitle()
+    {
+        $insertArgs = array(
+            'post_date' => '29.12.2017 18:24',
+            'meta_input' => array(
+                'einsatz_einsatzende' => '2017/12-29 23 42'
+            )
+        );
+        try {
+            $postStatus = 'publish';
+            $alarmzeit = DateTime::createFromFormat('d.m.Y H:i', $insertArgs['post_date']);
+            self::$helper->prepareArgsForInsertPost($insertArgs, 'Y/m-d H i', $postStatus, $alarmzeit);
+        } catch (Exception $e) {
+            $this->fail($e->getMessage());
+        }
+
+        // Check if the default post title has been set
+        $this->assertArrayHasKey('post_title', $insertArgs);
+        $this->assertEquals('Einsatz', $insertArgs['post_title']);
+
+        // The given post status should have been preserved
+        $this->assertArrayHasKey('post_status', $insertArgs);
+        $this->assertEquals($postStatus, $insertArgs['post_status']);
     }
 }

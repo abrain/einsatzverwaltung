@@ -107,7 +107,7 @@ class Helper
      * @param array $sourceEntry
      * @param array $insertArgs
      */
-    public function fillInsertArgs($mapping, $sourceEntry, &$insertArgs)
+    public function mapEntryToInsertArgs($mapping, $sourceEntry, &$insertArgs)
     {
         foreach ($mapping as $sourceField => $ownField) {
             if (empty($ownField) || !is_string($ownField)) {
@@ -241,72 +241,26 @@ class Helper
             $dateTimeFormat = 'Y-m-d H:i';
         }
 
-        foreach ($sourceEntries as $sourceEntry) {
-            $insertArgs = array();
-            $insertArgs['post_content'] = '';
-            $insertArgs['tax_input'] = array();
-            $insertArgs['meta_input'] = array();
+        try {
+            foreach ($sourceEntries as $sourceEntry) {
+                $insertArgs = array();
+                $insertArgs['post_content'] = '';
 
-            $this->fillInsertArgs($mapping, $sourceEntry, $insertArgs);
+                $this->mapEntryToInsertArgs($mapping, $sourceEntry, $insertArgs);
+                $alarmzeit = DateTime::createFromFormat($dateTimeFormat, $insertArgs['post_date']);
+                $this->prepareArgsForInsertPost($insertArgs, $dateTimeFormat, $postStatus, $alarmzeit);
 
-            // Datum des Einsatzes prüfen
-            $alarmzeit = DateTime::createFromFormat($dateTimeFormat, $insertArgs['post_date']);
-            if (false === $alarmzeit) {
-                $this->utilities->printError(
-                    sprintf(
-                        'Die Alarmzeit %s konnte mit dem angegebenen Format %s nicht eingelesen werden',
-                        esc_html($insertArgs['post_date']),
-                        esc_html($dateTimeFormat)
-                    )
-                );
-                continue;
-            }
-            $yearsImported[$alarmzeit->format('Y')] = 1;
-
-            $insertArgs['post_date'] = $alarmzeit->format('Y-m-d H:i');
-            $insertArgs['post_date_gmt'] = get_gmt_from_date($insertArgs['post_date']);
-
-            // Einsatzende korrekt formatieren
-            if (array_key_exists('einsatz_einsatzende', $insertArgs['meta_input']) && !empty($insertArgs['meta_input']['einsatz_einsatzende'])) {
-                $einsatzende = DateTime::createFromFormat($dateTimeFormat, $insertArgs['meta_input']['einsatz_einsatzende']);
-                if (false === $einsatzende) {
-                    $this->utilities->printError(
-                        sprintf(
-                            'Das Einsatzende %s konnte mit dem angegebenen Format %s nicht eingelesen werden',
-                            esc_html($insertArgs['meta_input']['einsatz_einsatzende']),
-                            esc_html($dateTimeFormat)
-                        )
-                    );
-                    continue;
+                // Neuen Beitrag anlegen
+                $postId = wp_insert_post($insertArgs, true);
+                if (is_wp_error($postId)) {
+                    throw new Exception('Konnte Einsatz nicht importieren: ' . $postId->get_error_message());
                 }
 
-                $insertArgs['meta_input']['einsatz_einsatzende'] = $einsatzende->format('Y-m-d H:i');
-            }
-
-            $insertArgs['post_type'] = 'einsatz';
-            $insertArgs['post_status'] = $postStatus;
-
-            // Titel sicherstellen
-            if (!array_key_exists('post_title', $insertArgs)) {
-                $insertArgs['post_title'] = 'Einsatz';
-            }
-            $insertArgs['post_title'] = wp_strip_all_tags($insertArgs['post_title']);
-            if (empty($insertArgs['post_title'])) {
-                $insertArgs['post_title'] = 'Einsatz';
-            }
-
-            // Mannschaftsstärke validieren
-            if (array_key_exists('einsatz_mannschaft', $insertArgs['meta_input'])) {
-                $insertArgs['meta_input']['einsatz_mannschaft'] = sanitize_text_field($insertArgs['meta_input']['einsatz_mannschaft']);
-            }
-
-            // Neuen Beitrag anlegen
-            $postId = wp_insert_post($insertArgs, true);
-            if (is_wp_error($postId)) {
-                $this->utilities->printError('Konnte Einsatz nicht importieren: ' . $postId->get_error_message());
-            } else {
                 $this->utilities->printInfo('Einsatz importiert, ID ' . $postId);
+                $yearsImported[$alarmzeit->format('Y')] = 1;
             }
+        } catch (Exception $e) {
+            $this->utilities->printError('Import abgebrochen, Ursache: ' . $e->getMessage());
         }
 
         if ('publish' === $postStatus) {
@@ -322,6 +276,62 @@ class Helper
 
         $this->utilities->printSuccess('Der Import ist abgeschlossen');
         echo '<a href="edit.php?post_type=einsatz">Zu den Einsatzberichten</a>';
+    }
+
+    /**
+     * @param array $insertArgs
+     * @param string $dateTimeFormat
+     * @param string $postStatus
+     * @param DateTime $alarmzeit
+     * @throws Exception
+     */
+    public function prepareArgsForInsertPost(&$insertArgs, $dateTimeFormat, $postStatus, $alarmzeit)
+    {
+        // Datum des Einsatzes prüfen
+        if (false === $alarmzeit) {
+            throw new Exception(sprintf(
+                'Die Alarmzeit %s konnte mit dem angegebenen Format %s nicht eingelesen werden',
+                esc_html($insertArgs['post_date']),
+                esc_html($dateTimeFormat)
+            ));
+        }
+
+        $insertArgs['post_date'] = $alarmzeit->format('Y-m-d H:i');
+        $insertArgs['post_date_gmt'] = get_gmt_from_date($insertArgs['post_date']);
+
+        // Einsatzende korrekt formatieren
+        if (array_key_exists('einsatz_einsatzende', $insertArgs['meta_input']) &&
+            !empty($insertArgs['meta_input']['einsatz_einsatzende'])
+        ) {
+            $endDate = DateTime::createFromFormat($dateTimeFormat, $insertArgs['meta_input']['einsatz_einsatzende']);
+            if (false === $endDate) {
+                throw new Exception(sprintf(
+                    'Das Einsatzende %s konnte mit dem angegebenen Format %s nicht eingelesen werden',
+                    esc_html($insertArgs['meta_input']['einsatz_einsatzende']),
+                    esc_html($dateTimeFormat)
+                ));
+            }
+
+            $insertArgs['meta_input']['einsatz_einsatzende'] = $endDate->format('Y-m-d H:i');
+        }
+
+        $insertArgs['post_type'] = 'einsatz';
+        $insertArgs['post_status'] = $postStatus;
+
+        // Titel sicherstellen
+        if (!array_key_exists('post_title', $insertArgs)) {
+            $insertArgs['post_title'] = 'Einsatz';
+        }
+        $insertArgs['post_title'] = wp_strip_all_tags($insertArgs['post_title']);
+        if (empty($insertArgs['post_title'])) {
+            $insertArgs['post_title'] = 'Einsatz';
+        }
+
+        // Mannschaftsstärke validieren
+        // NEEDS_WP4.6 wird durch den Einsatz von register_meta hinfällig
+        if (array_key_exists('einsatz_mannschaft', $insertArgs['meta_input'])) {
+            $insertArgs['meta_input']['einsatz_mannschaft'] = sanitize_text_field($insertArgs['meta_input']['einsatz_mannschaft']);
+        }
     }
 
     /**

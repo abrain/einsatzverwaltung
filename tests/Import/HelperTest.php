@@ -188,7 +188,8 @@ class HelperTest extends \WP_UnitTestCase
         $insertArgs = array(
             'post_date' => '29.12.2017 18:24',
             'meta_input' => array(
-                'einsatz_einsatzende' => '2017/12-29 23 42'
+                'einsatz_einsatzende' => '2017/12-29 23 42',
+                'einsatz_special' => '1'
             ),
             'post_title' => 'Nr. 112 - Technische Hilfeleistung'
         );
@@ -227,9 +228,13 @@ class HelperTest extends \WP_UnitTestCase
         $this->assertArrayHasKey('meta_input', $insertArgs);
         $this->assertArrayHasKey('einsatz_einsatzende', $insertArgs['meta_input']);
         $this->assertEquals('2017-12-29 23:42', $insertArgs['meta_input']['einsatz_einsatzende']);
+
+        // Check that the special flag is still present
+        $this->assertArrayHasKey('einsatz_special', $insertArgs['meta_input']);
+        $this->assertEquals('1', $insertArgs['meta_input']['einsatz_special']);
     }
 
-    public function testDefaultTitle()
+    public function testDefaults()
     {
         $insertArgs = array(
             'post_date' => '29.12.2017 18:24',
@@ -252,5 +257,9 @@ class HelperTest extends \WP_UnitTestCase
         // The given post status should have been preserved
         $this->assertArrayHasKey('post_status', $insertArgs);
         $this->assertEquals($postStatus, $insertArgs['post_status']);
+
+        // Check that the special flag defaults to 0
+        $this->assertArrayHasKey('einsatz_special', $insertArgs['meta_input']);
+        $this->assertEquals('0', $insertArgs['meta_input']['einsatz_special']);
     }
 }

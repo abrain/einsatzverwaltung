@@ -332,6 +332,11 @@ class Helper
         if (array_key_exists('einsatz_mannschaft', $insertArgs['meta_input'])) {
             $insertArgs['meta_input']['einsatz_mannschaft'] = sanitize_text_field($insertArgs['meta_input']['einsatz_mannschaft']);
         }
+
+        // Berichte müssen explizit als 'nicht besonders' markiert werden
+        if (!array_key_exists('einsatz_special', $insertArgs['meta_input'])) {
+            $insertArgs['meta_input']['einsatz_special'] = '0';
+        }
     }
 
     /**

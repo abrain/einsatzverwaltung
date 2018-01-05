@@ -215,67 +215,27 @@ class Helper
     public function import($source, $mapping)
     {
         set_time_limit(0); // Zeitlimit deaktivieren
-        
-        $sourceEntries = $source->getEntries(array_keys($mapping));
-        if (empty($sourceEntries)) {
-            $this->utilities->printError('Die Importquelle lieferte keine Ergebnisse. Entweder sind dort keine Eins&auml;tze gespeichert oder es gab ein Problem bei der Abfrage.');
-            return;
-        }
 
         // Der Veröffentlichungsstatus der importierten Berichte
         $postStatus = $source->isPublishReports() ? 'publish' : 'draft';
 
-        // Für die Dauer des Imports sollen die laufenden Nummern nicht aktuell gehalten werden, da dies die Performance
-        // stark beeinträchtigt
-        if ('publish' === $postStatus) {
-            $this->data->pauseAutoSequenceNumbers();
-        }
-        $yearsImported = array();
-
-        $dateFormat = $source->getDateFormat();
-        $timeFormat = $source->getTimeFormat();
-        if (!empty($dateFormat) && !empty($timeFormat)) {
-            $dateTimeFormat = $dateFormat . ' ' . $timeFormat;
-        }
-        if (empty($dateTimeFormat)) {
-            $dateTimeFormat = 'Y-m-d H:i';
-        }
+        $preparedInsertArgs = array();
+        $yearsAffected = array();
 
         try {
-            foreach ($sourceEntries as $sourceEntry) {
-                $insertArgs = array();
-                $insertArgs['post_content'] = '';
+            $this->prepareImport($source, $mapping, $postStatus, $preparedInsertArgs, $yearsAffected);
+        } catch (Exception $e) {
+            $this->utilities->printError('Importvorbereitung abgebrochen, Ursache: ' . $e->getMessage());
+            return;
+        }
 
-                $this->mapEntryToInsertArgs($mapping, $sourceEntry, $insertArgs);
-                $alarmzeit = DateTime::createFromFormat($dateTimeFormat, $insertArgs['post_date']);
-                $this->prepareArgsForInsertPost($insertArgs, $dateTimeFormat, $postStatus, $alarmzeit);
+        echo "<p>Daten eingelesen, starte den Import...</p>";
 
-                // Neuen Beitrag anlegen
-                $postId = wp_insert_post($insertArgs, true);
-                if (is_wp_error($postId)) {
-                    throw new Exception('Konnte Einsatz nicht importieren: ' . $postId->get_error_message());
-                }
-
-                $this->utilities->printInfo('Einsatz importiert, ID ' . $postId);
-                $yearsImported[$alarmzeit->format('Y')] = 1;
-            }
+        try {
+            $this->runImport($preparedInsertArgs, $postStatus, $yearsAffected);
         } catch (Exception $e) {
             $this->utilities->printError('Import abgebrochen, Ursache: ' . $e->getMessage());
         }
-
-        if ('publish' === $postStatus) {
-            // Die automatische Aktualisierung der laufenden Nummern wird wieder aufgenommen
-            $this->utilities->printSuccess('Die Berichte wurden importiert');
-            $this->utilities->printInfo('Metadaten werden aktualisiert ...');
-            flush();
-            $this->data->resumeAutoSequenceNumbers();
-            foreach (array_keys($yearsImported) as $year) {
-                $this->data->updateSequenceNumbers(strval($year));
-            }
-        }
-
-        $this->utilities->printSuccess('Der Import ist abgeschlossen');
-        echo '<a href="edit.php?post_type=einsatz">Zu den Einsatzberichten</a>';
     }
 
     /**
@@ -336,6 +296,45 @@ class Helper
         // Berichte müssen explizit als 'nicht besonders' markiert werden
         if (!array_key_exists('einsatz_special', $insertArgs['meta_input'])) {
             $insertArgs['meta_input']['einsatz_special'] = '0';
+        }
+    }
+
+    /**
+     * @param AbstractSource $source
+     * @param array $mapping
+     * @param string $postStatus
+     * @param array $preparedInsertArgs
+     * @param array $yearsAffected
+     * @throws Exception
+     */
+    public function prepareImport($source, $mapping, $postStatus, &$preparedInsertArgs, &$yearsAffected)
+    {
+        $sourceEntries = $source->getEntries(array_keys($mapping));
+        if (empty($sourceEntries)) {
+            throw new Exception('Die Importquelle lieferte keine Ergebnisse. Entweder sind dort keine Eins&auml;tze gespeichert oder es gab ein Problem bei der Abfrage.');
+        }
+
+        $dateFormat = $source->getDateFormat();
+        $timeFormat = $source->getTimeFormat();
+        if (!empty($dateFormat) && !empty($timeFormat)) {
+            $dateTimeFormat = $dateFormat . ' ' . $timeFormat;
+        }
+        if (empty($dateTimeFormat)) {
+            $dateTimeFormat = 'Y-m-d H:i';
+        }
+
+        foreach ($sourceEntries as $sourceEntry) {
+            $insertArgs = array();
+            $insertArgs['post_content'] = '';
+            $insertArgs['tax_input'] = array();
+            $insertArgs['meta_input'] = array();
+
+            $this->mapEntryToInsertArgs($mapping, $sourceEntry, $insertArgs);
+            $alarmzeit = DateTime::createFromFormat($dateTimeFormat, $insertArgs['post_date']);
+            $this->prepareArgsForInsertPost($insertArgs, $dateTimeFormat, $postStatus, $alarmzeit);
+
+            $preparedInsertArgs[] = $insertArgs;
+            $yearsAffected[$alarmzeit->format('Y')] = 1;
         }
     }
 
@@ -406,6 +405,46 @@ class Helper
         }
         submit_button($parsedArgs['submit_button_text']);
         echo '</form>';
+    }
+
+    /**
+     * @param array $preparedInsertArgs
+     * @param string $postStatus
+     * @param array $yearsAffected
+     * @throws Exception
+     */
+    public function runImport($preparedInsertArgs, $postStatus, $yearsAffected)
+    {
+        // Für die Dauer des Imports sollen die laufenden Nummern nicht aktuell gehalten werden, da dies die Performance
+        // stark beeinträchtigt
+        if ('publish' === $postStatus) {
+            $this->data->pauseAutoSequenceNumbers();
+        }
+
+        foreach ($preparedInsertArgs as $insertArgs) {
+            // Neuen Beitrag anlegen
+            $postId = wp_insert_post($insertArgs, true);
+            if (is_wp_error($postId)) {
+                throw new Exception('Konnte Einsatz nicht importieren: ' . $postId->get_error_message());
+            }
+
+            $this->utilities->printInfo('Einsatz importiert, ID ' . $postId);
+        }
+
+        if ('publish' === $postStatus) {
+            // Die automatische Aktualisierung der laufenden Nummern wird wieder aufgenommen
+            $this->utilities->printSuccess('Die Berichte wurden importiert');
+            $this->utilities->printInfo('Metadaten werden aktualisiert ...');
+            flush();
+            $this->data->resumeAutoSequenceNumbers();
+            foreach (array_keys($yearsAffected) as $year) {
+                echo "<p>Aktualisiere laufende Nummern für das Jahr $year...</p>";
+                $this->data->updateSequenceNumbers(strval($year));
+            }
+        }
+
+        $this->utilities->printSuccess('Der Import ist abgeschlossen');
+        echo '<a href="edit.php?post_type=einsatz">Zu den Einsatzberichten</a>';
     }
 
     /**

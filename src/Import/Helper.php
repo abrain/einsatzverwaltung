@@ -33,17 +33,17 @@ class Helper
     /**
      * @var array
      */
-    private $metaFields;
+    public $metaFields;
 
     /**
      * @var array
      */
-    private $postFields;
+    public $postFields;
 
     /**
      * @var array
      */
-    private $taxonomies;
+    public $taxonomies;
 
     /**
      * Helper constructor.
@@ -448,30 +448,6 @@ class Helper
 
         $this->utilities->printSuccess('Der Import ist abgeschlossen');
         echo '<a href="edit.php?post_type=einsatz">Zu den Einsatzberichten</a>';
-    }
-
-    /**
-     * @param array $metaFields
-     */
-    public function setMetaFields($metaFields)
-    {
-        $this->metaFields = $metaFields;
-    }
-
-    /**
-     * @param array $postFields
-     */
-    public function setPostFields($postFields)
-    {
-        $this->postFields = $postFields;
-    }
-
-    /**
-     * @param array $taxonomies
-     */
-    public function setTaxonomies($taxonomies)
-    {
-        $this->taxonomies = $taxonomies;
     }
 
     /**

@@ -128,9 +128,9 @@ class Tool
     {
         require_once dirname(__FILE__) . '/Helper.php';
         $this->helper = new Helper($this->utilities, $this->options, $this->data);
-        $this->helper->setMetaFields(IncidentReport::getMetaFields());
-        $this->helper->setTaxonomies(IncidentReport::getTerms());
-        $this->helper->setPostFields(IncidentReport::getPostFields());
+        $this->helper->metaFields = IncidentReport::getMetaFields();
+        $this->helper->taxonomies = IncidentReport::getTerms();
+        $this->helper->postFields = IncidentReport::getPostFields();
 
         echo '<div class="wrap">';
         echo '<h1>' . 'Einsatzberichte importieren' . '</h1>';

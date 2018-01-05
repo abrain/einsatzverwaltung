@@ -31,16 +31,16 @@ class HelperTest extends \WP_UnitTestCase
         register_taxonomy('nohierarchy', array(), array('hierarchical' => false));
         register_taxonomy('someTax', array(), array('hierarchical' => false));
 
-        self::$helper->setMetaFields(array('someMetaField' => array('label' => 'Some meta field')));
-        self::$helper->setPostFields(array(
+        self::$helper->metaFields = array('someMetaField' => array('label' => 'Some meta field'));
+        self::$helper->postFields = array(
             'somePostField' => array('label' => 'Some post field'),
             'anotherPostField' => array('label' => 'Another post field')
-        ));
-        self::$helper->setTaxonomies(array(
+        );
+        self::$helper->taxonomies = array(
             'hierarchy' => array('label' => 'Hierarchical taxonomy'),
             'nohierarchy' => array('label' => 'Non-hierarchical taxonomy'),
             'someTax' => array('label' => 'Another non-hierarchical taxonomy')
-        ));
+        );
 
         parent::setUpBeforeClass();
     }

@@ -66,14 +66,11 @@ class Tool
     {
         $this->utilities = $utilities;
         $this->options = $options;
-        $this->addHooks();
-        $this->loadSources();
         $this->data = $data;
-    }
 
-    private function addHooks()
-    {
         add_action('admin_menu', array($this, 'addToolToMenu'));
+
+        $this->loadSources();
     }
 
     /**
@@ -193,10 +190,10 @@ class Tool
             }
         }
 
-        // Datums- und Zeitformat für CSV-Import übernehmen
+        // 'Sofort veröffentlichen'-Option übernehmen
         $this->currentSource->putArg(
-                'import_publish_reports',
-                $this->utilities->sanitizeCheckbox(array($_POST, 'import_publish_reports'))
+            'import_publish_reports',
+            $this->utilities->sanitizeCheckbox(array($_POST, 'import_publish_reports'))
         );
 
         echo "<h2>{$this->currentAction['name']}</h2>";
@@ -285,9 +282,6 @@ class Tool
 
         // Einsätze zählen
         $entries = $this->currentSource->getEntries(null);
-        if (false === $entries) {
-            return;
-        }
         if (empty($entries)) {
             $this->utilities->printWarning('Es wurden keine Eins&auml;tze gefunden.');
             return;
@@ -300,10 +294,6 @@ class Tool
 
         // Felder matchen
         echo "<h3>Felder zuordnen</h3>";
-        if (false === $this->nextAction) {
-            $this->utilities->printError('Keine Nachfolgeaktion gefunden!');
-            return;
-        }
 
         $this->helper->renderMatchForm($this->currentSource, array(
             'nonce_action' => $this->getNonceAction($this->currentSource, $this->nextAction['slug']),

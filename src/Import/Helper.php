@@ -226,19 +226,16 @@ class Helper
     {
         set_time_limit(0); // Zeitlimit deaktivieren
 
-        // Der Veröffentlichungsstatus der importierten Berichte
-        $postStatus = $source->isPublishReports() ? 'publish' : 'draft';
-
         $preparedInsertArgs = array();
         $yearsAffected = array();
 
         // Den Import vorbereiten, um möglichst alle Fehler vorher abzufangen
-        $this->prepareImport($source, $mapping, $postStatus, $preparedInsertArgs, $yearsAffected);
+        $this->prepareImport($source, $mapping, $preparedInsertArgs, $yearsAffected);
 
         echo "<p>Daten eingelesen, starte den Import...</p>";
 
         // Den tatsächlichen Import starten
-        $this->runImport($preparedInsertArgs, $postStatus, $yearsAffected);
+        $this->runImport($preparedInsertArgs, $source, $yearsAffected);
     }
 
     /**
@@ -305,12 +302,11 @@ class Helper
     /**
      * @param AbstractSource $source
      * @param array $mapping
-     * @param string $postStatus
      * @param array $preparedInsertArgs
      * @param array $yearsAffected
      * @throws ImportPreparationException
      */
-    public function prepareImport($source, $mapping, $postStatus, &$preparedInsertArgs, &$yearsAffected)
+    public function prepareImport($source, $mapping, &$preparedInsertArgs, &$yearsAffected)
     {
         $sourceEntries = $source->getEntries(array_keys($mapping));
         if (empty($sourceEntries)) {
@@ -325,6 +321,9 @@ class Helper
         if (empty($dateTimeFormat)) {
             $dateTimeFormat = 'Y-m-d H:i';
         }
+
+        // Der Veröffentlichungsstatus der importierten Berichte
+        $postStatus = $source->isPublishReports() ? 'publish' : 'draft';
 
         foreach ($sourceEntries as $sourceEntry) {
             $insertArgs = array();
@@ -412,15 +411,15 @@ class Helper
 
     /**
      * @param array $preparedInsertArgs
-     * @param string $postStatus
+     * @param AbstractSource $source
      * @param array $yearsAffected
      * @throws ImportException
      */
-    public function runImport($preparedInsertArgs, $postStatus, $yearsAffected)
+    public function runImport($preparedInsertArgs, $source, $yearsAffected)
     {
         // Für die Dauer des Imports sollen die laufenden Nummern nicht aktuell gehalten werden, da dies die Performance
         // stark beeinträchtigt
-        if ('publish' === $postStatus) {
+        if ($source->isPublishReports()) {
             $this->data->pauseAutoSequenceNumbers();
         }
 
@@ -434,7 +433,7 @@ class Helper
             $this->utilities->printInfo('Einsatz importiert, ID ' . $postId);
         }
 
-        if ('publish' === $postStatus) {
+        if ($source->isPublishReports()) {
             // Die automatische Aktualisierung der laufenden Nummern wird wieder aufgenommen
             $this->utilities->printSuccess('Die Berichte wurden importiert');
             $this->utilities->printInfo('Metadaten werden aktualisiert ...');

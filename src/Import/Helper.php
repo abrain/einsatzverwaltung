@@ -2,12 +2,13 @@
 namespace abrain\Einsatzverwaltung\Import;
 
 use abrain\Einsatzverwaltung\Data;
+use abrain\Einsatzverwaltung\Exceptions\ImportException;
+use abrain\Einsatzverwaltung\Exceptions\ImportPreparationException;
 use abrain\Einsatzverwaltung\Import\Sources\AbstractSource;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\Utilities;
 use DateTime;
-use Exception;
 
 /**
  * Verschiedene Funktionen für den Import von Einsatzberichten
@@ -106,6 +107,7 @@ class Helper
      * @param array $mapping
      * @param array $sourceEntry
      * @param array $insertArgs
+     * @throws ImportPreparationException
      */
     public function mapEntryToInsertArgs($mapping, $sourceEntry, &$insertArgs)
     {
@@ -145,6 +147,7 @@ class Helper
      * @param string $taxonomy
      * @param string $terms
      * @return string
+     * @throws ImportPreparationException
      */
     public function getTaxInputString($taxonomy, $terms)
     {
@@ -158,11 +161,7 @@ class Helper
 
         $termNames = explode(',', $terms);
         foreach ($termNames as $termName) {
-            try {
-                $termIds[] = $this->getTermId($termName, $taxonomy);
-            } catch (Exception $e) {
-                $this->utilities->printError($e->getMessage());
-            }
+            $termIds[] = $this->getTermId($termName, $taxonomy);
         }
 
         return implode(',', $termIds);
@@ -174,12 +173,12 @@ class Helper
      * @param string $termName
      * @param string $taxonomy
      * @return int
-     * @throws Exception
+     * @throws ImportPreparationException
      */
     public function getTermId($termName, $taxonomy)
     {
         if (is_taxonomy_hierarchical($taxonomy) === false) {
-            throw new Exception("Die Taxonomie $taxonomy ist nicht hierarchisch!");
+            throw new ImportPreparationException("Die Taxonomie $taxonomy ist nicht hierarchisch!");
         }
 
         $termName = trim($termName);
@@ -194,7 +193,7 @@ class Helper
         $newterm = wp_insert_term($termName, $taxonomy);
 
         if (is_wp_error($newterm)) {
-            throw new Exception(sprintf(
+            throw new ImportPreparationException(sprintf(
                 "Konnte %s '%s' nicht anlegen: %s",
                 $this->taxonomies[$taxonomy]['label'],
                 $termName,
@@ -211,6 +210,8 @@ class Helper
      *
      * @param AbstractSource $source
      * @param array $mapping Zuordnung zwischen zu importieren Feldern und denen der Einsatzverwaltung
+     * @throws ImportException
+     * @throws ImportPreparationException
      */
     public function import($source, $mapping)
     {
@@ -222,20 +223,13 @@ class Helper
         $preparedInsertArgs = array();
         $yearsAffected = array();
 
-        try {
-            $this->prepareImport($source, $mapping, $postStatus, $preparedInsertArgs, $yearsAffected);
-        } catch (Exception $e) {
-            $this->utilities->printError('Importvorbereitung abgebrochen, Ursache: ' . $e->getMessage());
-            return;
-        }
+        // Den Import vorbereiten, um möglichst alle Fehler vorher abzufangen
+        $this->prepareImport($source, $mapping, $postStatus, $preparedInsertArgs, $yearsAffected);
 
         echo "<p>Daten eingelesen, starte den Import...</p>";
 
-        try {
-            $this->runImport($preparedInsertArgs, $postStatus, $yearsAffected);
-        } catch (Exception $e) {
-            $this->utilities->printError('Import abgebrochen, Ursache: ' . $e->getMessage());
-        }
+        // Den tatsächlichen Import starten
+        $this->runImport($preparedInsertArgs, $postStatus, $yearsAffected);
     }
 
     /**
@@ -243,13 +237,13 @@ class Helper
      * @param string $dateTimeFormat
      * @param string $postStatus
      * @param DateTime $alarmzeit
-     * @throws Exception
+     * @throws ImportPreparationException
      */
     public function prepareArgsForInsertPost(&$insertArgs, $dateTimeFormat, $postStatus, $alarmzeit)
     {
         // Datum des Einsatzes prüfen
         if (false === $alarmzeit) {
-            throw new Exception(sprintf(
+            throw new ImportPreparationException(sprintf(
                 'Die Alarmzeit %s konnte mit dem angegebenen Format %s nicht eingelesen werden',
                 esc_html($insertArgs['post_date']),
                 esc_html($dateTimeFormat)
@@ -265,7 +259,7 @@ class Helper
         ) {
             $endDate = DateTime::createFromFormat($dateTimeFormat, $insertArgs['meta_input']['einsatz_einsatzende']);
             if (false === $endDate) {
-                throw new Exception(sprintf(
+                throw new ImportPreparationException(sprintf(
                     'Das Einsatzende %s konnte mit dem angegebenen Format %s nicht eingelesen werden',
                     esc_html($insertArgs['meta_input']['einsatz_einsatzende']),
                     esc_html($dateTimeFormat)
@@ -305,13 +299,13 @@ class Helper
      * @param string $postStatus
      * @param array $preparedInsertArgs
      * @param array $yearsAffected
-     * @throws Exception
+     * @throws ImportPreparationException
      */
     public function prepareImport($source, $mapping, $postStatus, &$preparedInsertArgs, &$yearsAffected)
     {
         $sourceEntries = $source->getEntries(array_keys($mapping));
         if (empty($sourceEntries)) {
-            throw new Exception('Die Importquelle lieferte keine Ergebnisse. Entweder sind dort keine Eins&auml;tze gespeichert oder es gab ein Problem bei der Abfrage.');
+            throw new ImportPreparationException('Die Importquelle lieferte keine Ergebnisse. Entweder sind dort keine Eins&auml;tze gespeichert oder es gab ein Problem bei der Abfrage.');
         }
 
         $dateFormat = $source->getDateFormat();
@@ -411,7 +405,7 @@ class Helper
      * @param array $preparedInsertArgs
      * @param string $postStatus
      * @param array $yearsAffected
-     * @throws Exception
+     * @throws ImportException
      */
     public function runImport($preparedInsertArgs, $postStatus, $yearsAffected)
     {
@@ -425,7 +419,7 @@ class Helper
             // Neuen Beitrag anlegen
             $postId = wp_insert_post($insertArgs, true);
             if (is_wp_error($postId)) {
-                throw new Exception('Konnte Einsatz nicht importieren: ' . $postId->get_error_message());
+                throw new ImportException('Konnte Einsatz nicht importieren: ' . $postId->get_error_message());
             }
 
             $this->utilities->printInfo('Einsatz importiert, ID ' . $postId);

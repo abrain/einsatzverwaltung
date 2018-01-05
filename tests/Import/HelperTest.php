@@ -2,8 +2,8 @@
 namespace abrain\Einsatzverwaltung\Import;
 
 use abrain\Einsatzverwaltung\Core;
+use abrain\Einsatzverwaltung\Exceptions\ImportPreparationException;
 use DateTime;
-use Exception;
 
 /**
  * Class HelperTest
@@ -51,7 +51,12 @@ class HelperTest extends \WP_UnitTestCase
     public function testGetTaxInputStringForNT()
     {
         $input = 'term1, term78, term99';
-        $result = self::$helper->getTaxInputString('nohierarchy', $input);
+        try {
+            $result = self::$helper->getTaxInputString('nohierarchy', $input);
+        } catch (ImportPreparationException $e) {
+            $this->fail($e->getMessage());
+            return;
+        }
         $this->assertEquals($input, $result);
     }
 
@@ -73,7 +78,12 @@ class HelperTest extends \WP_UnitTestCase
         $exitingId = $term['term_id'];
 
         $input = implode(',', $terms);
-        $result = self::$helper->getTaxInputString('hierarchy', $input);
+        try {
+            $result = self::$helper->getTaxInputString('hierarchy', $input);
+        } catch (ImportPreparationException $e) {
+            $this->fail($e->getMessage());
+            return;
+        }
         $returnedIds = explode(',', $result);
         $this->assertCount(count($terms), $returnedIds);
 
@@ -100,7 +110,7 @@ class HelperTest extends \WP_UnitTestCase
 
         try {
             $returnedTermId = self::$helper->getTermId($termName, 'hierarchy');
-        } catch (Exception $e) {
+        } catch (ImportPreparationException $e) {
             $this->fail($e->getMessage());
             return;
         }
@@ -118,7 +128,7 @@ class HelperTest extends \WP_UnitTestCase
 
         try {
             $returnedTermId = self::$helper->getTermId($termName, 'hierarchy');
-        } catch (Exception $e) {
+        } catch (ImportPreparationException $e) {
             $this->fail($e->getMessage());
             return;
         }
@@ -156,7 +166,11 @@ class HelperTest extends \WP_UnitTestCase
             'f6' => ''
         );
 
-        self::$helper->mapEntryToInsertArgs($mapping, $entry, $insertArgs);
+        try {
+            self::$helper->mapEntryToInsertArgs($mapping, $entry, $insertArgs);
+        } catch (ImportPreparationException $e) {
+            $this->fail($e->getMessage());
+        }
 
         // Check post fields
         $this->assertArrayHasKey('somePostField', $insertArgs);
@@ -197,7 +211,7 @@ class HelperTest extends \WP_UnitTestCase
             $postStatus = 'draft';
             $alarmzeit = DateTime::createFromFormat('d.m.Y H:i', $insertArgs['post_date']);
             self::$helper->prepareArgsForInsertPost($insertArgs, 'Y/m-d H i', $postStatus, $alarmzeit);
-        } catch (Exception $e) {
+        } catch (ImportPreparationException $e) {
             $this->fail($e->getMessage());
         }
 
@@ -246,7 +260,7 @@ class HelperTest extends \WP_UnitTestCase
             $postStatus = 'publish';
             $alarmzeit = DateTime::createFromFormat('d.m.Y H:i', $insertArgs['post_date']);
             self::$helper->prepareArgsForInsertPost($insertArgs, 'Y/m-d H i', $postStatus, $alarmzeit);
-        } catch (Exception $e) {
+        } catch (ImportPreparationException $e) {
             $this->fail($e->getMessage());
         }
 

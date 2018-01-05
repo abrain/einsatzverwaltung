@@ -2,6 +2,8 @@
 namespace abrain\Einsatzverwaltung\Import;
 
 use abrain\Einsatzverwaltung\Data;
+use abrain\Einsatzverwaltung\Exceptions\ImportException;
+use abrain\Einsatzverwaltung\Exceptions\ImportPreparationException;
 use abrain\Einsatzverwaltung\Import\Sources\AbstractSource;
 use abrain\Einsatzverwaltung\Import\Sources\Csv;
 use abrain\Einsatzverwaltung\Import\Sources\WpEinsatz;
@@ -339,9 +341,18 @@ class Tool
             return;
         }
 
+        require_once dirname(dirname(__FILE__)) . '/Exceptions/ImportException.php';
+        require_once dirname(dirname(__FILE__)) . '/Exceptions/ImportPreparationException.php';
+
         // Import starten
         echo '<p>Die Daten werden eingelesen, das kann einen Moment dauern.</p>';
-        $this->helper->import($this->currentSource, $mapping);
+        try {
+            $this->helper->import($this->currentSource, $mapping);
+        } catch (ImportException $e) {
+            $this->utilities->printError('Import abgebrochen, Ursache: ' . $e->getMessage());
+        } catch (ImportPreparationException $e) {
+            $this->utilities->printError('Importvorbereitung abgebrochen, Ursache: ' . $e->getMessage());
+        }
     }
 
     private function printDataNotice()

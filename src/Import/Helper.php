@@ -92,11 +92,20 @@ class Helper
             return strcmp($field1['label'], $field2['label']);
         });
         $string = '<select name="' . $parsedArgs['name'] . '">';
-        $string .= '<option value="-"' . ($parsedArgs['selected'] == '-' ? ' selected="selected"' : '') . '>';
-        $string .= 'nicht importieren' . '</option>';
+        /** @noinspection HtmlUnknownAttribute */
+        $string .= sprintf(
+            '<option value="-" %s>%s</option>',
+            selected($parsedArgs['selected'], '-', false),
+            'nicht importieren'
+        );
         foreach ($fields as $slug => $fieldProperties) {
-            $string .= '<option value="' . $slug . '"' . ($parsedArgs['selected'] == $slug ? ' selected="selected"' : '') . '>';
-            $string .= $fieldProperties['label'] . '</option>';
+            /** @noinspection HtmlUnknownAttribute */
+            $string .= sprintf(
+                '<option value="%s" %s>%s</option>',
+                esc_attr($slug),
+                selected($parsedArgs['selected'], $slug, false),
+                esc_html($fieldProperties['label'])
+            );
         }
         $string .= '</select>';
 

@@ -333,16 +333,24 @@ class Tool
 
         require_once dirname(dirname(__FILE__)) . '/Exceptions/ImportException.php';
         require_once dirname(dirname(__FILE__)) . '/Exceptions/ImportPreparationException.php';
+        require_once dirname(__FILE__) . '/ImportStatus.php';
 
         // Import starten
         echo '<p>Die Daten werden eingelesen, das kann einen Moment dauern.</p>';
         try {
-            $this->helper->import($this->currentSource, $mapping);
+            $importStatus = new ImportStatus(0);
+            $this->helper->import($this->currentSource, $mapping, $importStatus);
         } catch (ImportException $e) {
-            $this->utilities->printError('Import abgebrochen, Ursache: ' . $e->getMessage());
+            $importStatus->abort('Import abgebrochen, Ursache: ' . $e->getMessage());
+            return;
         } catch (ImportPreparationException $e) {
-            $this->utilities->printError('Importvorbereitung abgebrochen, Ursache: ' . $e->getMessage());
+            $importStatus->abort('Importvorbereitung abgebrochen, Ursache: ' . $e->getMessage());
+            return;
         }
+
+        $this->utilities->printSuccess('Der Import ist abgeschlossen');
+        $url = admin_url('edit.php?post_type=einsatz');
+        printf('<a href="%s">Zu den Einsatzberichten</a>', $url);
     }
 
     private function printDataNotice()

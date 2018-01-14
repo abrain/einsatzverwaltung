@@ -219,10 +219,11 @@ class Helper
      *
      * @param AbstractSource $source
      * @param array $mapping Zuordnung zwischen zu importieren Feldern und denen der Einsatzverwaltung
+     * @param ImportStatus $importStatus
      * @throws ImportException
      * @throws ImportPreparationException
      */
-    public function import($source, $mapping)
+    public function import($source, $mapping, $importStatus)
     {
         set_time_limit(0); // Zeitlimit deaktivieren
 
@@ -232,10 +233,11 @@ class Helper
         // Den Import vorbereiten, um möglichst alle Fehler vorher abzufangen
         $this->prepareImport($source, $mapping, $preparedInsertArgs, $yearsAffected);
 
-        echo "<p>Daten eingelesen, starte den Import...</p>";
+        $importStatus->totalSteps = count($preparedInsertArgs);
+        $importStatus->displayMessage('Daten eingelesen, starte den Import...');
 
         // Den tatsächlichen Import starten
-        $this->runImport($preparedInsertArgs, $source, $yearsAffected);
+        $this->runImport($preparedInsertArgs, $source, $yearsAffected, $importStatus);
     }
 
     /**
@@ -413,9 +415,10 @@ class Helper
      * @param array $preparedInsertArgs
      * @param AbstractSource $source
      * @param array $yearsAffected
+     * @param ImportStatus $importStatus
      * @throws ImportException
      */
-    public function runImport($preparedInsertArgs, $source, $yearsAffected)
+    public function runImport($preparedInsertArgs, $source, $yearsAffected, $importStatus)
     {
         // Für die Dauer des Imports sollen die laufenden Nummern nicht aktuell gehalten werden, da dies die Performance
         // stark beeinträchtigt
@@ -430,23 +433,17 @@ class Helper
                 throw new ImportException('Konnte Einsatz nicht importieren: ' . $postId->get_error_message());
             }
 
-            $this->utilities->printInfo('Einsatz importiert, ID ' . $postId);
+            $importStatus->importSuccesss($postId);
         }
 
         if ($source->isPublishReports()) {
             // Die automatische Aktualisierung der laufenden Nummern wird wieder aufgenommen
-            $this->utilities->printSuccess('Die Berichte wurden importiert');
-            $this->utilities->printInfo('Metadaten werden aktualisiert ...');
-            flush();
             $this->data->resumeAutoSequenceNumbers();
             foreach (array_keys($yearsAffected) as $year) {
-                echo "<p>Aktualisiere laufende Nummern für das Jahr $year...</p>";
+                $importStatus->displayMessage(sprintf('Aktualisiere laufende Nummern für das Jahr %d...', $year));
                 $this->data->updateSequenceNumbers(strval($year));
             }
         }
-
-        $this->utilities->printSuccess('Der Import ist abgeschlossen');
-        echo '<a href="edit.php?post_type=einsatz">Zu den Einsatzberichten</a>';
     }
 
     /**

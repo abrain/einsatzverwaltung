@@ -108,7 +108,7 @@ class Settings
             'sanitize_title'
         );
         register_setting(
-            'einsatzvw_settings_general',
+            'einsatzvw_settings_numbers',
             'einsatzverwaltung_incidentnumbers_auto',
             array($this->utilities, 'sanitizeCheckbox')
         );

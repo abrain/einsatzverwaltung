@@ -388,6 +388,70 @@ class Core
         register_taxonomy('exteinsatzmittel', 'einsatz', $this->argsExteinsatzmittel);
         register_taxonomy('alarmierungsart', 'einsatz', $this->argsAlarmierungsart);
 
+        register_meta('post', 'einsatz_einsatzende', array(
+            'type' => 'string',
+            'description' => 'Datum und Uhrzeit, zu der der Einsatz endete.',
+            'single' => true,
+            'sanitize_callback' => array($this->data, 'sanitizeTimeOfEnding'),
+            'show_in_rest' => false
+        ));
+
+        register_meta('post', 'einsatz_einsatzleiter', array(
+            'type' => 'string',
+            'description' => 'Name der Person, die die Einsatzleitung innehatte.',
+            'single' => true,
+            'sanitize_callback' => 'sanitize_text_field',
+            'show_in_rest' => false
+        ));
+
+        register_meta('post', 'einsatz_einsatzort', array(
+            'type' => 'string',
+            'description' => 'Die Örtlichkeit, an der der Einsatz stattgefunden hat.',
+            'single' => true,
+            'sanitize_callback' => 'sanitize_text_field',
+            'show_in_rest' => false
+        ));
+
+        register_meta('post', 'einsatz_fehlalarm', array(
+            'type' => 'boolean',
+            'description' => 'Vermerk, ob es sich um einen Fehlalarm handelte.',
+            'single' => true,
+            'sanitize_callback' => array($this->utilities, 'sanitizeCheckbox'),
+            'show_in_rest' => false
+        ));
+
+        register_meta('post', 'einsatz_hasimages', array(
+            'type' => 'boolean',
+            'description' => 'Vermerk, ob der Einsatzbericht Bilder enthält.',
+            'single' => true,
+            'sanitize_callback' => array($this->utilities, 'sanitizeCheckbox'),
+            'show_in_rest' => false
+        ));
+
+        register_meta('post', 'einsatz_incidentNumber', array(
+            'type' => 'string',
+            'description' => 'Einsatznummer.',
+            'single' => true,
+            'sanitize_callback' => 'sanitize_text_field',
+            'show_in_rest' => false
+        ));
+
+        register_meta('post', 'einsatz_mannschaft', array(
+            'type' => 'string',
+            'description' => 'Angaben über die Personalstärke für diesen Einsatz.',
+            'single' => true,
+            'sanitize_callback' => 'sanitize_text_field',
+            'show_in_rest' => false
+        ));
+
+        register_meta('post', 'einsatz_special', array(
+            'type' => 'boolean',
+            'description' => 'Vermerk, ob es sich um einen besonderen Einsatzbericht handelt.',
+            'single' => true,
+            'sanitize_callback' => array($this->utilities, 'sanitizeCheckbox'),
+            'show_in_rest' => false
+        ));
+
         // Vermerke registrieren
         $annotationRepository = ReportAnnotationRepository::getInstance();
         $annotationRepository->addAnnotation(new ReportAnnotation(

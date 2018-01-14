@@ -9,7 +9,7 @@ jQuery(document).ready(function() {
     einsatzverwaltung_register_and_execute('keyup', 'meta_input\\[einsatz_einsatzende\\]', datumsregex, hinweistext, true);
 
     var used_values = jQuery("#einsatzleiter_used_values");
-    if (used_values.val() != undefined) {
+    if (used_values.val() !== undefined) {
         var einsatzleiter_namen = used_values.val().split(',');
         jQuery("#meta_input\\[einsatz_einsatzleiter\\]").autocomplete({
             source: einsatzleiter_namen
@@ -20,13 +20,9 @@ jQuery(document).ready(function() {
 function einsatzverwaltung_checkField(id, regex, msg, allowEmpty)
 {
     var field = jQuery('#' + id);
-    if(field.length != 0) {
+    if(field.length !== 0) {
         var val = field.val();
-        if((allowEmpty && val == "") || val.match(regex)) {
-            jQuery('#' + id + '_hint').html("");
-        } else {
-             jQuery('#' + id + '_hint').html(msg);
-        }
+        jQuery('#' + id + '_hint').html(((allowEmpty && val === "") || val.match(regex)) ? '' : msg);
     }
 }
 

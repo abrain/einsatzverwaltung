@@ -3,15 +3,15 @@ jQuery(document).ready(function() {
     var hinweistext = 'Bitte das folgende Format einhalten: JJJJ-MM-TT hh:mm, z.B. <strong>2014-01-31 13:37</strong>';
 
     jQuery('#einsatzverwaltung_alarmzeit').after('&nbsp;<span class="einsatzverwaltung_hint" id="einsatzverwaltung_alarmzeit_hint"></span>');
-    jQuery('#einsatzverwaltung_einsatzende').after('&nbsp;<span class="einsatzverwaltung_hint" id="einsatzverwaltung_einsatzende_hint"></span>');
+    jQuery('#meta_input\\[einsatz_einsatzende\\]').after('&nbsp;<span class="einsatzverwaltung_hint" id="meta_input[einsatz_einsatzende]_hint"></span>');
 
     einsatzverwaltung_register_and_execute('keyup', 'einsatzverwaltung_alarmzeit', datumsregex, hinweistext, false);
-    einsatzverwaltung_register_and_execute('keyup', 'einsatzverwaltung_einsatzende', datumsregex, hinweistext, true);
+    einsatzverwaltung_register_and_execute('keyup', 'meta_input\\[einsatz_einsatzende\\]', datumsregex, hinweistext, true);
 
     var used_values = jQuery("#einsatzleiter_used_values");
-    if (used_values.val() != undefined) {
+    if (used_values.val() !== undefined) {
         var einsatzleiter_namen = used_values.val().split(',');
-        jQuery("#einsatzverwaltung_einsatzleiter").autocomplete({
+        jQuery("#meta_input\\[einsatz_einsatzleiter\\]").autocomplete({
             source: einsatzleiter_namen
         });
     }
@@ -20,13 +20,9 @@ jQuery(document).ready(function() {
 function einsatzverwaltung_checkField(id, regex, msg, allowEmpty)
 {
     var field = jQuery('#' + id);
-    if(field.length != 0) {
+    if(field.length !== 0) {
         var val = field.val();
-        if((allowEmpty && val == "") || val.match(regex)) {
-            jQuery('#' + id + '_hint').html("");
-        } else {
-             jQuery('#' + id + '_hint').html(msg);
-        }
+        jQuery('#' + id + '_hint').html(((allowEmpty && val === "") || val.match(regex)) ? '' : msg);
     }
 }
 

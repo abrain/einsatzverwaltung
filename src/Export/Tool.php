@@ -62,7 +62,7 @@ class Tool
             if ($format) {
                 $startDate = @$_GET['export_filters']['start_date'];
                 $endDate = @$_GET['export_filters']['end_date'];
-                $exportOptions = (array)@$_GET['export_options'][$_GET['format']];
+                $exportOptions = stripslashes_deep((array)@$_GET['export_options'][$_GET['format']]);
 
                 $format->setFilters($startDate, $endDate);
                 $format->setOptions($exportOptions);

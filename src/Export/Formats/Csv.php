@@ -134,7 +134,7 @@ class Csv extends AbstractFormat
             $report = new IncidentReport($post);
             
             $duration = Data::getDauer($report);
-            if (!$duration) {
+            if (empty($duration)) {
                 $duration = 0;
             }
 

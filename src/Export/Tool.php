@@ -33,10 +33,7 @@ class Tool
     {
         add_action('admin_menu', array($this, 'addToolToMenu'));
 
-        // stelle sicher, dass der Benutzer über ausreichend Berechtigungen verfügt
-        if (is_admin()) {
-            add_action('init', array($this, 'startExport'));
-        }
+        add_action('init', array($this, 'startExport'));
     }
 
     /**
@@ -47,7 +44,7 @@ class Tool
         add_management_page(
             'Einsatzberichte exportieren',
             'Einsatzberichte exportieren',
-            'manage_options',
+            'export',
             self::EVW_TOOL_EXPORT_SLUG,
             array($this, 'renderToolPage')
         );
@@ -58,7 +55,7 @@ class Tool
      */
     public function startExport()
     {
-        if (@$_GET['page'] == self::EVW_TOOL_EXPORT_SLUG &&
+        if (current_user_can('export') && @$_GET['page'] == self::EVW_TOOL_EXPORT_SLUG &&
             @$_GET['download'] == true) {
             $format = @$this->formats[$_GET['format']];
  

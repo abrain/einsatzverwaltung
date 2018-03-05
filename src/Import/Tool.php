@@ -1,8 +1,9 @@
 <?php
 namespace abrain\Einsatzverwaltung\Import;
 
-use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\Data;
+use abrain\Einsatzverwaltung\Exceptions\ImportException;
+use abrain\Einsatzverwaltung\Exceptions\ImportPreparationException;
 use abrain\Einsatzverwaltung\Import\Sources\AbstractSource;
 use abrain\Einsatzverwaltung\Import\Sources\Csv;
 use abrain\Einsatzverwaltung\Import\Sources\WpEinsatz;
@@ -45,11 +46,6 @@ class Tool
     private $utilities;
 
     /**
-     * @var Core
-     */
-    private $core;
-
-    /**
      * @var Options
      */
     private $options;
@@ -62,24 +58,19 @@ class Tool
     /**
      * Konstruktor
      *
-     * @param Core $core
      * @param Utilities $utilities
      * @param Options $options
      * @param Data $data
      */
-    public function __construct($core, $utilities, $options, $data)
+    public function __construct($utilities, $options, $data)
     {
-        $this->core = $core;
         $this->utilities = $utilities;
         $this->options = $options;
-        $this->addHooks();
-        $this->loadSources();
         $this->data = $data;
-    }
 
-    private function addHooks()
-    {
         add_action('admin_menu', array($this, 'addToolToMenu'));
+
+        $this->loadSources();
     }
 
     /**
@@ -133,7 +124,10 @@ class Tool
     public function renderToolPage()
     {
         require_once dirname(__FILE__) . '/Helper.php';
-        $this->helper = new Helper($this->utilities, $this->core, $this->options, $this->data);
+        $this->helper = new Helper($this->utilities, $this->options, $this->data);
+        $this->helper->metaFields = IncidentReport::getMetaFields();
+        $this->helper->taxonomies = IncidentReport::getTerms();
+        $this->helper->postFields = IncidentReport::getPostFields();
 
         echo '<div class="wrap">';
         echo '<h1>' . 'Einsatzberichte importieren' . '</h1>';
@@ -196,10 +190,10 @@ class Tool
             }
         }
 
-        // Datums- und Zeitformat für CSV-Import übernehmen
+        // 'Sofort veröffentlichen'-Option übernehmen
         $this->currentSource->putArg(
-                'import_publish_reports',
-                $this->utilities->sanitizeCheckbox(array($_POST, 'import_publish_reports'))
+            'import_publish_reports',
+            $this->utilities->sanitizeCheckbox(array($_POST, 'import_publish_reports'))
         );
 
         echo "<h2>{$this->currentAction['name']}</h2>";
@@ -249,6 +243,7 @@ class Tool
             <label><input type="radio" name="delimiter" value=";" checked="checked"><code>;</code> Semikolon</label>
             &nbsp;<label><input type="radio" name="delimiter" value=","><code>,</code> Komma</label>
             <p class="description">Meist werden die Spalten mit einem Semikolon voneinander getrennt. Wenn du unsicher bist, solltest du die CSV-Datei mit einem Texteditor &ouml;ffnen und nachsehen.</p>
+            <p class="description">Als Feldbegrenzerzeichen (umschlie&szlig;t ggf. den Inhalt einer Spalte) wird das Anf&uuml;hrungszeichen <code>&quot;</code> erwartet.</p>
             <?php
             echo '<input type="hidden" name="aktion" value="' . $this->currentSource->getActionAttribute($this->nextAction['slug']) . '" />';
             submit_button($this->nextAction['button_text']);
@@ -287,9 +282,6 @@ class Tool
 
         // Einsätze zählen
         $entries = $this->currentSource->getEntries(null);
-        if (false === $entries) {
-            return;
-        }
         if (empty($entries)) {
             $this->utilities->printWarning('Es wurden keine Eins&auml;tze gefunden.');
             return;
@@ -302,10 +294,6 @@ class Tool
 
         // Felder matchen
         echo "<h3>Felder zuordnen</h3>";
-        if (false === $this->nextAction) {
-            $this->utilities->printError('Keine Nachfolgeaktion gefunden!');
-            return;
-        }
 
         $this->helper->renderMatchForm($this->currentSource, array(
             'nonce_action' => $this->getNonceAction($this->currentSource, $this->nextAction['slug']),
@@ -343,9 +331,26 @@ class Tool
             return;
         }
 
+        require_once dirname(dirname(__FILE__)) . '/Exceptions/ImportException.php';
+        require_once dirname(dirname(__FILE__)) . '/Exceptions/ImportPreparationException.php';
+        require_once dirname(__FILE__) . '/ImportStatus.php';
+
         // Import starten
         echo '<p>Die Daten werden eingelesen, das kann einen Moment dauern.</p>';
-        $this->helper->import($this->currentSource, $mapping);
+        try {
+            $importStatus = new ImportStatus(0);
+            $this->helper->import($this->currentSource, $mapping, $importStatus);
+        } catch (ImportException $e) {
+            $importStatus->abort('Import abgebrochen, Ursache: ' . $e->getMessage());
+            return;
+        } catch (ImportPreparationException $e) {
+            $importStatus->abort('Importvorbereitung abgebrochen, Ursache: ' . $e->getMessage());
+            return;
+        }
+
+        $this->utilities->printSuccess('Der Import ist abgeschlossen');
+        $url = admin_url('edit.php?post_type=einsatz');
+        printf('<a href="%s">Zu den Einsatzberichten</a>', $url);
     }
 
     private function printDataNotice()

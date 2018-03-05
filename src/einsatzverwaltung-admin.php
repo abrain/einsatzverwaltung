@@ -151,21 +151,21 @@ class Admin
 
         $this->echoInputCheckbox(
             'Fehlalarm',
-            'einsatzverwaltung_fehlalarm',
+            'meta_input[einsatz_fehlalarm]',
             $report->isFalseAlarm()
         );
         echo '<br>';
 
         $this->echoInputCheckbox(
             'Besonderer Einsatz',
-            'einsatzverwaltung_special',
+            'meta_input[einsatz_special]',
             $report->isSpecial()
         );
         echo '<br>';
 
         $this->echoInputCheckbox(
             'Bilder im Bericht',
-            'einsatzverwaltung_hasimages',
+            'meta_input[einsatz_hasimages]',
             $report->hasImages()
         );
     }
@@ -214,7 +214,7 @@ class Admin
 
         $this->echoInputText(
             'Einsatzende',
-            'einsatzverwaltung_einsatzende',
+            'meta_input[einsatz_einsatzende]',
             esc_attr($einsatzende),
             'JJJJ-MM-TT hh:mm'
         );
@@ -223,19 +223,19 @@ class Admin
 
         $this->echoInputText(
             'Einsatzort',
-            'einsatzverwaltung_einsatzort',
+            'meta_input[einsatz_einsatzort]',
             esc_attr($einsatzort)
         );
 
         $this->echoInputText(
             'Einsatzleiter',
-            'einsatzverwaltung_einsatzleiter',
+            'meta_input[einsatz_einsatzleiter]',
             esc_attr($einsatzleiter)
         );
 
         $this->echoInputText(
             'Mannschaftsst&auml;rke',
-            'einsatzverwaltung_mannschaft',
+            'meta_input[einsatz_mannschaft]',
             esc_attr($mannschaftsstaerke)
         );
 

@@ -3,6 +3,9 @@ namespace abrain\Einsatzverwaltung\Export\Formats;
 
 /**
  * Exportiert Einsatzberichte in eine für Excel formatierte CSV-Datei.
+ *
+ * Die escapeChar-Funktion wurde erst einmal auskommentiert, da diese PHP >=5.5.4
+ * voraussetzt, das Plugin jedoch auch unter PHP <5.4 laufen soll.
  */
 class Excel extends Csv
 {
@@ -34,7 +37,7 @@ class Excel extends Csv
     {
         $this->delimiter = ';';
         $this->enclosure = '"';
-        $this->escape_char = '\\';
+        // $this->escapeChar = '\\';
         $this->header = (boolean)@$options['columns'];
     }
 }

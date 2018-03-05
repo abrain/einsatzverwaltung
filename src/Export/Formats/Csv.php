@@ -6,6 +6,9 @@ use abrain\Einsatzverwaltung\Data;
 
 /**
  * Exportiert Einsatzberichte in eine CSV-Datei.
+ *
+ * Die escapeChar-Funktion wurde erst einmal auskommentiert, da diese PHP >=5.5.4
+ * voraussetzt, das Plugin jedoch auch unter PHP <5.4 laufen soll. 
  */
 class Csv extends AbstractFormat
 {
@@ -22,7 +25,7 @@ class Csv extends AbstractFormat
     /**
      * @var string
      */
-    protected $escapeChar;
+    // protected $escapeChar;
 
     /**
      * @var boolean
@@ -55,12 +58,12 @@ class Csv extends AbstractFormat
                 <input name="export_options[csv][enclosure]" type="text" value="&quot;" required="required">
             </label>
         </li>
-        <li>
+        <!--<li>
             <label>
                 <span class="label-responsive">Spalten escaped mit:</span>
                 <input name="export_options[csv][escapeChar]" type="text" value=";" required="required">
             </label>
-        </li>
+        </li>-->
         <li>
             <input type="checkbox" name="export_options[csv][headers]" id="csv_headers" value="1" checked="checked">
             <label for="csv_headers">Spaltennamen in die erste Zeile setzen</label>
@@ -81,10 +84,10 @@ class Csv extends AbstractFormat
         if (empty($this->enclosure)) {
             $this->enclosure = '"';
         }
-        $this->escapeChar = @$options['escapeChar'];
-        if (empty($this->escapeChar)) {
-            $this->escapeChar = '\\';
-        }
+        // $this->escapeChar = @$options['escapeChar'];
+        // if (empty($this->escapeChar)) {
+        //     $this->escapeChar = '\\';
+        // }
         $this->headers = (boolean)@$options['headers'];
     }
 
@@ -125,7 +128,7 @@ class Csv extends AbstractFormat
                 'Besonderer Einsatz',
                 'Fehlalarm'
             );
-            fputcsv($handle, $data, $this->delimiter, $this->enclosure, $this->escapeChar);
+            fputcsv($handle, $data, $this->delimiter, $this->enclosure/*, $this->escapeChar*/);
         }
 
         $query = $this->getQuery();
@@ -160,7 +163,7 @@ class Csv extends AbstractFormat
                ($report->isSpecial() ? 'Ja' : 'Nein'),
                ($report->isFalseAlarm() ? 'Ja' : 'Nein'),
             );
-            fputcsv($handle, $data, $this->delimiter, $this->enclosure, $this->escapeChar);
+            fputcsv($handle, $data, $this->delimiter, $this->enclosure/*, $this->escapeChar*/);
         }
 
         fclose($handle);

@@ -6,6 +6,9 @@ use abrain\Einsatzverwaltung\Data;
 
 /**
  * Exportiert Einsatzberichte in eine JSON-Datei.
+ *
+ * Die prettyPrint-Funktion wurde erst einmal auskommentiert, da diese PHP >=5.4
+ * voraussetzt, das Plugin jedoch auch unter PHP <5.4 laufen soll. 
  */
 class Json extends AbstractFormat
 {

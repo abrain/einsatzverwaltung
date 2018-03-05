@@ -22,10 +22,6 @@ class Tool
 
     /**
      * Konstruktor
-     *
-     * @param Core $core
-     * @param Utilities $utilities
-     * @param Options $options
      */
     public function __construct()
     {

@@ -315,7 +315,7 @@ class Core
 
         // Tools
         $this->importTool = new ImportTool($this->utilities, $this->options, $this->data);
-        $this->exportTool = new ExportTool($this, $this->utilities, $this->options);
+        $this->exportTool = new ExportTool();
         $this->tasksPage = new TasksPage($this->utilities, $this->data);
 
         // Widgets

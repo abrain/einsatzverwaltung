@@ -89,7 +89,7 @@ class Json extends AbstractFormat
 
             $typeOfIncident = $report->getTypeOfIncident();
             // $typeOfIncident soll stets ein String sein
-            if (!$typeOfIncident) {
+            if (empty($typeOfIncident)) {
                 $typeOfIncident = '';
             }
     

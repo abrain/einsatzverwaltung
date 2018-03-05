@@ -139,7 +139,7 @@ class Csv extends AbstractFormat
             }
 
             $typeOfIncident = $report->getTypeOfIncident();
-            if (!$typeOfIncident) {
+            if (empty($typeOfIncident)) {
                 $typeOfIncident = '';
             }
 

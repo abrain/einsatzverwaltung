@@ -12,7 +12,7 @@ class Json extends AbstractFormat
     /**
      * @var boolean
      */
-    protected $prettyPrint;
+    // protected $prettyPrint;
 
     /**
      * @inheritDoc
@@ -27,14 +27,14 @@ class Json extends AbstractFormat
      */
     public function renderOptions()
     {
-        ?>
+ /*       ?>
         <li>
             <input type="checkbox" name="export_options[json][prettyPrint]" id="json_pretty_print" value="1">
             <label for="json_pretty_print">
                 Mit Whitespace formatiertes JSON ausgeben (Menschenlesbares Format verwenden)
             </label>
         </li>
-<?php
+<?php */
     }
 
     /**
@@ -50,7 +50,7 @@ class Json extends AbstractFormat
      */
     public function setOptions(array $options)
     {
-        $this->prettyPrint = (boolean)@$options['prettyPrint'];
+        // $this->prettyPrint = (boolean)@$options['prettyPrint'];
     }
 
     /**
@@ -65,15 +65,15 @@ class Json extends AbstractFormat
     public function export()
     {
         $options = 0;
-        // verwende ggf. menschenlesbares Format für die Ausgabe
-        if ($this->prettyPrint) {
-            $options = JSON_PRETTY_PRINT;
-        }
+        // // verwende ggf. menschenlesbares Format für die Ausgabe
+        // if ($this->prettyPrint) {
+        //     $options = JSON_PRETTY_PRINT;
+        // }
 
         echo '[';
-        if ($this->prettyPrint) {
-            echo "\n";
-        }
+        // if ($this->prettyPrint) {
+        //     echo "\n";
+        // }
 
         $query = $this->getQuery();
         while ($query->have_posts()) {
@@ -120,11 +120,11 @@ class Json extends AbstractFormat
                 $output .= ',';
             }
 
-            // rücke die JSON-Ausgabe des Einsatzberichtes ein, falls die Ausgabe
-            // menschenlesbar formatiert werden soll
-            if ($this->prettyPrint) {
-                $output = preg_replace("/^(.*)$/m", "    $1", $output) . "\n";
-            }
+            // // rücke die JSON-Ausgabe des Einsatzberichtes ein, falls die Ausgabe
+            // // menschenlesbar formatiert werden soll
+            // if ($this->prettyPrint) {
+            //     $output = preg_replace("/^(.*)$/m", "    $1", $output) . "\n";
+            // }
 
             echo $output;
         }

@@ -43,7 +43,7 @@ abstract class AbstractFormat implements Format
         // Exportiere nur die Einsatzberichte, welche nicht vor $startDate und/oder
         // nach $endDate liegen
         if ($this->startDate || $this->endDate) {
-            $args['date_query'] = array('inclusive' => true);
+            $args['date_query'] = array();
 
             if ($this->startDate) {
                 $args['date_query']['after'] = date('Y-m-d', strtotime($this->startDate));

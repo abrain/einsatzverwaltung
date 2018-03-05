@@ -83,7 +83,7 @@ class Json extends AbstractFormat
 
             $duration = Data::getDauer($report);
             // $duration soll stets eine Zahl sein
-            if (!$duration) {
+            if (empty($duration)) {
                 $duration = 0;
             }
 

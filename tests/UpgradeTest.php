@@ -347,4 +347,27 @@ class UpgradeTest extends WP_UnitTestCase
         self::assertInternalType('array', get_option('einsatzverwaltung_admin_notices'));
         self::assertContains('regenerateSlugs', get_option('einsatzverwaltung_admin_notices'));
     }
+
+    public function testUpgrade134()
+    {
+        $reportFactory = new ReportFactory();
+        $reportIds = $reportFactory->create_many(5);
+        delete_post_meta($reportIds[1], 'einsatz_special');
+        delete_post_meta($reportIds[4], 'einsatz_special');
+        update_post_meta($reportIds[3], 'einsatz_special', 1);
+
+        self::assertEquals(0, get_post_meta($reportIds[0], 'einsatz_special', true));
+        self::assertEquals('', get_post_meta($reportIds[1], 'einsatz_special', true));
+        self::assertEquals(0, get_post_meta($reportIds[2], 'einsatz_special', true));
+        self::assertEquals(1, get_post_meta($reportIds[3], 'einsatz_special', true));
+        self::assertEquals('', get_post_meta($reportIds[4], 'einsatz_special', true));
+
+        $this->runUpgrade(20, 21);
+
+        self::assertEquals(0, get_post_meta($reportIds[0], 'einsatz_special', true));
+        self::assertEquals(0, get_post_meta($reportIds[1], 'einsatz_special', true));
+        self::assertEquals(0, get_post_meta($reportIds[2], 'einsatz_special', true));
+        self::assertEquals(1, get_post_meta($reportIds[3], 'einsatz_special', true));
+        self::assertEquals(0, get_post_meta($reportIds[4], 'einsatz_special', true));
+    }
 }

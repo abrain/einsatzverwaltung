@@ -97,6 +97,10 @@ class Update
         if ($currentDbVersion < 20 && $targetDbVersion >= 20) {
             $this->upgrade130();
         }
+
+        if ($currentDbVersion < 21 && $targetDbVersion >= 21) {
+            $this->upgrade134();
+        }
     }
 
     /**
@@ -309,6 +313,27 @@ class Update
         $this->addAdminNotice('regenerateSlugs');
 
         update_option('einsatzvw_db_version', 20);
+    }
+
+    /**
+     * Adds a defined value (0) to the `special` annotation for all reports that did not have a value before
+     *
+     * @since 1.3.4
+     */
+    private function upgrade134()
+    {
+        /** @var wpdb $wpdb */
+        global $wpdb;
+
+        $postIds = $wpdb->get_col("SELECT ID FROM $wpdb->posts WHERE post_type = 'einsatz'");
+        $hasMetaKey = $wpdb->get_col("SELECT post_id FROM $wpdb->postmeta WHERE meta_key = 'einsatz_special'");
+        $idsWithoutMetaKey = array_diff($postIds, $hasMetaKey);
+
+        foreach ($idsWithoutMetaKey as $id) {
+            add_post_meta($id, 'einsatz_special', 0, true);
+        }
+
+        update_option('einsatzvw_db_version', 21);
     }
 
     /**

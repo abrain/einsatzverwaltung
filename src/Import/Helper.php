@@ -255,6 +255,10 @@ class Helper
                 $metaValues['einsatz_mannschaft'] = sanitize_text_field($metaValues['einsatz_mannschaft']);
             }
 
+            if (empty($metaValues) || !array_key_exists('einsatz_special', $metaValues) || empty($metaValues['einsatz_special'])) {
+                $metaValues['einsatz_special'] = '0';
+            }
+
             // Neuen Beitrag anlegen
             $postId = wp_insert_post($insertArgs, true);
             if (is_wp_error($postId)) {

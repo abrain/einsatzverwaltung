@@ -237,7 +237,7 @@ class Formatter
             $name = $vehicle->name;
 
             if ($makeLinks) {
-                $pageid = Taxonomies::getTermField($vehicle->term_id, 'fahrzeug', 'fahrzeugpid');
+                $pageid = Taxonomies::getTermField($vehicle->term_id, 'fahrzeugpid');
                 if (!empty($pageid)) {
                     $pageurl = get_permalink($pageid);
                     if ($pageurl !== false) {
@@ -279,7 +279,7 @@ class Formatter
             $name = $force->name;
 
             if ($makeLinks) {
-                $url = Taxonomies::getTermField($force->term_id, 'exteinsatzmittel', 'url');
+                $url = Taxonomies::getTermField($force->term_id, 'url');
                 if (!empty($url)) {
                     $openInNewWindow = $this->options->isOpenExtEinsatzmittelNewWindow();
                     $name = '<a href="'.$url.'" title="Mehr Informationen zu '.$force->name.'"';

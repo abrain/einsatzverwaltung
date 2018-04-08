@@ -345,7 +345,7 @@ class IncidentReport
                 continue;
             }
 
-            $vehicleOrder = Taxonomies::getTermField($vehicle->term_id, 'fahrzeug', 'vehicleorder');
+            $vehicleOrder = Taxonomies::getTermField($vehicle->term_id, 'vehicleorder');
             if (!empty($vehicleOrder)) {
                 $vehicle->vehicle_order = $vehicleOrder;
             }

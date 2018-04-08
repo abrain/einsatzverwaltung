@@ -61,7 +61,7 @@ class Taxonomies
      */
     public function addFieldsExteinsatzmittelEdit($tag)
     {
-        $exteinsatzmittelUrl = self::getTermField($tag->term_id, 'exteinsatzmittel', 'url', '');
+        $exteinsatzmittelUrl = self::getTermField($tag->term_id, 'url', '');
 
         echo '<tr class="form-field">';
         echo '<th scope="row"><label for="url">URL</label></th>';
@@ -96,7 +96,7 @@ class Taxonomies
      */
     public function addFieldsFahrzeugEdit($tag)
     {
-        $fahrzeugPid = self::getTermField($tag->term_id, 'fahrzeug', 'fahrzeugpid', '');
+        $fahrzeugPid = self::getTermField($tag->term_id, 'fahrzeugpid', '');
 
         echo '<tr class="form-field">';
         echo '<th scope="row"><label for="fahrzeugpid">Fahrzeugseite</label></th><td>';
@@ -107,7 +107,7 @@ class Taxonomies
         ));
         echo '<p class="description">Seite mit mehr Informationen &uuml;ber das Fahrzeug. Wird in Einsatzberichten mit diesem Fahrzeug verlinkt.</p></td></tr>';
 
-        $vehicleOrder = self::getTermField($tag->term_id, 'fahrzeug', 'vehicleorder', 0);
+        $vehicleOrder = self::getTermField($tag->term_id, 'vehicleorder', 0);
         echo '<tr class="form-field">';
         echo '<th scope="row"><label for="tag-vehicleorder">Reihenfolge</label></th><td>';
         echo '<input id="tag-vehicleorder" type="number" min="0" value="' . esc_attr($vehicleOrder) . '" name="vehicleorder">';
@@ -156,7 +156,7 @@ class Taxonomies
     {
         switch ($columnName) {
             case 'fahrzeugpage':
-                $fahrzeugpid = self::getTermField($termId, 'fahrzeug', 'fahrzeugpid');
+                $fahrzeugpid = self::getTermField($termId, 'fahrzeugpid');
                 if (empty($fahrzeugpid)) {
                     return '&nbsp;';
                 }
@@ -171,7 +171,7 @@ class Taxonomies
                 );
                 break;
             case 'vehicleorder':
-                $vehicleOrder = self::getTermField($termId, 'fahrzeug', 'vehicleorder');
+                $vehicleOrder = self::getTermField($termId, 'vehicleorder');
                 return (empty($vehicleOrder) ? '&nbsp;' : esc_html($vehicleOrder));
                 break;
             default:
@@ -216,7 +216,7 @@ class Taxonomies
      */
     public function columnContentExteinsatzmittel($string, $columnName, $termId)
     {
-        $url = self::getTermField($termId, 'exteinsatzmittel', 'url');
+        $url = self::getTermField($termId, 'url');
         if (empty($url)) {
             return '&nbsp;';
         }
@@ -254,14 +254,13 @@ class Taxonomies
     /**
      * Liefert den Wert eines zusätzlich angelegten Feldes zurück
      *
-     * @param $termId
-     * @param $taxonomy
-     * @param $field
+     * @param int $termId
+     * @param string $field
      * @param mixed $default
      *
-     * @return mixed|void
+     * @return mixed
      */
-    public static function getTermField($termId, $taxonomy, $field, $default = false)
+    public static function getTermField($termId, $field, $default = false)
     {
         $termMeta = get_term_meta($termId, $field, true);
         return (false === $termMeta ? $default : $termMeta);

@@ -22,6 +22,7 @@ jQuery(document).ready(function() {
     });
 
     // Color picker initialisieren
-    jQuery('#zebra-color-picker').iris();
-    jQuery('#annotationoff-color-picker').iris();
+    if ( jQuery.isFunction( jQuery.fn.wpColorPicker ) ) {
+        jQuery( 'input.einsatzverwaltung-color-picker' ).wpColorPicker();
+    }
 });

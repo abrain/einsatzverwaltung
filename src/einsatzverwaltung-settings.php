@@ -373,6 +373,21 @@ class Settings
         );
     }
 
+    /**
+     * Gibt den von WordPress mitgelieferten Colorpicker aus
+     *
+     * @param string $optionName Name der Einstellung
+     * @param string $defaultValue Der Standardwert, der im Colorpicker angeboten werden soll
+     */
+    private function echoColorPicker($optionName, $defaultValue)
+    {
+        printf(
+            '<input type="text" name="%1$s" class="einsatzverwaltung-color-picker" value="%2$s" data-default-color="%3$s" />',
+            esc_attr($optionName),
+            esc_attr(get_option($optionName, $defaultValue)),
+            esc_attr($defaultValue)
+        );
+    }
 
     /**
      * Gibt eine Checkbox auf der Einstellungsseite aus
@@ -631,7 +646,8 @@ class Settings
 
     public function echoEinsatzlisteAnnotationsSettings()
     {
-        echo '<p>Farbe f&uuml;r inaktive Vermerke: <input type="text" size="7" id="annotationoff-color-picker" name="einsatzvw_list_annotations_color_off" value="' . esc_attr(get_option('einsatzvw_list_annotations_color_off', AnnotationIconBar::DEFAULT_COLOR_OFF)) . '" /></p>';
+        echo '<p>Farbe f&uuml;r inaktive Vermerke:</p>';
+        $this->echoColorPicker('einsatzvw_list_annotations_color_off', AnnotationIconBar::DEFAULT_COLOR_OFF);
         echo '<p class="description">Diese Farbe wird f&uuml;r die Symbole von inaktiven Vermerken verwendet, die von aktiven werden in der Textfarbe Deines Themes dargestellt. Anzugeben ist der Farbwert in Hexadezimalschreibweise (3- oder 6-stellig) mit f&uuml;hrendem #-Zeichen.</p>';
     }
 
@@ -644,7 +660,8 @@ class Settings
         );
         echo '<p class="description">Die Zeilen der Tabelle werden abwechselnd eingef&auml;rbt, um die Lesbarkeit zu verbessern. Wenn das Theme das ebenfalls tut, sollte diese Option deaktiviert werden, um Probleme bei der Darstellung zu vermeiden.</p>';
 
-        echo '<p>Farbe f&uuml;r Zebrastreifen: <input type="text" size="7" id="zebra-color-picker" name="einsatzvw_list_zebracolor" value="' . $this->reportListSettings->getZebraColor() . '" /></p>';
+        echo '<p>Farbe f&uuml;r Zebrastreifen:</p>';
+        $this->echoColorPicker('einsatzvw_list_zebracolor', ReportListSettings::DEFAULT_ZEBRACOLOR);
         echo '<p class="description">Diese Farbe wird f&uuml;r jede zweite Zeile verwendet, die jeweils andere Zeile wird vom Theme eingef&auml;rbt. Anzugeben ist der Farbwert in Hexadezimalschreibweise (3- oder 6-stellig) mit f&uuml;hrendem #-Zeichen.</p>';
 
         echo '<p><fieldset><label><input type="radio" name="einsatzvw_list_zebra_nth" value="even" ';

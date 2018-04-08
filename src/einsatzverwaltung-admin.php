@@ -121,9 +121,10 @@ class Admin
             wp_enqueue_script(
                 'einsatzverwaltung-settings-script',
                 $this->core->scriptUrl . 'einsatzverwaltung-settings.js',
-                array('jquery-ui-draggable', 'jquery-ui-droppable', 'jquery-ui-sortable', 'iris'),
+                array('jquery-ui-draggable', 'jquery-ui-droppable', 'jquery-ui-sortable', 'wp-color-picker'),
                 Core::VERSION
             );
+            wp_enqueue_style('wp-color-picker');
         }
 
         wp_enqueue_style(

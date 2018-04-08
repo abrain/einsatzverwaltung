@@ -420,5 +420,5 @@ Kein Upgrade, sondern die erste Version
 == Social Media ==
 
 * Twitter: [@einsatzvw](https://twitter.com/einsatzvw)
+* Mastodon: [@einsatzverwaltung](https://chaos.social/@einsatzverwaltung)
 * Facebook: [Einsatzverwaltung](https://www.facebook.com/einsatzverwaltung/)
-* GNU social: [@einsatzverwaltung](https://gnusocial.abrain.de/einsatzverwaltung)

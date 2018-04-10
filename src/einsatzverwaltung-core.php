@@ -15,12 +15,14 @@ require_once dirname(__FILE__) . '/einsatzverwaltung-options.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-shortcodes.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-settings.php';
 require_once dirname(__FILE__) . '/Import/Tool.php';
-require_once dirname(__FILE__) . '/einsatzverwaltung-taxonomies.php';
 require_once dirname(__FILE__) . '/Frontend/ReportList.php';
 require_once dirname(__FILE__) . '/Frontend/ReportListSettings.php';
 require_once dirname(__FILE__) . '/ReportQuery.php';
 require_once dirname(__FILE__) . '/TasksPage.php';
+require_once dirname(__FILE__) . '/TaxonomyCustomFields.php';
 
+use abrain\Einsatzverwaltung\CustomFields\ColorPicker;
+use abrain\Einsatzverwaltung\CustomFields\TextInput;
 use abrain\Einsatzverwaltung\Import\Tool as ImportTool;
 use abrain\Einsatzverwaltung\Model\ReportAnnotation;
 use abrain\Einsatzverwaltung\Util\Formatter;
@@ -304,7 +306,6 @@ class Core
         $this->frontend = new Frontend($this, $this->options, $this->utilities, $formatter);
         $this->settings = new Settings($this, $this->options, $this->utilities, $this->data);
         $this->shortcodes = new Shortcodes($this->utilities, $this, $this->options, $formatter);
-        $this->taxonomies = new Taxonomies($this->utilities);
 
         // Tools
         $this->importTool = new ImportTool($this->utilities, $this->options, $this->data);
@@ -477,6 +478,18 @@ class Core
             '',
             'Fehlalarm',
             'Kein Fehlalarm'
+        ));
+
+        $taxonomyCustomFields = new TaxonomyCustomFields();
+        $taxonomyCustomFields->addTextInput('exteinsatzmittel', new TextInput(
+            'url',
+            'URL',
+            'URL zu mehr Informationen &uuml;ber ein externes Einsatzmittel, beispielsweise dessen Webseite.'
+        ));
+        $taxonomyCustomFields->addColorpicker('einsatzart', new ColorPicker(
+            'color',
+            'Farbe',
+            'Beschreibung'
         ));
     }
 
@@ -681,14 +694,6 @@ class Core
     public function getShortcodes()
     {
         return $this->shortcodes;
-    }
-
-    /**
-     * @return Taxonomies
-     */
-    public function getTaxonomies()
-    {
-        return $this->taxonomies;
     }
 
     /**

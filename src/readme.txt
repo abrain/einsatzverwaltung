@@ -5,7 +5,7 @@ Tags: Feuerwehr, Hilfsorganisation, Öffentlichkeitsarbeit
 Requires at least: 4.4.0
 Tested up to: 4.9
 Requires PHP: 5.3
-Stable tag: 1.3.4
+Stable tag: 1.3.5
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -71,6 +71,9 @@ Das Du halte ich f&uuml;r die angenehmere Arbeitsgrundlage, aber man darf mich g
 Nein, mehr gibt es [hier](https://einsatzverwaltung.abrain.de/faq/).
 
 == Changelog ==
+
+= 1.3.5 =
+* Unn&ouml;tige Dateien aus Font Awesome entfernt
 
 = 1.3.4 =
 * Fehler behoben, bei dem importierte Einsatzberichte, die nicht als besonders markiert waren, auf der Startseite angezeigt wurden, obwohl dort nur als besonders markierte auftauchen sollten

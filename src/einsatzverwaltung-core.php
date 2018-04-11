@@ -21,6 +21,7 @@ require_once dirname(__FILE__) . '/ReportQuery.php';
 require_once dirname(__FILE__) . '/TasksPage.php';
 
 use abrain\Einsatzverwaltung\CustomFields\ColorPicker;
+use abrain\Einsatzverwaltung\CustomFields\PostSelector;
 use abrain\Einsatzverwaltung\CustomFields\TextInput;
 use abrain\Einsatzverwaltung\Import\Tool as ImportTool;
 use abrain\Einsatzverwaltung\Model\ReportAnnotation;
@@ -482,6 +483,7 @@ class Core
         require dirname(__FILE__) . '/TaxonomyCustomFields.php';
         require dirname(__FILE__) . '/CustomFields/CustomField.php';
         require dirname(__FILE__) . '/CustomFields/ColorPicker.php';
+        require dirname(__FILE__) . '/CustomFields/PostSelector.php';
         require dirname(__FILE__) . '/CustomFields/TextInput.php';
 
         $taxonomyCustomFields = new TaxonomyCustomFields();
@@ -494,6 +496,12 @@ class Core
             'color',
             'Farbe',
             'Beschreibung' // TODO
+        ));
+        $taxonomyCustomFields->addPostSelector('fahrzeug', new PostSelector(
+            'fahrzeugpid',
+            'Fahrzeugseite',
+            'Seite mit mehr Informationen &uuml;ber das Fahrzeug. Wird in Einsatzberichten mit diesem Fahrzeug verlinkt.',
+            array('einsatz', 'attachment')
         ));
     }
 

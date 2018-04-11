@@ -3,6 +3,7 @@ namespace abrain\Einsatzverwaltung;
 
 use abrain\Einsatzverwaltung\CustomFields\ColorPicker;
 use abrain\Einsatzverwaltung\CustomFields\CustomField;
+use abrain\Einsatzverwaltung\CustomFields\PostSelector;
 use abrain\Einsatzverwaltung\CustomFields\TextInput;
 
 /**
@@ -43,6 +44,15 @@ class TaxonomyCustomFields
     public function addColorpicker($taxonomy, ColorPicker $colorPicker)
     {
         $this->add($taxonomy, $colorPicker);
+    }
+
+    /**
+     * @param string $taxonomy The slug of the taxonomy.
+     * @param PostSelector $postSelector
+     */
+    public function addPostSelector($taxonomy, PostSelector $postSelector)
+    {
+        $this->add($taxonomy, $postSelector);
     }
 
     /**

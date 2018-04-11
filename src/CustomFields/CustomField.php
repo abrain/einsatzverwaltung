@@ -1,6 +1,10 @@
 <?php
 namespace abrain\Einsatzverwaltung\CustomFields;
 
+/**
+ * Base class for additional fields of taxonomies
+ * @package abrain\Einsatzverwaltung\CustomFields
+ */
 class CustomField
 {
     public $key;

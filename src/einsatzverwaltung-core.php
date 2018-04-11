@@ -19,7 +19,6 @@ require_once dirname(__FILE__) . '/Frontend/ReportList.php';
 require_once dirname(__FILE__) . '/Frontend/ReportListSettings.php';
 require_once dirname(__FILE__) . '/ReportQuery.php';
 require_once dirname(__FILE__) . '/TasksPage.php';
-require_once dirname(__FILE__) . '/TaxonomyCustomFields.php';
 
 use abrain\Einsatzverwaltung\CustomFields\ColorPicker;
 use abrain\Einsatzverwaltung\CustomFields\TextInput;
@@ -480,6 +479,11 @@ class Core
             'Kein Fehlalarm'
         ));
 
+        require dirname(__FILE__) . '/TaxonomyCustomFields.php';
+        require dirname(__FILE__) . '/CustomFields/CustomField.php';
+        require dirname(__FILE__) . '/CustomFields/ColorPicker.php';
+        require dirname(__FILE__) . '/CustomFields/TextInput.php';
+
         $taxonomyCustomFields = new TaxonomyCustomFields();
         $taxonomyCustomFields->addTextInput('exteinsatzmittel', new TextInput(
             'url',
@@ -489,7 +493,7 @@ class Core
         $taxonomyCustomFields->addColorpicker('einsatzart', new ColorPicker(
             'color',
             'Farbe',
-            'Beschreibung'
+            'Beschreibung' // TODO
         ));
     }
 

@@ -1,8 +1,20 @@
 <?php
 namespace abrain\Einsatzverwaltung\CustomFields;
 
+/**
+ * Represents an additional color picker of a taxonomy
+ * @package abrain\Einsatzverwaltung\CustomFields
+ */
 class ColorPicker extends CustomField
 {
+    /**
+     * @inheritDoc
+     */
+    public function __construct($key, $label, $description, $defaultValue = '')
+    {
+        parent::__construct($key, $label, $description, $defaultValue);
+    }
+
     /**
      * @inheritdoc
      */
@@ -10,9 +22,9 @@ class ColorPicker extends CustomField
     {
         return sprintf(
             '<div class="form-field"><label for="tag-%1$s">%2$s</label><input id="tag-%1$s" type="text" value="" name="%1$s" class="einsatzverwaltung-color-picker" /><p>%3$s</p></div>',
-            $this->key,
-            $this->label,
-            $this->description
+            esc_attr($this->key),
+            esc_html($this->label),
+            esc_html($this->description)
         );
     }
 
@@ -31,5 +43,4 @@ class ColorPicker extends CustomField
             esc_attr($value)
         );
     }
-
 }

@@ -21,10 +21,6 @@ class TaxonomyCustomFields
      */
     public function __construct()
     {
-        require 'CustomFields/CustomField.php';
-        require 'CustomFields/ColorPicker.php';
-        require 'CustomFields/TextInput.php';
-
         $this->fields = array();
 
         add_action('edited_term', array($this, 'saveTerm'), 10, 3);

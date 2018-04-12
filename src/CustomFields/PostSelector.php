@@ -22,45 +22,6 @@ class PostSelector extends CustomField
     }
 
     /**
-     * @inheritdoc
-     */
-    public function getAddTermMarkup()
-    {
-        return sprintf(
-            '<div class="form-field"><label for="tag-%1$s">%2$s</label>%4$s<p>%3$s</p></div>',
-            esc_attr($this->key),
-            esc_html($this->label),
-            esc_html($this->description),
-            $this->dropdownPosts(array(
-                'echo' => false,
-                'name' => 'fahrzeugpid',
-                'post_type' => $this->getDropdownPostTypes()
-            ))
-        );
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getEditTermMarkup($tag)
-    {
-        $value = $this->getValue($tag->term_id);
-
-        return sprintf(
-            '<tr class="form-field"><th scope="row"><label for="%1$s">%2$s</label></th><td>%4$s<p class="description">%3$s</p></td></tr>',
-            esc_attr($this->key),
-            esc_html($this->label),
-            esc_html($this->description),
-            $this->dropdownPosts(array(
-                'echo' => false,
-                'selected' => $value,
-                'name' => 'fahrzeugpid',
-                'post_type' => $this->getDropdownPostTypes()
-            ))
-        );
-    }
-
-    /**
      * @return array
      */
     private function getDropdownPostTypes()
@@ -142,5 +103,30 @@ class PostSelector extends CustomField
         }
 
         return $string;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getAddTermInput()
+    {
+        return $this->dropdownPosts(array(
+            'echo' => false,
+            'name' => 'fahrzeugpid',
+            'post_type' => $this->getDropdownPostTypes()
+        ));
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getEditTermInput($tag)
+    {
+        return $this->dropdownPosts(array(
+            'echo' => false,
+            'selected' => $this->getValue($tag->term_id),
+            'name' => 'fahrzeugpid',
+            'post_type' => $this->getDropdownPostTypes()
+        ));
     }
 }

@@ -5,7 +5,7 @@ namespace abrain\Einsatzverwaltung\CustomFields;
  * Base class for additional fields of taxonomies
  * @package abrain\Einsatzverwaltung\CustomFields
  */
-class CustomField
+abstract class CustomField
 {
     public $key;
     protected $label;
@@ -32,7 +32,13 @@ class CustomField
      */
     public function getAddTermMarkup()
     {
-        return '<span class="evw_error">NOT IMPLEMENTED</span>';
+        return sprintf(
+            '<div class="form-field"><label for="tag-%1$s">%2$s</label>%4$s<p>%3$s</p></div>',
+            esc_attr($this->key),
+            esc_html($this->label),
+            esc_html($this->description),
+            $this->getAddTermInput()
+        );
     }
 
     /**
@@ -41,7 +47,13 @@ class CustomField
      */
     public function getEditTermMarkup($tag)
     {
-        return '<span class="evw_error">NOT IMPLEMENTED</span>';
+        return sprintf(
+            '<tr class="form-field"><th scope="row"><label for="%1$s">%2$s</label></th><td>%4$s<p class="description">%3$s</p></td></tr>',
+            esc_attr($this->key),
+            esc_html($this->label),
+            esc_html($this->description),
+            $this->getEditTermInput($tag)
+        );
     }
 
     /**
@@ -53,4 +65,7 @@ class CustomField
         $termMeta = get_term_meta($termId, $this->key, true);
         return (false === $termMeta ? $this->defaultValue : $termMeta);
     }
+
+    abstract function getAddTermInput();
+    abstract function getEditTermInput($tag);
 }

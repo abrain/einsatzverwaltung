@@ -128,9 +128,7 @@ class TaxonomyCustomFields
         foreach ($this->fields[$taxonomy] as $field) {
             $value = filter_input(INPUT_POST, $field->key, FILTER_SANITIZE_STRING);
 
-            if (!empty($value)) {
-                update_term_meta($termId, $field->key, $value);
-            }
+            update_term_meta($termId, $field->key, empty($value) ? $field->defaultValue : $value);
         }
     }
 }

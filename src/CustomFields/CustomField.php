@@ -8,9 +8,9 @@ namespace abrain\Einsatzverwaltung\CustomFields;
 abstract class CustomField
 {
     public $key;
-    protected $label;
-    protected $description;
-    protected $defaultValue;
+    public $label;
+    public $description;
+    public $defaultValue;
 
     /**
      * CustomField constructor.

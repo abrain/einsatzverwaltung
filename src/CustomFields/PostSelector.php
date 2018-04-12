@@ -112,7 +112,7 @@ class PostSelector extends CustomField
     {
         return $this->dropdownPosts(array(
             'echo' => false,
-            'name' => 'fahrzeugpid',
+            'name' => $this->key,
             'post_type' => $this->getDropdownPostTypes()
         ));
     }
@@ -125,7 +125,7 @@ class PostSelector extends CustomField
         return $this->dropdownPosts(array(
             'echo' => false,
             'selected' => $this->getValue($tag->term_id),
-            'name' => 'fahrzeugpid',
+            'name' => $this->key,
             'post_type' => $this->getDropdownPostTypes()
         ));
     }

@@ -21,6 +21,7 @@ require_once dirname(__FILE__) . '/ReportQuery.php';
 require_once dirname(__FILE__) . '/TasksPage.php';
 
 use abrain\Einsatzverwaltung\CustomFields\ColorPicker;
+use abrain\Einsatzverwaltung\CustomFields\NumberInput;
 use abrain\Einsatzverwaltung\CustomFields\PostSelector;
 use abrain\Einsatzverwaltung\CustomFields\TextInput;
 use abrain\Einsatzverwaltung\Import\Tool as ImportTool;
@@ -483,6 +484,7 @@ class Core
         require dirname(__FILE__) . '/TaxonomyCustomFields.php';
         require dirname(__FILE__) . '/CustomFields/CustomField.php';
         require dirname(__FILE__) . '/CustomFields/ColorPicker.php';
+        require dirname(__FILE__) . '/CustomFields/NumberInput.php';
         require dirname(__FILE__) . '/CustomFields/PostSelector.php';
         require dirname(__FILE__) . '/CustomFields/TextInput.php';
 
@@ -502,6 +504,11 @@ class Core
             'Fahrzeugseite',
             'Seite mit mehr Informationen &uuml;ber das Fahrzeug. Wird in Einsatzberichten mit diesem Fahrzeug verlinkt.',
             array('einsatz', 'attachment')
+        ));
+        $taxonomyCustomFields->addNumberInput('fahrzeug', new NumberInput(
+            'vehicleorder',
+            'Reihenfolge',
+            'Optionale Angabe, mit der die Anzeigereihenfolge der Fahrzeuge beeinflusst werden kann. Fahrzeuge mit der kleineren Zahl werden zuerst angezeigt, anschlie&szlig;end diejenigen ohne Angabe bzw. dem Wert 0 in alphabetischer Reihenfolge.'
         ));
     }
 

@@ -37,4 +37,12 @@ class TextInput extends CustomField
             esc_attr($this->getValue($tag->term_id))
         );
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getColumnContent($termId)
+    {
+        return esc_html($this->getValue($termId));
+    }
 }

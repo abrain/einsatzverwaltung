@@ -75,9 +75,11 @@ class TaxonomyCustomFields
             $this->fields[$taxonomy] = array();
             add_action("{$taxonomy}_add_form_fields", array($this, 'onAddFormFields'));
             add_action("{$taxonomy}_edit_form_fields", array($this, 'onEditFormFields'), 10, 2);
+            add_action("manage_edit-{$taxonomy}_columns", array($this, 'onCustomColumns'));
+            add_action("manage_{$taxonomy}_custom_column", array($this, 'onColumnContent'), 10, 3);
         }
 
-        $this->fields[$taxonomy][] = $customField;
+        $this->fields[$taxonomy][$customField->key] = $customField;
     }
 
     /**
@@ -109,6 +111,65 @@ class TaxonomyCustomFields
         foreach ($this->fields[$taxonomy] as $field) {
             echo $field->getEditTermMarkup($tag);
         }
+    }
+
+    public function onCustomColumns($columns)
+    {
+        $screen = get_current_screen();
+
+        if (empty($screen)) {
+            return $columns;
+        }
+
+        $taxonomy = $screen->taxonomy;
+        if (!array_key_exists($taxonomy, $this->fields) || !is_array($this->fields[$taxonomy])) {
+            return $columns;
+        }
+
+        $filteredColumns = array();
+
+        foreach ($columns as $slug => $name) {
+            $filteredColumns[$slug] = $name;
+            if ($slug == 'description') {
+                /** @var CustomField $field */
+                foreach ($this->fields[$taxonomy] as $field) {
+                    $filteredColumns[$field->key] = $field->label;
+                }
+            }
+        }
+
+        return $filteredColumns;
+    }
+
+    /**
+     * Filterfunktion für den Inhalt der selbst angelegten Spalten
+     *
+     * @param string $string Leerer String.
+     * @param string $columnName Name der Spalte
+     * @param int $termId Term ID
+     *
+     * @return string Inhalt der Spalte
+     */
+    public function onColumnContent($string, $columnName, $termId)
+    {
+        $term = get_term($termId);
+        if (empty($term) || is_wp_error($term)) {
+            return '';
+        }
+
+        $taxonomy = $term->taxonomy;
+        if (!array_key_exists($taxonomy, $this->fields) || !is_array($this->fields[$taxonomy])) {
+            return '';
+        }
+
+        $fields = $this->fields[$taxonomy];
+        if (!array_key_exists($columnName, $fields)) {
+            return '';
+        }
+
+        /** @var CustomField $customField */
+        $customField = $fields[$columnName];
+        return $customField->getColumnContent($termId);
     }
 
     /**

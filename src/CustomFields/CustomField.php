@@ -28,7 +28,7 @@ abstract class CustomField
     }
 
     /**
-     * @return string
+     * @return string The markup for the form field shown when adding a new term.
      */
     public function getAddTermMarkup()
     {
@@ -42,8 +42,8 @@ abstract class CustomField
     }
 
     /**
-     * @param object $tag
-     * @return string
+     * @param object $tag Current taxonomy term object.
+     * @return string The markup for the form field shown when editing an existing term.
      */
     public function getEditTermMarkup($tag)
     {
@@ -66,6 +66,20 @@ abstract class CustomField
         return (false === $termMeta ? $this->defaultValue : $termMeta);
     }
 
-    abstract function getAddTermInput();
-    abstract function getEditTermInput($tag);
+    /**
+     * @return string The markup for the input shown when adding a new term.
+     */
+    abstract public function getAddTermInput();
+
+    /**
+     * @param int $termId
+     * @return string
+     */
+    abstract public function getColumnContent($termId);
+
+    /**
+     * @param object $tag Current taxonomy term object.
+     * @return string The markup for the input shown when editing an existing term.
+     */
+    abstract public function getEditTermInput($tag);
 }

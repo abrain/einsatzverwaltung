@@ -37,4 +37,20 @@ class ColorPicker extends CustomField
             esc_attr($this->getValue($tag->term_id))
         );
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getColumnContent($termId)
+    {
+        $value = $this->getValue($termId);
+        if (empty($value)) {
+            return '';
+        }
+
+        return sprintf(
+            '<div style="width: 20px; height: 20px; border: 1px solid black; background-color: %s">&nbsp;</div>',
+            esc_attr($value)
+        );
+    }
 }

@@ -129,4 +129,24 @@ class PostSelector extends CustomField
             'post_type' => $this->getDropdownPostTypes()
         ));
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getColumnContent($termId)
+    {
+        $postId = $this->getValue($termId);
+
+        if (empty($postId)) {
+            return '';
+        }
+
+        $title = get_the_title($postId);
+        return sprintf(
+            '<a href="%1$s" title="&quot;%2$s&quot; ansehen" target="_blank">%3$s</a>',
+            get_permalink($postId),
+            esc_attr($title),
+            esc_html($title)
+        );
+    }
 }

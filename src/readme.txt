@@ -4,8 +4,8 @@ Donate link: https://einsatzverwaltung.abrain.de/unterstuetzen/
 Tags: Feuerwehr, Hilfsorganisation, Öffentlichkeitsarbeit
 Requires at least: 4.6.0
 Tested up to: 4.9
-Requires PHP: 5.3
-Stable tag: 1.3.3
+Requires PHP: 5.3.0
+Stable tag: 1.3.5
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -72,6 +72,12 @@ Nein, mehr gibt es [hier](https://einsatzverwaltung.abrain.de/faq/).
 
 == Changelog ==
 
+= 1.3.5 =
+* Unn&ouml;tige Dateien aus Font Awesome entfernt
+
+= 1.3.4 =
+* Fehler behoben, bei dem importierte Einsatzberichte, die nicht als besonders markiert waren, auf der Startseite angezeigt wurden, obwohl dort nur als besonders markierte auftauchen sollten
+
 = 1.3.3 =
 * Kompatibilit&auml;tsproblem mit "Page Builder by SiteOrigin" behoben
 * Getestet mit WordPress 4.9
@@ -103,5 +109,5 @@ Nein, mehr gibt es [hier](https://einsatzverwaltung.abrain.de/faq/).
 == Social Media ==
 
 * Twitter: [@einsatzvw](https://twitter.com/einsatzvw)
+* Mastodon: [@einsatzverwaltung](https://chaos.social/@einsatzverwaltung)
 * Facebook: [Einsatzverwaltung](https://www.facebook.com/einsatzverwaltung/)
-* GNU social: [@einsatzverwaltung](https://gnusocial.abrain.de/einsatzverwaltung)

@@ -121,16 +121,17 @@ class Admin
             wp_enqueue_script(
                 'einsatzverwaltung-settings-script',
                 $this->core->scriptUrl . 'einsatzverwaltung-settings.js',
-                array('jquery-ui-draggable', 'jquery-ui-droppable', 'jquery-ui-sortable', 'iris'),
+                array('jquery-ui-draggable', 'jquery-ui-droppable', 'jquery-ui-sortable', 'wp-color-picker'),
                 Core::VERSION
             );
+            wp_enqueue_style('wp-color-picker');
         }
 
         wp_enqueue_style(
             'font-awesome',
             $this->core->pluginUrl . 'font-awesome/css/font-awesome.min.css',
             false,
-            '4.4.0'
+            '4.7.0'
         );
         wp_enqueue_style(
             'einsatzverwaltung-admin',

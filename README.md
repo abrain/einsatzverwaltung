@@ -30,5 +30,5 @@ Auch wenn PHP 5.3 vorausgesetzt und derzeit noch als Minimum erhalten wird, werd
 ### Social Media
 
 * Twitter: [@einsatzvw](https://twitter.com/einsatzvw)
+* Mastodon: [@einsatzverwaltung](https://chaos.social/@einsatzverwaltung)
 * Facebook: [Einsatzverwaltung](https://www.facebook.com/einsatzverwaltung/)
-* GNU social: [@einsatzverwaltung](https://gnusocial.abrain.de/einsatzverwaltung)

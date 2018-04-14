@@ -99,8 +99,8 @@ li.dropzone {
 }
 
 .aboutpage-icon {
-    width: 24%;
     display: inline-block;
+    padding: 10px;
 }
 
 .aboutpage-icon a {

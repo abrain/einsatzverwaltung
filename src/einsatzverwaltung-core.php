@@ -503,7 +503,7 @@ class Core
             'fahrzeugpid',
             'Fahrzeugseite',
             'Seite mit mehr Informationen &uuml;ber das Fahrzeug. Wird in Einsatzberichten mit diesem Fahrzeug verlinkt.',
-            array('einsatz', 'attachment')
+            array('einsatz', 'attachment', 'ai1ec_event', 'tribe_events')
         ));
         $taxonomyCustomFields->addNumberInput('fahrzeug', new NumberInput(
             'vehicleorder',

@@ -52,7 +52,13 @@ class Frontend
     private function addHooks()
     {
         add_action('wp_enqueue_scripts', array($this, 'enqueueStyleAndScripts'));
-        add_filter('the_content', array($this, 'renderContent'));
+        if (!(
+            is_array($_REQUEST) &&
+            array_key_exists('plugin', $_REQUEST) && $_REQUEST['plugin'] == 'all-in-one-event-calendar' &&
+            array_key_exists('action', $_REQUEST) && $_REQUEST['action'] == 'export_events'
+        )) {
+            add_filter('the_content', array($this, 'renderContent'));
+        }
         add_filter('the_excerpt', array($this, 'filterEinsatzExcerpt'));
         add_filter('the_excerpt_rss', array($this, 'filterEinsatzExcerptFeed'));
         add_action('pre_get_posts', array($this, 'addReportsToQuery'));

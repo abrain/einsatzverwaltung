@@ -33,7 +33,7 @@ use WP_User;
  */
 class Core
 {
-    const VERSION = '1.3.5';
+    const VERSION = '1.3.6';
     const DB_VERSION = 21;
 
    /**

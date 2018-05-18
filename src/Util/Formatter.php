@@ -90,6 +90,9 @@ class Formatter
         switch ($tag) {
             case '%title%':
                 $replace = get_the_title($post);
+                if (empty($replace)) {
+                    $replace = '(kein Titel)';
+                }
                 break;
             case '%date%':
                 $replace = date_i18n($this->options->getDateFormat(), $timeOfAlerting->getTimestamp());

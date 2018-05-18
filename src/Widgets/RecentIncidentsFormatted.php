@@ -28,6 +28,7 @@ class RecentIncidentsFormatted extends WP_Widget
             'rel' => true,
             'rev' => true,
             'name' => true,
+            'style' => true,
             'target' => true,
         ),
         'abbr' => array(),
@@ -38,24 +39,30 @@ class RecentIncidentsFormatted extends WP_Widget
             'class' => true,
             'dir' => true,
             'lang' => true,
+            'style' => true,
             'xml:lang' => true,
         ),
         'h3' => array(
             'align' => true,
+            'style' => true
         ),
         'h4' => array(
             'align' => true,
+            'style' => true
         ),
         'h5' => array(
             'align' => true,
+            'style' => true
         ),
         'h6' => array(
             'align' => true,
+            'style' => true
         ),
         'hr' => array(
             'align' => true,
             'noshade' => true,
             'size' => true,
+            'style' => true,
             'width' => true,
         ),
         'i' => array(
@@ -73,11 +80,13 @@ class RecentIncidentsFormatted extends WP_Widget
             'longdesc' => true,
             'vspace' => true,
             'src' => true,
+            'style' => true,
             'width' => true,
         ),
         'li' => array(
             'align' => true,
             'class' => true,
+            'style' => true,
             'value' => true,
         ),
         'p' => array(
@@ -85,6 +94,7 @@ class RecentIncidentsFormatted extends WP_Widget
             'class' => true,
             'dir' => true,
             'lang' => true,
+            'style' => true,
             'xml:lang' => true,
         ),
         'span' => array(
@@ -92,15 +102,18 @@ class RecentIncidentsFormatted extends WP_Widget
             'align' => true,
             'class' => true,
             'lang' => true,
+            'style' => true,
             'xml:lang' => true,
         ),
         'ul' => array(
             'class' => true,
+            'style' => true,
             'type' => true,
         ),
         'ol' => array(
             'class' => true,
             'start' => true,
+            'style' => true,
             'type' => true,
         ),
     );

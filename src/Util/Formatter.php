@@ -9,6 +9,7 @@ use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\Taxonomies;
 use abrain\Einsatzverwaltung\Utilities;
 use WP_Post;
+use WP_Term;
 
 /**
  * Formatierungen aller Art
@@ -102,6 +103,9 @@ class Formatter
             case '%incidentType%':
                 $replace = $this->getTypeOfIncident($incidentReport, false, false, false);
                 break;
+            case '%incidentTypeColor%':
+                $replace = $this->getColorOfTypeOfIncident($incidentReport->getTypeOfIncident());
+                break;
             case '%url%':
                 $replace = get_permalink($post->ID);
                 break;
@@ -128,6 +132,29 @@ class Formatter
     }
 
     /**
+     * @param WP_Term|false $typeOfIncident
+     * @return string
+     */
+    public function getColorOfTypeOfIncident($typeOfIncident)
+    {
+        if (empty($typeOfIncident)) {
+            return 'inherit';
+        }
+
+        $color = get_term_meta($typeOfIncident->term_id, 'color', true);
+        while (empty($color) && $typeOfIncident->parent !== 0) {
+            $typeOfIncident = WP_Term::get_instance($typeOfIncident->parent);
+            $color = get_term_meta($typeOfIncident->term_id, 'color', true);
+        }
+
+        if (empty($color)) {
+            return 'inherit';
+        }
+
+        return $color;
+    }
+
+    /**
      * @return array Ersetzbare Tags und ihre Beschreibungen
      */
     public function getTags()
@@ -138,6 +165,7 @@ class Formatter
             '%time%' => 'Zeitpunkt der Alarmierung',
             '%duration%' => 'Dauer des Einsatzes',
             '%incidentType%' => 'Art des Einsatzes',
+            '%incidentTypeColor%' => 'Farbe der Art des Einsatzes',
             '%url%' => 'URL zum Einsatzbericht',
             '%location%' => 'Ort des Einsatzes',
             '%feedUrl%' => 'URL zum Feed',

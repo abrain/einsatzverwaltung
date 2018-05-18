@@ -5,6 +5,7 @@ namespace abrain\Einsatzverwaltung\Model;
 use abrain\Einsatzverwaltung\Taxonomies;
 use DateTime;
 use WP_Post;
+use WP_Term;
 
 /**
  * Datenmodellklasse für Einsatzberichte
@@ -312,7 +313,7 @@ class IncidentReport
      * Gibt die Einsatzart eines bestimmten Einsatzes zurück. Auch wenn die Taxonomie 'einsatzart' mehrere Werte
      * speichern kann, wird nur der erste zurückgegeben.
      *
-     * @return object|false
+     * @return WP_Term|false
      */
     public function getTypeOfIncident()
     {

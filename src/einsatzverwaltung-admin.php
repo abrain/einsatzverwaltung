@@ -121,10 +121,9 @@ class Admin
             wp_enqueue_script(
                 'einsatzverwaltung-settings-script',
                 $this->core->scriptUrl . 'einsatzverwaltung-settings.js',
-                array('jquery-ui-draggable', 'jquery-ui-droppable', 'jquery-ui-sortable', 'wp-color-picker'),
+                array('jquery-ui-draggable', 'jquery-ui-droppable', 'jquery-ui-sortable'),
                 Core::VERSION
             );
-            wp_enqueue_style('wp-color-picker');
         }
 
         wp_enqueue_style(
@@ -139,6 +138,13 @@ class Admin
             array(),
             Core::VERSION
         );
+        wp_enqueue_script(
+            'einsatzverwaltung-admin-script',
+            $this->core->scriptUrl . 'einsatzverwaltung-admin.js',
+            array('wp-color-picker'),
+            Core::VERSION
+        );
+        wp_enqueue_style('wp-color-picker');
     }
 
     /**

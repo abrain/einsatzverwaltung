@@ -15,7 +15,7 @@ class TermmetaTest extends WP_UnitTestCase
     public function testCreateTerm()
     {
         $wpCreateTerm = wp_create_term('testterm', 'exteinsatzmittel');
-        $this->assertEmpty(Taxonomies::getTermField($wpCreateTerm['term_id'], 'exteinsatzmittel', 'url'));
+        $this->assertEmpty(Taxonomies::getTermField($wpCreateTerm['term_id'], 'url'));
     }
 
     public function testCreateTermWithMeta()
@@ -23,7 +23,7 @@ class TermmetaTest extends WP_UnitTestCase
         $url = 'http://www.example.org';
         $_POST['url'] = $url;
         $wpCreateTerm = wp_create_term('testterm', 'exteinsatzmittel');
-        $this->assertEquals($url, Taxonomies::getTermField($wpCreateTerm['term_id'], 'exteinsatzmittel', 'url'));
+        $this->assertEquals($url, Taxonomies::getTermField($wpCreateTerm['term_id'], 'url'));
     }
 
     public function testEditTerm()
@@ -32,17 +32,17 @@ class TermmetaTest extends WP_UnitTestCase
         $url1 = 'http://www.example.org';
         $_POST['url'] = $url1;
         wp_update_term($wpCreateTerm['term_id'], 'exteinsatzmittel');
-        $this->assertEquals($url1, Taxonomies::getTermField($wpCreateTerm['term_id'], 'exteinsatzmittel', 'url'));
+        $this->assertEquals($url1, Taxonomies::getTermField($wpCreateTerm['term_id'], 'url'));
 
         $url2 = '';
         $_POST['url'] = $url2;
         wp_update_term($wpCreateTerm['term_id'], 'exteinsatzmittel');
-        $this->assertEmpty(Taxonomies::getTermField($wpCreateTerm['term_id'], 'exteinsatzmittel', 'url'));
+        $this->assertEmpty(Taxonomies::getTermField($wpCreateTerm['term_id'], 'url'));
 
         $url3 = 'http://www.example.com';
         $_POST['url'] = $url3;
         wp_update_term($wpCreateTerm['term_id'], 'exteinsatzmittel');
-        $this->assertEquals($url3, Taxonomies::getTermField($wpCreateTerm['term_id'], 'exteinsatzmittel', 'url'));
+        $this->assertEquals($url3, Taxonomies::getTermField($wpCreateTerm['term_id'], 'url'));
     }
 
     public function testDeleteTerm()
@@ -50,9 +50,9 @@ class TermmetaTest extends WP_UnitTestCase
         $url = 'http://www.example.org';
         $_POST['url'] = $url;
         $wpCreateTerm = wp_create_term('testterm', 'exteinsatzmittel');
-        $this->assertEquals($url, Taxonomies::getTermField($wpCreateTerm['term_id'], 'exteinsatzmittel', 'url'));
+        $this->assertEquals($url, Taxonomies::getTermField($wpCreateTerm['term_id'], 'url'));
 
         wp_delete_term($wpCreateTerm['term_id'], 'exteinsatzmittel');
-        $this->assertEmpty(Taxonomies::getTermField($wpCreateTerm['term_id'], 'exteinsatzmittel', 'url'));
+        $this->assertEmpty(Taxonomies::getTermField($wpCreateTerm['term_id'], 'url'));
     }
 }

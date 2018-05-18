@@ -9,6 +9,7 @@ use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\Taxonomies;
 use abrain\Einsatzverwaltung\Utilities;
 use WP_Post;
+use WP_Term;
 
 /**
  * Formatierungen aller Art
@@ -89,6 +90,9 @@ class Formatter
         switch ($tag) {
             case '%title%':
                 $replace = get_the_title($post);
+                if (empty($replace)) {
+                    $replace = '(kein Titel)';
+                }
                 break;
             case '%date%':
                 $replace = date_i18n($this->options->getDateFormat(), $timeOfAlerting->getTimestamp());
@@ -101,6 +105,9 @@ class Formatter
                 break;
             case '%incidentType%':
                 $replace = $this->getTypeOfIncident($incidentReport, false, false, false);
+                break;
+            case '%incidentTypeColor%':
+                $replace = $this->getColorOfTypeOfIncident($incidentReport->getTypeOfIncident());
                 break;
             case '%url%':
                 $replace = get_permalink($post->ID);
@@ -128,6 +135,29 @@ class Formatter
     }
 
     /**
+     * @param WP_Term|false $typeOfIncident
+     * @return string
+     */
+    public function getColorOfTypeOfIncident($typeOfIncident)
+    {
+        if (empty($typeOfIncident)) {
+            return 'inherit';
+        }
+
+        $color = get_term_meta($typeOfIncident->term_id, 'color', true);
+        while (empty($color) && $typeOfIncident->parent !== 0) {
+            $typeOfIncident = WP_Term::get_instance($typeOfIncident->parent);
+            $color = get_term_meta($typeOfIncident->term_id, 'color', true);
+        }
+
+        if (empty($color)) {
+            return 'inherit';
+        }
+
+        return $color;
+    }
+
+    /**
      * @return array Ersetzbare Tags und ihre Beschreibungen
      */
     public function getTags()
@@ -138,6 +168,7 @@ class Formatter
             '%time%' => 'Zeitpunkt der Alarmierung',
             '%duration%' => 'Dauer des Einsatzes',
             '%incidentType%' => 'Art des Einsatzes',
+            '%incidentTypeColor%' => 'Farbe der Art des Einsatzes',
             '%url%' => 'URL zum Einsatzbericht',
             '%location%' => 'Ort des Einsatzes',
             '%feedUrl%' => 'URL zum Feed',
@@ -237,7 +268,7 @@ class Formatter
             $name = $vehicle->name;
 
             if ($makeLinks) {
-                $pageid = Taxonomies::getTermField($vehicle->term_id, 'fahrzeug', 'fahrzeugpid');
+                $pageid = Taxonomies::getTermField($vehicle->term_id, 'fahrzeugpid');
                 if (!empty($pageid)) {
                     $pageurl = get_permalink($pageid);
                     if ($pageurl !== false) {
@@ -279,7 +310,7 @@ class Formatter
             $name = $force->name;
 
             if ($makeLinks) {
-                $url = Taxonomies::getTermField($force->term_id, 'exteinsatzmittel', 'url');
+                $url = Taxonomies::getTermField($force->term_id, 'url');
                 if (!empty($url)) {
                     $openInNewWindow = $this->options->isOpenExtEinsatzmittelNewWindow();
                     $name = '<a href="'.$url.'" title="Mehr Informationen zu '.$force->name.'"';

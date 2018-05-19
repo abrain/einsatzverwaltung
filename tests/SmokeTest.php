@@ -17,9 +17,9 @@ class SmokeTest extends \PHPUnit_Framework_TestCase
         $phpHeader = $fileData['PHPmin'];
 
         $buildDir = getenv('TRAVIS_BUILD_DIR');
-        $prefix = $buildDir === false ? '' : '$TRAVIS_BUILD_DIR/vendor/bin/';
+        $prefix = $buildDir === false ? '.' : '$TRAVIS_BUILD_DIR';
 
-        $lastLine = exec($prefix . 'phpcompatinfo --no-ansi analyser:run src/');
+        $lastLine = exec($prefix . '/vendor/bin/phpcompatinfo --no-ansi analyser:run src/');
         $this->assertEquals(1, preg_match('/Requires PHP (\d\.\d\.\d) \(min\)/', $lastLine, $matches));
         $actualRequirement = $matches[1];
 

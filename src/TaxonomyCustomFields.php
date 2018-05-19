@@ -113,6 +113,12 @@ class TaxonomyCustomFields
         }
     }
 
+    /**
+     * Fügt für die zusätzlichen Felder zusätzliche Spalten in der Übersicht ein
+     *
+     * @param array $columns
+     * @return array
+     */
     public function onCustomColumns($columns)
     {
         $screen = get_current_screen();

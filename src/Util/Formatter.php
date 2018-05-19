@@ -6,7 +6,6 @@ use abrain\Einsatzverwaltung\Data;
 use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Options;
-use abrain\Einsatzverwaltung\Taxonomies;
 use abrain\Einsatzverwaltung\Utilities;
 use WP_Post;
 use WP_Term;
@@ -268,7 +267,7 @@ class Formatter
             $name = $vehicle->name;
 
             if ($makeLinks) {
-                $pageid = Taxonomies::getTermField($vehicle->term_id, 'fahrzeugpid');
+                $pageid = get_term_meta($vehicle->term_id, 'fahrzeugpid', true);
                 if (!empty($pageid)) {
                     $pageurl = get_permalink($pageid);
                     if ($pageurl !== false) {
@@ -310,7 +309,7 @@ class Formatter
             $name = $force->name;
 
             if ($makeLinks) {
-                $url = Taxonomies::getTermField($force->term_id, 'url');
+                $url = get_term_meta($force->term_id, 'url', true);
                 if (!empty($url)) {
                     $openInNewWindow = $this->options->isOpenExtEinsatzmittelNewWindow();
                     $name = '<a href="'.$url.'" title="Mehr Informationen zu '.$force->name.'"';

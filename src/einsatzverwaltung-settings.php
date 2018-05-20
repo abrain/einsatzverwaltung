@@ -163,14 +163,24 @@ class Settings
             array($this->utilities, 'sanitizeCheckbox')
         );
         register_setting(
-            'einsatzvw_settings_general',
-            'einsatzvw_excerpt_type',
-            array($this->utilities, 'sanitizeExcerptType')
+            'einsatzvw_settings_report',
+            'einsatzverwaltung_use_reporttemplate',
+            array($this, 'sanitizeReportTemplateUsage')
         );
         register_setting(
-            'einsatzvw_settings_general',
-            'einsatzvw_excerpt_type_feed',
-            array($this->utilities, 'sanitizeExcerptType')
+            'einsatzvw_settings_report',
+            'einsatzverwaltung_reporttemplate',
+            array($this, 'sanitizeTemplate')
+        );
+        register_setting(
+            'einsatzvw_settings_report',
+            'einsatzverwaltung_use_excerpttemplate',
+            array($this->utilities, 'sanitizeCheckbox')
+        );
+        register_setting(
+            'einsatzvw_settings_report',
+            'einsatzverwaltung_excerpttemplate',
+            array($this, 'sanitizeTemplate')
         );
         register_setting(
             'einsatzvw_settings_list',
@@ -330,11 +340,18 @@ class Settings
             'einsatzvw_settings_einsatzberichte'
         );
         add_settings_field(
-            'einsatzvw_settings_excerpt',
-            'Kurzfassung',
-            array($this, 'echoSettingsExcerpt'),
-            self::EVW_SETTINGS_SLUG . '-general',
-            'einsatzvw_settings_general'
+            'einsatzvw_settings_reporttemplate',
+            'Template',
+            array($this, 'echoReportTemplateSettings'),
+            self::EVW_SETTINGS_SLUG . '-report',
+            'einsatzvw_settings_einsatzberichte'
+        );
+        add_settings_field(
+            'einsatzvw_settings_excerpttemplate',
+            'Template für Kurzfassung',
+            array($this, 'echoExcerptTemplateSettings'),
+            self::EVW_SETTINGS_SLUG . '-report',
+            'einsatzvw_settings_einsatzberichte'
         );
         add_settings_field(
             'einsatzvw_settings_columns',
@@ -404,6 +421,24 @@ class Settings
         echo $text . '</label>';
     }
 
+    /**
+     * @param string $name Name der Option
+     * @param array $options Array aus Wert/Label-Paaren
+     * @param string $defaultValue Standardwert für Option, falls diese nicht existiert
+     */
+    private function echoRadioButtons($name, $options, $defaultValue)
+    {
+        $currentValue = get_option($name, $defaultValue);
+        foreach ($options as $value => $label) {
+            printf(
+                '<label><input type="radio" name="%s" value="%s"%s>%s</label><br>',
+                $name,
+                $value,
+                checked($value, $currentValue, false),
+                $label
+            );
+        }
+    }
 
     /**
      * Generiert eine Auswahlliste
@@ -422,6 +457,18 @@ class Settings
         echo '</select>';
     }
 
+    /**
+     * @param string $name Name der Option
+     */
+    private function echoTextarea($name)
+    {
+        $currentValue = get_option($name, '');
+        printf(
+            '<textarea name="%s" class="large-text" rows="10" cols="50">%s</textarea>',
+            $name,
+            esc_textarea($currentValue)
+        );
+    }
 
     /**
      * Gibt ein Eingabefeld aus
@@ -562,6 +609,27 @@ class Settings
         );
     }
 
+    public function echoReportTemplateSettings()
+    {
+        echo '<fieldset>';
+        $this->echoRadioButtons('einsatzverwaltung_use_reporttemplate', array(
+                'no' => 'Nicht verwenden',
+                'singular' => 'In der Einzelansicht verwenden',
+                'everywhere' => 'Überall verwenden',
+        ), 'no');
+        $this->echoTextarea('einsatzverwaltung_reporttemplate');
+        echo '<p class="description">Beschreibung</p>'; // TODO
+        echo '</fieldset>';
+    }
+
+    public function echoExcerptTemplateSettings()
+    {
+        echo '<fieldset>';
+        $this->echoSettingsCheckbox('einsatzverwaltung_use_excerpttemplate', 'Template verwenden');
+        $this->echoTextarea('einsatzverwaltung_excerpttemplate');
+        echo '<p class="description">Beschreibung</p>'; // TODO
+        echo '</fieldset>';
+    }
 
     /**
      * Gibt die Einstellmöglichkeiten für den Auszug aus
@@ -948,5 +1016,27 @@ class Settings
     public function sanitizeAnnotationOffColor($input)
     {
         return $this->utilities->sanitizeHexColor($input, AnnotationIconBar::DEFAULT_COLOR_OFF);
+    }
+
+    /**
+     * @param string $input
+     * @return string
+     */
+    public function sanitizeReportTemplateUsage($input)
+    {
+        if (!in_array($input, array('no', 'singular', 'everywhere'))) {
+            return 'no';
+        }
+
+        return $input;
+    }
+
+    /**
+     * @param string $input
+     * @return string
+     */
+    public function sanitizeTemplate($input)
+    {
+        return stripslashes(wp_filter_post_kses(addslashes($input)));
     }
 }

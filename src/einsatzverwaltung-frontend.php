@@ -193,21 +193,61 @@ class Frontend
     public function renderContent($content)
     {
         global $post;
-        if (get_post_type() !== "einsatz") {
-            return $content;
-        }
 
         // Wenn Beiträge durch ein Passwort geschützt sind, werden auch keine Einsatzdetails preisgegeben
         if (post_password_required()) {
             return $content;
         }
 
+        if ($this->useReportTemplate()) {
+            $template = get_option('einsatzverwaltung_reporttemplate', '');
+
+            if (empty($template)) {
+                return $content;
+            }
+
+            $formatted = $this->formatter->formatIncidentData($template, array(), $post);
+            return stripslashes(wp_filter_post_kses(addslashes($formatted)));
+        }
+
+        if (!is_singular('einsatz')) {
+            return $content;
+        }
+
+        // Fallback auf das klassische Layout
         $header = $this->getEinsatzberichtHeader($post, true, true);
         $content = $this->prepareContent($content);
 
         return $header . '<hr>' . $content;
     }
 
+    /**
+     * Entscheidet, ob für die Ausgabe des Einsatzberichts das Template verwendet wird oder nicht
+     *
+     * @return bool
+     */
+    private function useReportTemplate()
+    {
+        $useTemplate = get_option('einsatzverwaltung_use_reporttemplate', 'no');
+
+        if ($useTemplate === 'no') {
+            return false;
+        }
+
+        if ($useTemplate === 'singular' && is_singular('einsatz') && is_main_query() && in_the_loop()) {
+            return true;
+        }
+
+        if ($useTemplate === 'loops' && get_post_type() === 'einsatz' && is_main_query() && in_the_loop()) {
+            return true;
+        }
+
+        if ($useTemplate === 'everywhere' && get_post_type() === 'einsatz') {
+            return true;
+        }
+
+        return false;
+    }
 
     /**
      * Bereitet den Beitragstext auf

@@ -279,14 +279,18 @@ class Frontend
             return $excerpt;
         }
 
-        $excerptType = $this->options->getExcerptType();
-
-        // Kein Eingriff in das normale Verhalten von WordPress
-        if ('default' == $excerptType) {
+        if (get_option('einsatzverwaltung_use_excerpttemplate') !== '1') {
             return $excerpt;
         }
 
-        return $this->getEinsatzExcerpt($post, $excerptType, true, true);
+        $template = get_option('einsatzverwaltung_excerpttemplate', '');
+
+        if (empty($template)) {
+            return $excerpt;
+        }
+
+        $formatted = $this->formatter->formatIncidentData($template, array(), $post);
+        return stripslashes(wp_filter_post_kses(addslashes($formatted)));
     }
 
 

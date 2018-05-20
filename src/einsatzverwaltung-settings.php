@@ -14,6 +14,14 @@ use abrain\Einsatzverwaltung\Model\IncidentReport;
 class Settings
 {
     const EVW_SETTINGS_SLUG = 'einsatzvw-settings';
+
+    private $useReportTemplateOptions = array(
+        'no' => 'Nicht verwenden',
+        'singular' => 'In der Einzelansicht verwenden',
+        'loops' => 'In Übersichten verwenden',
+        'everywhere' => 'Überall verwenden',
+    );
+
     /**
      * @var Options
      */
@@ -612,11 +620,7 @@ class Settings
     public function echoReportTemplateSettings()
     {
         echo '<fieldset>';
-        $this->echoRadioButtons('einsatzverwaltung_use_reporttemplate', array(
-                'no' => 'Nicht verwenden',
-                'singular' => 'In der Einzelansicht verwenden',
-                'everywhere' => 'Überall verwenden',
-        ), 'no');
+        $this->echoRadioButtons('einsatzverwaltung_use_reporttemplate', $this->useReportTemplateOptions, 'no');
         $this->echoTextarea('einsatzverwaltung_reporttemplate');
         echo '<p class="description">Beschreibung</p>'; // TODO
         echo '</fieldset>';
@@ -1024,7 +1028,7 @@ class Settings
      */
     public function sanitizeReportTemplateUsage($input)
     {
-        if (!in_array($input, array('no', 'singular', 'everywhere'))) {
+        if (!in_array($input, array_keys($this->useReportTemplateOptions))) {
             return 'no';
         }
 

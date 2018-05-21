@@ -60,7 +60,7 @@ class Frontend
             add_filter('the_content', array($this, 'renderContent'));
         }
         add_filter('the_excerpt', array($this, 'filterEinsatzExcerpt'));
-        add_filter('the_excerpt_rss', array($this, 'filterEinsatzExcerptFeed'));
+        add_filter('the_excerpt_rss', array($this, 'filterEinsatzExcerpt'));
         add_action('pre_get_posts', array($this, 'addReportsToQuery'));
     }
 
@@ -289,7 +289,7 @@ class Frontend
             return $excerpt;
         }
 
-        $formatted = $this->formatter->formatIncidentData($template, array(), $post);
+        $formatted = $this->formatter->formatIncidentData($template, array(), $post, is_feed() ? 'feed' : 'post');
         return stripslashes(wp_filter_post_kses(addslashes($formatted)));
     }
 

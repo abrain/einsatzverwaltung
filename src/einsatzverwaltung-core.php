@@ -587,21 +587,6 @@ class Core
     }
 
     /**
-     * Gibt die möglichen Kurzfassungstypen zurück
-     *
-     * @return array
-     */
-    public function getExcerptTypes()
-    {
-        return array(
-            'default' => 'WordPress-Standard',
-            'none' => 'Leer',
-            'details' => 'Einsatzdetails',
-            'text' => 'Berichtstext'
-        );
-    }
-
-    /**
      * Gibt die möglichen Berechtigungen für Einsatzberichte zurück
      *
      * @return array

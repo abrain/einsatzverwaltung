@@ -293,58 +293,6 @@ class Frontend
         return stripslashes(wp_filter_post_kses(addslashes($formatted)));
     }
 
-
-    /**
-     * Gibt die Kurzfassung (Exzerpt) für den Feed zurück
-     *
-     * @param string $excerpt Filterparameter, wird bei Einsatzberichten nicht beachtet, bei anderen Beitragstypen
-     * unverändert verwendet
-     *
-     * @return string Die Kurzfassung
-     */
-    public function filterEinsatzExcerptFeed($excerpt)
-    {
-        global $post;
-        if (get_post_type() !== 'einsatz') {
-            return $excerpt;
-        }
-
-        $excerptType = $this->options->getExcerptTypeFeed();
-
-        // Kein Eingriff in das normale Verhalten von WordPress
-        if ('default' == $excerptType) {
-            return $excerpt;
-        }
-
-        $getExcerpt = $this->getEinsatzExcerpt($post, $excerptType, true, false);
-        $getExcerpt = str_replace('<strong>', '', $getExcerpt);
-        $getExcerpt = str_replace('</strong>', '', $getExcerpt);
-        return $getExcerpt;
-    }
-
-    /**
-     * @param WP_Post $post
-     * @param string $excerptType
-     * @param bool $excerptMayContainLinks
-     * @param bool $showArchiveLinks
-     *
-     * @return mixed|string|void
-     */
-    private function getEinsatzExcerpt($post, $excerptType, $excerptMayContainLinks, $showArchiveLinks)
-    {
-        switch ($excerptType) {
-            case 'details':
-                return $this->getEinsatzberichtHeader($post, $excerptMayContainLinks, $showArchiveLinks);
-            case 'text':
-                return $this->prepareContent(get_the_content());
-            case 'none':
-                return '';
-            default:
-                return $this->getEinsatzberichtHeader($post, $excerptMayContainLinks, $showArchiveLinks);
-        }
-    }
-
-
     /**
      * Gibt Einsatzberichte ggf. auch zwischen den 'normalen' Blogbeiträgen aus
      *

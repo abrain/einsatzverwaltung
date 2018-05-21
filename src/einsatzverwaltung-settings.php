@@ -636,31 +636,6 @@ class Settings
     }
 
     /**
-     * Gibt die Einstellmöglichkeiten für den Auszug aus
-     */
-    public function echoSettingsExcerpt()
-    {
-        $types = $this->core->getExcerptTypes();
-
-        echo '<p>Kurzfassung auf der Webseite:&nbsp;';
-        $this->echoSelect(
-            'einsatzvw_excerpt_type',
-            $types,
-            $this->options->getExcerptType()
-        );
-        echo '<p class="description">Sollte diese Einstellung keinen Effekt auf der Webseite zeigen, nutzt das verwendete Theme m&ouml;glicherweise keine Kurzfassungen und zeigt immer den vollen Beitrag.</p>';
-
-        echo '<p>Kurzfassung im Feed:&nbsp;';
-        $this->echoSelect(
-            'einsatzvw_excerpt_type_feed',
-            $types,
-            $this->options->getExcerptTypeFeed()
-        );
-        echo '<p class="description">Bitte auch die Einstellung zum Umfang der Eintr&auml;ge im Feed (Einstellungen &gt; Lesen) beachten!<br/>Im Feed werden bei den Einsatzdetails aus technischen Gr&uuml;nden keine Links zu gefilterten Einsatzlisten angezeigt.</p>';
-    }
-
-
-    /**
      *
      */
     public function echoEinsatzlisteColumns()

@@ -356,7 +356,7 @@ class Settings
         );
         add_settings_field(
             'einsatzvw_settings_excerpttemplate',
-            'Template für Kurzfassung',
+            'Template für Auszug',
             array($this, 'echoExcerptTemplateSettings'),
             self::EVW_SETTINGS_SLUG . '-report',
             'einsatzvw_settings_einsatzberichte'

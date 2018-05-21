@@ -264,13 +264,13 @@ class Frontend
 
 
     /**
-     * Stellt die Kurzfassung (Exzerpt) zur Verfügung, im Fall von Einsatzberichten wird
+     * Stellt den Auszug zur Verfügung, im Fall von Einsatzberichten wird
      * hier wahlweise der Berichtstext, Einsatzdetails oder beides zurückgegeben
      *
      * @param string $excerpt Filterparameter, wird bei Einsatzberichten nicht beachtet, bei anderen Beitragstypen
      * unverändert verwendet
      *
-     * @return string Die Kurzfassung
+     * @return string Der Auszug
      */
     public function filterEinsatzExcerpt($excerpt)
     {

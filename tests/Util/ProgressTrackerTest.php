@@ -7,6 +7,15 @@ namespace abrain\Einsatzverwaltung\Util;
  */
 class ProgressTrackerTest extends \WP_UnitTestCase
 {
+    /**
+     * @inheritDoc
+     */
+    public static function setUpBeforeClass()
+    {
+        parent::setUpBeforeClass();
+        require_once dirname(dirname(dirname(__FILE__))) . '/src/Util/ProgressTracker.php';
+    }
+
     public function testAddStep()
     {
         $progressTracker = new ProgressTracker();

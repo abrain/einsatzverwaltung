@@ -283,14 +283,20 @@ class UpgradeTest extends WP_UnitTestCase
     public function testUpgrade130()
     {
         $ee1 = wp_create_term('Externes Einsatzmittel 1', 'exteinsatzmittel');
+        delete_term_meta($ee1['term_id'], 'url'); // Metafelder sollen noch nicht existieren
         add_option('evw_tax_exteinsatzmittel_'.$ee1['term_id'].'_url', 'website1');
         $ee2 = wp_create_term('Externes Einsatzmittel 2', 'exteinsatzmittel');
+        delete_term_meta($ee2['term_id'], 'url');
         add_option('evw_tax_exteinsatzmittel_'.$ee2['term_id'].'_url', 'website2');
 
         $vehicle1 = wp_create_term('Fahrzeug 1', 'fahrzeug');
+        delete_term_meta($vehicle1['term_id'], 'fahrzeugpid');
+        delete_term_meta($vehicle1['term_id'], 'vehicleorder');
         add_option('evw_tax_fahrzeug_'.$vehicle1['term_id'].'_fahrzeugpid', 46);
         add_option('evw_tax_fahrzeug_'.$vehicle1['term_id'].'_vehicleorder', 1);
         $vehicle2 = wp_create_term('Fahrzeug 2', 'fahrzeug');
+        delete_term_meta($vehicle2['term_id'], 'fahrzeugpid');
+        delete_term_meta($vehicle2['term_id'], 'vehicleorder');
         add_option('evw_tax_fahrzeug_'.$vehicle2['term_id'].'_vehicleorder', 147);
 
         // Unbehandelte Term-Splits

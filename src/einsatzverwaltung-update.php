@@ -101,6 +101,10 @@ class Update
         if ($currentDbVersion < 21 && $targetDbVersion >= 21) {
             $this->upgrade134();
         }
+
+        if ($currentDbVersion < 30 && $targetDbVersion >= 30) {
+            $this->upgrade140();
+        }
     }
 
     /**
@@ -334,6 +338,22 @@ class Update
         }
 
         update_option('einsatzvw_db_version', 21);
+    }
+
+    /**
+     * Adds newly introduced options and removes their predecessors
+     *
+     * @since 1.4.0
+     */
+    private function upgrade140()
+    {
+        add_option('einsatzverwaltung_use_reporttemplate', 'no');
+        add_option('einsatzverwaltung_reporttemplate', '');
+        add_option('einsatzverwaltung_use_excerpttemplate', '0');
+        add_option('einsatzverwaltung_excerpttemplate', '');
+
+        delete_option('einsatzvw_excerpt_type');
+        delete_option('einsatzvw_excerpt_type_feed');
     }
 
     /**

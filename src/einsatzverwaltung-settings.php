@@ -14,6 +14,14 @@ use abrain\Einsatzverwaltung\Model\IncidentReport;
 class Settings
 {
     const EVW_SETTINGS_SLUG = 'einsatzvw-settings';
+
+    private $useReportTemplateOptions = array(
+        'no' => 'Nicht verwenden (zeigt die klassische Einzelansicht)',
+        'singular' => 'In der Einzelansicht verwenden',
+        'loops' => 'In der Einzelansicht und in &Uuml;bersichten (Startseite, Archive, Suchergebnisse, ...) verwenden',
+        'everywhere' => '&Uuml;berall verwenden',
+    );
+
     /**
      * @var Options
      */
@@ -163,14 +171,24 @@ class Settings
             array($this->utilities, 'sanitizeCheckbox')
         );
         register_setting(
-            'einsatzvw_settings_general',
-            'einsatzvw_excerpt_type',
-            array($this->utilities, 'sanitizeExcerptType')
+            'einsatzvw_settings_report',
+            'einsatzverwaltung_use_reporttemplate',
+            array($this, 'sanitizeReportTemplateUsage')
         );
         register_setting(
-            'einsatzvw_settings_general',
-            'einsatzvw_excerpt_type_feed',
-            array($this->utilities, 'sanitizeExcerptType')
+            'einsatzvw_settings_report',
+            'einsatzverwaltung_reporttemplate',
+            array($this, 'sanitizeTemplate')
+        );
+        register_setting(
+            'einsatzvw_settings_report',
+            'einsatzverwaltung_use_excerpttemplate',
+            array($this->utilities, 'sanitizeCheckbox')
+        );
+        register_setting(
+            'einsatzvw_settings_report',
+            'einsatzverwaltung_excerpttemplate',
+            array($this, 'sanitizeTemplate')
         );
         register_setting(
             'einsatzvw_settings_list',
@@ -257,6 +275,14 @@ class Settings
             self::EVW_SETTINGS_SLUG . '-report'
         );
         add_settings_section(
+            'einsatzvw_settings_reporttemplates',
+            'Templates',
+            function () {
+                echo '<p>Mit den beiden folgenden Templates kann das Aussehen der Einsatzberichte bzw. deren Ausz&uuml;ge individuell angepasst werden. Das ausgef&uuml;llte Template erscheint immer dort, wo normal der Beitragstext stehen w&uuml;rde. Wie die Templates funktionieren ist in der <a href="https://einsatzverwaltung.abrain.de/dokumentation/templates/">Dokumentation</a> beschrieben.</p>';
+            },
+            self::EVW_SETTINGS_SLUG . '-report'
+        );
+        add_settings_section(
             'einsatzvw_settings_einsatzliste',
             '',
             function () {
@@ -330,11 +356,18 @@ class Settings
             'einsatzvw_settings_einsatzberichte'
         );
         add_settings_field(
-            'einsatzvw_settings_excerpt',
-            'Kurzfassung',
-            array($this, 'echoSettingsExcerpt'),
-            self::EVW_SETTINGS_SLUG . '-general',
-            'einsatzvw_settings_general'
+            'einsatzvw_settings_reporttemplate',
+            'Template f&uuml;r Einsatzbericht',
+            array($this, 'echoReportTemplateSettings'),
+            self::EVW_SETTINGS_SLUG . '-report',
+            'einsatzvw_settings_reporttemplates'
+        );
+        add_settings_field(
+            'einsatzvw_settings_excerpttemplate',
+            'Template f&uuml;r Auszug',
+            array($this, 'echoExcerptTemplateSettings'),
+            self::EVW_SETTINGS_SLUG . '-report',
+            'einsatzvw_settings_reporttemplates'
         );
         add_settings_field(
             'einsatzvw_settings_columns',
@@ -404,6 +437,24 @@ class Settings
         echo $text . '</label>';
     }
 
+    /**
+     * @param string $name Name der Option
+     * @param array $options Array aus Wert/Label-Paaren
+     * @param string $defaultValue Standardwert für Option, falls diese nicht existiert
+     */
+    private function echoRadioButtons($name, $options, $defaultValue)
+    {
+        $currentValue = get_option($name, $defaultValue);
+        foreach ($options as $value => $label) {
+            printf(
+                '<label><input type="radio" name="%s" value="%s"%s>%s</label><br>',
+                $name,
+                $value,
+                checked($value, $currentValue, false),
+                $label
+            );
+        }
+    }
 
     /**
      * Generiert eine Auswahlliste
@@ -422,6 +473,18 @@ class Settings
         echo '</select>';
     }
 
+    /**
+     * @param string $name Name der Option
+     */
+    private function echoTextarea($name)
+    {
+        $currentValue = get_option($name, '');
+        printf(
+            '<p><textarea name="%s" class="large-text" rows="10" cols="50">%s</textarea></p>',
+            $name,
+            esc_textarea($currentValue)
+        );
+    }
 
     /**
      * Gibt ein Eingabefeld aus
@@ -448,6 +511,7 @@ class Settings
      */
     public function echoSettingsPermalinks()
     {
+        echo '<fieldset>';
         $this->echoSettingsInput(
             'einsatzvw_rewrite_slug',
             sprintf(
@@ -458,6 +522,7 @@ class Settings
             ),
             $this->options->getRewriteSlug()
         );
+        echo '</fieldset>';
     }
 
     /**
@@ -465,10 +530,12 @@ class Settings
      */
     public function echoSettingsEinsatznummerFormat()
     {
+        echo '<fieldset>';
         printf('Jahreszahl + jahresbezogene, fortlaufende Nummer mit <input type="text" value="%2$s" size="2" id="%1$s" name="%1$s" /> Stellen<p class="description">Beispiel f&uuml;r den f&uuml;nften Einsatz in 2014:<br>bei 2 Stellen: 201405<br>bei 4 Stellen: 20140005</p><br>', 'einsatzvw_einsatznummer_stellen', $this->options->getEinsatznummerStellen());
         $this->echoSettingsCheckbox('einsatzvw_einsatznummer_lfdvorne', 'Laufende Nummer vor das Jahr stellen');
 
-        echo '<br><br><strong>Hinweis:</strong> Nach einer &Auml;nderung des Formats erhalten die bestehenden Einsatzberichte automatisch aktualisierte Nummern.';
+        echo '<p><strong>Hinweis:</strong> Nach einer &Auml;nderung des Formats erhalten die bestehenden Einsatzberichte automatisch aktualisierte Nummern.</p>';
+        echo '</fieldset>';
     }
 
     public function echoSettingsEinsatznummerAuto()
@@ -486,6 +553,7 @@ class Settings
      */
     public function echoEinsatzberichteMainloop()
     {
+        echo '<fieldset>';
         $this->echoSettingsCheckbox(
             'einsatzvw_show_einsatzberichte_mainloop',
             'Einsatzberichte zwischen den regul&auml;ren WordPress-Beitr&auml;gen anzeigen'
@@ -511,6 +579,7 @@ class Settings
             'Nur als besonders markierte Einsatzberichte zwischen den regul&auml;ren WordPress-Beitr&auml;gen bzw. in der Kategorie anzeigen.'
         );
         echo '<p class="description">Mit dieser Einstellung gelten die beiden oberen Einstellungen nur f&uuml;r als besonders markierte Einsatzberichte.</p>';
+        echo '</fieldset>';
     }
 
 
@@ -519,11 +588,13 @@ class Settings
      */
     public function echoSettingsEmptyDetails()
     {
+        echo '<fieldset>';
         $this->echoSettingsCheckbox(
             'einsatzvw_einsatz_hideemptydetails',
             'Nicht ausgef&uuml;llte Details ausblenden'
         );
-        echo '<p class="description">Ein Einsatzdetail gilt als nicht ausgef&uuml;llt, wenn das entsprechende Textfeld oder die entsprechende Liste leer ist.</p>';
+        echo '<p class="description">Ein Einsatzdetail gilt als nicht ausgef&uuml;llt, wenn das entsprechende Textfeld oder die entsprechende Liste leer ist. Diese Einstellung greift nur bei der klassischen Darstellung ohne Template.</p>';
+        echo '</fieldset>';
     }
 
 
@@ -532,6 +603,7 @@ class Settings
      */
     public function echoSettingsArchive()
     {
+        echo '<fieldset>';
         $this->echoSettingsCheckbox(
             'einsatzvw_show_einsatzart_archive',
             'Einsatzart'
@@ -547,6 +619,7 @@ class Settings
             'Fahrzeuge'
         );
         echo '<p class="description">F&uuml;r alle hier aktivierten Arten von Einsatzdetails werden im Kopfbereich des Einsatzberichts f&uuml;r alle auftretenden Werte Links zu einer gefilterten Einsatz&uuml;bersicht angezeigt. Beispielsweise kann man damit alle Eins&auml;tze unter Beteiligung einer bestimmten externen Einsatzkraft auflisten lassen.</p>';
+        echo '</fieldset>';
     }
 
 
@@ -556,37 +629,40 @@ class Settings
      */
     public function echoSettingsExtNew()
     {
+        echo '<fieldset>';
         $this->echoSettingsCheckbox(
             'einsatzvw_open_ext_in_new',
             'Links zu externen Einsatzmitteln in einem neuen Fenster öffnen'
         );
+        echo '</fieldset>';
     }
-
 
     /**
-     * Gibt die Einstellmöglichkeiten für den Auszug aus
+     * Einstellungen für die Gestaltung der Einsatzberichte per Template
      */
-    public function echoSettingsExcerpt()
+    public function echoReportTemplateSettings()
     {
-        $types = $this->core->getExcerptTypes();
-
-        echo '<p>Kurzfassung auf der Webseite:&nbsp;';
-        $this->echoSelect(
-            'einsatzvw_excerpt_type',
-            $types,
-            $this->options->getExcerptType()
-        );
-        echo '<p class="description">Sollte diese Einstellung keinen Effekt auf der Webseite zeigen, nutzt das verwendete Theme m&ouml;glicherweise keine Kurzfassungen und zeigt immer den vollen Beitrag.</p>';
-
-        echo '<p>Kurzfassung im Feed:&nbsp;';
-        $this->echoSelect(
-            'einsatzvw_excerpt_type_feed',
-            $types,
-            $this->options->getExcerptTypeFeed()
-        );
-        echo '<p class="description">Bitte auch die Einstellung zum Umfang der Eintr&auml;ge im Feed (Einstellungen &gt; Lesen) beachten!<br/>Im Feed werden bei den Einsatzdetails aus technischen Gr&uuml;nden keine Links zu gefilterten Einsatzlisten angezeigt.</p>';
+        echo '<fieldset>';
+        $this->echoRadioButtons('einsatzverwaltung_use_reporttemplate', $this->useReportTemplateOptions, 'no');
+        echo '<p class="description">';
+        printf('Die Option &quot;%s&quot; wird nicht empfohlen, ist aber bei manchen Themes die einzige M&ouml;glichkeit, das Template in &Uuml;bersichten nutzen zu k&ouml;nnen.', $this->useReportTemplateOptions['everywhere']);
+        echo '</p>';
+        $this->echoTextarea('einsatzverwaltung_reporttemplate');
+        echo '<p class="description">Es kann sein, dass das Theme in &Uuml;bersichten nur den Auszug anzeigt. Dessen Aussehen kann mit einem eigenen Template festgelegt werden (siehe unten).</p>';
+        echo '</fieldset>';
     }
 
+    /**
+     * Einstellungen für die Gestaltung des Auszugs von Einsatzberichten per Template
+     */
+    public function echoExcerptTemplateSettings()
+    {
+        echo '<fieldset>';
+        $this->echoSettingsCheckbox('einsatzverwaltung_use_excerpttemplate', 'Template verwenden');
+        echo '<p class="description">Im Gegensatz zum von WordPress generierten Auszug wird dieser nicht auf eine bestimmte L&auml;nge begrenzt. Das Einf&uuml;gen des Beitragstextes (<code>%content%</code>) ist also nicht zu empfehlen.</p>';
+        $this->echoTextarea('einsatzverwaltung_excerpttemplate');
+        echo '</fieldset>';
+    }
 
     /**
      *
@@ -628,6 +704,7 @@ class Settings
 
     public function echoEinsatzlisteColumnSettings()
     {
+        echo '<fieldset>';
         $this->echoSettingsCheckbox(
             'einsatzvw_list_art_hierarchy',
             '<strong>Einsatzart</strong>: Hierarchie der Einsatzart anzeigen'
@@ -642,17 +719,21 @@ class Settings
             'einsatzvw_list_ext_link',
             '<strong>Weitere Kr&auml;fte</strong>: Links anzeigen, sofern verf&uuml;gbar'
         );
+        echo '</fieldset>';
     }
 
     public function echoEinsatzlisteAnnotationsSettings()
     {
+        echo '<fieldset>';
         echo '<p>Farbe f&uuml;r inaktive Vermerke:</p>';
         $this->echoColorPicker('einsatzvw_list_annotations_color_off', AnnotationIconBar::DEFAULT_COLOR_OFF);
         echo '<p class="description">Diese Farbe wird f&uuml;r die Symbole von inaktiven Vermerken verwendet, die von aktiven werden in der Textfarbe Deines Themes dargestellt. Anzugeben ist der Farbwert in Hexadezimalschreibweise (3- oder 6-stellig) mit f&uuml;hrendem #-Zeichen.</p>';
+        echo '</fieldset>';
     }
 
     public function echoEinsatzlisteZebraSettings()
     {
+        echo '<fieldset>';
         $this->echoSettingsCheckbox(
             'einsatzvw_list_zebra',
             'Zebrastreifen anzeigen',
@@ -669,6 +750,7 @@ class Settings
         echo '>Gerade Zeilen einf&auml;rben</label> <label><input type="radio" name="einsatzvw_list_zebra_nth" value="odd" ';
         checked($this->reportListSettings->getZebraNthChildArg(), 'odd');
         echo '>Ungerade Zeilen einf&auml;rben</label></fieldset></p>';
+        echo '</fieldset>';
     }
 
     /**
@@ -676,6 +758,7 @@ class Settings
      */
     public function echoSettingsCapsRoles()
     {
+        echo '<fieldset>';
         $roles = get_editable_roles();
         if (empty($roles)) {
             echo "Es konnten keine Rollen gefunden werden.";
@@ -695,6 +778,7 @@ class Settings
             echo '<p class="description">Die Benutzer mit den hier ausgew&auml;hlten Rollen haben alle Rechte, um die Einsatzberichte und die zugeh&ouml;rigen Eigenschaften (z.B. Einsatzarten) zu verwalten. Zu dieser Einstellungsseite und den Werkzeugen haben in jedem Fall nur Administratoren Zugang.</p>';
             echo '<p class="description">Die Berechtigungen können mit speziellen Plugins deutlich feingranularer eingestellt werden.</p>';
         }
+        echo '</fieldset>';
     }
 
 
@@ -948,5 +1032,27 @@ class Settings
     public function sanitizeAnnotationOffColor($input)
     {
         return $this->utilities->sanitizeHexColor($input, AnnotationIconBar::DEFAULT_COLOR_OFF);
+    }
+
+    /**
+     * @param string $input
+     * @return string
+     */
+    public function sanitizeReportTemplateUsage($input)
+    {
+        if (!in_array($input, array_keys($this->useReportTemplateOptions))) {
+            return 'no';
+        }
+
+        return $input;
+    }
+
+    /**
+     * @param string $input
+     * @return string
+     */
+    public function sanitizeTemplate($input)
+    {
+        return stripslashes(wp_filter_post_kses(addslashes($input)));
     }
 }

@@ -5,7 +5,7 @@ Tags: Feuerwehr, Hilfsorganisation, Öffentlichkeitsarbeit
 Requires at least: 4.6.0
 Tested up to: 4.9
 Requires PHP: 5.3.0
-Stable tag: 1.3.5
+Stable tag: 1.3.6
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -71,6 +71,9 @@ Das Du halte ich f&uuml;r die angenehmere Arbeitsgrundlage, aber man darf mich g
 Nein, mehr gibt es [hier](https://einsatzverwaltung.abrain.de/faq/).
 
 == Changelog ==
+
+= 1.3.6 =
+* Fehler behoben, bei dem in einem Export aus dem All-in-One Event Calendar von Time.ly Einsatzdetails in Ereignissen auftauchen konnten
 
 = 1.3.5 =
 * Unn&ouml;tige Dateien aus Font Awesome entfernt

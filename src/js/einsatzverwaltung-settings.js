@@ -20,9 +20,4 @@ jQuery(document).ready(function() {
             jQuery("#einsatzvw_list_columns").val($columnsEnabled.sortable('toArray'));
         }
     });
-
-    // Color picker initialisieren
-    if ( jQuery.isFunction( jQuery.fn.wpColorPicker ) ) {
-        jQuery( 'input.einsatzverwaltung-color-picker' ).wpColorPicker();
-    }
 });

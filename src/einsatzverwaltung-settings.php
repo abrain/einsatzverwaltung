@@ -16,10 +16,10 @@ class Settings
     const EVW_SETTINGS_SLUG = 'einsatzvw-settings';
 
     private $useReportTemplateOptions = array(
-        'no' => 'Nicht verwenden',
+        'no' => 'Nicht verwenden (zeigt die klassische Einzelansicht)',
         'singular' => 'In der Einzelansicht verwenden',
-        'loops' => 'In Übersichten verwenden',
-        'everywhere' => 'Überall verwenden',
+        'loops' => 'In der Einzelansicht und in &Uuml;bersichten (Startseite, Archive, Suchergebnisse, ...) verwenden',
+        'everywhere' => '&Uuml;berall verwenden',
     );
 
     /**
@@ -275,6 +275,14 @@ class Settings
             self::EVW_SETTINGS_SLUG . '-report'
         );
         add_settings_section(
+            'einsatzvw_settings_reporttemplates',
+            'Templates',
+            function () {
+                echo '<p>Mit den beiden folgenden Templates kann das Aussehen der Einsatzberichte bzw. deren Ausz&uuml;ge individuell angepasst werden. Das ausgef&uuml;llte Template erscheint immer dort, wo normal der Beitragstext stehen w&uuml;rde. Wie die Templates funktionieren ist in der <a href="https://einsatzverwaltung.abrain.de/dokumentation/templates/">Dokumentation</a> beschrieben.</p>';
+            },
+            self::EVW_SETTINGS_SLUG . '-report'
+        );
+        add_settings_section(
             'einsatzvw_settings_einsatzliste',
             '',
             function () {
@@ -349,17 +357,17 @@ class Settings
         );
         add_settings_field(
             'einsatzvw_settings_reporttemplate',
-            'Template',
+            'Template f&uuml;r Einsatzbericht',
             array($this, 'echoReportTemplateSettings'),
             self::EVW_SETTINGS_SLUG . '-report',
-            'einsatzvw_settings_einsatzberichte'
+            'einsatzvw_settings_reporttemplates'
         );
         add_settings_field(
             'einsatzvw_settings_excerpttemplate',
-            'Template für Auszug',
+            'Template f&uuml;r Auszug',
             array($this, 'echoExcerptTemplateSettings'),
             self::EVW_SETTINGS_SLUG . '-report',
-            'einsatzvw_settings_einsatzberichte'
+            'einsatzvw_settings_reporttemplates'
         );
         add_settings_field(
             'einsatzvw_settings_columns',
@@ -472,7 +480,7 @@ class Settings
     {
         $currentValue = get_option($name, '');
         printf(
-            '<textarea name="%s" class="large-text" rows="10" cols="50">%s</textarea>',
+            '<p><textarea name="%s" class="large-text" rows="10" cols="50">%s</textarea></p>',
             $name,
             esc_textarea($currentValue)
         );
@@ -578,7 +586,7 @@ class Settings
             'einsatzvw_einsatz_hideemptydetails',
             'Nicht ausgef&uuml;llte Details ausblenden'
         );
-        echo '<p class="description">Ein Einsatzdetail gilt als nicht ausgef&uuml;llt, wenn das entsprechende Textfeld oder die entsprechende Liste leer ist.</p>';
+        echo '<p class="description">Ein Einsatzdetail gilt als nicht ausgef&uuml;llt, wenn das entsprechende Textfeld oder die entsprechende Liste leer ist. Diese Einstellung greift nur bei der klassischen Darstellung ohne Template.</p>';
     }
 
 
@@ -617,21 +625,30 @@ class Settings
         );
     }
 
+    /**
+     * Einstellungen für die Gestaltung der Einsatzberichte per Template
+     */
     public function echoReportTemplateSettings()
     {
         echo '<fieldset>';
         $this->echoRadioButtons('einsatzverwaltung_use_reporttemplate', $this->useReportTemplateOptions, 'no');
+        echo '<p class="description">';
+        printf('Die Option &quot;%s&quot; wird nicht empfohlen, ist aber bei manchen Themes die einzige M&ouml;glichkeit, das Template in &Uuml;bersichten nutzen zu k&ouml;nnen.', $this->useReportTemplateOptions['everywhere']);
+        echo '</p>';
         $this->echoTextarea('einsatzverwaltung_reporttemplate');
-        echo '<p class="description">Beschreibung</p>'; // TODO
+        echo '<p class="description">Es kann sein, dass das Theme in &Uuml;bersichten nur den Auszug anzeigt. Dessen Aussehen kann mit einem eigenen Template festgelegt werden (siehe unten).</p>';
         echo '</fieldset>';
     }
 
+    /**
+     * Einstellungen für die Gestaltung des Auszugs von Einsatzberichten per Template
+     */
     public function echoExcerptTemplateSettings()
     {
         echo '<fieldset>';
         $this->echoSettingsCheckbox('einsatzverwaltung_use_excerpttemplate', 'Template verwenden');
+        echo '<p class="description">Im Gegensatz zum von WordPress generierten Auszug wird dieser nicht auf eine bestimmte L&auml;nge begrenzt. Das Einf&uuml;gen des Beitragstextes (<code>%content%</code>) ist also nicht zu empfehlen.</p>';
         $this->echoTextarea('einsatzverwaltung_excerpttemplate');
-        echo '<p class="description">Beschreibung</p>'; // TODO
         echo '</fieldset>';
     }
 

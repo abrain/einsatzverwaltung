@@ -6,7 +6,6 @@ use abrain\Einsatzverwaltung\Data;
 use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Options;
-use abrain\Einsatzverwaltung\Taxonomies;
 use abrain\Einsatzverwaltung\Utilities;
 use WP_Post;
 use WP_Term;
@@ -54,10 +53,11 @@ class Formatter
      * @param string $pattern
      * @param array $allowedTags
      * @param WP_Post $post
+     * @param string $context
      *
      * @return mixed
      */
-    public function formatIncidentData($pattern, $allowedTags = array(), $post = null)
+    public function formatIncidentData($pattern, $allowedTags = array(), $post = null, $context = 'post')
     {
         if (empty($allowedTags)) {
             $allowedTags = array_keys($this->getTags());
@@ -65,7 +65,7 @@ class Formatter
 
         $formattedString = $pattern;
         foreach ($allowedTags as $tag) {
-            $formattedString = $this->format($post, $formattedString, $tag);
+            $formattedString = $this->format($post, $formattedString, $tag, $context);
         }
         return $formattedString;
     }
@@ -74,9 +74,10 @@ class Formatter
      * @param WP_Post $post
      * @param string $pattern
      * @param string $tag
+     * @param string $context
      * @return mixed|string
      */
-    private function format($post, $pattern, $tag)
+    private function format($post, $pattern, $tag, $context = 'post')
     {
         if ($post == null && !in_array($tag, $this->tagsNotNeedingPost)) {
             $message = 'Alle Tags außer ' . implode(',', $this->tagsNotNeedingPost) . ' brauchen ein Post-Objekt';
@@ -104,7 +105,8 @@ class Formatter
                 $replace = $this->utilities->getDurationString(Data::getDauer($incidentReport));
                 break;
             case '%incidentType%':
-                $replace = $this->getTypeOfIncident($incidentReport, false, false, false);
+                $showTypeArchive = get_option('einsatzvw_show_einsatzart_archive') === '1';
+                $replace = $this->getTypeOfIncident($incidentReport, ($context === 'post'), $showTypeArchive, false);
                 break;
             case '%incidentTypeColor%':
                 $replace = $this->getColorOfTypeOfIncident($incidentReport->getTypeOfIncident());
@@ -126,6 +128,18 @@ class Formatter
                 break;
             case '%annotations%':
                 $replace = $this->annotationIconBar->render($incidentReport);
+                break;
+            case '%vehicles%':
+                $replace = $this->getVehicles($incidentReport, ($context === 'post'), ($context === 'post'));
+                break;
+            case '%additionalForces%':
+                $replace = $this->getAdditionalForces($incidentReport, ($context === 'post'), ($context === 'post'));
+                break;
+            case '%typesOfAlerting%':
+                $replace = $this->getTypesOfAlerting($incidentReport);
+                break;
+            case '%content%':
+                $replace = $post->post_content;
                 break;
             default:
                 return $pattern;
@@ -174,7 +188,11 @@ class Formatter
             '%feedUrl%' => 'URL zum Feed',
             '%number%' => 'Einsatznummer',
             '%seqNum%' => 'Laufende Nummer',
-            '%annotations%' => 'Vermerke'
+            '%annotations%' => 'Vermerke',
+            '%vehicles%' => 'Fahrzeuge',
+            '%additionalForces%' => 'Weitere Kr&auml;fte',
+            '%typesOfAlerting%' => 'Alarmierungsarten',
+            '%content%' => 'Berichtstext'
         );
     }
 
@@ -268,7 +286,7 @@ class Formatter
             $name = $vehicle->name;
 
             if ($makeLinks) {
-                $pageid = Taxonomies::getTermField($vehicle->term_id, 'fahrzeugpid');
+                $pageid = get_term_meta($vehicle->term_id, 'fahrzeugpid', true);
                 if (!empty($pageid)) {
                     $pageurl = get_permalink($pageid);
                     if ($pageurl !== false) {
@@ -310,7 +328,7 @@ class Formatter
             $name = $force->name;
 
             if ($makeLinks) {
-                $url = Taxonomies::getTermField($force->term_id, 'url');
+                $url = get_term_meta($force->term_id, 'url', true);
                 if (!empty($url)) {
                     $openInNewWindow = $this->options->isOpenExtEinsatzmittelNewWindow();
                     $name = '<a href="'.$url.'" title="Mehr Informationen zu '.$force->name.'"';

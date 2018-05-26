@@ -60,7 +60,7 @@ class Frontend
             add_filter('the_content', array($this, 'renderContent'));
         }
         add_filter('the_excerpt', array($this, 'filterEinsatzExcerpt'));
-        add_filter('the_excerpt_rss', array($this, 'filterEinsatzExcerptFeed'));
+        add_filter('the_excerpt_rss', array($this, 'filterEinsatzExcerpt'));
         add_action('pre_get_posts', array($this, 'addReportsToQuery'));
     }
 
@@ -193,21 +193,61 @@ class Frontend
     public function renderContent($content)
     {
         global $post;
-        if (get_post_type() !== "einsatz") {
-            return $content;
-        }
 
         // Wenn Beiträge durch ein Passwort geschützt sind, werden auch keine Einsatzdetails preisgegeben
         if (post_password_required()) {
             return $content;
         }
 
+        if ($this->useReportTemplate()) {
+            $template = get_option('einsatzverwaltung_reporttemplate', '');
+
+            if (empty($template)) {
+                return $content;
+            }
+
+            $formatted = $this->formatter->formatIncidentData($template, array(), $post);
+            return stripslashes(wp_filter_post_kses(addslashes($formatted)));
+        }
+
+        if (!is_singular('einsatz')) {
+            return $content;
+        }
+
+        // Fallback auf das klassische Layout
         $header = $this->getEinsatzberichtHeader($post, true, true);
         $content = $this->prepareContent($content);
 
         return $header . '<hr>' . $content;
     }
 
+    /**
+     * Entscheidet, ob für die Ausgabe des Einsatzberichts das Template verwendet wird oder nicht
+     *
+     * @return bool
+     */
+    private function useReportTemplate()
+    {
+        $useTemplate = get_option('einsatzverwaltung_use_reporttemplate', 'no');
+
+        if ($useTemplate === 'no') {
+            return false;
+        }
+
+        if ($useTemplate === 'singular' && is_singular('einsatz') && is_main_query() && in_the_loop()) {
+            return true;
+        }
+
+        if ($useTemplate === 'loops' && get_post_type() === 'einsatz' && is_main_query() && in_the_loop()) {
+            return true;
+        }
+
+        if ($useTemplate === 'everywhere' && get_post_type() === 'einsatz') {
+            return true;
+        }
+
+        return false;
+    }
 
     /**
      * Bereitet den Beitragstext auf
@@ -224,13 +264,13 @@ class Frontend
 
 
     /**
-     * Stellt die Kurzfassung (Exzerpt) zur Verfügung, im Fall von Einsatzberichten wird
+     * Stellt den Auszug zur Verfügung, im Fall von Einsatzberichten wird
      * hier wahlweise der Berichtstext, Einsatzdetails oder beides zurückgegeben
      *
      * @param string $excerpt Filterparameter, wird bei Einsatzberichten nicht beachtet, bei anderen Beitragstypen
      * unverändert verwendet
      *
-     * @return string Die Kurzfassung
+     * @return string Der Auszug
      */
     public function filterEinsatzExcerpt($excerpt)
     {
@@ -239,67 +279,19 @@ class Frontend
             return $excerpt;
         }
 
-        $excerptType = $this->options->getExcerptType();
-
-        // Kein Eingriff in das normale Verhalten von WordPress
-        if ('default' == $excerptType) {
+        if (get_option('einsatzverwaltung_use_excerpttemplate') !== '1') {
             return $excerpt;
         }
 
-        return $this->getEinsatzExcerpt($post, $excerptType, true, true);
-    }
+        $template = get_option('einsatzverwaltung_excerpttemplate', '');
 
-
-    /**
-     * Gibt die Kurzfassung (Exzerpt) für den Feed zurück
-     *
-     * @param string $excerpt Filterparameter, wird bei Einsatzberichten nicht beachtet, bei anderen Beitragstypen
-     * unverändert verwendet
-     *
-     * @return string Die Kurzfassung
-     */
-    public function filterEinsatzExcerptFeed($excerpt)
-    {
-        global $post;
-        if (get_post_type() !== 'einsatz') {
+        if (empty($template)) {
             return $excerpt;
         }
 
-        $excerptType = $this->options->getExcerptTypeFeed();
-
-        // Kein Eingriff in das normale Verhalten von WordPress
-        if ('default' == $excerptType) {
-            return $excerpt;
-        }
-
-        $getExcerpt = $this->getEinsatzExcerpt($post, $excerptType, true, false);
-        $getExcerpt = str_replace('<strong>', '', $getExcerpt);
-        $getExcerpt = str_replace('</strong>', '', $getExcerpt);
-        return $getExcerpt;
+        $formatted = $this->formatter->formatIncidentData($template, array(), $post, is_feed() ? 'feed' : 'post');
+        return stripslashes(wp_filter_post_kses(addslashes($formatted)));
     }
-
-    /**
-     * @param WP_Post $post
-     * @param string $excerptType
-     * @param bool $excerptMayContainLinks
-     * @param bool $showArchiveLinks
-     *
-     * @return mixed|string|void
-     */
-    private function getEinsatzExcerpt($post, $excerptType, $excerptMayContainLinks, $showArchiveLinks)
-    {
-        switch ($excerptType) {
-            case 'details':
-                return $this->getEinsatzberichtHeader($post, $excerptMayContainLinks, $showArchiveLinks);
-            case 'text':
-                return $this->prepareContent(get_the_content());
-            case 'none':
-                return '';
-            default:
-                return $this->getEinsatzberichtHeader($post, $excerptMayContainLinks, $showArchiveLinks);
-        }
-    }
-
 
     /**
      * Gibt Einsatzberichte ggf. auch zwischen den 'normalen' Blogbeiträgen aus

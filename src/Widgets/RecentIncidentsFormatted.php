@@ -125,7 +125,8 @@ class RecentIncidentsFormatted extends WP_Widget
         'afterContent' => ''
     );
     private $allowedTagsPattern = array('%title%', '%date%', '%time%', '%location%', '%duration%', '%incidentType%',
-        '%incidentTypeColor%', '%url%', '%number%', '%seqNum%', '%annotations%');
+        '%incidentTypeColor%', '%url%', '%number%', '%seqNum%', '%annotations%', '%vehicles%', '%additionalForces%',
+        '%typesOfAlerting%');
     private $allowedTagsAfter = array('%feedUrl%');
 
     /**
@@ -183,9 +184,9 @@ class RecentIncidentsFormatted extends WP_Widget
 
         $widgetContent = $settings['beforeContent'];
         foreach ($incidents as $incident) {
-            $widgetContent .= self::$formatter->formatIncidentData($settings['pattern'], $this->allowedTagsPattern, $incident);
+            $widgetContent .= self::$formatter->formatIncidentData($settings['pattern'], $this->allowedTagsPattern, $incident, 'widget');
         }
-        $widgetContent .= self::$formatter->formatIncidentData($settings['afterContent'], $this->allowedTagsAfter);
+        $widgetContent .= self::$formatter->formatIncidentData($settings['afterContent'], $this->allowedTagsAfter, null, 'widget');
 
         echo wp_kses($widgetContent, $this->allowedHtmlTags);
         echo $args['after_widget'];

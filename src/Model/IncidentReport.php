@@ -2,7 +2,6 @@
 
 namespace abrain\Einsatzverwaltung\Model;
 
-use abrain\Einsatzverwaltung\Taxonomies;
 use DateTime;
 use WP_Post;
 use WP_Term;
@@ -346,7 +345,7 @@ class IncidentReport
                 continue;
             }
 
-            $vehicleOrder = Taxonomies::getTermField($vehicle->term_id, 'vehicleorder');
+            $vehicleOrder = get_term_meta($vehicle->term_id, 'vehicleorder', true);
             if (!empty($vehicleOrder)) {
                 $vehicle->vehicle_order = $vehicleOrder;
             }

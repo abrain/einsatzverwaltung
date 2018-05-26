@@ -262,23 +262,6 @@ class Utilities
         }
     }
 
-
-    /**
-     * Stellt einen gültigen Wert der Exzerpttypeinstellung sicher
-     *
-     * @param string $input Eingegebener Wert
-     *
-     * @return string Der Eingabewert, wenn gültig, ansonsten ein Standardwert
-     */
-    public function sanitizeExcerptType($input)
-    {
-        if (array_key_exists($input, $this->core->getExcerptTypes())) {
-            return $input;
-        } else {
-            return $this->options->getDefaultExcerptType();
-        }
-    }
-
     /**
      * Stellt sicher, dass es sich um einen validen Farbwert im Hexformat handelt
      *

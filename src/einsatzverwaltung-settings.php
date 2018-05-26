@@ -511,6 +511,7 @@ class Settings
      */
     public function echoSettingsPermalinks()
     {
+        echo '<fieldset>';
         $this->echoSettingsInput(
             'einsatzvw_rewrite_slug',
             sprintf(
@@ -521,6 +522,7 @@ class Settings
             ),
             $this->options->getRewriteSlug()
         );
+        echo '</fieldset>';
     }
 
     /**
@@ -528,10 +530,12 @@ class Settings
      */
     public function echoSettingsEinsatznummerFormat()
     {
+        echo '<fieldset>';
         printf('Jahreszahl + jahresbezogene, fortlaufende Nummer mit <input type="text" value="%2$s" size="2" id="%1$s" name="%1$s" /> Stellen<p class="description">Beispiel f&uuml;r den f&uuml;nften Einsatz in 2014:<br>bei 2 Stellen: 201405<br>bei 4 Stellen: 20140005</p><br>', 'einsatzvw_einsatznummer_stellen', $this->options->getEinsatznummerStellen());
         $this->echoSettingsCheckbox('einsatzvw_einsatznummer_lfdvorne', 'Laufende Nummer vor das Jahr stellen');
 
-        echo '<br><br><strong>Hinweis:</strong> Nach einer &Auml;nderung des Formats erhalten die bestehenden Einsatzberichte automatisch aktualisierte Nummern.';
+        echo '<p><strong>Hinweis:</strong> Nach einer &Auml;nderung des Formats erhalten die bestehenden Einsatzberichte automatisch aktualisierte Nummern.</p>';
+        echo '</fieldset>';
     }
 
     public function echoSettingsEinsatznummerAuto()
@@ -549,6 +553,7 @@ class Settings
      */
     public function echoEinsatzberichteMainloop()
     {
+        echo '<fieldset>';
         $this->echoSettingsCheckbox(
             'einsatzvw_show_einsatzberichte_mainloop',
             'Einsatzberichte zwischen den regul&auml;ren WordPress-Beitr&auml;gen anzeigen'
@@ -574,6 +579,7 @@ class Settings
             'Nur als besonders markierte Einsatzberichte zwischen den regul&auml;ren WordPress-Beitr&auml;gen bzw. in der Kategorie anzeigen.'
         );
         echo '<p class="description">Mit dieser Einstellung gelten die beiden oberen Einstellungen nur f&uuml;r als besonders markierte Einsatzberichte.</p>';
+        echo '</fieldset>';
     }
 
 
@@ -582,11 +588,13 @@ class Settings
      */
     public function echoSettingsEmptyDetails()
     {
+        echo '<fieldset>';
         $this->echoSettingsCheckbox(
             'einsatzvw_einsatz_hideemptydetails',
             'Nicht ausgef&uuml;llte Details ausblenden'
         );
         echo '<p class="description">Ein Einsatzdetail gilt als nicht ausgef&uuml;llt, wenn das entsprechende Textfeld oder die entsprechende Liste leer ist. Diese Einstellung greift nur bei der klassischen Darstellung ohne Template.</p>';
+        echo '</fieldset>';
     }
 
 
@@ -595,6 +603,7 @@ class Settings
      */
     public function echoSettingsArchive()
     {
+        echo '<fieldset>';
         $this->echoSettingsCheckbox(
             'einsatzvw_show_einsatzart_archive',
             'Einsatzart'
@@ -610,6 +619,7 @@ class Settings
             'Fahrzeuge'
         );
         echo '<p class="description">F&uuml;r alle hier aktivierten Arten von Einsatzdetails werden im Kopfbereich des Einsatzberichts f&uuml;r alle auftretenden Werte Links zu einer gefilterten Einsatz&uuml;bersicht angezeigt. Beispielsweise kann man damit alle Eins&auml;tze unter Beteiligung einer bestimmten externen Einsatzkraft auflisten lassen.</p>';
+        echo '</fieldset>';
     }
 
 
@@ -619,10 +629,12 @@ class Settings
      */
     public function echoSettingsExtNew()
     {
+        echo '<fieldset>';
         $this->echoSettingsCheckbox(
             'einsatzvw_open_ext_in_new',
             'Links zu externen Einsatzmitteln in einem neuen Fenster öffnen'
         );
+        echo '</fieldset>';
     }
 
     /**
@@ -692,6 +704,7 @@ class Settings
 
     public function echoEinsatzlisteColumnSettings()
     {
+        echo '<fieldset>';
         $this->echoSettingsCheckbox(
             'einsatzvw_list_art_hierarchy',
             '<strong>Einsatzart</strong>: Hierarchie der Einsatzart anzeigen'
@@ -706,17 +719,21 @@ class Settings
             'einsatzvw_list_ext_link',
             '<strong>Weitere Kr&auml;fte</strong>: Links anzeigen, sofern verf&uuml;gbar'
         );
+        echo '</fieldset>';
     }
 
     public function echoEinsatzlisteAnnotationsSettings()
     {
+        echo '<fieldset>';
         echo '<p>Farbe f&uuml;r inaktive Vermerke:</p>';
         $this->echoColorPicker('einsatzvw_list_annotations_color_off', AnnotationIconBar::DEFAULT_COLOR_OFF);
         echo '<p class="description">Diese Farbe wird f&uuml;r die Symbole von inaktiven Vermerken verwendet, die von aktiven werden in der Textfarbe Deines Themes dargestellt. Anzugeben ist der Farbwert in Hexadezimalschreibweise (3- oder 6-stellig) mit f&uuml;hrendem #-Zeichen.</p>';
+        echo '</fieldset>';
     }
 
     public function echoEinsatzlisteZebraSettings()
     {
+        echo '<fieldset>';
         $this->echoSettingsCheckbox(
             'einsatzvw_list_zebra',
             'Zebrastreifen anzeigen',
@@ -733,6 +750,7 @@ class Settings
         echo '>Gerade Zeilen einf&auml;rben</label> <label><input type="radio" name="einsatzvw_list_zebra_nth" value="odd" ';
         checked($this->reportListSettings->getZebraNthChildArg(), 'odd');
         echo '>Ungerade Zeilen einf&auml;rben</label></fieldset></p>';
+        echo '</fieldset>';
     }
 
     /**
@@ -740,6 +758,7 @@ class Settings
      */
     public function echoSettingsCapsRoles()
     {
+        echo '<fieldset>';
         $roles = get_editable_roles();
         if (empty($roles)) {
             echo "Es konnten keine Rollen gefunden werden.";
@@ -759,6 +778,7 @@ class Settings
             echo '<p class="description">Die Benutzer mit den hier ausgew&auml;hlten Rollen haben alle Rechte, um die Einsatzberichte und die zugeh&ouml;rigen Eigenschaften (z.B. Einsatzarten) zu verwalten. Zu dieser Einstellungsseite und den Werkzeugen haben in jedem Fall nur Administratoren Zugang.</p>';
             echo '<p class="description">Die Berechtigungen können mit speziellen Plugins deutlich feingranularer eingestellt werden.</p>';
         }
+        echo '</fieldset>';
     }
 
 

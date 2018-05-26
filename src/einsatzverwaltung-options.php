@@ -26,6 +26,7 @@ class Options
         'einsatzvw_category' => false,
         'einsatzvw_loop_only_special' => false,
         'einsatzverwaltung_incidentnumbers_auto' => false,
+        'einsatzverwaltung_use_excerpttemplate' => false,
     );
 
     /**

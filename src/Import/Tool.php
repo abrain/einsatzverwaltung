@@ -191,9 +191,10 @@ class Tool
         }
 
         // 'Sofort veröffentlichen'-Option übernehmen
+        $publishReports = filter_input(INPUT_POST, 'import_publish_reports', FILTER_SANITIZE_STRING);
         $this->currentSource->putArg(
             'import_publish_reports',
-            $this->utilities->sanitizeCheckbox(array($_POST, 'import_publish_reports'))
+            $this->utilities->sanitizeCheckbox($publishReports)
         );
 
         echo "<h2>{$this->currentAction['name']}</h2>";

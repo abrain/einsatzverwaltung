@@ -77,14 +77,17 @@ abstract class SubPage
      *
      * @param string $checkboxId Id der Option
      * @param string $text Beschriftung der Checkbox
-     * @internal param bool $state Optional, gibt den Zustand der Checkbox an.
+     * @param bool $defaultValue Standardwert für Option, falls diese nicht existiert
      */
-    protected function echoSettingsCheckbox($checkboxId, $text)
+    protected function echoSettingsCheckbox($checkboxId, $text, $defaultValue = false)
     {
-        echo '<input type="checkbox" value="1" id="' . $checkboxId . '" name="' . $checkboxId . '" ';
-        $state = (func_num_args() > 2 ? func_get_arg(2) : self::$options->getBoolOption($checkboxId));
-        echo self::$utilities->checked($state) . '/><label for="' . $checkboxId . '">';
-        echo $text . '</label>';
+        $currentValue = get_option($checkboxId, $defaultValue);
+        printf(
+            '<label for="%1$s"><input type="checkbox" value="1" id="%1$s" name="%1$s"%2$s>%3$s</label>',
+            esc_attr($checkboxId),
+            checked($currentValue, '1', false),
+            $text
+        );
     }
 
     /**

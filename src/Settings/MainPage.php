@@ -156,6 +156,7 @@ class MainPage
      */
     public function registerSettings()
     {
+        // NEEDS_WP4.7 Standardwerte in register_setting() mitgeben
         foreach ($this->subPages as $subPage) {
             $subPage->addSettingsSections();
             $subPage->addSettingsFields();

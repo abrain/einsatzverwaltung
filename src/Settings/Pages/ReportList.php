@@ -140,8 +140,7 @@ class ReportList extends SubPage
         echo '<fieldset>';
         $this->echoSettingsCheckbox(
             'einsatzvw_list_zebra',
-            'Zebrastreifen anzeigen',
-            $this->reportListSettings->isZebraTable()
+            'Zebrastreifen anzeigen'
         );
         echo '<p class="description">Die Zeilen der Tabelle werden abwechselnd eingef&auml;rbt, um die Lesbarkeit zu verbessern. Wenn das Theme das ebenfalls tut, sollte diese Option deaktiviert werden, um Probleme bei der Darstellung zu vermeiden.</p>';
 

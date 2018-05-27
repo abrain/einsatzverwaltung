@@ -88,12 +88,12 @@ class Report extends SubPage
         echo '<fieldset>';
         $this->echoSettingsCheckbox(
             'einsatzvw_einsatz_hideemptydetails',
-            'Nicht ausgef&uuml;llte Details ausblenden'
+            'Nicht ausgef&uuml;llte Details ausblenden',
+            true
         );
         echo '<p class="description">Ein Einsatzdetail gilt als nicht ausgef&uuml;llt, wenn das entsprechende Textfeld oder die entsprechende Liste leer ist. Diese Einstellung greift nur bei der klassischen Darstellung ohne Template.</p>';
         echo '</fieldset>';
     }
-
 
     /**
      * Gibt die Einstellmöglichkeiten für gefilterte Ansichten aus

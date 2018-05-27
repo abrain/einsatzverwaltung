@@ -11,6 +11,7 @@ use abrain\Einsatzverwaltung\Settings\Pages\Numbers;
 use abrain\Einsatzverwaltung\Settings\Pages\Report;
 use abrain\Einsatzverwaltung\Settings\Pages\ReportList;
 use abrain\Einsatzverwaltung\Settings\Pages\SubPage;
+use abrain\Einsatzverwaltung\Utilities;
 
 /**
  * Entry point for the plugin settings
@@ -34,8 +35,9 @@ class MainPage
     /**
      * MainPage constructor.
      * @param Options $options
+     * @param Utilities $utilities
      */
-    public function __construct(Options $options)
+    public function __construct(Options $options, Utilities $utilities)
     {
         $this->options = $options;
         $this->subPages = array();
@@ -48,6 +50,8 @@ class MainPage
         require_once dirname(__FILE__) . '/Pages/Capabilities.php';
         require_once dirname(__FILE__) . '/Pages/About.php';
 
+        SubPage::$options = $this->options;
+        SubPage::$utilities = $utilities;
         $this->subPages[] = new General();
         $this->subPages[] = new Numbers();
         $this->subPages[] = new Report();

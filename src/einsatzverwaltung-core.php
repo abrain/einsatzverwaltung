@@ -510,7 +510,7 @@ class Core
     private function registerSettings()
     {
         require_once dirname(__FILE__) . '/Settings/MainPage.php';
-        $mainPage = new MainPage($this->options);
+        $mainPage = new MainPage($this->options, $this->utilities);
         add_action('admin_menu', array($mainPage, 'addToSettingsMenu'));
         add_action('admin_init', array($mainPage, 'registerSettings'));
     }

@@ -141,6 +141,9 @@ class Formatter
             case '%content%':
                 $replace = $post->post_content;
                 break;
+            case '%featuredImage%':
+                $replace = current_theme_supports('post-thumbnails') ? get_the_post_thumbnail($post->ID) : '';
+                break;
             default:
                 return $pattern;
         }
@@ -192,7 +195,8 @@ class Formatter
             '%vehicles%' => 'Fahrzeuge',
             '%additionalForces%' => 'Weitere Kr&auml;fte',
             '%typesOfAlerting%' => 'Alarmierungsarten',
-            '%content%' => 'Berichtstext'
+            '%content%' => 'Berichtstext',
+            '%featuredImage%' => 'Beitragsbild',
         );
     }
 

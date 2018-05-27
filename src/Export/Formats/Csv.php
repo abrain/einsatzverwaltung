@@ -137,25 +137,27 @@ class Csv extends AbstractFormat
             $report = new IncidentReport($post);
             
             $duration = Data::getDauer($report);
-            if (empty($duration)) {
+	        // $duration soll stets eine Zahl sein
+	        if (empty($duration)) {
                 $duration = 0;
             }
 
-            $typeOfIncident = $report->getTypeOfIncident();
-            if (empty($typeOfIncident)) {
+            $typeOfIncident = $report->getTypeOfIncident()->name;
+	        // $typeOfIncident soll stets ein String sein
+	        if (empty($typeOfIncident)) {
                 $typeOfIncident = '';
             }
 
             $data = array(
                $report->getSequentialNumber(),
-               implode(',', $report->getTypesOfAlerting()),
+               implode(',', array_map(function($e) { return $e->name; }, $report->getTypesOfAlerting())),
                $report->getTimeOfAlerting()->format('Y-m-d H:i'),
                $report->getTimeOfEnding(),
                $duration,
                $report->getLocation(),
                $typeOfIncident,
-               implode(',', $report->getVehicles()),
-               implode(',', $report->getAdditionalForces()),
+               implode(',', array_map(function($e) { return $e->name; }, $report->getVehicles())),
+               implode(',', array_map(function($e) { return $e->name; }, $report->getAdditionalForces())),
                $report->getWorkforce(),
                $report->getIncidentCommander(),
                $post->post_title,

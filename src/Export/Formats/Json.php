@@ -84,28 +84,28 @@ class Json extends AbstractFormat
 
             $report = new IncidentReport($post);
 
-            $duration = Data::getDauer($report);
-            // $duration soll stets eine Zahl sein
-            if (empty($duration)) {
-                $duration = 0;
-            }
+	        $duration = Data::getDauer($report);
+	        // $duration soll stets eine Zahl sein
+	        if (empty($duration)) {
+		        $duration = 0;
+	        }
 
-            $typeOfIncident = $report->getTypeOfIncident();
-            // $typeOfIncident soll stets ein String sein
-            if (empty($typeOfIncident)) {
-                $typeOfIncident = '';
-            }
+	        $typeOfIncident = $report->getTypeOfIncident()->name;
+	        // $typeOfIncident soll stets ein String sein
+	        if (empty($typeOfIncident)) {
+		        $typeOfIncident = '';
+	        }
     
             $data = array(
                'Einsatznummer' => $report->getSequentialNumber(),
-               'Alarmierungsart' => implode(',', $report->getTypesOfAlerting()),
+               'Alarmierungsart' => implode(',', array_map(function($e) { return $e->name; }, $report->getTypesOfAlerting())),
                'Alarmzeit' => $report->getTimeOfAlerting()->format('Y-m-d H:i'),
                'Einsatzende' => $report->getTimeOfEnding(),
                'Dauer (Minuten)' => $duration,
                'Einsatzort' => $report->getLocation(),
                'Einsatzart' => $typeOfIncident,
-               'Fahrzeuge' => implode(',', $report->getVehicles()),
-               'Externe Einsatzmittel' => implode(',', $report->getAdditionalForces()),
+               'Fahrzeuge' => implode(',', array_map(function($e) { return $e->name; }, $report->getVehicles())),
+               'Externe Einsatzmittel' => implode(',', array_map(function($e) { return $e->name; }, $report->getAdditionalForces())),
                'Mannschaftsstärke' => $report->getWorkforce(),
                'Einsatzleiter' => $report->getIncidentCommander(),
                'Berichtstitel' => $post->post_title,

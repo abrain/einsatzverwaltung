@@ -223,20 +223,12 @@ class Utilities
     /**
      * Bereitet den Formularwert einer Checkbox für das Speichern in der Datenbank vor
      *
-     * @param array $input Der aufzubereitende Wert
+     * @param mixed $value Der aufzubereitende Wert
      *
      * @return int 0 für false, 1 für true
      */
-    public function sanitizeCheckbox($input)
+    public function sanitizeCheckbox($value)
     {
-        if (is_array($input)) {
-            $arr = $input[0];
-            $index = $input[1];
-            $value = (array_key_exists($index, $arr) ? $arr[$index] : "");
-        } else {
-            $value = $input;
-        }
-
         if (isset($value) && $value == "1") {
             return 1;
         } else {

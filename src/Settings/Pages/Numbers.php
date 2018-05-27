@@ -16,7 +16,20 @@ class Numbers extends SubPage
 
     public function addSettingsFields()
     {
-        // TODO: Implement addSettingsFields() method.
+        add_settings_field(
+            'einsatzvw_einsatznummer_auto',
+            'Einsatznummern automatisch verwalten',
+            array($this, 'echoFieldAuto'),
+            $this->settingsApiPage,
+            'einsatzvw_settings_numbers'
+        );
+        add_settings_field(
+            'einsatzvw_einsatznummer_stellen',
+            'Format der Einsatznummer',
+            array($this, 'echoFieldFormat'),
+            $this->settingsApiPage,
+            'einsatzvw_settings_numbers'
+        );
     }
 
     public function addSettingsSections()
@@ -29,8 +42,50 @@ class Numbers extends SubPage
         );
     }
 
+    public function echoFieldAuto()
+    {
+        $this->echoSettingsCheckbox(
+            'einsatzverwaltung_incidentnumbers_auto',
+            'Einsatznummern automatisch verwalten'
+        );
+        echo '<p class="description">Ist diese Option aktiv, kann die Einsatznummer nicht mehr manuell geändert werden. Sie wird automatisch gem&auml;&szlig; den nachfolgenden Regeln generiert und aktualisiert.</p>';
+    }
+
+    /**
+     *
+     */
+    public function echoFieldFormat()
+    {
+        echo '<fieldset>';
+        printf(
+            'Jahreszahl + jahresbezogene, fortlaufende Nummer mit <input type="text" value="%2$s" size="2" id="%1$s" name="%1$s" /> Stellen',
+            'einsatzvw_einsatznummer_stellen',
+            self::$options->getEinsatznummerStellen()
+        );
+        echo '<p class="description">Beispiel f&uuml;r den f&uuml;nften Einsatz in 2014:<br>bei 2 Stellen: 201405<br>bei 4 Stellen: 20140005</p><br>';
+        $this->echoSettingsCheckbox('einsatzvw_einsatznummer_lfdvorne', 'Laufende Nummer vor das Jahr stellen');
+
+        // FIXME das ist so nicht richtig
+        echo '<p><strong>Hinweis:</strong> Nach einer &Auml;nderung des Formats erhalten die bestehenden Einsatzberichte automatisch aktualisierte Nummern.</p>';
+        echo '</fieldset>';
+    }
+
     public function registerSettings()
     {
-        // TODO: Implement registerSettings() method.
+        register_setting(
+            'einsatzvw_settings_numbers',
+            'einsatzverwaltung_incidentnumbers_auto',
+            array(self::$utilities, 'sanitizeCheckbox')
+        );
+        register_setting(
+            'einsatzvw_settings_numbers',
+            'einsatzvw_einsatznummer_stellen',
+            array(self::$utilities, 'sanitizeEinsatznummerStellen')
+        );
+        register_setting(
+            'einsatzvw_settings_numbers',
+            'einsatzvw_einsatznummer_lfdvorne',
+            array(self::$utilities, 'sanitizeCheckbox')
+        );
     }
 }

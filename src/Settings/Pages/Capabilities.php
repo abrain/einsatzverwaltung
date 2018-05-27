@@ -21,7 +21,14 @@ class Capabilities extends SubPage
 
     public function addSettingsSections()
     {
-        // TODO: Implement addSettingsSections() method.
+        add_settings_section(
+            'einsatzvw_settings_caps',
+            '',
+            function () {
+                echo '<p>Hier kann festgelegt werden, welche Benutzer die Einsatzberichte verwalten k&ouml;nnen.</p>';
+            },
+            $this->settingsApiPage
+        );
     }
 
     public function registerSettings()

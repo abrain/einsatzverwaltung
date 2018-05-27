@@ -21,7 +21,12 @@ class Numbers extends SubPage
 
     public function addSettingsSections()
     {
-        // TODO: Implement addSettingsSections() method.
+        add_settings_section(
+            'einsatzvw_settings_numbers',
+            '',
+            null,
+            $this->settingsApiPage
+        );
     }
 
     public function registerSettings()

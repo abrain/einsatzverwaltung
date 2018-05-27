@@ -2,6 +2,8 @@
 
 namespace abrain\Einsatzverwaltung\Settings\Pages;
 
+use abrain\Einsatzverwaltung\Settings\MainPage;
+
 /**
  * Base class for a sub page of the plugin settings
  *
@@ -10,6 +12,7 @@ namespace abrain\Einsatzverwaltung\Settings\Pages;
 abstract class SubPage
 {
     public $identifier;
+    public $settingsApiPage;
     public $title;
 
     /**
@@ -20,6 +23,7 @@ abstract class SubPage
     public function __construct($identifier, $title)
     {
         $this->identifier = $identifier;
+        $this->settingsApiPage = MainPage::EVW_SETTINGS_SLUG . '-' . $identifier;
         $this->title = $title;
     }
 

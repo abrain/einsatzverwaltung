@@ -148,6 +148,18 @@ class MainPage
     }
 
     /**
+     * Macht Einstellungen im System bekannt und regelt die Zugehörigkeit zu Abschnitten auf Einstellungsseiten
+     */
+    public function registerSettings()
+    {
+        foreach ($this->subPages as $subPage) {
+            $subPage->addSettingsSections();
+            $subPage->addSettingsFields();
+            $subPage->registerSettings();
+        }
+    }
+
+    /**
      * @param string $slug
      * @return bool
      */

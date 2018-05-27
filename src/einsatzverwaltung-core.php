@@ -13,7 +13,6 @@ require_once dirname(__FILE__) . '/Widgets/RecentIncidents.php';
 require_once dirname(__FILE__) . '/Widgets/RecentIncidentsFormatted.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-options.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-shortcodes.php';
-require_once dirname(__FILE__) . '/Settings/MainPage.php';
 require_once dirname(__FILE__) . '/Import/Tool.php';
 require_once dirname(__FILE__) . '/Frontend/ReportList.php';
 require_once dirname(__FILE__) . '/Frontend/ReportListSettings.php';
@@ -510,8 +509,10 @@ class Core
 
     private function registerSettings()
     {
+        require_once dirname(__FILE__) . '/Settings/MainPage.php';
         $mainPage = new MainPage($this->options);
         add_action('admin_menu', array($mainPage, 'addToSettingsMenu'));
+        add_action('admin_init', array($mainPage, 'registerSettings'));
     }
 
     private function addRewriteRules()

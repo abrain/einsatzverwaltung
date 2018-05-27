@@ -13,7 +13,7 @@ require_once dirname(__FILE__) . '/Widgets/RecentIncidents.php';
 require_once dirname(__FILE__) . '/Widgets/RecentIncidentsFormatted.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-options.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-shortcodes.php';
-require_once dirname(__FILE__) . '/einsatzverwaltung-settings.php';
+require_once dirname(__FILE__) . '/Settings/MainPage.php';
 require_once dirname(__FILE__) . '/Import/Tool.php';
 require_once dirname(__FILE__) . '/Frontend/ReportList.php';
 require_once dirname(__FILE__) . '/Frontend/ReportListSettings.php';
@@ -26,6 +26,7 @@ use abrain\Einsatzverwaltung\CustomFields\PostSelector;
 use abrain\Einsatzverwaltung\CustomFields\TextInput;
 use abrain\Einsatzverwaltung\Import\Tool as ImportTool;
 use abrain\Einsatzverwaltung\Model\ReportAnnotation;
+use abrain\Einsatzverwaltung\Settings\MainPage;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use abrain\Einsatzverwaltung\Widgets\RecentIncidents;
 use abrain\Einsatzverwaltung\Widgets\RecentIncidentsFormatted;
@@ -258,11 +259,6 @@ class Core
      * @var Frontend
      */
     private $frontend;
-
-    /**
-     * @var Settings
-     */
-    private $settings;
     
     /**
      * @var Options
@@ -305,7 +301,7 @@ class Core
         $this->admin = new Admin($this, $this->options, $this->utilities);
         $this->data = new Data($this, $this->utilities, $this->options);
         $this->frontend = new Frontend($this, $this->options, $this->utilities, $formatter);
-        $this->settings = new Settings($this, $this->options, $this->utilities, $this->data);
+        $this->registerSettings();
         $this->shortcodes = new Shortcodes($this->utilities, $this, $this->options, $formatter);
 
         // Tools
@@ -512,6 +508,12 @@ class Core
         ));
     }
 
+    private function registerSettings()
+    {
+        $mainPage = new MainPage($this->options);
+        add_action('admin_menu', array($mainPage, 'addToSettingsMenu'));
+    }
+
     private function addRewriteRules()
     {
         global $wp_rewrite;
@@ -682,14 +684,6 @@ class Core
     public function getFrontend()
     {
         return $this->frontend;
-    }
-
-    /**
-     * @return Settings
-     */
-    public function getSettings()
-    {
-        return $this->settings;
     }
 
     /**

@@ -500,7 +500,7 @@ class ReportList
     {
         $reportListSettings = self::$settings; // FIXME Verrenkung, um PHP 5.3.0 als Minimum zu ermöglichen, solange das
                                                // Ende der Untersützung nicht im Blog angekündigt wurde.
-        if (empty($reportListSettings)) {
+        if (empty($reportListSettings)) {      // NEEDS_PHP5.5 direkt empty(self::$settings) prüfen
             self::$settings = new ReportListSettings();
         }
 

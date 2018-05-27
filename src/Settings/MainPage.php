@@ -4,6 +4,13 @@ namespace abrain\Einsatzverwaltung\Settings;
 
 use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\Options;
+use abrain\Einsatzverwaltung\Settings\Pages\About;
+use abrain\Einsatzverwaltung\Settings\Pages\Capabilities;
+use abrain\Einsatzverwaltung\Settings\Pages\General;
+use abrain\Einsatzverwaltung\Settings\Pages\Numbers;
+use abrain\Einsatzverwaltung\Settings\Pages\Report;
+use abrain\Einsatzverwaltung\Settings\Pages\ReportList;
+use abrain\Einsatzverwaltung\Settings\Pages\SubPage;
 
 /**
  * Entry point for the plugin settings
@@ -20,12 +27,33 @@ class MainPage
     private $options;
 
     /**
+     * @var SubPage[]
+     */
+    private $subPages;
+
+    /**
      * MainPage constructor.
      * @param Options $options
      */
     public function __construct(Options $options)
     {
         $this->options = $options;
+        $this->subPages = array();
+
+        require_once dirname(__FILE__) . '/Pages/SubPage.php';
+        require_once dirname(__FILE__) . '/Pages/General.php';
+        require_once dirname(__FILE__) . '/Pages/Numbers.php';
+        require_once dirname(__FILE__) . '/Pages/Report.php';
+        require_once dirname(__FILE__) . '/Pages/ReportList.php';
+        require_once dirname(__FILE__) . '/Pages/Capabilities.php';
+        require_once dirname(__FILE__) . '/Pages/About.php';
+
+        $this->subPages[] = new General();
+        $this->subPages[] = new Numbers();
+        $this->subPages[] = new Report();
+        $this->subPages[] = new ReportList();
+        $this->subPages[] = new Capabilities();
+        $this->subPages[] = new About();
     }
 
     /**
@@ -65,32 +93,22 @@ class MainPage
             echo '<div class="error"><p>' . $message . '</p></div>';
         }
 
-        $tabs = array(
-            'general' => 'Allgemein',
-            'numbers' => 'Einsatznummern',
-            'report' => 'Einsatzberichte',
-            'list' => 'Einsatzliste',
-            'capabilities' => 'Berechtigungen',
-            'about' => '&Uuml;ber',
-        );
-
         $flags = FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH;
         $currentTab = filter_input(INPUT_GET, 'tab', FILTER_SANITIZE_STRING, $flags);
 
-        if (empty($currentTab) || !array_key_exists($currentTab, $tabs)) {
-            $tabIds = array_keys($tabs);
-            $currentTab = $tabIds[0]; // NEEDS_PHP5.4 array_keys($tabs)[0]
+        if (empty($currentTab) || !$this->subPageExists($currentTab)) {
+            $currentTab = $this->subPages[0]->identifier;
         }
 
         echo "<h2 class=\"nav-tab-wrapper\">";
-        foreach ($tabs as $identifier => $label) {
-            $class = $currentTab === $identifier ? "nav-tab nav-tab-active" : "nav-tab";
+        foreach ($this->subPages as $subPage) {
+            $class = $currentTab === $subPage->identifier ? "nav-tab nav-tab-active" : "nav-tab";
             printf(
                 '<a href="?page=%s&tab=%s" class="%s">%s</a>',
                 self::EVW_SETTINGS_SLUG,
-                $identifier,
+                $subPage->identifier,
                 $class,
-                $label
+                $subPage->title
             );
         }
         echo "</h2>";
@@ -127,5 +145,24 @@ class MainPage
         do_settings_sections(self::EVW_SETTINGS_SLUG . '-' . $currentTab);
         submit_button();
         echo '</form>';
+    }
+
+    /**
+     * @param string $slug
+     * @return bool
+     */
+    private function subPageExists($slug)
+    {
+        if (empty($slug)) {
+            return false;
+        }
+
+        foreach ($this->subPages as $subPage) {
+            if ($subPage->identifier === $slug) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

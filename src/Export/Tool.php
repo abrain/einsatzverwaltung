@@ -33,7 +33,8 @@ class Tool
     {
         add_action('admin_menu', array($this, 'addToolToMenu'));
 
-        add_action('init', array($this, 'startExport'));
+        // Priorität muss höher als 10 sein, damit das Plugin in Core vorher richtig initialisiert wird
+        add_action('init', array($this, 'startExport'), 20);
     }
 
     /**

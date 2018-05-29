@@ -4,6 +4,7 @@ namespace abrain\Einsatzverwaltung\Settings\Pages;
 
 use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Frontend\ReportListSettings;
+use abrain\Einsatzverwaltung\Utilities;
 
 /**
  * ReportList settings page
@@ -84,7 +85,7 @@ class ReportList extends SubPage
             if (in_array($colId, $enabledColumns)) {
                 continue;
             }
-            $name = self::$utilities->getArrayValueIfKey($colInfo, 'longName', $colInfo['name']);
+            $name = array_key_exists('longName', $colInfo) ? $colInfo['longName'] : $colInfo['name'];
             echo '<li id="' . $colId . '" class="evw-column"><span>' . $name . '</span></li>';
         }
         echo '</ul></td></tr></table>';
@@ -99,7 +100,7 @@ class ReportList extends SubPage
             }
 
             $colInfo = $columns[$colId];
-            $name = self::$utilities->getArrayValueIfKey($colInfo, 'longName', $colInfo['name']);
+            $name = array_key_exists('longName', $colInfo) ? $colInfo['longName'] : $colInfo['name'];
             echo '<li id="' . $colId . '" class="evw-column"><span>' . $name . '</span></li>';
         }
         echo '</ul></td></tr></table>';
@@ -161,22 +162,22 @@ class ReportList extends SubPage
         register_setting(
             'einsatzvw_settings_list',
             'einsatzvw_list_columns',
-            array(self::$utilities, 'sanitizeColumns')
+            array('\abrain\Einsatzverwaltung\Frontend\ReportList', 'sanitizeColumns')
         );
         register_setting(
             'einsatzvw_settings_list',
             'einsatzvw_list_art_hierarchy',
-            array(self::$utilities, 'sanitizeCheckbox')
+            array('Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_list',
             'einsatzvw_list_fahrzeuge_link',
-            array(self::$utilities, 'sanitizeCheckbox')
+            array('Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_list',
             'einsatzvw_list_ext_link',
-            array(self::$utilities, 'sanitizeCheckbox')
+            array('Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_list',
@@ -186,7 +187,7 @@ class ReportList extends SubPage
         register_setting(
             'einsatzvw_settings_list',
             'einsatzvw_list_zebra',
-            array(self::$utilities, 'sanitizeCheckbox')
+            array('Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_list',
@@ -209,7 +210,7 @@ class ReportList extends SubPage
      */
     public function sanitizeZebraColor($input)
     {
-        return self::$utilities->sanitizeHexColor($input, ReportListSettings::DEFAULT_ZEBRACOLOR);
+        return Utilities::sanitizeHexColor($input, ReportListSettings::DEFAULT_ZEBRACOLOR);
     }
 
     /**
@@ -221,6 +222,6 @@ class ReportList extends SubPage
      */
     public function sanitizeAnnotationOffColor($input)
     {
-        return self::$utilities->sanitizeHexColor($input, AnnotationIconBar::DEFAULT_COLOR_OFF);
+        return Utilities::sanitizeHexColor($input, AnnotationIconBar::DEFAULT_COLOR_OFF);
     }
 }

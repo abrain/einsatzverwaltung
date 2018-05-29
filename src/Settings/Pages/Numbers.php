@@ -75,17 +75,17 @@ class Numbers extends SubPage
         register_setting(
             'einsatzvw_settings_numbers',
             'einsatzverwaltung_incidentnumbers_auto',
-            array(self::$utilities, 'sanitizeCheckbox')
+            array('Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_numbers',
             'einsatzvw_einsatznummer_stellen',
-            array(self::$utilities, 'sanitizeEinsatznummerStellen')
+            array('Utilities', 'sanitizeEinsatznummerStellen')
         );
         register_setting(
             'einsatzvw_settings_numbers',
             'einsatzvw_einsatznummer_lfdvorne',
-            array(self::$utilities, 'sanitizeCheckbox')
+            array('Utilities', 'sanitizeCheckbox')
         );
     }
 }

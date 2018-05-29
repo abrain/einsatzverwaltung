@@ -4,7 +4,6 @@ namespace abrain\Einsatzverwaltung\Settings\Pages;
 
 use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\Settings\MainPage;
-use abrain\Einsatzverwaltung\Utilities;
 
 /**
  * Base class for a sub page of the plugin settings
@@ -33,12 +32,6 @@ abstract class SubPage
      * @var string
      */
     public $title;
-
-    /**
-     * FIXME provisorisch
-     * @var Utilities
-     */
-    public static $utilities;
 
     /**
      * SubPage constructor.

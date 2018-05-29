@@ -166,27 +166,27 @@ class Report extends SubPage
         register_setting(
             'einsatzvw_settings_report',
             'einsatzvw_einsatz_hideemptydetails',
-            array(self::$utilities, 'sanitizeCheckbox')
+            array('Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_report',
             'einsatzvw_show_exteinsatzmittel_archive',
-            array(self::$utilities, 'sanitizeCheckbox')
+            array('Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_report',
             'einsatzvw_show_einsatzart_archive',
-            array(self::$utilities, 'sanitizeCheckbox')
+            array('Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_report',
             'einsatzvw_show_fahrzeug_archive',
-            array(self::$utilities, 'sanitizeCheckbox')
+            array('Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_report',
             'einsatzvw_open_ext_in_new',
-            array(self::$utilities, 'sanitizeCheckbox')
+            array('Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_report',
@@ -201,7 +201,7 @@ class Report extends SubPage
         register_setting(
             'einsatzvw_settings_report',
             'einsatzverwaltung_use_excerpttemplate',
-            array(self::$utilities, 'sanitizeCheckbox')
+            array('Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_report',

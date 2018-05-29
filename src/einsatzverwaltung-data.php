@@ -289,9 +289,9 @@ class Data
         $category = $this->options->getEinsatzberichteCategory();
         if ($category != -1) {
             if (!($this->options->isOnlySpecialInLoop()) || $report->isSpecial()) {
-                $this->utilities->addPostToCategory($postId, $category);
+                Utilities::addPostToCategory($postId, $category);
             } else {
-                $this->utilities->removePostFromCategory($postId, $category);
+                Utilities::removePostFromCategory($postId, $category);
             }
         }
         
@@ -317,7 +317,7 @@ class Data
         // Kategoriezugehörigkeit aktualisieren
         $category = $this->options->getEinsatzberichteCategory();
         if ($category != -1) {
-            $this->utilities->removePostFromCategory($postId, $category);
+            Utilities::removePostFromCategory($postId, $category);
         }
     }
 

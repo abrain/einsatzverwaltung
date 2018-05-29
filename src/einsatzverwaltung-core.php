@@ -413,7 +413,7 @@ class Core
             'type' => 'boolean',
             'description' => 'Vermerk, ob es sich um einen Fehlalarm handelte.',
             'single' => true,
-            'sanitize_callback' => array($this->utilities, 'sanitizeCheckbox'),
+            'sanitize_callback' => array('Utilities', 'sanitizeCheckbox'),
             'show_in_rest' => false
         ));
 
@@ -421,7 +421,7 @@ class Core
             'type' => 'boolean',
             'description' => 'Vermerk, ob der Einsatzbericht Bilder enthält.',
             'single' => true,
-            'sanitize_callback' => array($this->utilities, 'sanitizeCheckbox'),
+            'sanitize_callback' => array('Utilities', 'sanitizeCheckbox'),
             'show_in_rest' => false
         ));
 
@@ -445,7 +445,7 @@ class Core
             'type' => 'boolean',
             'description' => 'Vermerk, ob es sich um einen besonderen Einsatzbericht handelt.',
             'single' => true,
-            'sanitize_callback' => array($this->utilities, 'sanitizeCheckbox'),
+            'sanitize_callback' => array('Utilities', 'sanitizeCheckbox'),
             'show_in_rest' => false
         ));
 
@@ -510,7 +510,7 @@ class Core
     private function registerSettings()
     {
         require_once dirname(__FILE__) . '/Settings/MainPage.php';
-        $mainPage = new MainPage($this->options, $this->utilities);
+        $mainPage = new MainPage($this->options);
         add_action('admin_menu', array($mainPage, 'addToSettingsMenu'));
         add_action('admin_init', array($mainPage, 'registerSettings'));
     }

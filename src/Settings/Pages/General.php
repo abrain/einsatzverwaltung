@@ -3,6 +3,7 @@
 namespace abrain\Einsatzverwaltung\Settings\Pages;
 
 use abrain\Einsatzverwaltung\Model\IncidentReport;
+use abrain\Einsatzverwaltung\Utilities;
 
 /**
  * General settings page
@@ -141,13 +142,13 @@ class General extends SubPage
             'post_status' => array('publish', 'private'),
             'numberposts' => -1
         ));
-        $reports = self::$utilities->postsToIncidentReports($posts);
+        $reports = Utilities::postsToIncidentReports($posts);
 
         // Wenn zuvor eine Kategorie gesetzt war, müssen die Einsatzberichte aus dieser entfernt werden
         if ($oldValue != -1) {
             /** @var IncidentReport $report */
             foreach ($reports as $report) {
-                self::$utilities->removePostFromCategory($report->getPostId(), $oldValue);
+                Utilities::removePostFromCategory($report->getPostId(), $oldValue);
             }
         }
 
@@ -157,7 +158,7 @@ class General extends SubPage
             /** @var IncidentReport $report */
             foreach ($reports as $report) {
                 if (!$onlySpecialInCategory || $report->isSpecial()) {
-                    self::$utilities->addPostToCategory($report->getPostId(), $newValue);
+                    Utilities::addPostToCategory($report->getPostId(), $newValue);
                 }
             }
         }
@@ -192,13 +193,13 @@ class General extends SubPage
             'post_status' => array('publish', 'private'),
             'numberposts' => -1
         ));
-        $reports = self::$utilities->postsToIncidentReports($posts);
+        $reports = Utilities::postsToIncidentReports($posts);
 
         // Wenn die Einstellung abgewählt wurde, werden alle Einsatzberichte zur Kategorie hinzugefügt
         if ($newValue == 0) {
             /** @var IncidentReport $report */
             foreach ($reports as $report) {
-                self::$utilities->addPostToCategory($report->getPostId(), $categoryId);
+                Utilities::addPostToCategory($report->getPostId(), $categoryId);
             }
         }
 
@@ -208,9 +209,9 @@ class General extends SubPage
             /** @var IncidentReport $report */
             foreach ($reports as $report) {
                 if ($report->isSpecial()) {
-                    self::$utilities->addPostToCategory($report->getPostId(), $categoryId);
+                    Utilities::addPostToCategory($report->getPostId(), $categoryId);
                 } else {
-                    self::$utilities->removePostFromCategory($report->getPostId(), $categoryId);
+                    Utilities::removePostFromCategory($report->getPostId(), $categoryId);
                 }
             }
         }
@@ -228,7 +229,7 @@ class General extends SubPage
         register_setting(
             'einsatzvw_settings_general',
             'einsatzvw_show_einsatzberichte_mainloop',
-            array(self::$utilities, 'sanitizeCheckbox')
+            array('Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_general',
@@ -238,7 +239,7 @@ class General extends SubPage
         register_setting(
             'einsatzvw_settings_general',
             'einsatzvw_loop_only_special',
-            array(self::$utilities, 'sanitizeCheckbox')
+            array('Utilities', 'sanitizeCheckbox')
         );
     }
 }

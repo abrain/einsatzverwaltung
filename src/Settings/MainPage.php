@@ -11,7 +11,6 @@ use abrain\Einsatzverwaltung\Settings\Pages\Numbers;
 use abrain\Einsatzverwaltung\Settings\Pages\Report;
 use abrain\Einsatzverwaltung\Settings\Pages\ReportList;
 use abrain\Einsatzverwaltung\Settings\Pages\SubPage;
-use abrain\Einsatzverwaltung\Utilities;
 
 /**
  * Entry point for the plugin settings
@@ -23,11 +22,6 @@ class MainPage
     const EVW_SETTINGS_SLUG = 'einsatzvw-settings';
 
     /**
-     * @var Options
-     */
-    private $options;
-
-    /**
      * @var SubPage[]
      */
     private $subPages;
@@ -35,11 +29,9 @@ class MainPage
     /**
      * MainPage constructor.
      * @param Options $options
-     * @param Utilities $utilities
      */
-    public function __construct(Options $options, Utilities $utilities)
+    public function __construct(Options $options)
     {
-        $this->options = $options;
         $this->subPages = array();
 
         require_once dirname(__FILE__) . '/Pages/SubPage.php';
@@ -50,8 +42,7 @@ class MainPage
         require_once dirname(__FILE__) . '/Pages/Capabilities.php';
         require_once dirname(__FILE__) . '/Pages/About.php';
 
-        SubPage::$options = $this->options;
-        SubPage::$utilities = $utilities;
+        SubPage::$options = $options;
         $this->subPages[] = new General();
         $this->subPages[] = new Numbers();
         $this->subPages[] = new Report();
@@ -89,7 +80,7 @@ class MainPage
 
         <?php
         // Prüfen, ob Rewrite Slug von einer Seite genutzt wird
-        $rewriteSlug = $this->options->getRewriteSlug();
+        $rewriteSlug = sanitize_title(get_option('einsatzvw_rewrite_slug'), 'einsatzberichte');
         $conflictingPage = get_page_by_path($rewriteSlug);
         if ($conflictingPage instanceof \WP_Post) {
             $pageEditLink = '<a href="' . get_edit_post_link($conflictingPage->ID) . '">' . $conflictingPage->post_title . '</a>';

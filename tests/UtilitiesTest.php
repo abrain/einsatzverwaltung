@@ -39,11 +39,11 @@ class UtilitiesTest extends WP_UnitTestCase
         $this->assertEquals($initialCategories, wp_get_post_categories($postId));
 
         // Kategorie hinzufügen und prüfen, ob die Aktion erfolgreich war
-        $this->utilities->addPostToCategory($postId, $categoryIds[2]);
+        Utilities::addPostToCategory($postId, $categoryIds[2]);
         $this->assertEquals(array_slice($categoryIds, 0, 3), wp_get_post_categories($postId));
 
         // Kategorie hinzufügen und prüfen, ob die Aktion erfolgreich war
-        $this->utilities->addPostToCategory($postId, $categoryIds[3]);
+        Utilities::addPostToCategory($postId, $categoryIds[3]);
         $this->assertEquals($categoryIds, wp_get_post_categories($postId));
     }
 
@@ -75,11 +75,11 @@ class UtilitiesTest extends WP_UnitTestCase
         $this->assertEquals($categoryIds, wp_get_post_categories($postId));
 
         // Kategorie entfernen und prüfen, ob die Aktion erfolgreich war
-        $this->utilities->removePostFromCategory($postId, $categoryIds[0]);
+        Utilities::removePostFromCategory($postId, $categoryIds[0]);
         $this->assertEquals(array_slice($categoryIds, 1), wp_get_post_categories($postId));
 
         // Kategorie entfernen und prüfen, ob die Aktion erfolgreich war
-        $this->utilities->removePostFromCategory($postId, $categoryIds[3]);
+        Utilities::removePostFromCategory($postId, $categoryIds[3]);
         $this->assertEquals(array_slice($categoryIds, 1, 2), wp_get_post_categories($postId));
     }
 }

@@ -235,7 +235,7 @@ class Update
             ));
 
             foreach ($posts as $post) {
-                $this->utilities->addPostToCategory($post->ID, $categoryId);
+                Utilities::addPostToCategory($post->ID, $categoryId);
             }
         }
 

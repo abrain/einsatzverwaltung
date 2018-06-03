@@ -3,6 +3,7 @@ namespace abrain\Einsatzverwaltung\Export\Formats;
 
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Data;
+use abrain\Einsatzverwaltung\Util\Formatter;
 
 /**
  * Exportiert Einsatzberichte in eine JSON-Datei.
@@ -89,12 +90,6 @@ class Json extends AbstractFormat
             if (empty($duration)) {
                 $duration = 0;
             }
-
-            $typeOfIncident = $report->getTypeOfIncident()->name;
-            // $typeOfIncident soll stets ein String sein
-            if (empty($typeOfIncident)) {
-                $typeOfIncident = '';
-            }
     
             $data = array(
                'Einsatznummer' => $report->getSequentialNumber(),
@@ -103,7 +98,7 @@ class Json extends AbstractFormat
                'Einsatzende' => $report->getTimeOfEnding(),
                'Dauer (Minuten)' => $duration,
                'Einsatzort' => $report->getLocation(),
-               'Einsatzart' => $typeOfIncident,
+               'Einsatzart' => Formatter::getTypeOfIncident($report, false, false, false),
                'Fahrzeuge' => implode(',', array_map(function($e) { return $e->name; }, $report->getVehicles())),
                'Externe Einsatzmittel' => implode(',', array_map(function($e) { return $e->name; }, $report->getAdditionalForces())),
                'Mannschaftsstärke' => $report->getWorkforce(),

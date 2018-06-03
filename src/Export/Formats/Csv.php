@@ -3,6 +3,7 @@ namespace abrain\Einsatzverwaltung\Export\Formats;
 
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Data;
+use abrain\Einsatzverwaltung\Util\Formatter;
 
 /**
  * Exportiert Einsatzberichte in eine CSV-Datei.
@@ -142,12 +143,6 @@ class Csv extends AbstractFormat
                 $duration = 0;
             }
 
-            $typeOfIncident = $report->getTypeOfIncident()->name;
-            // $typeOfIncident soll stets ein String sein
-            if (empty($typeOfIncident)) {
-                $typeOfIncident = '';
-            }
-
             $data = array(
                $report->getSequentialNumber(),
                implode(',', array_map(function($e) { return $e->name; }, $report->getTypesOfAlerting())),
@@ -155,7 +150,7 @@ class Csv extends AbstractFormat
                $report->getTimeOfEnding(),
                $duration,
                $report->getLocation(),
-               $typeOfIncident,
+               Formatter::getTypeOfIncident($report, false, false, false),
                implode(',', array_map(function($e) { return $e->name; }, $report->getVehicles())),
                implode(',', array_map(function($e) { return $e->name; }, $report->getAdditionalForces())),
                $report->getWorkforce(),

@@ -8,7 +8,7 @@ use abrain\Einsatzverwaltung\Data;
  * Exportiert Einsatzberichte in eine JSON-Datei.
  *
  * Die prettyPrint-Funktion wurde erst einmal auskommentiert, da diese PHP >=5.4
- * voraussetzt, das Plugin jedoch auch unter PHP <5.4 laufen soll. 
+ * voraussetzt, das Plugin jedoch auch unter PHP <5.4 laufen soll.
  */
 class Json extends AbstractFormat
 {
@@ -84,17 +84,17 @@ class Json extends AbstractFormat
 
             $report = new IncidentReport($post);
 
-	        $duration = Data::getDauer($report);
-	        // $duration soll stets eine Zahl sein
-	        if (empty($duration)) {
-		        $duration = 0;
-	        }
+            $duration = Data::getDauer($report);
+            // $duration soll stets eine Zahl sein
+            if (empty($duration)) {
+                $duration = 0;
+            }
 
-	        $typeOfIncident = $report->getTypeOfIncident()->name;
-	        // $typeOfIncident soll stets ein String sein
-	        if (empty($typeOfIncident)) {
-		        $typeOfIncident = '';
-	        }
+            $typeOfIncident = $report->getTypeOfIncident()->name;
+            // $typeOfIncident soll stets ein String sein
+            if (empty($typeOfIncident)) {
+                $typeOfIncident = '';
+            }
     
             $data = array(
                'Einsatznummer' => $report->getSequentialNumber(),

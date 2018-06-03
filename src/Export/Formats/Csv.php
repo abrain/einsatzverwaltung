@@ -8,7 +8,7 @@ use abrain\Einsatzverwaltung\Data;
  * Exportiert Einsatzberichte in eine CSV-Datei.
  *
  * Die escapeChar-Funktion wurde erst einmal auskommentiert, da diese PHP >=5.5.4
- * voraussetzt, das Plugin jedoch auch unter PHP <5.4 laufen soll. 
+ * voraussetzt, das Plugin jedoch auch unter PHP <5.4 laufen soll.
  */
 class Csv extends AbstractFormat
 {
@@ -137,14 +137,14 @@ class Csv extends AbstractFormat
             $report = new IncidentReport($post);
             
             $duration = Data::getDauer($report);
-	        // $duration soll stets eine Zahl sein
-	        if (empty($duration)) {
+            // $duration soll stets eine Zahl sein
+            if (empty($duration)) {
                 $duration = 0;
             }
 
             $typeOfIncident = $report->getTypeOfIncident()->name;
-	        // $typeOfIncident soll stets ein String sein
-	        if (empty($typeOfIncident)) {
+            // $typeOfIncident soll stets ein String sein
+            if (empty($typeOfIncident)) {
                 $typeOfIncident = '';
             }
 

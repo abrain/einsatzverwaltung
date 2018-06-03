@@ -16,7 +16,7 @@ class Tool
     const EVW_TOOL_EXPORT_SLUG = 'einsatzvw-tool-export';
 
     /**
-     * @var Formats\Format
+     * @var Formats\Format[]
      */
     private $formats = array();
 

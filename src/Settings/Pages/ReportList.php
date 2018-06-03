@@ -132,7 +132,7 @@ class ReportList extends SubPage
         echo '<fieldset>';
         echo '<p>Farbe f&uuml;r inaktive Vermerke:</p>';
         $this->echoColorPicker('einsatzvw_list_annotations_color_off', AnnotationIconBar::DEFAULT_COLOR_OFF);
-        echo '<p class="description">Diese Farbe wird f&uuml;r die Symbole von inaktiven Vermerken verwendet, die von aktiven werden in der Textfarbe Deines Themes dargestellt. Anzugeben ist der Farbwert in Hexadezimalschreibweise (3- oder 6-stellig) mit f&uuml;hrendem #-Zeichen.</p>';
+        echo '<p class="description">Diese Farbe wird f&uuml;r die Symbole von inaktiven Vermerken verwendet, die von aktiven werden in der Textfarbe Deines Themes dargestellt.</p>';
         echo '</fieldset>';
     }
 
@@ -147,7 +147,7 @@ class ReportList extends SubPage
 
         echo '<p>Farbe f&uuml;r Zebrastreifen:</p>';
         $this->echoColorPicker('einsatzvw_list_zebracolor', ReportListSettings::DEFAULT_ZEBRACOLOR);
-        echo '<p class="description">Diese Farbe wird f&uuml;r jede zweite Zeile verwendet, die jeweils andere Zeile wird vom Theme eingef&auml;rbt. Anzugeben ist der Farbwert in Hexadezimalschreibweise (3- oder 6-stellig) mit f&uuml;hrendem #-Zeichen.</p>';
+        echo '<p class="description">Diese Farbe wird f&uuml;r jede zweite Zeile verwendet, die jeweils andere Zeile beh&auml;lt die vom Theme vorgegebene Farbe.</p>';
 
         echo '<p><fieldset><label><input type="radio" name="einsatzvw_list_zebra_nth" value="even" ';
         checked($this->reportListSettings->getZebraNthChildArg(), 'even');

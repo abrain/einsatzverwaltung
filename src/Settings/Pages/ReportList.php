@@ -2,7 +2,6 @@
 
 namespace abrain\Einsatzverwaltung\Settings\Pages;
 
-use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Frontend\ReportListSettings;
 use abrain\Einsatzverwaltung\Utilities;
 
@@ -38,13 +37,6 @@ class ReportList extends SubPage
             'einsatzvw_settings_column_settings',
             'Einstellungen zu einzelnen Spalten',
             array($this, 'echoFieldColumnSettings'),
-            $this->settingsApiPage,
-            'einsatzvw_settings_einsatzliste'
-        );
-        add_settings_field(
-            'einsatzvw_settings_listannotations',
-            'Vermerke',
-            array($this, 'echoFieldAnnotations'),
             $this->settingsApiPage,
             'einsatzvw_settings_einsatzliste'
         );
@@ -127,15 +119,6 @@ class ReportList extends SubPage
         echo '</fieldset>';
     }
 
-    public function echoFieldAnnotations()
-    {
-        echo '<fieldset>';
-        echo '<p>Farbe f&uuml;r inaktive Vermerke:</p>';
-        $this->echoColorPicker('einsatzvw_list_annotations_color_off', AnnotationIconBar::DEFAULT_COLOR_OFF);
-        echo '<p class="description">Diese Farbe wird f&uuml;r die Symbole von inaktiven Vermerken verwendet, die von aktiven werden in der Textfarbe Deines Themes dargestellt.</p>';
-        echo '</fieldset>';
-    }
-
     public function echoFieldZebra()
     {
         echo '<fieldset>';
@@ -181,11 +164,6 @@ class ReportList extends SubPage
         );
         register_setting(
             'einsatzvw_settings_list',
-            'einsatzvw_list_annotations_color_off',
-            array($this, 'sanitizeAnnotationOffColor') // NEEDS_WP4.6 das globale sanitize_hex_color() verwenden
-        );
-        register_setting(
-            'einsatzvw_settings_list',
             'einsatzvw_list_zebra',
             array('Utilities', 'sanitizeCheckbox')
         );
@@ -211,17 +189,5 @@ class ReportList extends SubPage
     public function sanitizeZebraColor($input)
     {
         return Utilities::sanitizeHexColor($input, ReportListSettings::DEFAULT_ZEBRACOLOR);
-    }
-
-    /**
-     * Stellt sicher, dass die Farbe für die inaktiven Vermerke gültig ist
-     *
-     * @param string $input Der zu prüfende Farbwert
-     *
-     * @return string Der übergebene Farbwert, wenn er gültig ist, ansonsten die Standardeinstellung
-     */
-    public function sanitizeAnnotationOffColor($input)
-    {
-        return Utilities::sanitizeHexColor($input, AnnotationIconBar::DEFAULT_COLOR_OFF);
     }
 }

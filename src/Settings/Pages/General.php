@@ -2,6 +2,7 @@
 
 namespace abrain\Einsatzverwaltung\Settings\Pages;
 
+use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Utilities;
 
@@ -34,6 +35,13 @@ class General extends SubPage
             'einsatzvw_einsatznummer_mainloop',
             'Einsatzbericht als Beitrag',
             array($this, 'echoFieldMainloop'),
+            $this->settingsApiPage,
+            'einsatzvw_settings_general'
+        );
+        add_settings_field(
+            'einsatzvw_settings_listannotations',
+            'Vermerke',
+            array($this, 'echoFieldAnnotations'),
             $this->settingsApiPage,
             'einsatzvw_settings_general'
         );
@@ -101,6 +109,15 @@ class General extends SubPage
             ),
             sanitize_title(get_option('einsatzvw_rewrite_slug'), 'einsatzberichte')
         );
+        echo '</fieldset>';
+    }
+
+    public function echoFieldAnnotations()
+    {
+        echo '<fieldset>';
+        echo '<p>Farbe f&uuml;r inaktive Vermerke:</p>';
+        $this->echoColorPicker('einsatzvw_list_annotations_color_off', AnnotationIconBar::DEFAULT_COLOR_OFF);
+        echo '<p class="description">Diese Farbe wird f&uuml;r die Symbole von inaktiven Vermerken verwendet, die von aktiven werden in der Textfarbe Deines Themes dargestellt.</p>';
         echo '</fieldset>';
     }
 
@@ -241,5 +258,22 @@ class General extends SubPage
             'einsatzvw_loop_only_special',
             array('Utilities', 'sanitizeCheckbox')
         );
+        register_setting(
+            'einsatzvw_settings_general',
+            'einsatzvw_list_annotations_color_off',
+            array($this, 'sanitizeAnnotationOffColor') // NEEDS_WP4.6 das globale sanitize_hex_color() verwenden
+        );
+    }
+
+    /**
+     * Stellt sicher, dass die Farbe für die inaktiven Vermerke gültig ist
+     *
+     * @param string $input Der zu prüfende Farbwert
+     *
+     * @return string Der übergebene Farbwert, wenn er gültig ist, ansonsten die Standardeinstellung
+     */
+    public function sanitizeAnnotationOffColor($input)
+    {
+        return Utilities::sanitizeHexColor($input, AnnotationIconBar::DEFAULT_COLOR_OFF);
     }
 }

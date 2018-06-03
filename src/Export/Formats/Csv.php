@@ -1,10 +1,6 @@
 <?php
 namespace abrain\Einsatzverwaltung\Export\Formats;
 
-use abrain\Einsatzverwaltung\Model\IncidentReport;
-use abrain\Einsatzverwaltung\Data;
-use abrain\Einsatzverwaltung\Util\Formatter;
-
 /**
  * Exportiert Einsatzberichte in eine CSV-Datei.
  *
@@ -112,57 +108,27 @@ class Csv extends AbstractFormat
 
         // füge ggf. Spaltennamen als die erste Zeile ein
         if ($this->headers) {
-            $data = array(
-                'Einsatznummer',
-                'Alarmierungsart',
-                'Alarmzeit',
-                'Einsatzende',
-                'Dauer (Minuten)',
-                'Einsatzort',
-                'Einsatzart',
-                'Fahrzeuge',
-                'Externe Einsatzmittel',
-                'Mannschaftsstärke',
-                'Einsatzleiter',
-                'Berichtstitel',
-                'Berichtstext',
-                'Besonderer Einsatz',
-                'Fehlalarm'
-            );
+            $data = $this->getColumnNames();
             fputcsv($handle, $data, $this->delimiter, $this->enclosure/*, $this->escapeChar*/);
         }
 
         $query = $this->getQuery();
         while ($query->have_posts()) {
             $post = $query->next_post();
-            $report = new IncidentReport($post);
-            
-            $duration = Data::getDauer($report);
-            // $duration soll stets eine Zahl sein
-            if (empty($duration)) {
-                $duration = 0;
-            }
 
-            $data = array(
-               $report->getSequentialNumber(),
-               implode(',', array_map(function($e) { return $e->name; }, $report->getTypesOfAlerting())),
-               $report->getTimeOfAlerting()->format('Y-m-d H:i'),
-               $report->getTimeOfEnding(),
-               $duration,
-               $report->getLocation(),
-               Formatter::getTypeOfIncident($report, false, false, false),
-               implode(',', array_map(function($e) { return $e->name; }, $report->getVehicles())),
-               implode(',', array_map(function($e) { return $e->name; }, $report->getAdditionalForces())),
-               $report->getWorkforce(),
-               $report->getIncidentCommander(),
-               $post->post_title,
-               $post->post_content,
-               ($report->isSpecial() ? 'Ja' : 'Nein'),
-               ($report->isFalseAlarm() ? 'Ja' : 'Nein'),
-            );
+            $data = $this->getValuesForReport($post);
             fputcsv($handle, $data, $this->delimiter, $this->enclosure/*, $this->escapeChar*/);
         }
 
         fclose($handle);
+    }
+
+    /**
+     * @param bool $bool
+     * @return mixed
+     */
+    protected function getBooleanRepresentation($bool)
+    {
+        return ($bool === true ? 'Ja' : 'Nein');
     }
 }

@@ -1,6 +1,10 @@
 <?php
 namespace abrain\Einsatzverwaltung\Export\Formats;
 
+use abrain\Einsatzverwaltung\Data;
+use abrain\Einsatzverwaltung\Model\IncidentReport;
+use abrain\Einsatzverwaltung\Util\Formatter;
+
 /**
  * Abstraktion für Exportformate
  */
@@ -55,4 +59,69 @@ abstract class AbstractFormat implements Format
 
         return new \WP_Query($args);
     }
+
+    /**
+     * Gibt die Namen der zu exportierenden Felder zurück
+     *
+     * @return array
+     */
+    protected function getColumnNames()
+    {
+        return array(
+            'Einsatznummer',
+            'Alarmierungsart',
+            'Alarmzeit',
+            'Einsatzende',
+            'Dauer (Minuten)',
+            'Einsatzort',
+            'Einsatzart',
+            'Fahrzeuge',
+            'Externe Einsatzmittel',
+            'Mannschaftsstärke',
+            'Einsatzleiter',
+            'Berichtstitel',
+            'Berichtstext',
+            'Besonderer Einsatz',
+            'Fehlalarm'
+        );
+    }
+
+    /**
+     * @param \WP_Post $post
+     * @return array
+     */
+    protected function getValuesForReport(\WP_Post $post)
+    {
+        $report = new IncidentReport($post);
+
+        $duration = Data::getDauer($report);
+        // $duration soll stets eine Zahl sein
+        if (empty($duration)) {
+            $duration = 0;
+        }
+
+        return array(
+            $report->getSequentialNumber(),
+            implode(',', array_map(function($e) { return $e->name; }, $report->getTypesOfAlerting())),
+            $report->getTimeOfAlerting()->format('Y-m-d H:i'),
+            $report->getTimeOfEnding(),
+            $duration,
+            $report->getLocation(),
+            Formatter::getTypeOfIncident($report, false, false, false),
+            implode(',', array_map(function($e) { return $e->name; }, $report->getVehicles())),
+            implode(',', array_map(function($e) { return $e->name; }, $report->getAdditionalForces())),
+            $report->getWorkforce(),
+            $report->getIncidentCommander(),
+            $post->post_title,
+            $post->post_content,
+            $this->getBooleanRepresentation($report->isSpecial()),
+            $this->getBooleanRepresentation($report->isFalseAlarm()),
+        );
+    }
+
+    /**
+     * @param bool $bool
+     * @return mixed
+     */
+    abstract protected function getBooleanRepresentation($bool);
 }

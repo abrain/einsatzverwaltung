@@ -131,4 +131,13 @@ class Csv extends AbstractFormat
     {
         return ($bool === true ? 'Ja' : 'Nein');
     }
+
+    /**
+     * @param array $array
+     * @return mixed
+     */
+    protected function getArrayRepresentation($array)
+    {
+        return join(',', $array);
+    }
 }

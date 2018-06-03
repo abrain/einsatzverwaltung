@@ -113,4 +113,13 @@ class Json extends AbstractFormat
     {
         return $bool;
     }
+
+    /**
+     * @param array $array
+     * @return mixed
+     */
+    protected function getArrayRepresentation($array)
+    {
+        return $array;
+    }
 }

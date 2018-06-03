@@ -69,7 +69,7 @@ abstract class AbstractFormat implements Format
     {
         return array(
             'Einsatznummer',
-            'Alarmierungsart',
+            'Alarmierungsarten',
             'Alarmzeit',
             'Einsatzende',
             'Dauer (Minuten)',
@@ -102,14 +102,14 @@ abstract class AbstractFormat implements Format
 
         return array(
             $report->getSequentialNumber(),
-            implode(',', array_map(function($e) { return $e->name; }, $report->getTypesOfAlerting())),
+            $this->getArrayRepresentation(array_map(array($this, 'getName'), $report->getTypesOfAlerting())),
             $report->getTimeOfAlerting()->format('Y-m-d H:i'),
             $report->getTimeOfEnding(),
             $duration,
             $report->getLocation(),
             Formatter::getTypeOfIncident($report, false, false, false),
-            implode(',', array_map(function($e) { return $e->name; }, $report->getVehicles())),
-            implode(',', array_map(function($e) { return $e->name; }, $report->getAdditionalForces())),
+            $this->getArrayRepresentation(array_map(array($this, 'getName'), $report->getVehicles())),
+            $this->getArrayRepresentation(array_map(array($this, 'getName'), $report->getAdditionalForces())),
             $report->getWorkforce(),
             $report->getIncidentCommander(),
             $post->post_title,
@@ -118,6 +118,21 @@ abstract class AbstractFormat implements Format
             $this->getBooleanRepresentation($report->isFalseAlarm()),
         );
     }
+
+    /**
+     * @param \WP_Term $object
+     * @return string
+     */
+    private function getName($object)
+    {
+        return $object->name;
+    }
+
+    /**
+     * @param array $array
+     * @return mixed
+     */
+    abstract protected function getArrayRepresentation($array);
 
     /**
      * @param bool $bool

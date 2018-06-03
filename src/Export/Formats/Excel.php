@@ -38,6 +38,6 @@ class Excel extends Csv
         $this->delimiter = ';';
         $this->enclosure = '"';
         // $this->escapeChar = '\\';
-        $this->header = (boolean)@$options['columns'];
+        $this->headers = (boolean)@$options['columns'];
     }
 }

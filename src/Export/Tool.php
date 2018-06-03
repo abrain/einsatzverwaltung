@@ -1,9 +1,6 @@
 <?php
 namespace abrain\Einsatzverwaltung\Export;
 
-use abrain\Einsatzverwaltung\Core;
-use abrain\Einsatzverwaltung\Options;
-use abrain\Einsatzverwaltung\Utilities;
 use abrain\Einsatzverwaltung\Export\Formats\Csv;
 use abrain\Einsatzverwaltung\Export\Formats\Excel;
 use abrain\Einsatzverwaltung\Export\Formats\Json;

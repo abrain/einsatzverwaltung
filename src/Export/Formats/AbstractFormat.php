@@ -69,6 +69,7 @@ abstract class AbstractFormat implements Format
     {
         return array(
             'Einsatznummer',
+            'Lfd.',
             'Alarmierungsarten',
             'Alarmzeit',
             'Einsatzende',
@@ -101,6 +102,7 @@ abstract class AbstractFormat implements Format
         }
 
         return array(
+            $report->getNumber(),
             $report->getSequentialNumber(),
             $this->getArrayRepresentation(array_map(array($this, 'getName'), $report->getTypesOfAlerting())),
             $report->getTimeOfAlerting()->format('Y-m-d H:i'),

@@ -283,5 +283,7 @@ class RecentIncidentsFormatted extends WP_Widget
             echo '<br>' . $tag . ' (' . $formatterTags[$tag] . ')';
         }
         echo '</p>';
+
+        return '';
     }
 }

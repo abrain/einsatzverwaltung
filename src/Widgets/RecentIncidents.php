@@ -192,7 +192,7 @@ class RecentIncidents extends WP_Widget
      * @see WP_Widget::form()
      *
      * @param array $instance Previously saved values from database.
-     * @return string|void
+     * @return string
      */
     public function form($instance)
     {
@@ -279,5 +279,7 @@ class RecentIncidents extends WP_Widget
             checked($showAnnotations, '1', false),
             'Vermerke anzeigen'
         );
+
+        return '';
     }
 }

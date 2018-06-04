@@ -1,6 +1,7 @@
 <?php
 namespace abrain\Einsatzverwaltung\Export;
 
+use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\Export\Formats\Csv;
 use abrain\Einsatzverwaltung\Export\Formats\Excel;
 use abrain\Einsatzverwaltung\Export\Formats\Json;
@@ -32,6 +33,19 @@ class Tool
 
         // Priorität muss höher als 10 sein, damit das Plugin in Core vorher richtig initialisiert wird
         add_action('init', array($this, 'startExport'), 20);
+
+        add_action('admin_enqueue_scripts', function ($hook) {
+            if ($hook !== 'tools_page_einsatzvw-tool-export') {
+                return;
+            }
+
+            wp_enqueue_script(
+                'einsatzverwaltung-export',
+                Core::getInstance()->scriptUrl . 'export.js',
+                array('jquery'),
+                Core::VERSION
+            );
+        });
     }
 
     /**
@@ -121,21 +135,6 @@ class Tool
         </ul>
     </fieldset>
 
-    <script type="text/javascript">
-        jQuery(document).ready(function($){
-            var form = $('#export-form'),
-                options = form.find('.export-options');
-            options.hide();
-            form.find('input[name="format"]').change(function() {
-                options.slideUp('fast');
-                switch ( $(this).val() ) {
-                    <?php foreach (array_keys($this->formats) as $formatKey) { ?>
-                        case '<?php echo $formatKey; ?>': $('#<?php echo $formatKey; ?>-options').slideDown(); break;
-                    <?php } ?>
-                }
-            });
-        });
-    </script>
     <h2>Wähle, in welches Format du exportieren möchtest</h2>
     <fieldset>
         <legend class="screen-reader-text">Wähle, in welches Format du exportieren möchtest</legend>
@@ -147,7 +146,7 @@ class Tool
                     <?php echo $format->getTitle(); ?>
                 </label>
             </p>
-            <ul id="<?php echo $formatKey; ?>-options" class="export-options export-filters">
+            <ul id="<?php echo $formatKey; ?>-options" class="export-options export-filters" style="display: none;">
                 <?php $format->renderOptions(); ?>
             </ul>
         <?php } ?>

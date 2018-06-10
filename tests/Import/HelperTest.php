@@ -276,4 +276,15 @@ class HelperTest extends \WP_UnitTestCase
         $this->assertArrayHasKey('einsatz_special', $insertArgs['meta_input']);
         $this->assertEquals('0', $insertArgs['meta_input']['einsatz_special']);
     }
+
+    public function testSanitizeBooleanValues()
+    {
+        $this->assertEquals('1', self::$helper->sanitizeBooleanValues('1'));
+        $this->assertEquals('1', self::$helper->sanitizeBooleanValues('ja'));
+        $this->assertEquals('1', self::$helper->sanitizeBooleanValues('Ja'));
+        $this->assertEquals('0', self::$helper->sanitizeBooleanValues(''));
+        $this->assertEquals('0', self::$helper->sanitizeBooleanValues('0'));
+        $this->assertEquals('0', self::$helper->sanitizeBooleanValues('invalid'));
+        $this->assertEquals('0', self::$helper->sanitizeBooleanValues('Nein'));
+    }
 }

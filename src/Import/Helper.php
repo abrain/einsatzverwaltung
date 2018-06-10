@@ -289,10 +289,25 @@ class Helper
             $insertArgs['post_title'] = 'Einsatz';
         }
 
-        // Berichte müssen explizit als 'nicht besonders' markiert werden
-        if (!array_key_exists('einsatz_special', $insertArgs['meta_input'])) {
-            $insertArgs['meta_input']['einsatz_special'] = '0';
+        // sicherstellen, dass boolsche Werte als 0 oder 1 dargestellt werden
+        $boolAnnotations = array('einsatz_special', 'einsatz_fehlalarm', 'einsatz_hasimages');
+        foreach ($boolAnnotations as $metaKey) {
+            $insertArgs['meta_input'][$metaKey] = $this->sanitizeBooleanValues(@$insertArgs['meta_input'][$metaKey]);
         }
+    }
+
+    /**
+     * Stellt sicher, dass boolsche Werte durch 0 und 1 dargestellt werden
+     * @param string $value
+     * @return string
+     */
+    public function sanitizeBooleanValues($value)
+    {
+        if (empty($value)) {
+            return '0';
+        }
+
+        return (in_array(strtolower($value), array('1', 'ja')) ? '1' : '0');
     }
 
     /**

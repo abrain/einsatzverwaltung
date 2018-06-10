@@ -366,6 +366,6 @@ class Tool
         if ('evw_csv' == $this->currentSource->getIdentifier()) {
             echo '<p>Die Felder <strong>Alarmzeit</strong> und <strong>Einsatzende</strong> erwarten eine Datums- und Zeitangabe, das Format kann bei der Zuordnung der Felder angegeben werden.</p>';
         }
-        echo '<p>Die Felder <strong>Besonderer Einsatz</strong> und <strong>Fehlalarm</strong> erwarten den Wert <code>1</code> (= ja) oder <code>0</code> (= nein). Sie d&uuml;rfen auch leer bleiben, was als 0 (= nein) zählt.</p>';
+        echo '<p>Die Felder <strong>Besonderer Einsatz</strong> und <strong>Fehlalarm</strong> erwarten Ja/Nein-Werte. Als Ja interpretiert werden <code>1</code> und <code>Ja</code> (Gro&szlig;- und Kleinschreibung unerheblich), alle anderen Werte einschlie&szlig;lich eines leeren Feldes z&auml;hlen als Nein.</p>';
     }
 }

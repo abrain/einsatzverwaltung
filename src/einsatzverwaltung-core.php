@@ -500,7 +500,7 @@ class Core
         $taxonomyCustomFields->addColorpicker('einsatzart', new ColorPicker(
             'typecolor',
             'Farbe',
-            'Beschreibung' // TODO
+            'Ordne dieser Einsatzart eine Farbe zu. Einsatzarten ohne Farbe erben diese gegebenenfalls von übergeordneten Einsatzarten.'
         ));
         $taxonomyCustomFields->addPostSelector('fahrzeug', new PostSelector(
             'fahrzeugpid',

@@ -43,12 +43,21 @@ class MainPage
         require_once dirname(__FILE__) . '/Pages/About.php';
 
         SubPage::$options = $options;
-        $this->subPages[] = new General();
-        $this->subPages[] = new Numbers();
-        $this->subPages[] = new Report();
-        $this->subPages[] = new ReportList();
-        $this->subPages[] = new Capabilities();
-        $this->subPages[] = new About();
+        $this->addSubPage(new General());
+        $this->addSubPage(new Numbers());
+        $this->addSubPage(new Report());
+        $this->addSubPage(new ReportList());
+        $this->addSubPage(new Capabilities());
+        $this->addSubPage(new About());
+    }
+
+    /**
+     * Fügt der Einstellungsseite eine Unterseite hinzu
+     * @param SubPage $subPage
+     */
+    private function addSubPage(SubPage $subPage)
+    {
+        $this->subPages[$subPage->identifier] = $subPage;
     }
 
     /**
@@ -88,58 +97,49 @@ class MainPage
             echo '<div class="error"><p>' . $message . '</p></div>';
         }
 
-        $flags = FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH;
-        $currentTab = filter_input(INPUT_GET, 'tab', FILTER_SANITIZE_STRING, $flags);
-
-        if (empty($currentTab) || !$this->subPageExists($currentTab)) {
-            $currentTab = $this->subPages[0]->identifier;
+        $currentSubPage = $this->getCurrentSubPage();
+        if (empty($currentSubPage)) {
+            return;
         }
 
         echo "<h2 class=\"nav-tab-wrapper\">";
         foreach ($this->subPages as $subPage) {
-            $class = $currentTab === $subPage->identifier ? "nav-tab nav-tab-active" : "nav-tab";
             printf(
                 '<a href="?page=%s&tab=%s" class="%s">%s</a>',
                 self::EVW_SETTINGS_SLUG,
                 $subPage->identifier,
-                $class,
+                $currentSubPage === $subPage ? "nav-tab nav-tab-active" : "nav-tab",
                 $subPage->title
             );
         }
         echo "</h2>";
 
-        if ('about' === $currentTab) {
-            ?>
-            <div class="aboutpage-icons">
-                <div class="aboutpage-icon"><a href="https://einsatzverwaltung.abrain.de" target="_blank"><i class="fa fa-globe fa-4x"></i><br>Webseite</a></div>
-                <div class="aboutpage-icon"><a href="https://einsatzverwaltung.abrain.de/dokumentation/" target="_blank"><i class="fa fa-book fa-4x"></i><br>Dokumentation</a></div>
-                <div class="aboutpage-icon"><a href="https://github.com/abrain/einsatzverwaltung" target="_blank"><i class="fa fa-github fa-4x"></i><br>GitHub</a></div>
-                <div class="aboutpage-icon"><a href="https://de.wordpress.org/plugins/einsatzverwaltung/" target="_blank"><i class="fa fa-wordpress fa-4x"></i><br>Plugin-Verzeichnis</a></div>
-            </div>
-
-            <h2>Support</h2>
-            <p>Solltest Du ein Problem bei der Benutzung des Plugins haben, schaue bitte erst auf <a href="https://github.com/abrain/einsatzverwaltung/issues">GitHub</a> und im <a href="https://wordpress.org/support/plugin/einsatzverwaltung">Forum auf wordpress.org</a> nach, ob andere das Problem auch haben bzw. hatten. Wenn es noch keinen passenden Eintrag gibt, lege bitte einen entsprechenden Issue bzw. Thread an. Du kannst aber auch einfach eine <a href="mailto:kontakt@abrain.de">E-Mail</a> schreiben.</p>
-            <p>Gib bitte immer die folgenden Versionen mit an:&nbsp;<code style="border: 1px solid grey;">
-            <?php printf('Plugin: %s, WordPress: %s, PHP: %s', Core::VERSION, get_bloginfo('version'), phpversion()); ?>
-            </code></p>
-
-            <h2>Social Media</h2>
-            <ul>
-                <li>Twitter: <a href="https://twitter.com/einsatzvw" title="Einsatzverwaltung auf Twitter">@einsatzvw</a></li>
-                <li>Mastodon: <a href="https://chaos.social/@einsatzverwaltung" title="Einsatzverwaltung im Fediverse">@einsatzverwaltung</a></li>
-                <li>Facebook: <a href="https://www.facebook.com/einsatzverwaltung/" title="Einsatzverwaltung auf Facebook">Einsatzverwaltung</a></li>
-            </ul>
-            <p>Du kannst die Neuigkeiten auch mit deinem Feedreader abonnieren: <a href="https://einsatzverwaltung.abrain.de/feed/">RSS</a> / <a href="https://einsatzverwaltung.abrain.de/feed/atom/">Atom</a></p>
-            <?php
-            return;
-        }
+        $currentSubPage->echoStaticContent();
 
         // Einstellungen ausgeben
-        echo '<form method="post" action="options.php">';
-        settings_fields('einsatzvw_settings_' . $currentTab);
-        do_settings_sections(self::EVW_SETTINGS_SLUG . '-' . $currentTab);
-        submit_button();
-        echo '</form>';
+        if ($currentSubPage->hasForm()) {
+            echo '<form method="post" action="options.php">';
+            settings_fields('einsatzvw_settings_' . $currentSubPage->identifier);
+            do_settings_sections(self::EVW_SETTINGS_SLUG . '-' . $currentSubPage->identifier);
+            submit_button();
+            echo '</form>';
+        }
+    }
+
+    /**
+     * @return SubPage
+     */
+    private function getCurrentSubPage()
+    {
+        $flags = FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH;
+        $tab = filter_input(INPUT_GET, 'tab', FILTER_SANITIZE_STRING, $flags);
+
+        if (empty($tab) || !array_key_exists($tab, $this->subPages)) {
+            $subPageObjects = array_values($this->subPages);
+            return $subPageObjects[0];
+        }
+
+        return $this->subPages[$tab];
     }
 
     /**
@@ -153,24 +153,5 @@ class MainPage
             $subPage->addSettingsFields();
             $subPage->registerSettings();
         }
-    }
-
-    /**
-     * @param string $slug
-     * @return bool
-     */
-    private function subPageExists($slug)
-    {
-        if (empty($slug)) {
-            return false;
-        }
-
-        foreach ($this->subPages as $subPage) {
-            if ($subPage->identifier === $slug) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

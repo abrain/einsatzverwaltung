@@ -150,4 +150,24 @@ abstract class SubPage
             $description
         );
     }
+
+    /**
+     * Diese Methode kann von Implementierungen dieser Klasse überschrieben werden, um Inhalte auszugeben, bevor das
+     * Formular gerendert wird.
+     */
+    public function echoStaticContent()
+    {
+        return;
+    }
+
+    /**
+     * Diese Methode kann von Implementierungen dieser Klasse überschrieben werden, wenn sie keine Formularelemente
+     * ausgeben und damit keinen Button zum Speichern benötigen
+     *
+     * @return bool
+     */
+    public function hasForm()
+    {
+        return true;
+    }
 }

@@ -88,7 +88,7 @@ class Shortcodes
             $columnsWithLink = false;
         }
         if ($columnsWithLink !== false) {
-            $columnsWithLink = $this->utilities->sanitizeColumnsArray($columnsWithLink);
+            $columnsWithLink = ReportList::sanitizeColumnsArray($columnsWithLink);
         }
 
         // Berichte abfragen

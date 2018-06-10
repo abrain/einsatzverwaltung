@@ -59,6 +59,8 @@ class Data
             add_action('updated_postmeta', array($this, 'adjustIncidentNumber'), 10, 4);
             add_action('added_post_meta', array($this, 'adjustIncidentNumber'), 10, 4);
         }
+        add_action('updated_option', array($this, 'maybeAutoIncidentNumbersChanged'), 10, 3);
+        add_action('updated_option', array($this, 'maybeIncidentNumberFormatChanged'), 10, 3);
     }
 
     /**
@@ -288,9 +290,9 @@ class Data
         $category = $this->options->getEinsatzberichteCategory();
         if ($category != -1) {
             if (!($this->options->isOnlySpecialInLoop()) || $report->isSpecial()) {
-                $this->utilities->addPostToCategory($postId, $category);
+                Utilities::addPostToCategory($postId, $category);
             } else {
-                $this->utilities->removePostFromCategory($postId, $category);
+                Utilities::removePostFromCategory($postId, $category);
             }
         }
         
@@ -316,7 +318,7 @@ class Data
         // Kategoriezugehörigkeit aktualisieren
         $category = $this->options->getEinsatzberichteCategory();
         if ($category != -1) {
-            $this->utilities->removePostFromCategory($postId, $category);
+            Utilities::removePostFromCategory($postId, $category);
         }
     }
 
@@ -421,5 +423,59 @@ class Data
         $formattedDateTime = date_format($dateTime, 'Y-m-d H:i');
 
         return ($formattedDateTime === false ? '' : $formattedDateTime);
+    }
+
+    /**
+     * Prüft, ob die automatische Verwaltung der Einsatznummern aktiviert wurde, und deshalb alle Einsatznummern
+     * aktualisiert werden müssen
+     *
+     * @param string $option Name der Option
+     * @param string $oldValue Der alte Wert
+     * @param string $newValue Der neue Wert
+     */
+    public function maybeAutoIncidentNumbersChanged($option, $oldValue, $newValue)
+    {
+        // Wir sind nur an einer bestimmten Option interessiert
+        if ('einsatzverwaltung_incidentnumbers_auto' != $option) {
+            return;
+        }
+
+        // Nur Änderungen sind interessant
+        if ($newValue == $oldValue) {
+            return;
+        }
+
+        // Die automatische Verwaltung wurde aktiviert
+        if ($newValue == 1) {
+            $this->updateAllIncidentNumbers();
+        }
+    }
+
+    /**
+     * Prüft, ob sich das Format der Einsatznummern geändert hat, und deshalb alle Einsatznummern aktualisiert werden
+     * müssen
+     *
+     * @param string $option Name der Option
+     * @param string $oldValue Der alte Wert
+     * @param string $newValue Der neue Wert
+     */
+    public function maybeIncidentNumberFormatChanged($option, $oldValue, $newValue)
+    {
+        // Wir sind nur an bestimmten Optionen interessiert
+        if (!in_array($option, array('einsatzvw_einsatznummer_stellen', 'einsatzvw_einsatznummer_lfdvorne'))) {
+            return;
+        }
+
+        // Nur Änderungen sind interessant
+        if ($newValue == $oldValue) {
+            return;
+        }
+
+        // Nur neu formatieren, wenn die Einsatznummern automatisch verwaltet werden
+        if (get_option('einsatzverwaltung_incidentnumbers_auto') !== '1') {
+            return;
+        }
+
+        $this->updateAllIncidentNumbers();
     }
 }

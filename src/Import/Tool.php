@@ -194,7 +194,7 @@ class Tool
         $publishReports = filter_input(INPUT_POST, 'import_publish_reports', FILTER_SANITIZE_STRING);
         $this->currentSource->putArg(
             'import_publish_reports',
-            $this->utilities->sanitizeCheckbox($publishReports)
+            Utilities::sanitizeCheckbox($publishReports)
         );
 
         echo "<h2>{$this->currentAction['name']}</h2>";

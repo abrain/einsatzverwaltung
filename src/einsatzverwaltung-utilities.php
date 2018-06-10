@@ -1,7 +1,6 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
-use abrain\Einsatzverwaltung\Frontend\ReportList;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 
 /**
@@ -45,7 +44,7 @@ class Utilities
      * @param int $postId Die ID des Einsatzberichts
      * @param int $category Die ID der Kategorie
      */
-    public function addPostToCategory($postId, $category)
+    public static function addPostToCategory($postId, $category)
     {
         wp_set_post_categories($postId, $category, true);
     }
@@ -151,7 +150,7 @@ class Utilities
      *
      * @return array Array mit IncidentReport-Objekten
      */
-    public function postsToIncidentReports($arr)
+    public static function postsToIncidentReports($arr)
     {
         $reports = array();
         foreach ($arr as $post) {
@@ -210,7 +209,7 @@ class Utilities
      * @param int $postId Die ID des Einsatzberichts
      * @param int $category Die ID der Kategorie
      */
-    public function removePostFromCategory($postId, $category)
+    public static function removePostFromCategory($postId, $category)
     {
         $categories = wp_get_post_categories($postId);
         $key = array_search($category, $categories);
@@ -227,7 +226,7 @@ class Utilities
      *
      * @return int 0 für false, 1 für true
      */
-    public function sanitizeCheckbox($value)
+    public static function sanitizeCheckbox($value)
     {
         if (isset($value) && $value == "1") {
             return 1;
@@ -244,13 +243,13 @@ class Utilities
      *
      * @return int
      */
-    public function sanitizeEinsatznummerStellen($input)
+    public static function sanitizeEinsatznummerStellen($input)
     {
         $val = intval($input);
         if (is_numeric($val) && $val > 0) {
             return $val;
         } else {
-            return $this->options->getDefaultEinsatznummerStellen();
+            return 3;
         }
     }
 
@@ -264,7 +263,7 @@ class Utilities
      *
      * @return string Den übergebenen Farbwert, wenn er korrekt ist, ansonsten den Standardwert
      */
-    public function sanitizeHexColor($color, $default)
+    public static function sanitizeHexColor($color, $default)
     {
         if (empty($color)) {
             return $default;
@@ -293,58 +292,5 @@ class Utilities
         } else {
             return $defaultvalue;
         }
-    }
-
-
-    /**
-     * Stellt sicher, dass nur gültige Spalten-Ids gespeichert werden.
-     *
-     * @param string $input Kommaseparierte Spalten-Ids
-     *
-     * @return string Der Eingabestring ohne ungültige Spalten-Ids, bei Problemen werden die Standardspalten
-     * zurückgegeben
-     */
-    public function sanitizeColumns($input)
-    {
-        if (empty($input)) {
-            return $this->options->getDefaultColumns();
-        }
-
-        $inputArray = explode(',', $input);
-        $validColumnIds = $this->sanitizeColumnsArray($inputArray);
-
-        if (empty($validColumnIds)) {
-            return $this->options->getDefaultColumns();
-        }
-
-        return implode(',', $validColumnIds);
-    }
-
-    /**
-     * Bereinigt ein Array von Spalten-Ids, sodass nur gültige Ids darin verbleiben
-     *
-     * @param $inputArray
-     *
-     * @return array
-     */
-    public function sanitizeColumnsArray($inputArray)
-    {
-        $columns = ReportList::getListColumns();
-        $columnIds = array_keys($columns);
-
-        $validColumnIds = array();
-        foreach ($inputArray as $colId) {
-            $colId = trim($colId);
-            if (in_array($colId, $columnIds)) {
-                $validColumnIds[] = $colId;
-            }
-        }
-
-        if (empty($validColumnIds)) {
-            $defaultColumns = $this->options->getDefaultColumns();
-            $validColumnIds = explode(',', $defaultColumns);
-        }
-
-        return $validColumnIds;
     }
 }

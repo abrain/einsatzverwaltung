@@ -3,6 +3,7 @@ namespace abrain\Einsatzverwaltung;
 
 use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
+use abrain\Einsatzverwaltung\Settings\MainPage;
 use WP_Post;
 
 /**
@@ -483,7 +484,7 @@ class Admin
      */
     public function addActionLinks($links)
     {
-        $settingsPage = 'options-general.php?page=' . Settings::EVW_SETTINGS_SLUG;
+        $settingsPage = 'options-general.php?page=' . MainPage::EVW_SETTINGS_SLUG;
         $actionLinks = array('<a href="' . admin_url($settingsPage) . '">Einstellungen</a>');
         return array_merge($links, $actionLinks);
     }

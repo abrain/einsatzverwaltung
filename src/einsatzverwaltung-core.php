@@ -13,7 +13,6 @@ require_once dirname(__FILE__) . '/Widgets/RecentIncidents.php';
 require_once dirname(__FILE__) . '/Widgets/RecentIncidentsFormatted.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-options.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-shortcodes.php';
-require_once dirname(__FILE__) . '/einsatzverwaltung-settings.php';
 require_once dirname(__FILE__) . '/Import/Tool.php';
 require_once dirname(__FILE__) . '/Export/Tool.php';
 require_once dirname(__FILE__) . '/Frontend/ReportList.php';
@@ -28,6 +27,7 @@ use abrain\Einsatzverwaltung\CustomFields\TextInput;
 use abrain\Einsatzverwaltung\Import\Tool as ImportTool;
 use abrain\Einsatzverwaltung\Export\Tool as ExportTool;
 use abrain\Einsatzverwaltung\Model\ReportAnnotation;
+use abrain\Einsatzverwaltung\Settings\MainPage;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use abrain\Einsatzverwaltung\Widgets\RecentIncidents;
 use abrain\Einsatzverwaltung\Widgets\RecentIncidentsFormatted;
@@ -260,11 +260,6 @@ class Core
      * @var Frontend
      */
     private $frontend;
-
-    /**
-     * @var Settings
-     */
-    private $settings;
     
     /**
      * @var Options
@@ -312,7 +307,7 @@ class Core
         $this->admin = new Admin($this, $this->options, $this->utilities);
         $this->data = new Data($this, $this->utilities, $this->options);
         $this->frontend = new Frontend($this, $this->options, $this->utilities, $formatter);
-        $this->settings = new Settings($this, $this->options, $this->utilities, $this->data);
+        $this->registerSettings();
         $this->shortcodes = new Shortcodes($this->utilities, $this, $this->options, $formatter);
 
         // Tools
@@ -426,7 +421,7 @@ class Core
             'type' => 'boolean',
             'description' => 'Vermerk, ob es sich um einen Fehlalarm handelte.',
             'single' => true,
-            'sanitize_callback' => array($this->utilities, 'sanitizeCheckbox'),
+            'sanitize_callback' => array('Utilities', 'sanitizeCheckbox'),
             'show_in_rest' => false
         ));
 
@@ -434,7 +429,7 @@ class Core
             'type' => 'boolean',
             'description' => 'Vermerk, ob der Einsatzbericht Bilder enthält.',
             'single' => true,
-            'sanitize_callback' => array($this->utilities, 'sanitizeCheckbox'),
+            'sanitize_callback' => array('Utilities', 'sanitizeCheckbox'),
             'show_in_rest' => false
         ));
 
@@ -458,7 +453,7 @@ class Core
             'type' => 'boolean',
             'description' => 'Vermerk, ob es sich um einen besonderen Einsatzbericht handelt.',
             'single' => true,
-            'sanitize_callback' => array($this->utilities, 'sanitizeCheckbox'),
+            'sanitize_callback' => array('Utilities', 'sanitizeCheckbox'),
             'show_in_rest' => false
         ));
 
@@ -518,6 +513,14 @@ class Core
             'Reihenfolge',
             'Optionale Angabe, mit der die Anzeigereihenfolge der Fahrzeuge beeinflusst werden kann. Fahrzeuge mit der kleineren Zahl werden zuerst angezeigt, anschlie&szlig;end diejenigen ohne Angabe bzw. dem Wert 0 in alphabetischer Reihenfolge.'
         ));
+    }
+
+    private function registerSettings()
+    {
+        require_once dirname(__FILE__) . '/Settings/MainPage.php';
+        $mainPage = new MainPage($this->options);
+        add_action('admin_menu', array($mainPage, 'addToSettingsMenu'));
+        add_action('admin_init', array($mainPage, 'registerSettings'));
     }
 
     private function addRewriteRules()
@@ -690,14 +693,6 @@ class Core
     public function getFrontend()
     {
         return $this->frontend;
-    }
-
-    /**
-     * @return Settings
-     */
-    public function getSettings()
-    {
-        return $this->settings;
     }
 
     /**

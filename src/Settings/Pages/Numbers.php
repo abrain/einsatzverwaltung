@@ -64,9 +64,8 @@ class Numbers extends SubPage
         );
         echo '<p class="description">Beispiel f&uuml;r den f&uuml;nften Einsatz in 2014:<br>bei 2 Stellen: 201405<br>bei 4 Stellen: 20140005</p><br>';
         $this->echoSettingsCheckbox('einsatzvw_einsatznummer_lfdvorne', 'Laufende Nummer vor das Jahr stellen');
-
-        // FIXME das ist so nicht richtig
-        echo '<p><strong>Hinweis:</strong> Nach einer &Auml;nderung des Formats erhalten die bestehenden Einsatzberichte automatisch aktualisierte Nummern.</p>';
+        
+        echo '<p><strong>Hinweis:</strong> Nach einer &Auml;nderung des Formats erhalten die bestehenden Einsatzberichte nur dann automatisch aktualisierte Nummern, wenn die Option <em>Einsatznummern automatisch verwalten</em> aktiviert ist.</p>';
         echo '</fieldset>';
     }
 

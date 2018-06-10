@@ -60,6 +60,7 @@ class Data
             add_action('added_post_meta', array($this, 'adjustIncidentNumber'), 10, 4);
         }
         add_action('updated_option', array($this, 'maybeAutoIncidentNumbersChanged'), 10, 3);
+        add_action('updated_option', array($this, 'maybeIncidentNumberFormatChanged'), 10, 3);
     }
 
     /**
@@ -448,5 +449,33 @@ class Data
         if ($newValue == 1) {
             $this->updateAllIncidentNumbers();
         }
+    }
+
+    /**
+     * Prüft, ob sich das Format der Einsatznummern geändert hat, und deshalb alle Einsatznummern aktualisiert werden
+     * müssen
+     *
+     * @param string $option Name der Option
+     * @param string $oldValue Der alte Wert
+     * @param string $newValue Der neue Wert
+     */
+    public function maybeIncidentNumberFormatChanged($option, $oldValue, $newValue)
+    {
+        // Wir sind nur an bestimmten Optionen interessiert
+        if (!in_array($option, array('einsatzvw_einsatznummer_stellen', 'einsatzvw_einsatznummer_lfdvorne'))) {
+            return;
+        }
+
+        // Nur Änderungen sind interessant
+        if ($newValue == $oldValue) {
+            return;
+        }
+
+        // Nur neu formatieren, wenn die Einsatznummern automatisch verwaltet werden
+        if (get_option('einsatzverwaltung_incidentnumbers_auto') !== '1') {
+            return;
+        }
+
+        $this->updateAllIncidentNumbers();
     }
 }

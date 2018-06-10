@@ -498,7 +498,7 @@ class Core
             'URL zu mehr Informationen &uuml;ber ein externes Einsatzmittel, beispielsweise dessen Webseite.'
         ));
         $taxonomyCustomFields->addColorpicker('einsatzart', new ColorPicker(
-            'color',
+            'typecolor',
             'Farbe',
             'Beschreibung' // TODO
         ));

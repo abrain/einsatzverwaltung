@@ -161,10 +161,10 @@ class Formatter
             return 'inherit';
         }
 
-        $color = get_term_meta($typeOfIncident->term_id, 'color', true);
+        $color = get_term_meta($typeOfIncident->term_id, 'typecolor', true);
         while (empty($color) && $typeOfIncident->parent !== 0) {
             $typeOfIncident = WP_Term::get_instance($typeOfIncident->parent);
-            $color = get_term_meta($typeOfIncident->term_id, 'color', true);
+            $color = get_term_meta($typeOfIncident->term_id, 'typecolor', true);
         }
 
         if (empty($color)) {

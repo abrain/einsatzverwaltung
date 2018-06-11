@@ -1,6 +1,7 @@
 <?php
 namespace abrain\Einsatzverwaltung\Widgets;
 
+use abrain\Einsatzverwaltung\Core;
 use WP_UnitTestCase;
 
 /**
@@ -12,7 +13,8 @@ class RecentIncidentsFormattedTest extends WP_UnitTestCase
 {
     public function testUpdate()
     {
-        $widget = new RecentIncidentsFormatted();
+        $core = Core::getInstance();
+        $widget = new RecentIncidentsFormatted($core->formatter, $core->utilities);
         $new = array(
             'title' => '',
             'numIncidents' => '',

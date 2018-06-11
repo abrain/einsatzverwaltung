@@ -18,22 +18,25 @@ class RecentIncidents extends WP_Widget
     /**
      * @var Formatter
      */
-    private static $formatter;
+    private $formatter;
 
     /**
      * @var Options
      */
-    private static $options;
+    private $options;
 
     /**
      * @var Utilities
      */
-    private static $utilities;
+    private $utilities;
 
     /**
      * Register widget with WordPress.
+     * @param Options $options
+     * @param Utilities $utilities
+     * @param Formatter $formatter
      */
-    public function __construct()
+    public function __construct(Options $options, Utilities $utilities, Formatter $formatter)
     {
         parent::__construct(
             'einsatzverwaltung_widget', // Base ID
@@ -43,18 +46,9 @@ class RecentIncidents extends WP_Widget
                 'customize_selective_refresh' => true,
             ) // Args
         );
-    }
-
-    /**
-     * @param Options $options
-     * @param Utilities $utilities
-     * @param Formatter $formatter
-     */
-    public static function setDependencies($options, $utilities, $formatter)
-    {
-        self::$formatter = $formatter;
-        self::$options = $options;
-        self::$utilities = $utilities;
+        $this->options = $options;
+        $this->utilities = $utilities;
+        $this->formatter = $formatter;
     }
 
     /**
@@ -70,14 +64,14 @@ class RecentIncidents extends WP_Widget
         $title = apply_filters('widget_title', $instance['title']);
 
         // TODO mit wp_parse_args() vereinfachen
-        $anzahl = self::$utilities->getArrayValueIfKey($instance, 'anzahl', 3);
-        $zeigeDatum = self::$utilities->getArrayValueIfKey($instance, 'zeigeDatum', false);
-        $zeigeZeit = self::$utilities->getArrayValueIfKey($instance, 'zeigeZeit', false);
-        $zeigeFeedlink = self::$utilities->getArrayValueIfKey($instance, 'zeigeFeedlink', false);
-        $zeigeOrt = self::$utilities->getArrayValueIfKey($instance, 'zeigeOrt', false);
-        $zeigeArt = self::$utilities->getArrayValueIfKey($instance, 'zeigeArt', false);
-        $zeigeArtHierarchie = self::$utilities->getArrayValueIfKey($instance, 'zeigeArtHierarchie', false);
-        $showAnnotations = self::$utilities->getArrayValueIfKey($instance, 'showAnnotations', false);
+        $anzahl = $this->utilities->getArrayValueIfKey($instance, 'anzahl', 3);
+        $zeigeDatum = $this->utilities->getArrayValueIfKey($instance, 'zeigeDatum', false);
+        $zeigeZeit = $this->utilities->getArrayValueIfKey($instance, 'zeigeZeit', false);
+        $zeigeFeedlink = $this->utilities->getArrayValueIfKey($instance, 'zeigeFeedlink', false);
+        $zeigeOrt = $this->utilities->getArrayValueIfKey($instance, 'zeigeOrt', false);
+        $zeigeArt = $this->utilities->getArrayValueIfKey($instance, 'zeigeArt', false);
+        $zeigeArtHierarchie = $this->utilities->getArrayValueIfKey($instance, 'zeigeArtHierarchie', false);
+        $showAnnotations = $this->utilities->getArrayValueIfKey($instance, 'showAnnotations', false);
 
         if (empty($title)) {
             $title = "Letzte Eins&auml;tze";
@@ -113,16 +107,16 @@ class RecentIncidents extends WP_Widget
 
             if ($zeigeDatum) {
                 $timestamp = strtotime($post->post_date);
-                $datumsformat = self::$options->getDateFormat();
+                $datumsformat = $this->options->getDateFormat();
                 $letzteEinsaetze .= "<br><span class=\"einsatzdatum\">".date_i18n($datumsformat, $timestamp)."</span>";
                 if ($zeigeZeit) {
-                    $zeitformat = self::$options->getTimeFormat();
+                    $zeitformat = $this->options->getTimeFormat();
                     $letzteEinsaetze .= " | <span class=\"einsatzzeit\">".date_i18n($zeitformat, $timestamp)." Uhr</span>";
                 }
             }
 
             if ($zeigeArt) {
-                $typeOfIncident = self::$formatter->getTypeOfIncident($report, false, false, $zeigeArtHierarchie);
+                $typeOfIncident = $this->formatter->getTypeOfIncident($report, false, false, $zeigeArtHierarchie);
                 if (!empty($typeOfIncident)) {
                     $letzteEinsaetze .= sprintf('<br><span class="einsatzart">%s</span>', $typeOfIncident);
                 }
@@ -175,13 +169,13 @@ class RecentIncidents extends WP_Widget
             $instance['anzahl'] = $newInstance['anzahl'];
         }
 
-        $instance['zeigeDatum'] = self::$utilities->getArrayValueIfKey($newInstance, 'zeigeDatum', false);
-        $instance['zeigeZeit'] = self::$utilities->getArrayValueIfKey($newInstance, 'zeigeZeit', false);
-        $instance['zeigeOrt'] = self::$utilities->getArrayValueIfKey($newInstance, 'zeigeOrt', false);
-        $instance['zeigeArt'] = self::$utilities->getArrayValueIfKey($newInstance, 'zeigeArt', false);
-        $instance['zeigeArtHierarchie'] = self::$utilities->getArrayValueIfKey($newInstance, 'zeigeArtHierarchie', false);
-        $instance['zeigeFeedlink'] = self::$utilities->getArrayValueIfKey($newInstance, 'zeigeFeedlink', false);
-        $instance['showAnnotations'] = '1' === self::$utilities->getArrayValueIfKey($newInstance, 'showAnnotations', false);
+        $instance['zeigeDatum'] = $this->utilities->getArrayValueIfKey($newInstance, 'zeigeDatum', false);
+        $instance['zeigeZeit'] = $this->utilities->getArrayValueIfKey($newInstance, 'zeigeZeit', false);
+        $instance['zeigeOrt'] = $this->utilities->getArrayValueIfKey($newInstance, 'zeigeOrt', false);
+        $instance['zeigeArt'] = $this->utilities->getArrayValueIfKey($newInstance, 'zeigeArt', false);
+        $instance['zeigeArtHierarchie'] = $this->utilities->getArrayValueIfKey($newInstance, 'zeigeArtHierarchie', false);
+        $instance['zeigeFeedlink'] = $this->utilities->getArrayValueIfKey($newInstance, 'zeigeFeedlink', false);
+        $instance['showAnnotations'] = '1' === $this->utilities->getArrayValueIfKey($newInstance, 'showAnnotations', false);
 
         return $instance;
     }
@@ -196,15 +190,15 @@ class RecentIncidents extends WP_Widget
      */
     public function form($instance)
     {
-        $title = self::$utilities->getArrayValueIfKey($instance, 'title', 'Letzte Eins&auml;tze');
-        $anzahl = self::$utilities->getArrayValueIfKey($instance, 'anzahl', 3);
-        $zeigeDatum = self::$utilities->getArrayValueIfKey($instance, 'zeigeDatum', false);
-        $zeigeZeit = self::$utilities->getArrayValueIfKey($instance, 'zeigeZeit', false);
-        $zeigeFeedlink = self::$utilities->getArrayValueIfKey($instance, 'zeigeFeedlink', false);
-        $zeigeOrt = self::$utilities->getArrayValueIfKey($instance, 'zeigeOrt', false);
-        $zeigeArt = self::$utilities->getArrayValueIfKey($instance, 'zeigeArt', false);
-        $zeigeArtHierarchie = self::$utilities->getArrayValueIfKey($instance, 'zeigeArtHierarchie', false);
-        $showAnnotations = self::$utilities->getArrayValueIfKey($instance, 'showAnnotations', false);
+        $title = $this->utilities->getArrayValueIfKey($instance, 'title', 'Letzte Eins&auml;tze');
+        $anzahl = $this->utilities->getArrayValueIfKey($instance, 'anzahl', 3);
+        $zeigeDatum = $this->utilities->getArrayValueIfKey($instance, 'zeigeDatum', false);
+        $zeigeZeit = $this->utilities->getArrayValueIfKey($instance, 'zeigeZeit', false);
+        $zeigeFeedlink = $this->utilities->getArrayValueIfKey($instance, 'zeigeFeedlink', false);
+        $zeigeOrt = $this->utilities->getArrayValueIfKey($instance, 'zeigeOrt', false);
+        $zeigeArt = $this->utilities->getArrayValueIfKey($instance, 'zeigeArt', false);
+        $zeigeArtHierarchie = $this->utilities->getArrayValueIfKey($instance, 'zeigeArtHierarchie', false);
+        $showAnnotations = $this->utilities->getArrayValueIfKey($instance, 'showAnnotations', false);
 
         printf(
             '<p><label for="%1$s">%2$s</label><input class="widefat" id="%1$s" name="%3$s" type="text" value="%4$s" /></p>',

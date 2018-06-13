@@ -6,6 +6,7 @@ use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use abrain\Einsatzverwaltung\Utilities;
+use WP_Post;
 use WP_Widget;
 
 /**
@@ -61,90 +62,111 @@ class RecentIncidents extends WP_Widget
      */
     public function widget($args, $instance)
     {
+        $defaults = array(
+            'title' => 'Letzte Eins&auml;tze',
+            'anzahl' => 3,
+            'zeigeDatum' => false,
+            'zeigeZeit' => false,
+            'zeigeFeedlink' => false,
+            'zeigeOrt' => false,
+            'zeigeArt' => false,
+            'zeigeArtHierarchie' => false,
+            'showAnnotations' => false
+        );
+        $instance = wp_parse_args($instance, $defaults);
+
         $title = apply_filters('widget_title', $instance['title']);
 
-        // TODO mit wp_parse_args() vereinfachen
-        $anzahl = $this->utilities->getArrayValueIfKey($instance, 'anzahl', 3);
-        $zeigeDatum = $this->utilities->getArrayValueIfKey($instance, 'zeigeDatum', false);
-        $zeigeZeit = $this->utilities->getArrayValueIfKey($instance, 'zeigeZeit', false);
-        $zeigeFeedlink = $this->utilities->getArrayValueIfKey($instance, 'zeigeFeedlink', false);
-        $zeigeOrt = $this->utilities->getArrayValueIfKey($instance, 'zeigeOrt', false);
-        $zeigeArt = $this->utilities->getArrayValueIfKey($instance, 'zeigeArt', false);
-        $zeigeArtHierarchie = $this->utilities->getArrayValueIfKey($instance, 'zeigeArtHierarchie', false);
-        $showAnnotations = $this->utilities->getArrayValueIfKey($instance, 'showAnnotations', false);
+        echo $args['before_widget'];
+        echo $args['before_title'];
+        echo esc_html($title);
+        echo $args['after_title'];
 
-        if (empty($title)) {
-            $title = "Letzte Eins&auml;tze";
+        $this->echoReports($instance);
+
+        if ($instance['zeigeFeedlink']) {
+            printf(
+                '<p class="einsatzfeed"><span class="fa fa-rss"></span>&nbsp;<a href="%s">%s</a></p>',
+                get_post_type_archive_feed_link('einsatz'),
+                'Einsatzberichte (Feed)'
+            );
         }
+        echo $args['after_widget'];
+    }
 
-        if (!isset($anzahl) || empty($anzahl) || !is_numeric($anzahl) || $anzahl < 1) {
-            $anzahl = 3;
-        }
-
-        $letzteEinsaetze = "";
+    /**
+     * @param array $instance
+     */
+    private function echoReports($instance)
+    {
         $posts = get_posts(array(
             'post_type' => 'einsatz',
             'post_status' => 'publish',
-            'posts_per_page' => $anzahl
+            'posts_per_page' => absint($instance['anzahl'])
         ));
-        foreach ($posts as $post) {
-            $report = new IncidentReport($post);
-            $letzteEinsaetze .= '<li class="einsatzbericht">';
 
-            if (true === $showAnnotations) {
-                $annotationIconBar = AnnotationIconBar::getInstance();
-                $letzteEinsaetze .= '<div class="annotation-icon-bar">' . $annotationIconBar->render($report) . '</div>';
-            }
-
-            $letzteEinsaetze .= "<a href=\"".get_permalink($post->ID)."\" rel=\"bookmark\" class=\"einsatzmeldung\">";
-            $meldung = get_the_title($post->ID);
-            if (!empty($meldung)) {
-                $letzteEinsaetze .= $meldung;
-            } else {
-                $letzteEinsaetze .= "(kein Titel)";
-            }
-            $letzteEinsaetze .= "</a>";
-
-            if ($zeigeDatum) {
-                $timestamp = strtotime($post->post_date);
-                $datumsformat = $this->options->getDateFormat();
-                $letzteEinsaetze .= "<br><span class=\"einsatzdatum\">".date_i18n($datumsformat, $timestamp)."</span>";
-                if ($zeigeZeit) {
-                    $zeitformat = $this->options->getTimeFormat();
-                    $letzteEinsaetze .= " | <span class=\"einsatzzeit\">".date_i18n($zeitformat, $timestamp)." Uhr</span>";
-                }
-            }
-
-            if ($zeigeArt) {
-                $typeOfIncident = $this->formatter->getTypeOfIncident($report, false, false, $zeigeArtHierarchie);
-                if (!empty($typeOfIncident)) {
-                    $letzteEinsaetze .= sprintf('<br><span class="einsatzart">%s</span>', $typeOfIncident);
-                }
-            }
-
-            if ($zeigeOrt) {
-                $location = $report->getLocation();
-                if (!empty($location)) {
-                    $letzteEinsaetze .= "<br><span class=\"einsatzort\">Ort:&nbsp;".$location."</span>";
-                }
-            }
-
-            $letzteEinsaetze .= "</li>";
-        }
-
-        echo $args['before_widget'];
-        echo $args['before_title'] . $title . $args['after_title'];
-        if (empty($letzteEinsaetze)) {
+        if (empty($posts)) {
             echo '<p>Keine Eins&auml;tze</p>';
-        } else {
-            echo '<ul class="einsatzberichte">' . $letzteEinsaetze . '</ul>';
+            return;
         }
-        if ($zeigeFeedlink) {
-            echo '<p class="einsatzfeed"><span class="fa fa-rss"></span>&nbsp;<a href="';
-            echo get_post_type_archive_feed_link('einsatz');
-            echo '">Einsatzberichte (Feed)</a></p>';
+
+        echo '<ul class="einsatzberichte">';
+        foreach ($posts as $post) {
+            echo '<li class="einsatzbericht">';
+            $this->echoSingleReport($post, $instance);
+            echo "</li>";
         }
-        echo $args['after_widget'];
+        echo '</ul>';
+    }
+
+    /**
+     * @param WP_Post $post
+     * @param array $instance
+     */
+    private function echoSingleReport(WP_Post $post, $instance)
+    {
+        $report = new IncidentReport($post);
+
+        if (true === ($instance['showAnnotations'])) {
+            $annotationIconBar = AnnotationIconBar::getInstance();
+            printf('<div class="annotation-icon-bar">%s</div>', $annotationIconBar->render($report));
+        }
+
+        $meldung = get_the_title($post->ID);
+        printf(
+            '<a href="%s" rel="bookmark" class="einsatzmeldung">%s</a>',
+            esc_attr(get_permalink($post->ID)),
+            (empty($meldung) ? "(kein Titel)" : $meldung)
+        );
+
+        if ($instance['zeigeDatum']) {
+            $timestamp = strtotime($post->post_date);
+            $datumsformat = $this->options->getDateFormat();
+            printf('<br><span class="einsatzdatum">%s</span>', date_i18n($datumsformat, $timestamp));
+            if ($instance['zeigeZeit']) {
+                $zeitformat = $this->options->getTimeFormat();
+                printf(' | <span class="einsatzzeit">%s Uhr</span>', date_i18n($zeitformat, $timestamp));
+            }
+        }
+
+        if ($instance['zeigeArt']) {
+            $typeOfIncident = $this->formatter->getTypeOfIncident(
+                $report,
+                false,
+                false,
+                $instance['zeigeArtHierarchie']
+            );
+            if (!empty($typeOfIncident)) {
+                printf('<br><span class="einsatzart">%s</span>', $typeOfIncident);
+            }
+        }
+
+        if ($instance['zeigeOrt']) {
+            $location = $report->getLocation();
+            if (!empty($location)) {
+                printf('<br><span class="einsatzort">Ort:&nbsp;%s</span>', $location);
+            }
+        }
     }
 
     /**

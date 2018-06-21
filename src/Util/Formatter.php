@@ -1,7 +1,6 @@
 <?php
 namespace abrain\Einsatzverwaltung\Util;
 
-use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\Data;
 use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
@@ -38,9 +37,8 @@ class Formatter
      * Formatter constructor.
      * @param Options $options
      * @param Utilities $utilities
-     * @param Core $core
      */
-    public function __construct($options, $utilities, $core)
+    public function __construct($options, $utilities)
     {
         require_once dirname(__FILE__) . '/../Frontend/AnnotationIconBar.php';
         $this->options = $options;

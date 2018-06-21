@@ -307,7 +307,7 @@ class Core
         $this->options = new Options($this->utilities);
         $this->utilities->setDependencies($this->options); // FIXME Yay, zirkuläre Abhängigkeiten!
 
-        $this->formatter = new Formatter($this->options, $this->utilities, $this); // TODO In Singleton umwandeln
+        $this->formatter = new Formatter($this->options, $this->utilities); // TODO In Singleton umwandeln
 
         $this->admin = new Admin($this, $this->options, $this->utilities);
         $this->data = new Data($this, $this->utilities, $this->options);

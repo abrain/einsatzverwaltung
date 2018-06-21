@@ -80,9 +80,7 @@ class Formatter
     private function format($post, $pattern, $tag, $context = 'post')
     {
         if ($post == null && !in_array($tag, $this->tagsNotNeedingPost)) {
-            $message = 'Alle Tags außer ' . implode(',', $this->tagsNotNeedingPost) . ' brauchen ein Post-Objekt';
-            _doing_it_wrong(__FUNCTION__, $message, null);
-            return '';
+            return $pattern;
         }
 
         $incidentReport = new IncidentReport($post);

@@ -599,6 +599,21 @@ class Core
     }
 
     /**
+     * Gibt den Link zu einem bestimmten Jahresarchiv zurück, berücksichtigt dabei die Permalink-Einstellungen
+     *
+     * @param string $year
+     *
+     * @return string
+     */
+    public function getYearArchiveLink($year)
+    {
+        global $wp_rewrite;
+        $link = get_post_type_archive_link('einsatz');
+        $link = ($wp_rewrite->using_permalinks() ? trailingslashit($link) : $link . '&year=') . $year;
+        return user_trailingslashit($link);
+    }
+
+    /**
      * Gibt die möglichen Berechtigungen für Einsatzberichte zurück
      *
      * @return array

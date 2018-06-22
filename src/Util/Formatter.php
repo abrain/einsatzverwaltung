@@ -1,6 +1,7 @@
 <?php
 namespace abrain\Einsatzverwaltung\Util;
 
+use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\Data;
 use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
@@ -140,6 +141,10 @@ class Formatter
             case '%featuredImage%':
                 $replace = current_theme_supports('post-thumbnails') ? get_the_post_thumbnail($post->ID) : '';
                 break;
+            case '%yearArchive%':
+                $year = $timeOfAlerting->format('Y');
+                $replace = Core::getInstance()->getYearArchiveLink($year);
+                break;
             default:
                 return $pattern;
         }
@@ -193,6 +198,7 @@ class Formatter
             '%typesOfAlerting%' => 'Alarmierungsarten',
             '%content%' => 'Berichtstext',
             '%featuredImage%' => 'Beitragsbild',
+            '%yearArchive%' => 'Link zum Jahresarchiv',
         );
     }
 

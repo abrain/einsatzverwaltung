@@ -376,7 +376,6 @@ class Core
 
     public function onPluginsLoaded()
     {
-        load_plugin_textdomain('einsatzverwaltung');
         $this->maybeUpdate();
     }
 
@@ -555,7 +554,6 @@ class Core
 
     public function registerWidgets()
     {
-        // NEEDS_WP4.6 Instanziierte Widgets übergeben
         register_widget(new RecentIncidents($this->options, $this->utilities, $this->formatter));
         register_widget(new RecentIncidentsFormatted($this->formatter, $this->utilities));
     }

@@ -339,10 +339,10 @@ class Core
      */
     public function onActivation()
     {
-        update_option('einsatzvw_version', self::VERSION);
         add_option('einsatzvw_db_version', self::DB_VERSION);
 
         $this->maybeUpdate();
+        update_option('einsatzvw_version', self::VERSION);
 
         // Posttypen registrieren
         $this->registerTypes();
@@ -377,6 +377,7 @@ class Core
     public function onPluginsLoaded()
     {
         $this->maybeUpdate();
+        update_option('einsatzvw_version', self::VERSION);
     }
 
     /**

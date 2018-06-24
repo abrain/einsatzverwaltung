@@ -46,13 +46,13 @@ class Csv extends AbstractFormat
         <li>
             <label>
                 <span class="label-responsive">Spalten getrennt mit:</span>
-                <input name="export_options[csv][delimiter]" type="text" value="," required="required">
+                <input name="export_options[csv][delimiter]" type="text" value="," required="required" maxlength="1">
             </label>
         </li>
         <li>
             <label>
                 <span class="label-responsive">Spalten eingeschlossen von:</span>
-                <input name="export_options[csv][enclosure]" type="text" value="&quot;" required="required">
+                <input name="export_options[csv][enclosure]" type="text" value="&quot;" required="required" maxlength="1">
             </label>
         </li>
         <!--<li>

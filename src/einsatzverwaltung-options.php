@@ -1,6 +1,8 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
+use abrain\Einsatzverwaltung\Frontend\ReportList;
+
 /**
  * Bietet Schnittstellen zur Abfrage von Einstellungen
  */
@@ -13,8 +15,6 @@ class Options
         'einsatzvw_show_exteinsatzmittel_archive' => false,
         'einsatzvw_show_fahrzeug_archive' => false,
         'einsatzvw_open_ext_in_new' => false,
-        'einsatzvw_excerpt_type' => 'default',
-        'einsatzvw_excerpt_type_feed' => 'default',
         'einsatzvw_show_einsatzberichte_mainloop' => false,
         'einsatzvw_einsatz_hideemptydetails' => true,
         'einsatzvw_einsatznummer_lfdvorne' => false,
@@ -28,6 +28,7 @@ class Options
         'einsatzvw_category' => false,
         'einsatzvw_loop_only_special' => false,
         'einsatzverwaltung_incidentnumbers_auto' => false,
+        'einsatzverwaltung_use_excerpttemplate' => false,
     );
 
     /**
@@ -87,11 +88,6 @@ class Options
         return $this->defaults['einsatzvw_einsatznummer_stellen'];
     }
 
-    public function getDefaultExcerptType()
-    {
-        return $this->defaults['einsatzvw_excerpt_type'];
-    }
-
     /**
      * Gibt das Datumsformat von WordPress zurück
      */
@@ -121,7 +117,7 @@ class Options
     public function getEinsatzlisteEnabledColumns()
     {
         $enabledColumns = $this->getOption('einsatzvw_list_columns');
-        $enabledColumns = $this->utilities->sanitizeColumns($enabledColumns);
+        $enabledColumns = ReportList::sanitizeColumns($enabledColumns);
         return explode(',', $enabledColumns);
     }
 
@@ -131,25 +127,7 @@ class Options
     public function getEinsatznummerStellen()
     {
         $option = $this->getOption('einsatzvw_einsatznummer_stellen');
-        return $this->utilities->sanitizeEinsatznummerStellen($option);
-    }
-
-    /**
-     * @return string
-     */
-    public function getExcerptType()
-    {
-        $option = $this->getOption('einsatzvw_excerpt_type');
-        return $this->utilities->sanitizeExcerptType($option);
-    }
-
-    /**
-     * @return string
-     */
-    public function getExcerptTypeFeed()
-    {
-        $option = $this->getOption('einsatzvw_excerpt_type_feed');
-        return $this->utilities->sanitizeExcerptType($option);
+        return Utilities::sanitizeEinsatznummerStellen($option);
     }
 
     /**

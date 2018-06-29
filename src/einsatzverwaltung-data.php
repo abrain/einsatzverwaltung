@@ -55,12 +55,12 @@ class Data
         add_action('private_einsatz', array($this, 'onPublish'), 10, 2);
         add_action('publish_einsatz', array($this, 'onPublish'), 10, 2);
         add_action('trash_einsatz', array($this, 'onTrash'), 10, 2);
-        add_filter('sanitize_post_meta_einsatz_fehlalarm', array($this->utilities, 'sanitizeCheckbox'));
-        add_filter('sanitize_post_meta_einsatz_special', array($this->utilities, 'sanitizeCheckbox'));
         if ($this->options->isAutoIncidentNumbers()) {
             add_action('updated_postmeta', array($this, 'adjustIncidentNumber'), 10, 4);
             add_action('added_post_meta', array($this, 'adjustIncidentNumber'), 10, 4);
         }
+        add_action('updated_option', array($this, 'maybeAutoIncidentNumbersChanged'), 10, 3);
+        add_action('updated_option', array($this, 'maybeIncidentNumberFormatChanged'), 10, 3);
     }
 
     /**
@@ -195,8 +195,6 @@ class Data
             return;
         }
 
-        $updateArgs = array();
-
         // Alarmzeit validieren
         $inputAlarmzeit = sanitize_text_field($_POST['einsatzverwaltung_alarmzeit']);
         if (!empty($inputAlarmzeit)) {
@@ -211,59 +209,30 @@ class Data
             // Wird bis zur Veröffentlichung in Postmeta zwischengespeichert.
             update_post_meta($postId, '_einsatz_timeofalerting', date_format($alarmzeit, 'Y-m-d H:i:s'));
         } else {
+            $updateArgs = array('ID' => $postId);
             $updateArgs['post_date'] = date_format($alarmzeit, 'Y-m-d H:i:s');
             $updateArgs['post_date_gmt'] = get_gmt_from_date($updateArgs['post_date']);
-        }
-
-        // Einsatznummer setzen, sofern sie nicht automatisch verwaltet wird
-        if (!$this->options->isAutoIncidentNumbers()) {
-            $inputIncidentNumber = sanitize_text_field($_POST['einsatzverwaltung_nummer']);
-            if (!empty($inputIncidentNumber)) {
-                $this->setEinsatznummer($postId, $inputIncidentNumber);
-            }
-        }
-
-        // Einsatzende validieren
-        $inputEinsatzende = sanitize_text_field($_POST['einsatzverwaltung_einsatzende']);
-        if (!empty($inputEinsatzende)) {
-            $einsatzende = date_create($inputEinsatzende);
-        }
-        if (empty($einsatzende)) {
-            $einsatzende = "";
-        } else {
-            $einsatzende = date_format($einsatzende, 'Y-m-d H:i');
-        }
-
-        // Einsatzort validieren
-        $einsatzort = sanitize_text_field($_POST['einsatzverwaltung_einsatzort']);
-
-        // Einsatzleiter validieren
-        $einsatzleiter = sanitize_text_field($_POST['einsatzverwaltung_einsatzleiter']);
-
-        // Mannschaftsstärke validieren
-        $mannschaftsstaerke = sanitize_text_field($_POST['einsatzverwaltung_mannschaft']);
-
-        // Vermerke validieren
-        $fehlalarm = $this->utilities->sanitizeCheckbox(array($_POST, 'einsatzverwaltung_fehlalarm'));
-        $hasImages = $this->utilities->sanitizeCheckbox(array($_POST, 'einsatzverwaltung_hasimages'));
-        $isSpecial = $this->utilities->sanitizeCheckbox(array($_POST, 'einsatzverwaltung_special'));
-
-        // Metadaten schreiben
-        update_post_meta($postId, 'einsatz_einsatzende', $einsatzende);
-        update_post_meta($postId, 'einsatz_einsatzort', $einsatzort);
-        update_post_meta($postId, 'einsatz_einsatzleiter', $einsatzleiter);
-        update_post_meta($postId, 'einsatz_mannschaft', $mannschaftsstaerke);
-        update_post_meta($postId, 'einsatz_fehlalarm', $fehlalarm);
-        update_post_meta($postId, 'einsatz_hasimages', $hasImages);
-        update_post_meta($postId, 'einsatz_special', $isSpecial);
-
-        if (!empty($updateArgs)) {
-            $updateArgs['ID'] = $postId;
 
             // save_post Filter kurzzeitig deaktivieren, damit keine Dauerschleife entsteht
             remove_action('save_post_einsatz', array($this, 'savePostdata'));
             wp_update_post($updateArgs);
             add_action('save_post_einsatz', array($this, 'savePostdata'), 10, 2);
+        }
+
+        // Einsatznummer setzen, sofern sie nicht automatisch verwaltet wird
+        if (!$this->options->isAutoIncidentNumbers()) {
+            $this->setEinsatznummer(
+                $postId,
+                filter_input(INPUT_POST, 'einsatzverwaltung_nummer', FILTER_SANITIZE_STRING)
+            );
+        }
+
+        // Vermerke explizit deaktivieren, wenn sie nicht gesetzt wurden
+        $annotations = array('einsatz_fehlalarm', 'einsatz_hasimages', 'einsatz_special');
+        foreach ($annotations as $annotation) {
+            if (!array_key_exists($annotation, $_POST['meta_input'])) {
+                update_post_meta($postId, $annotation, '0');
+            }
         }
     }
 
@@ -321,9 +290,9 @@ class Data
         $category = $this->options->getEinsatzberichteCategory();
         if ($category != -1) {
             if (!($this->options->isOnlySpecialInLoop()) || $report->isSpecial()) {
-                $this->utilities->addPostToCategory($postId, $category);
+                Utilities::addPostToCategory($postId, $category);
             } else {
-                $this->utilities->removePostFromCategory($postId, $category);
+                Utilities::removePostFromCategory($postId, $category);
             }
         }
         
@@ -349,7 +318,7 @@ class Data
         // Kategoriezugehörigkeit aktualisieren
         $category = $this->options->getEinsatzberichteCategory();
         if ($category != -1) {
-            $this->utilities->removePostFromCategory($postId, $category);
+            Utilities::removePostFromCategory($postId, $category);
         }
     }
 
@@ -434,5 +403,79 @@ class Data
                 $this->setEinsatznummer($post->ID, $newIncidentNumber);
             }
         }
+    }
+
+    /**
+     * @param string $value
+     * @return string
+     */
+    public function sanitizeTimeOfEnding($value)
+    {
+        $sanitizedValue = sanitize_text_field($value);
+        if (!empty($sanitizedValue)) {
+            $dateTime = date_create($sanitizedValue);
+        }
+
+        if (empty($dateTime)) {
+            return "";
+        }
+
+        $formattedDateTime = date_format($dateTime, 'Y-m-d H:i');
+
+        return ($formattedDateTime === false ? '' : $formattedDateTime);
+    }
+
+    /**
+     * Prüft, ob die automatische Verwaltung der Einsatznummern aktiviert wurde, und deshalb alle Einsatznummern
+     * aktualisiert werden müssen
+     *
+     * @param string $option Name der Option
+     * @param string $oldValue Der alte Wert
+     * @param string $newValue Der neue Wert
+     */
+    public function maybeAutoIncidentNumbersChanged($option, $oldValue, $newValue)
+    {
+        // Wir sind nur an einer bestimmten Option interessiert
+        if ('einsatzverwaltung_incidentnumbers_auto' != $option) {
+            return;
+        }
+
+        // Nur Änderungen sind interessant
+        if ($newValue == $oldValue) {
+            return;
+        }
+
+        // Die automatische Verwaltung wurde aktiviert
+        if ($newValue == 1) {
+            $this->updateAllIncidentNumbers();
+        }
+    }
+
+    /**
+     * Prüft, ob sich das Format der Einsatznummern geändert hat, und deshalb alle Einsatznummern aktualisiert werden
+     * müssen
+     *
+     * @param string $option Name der Option
+     * @param string $oldValue Der alte Wert
+     * @param string $newValue Der neue Wert
+     */
+    public function maybeIncidentNumberFormatChanged($option, $oldValue, $newValue)
+    {
+        // Wir sind nur an bestimmten Optionen interessiert
+        if (!in_array($option, array('einsatzvw_einsatznummer_stellen', 'einsatzvw_einsatznummer_lfdvorne'))) {
+            return;
+        }
+
+        // Nur Änderungen sind interessant
+        if ($newValue == $oldValue) {
+            return;
+        }
+
+        // Nur neu formatieren, wenn die Einsatznummern automatisch verwaltet werden
+        if (get_option('einsatzverwaltung_incidentnumbers_auto') !== '1') {
+            return;
+        }
+
+        $this->updateAllIncidentNumbers();
     }
 }

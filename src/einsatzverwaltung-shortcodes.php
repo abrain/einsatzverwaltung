@@ -88,7 +88,7 @@ class Shortcodes
             $columnsWithLink = false;
         }
         if ($columnsWithLink !== false) {
-            $columnsWithLink = $this->utilities->sanitizeColumnsArray($columnsWithLink);
+            $columnsWithLink = ReportList::sanitizeColumnsArray($columnsWithLink);
         }
 
         // Berichte abfragen
@@ -126,7 +126,7 @@ class Shortcodes
      */
     public function einsatzjahre()
     {
-        global $year, $wp_rewrite;
+        global $year;
         $jahre = Data::getJahreMitEinsatz();
 
         $string = '';
@@ -135,9 +135,7 @@ class Shortcodes
                 $string .= ' | ';
             }
 
-            $link = get_post_type_archive_link('einsatz');
-            $link = ($wp_rewrite->using_permalinks() ? trailingslashit($link) : $link . '&year=') . $jahr;
-            $string .= '<a href="' . user_trailingslashit($link) . '">';
+            $string .= sprintf('<a href="%s">', $this->core->getYearArchiveLink($jahr));
 
             if ($year == $jahr || empty($year) && $jahr == date('Y')) {
                 $string .= "<strong>$jahr</strong>";

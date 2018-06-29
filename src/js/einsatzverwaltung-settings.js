@@ -20,8 +20,4 @@ jQuery(document).ready(function() {
             jQuery("#einsatzvw_list_columns").val($columnsEnabled.sortable('toArray'));
         }
     });
-
-    // Color picker initialisieren
-    jQuery('#zebra-color-picker').iris();
-    jQuery('#annotationoff-color-picker').iris();
 });

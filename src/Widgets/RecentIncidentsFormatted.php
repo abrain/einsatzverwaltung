@@ -15,12 +15,12 @@ class RecentIncidentsFormatted extends WP_Widget
     /**
      * @var Formatter
      */
-    private static $formatter;
+    private $formatter;
 
     /**
      * @var Utilities
      */
-    private static $utilities;
+    private $utilities;
 
     private $allowedHtmlTags = array(
         'a' => array(
@@ -28,6 +28,7 @@ class RecentIncidentsFormatted extends WP_Widget
             'rel' => true,
             'rev' => true,
             'name' => true,
+            'style' => true,
             'target' => true,
         ),
         'abbr' => array(),
@@ -38,24 +39,30 @@ class RecentIncidentsFormatted extends WP_Widget
             'class' => true,
             'dir' => true,
             'lang' => true,
+            'style' => true,
             'xml:lang' => true,
         ),
         'h3' => array(
             'align' => true,
+            'style' => true
         ),
         'h4' => array(
             'align' => true,
+            'style' => true
         ),
         'h5' => array(
             'align' => true,
+            'style' => true
         ),
         'h6' => array(
             'align' => true,
+            'style' => true
         ),
         'hr' => array(
             'align' => true,
             'noshade' => true,
             'size' => true,
+            'style' => true,
             'width' => true,
         ),
         'i' => array(
@@ -73,11 +80,13 @@ class RecentIncidentsFormatted extends WP_Widget
             'longdesc' => true,
             'vspace' => true,
             'src' => true,
+            'style' => true,
             'width' => true,
         ),
         'li' => array(
             'align' => true,
             'class' => true,
+            'style' => true,
             'value' => true,
         ),
         'p' => array(
@@ -85,6 +94,7 @@ class RecentIncidentsFormatted extends WP_Widget
             'class' => true,
             'dir' => true,
             'lang' => true,
+            'style' => true,
             'xml:lang' => true,
         ),
         'span' => array(
@@ -92,15 +102,18 @@ class RecentIncidentsFormatted extends WP_Widget
             'align' => true,
             'class' => true,
             'lang' => true,
+            'style' => true,
             'xml:lang' => true,
         ),
         'ul' => array(
             'class' => true,
+            'style' => true,
             'type' => true,
         ),
         'ol' => array(
             'class' => true,
             'start' => true,
+            'style' => true,
             'type' => true,
         ),
     );
@@ -112,13 +125,16 @@ class RecentIncidentsFormatted extends WP_Widget
         'afterContent' => ''
     );
     private $allowedTagsPattern = array('%title%', '%date%', '%time%', '%location%', '%duration%', '%incidentType%',
-        '%url%', '%number%', '%seqNum%', '%annotations%');
+        '%incidentTypeColor%', '%url%', '%number%', '%seqNum%', '%annotations%', '%vehicles%', '%additionalForces%',
+        '%typesOfAlerting%', '%featuredImage%');
     private $allowedTagsAfter = array('%feedUrl%');
 
     /**
      * Konstruktor, generiert und registriert das Widget
+     * @param Formatter $formatter
+     * @param Utilities $utilities
      */
-    public function __construct()
+    public function __construct(Formatter $formatter, Utilities $utilities)
     {
         parent::__construct(
             'recent-incidents-formatted',
@@ -129,16 +145,8 @@ class RecentIncidentsFormatted extends WP_Widget
                 'customize_selective_refresh' => true,
             )
         );
-    }
-
-    /**
-     * @param Formatter $formatter
-     * @param Utilities $utilities
-     */
-    public static function setDependencies($formatter, $utilities)
-    {
-        self::$formatter = $formatter;
-        self::$utilities = $utilities;
+        $this->formatter = $formatter;
+        $this->utilities = $utilities;
     }
 
     /**
@@ -170,9 +178,9 @@ class RecentIncidentsFormatted extends WP_Widget
 
         $widgetContent = $settings['beforeContent'];
         foreach ($incidents as $incident) {
-            $widgetContent .= self::$formatter->formatIncidentData($settings['pattern'], $this->allowedTagsPattern, $incident);
+            $widgetContent .= $this->formatter->formatIncidentData($settings['pattern'], $this->allowedTagsPattern, $incident, 'widget');
         }
-        $widgetContent .= self::$formatter->formatIncidentData($settings['afterContent'], $this->allowedTagsAfter);
+        $widgetContent .= $this->formatter->formatIncidentData($settings['afterContent'], $this->allowedTagsAfter, null, 'widget');
 
         echo wp_kses($widgetContent, $this->allowedHtmlTags);
         echo $args['after_widget'];
@@ -190,7 +198,7 @@ class RecentIncidentsFormatted extends WP_Widget
     {
         $instance = array();
         $instance['title'] = strip_tags($newInstance['title']);
-        $instance['numIncidents'] = self::$utilities->sanitizeNumberGreaterZero(
+        $instance['numIncidents'] = $this->utilities->sanitizeNumberGreaterZero(
             $newInstance['numIncidents'],
             $this->defaults['numIncidents']
         );
@@ -216,11 +224,11 @@ class RecentIncidentsFormatted extends WP_Widget
             $this->get_field_id('title'),
             'Titel:',
             $this->get_field_name('title'),
-            esc_attr(self::$utilities->getArrayValueIfKey($instance, 'title', ''))
+            esc_attr($this->utilities->getArrayValueIfKey($instance, 'title', ''))
         );
         echo '</p>';
 
-        $numIncidents = self::$utilities->getArrayValueIfKey($instance, 'numIncidents', $this->defaults['numIncidents']);
+        $numIncidents = $this->utilities->getArrayValueIfKey($instance, 'numIncidents', $this->defaults['numIncidents']);
         echo '<p>';
         printf(
             '<label for="%1$s">%2$s</label>&nbsp;<input id="%1$s" name="%3$s" type="text" value="%4$s" size="3" />',
@@ -237,7 +245,7 @@ class RecentIncidentsFormatted extends WP_Widget
             $this->get_field_id('beforeContent'),
             'HTML-Code vor den Einsatzberichten:',
             $this->get_field_name('beforeContent'),
-            self::$utilities->getArrayValueIfKey($instance, 'beforeContent', '')
+            $this->utilities->getArrayValueIfKey($instance, 'beforeContent', '')
         );
         echo '</p>';
 
@@ -247,10 +255,10 @@ class RecentIncidentsFormatted extends WP_Widget
             $this->get_field_id('pattern'),
             'HTML-Template pro Einsatzbericht:',
             $this->get_field_name('pattern'),
-            self::$utilities->getArrayValueIfKey($instance, 'pattern', '')
+            $this->utilities->getArrayValueIfKey($instance, 'pattern', '')
         );
         echo '</p><p class="description">' . 'Folgende Tags werden ersetzt:';
-        $formatterTags = self::$formatter->getTags();
+        $formatterTags = $this->formatter->getTags();
         foreach ($this->allowedTagsPattern as $tag) {
             echo '<br>' . $tag . ' (' . $formatterTags[$tag] . ')';
         }
@@ -262,12 +270,14 @@ class RecentIncidentsFormatted extends WP_Widget
             $this->get_field_id('afterContent'),
             'HTML-Code nach den Einsatzberichten:',
             $this->get_field_name('afterContent'),
-            self::$utilities->getArrayValueIfKey($instance, 'afterContent', '')
+            $this->utilities->getArrayValueIfKey($instance, 'afterContent', '')
         );
         echo '</p><p class="description">' . 'Folgende Tags werden ersetzt:';
         foreach ($this->allowedTagsAfter as $tag) {
             echo '<br>' . $tag . ' (' . $formatterTags[$tag] . ')';
         }
         echo '</p>';
+
+        return '';
     }
 }

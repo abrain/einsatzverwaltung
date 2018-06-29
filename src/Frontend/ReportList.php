@@ -18,6 +18,7 @@ use DateTime;
 class ReportList
 {
     const TABLECLASS = 'einsatzverwaltung-reportlist';
+    const DEFAULT_COLUMNS = 'number,date,time,title';
 
     /**
      * @var AnnotationIconBar
@@ -169,13 +170,13 @@ class ReportList
         // Variablen setzen
         $this->compact = (bool) $parsedArgs['compact'];
         $this->splitMonths = (bool) $parsedArgs['splitMonths'] && !$this->compact;
-        $this->columns = $this->utilities->sanitizeColumnsArray($parsedArgs['columns']);
+        $this->columns = ReportList::sanitizeColumnsArray($parsedArgs['columns']);
         $this->numberOfColumns = count($this->columns);
         $this->linkToVehicles = (true === $parsedArgs['linkToVehicles']);
         $this->linkToAddForces = (true === $parsedArgs['linkToAddForces']);
         $this->columnsWithLink = $parsedArgs['columnsWithLink'];
         if ($this->columnsWithLink !== false) {
-            $this->columnsWithLink = $this->utilities->sanitizeColumnsArray($this->columnsWithLink);
+            $this->columnsWithLink = ReportList::sanitizeColumnsArray($this->columnsWithLink);
         }
         $this->linkEmptyReports = (true === $parsedArgs['linkEmptyReports']);
         $this->showHeading = (bool) $parsedArgs['showHeading'];
@@ -500,7 +501,7 @@ class ReportList
     {
         $reportListSettings = self::$settings; // FIXME Verrenkung, um PHP 5.3.0 als Minimum zu ermöglichen, solange das
                                                // Ende der Untersützung nicht im Blog angekündigt wurde.
-        if (empty($reportListSettings)) {
+        if (empty($reportListSettings)) {      // NEEDS_PHP5.5 direkt empty(self::$settings) prüfen
             self::$settings = new ReportListSettings();
         }
 
@@ -521,5 +522,56 @@ class ReportList
         $string .= '}';
 
         return $string;
+    }
+
+    /**
+     * Stellt sicher, dass nur gültige Spalten-Ids gespeichert werden.
+     *
+     * @param string $input Kommaseparierte Spalten-Ids
+     *
+     * @return string Der Eingabestring ohne ungültige Spalten-Ids, bei Problemen werden die Standardspalten
+     * zurückgegeben
+     */
+    public static function sanitizeColumns($input)
+    {
+        if (empty($input)) {
+            return ReportList::DEFAULT_COLUMNS;
+        }
+
+        $inputArray = explode(',', $input);
+        $validColumnIds = self::sanitizeColumnsArray($inputArray);
+
+        if (empty($validColumnIds)) {
+            return ReportList::DEFAULT_COLUMNS;
+        }
+
+        return implode(',', $validColumnIds);
+    }
+
+    /**
+     * Bereinigt ein Array von Spalten-Ids, sodass nur gültige Ids darin verbleiben
+     *
+     * @param $inputArray
+     *
+     * @return array
+     */
+    public static function sanitizeColumnsArray($inputArray)
+    {
+        $columns = ReportList::getListColumns();
+        $columnIds = array_keys($columns);
+
+        $validColumnIds = array();
+        foreach ($inputArray as $colId) {
+            $colId = trim($colId);
+            if (in_array($colId, $columnIds)) {
+                $validColumnIds[] = $colId;
+            }
+        }
+
+        if (empty($validColumnIds)) {
+            $validColumnIds = explode(',', ReportList::DEFAULT_COLUMNS);
+        }
+
+        return $validColumnIds;
     }
 }

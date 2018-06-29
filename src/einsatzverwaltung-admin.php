@@ -3,6 +3,7 @@ namespace abrain\Einsatzverwaltung;
 
 use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
+use abrain\Einsatzverwaltung\Settings\MainPage;
 use WP_Post;
 
 /**
@@ -121,7 +122,7 @@ class Admin
             wp_enqueue_script(
                 'einsatzverwaltung-settings-script',
                 $this->core->scriptUrl . 'einsatzverwaltung-settings.js',
-                array('jquery-ui-draggable', 'jquery-ui-droppable', 'jquery-ui-sortable', 'iris'),
+                array('jquery-ui-draggable', 'jquery-ui-droppable', 'jquery-ui-sortable'),
                 Core::VERSION
             );
         }
@@ -130,7 +131,7 @@ class Admin
             'font-awesome',
             $this->core->pluginUrl . 'font-awesome/css/font-awesome.min.css',
             false,
-            '4.4.0'
+            '4.7.0'
         );
         wp_enqueue_style(
             'einsatzverwaltung-admin',
@@ -138,6 +139,13 @@ class Admin
             array(),
             Core::VERSION
         );
+        wp_enqueue_script(
+            'einsatzverwaltung-admin-script',
+            $this->core->scriptUrl . 'einsatzverwaltung-admin.js',
+            array('wp-color-picker'),
+            Core::VERSION
+        );
+        wp_enqueue_style('wp-color-picker');
     }
 
     /**
@@ -151,21 +159,21 @@ class Admin
 
         $this->echoInputCheckbox(
             'Fehlalarm',
-            'einsatzverwaltung_fehlalarm',
+            'meta_input[einsatz_fehlalarm]',
             $report->isFalseAlarm()
         );
         echo '<br>';
 
         $this->echoInputCheckbox(
             'Besonderer Einsatz',
-            'einsatzverwaltung_special',
+            'meta_input[einsatz_special]',
             $report->isSpecial()
         );
         echo '<br>';
 
         $this->echoInputCheckbox(
             'Bilder im Bericht',
-            'einsatzverwaltung_hasimages',
+            'meta_input[einsatz_hasimages]',
             $report->hasImages()
         );
     }
@@ -214,7 +222,7 @@ class Admin
 
         $this->echoInputText(
             'Einsatzende',
-            'einsatzverwaltung_einsatzende',
+            'meta_input[einsatz_einsatzende]',
             esc_attr($einsatzende),
             'JJJJ-MM-TT hh:mm'
         );
@@ -223,19 +231,19 @@ class Admin
 
         $this->echoInputText(
             'Einsatzort',
-            'einsatzverwaltung_einsatzort',
+            'meta_input[einsatz_einsatzort]',
             esc_attr($einsatzort)
         );
 
         $this->echoInputText(
             'Einsatzleiter',
-            'einsatzverwaltung_einsatzleiter',
+            'meta_input[einsatz_einsatzleiter]',
             esc_attr($einsatzleiter)
         );
 
         $this->echoInputText(
             'Mannschaftsst&auml;rke',
-            'einsatzverwaltung_mannschaft',
+            'meta_input[einsatz_mannschaft]',
             esc_attr($mannschaftsstaerke)
         );
 
@@ -476,7 +484,7 @@ class Admin
      */
     public function addActionLinks($links)
     {
-        $settingsPage = 'options-general.php?page=' . Settings::EVW_SETTINGS_SLUG;
+        $settingsPage = 'options-general.php?page=' . MainPage::EVW_SETTINGS_SLUG;
         $actionLinks = array('<a href="' . admin_url($settingsPage) . '">Einstellungen</a>');
         return array_merge($links, $actionLinks);
     }

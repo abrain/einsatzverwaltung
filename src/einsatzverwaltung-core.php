@@ -13,16 +13,21 @@ require_once dirname(__FILE__) . '/Widgets/RecentIncidents.php';
 require_once dirname(__FILE__) . '/Widgets/RecentIncidentsFormatted.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-options.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-shortcodes.php';
-require_once dirname(__FILE__) . '/einsatzverwaltung-settings.php';
 require_once dirname(__FILE__) . '/Import/Tool.php';
-require_once dirname(__FILE__) . '/einsatzverwaltung-taxonomies.php';
+require_once dirname(__FILE__) . '/Export/Tool.php';
 require_once dirname(__FILE__) . '/Frontend/ReportList.php';
 require_once dirname(__FILE__) . '/Frontend/ReportListSettings.php';
 require_once dirname(__FILE__) . '/ReportQuery.php';
 require_once dirname(__FILE__) . '/TasksPage.php';
 
+use abrain\Einsatzverwaltung\CustomFields\ColorPicker;
+use abrain\Einsatzverwaltung\CustomFields\NumberInput;
+use abrain\Einsatzverwaltung\CustomFields\PostSelector;
+use abrain\Einsatzverwaltung\CustomFields\TextInput;
 use abrain\Einsatzverwaltung\Import\Tool as ImportTool;
+use abrain\Einsatzverwaltung\Export\Tool as ExportTool;
 use abrain\Einsatzverwaltung\Model\ReportAnnotation;
+use abrain\Einsatzverwaltung\Settings\MainPage;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use abrain\Einsatzverwaltung\Widgets\RecentIncidents;
 use abrain\Einsatzverwaltung\Widgets\RecentIncidentsFormatted;
@@ -33,8 +38,8 @@ use WP_User;
  */
 class Core
 {
-    const VERSION = '1.3.6';
-    const DB_VERSION = 21;
+    const VERSION = '1.4.0';
+    const DB_VERSION = 30;
 
    /**
     * Statische Variable, um die aktuelle (einzige!) Instanz dieser Klasse zu halten
@@ -255,21 +260,21 @@ class Core
      * @var Frontend
      */
     private $frontend;
-
-    /**
-     * @var Settings
-     */
-    private $settings;
     
     /**
      * @var Options
      */
-    private $options;
+    public $options;
     
     /**
      * @var ImportTool
      */
     private $importTool;
+    
+    /**
+     * @var ExportTool
+     */
+    private $exportTool;
     
     /**
      * @var TasksPage
@@ -279,7 +284,12 @@ class Core
     /**
      * @var Utilities
      */
-    private $utilities;
+    public $utilities;
+
+    /**
+     * @var Formatter
+     */
+    public $formatter;
 
     /**
      * Constructor
@@ -297,22 +307,18 @@ class Core
         $this->options = new Options($this->utilities);
         $this->utilities->setDependencies($this->options); // FIXME Yay, zirkuläre Abhängigkeiten!
 
-        $formatter = new Formatter($this->options, $this->utilities, $this); // TODO In Singleton umwandeln
+        $this->formatter = new Formatter($this->options, $this->utilities); // TODO In Singleton umwandeln
 
         $this->admin = new Admin($this, $this->options, $this->utilities);
         $this->data = new Data($this, $this->utilities, $this->options);
-        $this->frontend = new Frontend($this, $this->options, $this->utilities, $formatter);
-        $this->settings = new Settings($this, $this->options, $this->utilities, $this->data);
-        $this->shortcodes = new Shortcodes($this->utilities, $this, $this->options, $formatter);
-        $this->taxonomies = new Taxonomies($this->utilities);
+        $this->frontend = new Frontend($this, $this->options, $this->utilities, $this->formatter);
+        $this->registerSettings();
+        $this->shortcodes = new Shortcodes($this->utilities, $this, $this->options, $this->formatter);
 
         // Tools
-        $this->importTool = new ImportTool($this, $this->utilities, $this->options, $this->data);
+        $this->importTool = new ImportTool($this->utilities, $this->options, $this->data);
+        $this->exportTool = new ExportTool();
         $this->tasksPage = new TasksPage($this->utilities, $this->data);
-
-        // Widgets
-        RecentIncidents::setDependencies($this->options, $this->utilities, $formatter);
-        RecentIncidentsFormatted::setDependencies($formatter, $this->utilities);
 
         $this->addHooks();
     }
@@ -333,10 +339,10 @@ class Core
      */
     public function onActivation()
     {
-        update_option('einsatzvw_version', self::VERSION);
         add_option('einsatzvw_db_version', self::DB_VERSION);
 
         $this->maybeUpdate();
+        update_option('einsatzvw_version', self::VERSION);
 
         // Posttypen registrieren
         $this->registerTypes();
@@ -370,8 +376,8 @@ class Core
 
     public function onPluginsLoaded()
     {
-        load_plugin_textdomain('einsatzverwaltung');
         $this->maybeUpdate();
+        update_option('einsatzvw_version', self::VERSION);
     }
 
     /**
@@ -387,6 +393,70 @@ class Core
         register_taxonomy('fahrzeug', 'einsatz', $this->argsFahrzeug);
         register_taxonomy('exteinsatzmittel', 'einsatz', $this->argsExteinsatzmittel);
         register_taxonomy('alarmierungsart', 'einsatz', $this->argsAlarmierungsart);
+
+        register_meta('post', 'einsatz_einsatzende', array(
+            'type' => 'string',
+            'description' => 'Datum und Uhrzeit, zu der der Einsatz endete.',
+            'single' => true,
+            'sanitize_callback' => array($this->data, 'sanitizeTimeOfEnding'),
+            'show_in_rest' => false
+        ));
+
+        register_meta('post', 'einsatz_einsatzleiter', array(
+            'type' => 'string',
+            'description' => 'Name der Person, die die Einsatzleitung innehatte.',
+            'single' => true,
+            'sanitize_callback' => 'sanitize_text_field',
+            'show_in_rest' => false
+        ));
+
+        register_meta('post', 'einsatz_einsatzort', array(
+            'type' => 'string',
+            'description' => 'Die Örtlichkeit, an der der Einsatz stattgefunden hat.',
+            'single' => true,
+            'sanitize_callback' => 'sanitize_text_field',
+            'show_in_rest' => false
+        ));
+
+        register_meta('post', 'einsatz_fehlalarm', array(
+            'type' => 'boolean',
+            'description' => 'Vermerk, ob es sich um einen Fehlalarm handelte.',
+            'single' => true,
+            'sanitize_callback' => array('Utilities', 'sanitizeCheckbox'),
+            'show_in_rest' => false
+        ));
+
+        register_meta('post', 'einsatz_hasimages', array(
+            'type' => 'boolean',
+            'description' => 'Vermerk, ob der Einsatzbericht Bilder enthält.',
+            'single' => true,
+            'sanitize_callback' => array('Utilities', 'sanitizeCheckbox'),
+            'show_in_rest' => false
+        ));
+
+        register_meta('post', 'einsatz_incidentNumber', array(
+            'type' => 'string',
+            'description' => 'Einsatznummer.',
+            'single' => true,
+            'sanitize_callback' => 'sanitize_text_field',
+            'show_in_rest' => false
+        ));
+
+        register_meta('post', 'einsatz_mannschaft', array(
+            'type' => 'string',
+            'description' => 'Angaben über die Personalstärke für diesen Einsatz.',
+            'single' => true,
+            'sanitize_callback' => 'sanitize_text_field',
+            'show_in_rest' => false
+        ));
+
+        register_meta('post', 'einsatz_special', array(
+            'type' => 'boolean',
+            'description' => 'Vermerk, ob es sich um einen besonderen Einsatzbericht handelt.',
+            'single' => true,
+            'sanitize_callback' => array('Utilities', 'sanitizeCheckbox'),
+            'show_in_rest' => false
+        ));
 
         // Vermerke registrieren
         $annotationRepository = ReportAnnotationRepository::getInstance();
@@ -414,6 +484,44 @@ class Core
             'Fehlalarm',
             'Kein Fehlalarm'
         ));
+
+        require dirname(__FILE__) . '/TaxonomyCustomFields.php';
+        require dirname(__FILE__) . '/CustomFields/CustomField.php';
+        require dirname(__FILE__) . '/CustomFields/ColorPicker.php';
+        require dirname(__FILE__) . '/CustomFields/NumberInput.php';
+        require dirname(__FILE__) . '/CustomFields/PostSelector.php';
+        require dirname(__FILE__) . '/CustomFields/TextInput.php';
+
+        $taxonomyCustomFields = new TaxonomyCustomFields();
+        $taxonomyCustomFields->addTextInput('exteinsatzmittel', new TextInput(
+            'url',
+            'URL',
+            'URL zu mehr Informationen &uuml;ber ein externes Einsatzmittel, beispielsweise dessen Webseite.'
+        ));
+        $taxonomyCustomFields->addColorpicker('einsatzart', new ColorPicker(
+            'typecolor',
+            'Farbe',
+            'Ordne dieser Einsatzart eine Farbe zu. Einsatzarten ohne Farbe erben diese gegebenenfalls von übergeordneten Einsatzarten.'
+        ));
+        $taxonomyCustomFields->addPostSelector('fahrzeug', new PostSelector(
+            'fahrzeugpid',
+            'Fahrzeugseite',
+            'Seite mit mehr Informationen &uuml;ber das Fahrzeug. Wird in Einsatzberichten mit diesem Fahrzeug verlinkt.',
+            array('einsatz', 'attachment', 'ai1ec_event', 'tribe_events')
+        ));
+        $taxonomyCustomFields->addNumberInput('fahrzeug', new NumberInput(
+            'vehicleorder',
+            'Reihenfolge',
+            'Optionale Angabe, mit der die Anzeigereihenfolge der Fahrzeuge beeinflusst werden kann. Fahrzeuge mit der kleineren Zahl werden zuerst angezeigt, anschlie&szlig;end diejenigen ohne Angabe bzw. dem Wert 0 in alphabetischer Reihenfolge.'
+        ));
+    }
+
+    private function registerSettings()
+    {
+        require_once dirname(__FILE__) . '/Settings/MainPage.php';
+        $mainPage = new MainPage($this->options);
+        add_action('admin_menu', array($mainPage, 'addToSettingsMenu'));
+        add_action('admin_init', array($mainPage, 'registerSettings'));
     }
 
     private function addRewriteRules()
@@ -447,9 +555,8 @@ class Core
 
     public function registerWidgets()
     {
-        // NEEDS_WP4.6 Instanziierte Widgets übergeben
-        register_widget('abrain\Einsatzverwaltung\Widgets\RecentIncidents');
-        register_widget('abrain\Einsatzverwaltung\Widgets\RecentIncidentsFormatted');
+        register_widget(new RecentIncidents($this->options, $this->utilities, $this->formatter));
+        register_widget(new RecentIncidentsFormatted($this->formatter, $this->utilities));
     }
 
     /**
@@ -491,18 +598,18 @@ class Core
     }
 
     /**
-     * Gibt die möglichen Kurzfassungstypen zurück
+     * Gibt den Link zu einem bestimmten Jahresarchiv zurück, berücksichtigt dabei die Permalink-Einstellungen
      *
-     * @return array
+     * @param string $year
+     *
+     * @return string
      */
-    public function getExcerptTypes()
+    public function getYearArchiveLink($year)
     {
-        return array(
-            'default' => 'WordPress-Standard',
-            'none' => 'Leer',
-            'details' => 'Einsatzdetails',
-            'text' => 'Berichtstext'
-        );
+        global $wp_rewrite;
+        $link = get_post_type_archive_link('einsatz');
+        $link = ($wp_rewrite->using_permalinks() ? trailingslashit($link) : $link . '&year=') . $year;
+        return user_trailingslashit($link);
     }
 
     /**
@@ -604,14 +711,6 @@ class Core
     }
 
     /**
-     * @return Settings
-     */
-    public function getSettings()
-    {
-        return $this->settings;
-    }
-
-    /**
      * @return Shortcodes
      */
     public function getShortcodes()
@@ -620,19 +719,19 @@ class Core
     }
 
     /**
-     * @return Taxonomies
-     */
-    public function getTaxonomies()
-    {
-        return $this->taxonomies;
-    }
-
-    /**
      * @return ImportTool
      */
     public function getImportTool()
     {
         return $this->importTool;
+    }
+
+    /**
+     * @return ExportTool
+     */
+    public function getExportTool()
+    {
+        return $this->exportTool;
     }
 
     /**

@@ -134,6 +134,7 @@ class Tool
             </li>
         </ul>
     </fieldset>
+    <p class="description">Wird kein Zeitraum ausgew&auml;hlt, werden alle Einsatzberichte exportiert.</p>
 
     <h2>Wähle, in welches Format du exportieren möchtest</h2>
     <fieldset>

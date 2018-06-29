@@ -72,6 +72,17 @@ Nein, mehr gibt es [hier](https://einsatzverwaltung.abrain.de/faq/).
 
 == Changelog ==
 
+= 1.4.0 =
+* Gestaltung von Einsatzberichten und Ausz&uuml;gen mit Hilfe von Templates
+* Export von Einsatzberichten in den Formaten CSV und JSON (Dank an [Heiko](https://github.com/heikobornholdt/))
+* Templates: Neue Platzhalter f&uuml;r Farbe der Einsatzart, Fahrzeuge, weitere Kr&auml;fte, Alarmierungsarten, Beitragstext, Beitragsbild, URL des Jahresarchivs
+* Einsatzarten kann eine Farbe zugewiesen werden
+* Farben k&ouml;nnen per Colorpicker ausgew&auml;hlt werden
+* Import akzeptiert bei Wahrheitswerten neben 1/0 jetzt auch ja/nein
+* Einstellungen auf mehrere Tabs aufgeteilt
+* Verschiedene Leistungsverbesserungen
+* Font Awesome auf Version 4.7 aktualisiert
+
 = 1.3.6 =
 * Fehler behoben, bei dem in einem Export aus dem All-in-One Event Calendar von Time.ly Einsatzdetails in Ereignissen auftauchen konnten
 
@@ -98,16 +109,19 @@ Nein, mehr gibt es [hier](https://einsatzverwaltung.abrain.de/faq/).
 
 = 1.3.0 =
 * Neuer Vermerk 'Bilder im Bericht'
-* Einsatzliste: Neue Spalten für Vermerke 'Bilder im Bericht' und 'Besonderer Einsatz'
-* Vermerke werden in der Übersicht im Adminbereich angezeigt
+* Einsatzliste: Neue Spalten f&uuml;r Vermerke 'Bilder im Bericht' und 'Besonderer Einsatz'
+* Vermerke werden in der &Uuml;bersicht im Adminbereich angezeigt
 * Einsatznummer ist nun nicht mehr Teil der URL
 * Import: Einsatznummer kann importiert werden
-* Einsatznummern können wahlweise automatisch oder manuell verwaltet werden
+* Einsatznummern k&ouml;nnen wahlweise automatisch oder manuell verwaltet werden
 * Werkzeug zum Reparieren der Einsatznummern entfernt
 * Mindestanforderung auf WordPress 4.4 angehoben
 * Getestet mit WordPress 4.7
 
 == Upgrade Notice ==
+
+= 1.4.0 =
+Templates f&uuml;r Einsatzberichte und Ausz&uuml;ge, Export von Einsatzberichten, und mehr
 
 == Social Media ==
 

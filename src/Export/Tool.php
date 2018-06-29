@@ -152,10 +152,10 @@ class Tool
         <?php } ?>
     </fieldset>
 
-    <?php submit_button('Export-Datei herunterladen'); ?>
+        <?php submit_button('Export-Datei herunterladen'); ?>
 </form>
 
-<?php
+        <?php
         echo '</div>';
     }
 

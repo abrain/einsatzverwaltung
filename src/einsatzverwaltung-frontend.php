@@ -57,7 +57,7 @@ class Frontend
             array_key_exists('plugin', $_REQUEST) && $_REQUEST['plugin'] == 'all-in-one-event-calendar' &&
             array_key_exists('action', $_REQUEST) && $_REQUEST['action'] == 'export_events'
         )) {
-            add_filter('the_content', array($this, 'renderContent'));
+            add_filter('the_content', array($this, 'renderContent'), 9);
         }
         add_filter('the_excerpt', array($this, 'filterEinsatzExcerpt'));
         add_filter('the_excerpt_rss', array($this, 'filterEinsatzExcerpt'));

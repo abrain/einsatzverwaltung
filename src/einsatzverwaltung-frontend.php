@@ -61,6 +61,7 @@ class Frontend
         }
         add_filter('the_excerpt', array($this, 'filterEinsatzExcerpt'));
         add_filter('the_excerpt_rss', array($this, 'filterEinsatzExcerpt'));
+        add_filter('the_excerpt_embed', array($this, 'filterEinsatzExcerpt'));
         add_action('pre_get_posts', array($this, 'addReportsToQuery'));
     }
 

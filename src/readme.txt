@@ -5,7 +5,7 @@ Tags: Feuerwehr, Hilfsorganisation, Öffentlichkeitsarbeit
 Requires at least: 4.6.0
 Tested up to: 4.9
 Requires PHP: 5.3.0
-Stable tag: 1.4.0
+Stable tag: 1.4.1
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -71,6 +71,10 @@ Das Du halte ich f&uuml;r die angenehmere Arbeitsgrundlage, aber man darf mich g
 Nein, mehr gibt es [hier](https://einsatzverwaltung.abrain.de/faq/).
 
 == Changelog ==
+
+= 1.4.1 =
+* Abs&auml;tze wurden bei der Verwendung von Templates nicht richtig dargestellt
+* Einstellungen f&uuml;r Ausz&uuml;ge gelten jetzt auch f&uuml;r oEmbeds
 
 = 1.4.0 =
 * Gestaltung von Einsatzberichten und Ausz&uuml;gen mit Hilfe von Templates

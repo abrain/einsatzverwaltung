@@ -55,7 +55,6 @@ class Admin
         add_filter('manage_edit-einsatz_columns', array($this, 'filterColumnsEinsatz'));
         add_action('manage_einsatz_posts_custom_column', array($this, 'filterColumnContentEinsatz'), 10, 2);
         add_action('dashboard_glance_items', array($this, 'addEinsatzberichteToDashboard')); // since WP 3.8
-        add_action('right_now_content_table_end', array($this, 'addEinsatzberichteToDashboardLegacy')); // before WP 3.8
         add_filter('plugin_row_meta', array($this, 'pluginMetaLinks'), 10, 2);
         add_filter('plugin_action_links_' . $this->core->pluginBasename, array($this,'addActionLinks'));
     }
@@ -429,34 +428,6 @@ class Admin
         }
 
         return $items;
-    }
-
-    /**
-     * Zahl der Einsatzberichte im Dashboard anzeigen (für WordPress 3.7 und älter)
-     */
-    public function addEinsatzberichteToDashboardLegacy()
-    {
-        if (post_type_exists('einsatz')) {
-            $postType = 'einsatz';
-            $ptInfo = get_post_type_object($postType); // get a specific CPT's details
-            $numberOfPosts = wp_count_posts($postType); // retrieve number of posts associated with this CPT
-            $num = number_format_i18n($numberOfPosts->publish); // number of published posts for this CPT
-            // singular/plural text label for CPT
-            $text = _n($ptInfo->labels->singular_name, $ptInfo->labels->name, intval($numberOfPosts->publish));
-            echo '<tr><td class="first b">';
-            if (current_user_can('edit_einsatzberichte')) {
-                echo '<a href="edit.php?post_type='.$postType.'">'.$num.'</a>';
-            } else {
-                echo $num;
-            }
-            echo '</td><td class="t">';
-            if (current_user_can('edit_einsatzberichte')) {
-                echo '<a href="edit.php?post_type='.$postType.'">'.$text.'</a>';
-            } else {
-                echo $text;
-            }
-            echo '</td></tr>';
-        }
     }
 
     /**

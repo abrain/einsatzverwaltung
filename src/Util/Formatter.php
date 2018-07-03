@@ -53,10 +53,11 @@ class Formatter
      * @param array $allowedTags
      * @param WP_Post $post
      * @param string $context
+     * @param string $originalContent
      *
      * @return mixed
      */
-    public function formatIncidentData($pattern, $allowedTags = array(), $post = null, $context = 'post')
+    public function formatIncidentData($pattern, $allowedTags = array(), $post = null, $context = 'post', $originalContent = '')
     {
         if (empty($allowedTags)) {
             $allowedTags = array_keys($this->getTags());
@@ -64,6 +65,11 @@ class Formatter
 
         $formattedString = $pattern;
         foreach ($allowedTags as $tag) {
+            if ($tag == '%content%') {
+                $formattedString = str_replace($tag, $formattedString, $originalContent);
+                continue;
+            }
+
             $formattedString = $this->format($post, $formattedString, $tag, $context);
         }
         return $formattedString;

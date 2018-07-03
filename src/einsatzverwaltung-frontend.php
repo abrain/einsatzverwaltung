@@ -207,7 +207,7 @@ class Frontend
                 return $content;
             }
 
-            $formatted = $this->formatter->formatIncidentData($template, array(), $post);
+            $formatted = $this->formatter->formatIncidentData($template, array(), $post, 'post', $content);
             return stripslashes(wp_filter_post_kses(addslashes($formatted)));
         }
 

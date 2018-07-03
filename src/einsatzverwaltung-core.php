@@ -1,7 +1,6 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
-require_once dirname(__FILE__) . '/einsatzverwaltung-admin.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-data.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-utilities.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-frontend.php';
@@ -13,12 +12,9 @@ require_once dirname(__FILE__) . '/Widgets/RecentIncidents.php';
 require_once dirname(__FILE__) . '/Widgets/RecentIncidentsFormatted.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-options.php';
 require_once dirname(__FILE__) . '/einsatzverwaltung-shortcodes.php';
-require_once dirname(__FILE__) . '/Import/Tool.php';
-require_once dirname(__FILE__) . '/Export/Tool.php';
 require_once dirname(__FILE__) . '/Frontend/ReportList.php';
 require_once dirname(__FILE__) . '/Frontend/ReportListSettings.php';
 require_once dirname(__FILE__) . '/ReportQuery.php';
-require_once dirname(__FILE__) . '/TasksPage.php';
 
 use abrain\Einsatzverwaltung\CustomFields\ColorPicker;
 use abrain\Einsatzverwaltung\CustomFields\NumberInput;
@@ -309,18 +305,31 @@ class Core
 
         $this->formatter = new Formatter($this->options, $this->utilities); // TODO In Singleton umwandeln
 
-        $this->admin = new Admin($this, $this->options, $this->utilities);
         $this->data = new Data($this, $this->utilities, $this->options);
         $this->frontend = new Frontend($this, $this->options, $this->utilities, $this->formatter);
-        $this->registerSettings();
         $this->shortcodes = new Shortcodes($this->utilities, $this, $this->options, $this->formatter);
+
+        if (is_admin()) {
+            $this->loadClassesForAdmin();
+        }
+
+        $this->addHooks();
+    }
+
+    private function loadClassesForAdmin()
+    {
+        require_once dirname(__FILE__) . '/einsatzverwaltung-admin.php';
+        require_once dirname(__FILE__) . '/Import/Tool.php';
+        require_once dirname(__FILE__) . '/Export/Tool.php';
+        require_once dirname(__FILE__) . '/TasksPage.php';
+
+        $this->admin = new Admin($this, $this->options, $this->utilities);
+        $this->registerSettings();
 
         // Tools
         $this->importTool = new ImportTool($this->utilities, $this->options, $this->data);
         $this->exportTool = new ExportTool();
         $this->tasksPage = new TasksPage($this->utilities, $this->data);
-
-        $this->addHooks();
     }
 
     private function addHooks()

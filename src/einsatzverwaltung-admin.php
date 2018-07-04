@@ -22,27 +22,13 @@ class Admin
     private $core;
 
     /**
-     * @var Options
-     */
-    private $options;
-
-    /**
-     * @var Utilities
-     */
-    private $utilities;
-
-    /**
      * Constructor
      *
      * @param Core $core
-     * @param Options $options
-     * @param Utilities $utilities
      */
-    public function __construct($core, $options, $utilities)
+    public function __construct($core)
     {
         $this->core = $core;
-        $this->options = $options;
-        $this->utilities = $utilities;
         $this->addHooks();
     }
 
@@ -200,7 +186,7 @@ class Admin
         echo '<input type="hidden" id="einsatzleiter_used_values" value="' . implode(',', $names) . '" />';
         echo '<table><tbody>';
 
-        if ($this->options->isAutoIncidentNumbers()) {
+        if (get_option('einsatzverwaltung_incidentnumbers_auto', '0') === '1') {
             echo '<tr><td>Einsatznummer</td><td>' . esc_html($nummer) . '</td></tr>';
         } else {
             $this->echoInputText(
@@ -278,7 +264,7 @@ class Admin
     private function echoInputCheckbox($label, $name, $state)
     {
         echo '<input type="checkbox" id="' . $name . '" name="' . $name . '" value="1" ';
-        echo $this->utilities->checked($state) . '/><label for="' . $name . '">' . $label . '</label>';
+        echo checked($state, '1') . '/><label for="' . $name . '">' . $label . '</label>';
     }
 
     /**

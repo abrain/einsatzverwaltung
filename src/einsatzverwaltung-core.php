@@ -323,7 +323,7 @@ class Core
         require_once dirname(__FILE__) . '/Export/Tool.php';
         require_once dirname(__FILE__) . '/TasksPage.php';
 
-        $this->admin = new Admin($this, $this->options, $this->utilities);
+        $this->admin = new Admin($this);
         $this->registerSettings();
 
         // Tools

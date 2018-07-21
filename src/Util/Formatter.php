@@ -145,6 +145,9 @@ class Formatter
                 $year = $timeOfAlerting->format('Y');
                 $replace = Core::getInstance()->getYearArchiveLink($year);
                 break;
+            case '%workforce%':
+                $replace = $incidentReport->getWorkforce();
+                break;
             default:
                 return $pattern;
         }
@@ -199,6 +202,7 @@ class Formatter
             '%content%' => 'Berichtstext',
             '%featuredImage%' => 'Beitragsbild',
             '%yearArchive%' => 'Link zum Jahresarchiv',
+            '%workforce%' => 'Mannschaftsstärke',
         );
     }
 

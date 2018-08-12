@@ -29,20 +29,6 @@ class Admin
     public function __construct($core)
     {
         $this->core = $core;
-        $this->addHooks();
-    }
-
-    private function addHooks()
-    {
-        add_action('add_meta_boxes_einsatz', array($this, 'addMetaBoxes'));
-        add_action('admin_menu', array($this, 'adjustTaxonomies'));
-        add_action('admin_notices', array($this, 'displayAdminNotices'));
-        add_action('admin_enqueue_scripts', array($this, 'enqueueEditScripts'));
-        add_filter('manage_edit-einsatz_columns', array($this, 'filterColumnsEinsatz'));
-        add_action('manage_einsatz_posts_custom_column', array($this, 'filterColumnContentEinsatz'), 10, 2);
-        add_action('dashboard_glance_items', array($this, 'addEinsatzberichteToDashboard')); // since WP 3.8
-        add_filter('plugin_row_meta', array($this, 'pluginMetaLinks'), 10, 2);
-        add_filter('plugin_action_links_' . $this->core->pluginBasename, array($this,'addActionLinks'));
     }
 
     /**

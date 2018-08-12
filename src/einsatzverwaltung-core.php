@@ -324,12 +324,29 @@ class Core
         require_once dirname(__FILE__) . '/TasksPage.php';
 
         $this->admin = new Admin($this);
+        add_action('add_meta_boxes_einsatz', array($this->admin, 'addMetaBoxes'));
+        add_action('admin_menu', array($this->admin, 'adjustTaxonomies'));
+        add_action('admin_notices', array($this->admin, 'displayAdminNotices'));
+        add_action('admin_enqueue_scripts', array($this->admin, 'enqueueEditScripts'));
+        add_filter('manage_edit-einsatz_columns', array($this->admin, 'filterColumnsEinsatz'));
+        add_action('manage_einsatz_posts_custom_column', array($this->admin, 'filterColumnContentEinsatz'), 10, 2);
+        add_action('dashboard_glance_items', array($this->admin, 'addEinsatzberichteToDashboard')); // since WP 3.8
+        add_filter('plugin_row_meta', array($this->admin, 'pluginMetaLinks'), 10, 2);
+        add_filter('plugin_action_links_' . $this->pluginBasename, array($this->admin,'addActionLinks'));
+
         $this->registerSettings();
 
-        // Tools
         $this->importTool = new ImportTool($this->utilities, $this->options, $this->data);
+        add_action('admin_menu', array($this->importTool, 'addToolToMenu'));
+
         $this->exportTool = new ExportTool();
+        add_action('admin_menu', array($this->exportTool, 'addToolToMenu'));
+        add_action('init', array($this->exportTool, 'startExport'), 20); // 20, damit alles andere initialisiert ist
+        add_action('admin_enqueue_scripts', array($this->exportTool, 'enqueueAdminScripts'));
+
         $this->tasksPage = new TasksPage($this->utilities, $this->data);
+        add_action('admin_menu', array($this->tasksPage, 'registerPage'));
+        add_action('admin_menu', array($this->tasksPage, 'hidePage'), 999);
     }
 
     private function addHooks()

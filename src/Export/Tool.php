@@ -23,29 +23,7 @@ class Tool
      */
     public function __construct()
     {
-        $this->addHooks();
         $this->loadFormats();
-    }
-
-    private function addHooks()
-    {
-        add_action('admin_menu', array($this, 'addToolToMenu'));
-
-        // Priorität muss höher als 10 sein, damit das Plugin in Core vorher richtig initialisiert wird
-        add_action('init', array($this, 'startExport'), 20);
-
-        add_action('admin_enqueue_scripts', function ($hook) {
-            if ($hook !== 'tools_page_einsatzvw-tool-export') {
-                return;
-            }
-
-            wp_enqueue_script(
-                'einsatzverwaltung-export',
-                Core::getInstance()->scriptUrl . 'export.js',
-                array('jquery'),
-                Core::VERSION
-            );
-        });
     }
 
     /**
@@ -59,6 +37,23 @@ class Tool
             'export',
             self::EVW_TOOL_EXPORT_SLUG,
             array($this, 'renderToolPage')
+        );
+    }
+
+    /**
+     * @param string $hook
+     */
+    public function enqueueAdminScripts($hook)
+    {
+        if ($hook !== 'tools_page_einsatzvw-tool-export') {
+            return;
+        }
+
+        wp_enqueue_script(
+            'einsatzverwaltung-export',
+            Core::getInstance()->scriptUrl . 'export.js',
+            array('jquery'),
+            Core::VERSION
         );
     }
 

@@ -68,8 +68,6 @@ class Tool
         $this->options = $options;
         $this->data = $data;
 
-        add_action('admin_menu', array($this, 'addToolToMenu'));
-
         $this->loadSources();
     }
 

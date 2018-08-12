@@ -336,8 +336,8 @@ class Tool
 
         // Import starten
         echo '<p>Die Daten werden eingelesen, das kann einen Moment dauern.</p>';
+        $importStatus = new ImportStatus(0);
         try {
-            $importStatus = new ImportStatus(0);
             $this->helper->import($this->currentSource, $mapping, $importStatus);
         } catch (ImportException $e) {
             $importStatus->abort('Import abgebrochen, Ursache: ' . $e->getMessage());

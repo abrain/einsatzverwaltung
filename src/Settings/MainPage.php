@@ -2,7 +2,6 @@
 
 namespace abrain\Einsatzverwaltung\Settings;
 
-use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\Settings\Pages\About;
 use abrain\Einsatzverwaltung\Settings\Pages\Capabilities;

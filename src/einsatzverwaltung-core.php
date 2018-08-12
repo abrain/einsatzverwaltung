@@ -307,7 +307,7 @@ class Core
 
         $this->data = new Data($this, $this->utilities, $this->options);
         $this->frontend = new Frontend($this, $this->options, $this->utilities, $this->formatter);
-        $this->shortcodes = new Shortcodes($this->utilities, $this, $this->options, $this->formatter);
+        new Shortcodes($this->utilities, $this, $this->options, $this->formatter);
 
         if (is_admin()) {
             $this->loadClassesForAdmin();
@@ -687,14 +687,6 @@ class Core
     public function getFrontend()
     {
         return $this->frontend;
-    }
-
-    /**
-     * @return Shortcodes
-     */
-    public function getShortcodes()
-    {
-        return $this->shortcodes;
     }
 
     /**

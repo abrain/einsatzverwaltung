@@ -211,21 +211,6 @@ class Options
     }
 
     /**
-     * @param $roleSlug
-     *
-     * @return bool
-     */
-    public function isRoleAllowedToEdit($roleSlug)
-    {
-        if ($roleSlug === 'administrator') {
-            return true;
-        }
-
-        $option = $this->getOption('einsatzvw_cap_roles_' . $roleSlug);
-        return $this->toBoolean($option);
-    }
-
-    /**
      * @return bool
      */
     public function isShowEinsatzartArchive()

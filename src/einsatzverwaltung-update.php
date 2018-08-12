@@ -136,7 +136,7 @@ class Update
     {
         update_option('einsatzvw_cap_roles_administrator', 1);
         $roleObject = get_role('administrator');
-        foreach ($this->core->getCapabilities() as $cap) {
+        foreach (UserRightsManager::$capabilities as $cap) {
             $roleObject->add_cap($cap);
         }
 
@@ -191,7 +191,7 @@ class Update
         if (!empty($roles)) {
             foreach (array_keys($roles) as $roleSlug) {
                 $roleObject = get_role($roleSlug);
-                foreach ($this->core->getCapabilities() as $cap) {
+                foreach (UserRightsManager::$capabilities as $cap) {
                     $roleObject->remove_cap($cap);
                 }
             }

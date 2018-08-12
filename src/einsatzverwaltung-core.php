@@ -356,7 +356,11 @@ class Core
         register_activation_hook($this->pluginFile, array($this, 'onActivation'));
         register_deactivation_hook($this->pluginFile, array($this, 'onDeactivation'));
         add_action('widgets_init', array($this, 'registerWidgets'));
-        add_filter('user_has_cap', array($this, 'userHasCap'), 10, 4);
+
+        require_once dirname(__FILE__) . '/UserRightsManager.php';
+        $userRightsManager = new UserRightsManager();
+        add_filter('user_has_cap', array($userRightsManager, 'userHasCap'), 10, 4);
+
         add_action('parse_query', array($this, 'einsatznummerMetaQuery'));
     }
 
@@ -636,57 +640,6 @@ class Core
         $link = get_post_type_archive_link('einsatz');
         $link = ($wp_rewrite->using_permalinks() ? trailingslashit($link) : $link . '&year=') . $year;
         return user_trailingslashit($link);
-    }
-
-    /**
-     * Gibt die möglichen Berechtigungen für Einsatzberichte zurück
-     *
-     * @return array
-     */
-    public function getCapabilities()
-    {
-        return array(
-            'edit_einsatzberichte',
-            'edit_private_einsatzberichte',
-            'edit_published_einsatzberichte',
-            'edit_others_einsatzberichte',
-            'publish_einsatzberichte',
-            'read_private_einsatzberichte',
-            'delete_einsatzberichte',
-            'delete_private_einsatzberichte',
-            'delete_published_einsatzberichte',
-            'delete_others_einsatzberichte'
-        );
-    }
-
-    /**
-     * Prüft und vergibt Benutzerrechte zur Laufzeit
-     *
-     * @param array $allcaps Effektive Nutzerrechte
-     * @param array $caps Die angefragten Nutzerrechte
-     * @param array $args Zusätzliche Parameter wie Objekt-ID
-     * @param WP_User $user Benutzerobjekt
-     *
-     * @return array Die gefilterten oder erweiterten Nutzerrechte
-     */
-    public function userHasCap($allcaps, $caps, $args, $user)
-    {
-        $requestedCaps = array_intersect($this->getCapabilities(), $caps);
-
-        // Wenn es nicht um Berechtigungen aus der Einsatzverwaltung geht, können wir uns den Rest sparen
-        if (count($requestedCaps) == 0) {
-            return $allcaps;
-        }
-
-        // Wenn der Benutzer mindestens einer berechtigten Rolle zugeordnet ist, werden die Berechtigungen erteilt
-        $allowedUserRoles = array_filter($user->roles, array($this->options, 'isRoleAllowedToEdit'));
-        if (count($allowedUserRoles) > 0) {
-            foreach ($requestedCaps as $requestedCap) {
-                $allcaps[$requestedCap] = 1;
-            }
-        }
-
-        return $allcaps;
     }
 
     private function maybeUpdate()

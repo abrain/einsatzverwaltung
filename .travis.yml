@@ -29,7 +29,3 @@ before_script:
 
 after_script:
   - CODECLIMATE_REPO_TOKEN=c0e18ea554a37a7495947a34c818939c0599bde7c1efa3ee136989c053dde9da ./vendor/bin/test-reporter
-
-addons:
-    code_climate:
-        repo_token: c0e18ea554a37a7495947a34c818939c0599bde7c1efa3ee136989c053dde9da

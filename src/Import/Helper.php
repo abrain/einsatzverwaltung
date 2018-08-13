@@ -225,8 +225,6 @@ class Helper
      */
     public function import($source, $mapping, $importStatus)
     {
-        set_time_limit(0); // Zeitlimit deaktivieren
-
         $preparedInsertArgs = array();
         $yearsAffected = array();
 

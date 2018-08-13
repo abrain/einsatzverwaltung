@@ -62,6 +62,11 @@ class Formatter
             $allowedTags = array_keys($this->getTags());
         }
 
+        // Content should be handled separately, so we will ignore it
+        $allowedTags = array_filter($allowedTags, function ($tag) {
+            return $tag !== '%content%';
+        });
+
         $formattedString = $pattern;
         foreach ($allowedTags as $tag) {
             $formattedString = $this->format($post, $formattedString, $tag, $context);

@@ -66,7 +66,7 @@ class Formatter
         $formattedString = $pattern;
         foreach ($allowedTags as $tag) {
             if ($tag == '%content%') {
-                $formattedString = str_replace($tag, $formattedString, $originalContent);
+                $formattedString = str_replace($tag, $originalContent, $formattedString);
                 continue;
             }
 

@@ -206,9 +206,10 @@ class Frontend
             if (empty($template)) {
                 return $content;
             }
-
-            $formatted = $this->formatter->formatIncidentData($template, array(), $post, 'post', $content);
-            return stripslashes(wp_filter_post_kses(addslashes($formatted)));
+            
+            $templateWithData = $this->formatter->formatIncidentData($template, array(), $post, 'post');
+            $templateWithContent = str_replace('%content%', $content, $templateWithData);
+            return stripslashes(wp_filter_post_kses(addslashes($templateWithContent)));
         }
 
         if (!is_singular('einsatz')) {

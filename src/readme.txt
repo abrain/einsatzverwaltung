@@ -5,7 +5,7 @@ Tags: Feuerwehr, Hilfsorganisation, Öffentlichkeitsarbeit
 Requires at least: 4.6.0
 Tested up to: 4.9
 Requires PHP: 5.3.0
-Stable tag: 1.4.1
+Stable tag: 1.4.2
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -71,6 +71,11 @@ Das Du halte ich f&uuml;r die angenehmere Arbeitsgrundlage, aber man darf mich g
 Nein, mehr gibt es [hier](https://einsatzverwaltung.abrain.de/faq/).
 
 == Changelog ==
+
+= 1.4.2 =
+* Templates: Behebt ein Problem, bei dem Shortcodes falsch geparst wurden
+* Templates: Neuer Platzhalter f&uuml;r die Mannschaftsst&auml;rke
+* Deaktivierung des Zeitlimits bei Updates, Importen etc. entfernt, da es bei manchen Hostern Probleme gab
 
 = 1.4.1 =
 * Abs&auml;tze wurden bei der Verwendung von Templates nicht richtig dargestellt

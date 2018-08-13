@@ -62,6 +62,11 @@ class Formatter
             $allowedTags = array_keys($this->getTags());
         }
 
+        // Content should be handled separately, so we will ignore it
+        $allowedTags = array_filter($allowedTags, function ($tag) {
+            return $tag !== '%content%';
+        });
+
         $formattedString = $pattern;
         foreach ($allowedTags as $tag) {
             $formattedString = $this->format($post, $formattedString, $tag, $context);
@@ -145,6 +150,9 @@ class Formatter
                 $year = $timeOfAlerting->format('Y');
                 $replace = Core::getInstance()->getYearArchiveLink($year);
                 break;
+            case '%workforce%':
+                $replace = $incidentReport->getWorkforce();
+                break;
             default:
                 return $pattern;
         }
@@ -199,6 +207,7 @@ class Formatter
             '%content%' => 'Berichtstext',
             '%featuredImage%' => 'Beitragsbild',
             '%yearArchive%' => 'Link zum Jahresarchiv',
+            '%workforce%' => 'Mannschaftsstärke',
         );
     }
 

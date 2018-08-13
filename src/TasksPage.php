@@ -65,7 +65,6 @@ class TasksPage
 
         switch ($action) {
             case 'regenerate-slugs':
-                set_time_limit(0); // Zeitlimit deaktivieren
                 $posts = get_posts(array(
                     'nopaging' => true,
                     'orderby' => 'post_date',

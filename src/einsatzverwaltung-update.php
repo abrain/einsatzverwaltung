@@ -354,6 +354,8 @@ class Update
 
         delete_option('einsatzvw_excerpt_type');
         delete_option('einsatzvw_excerpt_type_feed');
+
+        update_option('einsatzvw_db_version', 30);
     }
 
     /**

@@ -376,4 +376,9 @@ class UpgradeTest extends WP_UnitTestCase
         self::assertEquals(1, get_post_meta($reportIds[3], 'einsatz_special', true));
         self::assertEquals(0, get_post_meta($reportIds[4], 'einsatz_special', true));
     }
+
+    public function testUpgrade140()
+    {
+        $this->runUpgrade(21, 30);
+    }
 }

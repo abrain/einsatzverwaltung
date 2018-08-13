@@ -58,9 +58,6 @@ class Update
             return new WP_Error('', 'Zieldatenbankversion darf nicht leer sein');
         }
 
-        // Kein Timeout während des Updates
-        set_time_limit(0);
-
         if (empty($currentDbVersion) && $targetDbVersion >= 1) {
             $currentDbVersion = 0;
             $this->upgrade054();

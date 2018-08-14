@@ -84,16 +84,8 @@ class Tool
 
     private function loadFormats()
     {
-        require_once dirname(__FILE__) . '/Formats/Format.php';
-        require_once dirname(__FILE__) . '/Formats/AbstractFormat.php';
-
-        require_once dirname(__FILE__) . '/Formats/Csv.php';
         $this->formats['csv'] = new Csv();
-
-        require_once dirname(__FILE__) . '/Formats/Excel.php';
         $this->formats['excel'] = new Excel();
-
-        require_once dirname(__FILE__) . '/Formats/Json.php';
         $this->formats['json'] = new Json();
     }
 

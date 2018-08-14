@@ -106,12 +106,9 @@ class Tool
 
     private function loadSources()
     {
-        require_once dirname(__FILE__) . '/Sources/AbstractSource.php';
-        require_once dirname(__FILE__) . '/Sources/WpEinsatz.php';
         $wpEinsatz = new WpEinsatz($this->utilities);
         $this->sources[$wpEinsatz->getIdentifier()] = $wpEinsatz;
 
-        require_once dirname(__FILE__) . '/Sources/Csv.php';
         $csv = new Csv($this->utilities);
         $this->sources[$csv->getIdentifier()] = $csv;
     }
@@ -121,7 +118,6 @@ class Tool
      */
     public function renderToolPage()
     {
-        require_once dirname(__FILE__) . '/Helper.php';
         $this->helper = new Helper($this->utilities, $this->options, $this->data);
         $this->helper->metaFields = IncidentReport::getMetaFields();
         $this->helper->taxonomies = IncidentReport::getTerms();
@@ -329,10 +325,6 @@ class Tool
             ));
             return;
         }
-
-        require_once dirname(dirname(__FILE__)) . '/Exceptions/ImportException.php';
-        require_once dirname(dirname(__FILE__)) . '/Exceptions/ImportPreparationException.php';
-        require_once dirname(__FILE__) . '/ImportStatus.php';
 
         // Import starten
         echo '<p>Die Daten werden eingelesen, das kann einen Moment dauern.</p>';

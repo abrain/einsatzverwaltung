@@ -1,19 +1,6 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
-require_once dirname(__FILE__) . '/einsatzverwaltung-data.php';
-require_once dirname(__FILE__) . '/einsatzverwaltung-utilities.php';
-require_once dirname(__FILE__) . '/einsatzverwaltung-frontend.php';
-require_once dirname(__FILE__) . '/Model/IncidentReport.php';
-require_once dirname(__FILE__) . '/Util/Formatter.php';
-require_once dirname(__FILE__) . '/Widgets/RecentIncidents.php';
-require_once dirname(__FILE__) . '/Widgets/RecentIncidentsFormatted.php';
-require_once dirname(__FILE__) . '/einsatzverwaltung-options.php';
-require_once dirname(__FILE__) . '/einsatzverwaltung-shortcodes.php';
-require_once dirname(__FILE__) . '/Frontend/ReportList.php';
-require_once dirname(__FILE__) . '/Frontend/ReportListSettings.php';
-require_once dirname(__FILE__) . '/ReportQuery.php';
-
 use abrain\Einsatzverwaltung\Import\Tool as ImportTool;
 use abrain\Einsatzverwaltung\Export\Tool as ExportTool;
 use abrain\Einsatzverwaltung\Settings\MainPage;
@@ -104,8 +91,6 @@ class Core
         $this->scriptUrl = $this->pluginUrl . 'js/';
         $this->styleUrl = $this->pluginUrl . 'css/';
 
-        require_once dirname(__FILE__) . '/TypeRegistry.php';
-
         $this->utilities = new Utilities($this);
         $this->options = new Options($this->utilities);
         $this->utilities->setDependencies($this->options); // FIXME Yay, zirkuläre Abhängigkeiten!
@@ -127,11 +112,6 @@ class Core
 
     private function loadClassesForAdmin()
     {
-        require_once dirname(__FILE__) . '/einsatzverwaltung-admin.php';
-        require_once dirname(__FILE__) . '/Import/Tool.php';
-        require_once dirname(__FILE__) . '/Export/Tool.php';
-        require_once dirname(__FILE__) . '/TasksPage.php';
-
         $this->admin = new Admin($this);
         add_action('add_meta_boxes_einsatz', array($this->admin, 'addMetaBoxes'));
         add_action('admin_menu', array($this->admin, 'adjustTaxonomies'));
@@ -166,7 +146,6 @@ class Core
         register_deactivation_hook($this->pluginFile, array($this, 'onDeactivation'));
         add_action('widgets_init', array($this, 'registerWidgets'));
 
-        require_once dirname(__FILE__) . '/UserRightsManager.php';
         $userRightsManager = new UserRightsManager();
         add_filter('user_has_cap', array($userRightsManager, 'userHasCap'), 10, 4);
 
@@ -221,7 +200,6 @@ class Core
 
     private function registerSettings()
     {
-        require_once dirname(__FILE__) . '/Settings/MainPage.php';
         $mainPage = new MainPage($this->options);
         add_action('admin_menu', array($mainPage, 'addToSettingsMenu'));
         add_action('admin_init', array($mainPage, 'registerSettings'));
@@ -334,7 +312,6 @@ class Core
      */
     public function getUpdater()
     {
-        require_once(__DIR__ . '/einsatzverwaltung-update.php');
         return new Update($this, $this->options, $this->utilities, $this->data);
     }
 
@@ -400,5 +377,3 @@ class Core
         return self::$instance;
     }
 }
-
-Core::getInstance();

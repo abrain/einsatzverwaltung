@@ -19,7 +19,8 @@ Pull Requests werden nur im Branch `develop` angenommen.
 Das Plugin an sich liegt im Ordner `src`, alles andere dient der Unterst&uuml;tzung bei der Entwicklung.
 Code aus einem anderen Branch als `master` sollte nicht f&uuml;r Produktivsysteme verwendet werden.
 
-Der PHP-Code wird gem&auml;&szlig; dem Coding Style Guide [PSR-2](http://www.php-fig.org/psr/psr-2/) formatiert.
+Der PHP-Code wird gem&auml;&szlig; dem Coding Style Guide [PSR-2](https://www.php-fig.org/psr/psr-2/) formatiert.
+Klassen werden automatisch geladen, die Dateien sind nach [PSR-4](https://www.php-fig.org/psr/psr-4/) zu organisieren.
 
 ### Mindestvoraussetzungen
 * PHP: 5.3.0

@@ -33,14 +33,6 @@ class MainPage
     {
         $this->subPages = array();
 
-        require_once dirname(__FILE__) . '/Pages/SubPage.php';
-        require_once dirname(__FILE__) . '/Pages/General.php';
-        require_once dirname(__FILE__) . '/Pages/Numbers.php';
-        require_once dirname(__FILE__) . '/Pages/Report.php';
-        require_once dirname(__FILE__) . '/Pages/ReportList.php';
-        require_once dirname(__FILE__) . '/Pages/Capabilities.php';
-        require_once dirname(__FILE__) . '/Pages/About.php';
-
         SubPage::$options = $options;
         $this->addSubPage(new General());
         $this->addSubPage(new Numbers());

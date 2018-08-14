@@ -364,7 +364,6 @@ class Admin
                 break;
             case 'einsatzverwaltung_annotations':
                 if (empty($this->annotationIconBar)) {
-                    require_once dirname(__FILE__) . '/Frontend/AnnotationIconBar.php';
                     $this->annotationIconBar = AnnotationIconBar::getInstance();
                 }
                 echo $this->annotationIconBar->render($report);

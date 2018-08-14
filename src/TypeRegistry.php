@@ -217,15 +217,6 @@ class TypeRegistry
     {
         $this->options = $options;
         $this->data = $data;
-
-        require dirname(__FILE__) . '/Model/ReportAnnotation.php';
-        require dirname(__FILE__) . '/ReportAnnotationRepository.php';
-        require dirname(__FILE__) . '/TaxonomyCustomFields.php';
-        require dirname(__FILE__) . '/CustomFields/CustomField.php';
-        require dirname(__FILE__) . '/CustomFields/ColorPicker.php';
-        require dirname(__FILE__) . '/CustomFields/NumberInput.php';
-        require dirname(__FILE__) . '/CustomFields/PostSelector.php';
-        require dirname(__FILE__) . '/CustomFields/TextInput.php';
     }
 
     /**

@@ -41,7 +41,6 @@ class Formatter
      */
     public function __construct($options, $utilities)
     {
-        require_once dirname(__FILE__) . '/../Frontend/AnnotationIconBar.php';
         $this->options = $options;
         $this->utilities = $utilities;
         $this->annotationIconBar = AnnotationIconBar::getInstance();

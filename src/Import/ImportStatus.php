@@ -1,8 +1,6 @@
 <?php
 namespace abrain\Einsatzverwaltung\Import;
 
-require_once dirname(dirname(__FILE__)) . '/Util/ProgressTracker.php';
-
 use abrain\Einsatzverwaltung\Util\ProgressTracker;
 
 /**

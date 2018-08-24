@@ -8,6 +8,7 @@ use abrain\Einsatzverwaltung\CustomFields\TextInput;
 use abrain\Einsatzverwaltung\Exceptions\TypeRegistrationException;
 use abrain\Einsatzverwaltung\Model\ReportAnnotation;
 use abrain\Einsatzverwaltung\Types\CustomType;
+use abrain\Einsatzverwaltung\Types\IncidentType;
 use abrain\Einsatzverwaltung\Types\Report;
 
 /**
@@ -18,42 +19,7 @@ use abrain\Einsatzverwaltung\Types\Report;
 class TypeRegistry
 {
     private $postTypes = array();
-
-    private $argsEinsatzart = array(
-        'label' => 'Einsatzarten',
-        'labels' => array(
-            'name' => 'Einsatzarten',
-            'singular_name' => 'Einsatzart',
-            'menu_name' => 'Einsatzarten',
-            'search_items' => 'Einsatzarten suchen',
-            'popular_items' => 'H&auml;ufige Einsatzarten',
-            'all_items' => 'Alle Einsatzarten',
-            'parent_item' => '&Uuml;bergeordnete Einsatzart',
-            'parent_item_colon' => '&Uuml;bergeordnete Einsatzart:',
-            'edit_item' => 'Einsatzart bearbeiten',
-            'view_item' => 'Einsatzart ansehen',
-            'update_item' => 'Einsatzart aktualisieren',
-            'add_new_item' => 'Neue Einsatzart',
-            'new_item_name' => 'Einsatzart hinzuf&uuml;gen',
-            'separate_items_with_commas' => 'Einsatzarten mit Kommas trennen',
-            'add_or_remove_items' => 'Einsatzarten hinzuf&uuml;gen oder entfernen',
-            'choose_from_most_used' => 'Aus h&auml;ufigen Einsatzarten w&auml;hlen',
-            'not_found' => 'Keine Einsatzarten gefunden.',
-            'no_terms' => 'Keine Einsatzarten',
-            'items_list_navigation' => 'Navigation der Liste der Einsatzarten',
-            'items_list' => 'Liste der Einsatzarten',
-        ),
-        'public' => true,
-        'show_in_nav_menus' => false,
-        'meta_box_cb' => 'abrain\Einsatzverwaltung\Admin::displayMetaBoxEinsatzart',
-        'capabilities' => array(
-            'manage_terms' => 'edit_einsatzberichte',
-            'edit_terms' => 'edit_einsatzberichte',
-            'delete_terms' => 'edit_einsatzberichte',
-            'assign_terms' => 'edit_einsatzberichte'
-        ),
-        'hierarchical' => true
-    );
+    private $taxonomies = array();
 
     private $argsFahrzeug = array(
         'label' => 'Fahrzeuge',
@@ -170,9 +136,10 @@ class TypeRegistry
      */
     public function registerTypes()
     {
-        $this->registerPostType(new Report());
+        $report = new Report();
+        $this->registerPostType($report);
+        $this->registerTaxonomy(new IncidentType(), $report->getSlug());
 
-        register_taxonomy('einsatzart', 'einsatz', $this->argsEinsatzart);
         register_taxonomy('fahrzeug', 'einsatz', $this->argsFahrzeug);
         register_taxonomy('exteinsatzmittel', 'einsatz', $this->argsExteinsatzmittel);
         register_taxonomy('alarmierungsart', 'einsatz', $this->argsAlarmierungsart);
@@ -207,6 +174,33 @@ class TypeRegistry
         }
 
         $this->postTypes[$slug] = $postType;
+    }
+
+    /**
+     * Registers a custom taxonomy for a certain post type
+     *
+     * @param CustomType $customTaxonomy Object that describes the custom taxonomy
+     * @param string $postType
+     * @throws TypeRegistrationException
+     */
+    private function registerTaxonomy(CustomType $customTaxonomy, $postType)
+    {
+        $slug = $customTaxonomy->getSlug();
+        if (get_taxonomy($slug) !== false) {
+            throw new TypeRegistrationException(
+                sprintf(__('Taxonomy with slug "%s" already exists', 'einsatzverwaltung'), $slug)
+            );
+        }
+
+        $postType = register_taxonomy($slug, $postType, $customTaxonomy->getRegistrationArgs());
+        if (is_wp_error($postType)) {
+            throw new TypeRegistrationException(sprintf(
+                __('Failed to register post type with slug "%s": %s', 'einsatzverwaltung'),
+                $slug,
+                $postType->get_error_message()
+            ));
+        }
+        array_push($this->taxonomies, $slug);
     }
 
     private function registerPostMeta()

@@ -106,7 +106,7 @@ class Core
         $this->frontend = new Frontend($this, $this->options, $this->utilities, $this->formatter);
         new Shortcodes($this->utilities, $this, $this->options, $this->formatter);
 
-        $this->typeRegistry = new TypeRegistry($this->options, $this->data);
+        $this->typeRegistry = new TypeRegistry($this->data);
 
         if (is_admin()) {
             $this->loadClassesForAdmin();
@@ -169,7 +169,12 @@ class Core
         update_option('einsatzvw_version', self::VERSION);
 
         // Posttypen registrieren
-        $this->typeRegistry->registerTypes();
+        try {
+            $this->typeRegistry->registerTypes();
+        } catch (Exceptions\TypeRegistrationException $e) {
+            array_push($this->adminErrorMessages, $e->getMessage());
+            return;
+        }
         $this->addRewriteRules();
 
         // Permalinks aktualisieren
@@ -190,7 +195,12 @@ class Core
      */
     public function onInit()
     {
-        $this->typeRegistry->registerTypes();
+        try {
+            $this->typeRegistry->registerTypes();
+        } catch (Exceptions\TypeRegistrationException $e) {
+            array_push($this->adminErrorMessages, $e->getMessage());
+            return;
+        }
         $this->addRewriteRules();
         if ($this->options->isFlushRewriteRules()) {
             flush_rewrite_rules();

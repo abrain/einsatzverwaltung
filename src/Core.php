@@ -80,6 +80,11 @@ class Core
     private $typeRegistry;
 
     /**
+     * @var array
+     */
+    private $adminErrorMessages = array();
+
+    /**
      * Constructor
      */
     private function __construct()
@@ -140,6 +145,7 @@ class Core
 
     private function addHooks()
     {
+        add_action('admin_notices', array($this, 'onAdminNotices'));
         add_action('init', array($this, 'onInit'));
         add_action('plugins_loaded', array($this, 'onPluginsLoaded'));
         register_activation_hook($this->pluginFile, array($this, 'onActivation'));
@@ -196,6 +202,19 @@ class Core
     {
         $this->maybeUpdate();
         update_option('einsatzvw_version', self::VERSION);
+    }
+
+    public function onAdminNotices()
+    {
+        if (empty($this->adminErrorMessages)) {
+            return;
+        }
+        
+        $pluginData = get_plugin_data(einsatzverwaltung_plugin_file());
+        foreach ($this->adminErrorMessages as $errorMessage) {
+            $message = sprintf('Plugin %s: %s', $pluginData['Name'], $errorMessage);
+            printf('<div class="%1$s"><p>%2$s</p></div>', esc_attr('notice notice-error'), esc_html($message));
+        }
     }
 
     private function registerSettings()

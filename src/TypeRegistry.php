@@ -7,6 +7,7 @@ use abrain\Einsatzverwaltung\CustomFields\PostSelector;
 use abrain\Einsatzverwaltung\CustomFields\TextInput;
 use abrain\Einsatzverwaltung\Exceptions\TypeRegistrationException;
 use abrain\Einsatzverwaltung\Model\ReportAnnotation;
+use abrain\Einsatzverwaltung\Types\Alarmierungsart;
 use abrain\Einsatzverwaltung\Types\CustomType;
 use abrain\Einsatzverwaltung\Types\ExtEinsatzmittel;
 use abrain\Einsatzverwaltung\Types\IncidentType;
@@ -22,38 +23,6 @@ class TypeRegistry
 {
     private $postTypes = array();
     private $taxonomies = array();
-
-    private $argsAlarmierungsart = array(
-        'label' => 'Alarmierungsart',
-        'labels' => array(
-            'name' => 'Alarmierungsarten',
-            'singular_name' => 'Alarmierungsart',
-            'menu_name' => 'Alarmierungsarten',
-            'search_items' => 'Alarmierungsart suchen',
-            'popular_items' => 'H&auml;ufige Alarmierungsarten',
-            'all_items' => 'Alle Alarmierungsarten',
-            'edit_item' => 'Alarmierungsart bearbeiten',
-            'view_item' => 'Alarmierungsart ansehen',
-            'update_item' => 'Alarmierungsart aktualisieren',
-            'add_new_item' => 'Neue Alarmierungsart',
-            'new_item_name' => 'Alarmierungsart hinzuf&uuml;gen',
-            'separate_items_with_commas' => 'Alarmierungsarten mit Kommas trennen',
-            'add_or_remove_items' => 'Alarmierungsarten hinzuf&uuml;gen oder entfernen',
-            'choose_from_most_used' => 'Aus h&auml;ufigen Alarmierungsarten w&auml;hlen',
-            'not_found' => 'Keine Alarmierungsarten gefunden.',
-            'no_terms' => 'Keine Alarmierungsarten',
-            'items_list_navigation' => 'Navigation der Liste der Alarmierungsarten',
-            'items_list' => 'Liste der Alarmierungsarten',
-        ),
-        'public' => true,
-        'show_in_nav_menus' => false,
-        'capabilities' => array(
-            'manage_terms' => 'edit_einsatzberichte',
-            'edit_terms' => 'edit_einsatzberichte',
-            'delete_terms' => 'edit_einsatzberichte',
-            'assign_terms' => 'edit_einsatzberichte'
-        )
-    );
     private $data;
 
     /**
@@ -76,8 +45,7 @@ class TypeRegistry
         $this->registerTaxonomy(new IncidentType(), $report->getSlug());
         $this->registerTaxonomy(new Vehicle(), $report->getSlug());
         $this->registerTaxonomy(new ExtEinsatzmittel(), $report->getSlug());
-
-        register_taxonomy('alarmierungsart', 'einsatz', $this->argsAlarmierungsart);
+        $this->registerTaxonomy(new Alarmierungsart(), $report->getSlug());
 
         $this->registerPostMeta();
         $this->registerAnnotations();

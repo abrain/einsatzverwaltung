@@ -1,6 +1,10 @@
 <?php
 namespace abrain\Einsatzverwaltung\Types;
 
+use abrain\Einsatzverwaltung\Model\ReportAnnotation;
+use abrain\Einsatzverwaltung\ReportAnnotationRepository;
+use abrain\Einsatzverwaltung\TaxonomyCustomFields;
+
 /**
  * Description of the custom post type for the reports
  * @package abrain\Einsatzverwaltung\Types
@@ -106,5 +110,130 @@ class Report implements CustomType
     public function getSlug()
     {
         return 'einsatz';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function registerCustomFields(TaxonomyCustomFields $taxonomyCustomFields)
+    {
+        $this->registerPostMeta();
+        $this->registerAnnotations();
+    }
+
+    private function registerAnnotations()
+    {
+        $annotationRepository = ReportAnnotationRepository::getInstance();
+        $annotationRepository->addAnnotation(new ReportAnnotation(
+            'images',
+            'Bilder im Bericht',
+            'einsatz_hasimages',
+            'camera',
+            'Einsatzbericht enthält Bilder',
+            'Einsatzbericht enthält keine Bilder'
+        ));
+        $annotationRepository->addAnnotation(new ReportAnnotation(
+            'special',
+            'Besonderer Einsatz',
+            'einsatz_special',
+            'star',
+            'Besonderer Einsatz',
+            'Kein besonderer Einsatz'
+        ));
+        $annotationRepository->addAnnotation(new ReportAnnotation(
+            'falseAlarm',
+            'Fehlalarm',
+            'einsatz_fehlalarm',
+            '',
+            'Fehlalarm',
+            'Kein Fehlalarm'
+        ));
+    }
+
+    private function registerPostMeta()
+    {
+        register_meta('post', 'einsatz_einsatzende', array(
+            'type' => 'string',
+            'description' => 'Datum und Uhrzeit, zu der der Einsatz endete.',
+            'single' => true,
+            'sanitize_callback' => array($this, 'sanitizeTimeOfEnding'),
+            'show_in_rest' => false
+        ));
+
+        register_meta('post', 'einsatz_einsatzleiter', array(
+            'type' => 'string',
+            'description' => 'Name der Person, die die Einsatzleitung innehatte.',
+            'single' => true,
+            'sanitize_callback' => 'sanitize_text_field',
+            'show_in_rest' => false
+        ));
+
+        register_meta('post', 'einsatz_einsatzort', array(
+            'type' => 'string',
+            'description' => 'Die Örtlichkeit, an der der Einsatz stattgefunden hat.',
+            'single' => true,
+            'sanitize_callback' => 'sanitize_text_field',
+            'show_in_rest' => false
+        ));
+
+        register_meta('post', 'einsatz_fehlalarm', array(
+            'type' => 'boolean',
+            'description' => 'Vermerk, ob es sich um einen Fehlalarm handelte.',
+            'single' => true,
+            'sanitize_callback' => array('Utilities', 'sanitizeCheckbox'),
+            'show_in_rest' => false
+        ));
+
+        register_meta('post', 'einsatz_hasimages', array(
+            'type' => 'boolean',
+            'description' => 'Vermerk, ob der Einsatzbericht Bilder enthält.',
+            'single' => true,
+            'sanitize_callback' => array('Utilities', 'sanitizeCheckbox'),
+            'show_in_rest' => false
+        ));
+
+        register_meta('post', 'einsatz_incidentNumber', array(
+            'type' => 'string',
+            'description' => 'Einsatznummer.',
+            'single' => true,
+            'sanitize_callback' => 'sanitize_text_field',
+            'show_in_rest' => false
+        ));
+
+        register_meta('post', 'einsatz_mannschaft', array(
+            'type' => 'string',
+            'description' => 'Angaben über die Personalstärke für diesen Einsatz.',
+            'single' => true,
+            'sanitize_callback' => 'sanitize_text_field',
+            'show_in_rest' => false
+        ));
+
+        register_meta('post', 'einsatz_special', array(
+            'type' => 'boolean',
+            'description' => 'Vermerk, ob es sich um einen besonderen Einsatzbericht handelt.',
+            'single' => true,
+            'sanitize_callback' => array('Utilities', 'sanitizeCheckbox'),
+            'show_in_rest' => false
+        ));
+    }
+
+    /**
+     * @param string $value
+     * @return string
+     */
+    public function sanitizeTimeOfEnding($value)
+    {
+        $sanitizedValue = sanitize_text_field($value);
+        if (!empty($sanitizedValue)) {
+            $dateTime = date_create($sanitizedValue);
+        }
+
+        if (empty($dateTime)) {
+            return "";
+        }
+
+        $formattedDateTime = date_format($dateTime, 'Y-m-d H:i');
+
+        return ($formattedDateTime === false ? '' : $formattedDateTime);
     }
 }

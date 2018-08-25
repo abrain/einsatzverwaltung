@@ -1,12 +1,7 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
-use abrain\Einsatzverwaltung\CustomFields\ColorPicker;
-use abrain\Einsatzverwaltung\CustomFields\NumberInput;
-use abrain\Einsatzverwaltung\CustomFields\PostSelector;
-use abrain\Einsatzverwaltung\CustomFields\TextInput;
 use abrain\Einsatzverwaltung\Exceptions\TypeRegistrationException;
-use abrain\Einsatzverwaltung\Model\ReportAnnotation;
 use abrain\Einsatzverwaltung\Types\Alarmierungsart;
 use abrain\Einsatzverwaltung\Types\CustomType;
 use abrain\Einsatzverwaltung\Types\ExtEinsatzmittel;
@@ -23,15 +18,18 @@ class TypeRegistry
 {
     private $postTypes = array();
     private $taxonomies = array();
-    private $data;
+
+    /**
+     * @var TaxonomyCustomFields
+     */
+    private $taxonomyCustomFields;
 
     /**
      * TypeRegistry constructor.
-     * @param $data
      */
-    public function __construct(Data $data)
+    public function __construct()
     {
-        $this->data = $data;
+        $this->taxonomyCustomFields = new TaxonomyCustomFields();
     }
 
     /**
@@ -46,10 +44,6 @@ class TypeRegistry
         $this->registerTaxonomy(new Vehicle(), $report->getSlug());
         $this->registerTaxonomy(new ExtEinsatzmittel(), $report->getSlug());
         $this->registerTaxonomy(new Alarmierungsart(), $report->getSlug());
-
-        $this->registerPostMeta();
-        $this->registerAnnotations();
-        $this->registerTaxonomyCustomFields();
     }
 
     /**
@@ -75,6 +69,8 @@ class TypeRegistry
                 $postType->get_error_message()
             ));
         }
+
+        $customType->registerCustomFields($this->taxonomyCustomFields);
 
         $this->postTypes[$slug] = $postType;
     }
@@ -103,128 +99,9 @@ class TypeRegistry
                 $postType->get_error_message()
             ));
         }
+
+        $customTaxonomy->registerCustomFields($this->taxonomyCustomFields);
+
         array_push($this->taxonomies, $slug);
-    }
-
-    private function registerPostMeta()
-    {
-        register_meta('post', 'einsatz_einsatzende', array(
-            'type' => 'string',
-            'description' => 'Datum und Uhrzeit, zu der der Einsatz endete.',
-            'single' => true,
-            'sanitize_callback' => array($this->data, 'sanitizeTimeOfEnding'),
-            'show_in_rest' => false
-        ));
-
-        register_meta('post', 'einsatz_einsatzleiter', array(
-            'type' => 'string',
-            'description' => 'Name der Person, die die Einsatzleitung innehatte.',
-            'single' => true,
-            'sanitize_callback' => 'sanitize_text_field',
-            'show_in_rest' => false
-        ));
-
-        register_meta('post', 'einsatz_einsatzort', array(
-            'type' => 'string',
-            'description' => 'Die Örtlichkeit, an der der Einsatz stattgefunden hat.',
-            'single' => true,
-            'sanitize_callback' => 'sanitize_text_field',
-            'show_in_rest' => false
-        ));
-
-        register_meta('post', 'einsatz_fehlalarm', array(
-            'type' => 'boolean',
-            'description' => 'Vermerk, ob es sich um einen Fehlalarm handelte.',
-            'single' => true,
-            'sanitize_callback' => array('Utilities', 'sanitizeCheckbox'),
-            'show_in_rest' => false
-        ));
-
-        register_meta('post', 'einsatz_hasimages', array(
-            'type' => 'boolean',
-            'description' => 'Vermerk, ob der Einsatzbericht Bilder enthält.',
-            'single' => true,
-            'sanitize_callback' => array('Utilities', 'sanitizeCheckbox'),
-            'show_in_rest' => false
-        ));
-
-        register_meta('post', 'einsatz_incidentNumber', array(
-            'type' => 'string',
-            'description' => 'Einsatznummer.',
-            'single' => true,
-            'sanitize_callback' => 'sanitize_text_field',
-            'show_in_rest' => false
-        ));
-
-        register_meta('post', 'einsatz_mannschaft', array(
-            'type' => 'string',
-            'description' => 'Angaben über die Personalstärke für diesen Einsatz.',
-            'single' => true,
-            'sanitize_callback' => 'sanitize_text_field',
-            'show_in_rest' => false
-        ));
-
-        register_meta('post', 'einsatz_special', array(
-            'type' => 'boolean',
-            'description' => 'Vermerk, ob es sich um einen besonderen Einsatzbericht handelt.',
-            'single' => true,
-            'sanitize_callback' => array('Utilities', 'sanitizeCheckbox'),
-            'show_in_rest' => false
-        ));
-    }
-
-    private function registerAnnotations()
-    {
-        $annotationRepository = ReportAnnotationRepository::getInstance();
-        $annotationRepository->addAnnotation(new ReportAnnotation(
-            'images',
-            'Bilder im Bericht',
-            'einsatz_hasimages',
-            'camera',
-            'Einsatzbericht enthält Bilder',
-            'Einsatzbericht enthält keine Bilder'
-        ));
-        $annotationRepository->addAnnotation(new ReportAnnotation(
-            'special',
-            'Besonderer Einsatz',
-            'einsatz_special',
-            'star',
-            'Besonderer Einsatz',
-            'Kein besonderer Einsatz'
-        ));
-        $annotationRepository->addAnnotation(new ReportAnnotation(
-            'falseAlarm',
-            'Fehlalarm',
-            'einsatz_fehlalarm',
-            '',
-            'Fehlalarm',
-            'Kein Fehlalarm'
-        ));
-    }
-
-    private function registerTaxonomyCustomFields()
-    {
-        $taxonomyCustomFields = new TaxonomyCustomFields();
-        $taxonomyCustomFields->addTextInput('exteinsatzmittel', new TextInput(
-            'url',
-            'URL',
-            'URL zu mehr Informationen &uuml;ber ein externes Einsatzmittel, beispielsweise dessen Webseite.'
-        ));
-        $taxonomyCustomFields->addColorpicker('einsatzart', new ColorPicker(
-            'typecolor',
-            'Farbe',
-            'Ordne dieser Einsatzart eine Farbe zu. Einsatzarten ohne Farbe erben diese gegebenenfalls von übergeordneten Einsatzarten.'
-        ));
-        $taxonomyCustomFields->addPostSelector('fahrzeug', new PostSelector(
-            'fahrzeugpid',
-            'Fahrzeugseite',
-            'Seite mit mehr Informationen &uuml;ber das Fahrzeug. Wird in Einsatzberichten mit diesem Fahrzeug verlinkt.',
-            array('einsatz', 'attachment', 'ai1ec_event', 'tribe_events')
-        ));
-        $taxonomyCustomFields->addNumberInput('fahrzeug', new NumberInput(
-            'vehicleorder',
-            'Reihenfolge',
-            'Optionale Angabe, mit der die Anzeigereihenfolge der Fahrzeuge beeinflusst werden kann. Fahrzeuge mit der kleineren Zahl werden zuerst angezeigt, anschlie&szlig;end diejenigen ohne Angabe bzw. dem Wert 0 in alphabetischer Reihenfolge.'
-        ));
     }
 }

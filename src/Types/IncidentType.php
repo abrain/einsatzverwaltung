@@ -1,6 +1,9 @@
 <?php
 namespace abrain\Einsatzverwaltung\Types;
 
+use abrain\Einsatzverwaltung\CustomFields\ColorPicker;
+use abrain\Einsatzverwaltung\TaxonomyCustomFields;
+
 /**
  * Description of the custom taxonomy 'Type of incident'
  * @package abrain\Einsatzverwaltung\Types
@@ -55,5 +58,17 @@ class IncidentType implements CustomType
             ),
             'hierarchical' => true
         );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function registerCustomFields(TaxonomyCustomFields $taxonomyCustomFields)
+    {
+        $taxonomyCustomFields->addColorpicker($this->getSlug(), new ColorPicker(
+            'typecolor',
+            'Farbe',
+            'Ordne dieser Einsatzart eine Farbe zu. Einsatzarten ohne Farbe erben diese gegebenenfalls von übergeordneten Einsatzarten.'
+        ));
     }
 }

@@ -106,7 +106,7 @@ class Core
         $this->frontend = new Frontend($this, $this->options, $this->utilities, $this->formatter);
         new Shortcodes($this->utilities, $this, $this->options, $this->formatter);
 
-        $this->typeRegistry = new TypeRegistry($this->data);
+        $this->typeRegistry = new TypeRegistry();
 
         if (is_admin()) {
             $this->loadClassesForAdmin();

@@ -406,26 +406,6 @@ class Data
     }
 
     /**
-     * @param string $value
-     * @return string
-     */
-    public function sanitizeTimeOfEnding($value)
-    {
-        $sanitizedValue = sanitize_text_field($value);
-        if (!empty($sanitizedValue)) {
-            $dateTime = date_create($sanitizedValue);
-        }
-
-        if (empty($dateTime)) {
-            return "";
-        }
-
-        $formattedDateTime = date_format($dateTime, 'Y-m-d H:i');
-
-        return ($formattedDateTime === false ? '' : $formattedDateTime);
-    }
-
-    /**
      * Prüft, ob die automatische Verwaltung der Einsatznummern aktiviert wurde, und deshalb alle Einsatznummern
      * aktualisiert werden müssen
      *

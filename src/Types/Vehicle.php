@@ -1,6 +1,10 @@
 <?php
 namespace abrain\Einsatzverwaltung\Types;
 
+use abrain\Einsatzverwaltung\CustomFields\NumberInput;
+use abrain\Einsatzverwaltung\CustomFields\PostSelector;
+use abrain\Einsatzverwaltung\TaxonomyCustomFields;
+
 /**
  * Description of the custom taxonomy 'Vehicle'
  * @package abrain\Einsatzverwaltung\Types
@@ -51,5 +55,23 @@ class Vehicle implements CustomType
                 'assign_terms' => 'edit_einsatzberichte'
             )
         );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function registerCustomFields(TaxonomyCustomFields $taxonomyCustomFields)
+    {
+        $taxonomyCustomFields->addPostSelector($this->getSlug(), new PostSelector(
+            'fahrzeugpid',
+            'Fahrzeugseite',
+            'Seite mit mehr Informationen &uuml;ber das Fahrzeug. Wird in Einsatzberichten mit diesem Fahrzeug verlinkt.',
+            array('einsatz', 'attachment', 'ai1ec_event', 'tribe_events')
+        ));
+        $taxonomyCustomFields->addNumberInput($this->getSlug(), new NumberInput(
+            'vehicleorder',
+            'Reihenfolge',
+            'Optionale Angabe, mit der die Anzeigereihenfolge der Fahrzeuge beeinflusst werden kann. Fahrzeuge mit der kleineren Zahl werden zuerst angezeigt, anschlie&szlig;end diejenigen ohne Angabe bzw. dem Wert 0 in alphabetischer Reihenfolge.'
+        ));
     }
 }

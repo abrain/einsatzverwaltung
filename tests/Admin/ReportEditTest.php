@@ -4,6 +4,7 @@ namespace abrain\Einsatzverwaltung\Admin;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\ReportFactory;
 use DateTime;
+use WP_Post;
 use WP_UnitTestCase;
 use WP_User;
 
@@ -144,5 +145,32 @@ class ReportEditTest extends WP_UnitTestCase
             $report->getTimeOfAlerting()->format('Y-m-d H:i:s'),
             'Alarmzeit wurde nicht im veröffentlichten Bericht gespeichert'
         );
+    }
+
+    public function testSanitizeTimeOfEnd()
+    {
+        $reportFactory = new ReportFactory();
+
+        /** @var WP_Post $post */
+        $post = $reportFactory->create_and_get(array(
+            'meta_input' => array(
+                'einsatz_einsatzende' => ''
+            )
+        ));
+        $this->assertEmpty(get_post_meta($post->ID, 'einsatz_einsatzende', true));
+
+        $post = $reportFactory->create_and_get(array(
+            'meta_input' => array(
+                'einsatz_einsatzende' => 'invaliddate'
+            )
+        ));
+        $this->assertEmpty(get_post_meta($post->ID, 'einsatz_einsatzende', true));
+
+        $post = $reportFactory->create_and_get(array(
+            'meta_input' => array(
+                'einsatz_einsatzende' => '2018-06-24 13:46'
+            )
+        ));
+        $this->assertEquals('2018-06-24 13:46', get_post_meta($post->ID, 'einsatz_einsatzende', true));
     }
 }

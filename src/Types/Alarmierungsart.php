@@ -1,6 +1,8 @@
 <?php
 namespace abrain\Einsatzverwaltung\Types;
 
+use abrain\Einsatzverwaltung\TaxonomyCustomFields;
+
 /**
  * Description of the custom taxonomy 'Alarmierungsart'
  * @package abrain\Einsatzverwaltung\Types
@@ -51,5 +53,12 @@ class Alarmierungsart implements CustomType
                 'assign_terms' => 'edit_einsatzberichte'
             )
         );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function registerCustomFields(TaxonomyCustomFields $taxonomyCustomFields)
+    {
     }
 }

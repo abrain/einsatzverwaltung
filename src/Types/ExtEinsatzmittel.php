@@ -1,0 +1,58 @@
+<?php
+namespace abrain\Einsatzverwaltung\Types;
+
+/**
+ * Description of the custom taxonomy 'Externes Einsatzmittel'
+ * @package abrain\Einsatzverwaltung\Types
+ */
+class ExtEinsatzmittel implements CustomType
+{
+    /**
+     * @return string
+     */
+    public function getSlug()
+    {
+        return 'exteinsatzmittel';
+    }
+
+    /**
+     * @return array
+     */
+    public function getRegistrationArgs()
+    {
+        return array(
+            'label' => 'Externe Einsatzmittel',
+            'labels' => array(
+                'name' => 'Externe Einsatzmittel',
+                'singular_name' => 'Externes Einsatzmittel',
+                'menu_name' => 'Externe Einsatzmittel',
+                'search_items' => 'Externe Einsatzmittel suchen',
+                'popular_items' => 'H&auml;ufig eingesetzte externe Einsatzmittel',
+                'all_items' => 'Alle externen Einsatzmittel',
+                'edit_item' => 'Externes Einsatzmittel bearbeiten',
+                'view_item' => 'Externes Einsatzmittel ansehen',
+                'update_item' => 'Externes Einsatzmittel aktualisieren',
+                'add_new_item' => 'Neues externes Einsatzmittel',
+                'new_item_name' => 'Externes Einsatzmittel hinzuf&uuml;gen',
+                'separate_items_with_commas' => 'Externe Einsatzmittel mit Kommas trennen',
+                'add_or_remove_items' => 'Externe Einsatzmittel hinzuf&uuml;gen oder entfernen',
+                'choose_from_most_used' => 'Aus h&auml;ufig eingesetzten externen Einsatzmitteln w&auml;hlen',
+                'not_found' => 'Keine externen Einsatzmittel gefunden.',
+                'no_terms' => 'Keine externen Einsatzmittel',
+                'items_list_navigation' => 'Navigation der Liste der externen Einsatzmittel',
+                'items_list' => 'Liste der externen Einsatzmittel',
+            ),
+            'public' => true,
+            'show_in_nav_menus' => false,
+            'capabilities' => array(
+                'manage_terms' => 'edit_einsatzberichte',
+                'edit_terms' => 'edit_einsatzberichte',
+                'delete_terms' => 'edit_einsatzberichte',
+                'assign_terms' => 'edit_einsatzberichte'
+            ),
+            'rewrite' => array(
+                'slug' => 'externe-einsatzmittel'
+            )
+        );
+    }
+}

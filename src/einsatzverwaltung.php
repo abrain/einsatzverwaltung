@@ -10,6 +10,10 @@ License: GPLv2
 Text Domain: einsatzverwaltung
 */
 
+if (!defined('ABSPATH')) {
+    die('You shall not pass!');
+}
+
 $php_version_min = '5.3.0';
 
 /**

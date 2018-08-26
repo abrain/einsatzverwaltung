@@ -31,6 +31,10 @@ class Loader
     }
 }
 
+if (!defined('ABSPATH')) {
+    die('You shall not pass!');
+}
+
 $autoloaderRegistered = spl_autoload_register(__NAMESPACE__ . '\Loader::load');
 
 if ($autoloaderRegistered === false) {

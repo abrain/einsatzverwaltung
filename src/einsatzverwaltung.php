@@ -14,8 +14,6 @@ if (!defined('ABSPATH')) {
     die('You shall not pass!');
 }
 
-$php_version_min = '5.3.0';
-
 /**
  * Gibt die Hauptdatei des Plugins zurück, wichtig für bestimmte Hooks
  * @return string
@@ -26,14 +24,26 @@ function einsatzverwaltung_plugin_file()
 }
 
 /**
+ * Returns the required PHP version for this plugin
+ *
+ * @return string
+ */
+function einsatzverwaltung_minPHPversion()
+{
+    $file = dirname(einsatzverwaltung_plugin_file()) . '/readme.txt';
+    $fileData = get_file_data($file, array('PHPmin' => 'Requires PHP'));
+    return $fileData['PHPmin'];
+}
+
+/**
  * Prüfe, ob PHP mindestens in Version $php_version_min läuft
  */
 $php_version = phpversion();
-if (version_compare($php_version, $php_version_min) < 0) {
+if (version_compare($php_version, einsatzverwaltung_minPHPversion()) < 0) {
     wp_die(
         sprintf(
             __('The plugin Einsatzverwaltung requires PHP version %s or newer. Please update PHP on your server.', 'einsatzverwaltung'),
-            $php_version_min
+            einsatzverwaltung_minPHPversion()
         ),
         __('Outdated PHP version', 'einsatzverwaltung'),
         array('back_link' => true)

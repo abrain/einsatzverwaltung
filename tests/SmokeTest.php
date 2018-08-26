@@ -12,9 +12,7 @@ class SmokeTest extends \PHPUnit_Framework_TestCase
      */
     public function testPhpCompatibility()
     {
-        $file = dirname(einsatzverwaltung_plugin_file()) . '/readme.txt';
-        $fileData = get_file_data($file, array('PHPmin' => 'Requires PHP'));
-        $phpHeader = $fileData['PHPmin'];
+        $phpHeader = einsatzverwaltung_minPHPversion();
 
         $buildDir = getenv('TRAVIS_BUILD_DIR');
         $prefix = $buildDir === false ? '.' : '$TRAVIS_BUILD_DIR';

@@ -49,4 +49,12 @@ if ($autoloaderRegistered === false) {
     return;
 }
 
+// Initialize some basic paths and URLs
+Core::$pluginFile = einsatzverwaltung_plugin_file();
+Core::$pluginBasename = plugin_basename(Core::$pluginFile);
+Core::$pluginDir = plugin_dir_path(Core::$pluginFile);
+Core::$pluginUrl = plugin_dir_url(Core::$pluginFile);
+Core::$scriptUrl = Core::$pluginUrl . 'js/';
+Core::$styleUrl = Core::$pluginUrl . 'css/';
+
 Core::getInstance();

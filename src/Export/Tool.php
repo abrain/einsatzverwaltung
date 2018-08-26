@@ -51,7 +51,7 @@ class Tool
 
         wp_enqueue_script(
             'einsatzverwaltung-export',
-            Core::getInstance()->scriptUrl . 'export.js',
+            Core::$scriptUrl . 'export.js',
             array('jquery'),
             Core::VERSION
         );

@@ -1,5 +1,8 @@
 <?php
-namespace abrain\Einsatzverwaltung;
+namespace abrain\Einsatzverwaltung\Admin;
+
+use abrain\Einsatzverwaltung\Data;
+use abrain\Einsatzverwaltung\Utilities;
 
 /**
  * Für diverse Aufgaben, die anfallen können und sonst keine eigene Seite haben

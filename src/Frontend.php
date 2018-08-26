@@ -72,13 +72,13 @@ class Frontend
     {
         wp_enqueue_style(
             'font-awesome',
-            $this->core->pluginUrl . 'font-awesome/css/font-awesome.min.css',
+            Core::$pluginUrl . 'font-awesome/css/font-awesome.min.css',
             false,
             '4.7.0'
         );
         wp_enqueue_style(
             'einsatzverwaltung-frontend',
-            $this->core->styleUrl . 'style-frontend.css',
+            Core::$styleUrl . 'style-frontend.css',
             array(),
             Core::VERSION
         );

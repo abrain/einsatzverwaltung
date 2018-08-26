@@ -1,9 +1,6 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
-use abrain\Einsatzverwaltung\Import\Tool as ImportTool;
-use abrain\Einsatzverwaltung\Export\Tool as ExportTool;
-use abrain\Einsatzverwaltung\Settings\MainPage;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use abrain\Einsatzverwaltung\Widgets\RecentIncidents;
 use abrain\Einsatzverwaltung\Widgets\RecentIncidentsFormatted;
@@ -22,17 +19,12 @@ class Core
     */
     private static $instance = null;
 
-    public $pluginFile;
-    public $pluginBasename;
-    public $pluginDir;
-    public $pluginUrl;
-    public $scriptUrl;
-    public $styleUrl;
-
-    /**
-     * @var Admin
-     */
-    private $admin;
+    public static $pluginFile;
+    public static $pluginBasename;
+    public static $pluginDir;
+    public static $pluginUrl;
+    public static $scriptUrl;
+    public static $styleUrl;
 
     /**
      * @var Data
@@ -48,21 +40,6 @@ class Core
      * @var Options
      */
     public $options;
-    
-    /**
-     * @var ImportTool
-     */
-    private $importTool;
-    
-    /**
-     * @var ExportTool
-     */
-    private $exportTool;
-    
-    /**
-     * @var TasksPage
-     */
-    private $tasksPage;
     
     /**
      * @var Utilities
@@ -89,13 +66,6 @@ class Core
      */
     private function __construct()
     {
-        $this->pluginFile = einsatzverwaltung_plugin_file();
-        $this->pluginBasename = plugin_basename($this->pluginFile);
-        $this->pluginDir = plugin_dir_path($this->pluginFile);
-        $this->pluginUrl = plugin_dir_url($this->pluginFile);
-        $this->scriptUrl = $this->pluginUrl . 'js/';
-        $this->styleUrl = $this->pluginUrl . 'css/';
-
         $this->utilities = new Utilities($this);
         $this->options = new Options($this->utilities);
         $this->utilities->setDependencies($this->options); // FIXME Yay, zirkuläre Abhängigkeiten!
@@ -109,38 +79,10 @@ class Core
         $this->typeRegistry = new TypeRegistry();
 
         if (is_admin()) {
-            $this->loadClassesForAdmin();
+            new Admin\Initializer($this->data, $this->options, $this->utilities);
         }
 
         $this->addHooks();
-    }
-
-    private function loadClassesForAdmin()
-    {
-        $this->admin = new Admin($this);
-        add_action('add_meta_boxes_einsatz', array($this->admin, 'addMetaBoxes'));
-        add_action('admin_menu', array($this->admin, 'adjustTaxonomies'));
-        add_action('admin_notices', array($this->admin, 'displayAdminNotices'));
-        add_action('admin_enqueue_scripts', array($this->admin, 'enqueueEditScripts'));
-        add_filter('manage_edit-einsatz_columns', array($this->admin, 'filterColumnsEinsatz'));
-        add_action('manage_einsatz_posts_custom_column', array($this->admin, 'filterColumnContentEinsatz'), 10, 2);
-        add_action('dashboard_glance_items', array($this->admin, 'addEinsatzberichteToDashboard')); // since WP 3.8
-        add_filter('plugin_row_meta', array($this->admin, 'pluginMetaLinks'), 10, 2);
-        add_filter('plugin_action_links_' . $this->pluginBasename, array($this->admin,'addActionLinks'));
-
-        $this->registerSettings();
-
-        $this->importTool = new ImportTool($this->utilities, $this->options, $this->data);
-        add_action('admin_menu', array($this->importTool, 'addToolToMenu'));
-
-        $this->exportTool = new ExportTool();
-        add_action('admin_menu', array($this->exportTool, 'addToolToMenu'));
-        add_action('init', array($this->exportTool, 'startExport'), 20); // 20, damit alles andere initialisiert ist
-        add_action('admin_enqueue_scripts', array($this->exportTool, 'enqueueAdminScripts'));
-
-        $this->tasksPage = new TasksPage($this->utilities, $this->data);
-        add_action('admin_menu', array($this->tasksPage, 'registerPage'));
-        add_action('admin_menu', array($this->tasksPage, 'hidePage'), 999);
     }
 
     private function addHooks()
@@ -148,8 +90,8 @@ class Core
         add_action('admin_notices', array($this, 'onAdminNotices'));
         add_action('init', array($this, 'onInit'));
         add_action('plugins_loaded', array($this, 'onPluginsLoaded'));
-        register_activation_hook($this->pluginFile, array($this, 'onActivation'));
-        register_deactivation_hook($this->pluginFile, array($this, 'onDeactivation'));
+        register_activation_hook(self::$pluginFile, array($this, 'onActivation'));
+        register_deactivation_hook(self::$pluginFile, array($this, 'onDeactivation'));
         add_action('widgets_init', array($this, 'registerWidgets'));
 
         $userRightsManager = new UserRightsManager();
@@ -225,13 +167,6 @@ class Core
             $message = sprintf('Plugin %s: %s', $pluginData['Name'], $errorMessage);
             printf('<div class="%1$s"><p>%2$s</p></div>', esc_attr('notice notice-error'), esc_html($message));
         }
-    }
-
-    private function registerSettings()
-    {
-        $mainPage = new MainPage($this->options);
-        add_action('admin_menu', array($mainPage, 'addToSettingsMenu'));
-        add_action('admin_init', array($mainPage, 'registerSettings'));
     }
 
     private function addRewriteRules()
@@ -345,14 +280,6 @@ class Core
     }
 
     /**
-     * @return Admin
-     */
-    public function getAdmin()
-    {
-        return $this->admin;
-    }
-
-    /**
      * @return Data
      */
     public function getData()
@@ -366,30 +293,6 @@ class Core
     public function getFrontend()
     {
         return $this->frontend;
-    }
-
-    /**
-     * @return ImportTool
-     */
-    public function getImportTool()
-    {
-        return $this->importTool;
-    }
-
-    /**
-     * @return ExportTool
-     */
-    public function getExportTool()
-    {
-        return $this->exportTool;
-    }
-
-    /**
-     * @return TasksPage
-     */
-    public function getTasksPage()
-    {
-        return $this->tasksPage;
     }
 
     /**

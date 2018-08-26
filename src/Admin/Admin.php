@@ -1,6 +1,9 @@
 <?php
-namespace abrain\Einsatzverwaltung;
+namespace abrain\Einsatzverwaltung\Admin;
 
+use abrain\Einsatzverwaltung\Core;
+use abrain\Einsatzverwaltung\Data;
+use abrain\Einsatzverwaltung\Frontend;
 use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Settings\MainPage;
@@ -15,21 +18,6 @@ class Admin
      * @var AnnotationIconBar
      */
     private $annotationIconBar;
-
-    /**
-     * @var Core
-     */
-    private $core;
-
-    /**
-     * Constructor
-     *
-     * @param Core $core
-     */
-    public function __construct($core)
-    {
-        $this->core = $core;
-    }
 
     /**
      * Fügt die Metabox zum Bearbeiten der Einsatzdetails ein
@@ -79,20 +67,20 @@ class Admin
             // Nur auf der Bearbeitungsseite anzeigen
             wp_enqueue_script(
                 'einsatzverwaltung-edit-script',
-                $this->core->scriptUrl . 'einsatzverwaltung-edit.js',
+                Core::$scriptUrl . 'einsatzverwaltung-edit.js',
                 array('jquery', 'jquery-ui-autocomplete'),
                 Core::VERSION
             );
             wp_enqueue_style(
                 'einsatzverwaltung-edit',
-                $this->core->styleUrl . 'style-edit.css',
+                Core::$styleUrl . 'style-edit.css',
                 array(),
                 Core::VERSION
             );
         } elseif ('settings_page_einsatzvw-settings' == $hook) {
             wp_enqueue_script(
                 'einsatzverwaltung-settings-script',
-                $this->core->scriptUrl . 'einsatzverwaltung-settings.js',
+                Core::$scriptUrl . 'einsatzverwaltung-settings.js',
                 array('jquery-ui-draggable', 'jquery-ui-droppable', 'jquery-ui-sortable'),
                 Core::VERSION
             );
@@ -100,19 +88,19 @@ class Admin
 
         wp_enqueue_style(
             'font-awesome',
-            $this->core->pluginUrl . 'font-awesome/css/font-awesome.min.css',
+            Core::$pluginUrl . 'font-awesome/css/font-awesome.min.css',
             false,
             '4.7.0'
         );
         wp_enqueue_style(
             'einsatzverwaltung-admin',
-            $this->core->styleUrl . 'style-admin.css',
+            Core::$styleUrl . 'style-admin.css',
             array(),
             Core::VERSION
         );
         wp_enqueue_script(
             'einsatzverwaltung-admin-script',
-            $this->core->scriptUrl . 'einsatzverwaltung-admin.js',
+            Core::$scriptUrl . 'einsatzverwaltung-admin.js',
             array('wp-color-picker'),
             Core::VERSION
         );
@@ -410,7 +398,7 @@ class Admin
      */
     public function pluginMetaLinks($links, $file)
     {
-        if ($this->core->pluginBasename === $file) {
+        if (Core::$pluginBasename === $file) {
             $links[] = '<a href="https://einsatzverwaltung.abrain.de/feed/">Newsfeed</a>';
         }
 

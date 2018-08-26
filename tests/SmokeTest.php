@@ -1,5 +1,5 @@
 <?php
-namespace abrain\Einsatzverwaltung\Tests;
+namespace abrain\Einsatzverwaltung;
 
 /**
  * Enthält Tests, die die größten Showstopper abklopfen

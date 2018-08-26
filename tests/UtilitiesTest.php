@@ -8,7 +8,7 @@ use WP_UnitTestCase;
  * Tests für diverse Hilfsfunktionen
  *
  * @author Andreas Brain
- * @coversDefaultClass abrain\Einsatzverwaltung\Utilities
+ * @coversDefaultClass \abrain\Einsatzverwaltung\Utilities
  */
 class UtilitiesTest extends WP_UnitTestCase
 {

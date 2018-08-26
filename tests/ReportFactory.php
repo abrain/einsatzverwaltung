@@ -33,6 +33,7 @@ class ReportFactory extends WP_UnitTest_Factory_For_Post
 
     /**
      * Sorgt dafür, dass die zusätzlichen Angaben (postmeta) einen Standardwert haben
+     * FIXME nicht gut, da unklar ist, ob Postmeta auch sonst wie gedacht mit Standardwerten befüllt wird
      *
      * @param array $args
      * @param array|null $generation_definitions
@@ -57,6 +58,18 @@ class ReportFactory extends WP_UnitTest_Factory_For_Post
         return $generatedArgs;
     }
 
+    /**
+     * Erzeugt mehrere Einsatzberichte für das angegebene Jahr. Dabei werden die Alarmzeitpunkte gleichmäßig über das
+     * Jahr verteilt. Die ersten und letzten 3 Stunden des Jahres werden freigelassen, um in Tests vor bzw. nach allen
+     * Einsatzberichten neue hinzufügen zu können.
+     *
+     * @param string $year
+     * @param int $count
+     * @param array $args
+     * @param array $generationDefinitions
+     *
+     * @return array IDs der erzeugten Einsatzberichte
+     */
     public function generateManyForYear($year, $count, $args = array(), $generationDefinitions = null)
     {
         if ($count < 1) {
@@ -82,8 +95,8 @@ class ReportFactory extends WP_UnitTest_Factory_For_Post
         }
 
         $reportIds = array();
-        foreach ($dates as $index => $date) {
-            $reportIds[] = $this->create(array('post_date' => $date));
+        foreach ($dates as $date) {
+            $reportIds[] = $this->create(array_merge($args, array('post_date' => $date)), $generationDefinitions);
         }
         return $reportIds;
     }

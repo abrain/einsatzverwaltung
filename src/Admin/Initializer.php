@@ -2,6 +2,7 @@
 
 namespace abrain\Einsatzverwaltung\Admin;
 
+use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\Data;
 use abrain\Einsatzverwaltung\Export\Tool as ExportTool;
 use abrain\Einsatzverwaltung\Import\Tool as ImportTool;
@@ -23,19 +24,18 @@ class Initializer
      */
     public function __construct(Data $data, Options $options, Utilities $utilities)
     {
+        $pluginBasename = plugin_basename(einsatzverwaltung_plugin_file());
+        add_action('admin_menu', array($this, 'hideTaxonomies'));
+        add_action('admin_notices', array($this, 'displayAdminNotices'));
+        add_action('admin_enqueue_scripts', array($this, 'enqueueEditScripts'));
+        add_action('dashboard_glance_items', array($this, 'addReportsToDashboard'));
+        add_filter('plugin_row_meta', array($this, 'pluginMetaLinks'), 10, 2);
+        add_filter("plugin_action_links_{$pluginBasename}", array($this,'addActionLinks'));
+
         $admin = new Admin();
         add_action('add_meta_boxes_einsatz', array($admin, 'addMetaBoxes'));
-        add_action('admin_menu', array($admin, 'adjustTaxonomies'));
-        add_action('admin_notices', array($admin, 'displayAdminNotices'));
-        add_action('admin_enqueue_scripts', array($admin, 'enqueueEditScripts'));
         add_filter('manage_edit-einsatz_columns', array($admin, 'filterColumnsEinsatz'));
         add_action('manage_einsatz_posts_custom_column', array($admin, 'filterColumnContentEinsatz'), 10, 2);
-        add_action('dashboard_glance_items', array($admin, 'addEinsatzberichteToDashboard')); // since WP 3.8
-        add_filter('plugin_row_meta', array($admin, 'pluginMetaLinks'), 10, 2);
-        add_filter(
-            'plugin_action_links_' . plugin_basename(einsatzverwaltung_plugin_file()),
-            array($admin,'addActionLinks')
-        );
 
         // Register Settings
         $mainPage = new MainPage($options);
@@ -53,5 +53,156 @@ class Initializer
         $tasksPage = new TasksPage($utilities, $data);
         add_action('admin_menu', array($tasksPage, 'registerPage'));
         add_action('admin_menu', array($tasksPage, 'hidePage'), 999);
+    }
+
+    /**
+     * Hides auto-generated UI for the WordPress core taxonomies 'category' and 'post_tag', we only want to use them
+     * under the hood
+     */
+    public function hideTaxonomies()
+    {
+        // Hide meta box for category selection when editing reports
+        remove_meta_box('categorydiv', 'einsatz', 'side');
+
+        // Hide the submenu item to edit categories (still exists for posts)
+        remove_submenu_page(
+            'edit.php?post_type=einsatz',
+            'edit-tags.php?taxonomy=category&amp;post_type=einsatz'
+        );
+    }
+
+    /**
+     * Zusätzliche Skripte im Admin-Bereich einbinden
+     *
+     * @param string $hook Name der aufgerufenen Datei
+     */
+    public function enqueueEditScripts($hook)
+    {
+        if ('post.php' == $hook || 'post-new.php' == $hook) {
+            // Nur auf der Bearbeitungsseite anzeigen
+            wp_enqueue_script(
+                'einsatzverwaltung-edit-script',
+                Core::$scriptUrl . 'einsatzverwaltung-edit.js',
+                array('jquery', 'jquery-ui-autocomplete'),
+                Core::VERSION
+            );
+            wp_enqueue_style(
+                'einsatzverwaltung-edit',
+                Core::$styleUrl . 'style-edit.css',
+                array(),
+                Core::VERSION
+            );
+        } elseif ('settings_page_einsatzvw-settings' == $hook) {
+            wp_enqueue_script(
+                'einsatzverwaltung-settings-script',
+                Core::$scriptUrl . 'einsatzverwaltung-settings.js',
+                array('jquery-ui-draggable', 'jquery-ui-droppable', 'jquery-ui-sortable'),
+                Core::VERSION
+            );
+        }
+
+        wp_enqueue_style(
+            'font-awesome',
+            Core::$pluginUrl . 'font-awesome/css/font-awesome.min.css',
+            false,
+            '4.7.0'
+        );
+        wp_enqueue_style(
+            'einsatzverwaltung-admin',
+            Core::$styleUrl . 'style-admin.css',
+            array(),
+            Core::VERSION
+        );
+        wp_enqueue_script(
+            'einsatzverwaltung-admin-script',
+            Core::$scriptUrl . 'einsatzverwaltung-admin.js',
+            array('wp-color-picker'),
+            Core::VERSION
+        );
+        wp_enqueue_style('wp-color-picker');
+    }
+
+    /**
+     * Zahl der Einsatzberichte im Dashboard anzeigen
+     *
+     * @param array $items
+     *
+     * @return array
+     */
+    public function addReportsToDashboard($items)
+    {
+        $postType = 'einsatz';
+        if (post_type_exists($postType)) {
+            $ptInfo = get_post_type_object($postType); // get a specific CPT's details
+            $numberOfPosts = wp_count_posts($postType); // retrieve number of posts associated with this CPT
+            $num = number_format_i18n($numberOfPosts->publish); // number of published posts for this CPT
+            // singular/plural text label for CPT
+            $text = _n($ptInfo->labels->singular_name, $ptInfo->labels->name, intval($numberOfPosts->publish));
+            echo '<li class="'.$ptInfo->name.'-count page-count">';
+            if (current_user_can('edit_einsatzberichte')) {
+                echo '<a href="edit.php?post_type='.$postType.'">'.$num.' '.$text.'</a>';
+            } else {
+                echo '<span>'.$num.' '.$text.'</span>';
+            }
+            echo '</li>';
+        }
+
+        return $items;
+    }
+
+    /**
+     * Fügt weiterführende Links in der Pluginliste ein
+     *
+     * @param array $links Liste mit Standardlinks von WordPress
+     * @param string $file Name der Plugindatei
+     * @return array Vervollständigte Liste mit Links
+     */
+    public function pluginMetaLinks($links, $file)
+    {
+        if (Core::$pluginBasename === $file) {
+            $links[] = '<a href="https://einsatzverwaltung.abrain.de/feed/">Newsfeed</a>';
+        }
+
+        return $links;
+    }
+
+    /**
+     * Zeigt einen Link zu den Einstellungen direkt auf der Plugin-Seite an
+     *
+     * @param $links
+     *
+     * @return array
+     */
+    public function addActionLinks($links)
+    {
+        $settingsPage = 'options-general.php?page=' . MainPage::EVW_SETTINGS_SLUG;
+        $actionLinks = array('<a href="' . admin_url($settingsPage) . '">Einstellungen</a>');
+        return array_merge($links, $actionLinks);
+    }
+
+    public function displayAdminNotices()
+    {
+        // Keine Notices auf der TaskPage anzeigen
+        $currentScreen = get_current_screen();
+        if ('tools_page_einsatzverwaltung-tasks' === $currentScreen->id) {
+            return;
+        }
+
+        $notices = get_option('einsatzverwaltung_admin_notices');
+
+        if (empty($notices) || !is_array($notices)) {
+            return;
+        }
+
+        if (in_array('regenerateSlugs', $notices)) {
+            $url = admin_url('tools.php?page=' . TasksPage::PAGE_SLUG . '&action=regenerate-slugs');
+            echo '<div class="notice notice-info"><p>Die Links zu den einzelnen Einsatzberichten ';
+            echo 'werden ab jetzt aus dem Berichtstitel generiert (wie bei gew&ouml;hnlichen WordPress-Beitr&auml;gen)';
+            echo ' und nicht mehr aus der Einsatznummer. Dazu ist eine Anpassung der bestehenden Berichte ';
+            echo 'notwendig. Die alten Links mit der Einsatznummer funktionieren f&uuml;r die bisherigen Berichte auch';
+            echo ' nach der Anpassung, k&uuml;nftige Berichte erhalten nur noch den neuen Link.<br>';
+            echo '<strong>Die Anpassung kann durchaus eine Minute dauern, bitte nur einmal klicken.</strong><br>';
+            echo '<a href="' . $url . '" class="button button-primary">Anpassung durchf&uuml;hren</a></p></div>';
+        }
     }
 }

@@ -28,7 +28,7 @@ class Initializer
         add_action('admin_menu', array($this, 'hideTaxonomies'));
         add_action('admin_notices', array($this, 'displayAdminNotices'));
         add_action('admin_enqueue_scripts', array($this, 'enqueueEditScripts'));
-        add_action('dashboard_glance_items', array($this, 'addReportsToDashboard'));
+        add_filter('dashboard_glance_items', array($this, 'addReportsToDashboard'));
         add_filter('plugin_row_meta', array($this, 'pluginMetaLinks'), 10, 2);
         add_filter("plugin_action_links_{$pluginBasename}", array($this,'addActionLinks'));
 
@@ -133,18 +133,23 @@ class Initializer
     {
         $postType = 'einsatz';
         if (post_type_exists($postType)) {
-            $ptInfo = get_post_type_object($postType); // get a specific CPT's details
-            $numberOfPosts = wp_count_posts($postType); // retrieve number of posts associated with this CPT
-            $num = number_format_i18n($numberOfPosts->publish); // number of published posts for this CPT
-            // singular/plural text label for CPT
-            $text = _n($ptInfo->labels->singular_name, $ptInfo->labels->name, intval($numberOfPosts->publish));
-            echo '<li class="'.$ptInfo->name.'-count page-count">';
-            if (current_user_can('edit_einsatzberichte')) {
-                echo '<a href="edit.php?post_type='.$postType.'">'.$num.' '.$text.'</a>';
+            $postCounts = wp_count_posts($postType);
+            $text = sprintf(
+                _n('%d Report', '%d Reports', intval($postCounts->publish), 'einsatzverwaltung'),
+                number_format_i18n($postCounts->publish)
+            );
+            $postTypeObject = get_post_type_object($postType);
+            $class = "$postType-count";
+            if (current_user_can($postTypeObject->cap->edit_posts)) {
+                $items[] = sprintf(
+                    '<a class="%s" href="%s">%s</a>',
+                    esc_attr($class),
+                    esc_attr('edit.php?post_type=' . $postType),
+                    esc_html($text)
+                );
             } else {
-                echo '<span>'.$num.' '.$text.'</span>';
+                $items[] = sprintf('<span class="%s">%s</span>', esc_attr($class), esc_html($text));
             }
-            echo '</li>';
         }
 
         return $items;

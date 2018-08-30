@@ -15,11 +15,6 @@ use WP_Post;
 class Admin
 {
     /**
-     * @var AnnotationIconBar
-     */
-    private $annotationIconBar;
-
-    /**
      * Fügt die Metabox zum Bearbeiten der Einsatzdetails ein
      */
     public function addMetaBoxes()
@@ -285,10 +280,7 @@ class Admin
                 }
                 break;
             case 'einsatzverwaltung_annotations':
-                if (empty($this->annotationIconBar)) {
-                    $this->annotationIconBar = AnnotationIconBar::getInstance();
-                }
-                echo $this->annotationIconBar->render($report);
+                echo AnnotationIconBar::getInstance()->render($report);
                 break;
             default:
                 break;

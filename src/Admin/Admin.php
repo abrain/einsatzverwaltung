@@ -1,12 +1,10 @@
 <?php
 namespace abrain\Einsatzverwaltung\Admin;
 
-use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\Data;
-use abrain\Einsatzverwaltung\Frontend;
 use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
-use abrain\Einsatzverwaltung\Settings\MainPage;
+use abrain\Einsatzverwaltung\Types\Report;
 use WP_Post;
 
 /**
@@ -149,12 +147,14 @@ class Admin
      */
     private function echoInputText($label, $name, $value, $placeholder = '', $size = 20)
     {
-        echo '<tr><td><label for="' . $name . '">' . $label . '</label></td>';
-        echo '<td><input type="text" id="' . $name . '" name="' . $name . '" value="'.$value.'" size="' . $size . '" ';
-        if (!empty($placeholder)) {
-            echo 'placeholder="'.$placeholder.'" ';
-        }
-        echo '/></td></tr>';
+        printf('<tr><td><label for="%1$s">%2$s</label></td>', esc_attr($name), esc_html($label));
+        printf(
+            '<td><input type="text" id="%1$s" name="%1$s" value="%2$s" size="%3$s" placeholder="%4$s" /></td></tr>',
+            esc_attr($name),
+            esc_attr($value),
+            esc_attr($size),
+            esc_attr($placeholder)
+        );
     }
 
     /**
@@ -166,8 +166,35 @@ class Admin
      */
     private function echoInputCheckbox($label, $name, $state)
     {
-        echo '<input type="checkbox" id="' . $name . '" name="' . $name . '" value="1" ';
-        echo checked($state, '1') . '/><label for="' . $name . '">' . $label . '</label>';
+        printf(
+            '<input type="checkbox" id="%1$s" name="%1$s" value="1" %2$s/><label for="%1$s">%3$s</label>',
+            esc_attr($name),
+            checked($state, '1', false),
+            $label
+        );
+    }
+
+    /**
+     * Zeigt Dropdown mit Hierarchie für die Einsatzart
+     *
+     * @param string $selected Slug der ausgewählten Einsatzart
+     */
+    public static function dropdownEinsatzart($selected)
+    {
+        wp_dropdown_categories(array(
+            'show_option_all'    => '',
+            'show_option_none'   => '- keine -',
+            'orderby'            => 'NAME',
+            'order'              => 'ASC',
+            'show_count'         => false,
+            'hide_empty'         => false,
+            'echo'               => true,
+            'selected'           => $selected,
+            'hierarchical'       => true,
+            'name'               => 'tax_input[einsatzart]',
+            'taxonomy'           => 'einsatzart',
+            'hide_if_empty'      => false
+        ));
     }
 
     /**
@@ -179,7 +206,7 @@ class Admin
     {
         $report = new IncidentReport($post);
         $typeOfIncident = $report->getTypeOfIncident();
-        Frontend::dropdownEinsatzart($typeOfIncident ? $typeOfIncident->term_id : 0);
+        self::dropdownEinsatzart($typeOfIncident ? $typeOfIncident->term_id : 0);
     }
 
     /**
@@ -215,8 +242,6 @@ class Admin
      */
     public function filterColumnContentEinsatz($column, $postId)
     {
-        global $post;
-
         $report = new IncidentReport($postId);
 
         switch ($column) {
@@ -244,40 +269,29 @@ class Admin
                 break;
             case 'e_art':
                 $term = $report->getTypeOfIncident();
-                if ($term) {
-                    $url = esc_url(
-                        add_query_arg(
-                            array('post_type' => $post->post_type, 'einsatzart' => $term->slug),
-                            'edit.php'
-                        )
-                    );
-                    $text = esc_html(sanitize_term_field('name', $term->name, $term->term_id, 'einsatzart', 'display'));
-                    echo '<a href="' . $url . '">' . $text . '</a>';
-                } else {
+                if ($term === false) {
                     echo '-';
+                    break;
                 }
+
+                $url = add_query_arg(array('post_type' => Report::SLUG, 'einsatzart' => $term->slug), 'edit.php');
+                $text = sanitize_term_field('name', $term->name, $term->term_id, 'einsatzart', 'display');
+                printf('<a href="%s">%s</a>', esc_url($url), esc_html($text));
                 break;
             case 'e_fzg':
                 $fahrzeuge = $report->getVehicles();
-
-                if (!empty($fahrzeuge)) {
-                    $out = array();
-                    foreach ($fahrzeuge as $term) {
-                        $url = esc_url(
-                            add_query_arg(
-                                array('post_type' => $post->post_type, 'fahrzeug' => $term->slug),
-                                'edit.php'
-                            )
-                        );
-                        $text = esc_html(
-                            sanitize_term_field('name', $term->name, $term->term_id, 'fahrzeug', 'display')
-                        );
-                        $out[] = '<a href="' . $url . '">' . $text . '</a>';
-                    }
-                    echo join(', ', $out);
-                } else {
+                if (empty($fahrzeuge)) {
                     echo '-';
+                    break;
                 }
+
+                $out = array();
+                foreach ($fahrzeuge as $term) {
+                    $url = add_query_arg(array('post_type' => Report::SLUG, 'fahrzeug' => $term->slug), 'edit.php');
+                    $text = sanitize_term_field('name', $term->name, $term->term_id, 'fahrzeug', 'display');
+                    $out[] = sprintf('<a href="%s">%s</a>', esc_url($url), esc_html($text));
+                }
+                echo join(', ', $out);
                 break;
             case 'einsatzverwaltung_annotations':
                 echo AnnotationIconBar::getInstance()->render($report);

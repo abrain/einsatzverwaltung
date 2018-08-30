@@ -12,6 +12,7 @@ use abrain\Einsatzverwaltung\TaxonomyCustomFields;
 class Report implements CustomType
 {
     const DEFAULT_REWRITE_SLUG = 'einsatzberichte';
+    const SLUG = 'einsatz';
 
     /**
      * @return string
@@ -109,7 +110,7 @@ class Report implements CustomType
      */
     public function getSlug()
     {
-        return 'einsatz';
+        return self::SLUG;
     }
 
     /**

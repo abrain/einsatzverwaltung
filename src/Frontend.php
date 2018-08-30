@@ -86,30 +86,6 @@ class Frontend
     }
 
     /**
-     * Zeigt Dropdown mit Hierarchie für die Einsatzart
-     *
-     * @param string $selected Slug der ausgewählten Einsatzart
-     */
-    public static function dropdownEinsatzart($selected)
-    {
-        wp_dropdown_categories(array(
-            'show_option_all'    => '',
-            'show_option_none'   => '- keine -',
-            'orderby'            => 'NAME',
-            'order'              => 'ASC',
-            'show_count'         => false,
-            'hide_empty'         => false,
-            'echo'               => true,
-            'selected'           => $selected,
-            'hierarchical'       => true,
-            'name'               => 'tax_input[einsatzart]',
-            'taxonomy'           => 'einsatzart',
-            'hide_if_empty'      => false
-        ));
-    }
-
-
-    /**
      * Erzeugt den Kopf eines Einsatzberichts
      *
      * @param WP_Post $post Das Post-Objekt

@@ -13,11 +13,6 @@ use WP_Query;
 class Frontend
 {
     /**
-     * @var Core
-     */
-    private $core;
-
-    /**
      * @var Formatter
      */
     private $formatter;
@@ -35,14 +30,12 @@ class Frontend
     /**
      * Constructor
      *
-     * @param Core $core
      * @param Options $options
      * @param Utilities $utilities
      * @param Formatter $formatter
      */
-    public function __construct($core, $options, $utilities, $formatter)
+    public function __construct($options, $utilities, $formatter)
     {
-        $this->core = $core;
         $this->formatter = $formatter;
         $this->options = $options;
         $this->utilities = $utilities;

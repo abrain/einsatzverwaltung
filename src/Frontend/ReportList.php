@@ -2,7 +2,6 @@
 namespace abrain\Einsatzverwaltung\Frontend;
 
 use abrain\Einsatzverwaltung\Core;
-use abrain\Einsatzverwaltung\Data;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\Util\Formatter;
@@ -384,7 +383,7 @@ class ReportList
                 $cellContent = $report->getWorkforce();
                 break;
             case 'duration':
-                $minutes = Data::getDauer($report);
+                $minutes = $report->getDuration();
                 $cellContent = $this->utilities->getDurationString($minutes, true);
                 break;
             case 'vehicles':

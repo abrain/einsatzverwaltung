@@ -97,6 +97,27 @@ class IncidentReport
     }
 
     /**
+     * Gibt die Einsatzdauer in Minuten zurück
+     *
+     * @return bool|int Dauer in Minuten oder false, wenn Alarmzeit und/oder Einsatzende nicht verfügbar sind
+     */
+    public function getDuration()
+    {
+        $timeOfAlerting = $this->getTimeOfAlerting();
+        $timeOfEnding = $this->getTimeOfEnding();
+
+        if (empty($timeOfAlerting) || empty($timeOfEnding)) {
+            return false;
+        }
+
+        $timestamp1 = $timeOfAlerting->getTimestamp();
+        $timestamp2 = strtotime($timeOfEnding);
+        $differenz = $timestamp2 - $timestamp1;
+
+        return intval($differenz / 60);
+    }
+
+    /**
      * Komparator für Fahrzeuge
      *
      * @param object $vehicle1

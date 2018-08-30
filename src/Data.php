@@ -64,28 +64,6 @@ class Data
     }
 
     /**
-     * Gibt die Einsatzdauer in Minuten zurück
-     *
-     * @param IncidentReport $report
-     *
-     * @return bool|int Dauer in Minuten oder false, wenn Alarmzeit und/oder Einsatzende nicht verfügbar sind
-     */
-    public static function getDauer($report)
-    {
-        $timeOfAlerting = $report->getTimeOfAlerting();
-        $timeOfEnding = $report->getTimeOfEnding();
-
-        if (empty($timeOfAlerting) || empty($timeOfEnding)) {
-            return false;
-        }
-
-        $timestamp1 = $timeOfAlerting->getTimestamp();
-        $timestamp2 = strtotime($timeOfEnding);
-        $differenz = $timestamp2 - $timestamp1;
-        return intval($differenz / 60);
-    }
-
-    /**
      * @param $kalenderjahr
      *
      * @return array

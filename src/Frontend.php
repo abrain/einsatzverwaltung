@@ -94,7 +94,7 @@ class Frontend
 
             $typesOfAlerting = $this->formatter->getTypesOfAlerting($report);
 
-            $duration = Data::getDauer($report);
+            $duration = $report->getDuration();
             $durationString = ($duration === false ? '' : $this->utilities->getDurationString($duration));
 
             $showEinsatzartArchiveLink = $showArchiveLinks && $this->options->isShowEinsatzartArchive();

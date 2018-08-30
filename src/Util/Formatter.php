@@ -2,7 +2,6 @@
 namespace abrain\Einsatzverwaltung\Util;
 
 use abrain\Einsatzverwaltung\Core;
-use abrain\Einsatzverwaltung\Data;
 use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Options;
@@ -103,7 +102,7 @@ class Formatter
                 $replace = date_i18n($this->options->getTimeFormat(), $timeOfAlerting->getTimestamp());
                 break;
             case '%duration%':
-                $replace = $this->utilities->getDurationString(Data::getDauer($incidentReport));
+                $replace = $this->utilities->getDurationString($incidentReport->getDuration());
                 break;
             case '%incidentType%':
                 $showTypeArchive = get_option('einsatzvw_show_einsatzart_archive') === '1';

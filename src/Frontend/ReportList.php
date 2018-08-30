@@ -1,7 +1,6 @@
 <?php
 namespace abrain\Einsatzverwaltung\Frontend;
 
-use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\Util\Formatter;
@@ -18,11 +17,6 @@ class ReportList
 {
     const TABLECLASS = 'einsatzverwaltung-reportlist';
     const DEFAULT_COLUMNS = 'number,date,time,title';
-
-    /**
-     * @var AnnotationIconBar
-     */
-    private $annotationIconBar;
 
     /**
      * @var array
@@ -50,11 +44,6 @@ class ReportList
      * @var array
      */
     private $columnsWithLink;
-
-    /**
-     * @var Core
-     */
-    private $core;
 
     /**
      * @var Formatter
@@ -128,14 +117,12 @@ class ReportList
      * ReportList constructor.
      *
      * @param Utilities $utilities
-     * @param Core $core
      * @param Options $options
      * @param Formatter $formatter
      */
-    public function __construct($utilities, $core, $options, $formatter)
+    public function __construct($utilities, $options, $formatter)
     {
         $this->utilities = $utilities;
-        $this->core = $core;
         $this->options = $options;
         $this->formatter = $formatter;
     }
@@ -179,10 +166,6 @@ class ReportList
         }
         $this->linkEmptyReports = (true === $parsedArgs['linkEmptyReports']);
         $this->showHeading = (bool) $parsedArgs['showHeading'];
-
-        if (in_array('annotationImages', $this->columns) || in_array('annotationSpecial', $this->columns)) {
-            $this->annotationIconBar = AnnotationIconBar::getInstance();
-        }
 
         // Berichte abarbeiten
         $currentYear = null;
@@ -403,10 +386,10 @@ class ReportList
                 $cellContent = $report->getSequentialNumber();
                 break;
             case 'annotationImages':
-                $cellContent = $this->annotationIconBar->render($report, array('images'));
+                $cellContent = AnnotationIconBar::getInstance()->render($report, array('images'));
                 break;
             case 'annotationSpecial':
-                $cellContent = $this->annotationIconBar->render($report, array('special'));
+                $cellContent = AnnotationIconBar::getInstance()->render($report, array('special'));
                 break;
             default:
                 $cellContent = '';

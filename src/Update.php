@@ -232,7 +232,7 @@ class Update
             ));
 
             foreach ($posts as $post) {
-                Utilities::addPostToCategory($post->ID, $categoryId);
+                wp_set_post_categories($post->ID, $categoryId, true);
             }
         }
 

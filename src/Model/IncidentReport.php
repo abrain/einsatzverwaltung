@@ -437,4 +437,14 @@ class IncidentReport
     {
         return ($this->getPostMeta('einsatz_special') == 1);
     }
+
+    /**
+     * Veranlasst die Zuordnung des Einsatzberichts zu einer Kategorie
+     *
+     * @param int $category Die ID der Kategorie
+     */
+    public function addToCategory($category)
+    {
+        wp_set_post_categories($this->getPostId(), $category, true);
+    }
 }

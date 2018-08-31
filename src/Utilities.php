@@ -39,17 +39,6 @@ class Utilities
     }
 
     /**
-     * Veranlasst die Zuordnung eines Einsatzberichts (bzw. eines beliebigen Beitrags) zu einer Kategorie
-     *
-     * @param int $postId Die ID des Einsatzberichts
-     * @param int $category Die ID der Kategorie
-     */
-    public static function addPostToCategory($postId, $category)
-    {
-        wp_set_post_categories($postId, $category, true);
-    }
-
-    /**
      * Hilfsfunktion für Checkboxen, übersetzt 1/0 Logik in Haken an/aus
      *
      * @param mixed $value Der zu überprüfende Wert

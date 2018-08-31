@@ -175,7 +175,7 @@ class General extends SubPage
             /** @var IncidentReport $report */
             foreach ($reports as $report) {
                 if (!$onlySpecialInCategory || $report->isSpecial()) {
-                    Utilities::addPostToCategory($report->getPostId(), $newValue);
+                    $report->addToCategory($newValue);
                 }
             }
         }
@@ -216,7 +216,7 @@ class General extends SubPage
         if ($newValue == 0) {
             /** @var IncidentReport $report */
             foreach ($reports as $report) {
-                Utilities::addPostToCategory($report->getPostId(), $categoryId);
+                $report->addToCategory($categoryId);
             }
         }
 
@@ -226,7 +226,7 @@ class General extends SubPage
             /** @var IncidentReport $report */
             foreach ($reports as $report) {
                 if ($report->isSpecial()) {
-                    Utilities::addPostToCategory($report->getPostId(), $categoryId);
+                    $report->addToCategory($categoryId);
                 } else {
                     Utilities::removePostFromCategory($report->getPostId(), $categoryId);
                 }

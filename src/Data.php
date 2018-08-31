@@ -268,7 +268,7 @@ class Data
         $category = $this->options->getEinsatzberichteCategory();
         if ($category != -1) {
             if (!($this->options->isOnlySpecialInLoop()) || $report->isSpecial()) {
-                Utilities::addPostToCategory($postId, $category);
+                $report->addToCategory($category);
             } else {
                 Utilities::removePostFromCategory($postId, $category);
             }

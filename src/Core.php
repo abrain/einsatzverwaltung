@@ -30,11 +30,6 @@ class Core
      * @var Data
      */
     private $data;
-
-    /**
-     * @var Frontend
-     */
-    private $frontend;
     
     /**
      * @var Options
@@ -73,7 +68,7 @@ class Core
         $this->formatter = new Formatter($this->options); // TODO In Singleton umwandeln
 
         $this->data = new Data($this, $this->utilities, $this->options);
-        $this->frontend = new Frontend($this->options, $this->utilities, $this->formatter);
+        new Frontend($this->options, $this->formatter);
         new Shortcodes($this->utilities, $this, $this->options, $this->formatter);
 
         $this->typeRegistry = new TypeRegistry();
@@ -285,14 +280,6 @@ class Core
     public function getData()
     {
         return $this->data;
-    }
-
-    /**
-     * @return Frontend
-     */
-    public function getFrontend()
-    {
-        return $this->frontend;
     }
 
     /**

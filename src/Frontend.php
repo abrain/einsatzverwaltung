@@ -21,24 +21,17 @@ class Frontend
      * @var Options
      */
     private $options;
-    
-    /**
-     * @var Utilities
-     */
-    private $utilities;
 
     /**
      * Constructor
      *
      * @param Options $options
-     * @param Utilities $utilities
      * @param Formatter $formatter
      */
-    public function __construct($options, $utilities, $formatter)
+    public function __construct($options, $formatter)
     {
         $this->formatter = $formatter;
         $this->options = $options;
-        $this->utilities = $utilities;
         $this->addHooks();
     }
 
@@ -95,7 +88,7 @@ class Frontend
             $typesOfAlerting = $this->formatter->getTypesOfAlerting($report);
 
             $duration = $report->getDuration();
-            $durationString = ($duration === false ? '' : $this->utilities->getDurationString($duration));
+            $durationString = ($duration === false ? '' : $this->formatter->getDurationString($duration));
 
             $showEinsatzartArchiveLink = $showArchiveLinks && $this->options->isShowEinsatzartArchive();
             $art = $this->formatter->getTypeOfIncident($report, $mayContainLinks, $showEinsatzartArchiveLink);

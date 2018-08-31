@@ -367,7 +367,7 @@ class ReportList
                 break;
             case 'duration':
                 $minutes = $report->getDuration();
-                $cellContent = $this->utilities->getDurationString($minutes, true);
+                $cellContent = $this->formatter->getDurationString($minutes, true);
                 break;
             case 'vehicles':
                 $cellContent = $this->formatter->getVehicles($report, $this->linkToVehicles, false);

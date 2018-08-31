@@ -5,7 +5,6 @@ use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Options;
-use abrain\Einsatzverwaltung\Utilities;
 use WP_Post;
 use WP_Term;
 
@@ -29,19 +28,12 @@ class Formatter
     private $options;
 
     /**
-     * @var Utilities
-     */
-    private $utilities;
-
-    /**
      * Formatter constructor.
      * @param Options $options
-     * @param Utilities $utilities
      */
-    public function __construct($options, $utilities)
+    public function __construct($options)
     {
         $this->options = $options;
-        $this->utilities = $utilities;
         $this->annotationIconBar = AnnotationIconBar::getInstance();
     }
 
@@ -102,7 +94,7 @@ class Formatter
                 $replace = date_i18n($this->options->getTimeFormat(), $timeOfAlerting->getTimestamp());
                 break;
             case '%duration%':
-                $replace = $this->utilities->getDurationString($incidentReport->getDuration());
+                $replace = $this->getDurationString($incidentReport->getDuration());
                 break;
             case '%incidentType%':
                 $showTypeArchive = get_option('einsatzvw_show_einsatzart_archive') === '1';
@@ -358,5 +350,38 @@ class Formatter
             $names[] = $name;
         }
         return join(", ", $names);
+    }
+
+    /**
+     * Gibt eine lesbare Angabe einer Dauer zurück (z.B. 2 Stunden 12 Minuten)
+     *
+     * @param int $minutes Dauer in Minuten
+     * @param bool $abbreviated
+     *
+     * @return string
+     */
+    public static function getDurationString($minutes, $abbreviated = false)
+    {
+        if (!is_numeric($minutes) || $minutes < 0) {
+            return '';
+        }
+
+        if ($minutes < 60) {
+            $dauerstring = sprintf(
+                '%d %s',
+                $minutes,
+                ($abbreviated ? 'min' : _n('minute', 'minutes', $minutes, 'einsatzverwaltung'))
+            );
+        } else {
+            $hours = intval($minutes / 60);
+            $remainingMinutes = $minutes % 60;
+            $dauerstring = $hours . ' ' . ($abbreviated ? 'h' : _n('hour', 'hours', $hours, 'einsatzverwaltung'));
+            if ($remainingMinutes > 0) {
+                $unit = $abbreviated ? 'min' : _n('minute', 'minutes', $remainingMinutes, 'einsatzverwaltung');
+                $dauerstring .= sprintf(' %d %s', $remainingMinutes, $unit);
+            }
+        }
+
+        return $dauerstring;
     }
 }

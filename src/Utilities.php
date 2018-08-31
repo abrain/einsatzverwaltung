@@ -63,41 +63,6 @@ class Utilities
     }
 
     /**
-     * Gibt eine lesbare Angabe einer Dauer zurück (z.B. 2 Stunden 12 Minuten)
-     *
-     * TODO In die Klasse Formatter verschieben
-     *
-     * @param int $minutes Dauer in Minuten
-     * @param bool $abbreviated
-     *
-     * @return string
-     */
-    public function getDurationString($minutes, $abbreviated = false)
-    {
-        if (!is_numeric($minutes) || $minutes < 0) {
-            return '';
-        }
-
-        if ($minutes < 60) {
-            $dauerstring = sprintf(
-                '%d %s',
-                $minutes,
-                ($abbreviated ? 'min' : _n('minute', 'minutes', $minutes, 'einsatzverwaltung'))
-            );
-        } else {
-            $hours = intval($minutes / 60);
-            $remainingMinutes = $minutes % 60;
-            $dauerstring = $hours . ' ' . ($abbreviated ? 'h' : _n('hour', 'hours', $hours, 'einsatzverwaltung'));
-            if ($remainingMinutes > 0) {
-                $unit = $abbreviated ? 'min' : _n('minute', 'minutes', $remainingMinutes, 'einsatzverwaltung');
-                $dauerstring .= sprintf(' %d %s', $remainingMinutes, $unit);
-            }
-        }
-
-        return $dauerstring;
-    }
-
-    /**
      * Prüft, ob WordPress mindestens in Version $ver läuft
      *
      * @param string $ver gesuchte Version von WordPress

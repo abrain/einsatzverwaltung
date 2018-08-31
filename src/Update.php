@@ -10,37 +10,16 @@ use wpdb;
 class Update
 {
     /**
-     * @var Core
-     */
-    private $core;
-
-    /**
      * @var Data
      */
     private $data;
 
     /**
-     * @var Options
-     */
-    private $options;
-
-    /**
-     * @var Utilities
-     */
-    private $utilities;
-
-    /**
      * Update constructor.
-     * @param Core $core
-     * @param Options $options
-     * @param Utilities $utilities
      * @param Data $data
      */
-    public function __construct($core, $options, $utilities, $data)
+    public function __construct($data)
     {
-        $this->core = $core;
-        $this->options = $options;
-        $this->utilities = $utilities;
         $this->data = $data;
     }
 
@@ -205,7 +184,7 @@ class Update
      */
     private function upgrade114()
     {
-        $this->options->setFlushRewriteRules(true);
+        update_option('einsatzvw_flush_rewrite_rules', 1);
         update_option('einsatzvw_db_version', 7);
     }
 
@@ -223,7 +202,7 @@ class Update
             require_once(ABSPATH . 'wp-admin/includes/taxonomy.php');
         }
 
-        $categoryId = $this->options->getEinsatzberichteCategory();
+        $categoryId = get_option('einsatzvw_category', -1);
         if (category_exists($categoryId)) {
             $posts = get_posts(array(
                 'post_type' => 'einsatz',

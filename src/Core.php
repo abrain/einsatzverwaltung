@@ -276,7 +276,7 @@ class Core
      */
     public function getUpdater()
     {
-        return new Update($this, $this->options, $this->utilities, $this->data);
+        return new Update($this->data);
     }
 
     /**

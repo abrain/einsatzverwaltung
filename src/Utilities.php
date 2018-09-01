@@ -57,7 +57,7 @@ class Utilities
      *
      * @return mixed
      */
-    public function getArrayValueIfKey($array, $key, $default)
+    public static function getArrayValueIfKey($array, $key, $default)
     {
         return (array_key_exists($key, $array) ? $array[$key] : $default);
     }
@@ -229,22 +229,5 @@ class Utilities
         }
         
         return $default;
-    }
-
-    /**
-     * Stellt sicher, dass eine Zahl positiv ist
-     *
-     * @param mixed $input
-     * @param int $defaultvalue
-     *
-     * @return int
-     */
-    public function sanitizeNumberGreaterZero($input, $defaultvalue = 0)
-    {
-        if (is_numeric($input) && intval($input) > 0 && intval($input) < PHP_INT_MAX) {
-            return intval($input);
-        } else {
-            return $defaultvalue;
-        }
     }
 }

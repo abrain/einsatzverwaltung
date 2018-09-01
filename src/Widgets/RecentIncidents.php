@@ -27,17 +27,11 @@ class RecentIncidents extends WP_Widget
     private $options;
 
     /**
-     * @var Utilities
-     */
-    private $utilities;
-
-    /**
      * Register widget with WordPress.
      * @param Options $options
-     * @param Utilities $utilities
      * @param Formatter $formatter
      */
-    public function __construct(Options $options, Utilities $utilities, Formatter $formatter)
+    public function __construct(Options $options, Formatter $formatter)
     {
         parent::__construct(
             'einsatzverwaltung_widget', // Base ID
@@ -48,7 +42,6 @@ class RecentIncidents extends WP_Widget
             ) // Args
         );
         $this->options = $options;
-        $this->utilities = $utilities;
         $this->formatter = $formatter;
     }
 
@@ -191,13 +184,13 @@ class RecentIncidents extends WP_Widget
             $instance['anzahl'] = $newInstance['anzahl'];
         }
 
-        $instance['zeigeDatum'] = $this->utilities->getArrayValueIfKey($newInstance, 'zeigeDatum', false);
-        $instance['zeigeZeit'] = $this->utilities->getArrayValueIfKey($newInstance, 'zeigeZeit', false);
-        $instance['zeigeOrt'] = $this->utilities->getArrayValueIfKey($newInstance, 'zeigeOrt', false);
-        $instance['zeigeArt'] = $this->utilities->getArrayValueIfKey($newInstance, 'zeigeArt', false);
-        $instance['zeigeArtHierarchie'] = $this->utilities->getArrayValueIfKey($newInstance, 'zeigeArtHierarchie', false);
-        $instance['zeigeFeedlink'] = $this->utilities->getArrayValueIfKey($newInstance, 'zeigeFeedlink', false);
-        $instance['showAnnotations'] = '1' === $this->utilities->getArrayValueIfKey($newInstance, 'showAnnotations', false);
+        $instance['zeigeDatum'] = Utilities::getArrayValueIfKey($newInstance, 'zeigeDatum', false);
+        $instance['zeigeZeit'] = Utilities::getArrayValueIfKey($newInstance, 'zeigeZeit', false);
+        $instance['zeigeOrt'] = Utilities::getArrayValueIfKey($newInstance, 'zeigeOrt', false);
+        $instance['zeigeArt'] = Utilities::getArrayValueIfKey($newInstance, 'zeigeArt', false);
+        $instance['zeigeArtHierarchie'] = Utilities::getArrayValueIfKey($newInstance, 'zeigeArtHierarchie', false);
+        $instance['zeigeFeedlink'] = Utilities::getArrayValueIfKey($newInstance, 'zeigeFeedlink', false);
+        $instance['showAnnotations'] = '1' === Utilities::getArrayValueIfKey($newInstance, 'showAnnotations', false);
 
         return $instance;
     }
@@ -212,15 +205,15 @@ class RecentIncidents extends WP_Widget
      */
     public function form($instance)
     {
-        $title = $this->utilities->getArrayValueIfKey($instance, 'title', 'Letzte Eins&auml;tze');
-        $anzahl = $this->utilities->getArrayValueIfKey($instance, 'anzahl', 3);
-        $zeigeDatum = $this->utilities->getArrayValueIfKey($instance, 'zeigeDatum', false);
-        $zeigeZeit = $this->utilities->getArrayValueIfKey($instance, 'zeigeZeit', false);
-        $zeigeFeedlink = $this->utilities->getArrayValueIfKey($instance, 'zeigeFeedlink', false);
-        $zeigeOrt = $this->utilities->getArrayValueIfKey($instance, 'zeigeOrt', false);
-        $zeigeArt = $this->utilities->getArrayValueIfKey($instance, 'zeigeArt', false);
-        $zeigeArtHierarchie = $this->utilities->getArrayValueIfKey($instance, 'zeigeArtHierarchie', false);
-        $showAnnotations = $this->utilities->getArrayValueIfKey($instance, 'showAnnotations', false);
+        $title = Utilities::getArrayValueIfKey($instance, 'title', 'Letzte Eins&auml;tze');
+        $anzahl = Utilities::getArrayValueIfKey($instance, 'anzahl', 3);
+        $zeigeDatum = Utilities::getArrayValueIfKey($instance, 'zeigeDatum', false);
+        $zeigeZeit = Utilities::getArrayValueIfKey($instance, 'zeigeZeit', false);
+        $zeigeFeedlink = Utilities::getArrayValueIfKey($instance, 'zeigeFeedlink', false);
+        $zeigeOrt = Utilities::getArrayValueIfKey($instance, 'zeigeOrt', false);
+        $zeigeArt = Utilities::getArrayValueIfKey($instance, 'zeigeArt', false);
+        $zeigeArtHierarchie = Utilities::getArrayValueIfKey($instance, 'zeigeArtHierarchie', false);
+        $showAnnotations = Utilities::getArrayValueIfKey($instance, 'showAnnotations', false);
 
         printf(
             '<p><label for="%1$s">%2$s</label><input class="widefat" id="%1$s" name="%3$s" type="text" value="%4$s" /></p>',

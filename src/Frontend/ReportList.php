@@ -108,21 +108,13 @@ class ReportList
     private $string;
 
     /**
-     * @var Utilities
-     */
-    private $utilities;
-
-
-    /**
      * ReportList constructor.
      *
-     * @param Utilities $utilities
      * @param Options $options
      * @param Formatter $formatter
      */
-    public function __construct($utilities, $options, $formatter)
+    public function __construct($options, $formatter)
     {
-        $this->utilities = $utilities;
         $this->options = $options;
         $this->formatter = $formatter;
     }
@@ -277,7 +269,7 @@ class ReportList
             }
 
             $colInfo = $allColumns[$colId];
-            $style = $this->utilities->getArrayValueIfKey($colInfo, 'nowrap', false) ? 'white-space: nowrap;' : '';
+            $style = Utilities::getArrayValueIfKey($colInfo, 'nowrap', false) ? 'white-space: nowrap;' : '';
             $this->string .= '<th' . (empty($style) ? '' : ' style="' . $style . '"') . '>' . $colInfo['name'] . '</th>';
         }
         $this->string .= '</tr>';

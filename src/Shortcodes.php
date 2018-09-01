@@ -105,7 +105,7 @@ class Shortcodes
 
         $reports = $reportQuery->getReports();
 
-        $reportList = new ReportList($this->utilities, $this->options, $this->formatter);
+        $reportList = new ReportList($this->options, $this->formatter);
         return $reportList->getList(
             $reports,
             array(

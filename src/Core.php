@@ -195,8 +195,8 @@ class Core
 
     public function registerWidgets()
     {
-        register_widget(new RecentIncidents($this->options, $this->utilities, $this->formatter));
-        register_widget(new RecentIncidentsFormatted($this->formatter, $this->utilities));
+        register_widget(new RecentIncidents($this->options, $this->formatter));
+        register_widget(new RecentIncidentsFormatted($this->formatter));
     }
 
     /**

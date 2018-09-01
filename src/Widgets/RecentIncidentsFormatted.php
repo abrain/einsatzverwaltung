@@ -17,11 +17,6 @@ class RecentIncidentsFormatted extends WP_Widget
      */
     private $formatter;
 
-    /**
-     * @var Utilities
-     */
-    private $utilities;
-
     private $allowedHtmlTags = array(
         'a' => array(
             'href' => true,
@@ -132,9 +127,8 @@ class RecentIncidentsFormatted extends WP_Widget
     /**
      * Konstruktor, generiert und registriert das Widget
      * @param Formatter $formatter
-     * @param Utilities $utilities
      */
-    public function __construct(Formatter $formatter, Utilities $utilities)
+    public function __construct(Formatter $formatter)
     {
         parent::__construct(
             'recent-incidents-formatted',
@@ -146,7 +140,6 @@ class RecentIncidentsFormatted extends WP_Widget
             )
         );
         $this->formatter = $formatter;
-        $this->utilities = $utilities;
     }
 
     /**
@@ -198,10 +191,10 @@ class RecentIncidentsFormatted extends WP_Widget
     {
         $instance = array();
         $instance['title'] = strip_tags($newInstance['title']);
-        $instance['numIncidents'] = $this->utilities->sanitizeNumberGreaterZero(
-            $newInstance['numIncidents'],
-            $this->defaults['numIncidents']
-        );
+        $instance['numIncidents'] = absint($newInstance['numIncidents']);
+        if ($instance['numIncidents'] === 0) {
+            $instance['numIncidents'] = $this->defaults['numIncidents'];
+        }
         $instance['beforeContent'] = wp_kses($newInstance['beforeContent'], $this->allowedHtmlTags);
         $instance['pattern'] = wp_kses($newInstance['pattern'], $this->allowedHtmlTags);
         $instance['afterContent'] = wp_kses($newInstance['afterContent'], $this->allowedHtmlTags);
@@ -218,24 +211,25 @@ class RecentIncidentsFormatted extends WP_Widget
      */
     public function form($instance)
     {
+        $values = wp_parse_args($instance, $this->defaults);
+
         echo '<p>';
         printf(
             '<label for="%1$s">%2$s</label><input class="widefat" id="%1$s" name="%3$s" type="text" value="%4$s" />',
             $this->get_field_id('title'),
             'Titel:',
             $this->get_field_name('title'),
-            esc_attr($this->utilities->getArrayValueIfKey($instance, 'title', ''))
+            esc_attr($values['title'])
         );
         echo '</p>';
 
-        $numIncidents = $this->utilities->getArrayValueIfKey($instance, 'numIncidents', $this->defaults['numIncidents']);
         echo '<p>';
         printf(
             '<label for="%1$s">%2$s</label>&nbsp;<input id="%1$s" name="%3$s" type="text" value="%4$s" size="3" />',
             $this->get_field_id('numIncidents'),
             'Anzahl der Einsatzberichte, die angezeigt werden:',
             $this->get_field_name('numIncidents'),
-            empty($numIncidents) ? $this->defaults['numIncidents'] : esc_attr($numIncidents)
+            esc_attr($values['numIncidents'])
         );
         echo '</p>';
 
@@ -245,7 +239,7 @@ class RecentIncidentsFormatted extends WP_Widget
             $this->get_field_id('beforeContent'),
             'HTML-Code vor den Einsatzberichten:',
             $this->get_field_name('beforeContent'),
-            $this->utilities->getArrayValueIfKey($instance, 'beforeContent', '')
+            esc_textarea($values['beforeContent'])
         );
         echo '</p>';
 
@@ -255,7 +249,7 @@ class RecentIncidentsFormatted extends WP_Widget
             $this->get_field_id('pattern'),
             'HTML-Template pro Einsatzbericht:',
             $this->get_field_name('pattern'),
-            $this->utilities->getArrayValueIfKey($instance, 'pattern', '')
+            esc_textarea($values['pattern'])
         );
         echo '</p><p class="description">' . 'Folgende Tags werden ersetzt:';
         $formatterTags = $this->formatter->getTags();
@@ -270,7 +264,7 @@ class RecentIncidentsFormatted extends WP_Widget
             $this->get_field_id('afterContent'),
             'HTML-Code nach den Einsatzberichten:',
             $this->get_field_name('afterContent'),
-            $this->utilities->getArrayValueIfKey($instance, 'afterContent', '')
+            esc_textarea($values['afterContent'])
         );
         echo '</p><p class="description">' . 'Folgende Tags werden ersetzt:';
         foreach ($this->allowedTagsAfter as $tag) {

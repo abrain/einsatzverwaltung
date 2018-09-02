@@ -2,7 +2,6 @@
 namespace abrain\Einsatzverwaltung\Widgets;
 
 use abrain\Einsatzverwaltung\Util\Formatter;
-use abrain\Einsatzverwaltung\Utilities;
 use WP_Widget;
 
 /**
@@ -134,8 +133,7 @@ class RecentIncidentsFormatted extends WP_Widget
             'recent-incidents-formatted',
             'Letzte Eins&auml;tze (eigenes Format)',
             array(
-                'description' => 'Zeigt die neuesten Eins&auml;tze an.' . ' ' .
-                    'Das Aussehen kann vollst&auml;ndig mit eigenem HTML bestimmt werden.',
+                'description' => 'Zeigt die neuesten Eins&auml;tze an. Das Aussehen kann vollst&auml;ndig mit eigenem HTML bestimmt werden.',
                 'customize_selective_refresh' => true,
             )
         );
@@ -251,11 +249,7 @@ class RecentIncidentsFormatted extends WP_Widget
             $this->get_field_name('pattern'),
             esc_textarea($values['pattern'])
         );
-        echo '</p><p class="description">' . 'Folgende Tags werden ersetzt:';
-        $formatterTags = $this->formatter->getTags();
-        foreach ($this->allowedTagsPattern as $tag) {
-            echo '<br>' . $tag . ' (' . $formatterTags[$tag] . ')';
-        }
+        $this->printTagReplacementInfo($this->allowedTagsPattern);
         echo '</p>';
 
         echo '<p>';
@@ -266,12 +260,22 @@ class RecentIncidentsFormatted extends WP_Widget
             $this->get_field_name('afterContent'),
             esc_textarea($values['afterContent'])
         );
-        echo '</p><p class="description">' . 'Folgende Tags werden ersetzt:';
-        foreach ($this->allowedTagsAfter as $tag) {
-            echo '<br>' . $tag . ' (' . $formatterTags[$tag] . ')';
-        }
+        $this->printTagReplacementInfo($this->allowedTagsAfter);
         echo '</p>';
 
         return '';
+    }
+
+    /**
+     * @param $allowedTags
+     */
+    private function printTagReplacementInfo($allowedTags)
+    {
+        echo '<br><small>';
+        _e('The following tags will be replaced:', 'einsatzverwaltung');
+        foreach ($allowedTags as $tag) {
+            printf('<br><strong>%s</strong> (%s)', esc_html($tag), esc_html(Formatter::getLabelForTag($tag)));
+        }
+        echo '</small>';
     }
 }

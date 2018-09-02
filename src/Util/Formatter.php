@@ -18,6 +18,31 @@ class Formatter
     private $tagsNotNeedingPost = array('%feedUrl%');
 
     /**
+     * @var array Ersetzbare Tags und ihre Beschreibungen
+     */
+    private static $availableTags = array(
+        '%title%' => 'Titel des Einsatzberichts',
+        '%date%' => 'Datum der Alarmierung',
+        '%time%' => 'Zeitpunkt der Alarmierung',
+        '%duration%' => 'Dauer des Einsatzes',
+        '%incidentType%' => 'Art des Einsatzes',
+        '%incidentTypeColor%' => 'Farbe der Art des Einsatzes',
+        '%url%' => 'URL zum Einsatzbericht',
+        '%location%' => 'Ort des Einsatzes',
+        '%feedUrl%' => 'URL zum Feed',
+        '%number%' => 'Einsatznummer',
+        '%seqNum%' => 'Laufende Nummer',
+        '%annotations%' => 'Vermerke',
+        '%vehicles%' => 'Fahrzeuge',
+        '%additionalForces%' => 'Weitere Kr&auml;fte',
+        '%typesOfAlerting%' => 'Alarmierungsarten',
+        '%content%' => 'Berichtstext',
+        '%featuredImage%' => 'Beitragsbild',
+        '%yearArchive%' => 'Link zum Jahresarchiv',
+        '%workforce%' => 'Mannschaftsstärke',
+    );
+
+    /**
      * @var AnnotationIconBar
      */
     private $annotationIconBar;
@@ -49,7 +74,7 @@ class Formatter
     public function formatIncidentData($pattern, $allowedTags = array(), $post = null, $context = 'post')
     {
         if (empty($allowedTags)) {
-            $allowedTags = array_keys($this->getTags());
+            $allowedTags = array_keys(self::$availableTags);
         }
 
         // Content should be handled separately, so we will ignore it
@@ -171,34 +196,6 @@ class Formatter
         }
 
         return $color;
-    }
-
-    /**
-     * @return array Ersetzbare Tags und ihre Beschreibungen
-     */
-    public function getTags()
-    {
-        return array(
-            '%title%' => 'Titel des Einsatzberichts',
-            '%date%' => 'Datum der Alarmierung',
-            '%time%' => 'Zeitpunkt der Alarmierung',
-            '%duration%' => 'Dauer des Einsatzes',
-            '%incidentType%' => 'Art des Einsatzes',
-            '%incidentTypeColor%' => 'Farbe der Art des Einsatzes',
-            '%url%' => 'URL zum Einsatzbericht',
-            '%location%' => 'Ort des Einsatzes',
-            '%feedUrl%' => 'URL zum Feed',
-            '%number%' => 'Einsatznummer',
-            '%seqNum%' => 'Laufende Nummer',
-            '%annotations%' => 'Vermerke',
-            '%vehicles%' => 'Fahrzeuge',
-            '%additionalForces%' => 'Weitere Kr&auml;fte',
-            '%typesOfAlerting%' => 'Alarmierungsarten',
-            '%content%' => 'Berichtstext',
-            '%featuredImage%' => 'Beitragsbild',
-            '%yearArchive%' => 'Link zum Jahresarchiv',
-            '%workforce%' => 'Mannschaftsstärke',
-        );
     }
 
     /**
@@ -383,5 +380,18 @@ class Formatter
         }
 
         return $dauerstring;
+    }
+
+    /**
+     * @param string $tag
+     * @return string
+     */
+    public static function getLabelForTag($tag)
+    {
+        if (!array_key_exists($tag, self::$availableTags)) {
+            return '';
+        }
+
+        return self::$availableTags[$tag];
     }
 }

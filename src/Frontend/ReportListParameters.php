@@ -68,7 +68,8 @@ class ReportListParameters
      */
     public function __construct()
     {
-        $this->columns = array();
+        $enabledColumns = self::sanitizeColumns(get_option('einsatzvw_list_columns', ''));
+        $this->columns = explode(',', $enabledColumns);
         $this->columnsLinkingReport = array('title');
         $this->compact = false;
         $this->linkEmptyReports = true;

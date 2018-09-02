@@ -102,7 +102,6 @@ class Shortcodes
         $reportList = new ReportList($this->options, $this->formatter);
         $parameters = new ReportListParameters();
         $parameters->setSplitMonths($shortcodeParams['monatetrennen'] == 'ja');
-        $parameters->setColumns($this->options->getEinsatzlisteEnabledColumns());
         $parameters->setColumnsLinkingReport($columnsWithLink);
         $parameters->linkEmptyReports = (!in_array('noLinkWithoutContent', $filteredOptions));
         $parameters->showHeading = (!in_array('noHeading', $filteredOptions));

@@ -2,6 +2,7 @@
 
 namespace abrain\Einsatzverwaltung\Settings\Pages;
 
+use abrain\Einsatzverwaltung\Frontend\ReportListParameters;
 use abrain\Einsatzverwaltung\Frontend\ReportListSettings;
 use abrain\Einsatzverwaltung\Utilities;
 
@@ -61,13 +62,11 @@ class ReportList extends SubPage
         );
     }
 
-    /**
-     *
-     */
     public function echoFieldColumns()
     {
         $columns = \abrain\Einsatzverwaltung\Frontend\ReportList::getListColumns();
-        $enabledColumns = self::$options->getEinsatzlisteEnabledColumns();
+        $enabledColumnsString = ReportListParameters::sanitizeColumns(get_option('einsatzvw_list_columns', ''));
+        $enabledColumns = explode(',', $enabledColumnsString);
 
         echo '<table id="columns-available"><tr><td style="width: 250px;">';
         echo '<span class="evw-area-title">Verf&uuml;gbare Spalten</span>';
@@ -96,7 +95,10 @@ class ReportList extends SubPage
             echo '<li id="' . $colId . '" class="evw-column"><span>' . $name . '</span></li>';
         }
         echo '</ul></td></tr></table>';
-        echo '<input name="einsatzvw_list_columns" id="einsatzvw_list_columns" type="hidden" value="' . implode(',', $enabledColumns) . '">';
+        printf(
+            '<input name="einsatzvw_list_columns" id="einsatzvw_list_columns" type="hidden" value="%s">',
+            esc_attr($enabledColumnsString)
+        );
     }
 
     public function echoFieldColumnSettings()

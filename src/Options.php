@@ -1,8 +1,6 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
-use abrain\Einsatzverwaltung\Frontend\ReportListParameters;
-
 /**
  * Bietet Schnittstellen zur Abfrage von Einstellungen
  */
@@ -19,9 +17,6 @@ class Options
         'einsatzvw_einsatznummer_lfdvorne' => false,
         'date_format' => 'd.m.Y',
         'time_format' => 'H:i',
-        'einsatzvw_list_art_hierarchy' => false,
-        'einsatzvw_list_ext_link' => false,
-        'einsatzvw_list_fahrzeuge_link' => false,
         'einsatzvw_rewrite_slug' => 'einsatzberichte',
         'einsatzvw_flush_rewrite_rules' => false,
         'einsatzvw_category' => false,
@@ -101,18 +96,6 @@ class Options
     {
         $categoryId = $this->getOption('einsatzvw_category');
         return (false === $categoryId ? -1 : intval($categoryId));
-    }
-
-    /**
-     * Gibt die aktiven Spalten für die Einsatzliste zurück
-     *
-     * @return array Spalten-IDs der aktiven Spalten, geprüft auf Existenz. Bei Problemen die Standardspalten.
-     */
-    public function getEinsatzlisteEnabledColumns()
-    {
-        $enabledColumns = $this->getOption('einsatzvw_list_columns');
-        $enabledColumns = ReportListParameters::sanitizeColumns($enabledColumns);
-        return explode(',', $enabledColumns);
     }
 
     /**

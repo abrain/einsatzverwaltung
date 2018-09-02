@@ -1,7 +1,7 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
-use abrain\Einsatzverwaltung\Frontend\ReportList;
+use abrain\Einsatzverwaltung\Frontend\ReportListParameters;
 
 /**
  * Bietet Schnittstellen zur Abfrage von Einstellungen
@@ -9,7 +9,6 @@ use abrain\Einsatzverwaltung\Frontend\ReportList;
 class Options
 {
     private $defaults = array(
-        'einsatzvw_list_columns' => 'number,date,time,title',
         'einsatzvw_einsatznummer_stellen' => 3,
         'einsatzvw_show_einsatzart_archive' => false,
         'einsatzvw_show_exteinsatzmittel_archive' => false,
@@ -78,11 +77,6 @@ class Options
         return $this->toBoolean($option);
     }
 
-    public function getDefaultColumns()
-    {
-        return $this->defaults['einsatzvw_list_columns'];
-    }
-
     public function getDefaultEinsatznummerStellen()
     {
         return $this->defaults['einsatzvw_einsatznummer_stellen'];
@@ -117,7 +111,7 @@ class Options
     public function getEinsatzlisteEnabledColumns()
     {
         $enabledColumns = $this->getOption('einsatzvw_list_columns');
-        $enabledColumns = ReportList::sanitizeColumns($enabledColumns);
+        $enabledColumns = ReportListParameters::sanitizeColumns($enabledColumns);
         return explode(',', $enabledColumns);
     }
 

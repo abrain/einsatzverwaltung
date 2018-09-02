@@ -145,7 +145,7 @@ class ReportList extends SubPage
         register_setting(
             'einsatzvw_settings_list',
             'einsatzvw_list_columns',
-            array('\abrain\Einsatzverwaltung\Frontend\ReportList', 'sanitizeColumns')
+            array('\abrain\Einsatzverwaltung\Frontend\ReportListParameters', 'sanitizeColumns')
         );
         register_setting(
             'einsatzvw_settings_list',

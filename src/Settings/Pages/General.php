@@ -98,18 +98,30 @@ class General extends SubPage
      */
     public function echoFieldPermalinks()
     {
+        global $wp_rewrite;
         echo '<fieldset>';
         $this->echoSettingsInput(
             'einsatzvw_rewrite_slug',
-            sprintf(
-                'Basis f&uuml;r Links zu Einsatzberichten, zum %1$sArchiv%2$s und zum %3$sFeed%2$s.',
-                '<a href="' . get_post_type_archive_link('einsatz') . '">',
-                '</a>',
-                '<a href="' . get_post_type_archive_feed_link('einsatz') . '">'
-            ),
             sanitize_title(get_option('einsatzvw_rewrite_slug'), 'einsatzberichte')
         );
-        echo '</fieldset>';
+        echo '<p class="description">';
+        printf(
+            'Basis f&uuml;r Links zu Einsatzberichten, zum %s und zum %s.',
+            sprintf('<a href="%s">%s</a>', get_post_type_archive_link('einsatz'), 'Archiv'),
+            sprintf('<a href="%s">%s</a>', get_post_type_archive_feed_link('einsatz'), 'Feed')
+        );
+        if ($wp_rewrite->using_permalinks() === false) {
+            echo '</p><p class="description">';
+            printf(
+                __('Note: This setting has no effect, as WordPress currently uses plain %s', 'einsatzverwaltung'),
+                sprintf(
+                    '<a href="%s">%s</a>',
+                    admin_url('options-permalink.php'),
+                    __('permalinks', 'einsatzverwaltung')
+                )
+            );
+        }
+        echo '</p></fieldset>';
     }
 
     public function echoFieldAnnotations()

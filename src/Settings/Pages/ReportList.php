@@ -106,17 +106,17 @@ class ReportList extends SubPage
         echo '<fieldset>';
         $this->echoSettingsCheckbox(
             'einsatzvw_list_art_hierarchy',
-            '<strong>Einsatzart</strong>: Hierarchie der Einsatzart anzeigen'
+            'Einsatzart: Hierarchie der Einsatzart anzeigen'
         );
         echo '<br/>';
         $this->echoSettingsCheckbox(
             'einsatzvw_list_fahrzeuge_link',
-            '<strong>Fahrzeuge</strong>: Links zu den Fahrzeugseiten anzeigen, sofern verf&uuml;gbar'
+            'Fahrzeuge: Links zu den Fahrzeugseiten anzeigen, sofern verf&uuml;gbar'
         );
         echo '<br/>';
         $this->echoSettingsCheckbox(
             'einsatzvw_list_ext_link',
-            '<strong>Weitere Kr&auml;fte</strong>: Links anzeigen, sofern verf&uuml;gbar'
+            'Weitere Kr&auml;fte: Links anzeigen, sofern verf&uuml;gbar'
         );
         echo '</fieldset>';
     }

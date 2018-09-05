@@ -11,11 +11,6 @@ use abrain\Einsatzverwaltung\Model\IncidentReport;
 class Utilities
 {
     /**
-     * @var Options
-     */
-    private $options;
-
-    /**
      * @var Core
      */
     private $core;
@@ -28,14 +23,6 @@ class Utilities
     public function __construct($core)
     {
         $this->core = $core;
-    }
-
-    /**
-     * @param Options $options
-     */
-    public function setDependencies($options)
-    {
-        $this->options = $options;
     }
 
     /**

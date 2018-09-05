@@ -10,10 +10,6 @@ use abrain\Einsatzverwaltung\Util\Formatter;
  */
 class Shortcodes
 {
-    /**
-     * @var Utilities
-     */
-    private $utilities;
 
     /**
      * @var Core
@@ -33,15 +29,13 @@ class Shortcodes
     /**
      * Constructor
      *
-     * @param Utilities $utilities
      * @param Core $core
      * @param Options $options
      * @param Formatter $formatter
      */
-    public function __construct($utilities, $core, $options, $formatter)
+    public function __construct($core, $options, $formatter)
     {
         $this->addHooks();
-        $this->utilities = $utilities;
         $this->core = $core;
         $this->options = $options;
         $this->formatter = $formatter;

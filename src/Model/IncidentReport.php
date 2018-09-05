@@ -312,7 +312,7 @@ class IncidentReport
      *
      * @param string $taxonomy Der eindeutige Bezeichner der Taxonomie
      *
-     * @return array Die Terms oder ein leeres Array
+     * @return WP_Term[] Die Terms oder ein leeres Array
      */
     private function getTheTerms($taxonomy)
     {
@@ -350,7 +350,7 @@ class IncidentReport
     /**
      * Gibt die Fahrzeuge eines Einsatzberichts aus
      *
-     * @return array
+     * @return WP_Term[]
      */
     public function getVehicles()
     {

@@ -254,9 +254,11 @@ class Formatter
             }
 
             if ($makeLinks && $showArchiveLinks) {
-                $title = 'Alle Eins&auml;tze vom Typ '. $typeOfIncident->name . ' anzeigen';
-                $url = get_term_link($typeOfIncident);
-                $link = '<a href="'.$url.'" class="fa fa-filter" style="text-decoration:none;" title="'.$title.'"></a>';
+                $link = sprintf(
+                    '<a href="%s" class="fa fa-filter" style="text-decoration:none;" title="%s"></a>',
+                    esc_url(get_term_link($typeOfIncident)),
+                    esc_attr(sprintf('Alle Eins&auml;tze vom Typ %s anzeigen', $typeOfIncident->name))
+                );
                 $string = '&nbsp;' . $link . $string;
             }
             $string = $typeOfIncident->name . $string;
@@ -288,22 +290,40 @@ class Formatter
             $name = $vehicle->name;
 
             if ($makeLinks) {
-                $pageid = get_term_meta($vehicle->term_id, 'fahrzeugpid', true);
-                if (!empty($pageid)) {
-                    $pageurl = get_permalink($pageid);
-                    if ($pageurl !== false) {
-                        $name = '<a href="'.$pageurl.'" title="Mehr Informationen zu '.$vehicle->name.'">'.$vehicle->name.'</a>';
-                    }
-                }
+                $name = $this->addVehicleLink($vehicle);
             }
 
             if ($makeLinks && $showArchiveLinks && $this->options->isShowFahrzeugArchive()) {
-                $name .= '&nbsp;<a href="'.get_term_link($vehicle).'" class="fa fa-filter" style="text-decoration:none;" title="Eins&auml;tze unter Beteiligung von '.$vehicle->name.' anzeigen"></a>';
+                $name .= '&nbsp;' . $this->getFilterLink($vehicle);
             }
 
             $names[] = $name;
         }
         return join(", ", $names);
+    }
+
+    /**
+     * @param WP_Term $vehicle
+     * @return string A link to the page associated with the vehicle (if any), otherwise the name without a link
+     */
+    private function addVehicleLink($vehicle)
+    {
+        $pageid = get_term_meta($vehicle->term_id, 'fahrzeugpid', true);
+        if (empty($pageid)) {
+            return $vehicle->name;
+        }
+
+        $pageurl = get_permalink($pageid);
+        if ($pageurl === false) {
+            return $vehicle->name;
+        }
+
+        return sprintf(
+            '<a href="%s" title="Mehr Informationen zu %s">%s</a>',
+            esc_url($pageurl),
+            esc_attr($vehicle->name),
+            esc_html($vehicle->name)
+        );
     }
 
     /**
@@ -330,23 +350,50 @@ class Formatter
             $name = $force->name;
 
             if ($makeLinks) {
-                $url = get_term_meta($force->term_id, 'url', true);
-                if (!empty($url)) {
-                    $openInNewWindow = $this->options->isOpenExtEinsatzmittelNewWindow();
-                    $name = '<a href="'.$url.'" title="Mehr Informationen zu '.$force->name.'"';
-                    $name .= ($openInNewWindow ? ' target="_blank"' : '') . '>'.$force->name.'</a>';
-                }
+                $name = $this->getAdditionalForceLink($force);
             }
 
             if ($makeLinks && $showArchiveLinks && $this->options->isShowExtEinsatzmittelArchive()) {
-                $title = 'Eins&auml;tze unter Beteiligung von ' . $force->name . ' anzeigen';
-                $name .= '&nbsp;<a href="'.get_term_link($force).'" class="fa fa-filter" ';
-                $name .= 'style="text-decoration:none;" title="' . $title . '"></a>';
+                $name .= '&nbsp;' . $this->getFilterLink($force);
             }
 
             $names[] = $name;
         }
         return join(", ", $names);
+    }
+
+    /**
+     * @param WP_Term $additionalForce
+     * @return string
+     */
+    private function getAdditionalForceLink($additionalForce)
+    {
+        $url = get_term_meta($additionalForce->term_id, 'url', true);
+        if (empty($url)) {
+            return $additionalForce->name;
+        }
+
+        $openInNewWindow = $this->options->isOpenExtEinsatzmittelNewWindow();
+        return sprintf(
+            '<a href="%s" title="%s" target="%s">%s</a>',
+            esc_url($url),
+            esc_attr(sprintf('Mehr Informationen zu %s', $additionalForce->name)),
+            esc_attr($openInNewWindow ? '_blank' : '_self'),
+            esc_html($additionalForce->name)
+        );
+    }
+
+    /**
+     * @param WP_Term $term
+     * @return string
+     */
+    private function getFilterLink(WP_Term $term)
+    {
+        return sprintf(
+            '<a href="%s" class="fa fa-filter" style="text-decoration: none;" title="%s"></a>',
+            get_term_link($term),
+            sprintf('Eins&auml;tze unter Beteiligung von %s anzeigen', $term->name)
+        );
     }
 
     /**
@@ -364,19 +411,16 @@ class Formatter
         }
 
         if ($minutes < 60) {
-            $dauerstring = sprintf(
-                '%d %s',
-                $minutes,
-                ($abbreviated ? 'min' : _n('minute', 'minutes', $minutes, 'einsatzverwaltung'))
-            );
-        } else {
-            $hours = intval($minutes / 60);
-            $remainingMinutes = $minutes % 60;
-            $dauerstring = $hours . ' ' . ($abbreviated ? 'h' : _n('hour', 'hours', $hours, 'einsatzverwaltung'));
-            if ($remainingMinutes > 0) {
-                $unit = $abbreviated ? 'min' : _n('minute', 'minutes', $remainingMinutes, 'einsatzverwaltung');
-                $dauerstring .= sprintf(' %d %s', $remainingMinutes, $unit);
-            }
+            $unit = $abbreviated ? 'min' : _n('minute', 'minutes', $minutes, 'einsatzverwaltung');
+            return sprintf('%d %s', $minutes, $unit);
+        }
+
+        $hours = intval($minutes / 60);
+        $remainingMinutes = $minutes % 60;
+        $dauerstring = $hours . ' ' . ($abbreviated ? 'h' : _n('hour', 'hours', $hours, 'einsatzverwaltung'));
+        if ($remainingMinutes > 0) {
+            $unit = $abbreviated ? 'min' : _n('minute', 'minutes', $remainingMinutes, 'einsatzverwaltung');
+            $dauerstring .= sprintf(' %d %s', $remainingMinutes, $unit);
         }
 
         return $dauerstring;

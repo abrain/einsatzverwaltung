@@ -11,33 +11,6 @@ use abrain\Einsatzverwaltung\Model\IncidentReport;
 class Utilities
 {
     /**
-     * @var Core
-     */
-    private $core;
-
-    /**
-     * Utilities constructor.
-     *
-     * @param Core $core
-     */
-    public function __construct($core)
-    {
-        $this->core = $core;
-    }
-
-    /**
-     * Hilfsfunktion für Checkboxen, übersetzt 1/0 Logik in Haken an/aus
-     *
-     * @param mixed $value Der zu überprüfende Wert
-     *
-     * @return bool Der entsprechende boolsche Wert für $value
-     */
-    public function checked($value)
-    {
-        return ($value === true || $value == 1 ? 'checked="checked" ' : '');
-    }
-
-    /**
      * @param array $array
      * @param string $key
      * @param mixed $default
@@ -47,41 +20,6 @@ class Utilities
     public static function getArrayValueIfKey($array, $key, $default)
     {
         return (array_key_exists($key, $array) ? $array[$key] : $default);
-    }
-
-    /**
-     * Prüft, ob WordPress mindestens in Version $ver läuft
-     *
-     * @param string $ver gesuchte Version von WordPress
-     *
-     * @return bool
-     */
-    public function isMinWPVersion($ver)
-    {
-        $currentversionparts = explode(".", get_bloginfo('version'));
-        if (count($currentversionparts) < 3) {
-            $currentversionparts[2] = "0";
-        }
-
-        $neededversionparts = explode(".", $ver);
-        if (count($neededversionparts) < 3) {
-            $neededversionparts[2] = "0";
-        }
-
-        if (intval($neededversionparts[0]) > intval($currentversionparts[0])) {
-            return false;
-        } elseif (intval($neededversionparts[0]) == intval($currentversionparts[0]) &&
-            intval($neededversionparts[1]) > intval($currentversionparts[1])
-        ) {
-            return false;
-        } elseif (intval($neededversionparts[0]) == intval($currentversionparts[0]) &&
-            intval($neededversionparts[1]) == intval($currentversionparts[1]) &&
-            intval($neededversionparts[2]) > intval($currentversionparts[2])
-        ) {
-            return false;
-        }
-
-        return true;
     }
 
     /**

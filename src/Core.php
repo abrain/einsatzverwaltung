@@ -61,8 +61,8 @@ class Core
      */
     private function __construct()
     {
-        $this->utilities = new Utilities($this);
-        $this->options = new Options($this->utilities);
+        $this->utilities = new Utilities();
+        $this->options = new Options();
 
         $this->formatter = new Formatter($this->options); // TODO In Singleton umwandeln
 

@@ -24,21 +24,6 @@ class Options
     );
 
     /**
-     * @var Utilities
-     */
-    private $utilities;
-
-    /**
-     * Options constructor.
-     *
-     * @param Utilities $utilities
-     */
-    public function __construct($utilities)
-    {
-        $this->utilities = $utilities;
-    }
-
-    /**
      * Ruft die benannte Option aus der Datenbank ab
      *
      * @param string $key Schlüssel der Option

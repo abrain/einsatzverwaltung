@@ -7,14 +7,12 @@ namespace abrain\Einsatzverwaltung;
 class Options
 {
     private $defaults = array(
-        'einsatzvw_einsatznummer_stellen' => 3,
         'einsatzvw_show_einsatzart_archive' => false,
         'einsatzvw_show_exteinsatzmittel_archive' => false,
         'einsatzvw_show_fahrzeug_archive' => false,
         'einsatzvw_open_ext_in_new' => false,
         'einsatzvw_show_einsatzberichte_mainloop' => false,
         'einsatzvw_einsatz_hideemptydetails' => true,
-        'einsatzvw_einsatznummer_lfdvorne' => false,
         'date_format' => 'd.m.Y',
         'time_format' => 'H:i',
         'einsatzvw_rewrite_slug' => 'einsatzberichte',
@@ -72,11 +70,6 @@ class Options
         return $this->toBoolean($option);
     }
 
-    public function getDefaultEinsatznummerStellen()
-    {
-        return $this->defaults['einsatzvw_einsatznummer_stellen'];
-    }
-
     /**
      * Gibt das Datumsformat von WordPress zurück
      */
@@ -99,15 +92,6 @@ class Options
     }
 
     /**
-     * @return int
-     */
-    public function getEinsatznummerStellen()
-    {
-        $option = $this->getOption('einsatzvw_einsatznummer_stellen');
-        return Utilities::sanitizeEinsatznummerStellen($option);
-    }
-
-    /**
      * Gibt die Basis für die URL zu Einsatzberichten zurück
      *
      * @since 1.0.0
@@ -126,23 +110,6 @@ class Options
     public function getTimeFormat()
     {
         return $this->getOption('time_format');
-    }
-
-    /**
-     * @return bool
-     */
-    public function isAutoIncidentNumbers()
-    {
-        return $this->getBoolOption('einsatzverwaltung_incidentnumbers_auto');
-    }
-
-    /**
-     * @return bool
-     */
-    public function isEinsatznummerLfdVorne()
-    {
-        $option = $this->getOption('einsatzvw_einsatznummer_lfdvorne');
-        return $this->toBoolean($option);
     }
 
     /**

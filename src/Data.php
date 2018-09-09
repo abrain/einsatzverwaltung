@@ -55,12 +55,6 @@ class Data
         add_action('private_einsatz', array($this, 'onPublish'), 10, 2);
         add_action('publish_einsatz', array($this, 'onPublish'), 10, 2);
         add_action('trash_einsatz', array($this, 'onTrash'), 10, 2);
-        if ($this->options->isAutoIncidentNumbers()) {
-            add_action('updated_postmeta', array($this, 'adjustIncidentNumber'), 10, 4);
-            add_action('added_post_meta', array($this, 'adjustIncidentNumber'), 10, 4);
-        }
-        add_action('updated_option', array($this, 'maybeAutoIncidentNumbersChanged'), 10, 3);
-        add_action('updated_option', array($this, 'maybeIncidentNumberFormatChanged'), 10, 3);
     }
 
     /**
@@ -198,8 +192,8 @@ class Data
         }
 
         // Einsatznummer setzen, sofern sie nicht automatisch verwaltet wird
-        if (!$this->options->isAutoIncidentNumbers()) {
-            $this->setEinsatznummer(
+        if (!ReportNumberController::isAutoIncidentNumbers()) {
+            ReportNumberController::setEinsatznummer(
                 $postId,
                 filter_input(INPUT_POST, 'einsatzverwaltung_nummer', FILTER_SANITIZE_STRING)
             );
@@ -300,32 +294,6 @@ class Data
         }
     }
 
-    /**
-     * Sobald die laufende Nummer aktualisiert wird, muss die Einsatznummer neu generiert werden.
-     *
-     * @param int $metaId ID des postmeta-Eintrags
-     * @param int $objectId Post-ID
-     * @param string $metaKey Der Key des postmeta-Eintrags
-     * @param string $metaValue Der Wert des postmeta-Eintrags
-     */
-    public function adjustIncidentNumber($metaId, $objectId, $metaKey, $metaValue)
-    {
-        // Nur Änderungen an der laufenden Nummer sind interessant
-        if ('einsatz_seqNum' != $metaKey) {
-            return;
-        }
-
-        // Für den unwahrscheinlichen Fall, dass der Metakey bei anderen Beitragstypen verwendet wird, ist hier Schluss
-        $postType = get_post_type($objectId);
-        if ('einsatz' != $postType) {
-            return;
-        }
-
-        $date = date_create(get_post_field('post_date', $objectId));
-        $newIncidentNumber = $this->core->formatEinsatznummer(date_format($date, 'Y'), $metaValue);
-        $this->setEinsatznummer($objectId, $newIncidentNumber);
-    }
-
     public function pauseAutoSequenceNumbers()
     {
         $this->assignSequenceNumbers = false;
@@ -334,21 +302,6 @@ class Data
     public function resumeAutoSequenceNumbers()
     {
         $this->assignSequenceNumbers = true;
-    }
-
-    /**
-     * Ändert die Einsatznummer eines bestehenden Einsatzes
-     *
-     * @param int $postId ID des Einsatzberichts
-     * @param string $einsatznummer Einsatznummer
-     */
-    public function setEinsatznummer($postId, $einsatznummer)
-    {
-        if (empty($postId) || empty($einsatznummer)) {
-            return;
-        }
-
-        update_post_meta($postId, 'einsatz_incidentNumber', $einsatznummer);
     }
 
     /**
@@ -364,76 +317,5 @@ class Data
         }
 
         update_post_meta($postId, 'einsatz_seqNum', $seqNum);
-    }
-
-    /**
-     * Generiert für alle Einsatzberichte eine Einsatznummer gemäß dem aktuell konfigurierten Format.
-     */
-    public function updateAllIncidentNumbers()
-    {
-        $years = self::getJahreMitEinsatz();
-        foreach ($years as $year) {
-            $posts = self::getEinsatzberichte($year);
-            foreach ($posts as $post) {
-                $incidentReport = new IncidentReport($post);
-                $seqNum = $incidentReport->getSequentialNumber();
-                $newIncidentNumber = $this->core->formatEinsatznummer($year, $seqNum);
-                $this->setEinsatznummer($post->ID, $newIncidentNumber);
-            }
-        }
-    }
-
-    /**
-     * Prüft, ob die automatische Verwaltung der Einsatznummern aktiviert wurde, und deshalb alle Einsatznummern
-     * aktualisiert werden müssen
-     *
-     * @param string $option Name der Option
-     * @param string $oldValue Der alte Wert
-     * @param string $newValue Der neue Wert
-     */
-    public function maybeAutoIncidentNumbersChanged($option, $oldValue, $newValue)
-    {
-        // Wir sind nur an einer bestimmten Option interessiert
-        if ('einsatzverwaltung_incidentnumbers_auto' != $option) {
-            return;
-        }
-
-        // Nur Änderungen sind interessant
-        if ($newValue == $oldValue) {
-            return;
-        }
-
-        // Die automatische Verwaltung wurde aktiviert
-        if ($newValue == 1) {
-            $this->updateAllIncidentNumbers();
-        }
-    }
-
-    /**
-     * Prüft, ob sich das Format der Einsatznummern geändert hat, und deshalb alle Einsatznummern aktualisiert werden
-     * müssen
-     *
-     * @param string $option Name der Option
-     * @param string $oldValue Der alte Wert
-     * @param string $newValue Der neue Wert
-     */
-    public function maybeIncidentNumberFormatChanged($option, $oldValue, $newValue)
-    {
-        // Wir sind nur an bestimmten Optionen interessiert
-        if (!in_array($option, array('einsatzvw_einsatznummer_stellen', 'einsatzvw_einsatznummer_lfdvorne'))) {
-            return;
-        }
-
-        // Nur Änderungen sind interessant
-        if ($newValue == $oldValue) {
-            return;
-        }
-
-        // Nur neu formatieren, wenn die Einsatznummern automatisch verwaltet werden
-        if (get_option('einsatzverwaltung_incidentnumbers_auto') !== '1') {
-            return;
-        }
-
-        $this->updateAllIncidentNumbers();
     }
 }

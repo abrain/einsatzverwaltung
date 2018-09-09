@@ -8,7 +8,6 @@ use abrain\Einsatzverwaltung\Import\Sources\AbstractSource;
 use abrain\Einsatzverwaltung\Import\Sources\Csv;
 use abrain\Einsatzverwaltung\Import\Sources\WpEinsatz;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
-use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\Utilities;
 
 /**
@@ -46,11 +45,6 @@ class Tool
     private $utilities;
 
     /**
-     * @var Options
-     */
-    private $options;
-
-    /**
      * @var Data
      */
     private $data;
@@ -59,13 +53,11 @@ class Tool
      * Konstruktor
      *
      * @param Utilities $utilities
-     * @param Options $options
      * @param Data $data
      */
-    public function __construct($utilities, $options, $data)
+    public function __construct($utilities, $data)
     {
         $this->utilities = $utilities;
-        $this->options = $options;
         $this->data = $data;
 
         $this->loadSources();
@@ -118,7 +110,7 @@ class Tool
      */
     public function renderToolPage()
     {
-        $this->helper = new Helper($this->utilities, $this->options, $this->data);
+        $this->helper = new Helper($this->utilities, $this->data);
         $this->helper->metaFields = IncidentReport::getMetaFields();
         $this->helper->taxonomies = IncidentReport::getTerms();
         $this->helper->postFields = IncidentReport::getPostFields();

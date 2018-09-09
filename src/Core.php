@@ -199,44 +199,6 @@ class Core
     }
 
     /**
-     * Berechnet die nächste freie Einsatznummer für das gegebene Jahr
-     *
-     * @param string $jahr
-     * @param bool $minuseins Wird beim Speichern der zusätzlichen Einsatzdaten in einsatzverwaltung_save_postdata
-     * benötigt, da der Einsatzbericht bereits gespeichert wurde, aber bei der Zählung für die Einsatznummer
-     * ausgelassen werden soll
-     *
-     * @return string Nächste freie Einsatznummer im angegebenen Jahr
-     */
-    public function getNextEinsatznummer($jahr, $minuseins = false)
-    {
-        if (empty($jahr) || !is_numeric($jahr)) {
-            $jahr = date('Y');
-        }
-
-        return $this->formatEinsatznummer($jahr, $this->data->getNumberOfIncidentReports($jahr) + ($minuseins ? 0 : 1));
-    }
-
-    /**
-     * Formatiert die Einsatznummer
-     *
-     * @param string $jahr Jahreszahl
-     * @param int $nummer Laufende Nummer des Einsatzes im angegebenen Jahr
-     *
-     * @return string Formatierte Einsatznummer
-     */
-    public function formatEinsatznummer($jahr, $nummer)
-    {
-        $stellen = $this->options->getEinsatznummerStellen();
-        $lfdvorne = $this->options->isEinsatznummerLfdVorne();
-        if ($lfdvorne) {
-            return str_pad($nummer, $stellen, "0", STR_PAD_LEFT).$jahr;
-        } else {
-            return $jahr.str_pad($nummer, $stellen, "0", STR_PAD_LEFT);
-        }
-    }
-
-    /**
      * Gibt den Link zu einem bestimmten Jahresarchiv zurück, berücksichtigt dabei die Permalink-Einstellungen
      *
      * @param string $year

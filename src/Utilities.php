@@ -176,24 +176,6 @@ class Utilities
         }
     }
 
-
-    /**
-     * Stellt einen sinnvollen Wert für die Anzahl Stellen der laufenden Einsatznummer sicher
-     *
-     * @param mixed $input
-     *
-     * @return int
-     */
-    public static function sanitizeEinsatznummerStellen($input)
-    {
-        $val = intval($input);
-        if (is_numeric($val) && $val > 0) {
-            return $val;
-        } else {
-            return 3;
-        }
-    }
-
     /**
      * Stellt sicher, dass es sich um einen validen Farbwert im Hexformat handelt
      *

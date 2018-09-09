@@ -42,7 +42,7 @@ class Initializer
         add_action('admin_menu', array($mainPage, 'addToSettingsMenu'));
         add_action('admin_init', array($mainPage, 'registerSettings'));
 
-        $importTool = new ImportTool($utilities, $options, $data);
+        $importTool = new ImportTool($utilities, $data);
         add_action('admin_menu', array($importTool, 'addToolToMenu'));
 
         $exportTool = new ExportTool();

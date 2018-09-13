@@ -66,7 +66,7 @@ class Core
 
         $this->formatter = new Formatter($this->options); // TODO In Singleton umwandeln
 
-        $this->data = new Data($this, $this->utilities, $this->options);
+        $this->data = new Data($this->options);
         new Frontend($this->options, $this->formatter);
         new Shortcodes($this, $this->options, $this->formatter);
 

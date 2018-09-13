@@ -11,16 +11,6 @@ use wpdb;
 class Data
 {
     /**
-     * @var Core
-     */
-    private $core;
-
-    /**
-     * @var Utilities
-     */
-    private $utilities;
-
-    /**
      * @var Options
      */
     private $options;
@@ -36,14 +26,10 @@ class Data
     /**
      * Constructor
      *
-     * @param Core $core
-     * @param Utilities $utilities
      * @param Options $options
      */
-    public function __construct($core, $utilities, $options)
+    public function __construct($options)
     {
-        $this->core = $core;
-        $this->utilities = $utilities;
         $this->options = $options;
 
         $this->addHooks();

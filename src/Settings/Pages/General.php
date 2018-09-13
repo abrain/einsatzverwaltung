@@ -273,19 +273,7 @@ class General extends SubPage
         register_setting(
             'einsatzvw_settings_general',
             'einsatzvw_list_annotations_color_off',
-            array($this, 'sanitizeAnnotationOffColor') // NEEDS_WP4.6 das globale sanitize_hex_color() verwenden
+            'sanitize_hex_color'
         );
-    }
-
-    /**
-     * Stellt sicher, dass die Farbe für die inaktiven Vermerke gültig ist
-     *
-     * @param string $input Der zu prüfende Farbwert
-     *
-     * @return string Der übergebene Farbwert, wenn er gültig ist, ansonsten die Standardeinstellung
-     */
-    public function sanitizeAnnotationOffColor($input)
-    {
-        return Utilities::sanitizeHexColor($input, AnnotationIconBar::DEFAULT_COLOR_OFF);
     }
 }

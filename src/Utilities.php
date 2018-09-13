@@ -113,28 +113,4 @@ class Utilities
             return 0;
         }
     }
-
-    /**
-     * Stellt sicher, dass es sich um einen validen Farbwert im Hexformat handelt
-     *
-     * TODO NEEDS_WP4.6 das globale sanitize_hex_color() verwenden
-     *
-     * @param string $color Die Farbe, die überprüft werden soll
-     * @param string $default Standardwert, der bei einem Fehler zurückgegeben wird
-     *
-     * @return string Den übergebenen Farbwert, wenn er korrekt ist, ansonsten den Standardwert
-     */
-    public static function sanitizeHexColor($color, $default)
-    {
-        if (empty($color)) {
-            return $default;
-        }
-        
-        // Es muss ein Gartenzaun mit 3 oder 6 Hexziffern sein
-        if (preg_match('|^#([A-Fa-f0-9]{3}){1,2}$|', $color)) {
-            return $color;
-        }
-        
-        return $default;
-    }
 }

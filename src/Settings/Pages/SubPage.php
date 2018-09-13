@@ -57,10 +57,15 @@ abstract class SubPage
      */
     protected function echoColorPicker($optionName, $defaultValue)
     {
+        $value = get_option($optionName, $defaultValue);
+        $sanitizedValue = sanitize_hex_color($value);
+        if (empty($sanitizedValue)) {
+            $sanitizedValue = $defaultValue;
+        }
         printf(
             '<input type="text" name="%s" class="einsatzverwaltung-color-picker" value="%s" data-default-color="%s" />',
             esc_attr($optionName),
-            esc_attr(get_option($optionName, $defaultValue)),
+            esc_attr($sanitizedValue),
             esc_attr($defaultValue)
         );
     }

@@ -32,10 +32,12 @@ class Initializer
         add_filter('plugin_row_meta', array($this, 'pluginMetaLinks'), 10, 2);
         add_filter("plugin_action_links_{$pluginBasename}", array($this,'addActionLinks'));
 
-        $admin = new Admin();
-        add_action('add_meta_boxes_einsatz', array($admin, 'addMetaBoxes'));
-        add_filter('manage_edit-einsatz_columns', array($admin, 'filterColumnsEinsatz'));
-        add_action('manage_einsatz_posts_custom_column', array($admin, 'filterColumnContentEinsatz'), 10, 2);
+        $reportListTable = new ReportListTable();
+        add_filter('manage_edit-einsatz_columns', array($reportListTable, 'filterColumnsEinsatz'));
+        add_action('manage_einsatz_posts_custom_column', array($reportListTable, 'filterColumnContentEinsatz'), 10, 2);
+
+        $reportEditScreen = new ReportEditScreen();
+        add_action('add_meta_boxes_einsatz', array($reportEditScreen, 'addMetaBoxes'));
 
         // Register Settings
         $mainPage = new MainPage($options);

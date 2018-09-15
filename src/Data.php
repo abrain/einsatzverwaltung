@@ -65,26 +65,6 @@ class Data
     }
 
     /**
-     * Gibt die Namen aller bisher verwendeten Einsatzleiter zurück
-     *
-     * @return array
-     */
-    public static function getEinsatzleiterNamen()
-    {
-        /** @var wpdb $wpdb */
-        global $wpdb;
-
-        $names = array();
-        $query = "SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = 'einsatz_einsatzleiter' AND meta_value <> ''";
-        $results = $wpdb->get_results($query, OBJECT);
-
-        foreach ($results as $result) {
-            $names[] = $result->meta_value;
-        }
-        return $names;
-    }
-
-    /**
      * Gibt ein Array mit Jahreszahlen zurück, in denen Einsätze vorliegen
      */
     public static function getJahreMitEinsatz()

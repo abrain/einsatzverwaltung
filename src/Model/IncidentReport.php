@@ -333,14 +333,14 @@ class IncidentReport
      * Gibt die Einsatzart eines bestimmten Einsatzes zurück. Auch wenn die Taxonomie 'einsatzart' mehrere Werte
      * speichern kann, wird nur der erste zurückgegeben.
      *
-     * @return WP_Term|false
+     * @return WP_Term
      */
     public function getTypeOfIncident()
     {
         $terms = $this->getTheTerms('einsatzart');
 
         if (empty($terms)) {
-            return false;
+            return null;
         }
 
         $keys = array_keys($terms);

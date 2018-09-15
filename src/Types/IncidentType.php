@@ -49,7 +49,7 @@ class IncidentType implements CustomType
             ),
             'public' => true,
             'show_in_nav_menus' => false,
-            'meta_box_cb' => array('abrain\Einsatzverwaltung\Admin\Admin', 'displayMetaBoxEinsatzart'),
+            'meta_box_cb' => array('abrain\Einsatzverwaltung\Admin\ReportEditScreen', 'displayMetaBoxEinsatzart'),
             'capabilities' => array(
                 'manage_terms' => 'edit_einsatzberichte',
                 'edit_terms' => 'edit_einsatzberichte',

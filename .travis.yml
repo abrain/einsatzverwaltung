@@ -27,8 +27,8 @@ jobs:
   - stage: validate
     name: "Basic Checks"
     php: 7.2
-    before_install: composer require bartlett/php-compatinfo:5.* --dev --no-update
-    script: phpunit -c phpunit-checks.xml --no-coverage
+    before_install: composer remove codeclimate/php-test-reporter --dev --no-update
+    script: ./vendor/bin/phpunit -c phpunit-checks.xml --no-coverage
 
 matrix:
   allow_failures:

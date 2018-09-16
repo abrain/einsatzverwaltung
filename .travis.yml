@@ -5,6 +5,10 @@ notifications:
     on_success: never
     on_failure: always
 
+branches:
+  except:
+  - /^feature\/[-\w]+$/
+
 php:
   - '5.6'
   - '7.0'

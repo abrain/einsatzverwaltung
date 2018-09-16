@@ -39,7 +39,7 @@ jobs:
     script: ./vendor/bin/phpunit -c phpunit-checks.xml --no-coverage
   - stage: validate
     name: 'Minimum requirement'
-    env: WP_VERSION=4.6.0 WP_MULTISITE=0
+    env: WP_VERSION=4.6 WP_MULTISITE=0
     php: '5.3'
     dist: precise
     before_install:

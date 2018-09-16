@@ -50,8 +50,7 @@ jobs:
 
 matrix:
   include:
-    - name: "WordPress nightly"
-      env: WP_VERSION=nightly WP_MULTISITE=0
+    - env: WP_VERSION=nightly WP_MULTISITE=0
       php: '7.2'
   allow_failures:
     - env: WP_VERSION=nightly WP_MULTISITE=0

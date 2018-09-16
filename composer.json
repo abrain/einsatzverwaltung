@@ -20,7 +20,5 @@
     "docs": "https://einsatzverwaltung.abrain.de/dokumentation/"
   },
   "require-dev": {
-    "codeclimate/php-test-reporter": "dev-master",
-    "phpunit/phpunit": "5.7.*"
   }
 }

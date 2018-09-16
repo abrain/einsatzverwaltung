@@ -27,7 +27,9 @@ jobs:
   - stage: validate
     name: "Basic Checks"
     php: 7.2
-    install: composer require bartlett/php-compatinfo
+    install:
+    - composer install --prefer-source
+    - composer require bartlett/php-compatinfo
     script: phpunit -c phpunit-checks.xml --no-coverage
 
 matrix:

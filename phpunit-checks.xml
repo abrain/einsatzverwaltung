@@ -1,0 +1,13 @@
+<phpunit
+    backupGlobals="false"
+    colors="true"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+    >
+    <testsuites>
+        <testsuite>
+            <file>tests/FileCheck.php</file>
+        </testsuite>
+    </testsuites>
+</phpunit>

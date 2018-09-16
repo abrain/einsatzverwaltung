@@ -3,7 +3,7 @@
   "description": "Wordpress-Plugin zur Verwaltung und Darstellung von Einsatzberichten der Feuerwehr und anderer Hilfsorganisationen",
   "homepage": "https://einsatzverwaltung.abrain.de",
   "type": "wordpress-plugin",
-  "license": "GPL-2.0+",
+  "license": "GPL-2.0-or-later",
   "authors": [
     {
       "name": "Andreas Brain",

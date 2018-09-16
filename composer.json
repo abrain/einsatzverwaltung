@@ -21,7 +21,6 @@
   },
   "require-dev": {
     "codeclimate/php-test-reporter": "dev-master",
-    "phpunit/phpunit": "5.7.*",
-    "bartlett/php-compatinfo": "5.*"
+    "phpunit/phpunit": "5.7.*"
   }
 }

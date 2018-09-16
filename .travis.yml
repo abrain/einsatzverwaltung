@@ -38,7 +38,7 @@ jobs:
   - stage: validate
     name: 'Minimum requirement'
     env: WP_VERSION=4.6.0 WP_MULTISITE=0
-    php: '5.3.3'
+    php: '5.3.10'
     dist: precise
     before_install: composer require phpunit/phpunit:4.8.* --dev
   - stage: validate

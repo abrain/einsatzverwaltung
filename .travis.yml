@@ -36,6 +36,12 @@ jobs:
     before_script: skip
     script: ./vendor/bin/phpunit -c phpunit-checks.xml --no-coverage
   - stage: validate
+    name: 'Minimum requirement'
+    env: WP_VERSION=4.6.0 WP_MULTISITE=0
+    php: '5.3.3'
+    dist: precise
+    before_install: composer require phpunit/phpunit:4.8.* --dev
+  - stage: validate
     name: 'Latest versions'
     env: WP_VERSION=4.9.8 WP_MULTISITE=0
     php: '7.2'

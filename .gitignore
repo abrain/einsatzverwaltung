@@ -2,5 +2,4 @@
 build
 setupLocalTest.sh
 vendor
-composer.lock
 .DS_Store

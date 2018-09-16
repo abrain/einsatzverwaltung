@@ -17,11 +17,6 @@ class Shortcodes
     private $core;
 
     /**
-     * @var Options
-     */
-    private $options;
-
-    /**
      * @var Formatter
      */
     private $formatter;
@@ -30,14 +25,12 @@ class Shortcodes
      * Constructor
      *
      * @param Core $core
-     * @param Options $options
      * @param Formatter $formatter
      */
-    public function __construct($core, $options, $formatter)
+    public function __construct($core, $formatter)
     {
         $this->addHooks();
         $this->core = $core;
-        $this->options = $options;
         $this->formatter = $formatter;
     }
 
@@ -93,7 +86,7 @@ class Shortcodes
 
         $reports = $reportQuery->getReports();
 
-        $reportList = new ReportList($this->options, $this->formatter);
+        $reportList = new ReportList($this->formatter);
         $parameters = new ReportListParameters();
         $parameters->setSplitMonths($shortcodeParams['monatetrennen'] == 'ja');
         $parameters->setColumnsLinkingReport($columnsWithLink);

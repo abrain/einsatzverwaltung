@@ -2,7 +2,6 @@
 namespace abrain\Einsatzverwaltung\Frontend;
 
 use abrain\Einsatzverwaltung\Model\IncidentReport;
-use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use abrain\Einsatzverwaltung\Utilities;
 use DateTime;
@@ -31,11 +30,6 @@ class ReportList
     private $formatter;
 
     /**
-     * @var Options
-     */
-    private $options;
-
-    /**
      * @var ReportListSettings
      */
     private static $settings;
@@ -50,12 +44,10 @@ class ReportList
     /**
      * ReportList constructor.
      *
-     * @param Options $options
      * @param Formatter $formatter
      */
-    public function __construct($options, $formatter)
+    public function __construct($formatter)
     {
-        $this->options = $options;
         $this->formatter = $formatter;
     }
 
@@ -295,7 +287,7 @@ class ReportList
                 $cellContent = $this->formatter->getAdditionalForces($report, $parameters->linkAdditionalForces, false);
                 break;
             case 'incidentType':
-                $showHierarchy = $this->options->getBoolOption('einsatzvw_list_art_hierarchy');
+                $showHierarchy = (get_option('einsatzvw_list_art_hierarchy', '0') === '1');
                 $cellContent = $this->formatter->getTypeOfIncident($report, false, false, $showHierarchy);
                 break;
             case 'seqNum':

@@ -27,9 +27,7 @@ jobs:
   - stage: validate
     name: "Basic Checks"
     php: 7.2
-    install:
-    - composer install --prefer-source
-    - composer install bartlett/php-compatinfo
+    before_install: composer require bartlett/php-compatinfo:5.* --dev --no-update
     script: phpunit -c phpunit-checks.xml --no-coverage
 
 matrix:
@@ -37,9 +35,8 @@ matrix:
     - env: WP_VERSION=nightly WP_MULTISITE=0
   fast_finish: true
 
-install:
-  - bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
-  - composer install --prefer-source
+before_install: bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
+install: composer install --prefer-source
 
 after_script:
   - CODECLIMATE_REPO_TOKEN=c0e18ea554a37a7495947a34c818939c0599bde7c1efa3ee136989c053dde9da ./vendor/bin/test-reporter

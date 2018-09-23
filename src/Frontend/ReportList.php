@@ -60,7 +60,10 @@ class ReportList
     private function constructList($reports, ReportListParameters $parameters)
     {
         if (empty($reports)) {
-            $this->string = '<span>F&uuml;r den gew&auml;hlten Zeitraum stehen keine Einsatzberichte zur Verf&uuml;gung</span>';
+            $this->string = sprintf(
+                '<span>%s</span>',
+                esc_html('F&uuml;r den gew&auml;hlten Zeitraum stehen keine Einsatzberichte zur Verf&uuml;gung')
+            );
             return;
         }
 
@@ -180,7 +183,7 @@ class ReportList
 
             $colInfo = $allColumns[$colId];
             $style = Utilities::getArrayValueIfKey($colInfo, 'nowrap', false) ? 'white-space: nowrap;' : '';
-            $this->string .= '<th' . (empty($style) ? '' : ' style="' . $style . '"') . '>' . $colInfo['name'] . '</th>';
+            $this->string .= sprintf('<th style="%s">%s</th>', esc_attr($style), esc_html($colInfo['name']));
         }
         $this->string .= '</tr>';
     }
@@ -203,21 +206,49 @@ class ReportList
     {
         $this->string .= '<tr class="report">';
         foreach ($parameters->getColumns() as $colId) {
-            $this->string .= '<td class="einsatz-column-' . $colId . '">';
-            $linkToReport = $parameters->linkEmptyReports || $report->hasContent();
-            $columnsLinkingReport = $parameters->getColumnsLinkingReport();
-            $linkThisColumn = $linkToReport && !empty($columnsLinkingReport) &&
-                in_array($colId, $columnsLinkingReport) && !in_array($colId, $this->columnsLinkBlacklist);
-            if ($linkThisColumn) {
-                $this->string .= '<a href="' . get_permalink($report->getPostId()) . '" rel="bookmark">';
-            }
-            $this->string .= $this->getCellContent($report, $colId, $parameters);
-            if ($linkThisColumn) {
-                $this->string .= '</a>';
-            }
-            $this->string .= '</td>';
+            $this->string .= $this->getCellMarkup($report, $parameters, $colId);
         }
         $this->string .= '</tr>';
+    }
+
+    /**
+     * @param IncidentReport $report
+     * @param ReportListParameters $parameters
+     * @param string $columnId
+     *
+     * @return string
+     */
+    private function getCellMarkup(IncidentReport $report, ReportListParameters $parameters, $columnId)
+    {
+        $cellContent = $this->getCellContent($report, $columnId, $parameters);
+
+        if ($this->isCellLinkToReport($report, $columnId, $parameters)) {
+            $cellContent = sprintf(
+                '<a href="%s" rel="bookmark">%s</a>',
+                esc_url(get_permalink($report->getPostId())),
+                $cellContent
+            );
+        }
+
+        return sprintf('<td class="einsatz-column-%s">%s</td>', $columnId, $cellContent);
+    }
+
+    /**
+     * Determines if a certain table cell should contain a link to the report
+     *
+     * @param IncidentReport $report
+     * @param string $columnId
+     * @param ReportListParameters $parameters
+     *
+     * @return bool
+     */
+    private function isCellLinkToReport(IncidentReport $report, $columnId, ReportListParameters $parameters)
+    {
+        $linkToReport = $parameters->linkEmptyReports || $report->hasContent();
+        $columnsLinkingReport = $parameters->getColumnsLinkingReport();
+        $userWantsLink = !empty($columnsLinkingReport) && in_array($columnId, $columnsLinkingReport);
+
+        return $linkToReport && $userWantsLink && !in_array($columnId, $this->columnsLinkBlacklist);
     }
 
     /**
@@ -398,15 +429,23 @@ class ReportList
 
         // Sollen Zebrastreifen angezeigt werden?
         if (self::$settings->isZebraTable()) {
-            $string .= '.einsatzverwaltung-reportlist tr.report:nth-child(' . self::$settings->getZebraNthChildArg() . ') {';
-            $string .= 'background-color: ' . self::$settings->getZebraColor() . '; }';
+            $string .= sprintf(
+                '.%s tr.report:nth-child(%s) { background-color: %s; }',
+                self::TABLECLASS,
+                self::$settings->getZebraNthChildArg(),
+                self::$settings->getZebraColor()
+            );
         }
 
         // Bei der responsiven Ansicht die selben Begriffe voranstellen wie im Tabellenkopf
         $string .= '@media (max-width: 767px) {';
         foreach (self::getListColumns() as $colId => $colInfo) {
-            $string .= "." . self::TABLECLASS . " td.einsatz-column-$colId:before ";
-            $string .= '{content: "' . (array_key_exists('cssname', $colInfo) ? $colInfo['cssname'] : $colInfo['name']) . ':";}';
+            $string .= sprintf(
+                '.%s td.einsatz-column-%s:before {content: "%s:";}',
+                self::TABLECLASS,
+                $colId,
+                (array_key_exists('cssname', $colInfo) ? $colInfo['cssname'] : $colInfo['name'])
+            ).PHP_EOL;
         }
         $string .= '}';
 

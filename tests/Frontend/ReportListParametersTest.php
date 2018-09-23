@@ -1,11 +1,13 @@
 <?php
 namespace abrain\Einsatzverwaltung\Frontend;
 
+use WP_UnitTestCase;
+
 /**
  * Class ReportListParametersTest
  * @package abrain\Einsatzverwaltung\Frontend
  */
-class ReportListParametersTest extends \PHPUnit_Framework_TestCase
+class ReportListParametersTest extends WP_UnitTestCase
 {
     public function testSanitizeColumns()
     {

@@ -144,10 +144,6 @@ class ReportListParameters
         $inputArray = explode(',', $input);
         $validColumnIds = self::sanitizeColumnsArray($inputArray);
 
-        if (empty($validColumnIds)) {
-            return self::DEFAULT_COLUMNS;
-        }
-
         return implode(',', $validColumnIds);
     }
 

@@ -91,7 +91,14 @@ class Update
         /** @var wpdb $wpdb */
         global $wpdb;
 
-        foreach (Data::getEinsatzberichte('') as $bericht) {
+        $allReports = get_posts(array(
+            'nopaging' => true,
+            'orderby' => 'post_date',
+            'order' => 'ASC',
+            'post_type' => 'einsatz',
+            'post_status' => array('publish', 'private')
+        ));
+        foreach ($allReports as $bericht) {
             $gmtdate = get_gmt_from_date($bericht->post_date);
             $result = $wpdb->update(
                 $wpdb->posts,

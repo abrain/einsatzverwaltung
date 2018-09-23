@@ -3,7 +3,6 @@ namespace abrain\Einsatzverwaltung;
 
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use WP_Query;
-use wpdb;
 
 /**
  * Stellt Methoden zur Datenabfrage und Datenmanipulation bereit
@@ -77,30 +76,6 @@ class Data
             $jahre[date("Y", $timestamp)] = 1;
         }
         return array_keys($jahre);
-    }
-
-    /**
-     * Gibt die Anzahl der veröffentlichten Einsatzberichte zurück
-     *
-     * @param int|null $year Das Jahr für das die Anfrage gestellt werden soll. Wird dieser Parameter weggelassen,
-     * werden alle Jahre berücksichtigt.
-     *
-     * @return int Die Anzahl der veröffentlichten Einsatzberichte
-     */
-    public function getNumberOfIncidentReports($year = null)
-    {
-        $args = array(
-            'post_type' => 'einsatz',
-            'post_status' => array('publish', 'private'),
-            'nopaging' => true
-        );
-
-        if (!empty($year) && is_numeric($year)) {
-            $args['year'] = $year;
-        }
-
-        $query = new WP_Query($args);
-        return $query->found_posts;
     }
 
     /**

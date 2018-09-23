@@ -12,6 +12,8 @@ class DataTest extends WP_UnitTestCase
 {
     public function testGetJahreMitEinsatz()
     {
+        $this->assertEquals(array(), Data::getJahreMitEinsatz());
+
         $reportFactory = new ReportFactory();
         $reportFactory->generateManyForYear('2014', 2);
         $reportFactory->generateManyForYear('2015', 2);

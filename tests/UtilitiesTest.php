@@ -8,7 +8,7 @@ use WP_UnitTestCase;
  * Tests für diverse Hilfsfunktionen
  *
  * @author Andreas Brain
- * @coversDefaultClass abrain\Einsatzverwaltung\Utilities
+ * @coversDefaultClass \abrain\Einsatzverwaltung\Utilities
  */
 class UtilitiesTest extends WP_UnitTestCase
 {
@@ -24,27 +24,6 @@ class UtilitiesTest extends WP_UnitTestCase
     {
         parent::setUp();
         $this->utilities = new Utilities(null);
-    }
-
-    /**
-     * @covers ::addPostToCategory
-     */
-    public function testAddPostToCategory()
-    {
-        // Einsatzbericht anlegen und mehreren Kategorien zuweisen
-        $postId = $this->factory->post->create(array('post_type' => 'einsatz'));
-        $categoryIds = $this->factory->category->create_many(4);
-        $initialCategories = array_slice($categoryIds, 0, 2);
-        wp_set_post_categories($postId, $initialCategories);
-        $this->assertEquals($initialCategories, wp_get_post_categories($postId));
-
-        // Kategorie hinzufügen und prüfen, ob die Aktion erfolgreich war
-        Utilities::addPostToCategory($postId, $categoryIds[2]);
-        $this->assertEquals(array_slice($categoryIds, 0, 3), wp_get_post_categories($postId));
-
-        // Kategorie hinzufügen und prüfen, ob die Aktion erfolgreich war
-        Utilities::addPostToCategory($postId, $categoryIds[3]);
-        $this->assertEquals($categoryIds, wp_get_post_categories($postId));
     }
 
     /**

@@ -55,9 +55,9 @@ class Csv extends AbstractSource
      */
     public function checkPreconditions()
     {
-        $this->fileHasHeadlines = (bool) $this->utilities->getArrayValueIfKey($this->args, 'has_headlines', false);
+        $this->fileHasHeadlines = (bool) Utilities::getArrayValueIfKey($this->args, 'has_headlines', false);
 
-        $delimiter = $this->utilities->getArrayValueIfKey($this->args, 'delimiter', false);
+        $delimiter = Utilities::getArrayValueIfKey($this->args, 'delimiter', false);
         if (in_array($delimiter, array(';', ','))) {
             $this->delimiter = $delimiter;
         }

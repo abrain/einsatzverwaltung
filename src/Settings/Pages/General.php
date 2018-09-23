@@ -98,18 +98,30 @@ class General extends SubPage
      */
     public function echoFieldPermalinks()
     {
+        global $wp_rewrite;
         echo '<fieldset>';
         $this->echoSettingsInput(
             'einsatzvw_rewrite_slug',
-            sprintf(
-                'Basis f&uuml;r Links zu Einsatzberichten, zum %1$sArchiv%2$s und zum %3$sFeed%2$s.',
-                '<a href="' . get_post_type_archive_link('einsatz') . '">',
-                '</a>',
-                '<a href="' . get_post_type_archive_feed_link('einsatz') . '">'
-            ),
             sanitize_title(get_option('einsatzvw_rewrite_slug'), 'einsatzberichte')
         );
-        echo '</fieldset>';
+        echo '<p class="description">';
+        printf(
+            'Basis f&uuml;r Links zu Einsatzberichten, zum %s und zum %s.',
+            sprintf('<a href="%s">%s</a>', get_post_type_archive_link('einsatz'), 'Archiv'),
+            sprintf('<a href="%s">%s</a>', get_post_type_archive_feed_link('einsatz'), 'Feed')
+        );
+        if ($wp_rewrite->using_permalinks() === false) {
+            echo '</p><p class="description">';
+            printf(
+                __('Note: This setting has no effect, as WordPress currently uses plain %s', 'einsatzverwaltung'),
+                sprintf(
+                    '<a href="%s">%s</a>',
+                    admin_url('options-permalink.php'),
+                    __('permalinks', 'einsatzverwaltung')
+                )
+            );
+        }
+        echo '</p></fieldset>';
     }
 
     public function echoFieldAnnotations()
@@ -175,7 +187,7 @@ class General extends SubPage
             /** @var IncidentReport $report */
             foreach ($reports as $report) {
                 if (!$onlySpecialInCategory || $report->isSpecial()) {
-                    Utilities::addPostToCategory($report->getPostId(), $newValue);
+                    $report->addToCategory($newValue);
                 }
             }
         }
@@ -216,7 +228,7 @@ class General extends SubPage
         if ($newValue == 0) {
             /** @var IncidentReport $report */
             foreach ($reports as $report) {
-                Utilities::addPostToCategory($report->getPostId(), $categoryId);
+                $report->addToCategory($categoryId);
             }
         }
 
@@ -226,7 +238,7 @@ class General extends SubPage
             /** @var IncidentReport $report */
             foreach ($reports as $report) {
                 if ($report->isSpecial()) {
-                    Utilities::addPostToCategory($report->getPostId(), $categoryId);
+                    $report->addToCategory($categoryId);
                 } else {
                     Utilities::removePostFromCategory($report->getPostId(), $categoryId);
                 }
@@ -261,19 +273,7 @@ class General extends SubPage
         register_setting(
             'einsatzvw_settings_general',
             'einsatzvw_list_annotations_color_off',
-            array($this, 'sanitizeAnnotationOffColor') // NEEDS_WP4.6 das globale sanitize_hex_color() verwenden
+            'sanitize_hex_color'
         );
-    }
-
-    /**
-     * Stellt sicher, dass die Farbe für die inaktiven Vermerke gültig ist
-     *
-     * @param string $input Der zu prüfende Farbwert
-     *
-     * @return string Der übergebene Farbwert, wenn er gültig ist, ansonsten die Standardeinstellung
-     */
-    public function sanitizeAnnotationOffColor($input)
-    {
-        return Utilities::sanitizeHexColor($input, AnnotationIconBar::DEFAULT_COLOR_OFF);
     }
 }

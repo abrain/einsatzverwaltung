@@ -1,5 +1,8 @@
 <?php
-namespace abrain\Einsatzverwaltung;
+namespace abrain\Einsatzverwaltung\Admin;
+
+use abrain\Einsatzverwaltung\Data;
+use abrain\Einsatzverwaltung\Utilities;
 
 /**
  * Für diverse Aufgaben, die anfallen können und sonst keine eigene Seite haben
@@ -28,9 +31,6 @@ class TasksPage
     {
         $this->utilities = $utilities;
         $this->data = $data;
-
-        add_action('admin_menu', array($this, 'registerPage'));
-        add_action('admin_menu', array($this, 'hidePage'), 999);
     }
 
     public function registerPage()

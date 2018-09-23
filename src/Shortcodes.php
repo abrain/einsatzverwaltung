@@ -2,6 +2,7 @@
 namespace abrain\Einsatzverwaltung;
 
 use abrain\Einsatzverwaltung\Frontend\ReportList;
+use abrain\Einsatzverwaltung\Frontend\ReportListParameters;
 use abrain\Einsatzverwaltung\Util\Formatter;
 
 /**
@@ -9,20 +10,11 @@ use abrain\Einsatzverwaltung\Util\Formatter;
  */
 class Shortcodes
 {
-    /**
-     * @var Utilities
-     */
-    private $utilities;
 
     /**
      * @var Core
      */
     private $core;
-
-    /**
-     * @var Options
-     */
-    private $options;
 
     /**
      * @var Formatter
@@ -32,17 +24,13 @@ class Shortcodes
     /**
      * Constructor
      *
-     * @param Utilities $utilities
      * @param Core $core
-     * @param Options $options
      * @param Formatter $formatter
      */
-    public function __construct($utilities, $core, $options, $formatter)
+    public function __construct($core, $formatter)
     {
         $this->addHooks();
-        $this->utilities = $utilities;
         $this->core = $core;
-        $this->options = $options;
         $this->formatter = $formatter;
     }
 
@@ -79,16 +67,9 @@ class Shortcodes
         $possibleOptions = array('special', 'noLinkWithoutContent', 'noHeading', 'compact');
         $filteredOptions = array_intersect($possibleOptions, $rawOptions);
         $showOnlySpecialReports = in_array('special', $filteredOptions);
-        $linkEmptyReports = !in_array('noLinkWithoutContent', $filteredOptions);
-        $showHeading = !in_array('noHeading', $filteredOptions);
-        $compact = in_array('compact', $filteredOptions);
-
         $columnsWithLink = explode(',', $shortcodeParams['link']);
         if (in_array('none', $columnsWithLink)) {
-            $columnsWithLink = false;
-        }
-        if ($columnsWithLink !== false) {
-            $columnsWithLink = ReportList::sanitizeColumnsArray($columnsWithLink);
+            $columnsWithLink = array();
         }
 
         // Berichte abfragen
@@ -105,18 +86,15 @@ class Shortcodes
 
         $reports = $reportQuery->getReports();
 
-        $reportList = new ReportList($this->utilities, $this->core, $this->options, $this->formatter);
-        return $reportList->getList(
-            $reports,
-            array(
-                'splitMonths' => ($shortcodeParams['monatetrennen'] == 'ja'),
-                'columns' => $this->options->getEinsatzlisteEnabledColumns(),
-                'columnsWithLink' => $columnsWithLink,
-                'linkEmptyReports' => $linkEmptyReports,
-                'showHeading' => $showHeading,
-                'compact' => $compact,
-            )
-        );
+        $reportList = new ReportList($this->formatter);
+        $parameters = new ReportListParameters();
+        $parameters->setSplitMonths($shortcodeParams['monatetrennen'] == 'ja');
+        $parameters->setColumnsLinkingReport($columnsWithLink);
+        $parameters->linkEmptyReports = (!in_array('noLinkWithoutContent', $filteredOptions));
+        $parameters->showHeading = (!in_array('noHeading', $filteredOptions));
+        $parameters->compact = in_array('compact', $filteredOptions);
+
+        return $reportList->getList($reports, $parameters);
     }
 
     /**

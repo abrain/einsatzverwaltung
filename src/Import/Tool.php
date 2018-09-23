@@ -8,7 +8,6 @@ use abrain\Einsatzverwaltung\Import\Sources\AbstractSource;
 use abrain\Einsatzverwaltung\Import\Sources\Csv;
 use abrain\Einsatzverwaltung\Import\Sources\WpEinsatz;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
-use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\Utilities;
 
 /**
@@ -46,11 +45,6 @@ class Tool
     private $utilities;
 
     /**
-     * @var Options
-     */
-    private $options;
-
-    /**
      * @var Data
      */
     private $data;
@@ -59,16 +53,12 @@ class Tool
      * Konstruktor
      *
      * @param Utilities $utilities
-     * @param Options $options
      * @param Data $data
      */
-    public function __construct($utilities, $options, $data)
+    public function __construct($utilities, $data)
     {
         $this->utilities = $utilities;
-        $this->options = $options;
         $this->data = $data;
-
-        add_action('admin_menu', array($this, 'addToolToMenu'));
 
         $this->loadSources();
     }
@@ -108,12 +98,9 @@ class Tool
 
     private function loadSources()
     {
-        require_once dirname(__FILE__) . '/Sources/AbstractSource.php';
-        require_once dirname(__FILE__) . '/Sources/WpEinsatz.php';
         $wpEinsatz = new WpEinsatz($this->utilities);
         $this->sources[$wpEinsatz->getIdentifier()] = $wpEinsatz;
 
-        require_once dirname(__FILE__) . '/Sources/Csv.php';
         $csv = new Csv($this->utilities);
         $this->sources[$csv->getIdentifier()] = $csv;
     }
@@ -123,8 +110,7 @@ class Tool
      */
     public function renderToolPage()
     {
-        require_once dirname(__FILE__) . '/Helper.php';
-        $this->helper = new Helper($this->utilities, $this->options, $this->data);
+        $this->helper = new Helper($this->utilities, $this->data);
         $this->helper->metaFields = IncidentReport::getMetaFields();
         $this->helper->taxonomies = IncidentReport::getTerms();
         $this->helper->postFields = IncidentReport::getPostFields();
@@ -332,14 +318,10 @@ class Tool
             return;
         }
 
-        require_once dirname(dirname(__FILE__)) . '/Exceptions/ImportException.php';
-        require_once dirname(dirname(__FILE__)) . '/Exceptions/ImportPreparationException.php';
-        require_once dirname(__FILE__) . '/ImportStatus.php';
-
         // Import starten
         echo '<p>Die Daten werden eingelesen, das kann einen Moment dauern.</p>';
+        $importStatus = new ImportStatus(0);
         try {
-            $importStatus = new ImportStatus(0);
             $this->helper->import($this->currentSource, $mapping, $importStatus);
         } catch (ImportException $e) {
             $importStatus->abort('Import abgebrochen, Ursache: ' . $e->getMessage());

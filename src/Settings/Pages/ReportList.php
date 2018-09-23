@@ -2,8 +2,8 @@
 
 namespace abrain\Einsatzverwaltung\Settings\Pages;
 
+use abrain\Einsatzverwaltung\Frontend\ReportListParameters;
 use abrain\Einsatzverwaltung\Frontend\ReportListSettings;
-use abrain\Einsatzverwaltung\Utilities;
 
 /**
  * ReportList settings page
@@ -61,13 +61,11 @@ class ReportList extends SubPage
         );
     }
 
-    /**
-     *
-     */
     public function echoFieldColumns()
     {
         $columns = \abrain\Einsatzverwaltung\Frontend\ReportList::getListColumns();
-        $enabledColumns = self::$options->getEinsatzlisteEnabledColumns();
+        $enabledColumnsString = ReportListParameters::sanitizeColumns(get_option('einsatzvw_list_columns', ''));
+        $enabledColumns = explode(',', $enabledColumnsString);
 
         echo '<table id="columns-available"><tr><td style="width: 250px;">';
         echo '<span class="evw-area-title">Verf&uuml;gbare Spalten</span>';
@@ -96,7 +94,10 @@ class ReportList extends SubPage
             echo '<li id="' . $colId . '" class="evw-column"><span>' . $name . '</span></li>';
         }
         echo '</ul></td></tr></table>';
-        echo '<input name="einsatzvw_list_columns" id="einsatzvw_list_columns" type="hidden" value="' . implode(',', $enabledColumns) . '">';
+        printf(
+            '<input name="einsatzvw_list_columns" id="einsatzvw_list_columns" type="hidden" value="%s">',
+            esc_attr($enabledColumnsString)
+        );
     }
 
     public function echoFieldColumnSettings()
@@ -104,17 +105,17 @@ class ReportList extends SubPage
         echo '<fieldset>';
         $this->echoSettingsCheckbox(
             'einsatzvw_list_art_hierarchy',
-            '<strong>Einsatzart</strong>: Hierarchie der Einsatzart anzeigen'
+            'Einsatzart: Hierarchie der Einsatzart anzeigen'
         );
         echo '<br/>';
         $this->echoSettingsCheckbox(
             'einsatzvw_list_fahrzeuge_link',
-            '<strong>Fahrzeuge</strong>: Links zu den Fahrzeugseiten anzeigen, sofern verf&uuml;gbar'
+            'Fahrzeuge: Links zu den Fahrzeugseiten anzeigen, sofern verf&uuml;gbar'
         );
         echo '<br/>';
         $this->echoSettingsCheckbox(
             'einsatzvw_list_ext_link',
-            '<strong>Weitere Kr&auml;fte</strong>: Links anzeigen, sofern verf&uuml;gbar'
+            'Weitere Kr&auml;fte: Links anzeigen, sofern verf&uuml;gbar'
         );
         echo '</fieldset>';
     }
@@ -133,9 +134,10 @@ class ReportList extends SubPage
         echo '<p class="description">Diese Farbe wird f&uuml;r jede zweite Zeile verwendet, die jeweils andere Zeile beh&auml;lt die vom Theme vorgegebene Farbe.</p>';
 
         echo '<p><fieldset><label><input type="radio" name="einsatzvw_list_zebra_nth" value="even" ';
-        checked($this->reportListSettings->getZebraNthChildArg(), 'even');
+        $zebraNthChildArg = $this->reportListSettings->getZebraNthChildArg();
+        checked($zebraNthChildArg, 'even');
         echo '>Gerade Zeilen einf&auml;rben</label> <label><input type="radio" name="einsatzvw_list_zebra_nth" value="odd" ';
-        checked($this->reportListSettings->getZebraNthChildArg(), 'odd');
+        checked($zebraNthChildArg, 'odd');
         echo '>Ungerade Zeilen einf&auml;rben</label></fieldset></p>';
         echo '</fieldset>';
     }
@@ -145,7 +147,7 @@ class ReportList extends SubPage
         register_setting(
             'einsatzvw_settings_list',
             'einsatzvw_list_columns',
-            array('\abrain\Einsatzverwaltung\Frontend\ReportList', 'sanitizeColumns')
+            array('\abrain\Einsatzverwaltung\Frontend\ReportListParameters', 'sanitizeColumns')
         );
         register_setting(
             'einsatzvw_settings_list',
@@ -170,24 +172,12 @@ class ReportList extends SubPage
         register_setting(
             'einsatzvw_settings_list',
             'einsatzvw_list_zebracolor',
-            array($this, 'sanitizeZebraColor') // NEEDS_WP4.6 das globale sanitize_hex_color() verwenden
+            'sanitize_hex_color'
         );
         register_setting(
             'einsatzvw_settings_list',
             'einsatzvw_list_zebra_nth',
             array($this->reportListSettings, 'sanitizeZebraNthChildArg')
         );
-    }
-
-    /**
-     * Stellt sicher, dass die Farbe für die Zebrastreifen gültig ist
-     *
-     * @param string $input Der zu prüfende Farbwert
-     *
-     * @return string Der übergebene Farbwert, wenn er gültig ist, ansonsten die Standardeinstellung
-     */
-    public function sanitizeZebraColor($input)
-    {
-        return Utilities::sanitizeHexColor($input, ReportListSettings::DEFAULT_ZEBRACOLOR);
     }
 }

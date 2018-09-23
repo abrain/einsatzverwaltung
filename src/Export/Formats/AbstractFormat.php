@@ -1,7 +1,6 @@
 <?php
 namespace abrain\Einsatzverwaltung\Export\Formats;
 
-use abrain\Einsatzverwaltung\Data;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Util\Formatter;
 
@@ -95,7 +94,7 @@ abstract class AbstractFormat implements Format
     {
         $report = new IncidentReport($post);
 
-        $duration = Data::getDauer($report);
+        $duration = $report->getDuration();
         // $duration soll stets eine Zahl sein
         if (empty($duration)) {
             $duration = 0;

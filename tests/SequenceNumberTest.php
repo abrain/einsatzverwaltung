@@ -1,7 +1,6 @@
 <?php
-namespace abrain\Einsatzverwaltung\Tests;
+namespace abrain\Einsatzverwaltung;
 
-use abrain\Einsatzverwaltung\ReportFactory;
 use WP_UnitTestCase;
 
 /**

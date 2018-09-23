@@ -13,11 +13,6 @@ use WP_Query;
 class Frontend
 {
     /**
-     * @var Core
-     */
-    private $core;
-
-    /**
      * @var Formatter
      */
     private $formatter;
@@ -26,26 +21,17 @@ class Frontend
      * @var Options
      */
     private $options;
-    
-    /**
-     * @var Utilities
-     */
-    private $utilities;
 
     /**
      * Constructor
      *
-     * @param Core $core
      * @param Options $options
-     * @param Utilities $utilities
      * @param Formatter $formatter
      */
-    public function __construct($core, $options, $utilities, $formatter)
+    public function __construct($options, $formatter)
     {
-        $this->core = $core;
         $this->formatter = $formatter;
         $this->options = $options;
-        $this->utilities = $utilities;
         $this->addHooks();
     }
 
@@ -72,42 +58,18 @@ class Frontend
     {
         wp_enqueue_style(
             'font-awesome',
-            $this->core->pluginUrl . 'font-awesome/css/font-awesome.min.css',
+            Core::$pluginUrl . 'font-awesome/css/font-awesome.min.css',
             false,
             '4.7.0'
         );
         wp_enqueue_style(
             'einsatzverwaltung-frontend',
-            $this->core->styleUrl . 'style-frontend.css',
+            Core::$styleUrl . 'style-frontend.css',
             array(),
             Core::VERSION
         );
         wp_add_inline_style('einsatzverwaltung-frontend', ReportList::getDynamicCss());
     }
-
-    /**
-     * Zeigt Dropdown mit Hierarchie für die Einsatzart
-     *
-     * @param string $selected Slug der ausgewählten Einsatzart
-     */
-    public static function dropdownEinsatzart($selected)
-    {
-        wp_dropdown_categories(array(
-            'show_option_all'    => '',
-            'show_option_none'   => '- keine -',
-            'orderby'            => 'NAME',
-            'order'              => 'ASC',
-            'show_count'         => false,
-            'hide_empty'         => false,
-            'echo'               => true,
-            'selected'           => $selected,
-            'hierarchical'       => true,
-            'name'               => 'tax_input[einsatzart]',
-            'taxonomy'           => 'einsatzart',
-            'hide_if_empty'      => false
-        ));
-    }
-
 
     /**
      * Erzeugt den Kopf eines Einsatzberichts
@@ -125,8 +87,8 @@ class Frontend
 
             $typesOfAlerting = $this->formatter->getTypesOfAlerting($report);
 
-            $duration = Data::getDauer($report);
-            $durationString = ($duration === false ? '' : $this->utilities->getDurationString($duration));
+            $duration = $report->getDuration();
+            $durationString = ($duration === false ? '' : $this->formatter->getDurationString($duration));
 
             $showEinsatzartArchiveLink = $showArchiveLinks && $this->options->isShowEinsatzartArchive();
             $art = $this->formatter->getTypeOfIncident($report, $mayContainLinks, $showEinsatzartArchiveLink);

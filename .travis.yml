@@ -11,8 +11,6 @@ branches:
 
 php:
   - '5.6'
-  - '7.0'
-  - '7.1'
   - '7.2'
 
 env:
@@ -63,10 +61,6 @@ matrix:
   exclude:
     - env: WP_VERSION=nightly WP_MULTISITE=0
       php: '5.6'
-    - env: WP_VERSION=nightly WP_MULTISITE=0
-      php: '7.0'
-    - env: WP_VERSION=nightly WP_MULTISITE=0
-      php: '7.1'
   allow_failures:
     - env: WP_VERSION=nightly WP_MULTISITE=0
   fast_finish: true

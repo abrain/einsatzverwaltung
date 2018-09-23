@@ -2,7 +2,8 @@
 namespace abrain\Einsatzverwaltung;
 
 use abrain\Einsatzverwaltung\Model\IncidentReport;
-use WP_Query;
+use WP_Post;
+use wpdb;
 
 /**
  * Stellt Methoden zur Datenabfrage und Datenmanipulation bereit
@@ -45,7 +46,7 @@ class Data
     /**
      * @param $kalenderjahr
      *
-     * @return array
+     * @return WP_Post[]
      */
     public static function getEinsatzberichte($kalenderjahr)
     {
@@ -68,21 +69,17 @@ class Data
      */
     public static function getJahreMitEinsatz()
     {
-        $jahre = array();
-        $query = new WP_Query('&post_type=einsatz&post_status=publish&nopaging=true');
-        while ($query->have_posts()) {
-            $nextPost = $query->next_post();
-            $timestamp = strtotime($nextPost->post_date);
-            $jahre[date("Y", $timestamp)] = 1;
-        }
-        return array_keys($jahre);
+        /** @var wpdb $wpdb */
+        global $wpdb;
+
+        return $wpdb->get_col("SELECT DISTINCT YEAR(post_date) AS years FROM $wpdb->posts WHERE post_type = 'einsatz' AND post_status = 'publish';");
     }
 
     /**
      * Zusätzliche Metadaten des Einsatzberichts speichern
      *
      * @param int $postId ID des Posts
-     * @param \WP_Post $post Das Post-Objekt
+     * @param WP_Post $post Das Post-Objekt
      */
     public function savePostdata($postId, $post)
     {
@@ -185,7 +182,7 @@ class Data
      * Wird aufgerufen, sobald ein Einsatzbericht veröffentlicht wird
      *
      * @param int $postId Die ID des Einsatzberichts
-     * @param \WP_Post $post Das Post-Objekt des Einsatzberichts
+     * @param WP_Post $post Das Post-Objekt des Einsatzberichts
      */
     public function onPublish($postId, $post)
     {
@@ -215,7 +212,7 @@ class Data
      * Wird aufgerufen, sobald ein Einsatzbericht in den Papierkorb verschoben wird
      *
      * @param int $postId Die ID des Einsatzberichts
-     * @param \WP_Post $post Das Post-Objekt des Einsatzberichts
+     * @param WP_Post $post Das Post-Objekt des Einsatzberichts
      */
     public function onTrash($postId, $post)
     {

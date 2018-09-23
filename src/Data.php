@@ -134,10 +134,8 @@ class Data
 
         // Einsatznummer setzen, sofern sie nicht automatisch verwaltet wird
         if (!ReportNumberController::isAutoIncidentNumbers()) {
-            ReportNumberController::setEinsatznummer(
-                $postId,
-                filter_input(INPUT_POST, 'einsatzverwaltung_nummer', FILTER_SANITIZE_STRING)
-            );
+            $number = filter_input(INPUT_POST, 'einsatzverwaltung_nummer', FILTER_SANITIZE_STRING);
+            update_post_meta($postId, 'einsatz_incidentNumber', $number);
         }
 
         // Vermerke explizit deaktivieren, wenn sie nicht gesetzt wurden

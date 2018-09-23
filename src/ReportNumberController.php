@@ -48,7 +48,7 @@ class ReportNumberController
 
         $date = date_create(get_post_field('post_date', $objectId));
         $newIncidentNumber = $this->formatEinsatznummer(date_format($date, 'Y'), $metaValue);
-        self::setEinsatznummer($objectId, $newIncidentNumber);
+        update_post_meta($objectId, 'einsatz_incidentNumber', $newIncidentNumber);
     }
 
     /**
@@ -97,21 +97,6 @@ class ReportNumberController
     }
 
     /**
-     * Ändert die Einsatznummer eines bestehenden Einsatzes
-     *
-     * @param int $postId ID des Einsatzberichts
-     * @param string $einsatznummer Einsatznummer
-     */
-    public static function setEinsatznummer($postId, $einsatznummer)
-    {
-        if (empty($postId) || empty($einsatznummer)) {
-            return;
-        }
-
-        update_post_meta($postId, 'einsatz_incidentNumber', $einsatznummer);
-    }
-
-    /**
      * Generiert für alle Einsatzberichte eine Einsatznummer gemäß dem aktuell konfigurierten Format.
      */
     public function updateAllIncidentNumbers()
@@ -123,7 +108,7 @@ class ReportNumberController
                 $incidentReport = new IncidentReport($post);
                 $seqNum = $incidentReport->getSequentialNumber();
                 $newIncidentNumber = $this->formatEinsatznummer($year, $seqNum);
-                self::setEinsatznummer($post->ID, $newIncidentNumber);
+                update_post_meta($post->ID, 'einsatz_incidentNumber', $newIncidentNumber);
             }
         }
     }

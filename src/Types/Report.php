@@ -17,7 +17,7 @@ class Report implements CustomType
     /**
      * @return string
      */
-    private function getRewriteSlug()
+    public static function getRewriteSlug()
     {
         return sanitize_title(
             get_option('einsatzvw_rewrite_slug', self::DEFAULT_REWRITE_SLUG),
@@ -88,7 +88,7 @@ class Report implements CustomType
             'has_archive' => true,
             'rewrite' => array(
                 'feeds' => true,
-                'slug' => $this->getRewriteSlug()
+                'slug' => self::getRewriteSlug()
             ),
             'supports' => array('title', 'editor', 'thumbnail', 'publicize', 'author', 'revisions'),
             'show_ui' => true,

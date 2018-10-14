@@ -10,12 +10,6 @@ use abrain\Einsatzverwaltung\Util\Formatter;
  */
 class Shortcodes
 {
-
-    /**
-     * @var Core
-     */
-    private $core;
-
     /**
      * @var Formatter
      */
@@ -24,13 +18,11 @@ class Shortcodes
     /**
      * Constructor
      *
-     * @param Core $core
      * @param Formatter $formatter
      */
-    public function __construct($core, $formatter)
+    public function __construct($formatter)
     {
         $this->addHooks();
-        $this->core = $core;
         $this->formatter = $formatter;
     }
 
@@ -113,7 +105,7 @@ class Shortcodes
                 $string .= ' | ';
             }
 
-            $string .= sprintf('<a href="%s">', $this->core->getYearArchiveLink($jahr));
+            $string .= sprintf('<a href="%s">', PermalinkController::getYearArchiveLink($jahr));
 
             if ($year == $jahr || empty($year) && $jahr == date('Y')) {
                 $string .= "<strong>$jahr</strong>";

@@ -1,10 +1,10 @@
 <?php
 namespace abrain\Einsatzverwaltung\Util;
 
-use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Options;
+use abrain\Einsatzverwaltung\PermalinkController;
 use WP_Post;
 use WP_Term;
 
@@ -163,7 +163,7 @@ class Formatter
                 break;
             case '%yearArchive%':
                 $year = $timeOfAlerting->format('Y');
-                $replace = Core::getInstance()->getYearArchiveLink($year);
+                $replace = PermalinkController::getYearArchiveLink($year);
                 break;
             case '%workforce%':
                 $replace = $incidentReport->getWorkforce();

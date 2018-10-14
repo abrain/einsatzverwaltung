@@ -15,7 +15,6 @@ class Options
         'einsatzvw_einsatz_hideemptydetails' => true,
         'date_format' => 'd.m.Y',
         'time_format' => 'H:i',
-        'einsatzvw_rewrite_slug' => 'einsatzberichte',
         'einsatzvw_flush_rewrite_rules' => false,
         'einsatzvw_category' => false,
         'einsatzvw_loop_only_special' => false,
@@ -74,19 +73,6 @@ class Options
     {
         $categoryId = $this->getOption('einsatzvw_category');
         return (false === $categoryId ? -1 : intval($categoryId));
-    }
-
-    /**
-     * Gibt die Basis für die URL zu Einsatzberichten zurück
-     *
-     * @since 1.0.0
-     *
-     * @return string
-     */
-    public function getRewriteSlug()
-    {
-        $option = $this->getOption('einsatzvw_rewrite_slug');
-        return sanitize_title($option, $this->defaults['einsatzvw_rewrite_slug']);
     }
 
     /**

@@ -57,6 +57,11 @@ class Core
     private $adminErrorMessages = array();
 
     /**
+     * @var PermalinkController
+     */
+    private $permalinkController;
+
+    /**
      * Constructor
      */
     private function __construct()
@@ -68,9 +73,10 @@ class Core
 
         $this->data = new Data($this->options);
         new Frontend($this->options, $this->formatter);
-        new Shortcodes($this, $this->formatter);
+        new Shortcodes($this->formatter);
 
         $this->typeRegistry = new TypeRegistry();
+        $this->permalinkController = new PermalinkController();
 
         if (is_admin()) {
             new Admin\Initializer($this->data, $this->options, $this->utilities);
@@ -91,7 +97,7 @@ class Core
         $userRightsManager = new UserRightsManager();
         add_filter('user_has_cap', array($userRightsManager, 'userHasCap'), 10, 4);
 
-        add_action('parse_query', array($this, 'einsatznummerMetaQuery'));
+        add_action('parse_query', array($this->permalinkController, 'einsatznummerMetaQuery'));
     }
 
     /**
@@ -111,7 +117,7 @@ class Core
             array_push($this->adminErrorMessages, $e->getMessage());
             return;
         }
-        $this->addRewriteRules();
+        $this->permalinkController->addRewriteRules();
 
         // Permalinks aktualisieren
         flush_rewrite_rules();
@@ -137,7 +143,7 @@ class Core
             array_push($this->adminErrorMessages, $e->getMessage());
             return;
         }
-        $this->addRewriteRules();
+        $this->permalinkController->addRewriteRules();
         if ($this->options->isFlushRewriteRules()) {
             flush_rewrite_rules();
             $this->options->setFlushRewriteRules(false);
@@ -163,54 +169,10 @@ class Core
         }
     }
 
-    private function addRewriteRules()
-    {
-        global $wp_rewrite;
-        if ($wp_rewrite->using_permalinks()) {
-            $base = ltrim($wp_rewrite->front, '/') . $this->options->getRewriteSlug();
-            add_rewrite_rule(
-                $base . '/(\d{4})/page/(\d{1,})/?$',
-                'index.php?post_type=einsatz&year=$matches[1]&paged=$matches[2]',
-                'top'
-            );
-            add_rewrite_rule($base . '/(\d{4})/?$', 'index.php?post_type=einsatz&year=$matches[1]', 'top');
-        }
-
-        add_rewrite_tag('%einsatznummer%', '([^&]+)');
-    }
-
-    /**
-     * @param \WP_Query $query
-     */
-    public function einsatznummerMetaQuery($query)
-    {
-        $enr = $query->get('einsatznummer');
-        if (!empty($enr)) {
-            $query->set('post_type', 'einsatz');
-            $query->set('meta_key', 'einsatz_incidentNumber');
-            $query->set('meta_value', $enr);
-        }
-    }
-
     public function registerWidgets()
     {
         register_widget(new RecentIncidents($this->options, $this->formatter));
         register_widget(new RecentIncidentsFormatted($this->formatter));
-    }
-
-    /**
-     * Gibt den Link zu einem bestimmten Jahresarchiv zurück, berücksichtigt dabei die Permalink-Einstellungen
-     *
-     * @param string $year
-     *
-     * @return string
-     */
-    public function getYearArchiveLink($year)
-    {
-        global $wp_rewrite;
-        $link = get_post_type_archive_link('einsatz');
-        $link = ($wp_rewrite->using_permalinks() ? trailingslashit($link) : $link . '&year=') . $year;
-        return user_trailingslashit($link);
     }
 
     private function maybeUpdate()

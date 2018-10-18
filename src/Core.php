@@ -98,6 +98,8 @@ class Core
         add_filter('user_has_cap', array($userRightsManager, 'userHasCap'), 10, 4);
 
         add_action('parse_query', array($this->permalinkController, 'einsatznummerMetaQuery'));
+        add_filter('post_type_link', array($this->permalinkController, 'filterPostTypeLink'), 10, 4);
+        add_filter('request', array($this->permalinkController, 'filterRequest'));
     }
 
     /**

@@ -114,12 +114,11 @@ class Core
 
         // Posttypen registrieren
         try {
-            $this->typeRegistry->registerTypes();
+            $this->typeRegistry->registerTypes($this->permalinkController);
         } catch (Exceptions\TypeRegistrationException $e) {
             array_push($this->adminErrorMessages, $e->getMessage());
             return;
         }
-        $this->permalinkController->addRewriteRules();
 
         // Permalinks aktualisieren
         flush_rewrite_rules();
@@ -140,12 +139,12 @@ class Core
     public function onInit()
     {
         try {
-            $this->typeRegistry->registerTypes();
+            $this->typeRegistry->registerTypes($this->permalinkController);
         } catch (Exceptions\TypeRegistrationException $e) {
             array_push($this->adminErrorMessages, $e->getMessage());
             return;
         }
-        $this->permalinkController->addRewriteRules();
+
         if ($this->options->isFlushRewriteRules()) {
             flush_rewrite_rules();
             $this->options->setFlushRewriteRules(false);

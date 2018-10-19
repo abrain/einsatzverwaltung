@@ -34,9 +34,12 @@ class TypeRegistry
 
     /**
      * Erzeugt den neuen Beitragstyp Einsatzbericht und die zugehörigen Taxonomien
+     *
+     * @param PermalinkController $permalinkController
+     *
      * @throws TypeRegistrationException
      */
-    public function registerTypes()
+    public function registerTypes(PermalinkController $permalinkController)
     {
         $report = new Report();
         $this->registerPostType($report);
@@ -44,6 +47,8 @@ class TypeRegistry
         $this->registerTaxonomy(new Vehicle(), $report->getSlug());
         $this->registerTaxonomy(new ExtEinsatzmittel(), $report->getSlug());
         $this->registerTaxonomy(new Alarmierungsart(), $report->getSlug());
+
+        $permalinkController->addRewriteRules($report);
     }
 
     /**

@@ -13,12 +13,29 @@ class PermalinkController
 {
     const DEFAULT_REPORT_PERMALINK = '%postname%';
 
-    public function addRewriteRules()
+    /**
+     * @var string
+     */
+    private $reportPermalink;
+
+    /**
+     * @var string
+     */
+    private $reportRewriteSlug;
+
+    /**
+     * @param Report $report
+     */
+    public function addRewriteRules(Report $report)
     {
         global $wp_rewrite;
+
         if ($wp_rewrite->using_permalinks()) {
+            $this->reportPermalink = get_option('einsatz_permalink', self::DEFAULT_REPORT_PERMALINK); // TODO sanitize/validate
+            $this->reportRewriteSlug = $report->rewriteSlug;
+
             // add rules for paginated year archive
-            $base = ltrim($wp_rewrite->front, '/') . Report::getRewriteSlug();
+            $base = ltrim($wp_rewrite->front, '/') . $this->reportRewriteSlug;
             add_rewrite_rule(
                 $base . '/(\d{4})/page/(\d{1,})/?$',
                 'index.php?post_type=einsatz&year=$matches[1]&paged=$matches[2]',
@@ -27,8 +44,7 @@ class PermalinkController
             add_rewrite_rule($base . '/(\d{4})/?$', 'index.php?post_type=einsatz&year=$matches[1]', 'top');
 
             // if the custom permalink contains a slash, the rewrite tag %einsatz% has to allow for slashes
-            $permalinkStructure = get_option('einsatz_permalink', self::DEFAULT_REPORT_PERMALINK);
-            if (strpos($permalinkStructure, '/') !== false) {
+            if (strpos($this->reportPermalink, '/') !== false) {
                 $postType = get_post_type_object(Report::SLUG);
                 remove_rewrite_tag("%$postType->name%");
                 add_rewrite_tag(
@@ -46,12 +62,13 @@ class PermalinkController
      * Builds the selector, the part of the URL that uniquely identifies a single report
      *
      * @param WP_Post $post
+     * @param string $structure
      *
      * @return string
      */
-    public function buildSelector(WP_Post $post)
+    public function buildSelector(WP_Post $post, $structure)
     {
-        // TODO build link based on option 'einsatz_permalink'
+        // TODO build link based on $structure
         return $post->ID . '-seotitle';
     }
 
@@ -95,7 +112,7 @@ class PermalinkController
             return $postLink;
         }
 
-        $path = sprintf('%s/%s', Report::getRewriteSlug(), $this->buildSelector($post));
+        $path = sprintf('%s/%s', $this->reportRewriteSlug, $this->buildSelector($post, $this->reportPermalink));
         return home_url(user_trailingslashit($path));
     }
 
@@ -119,18 +136,14 @@ class PermalinkController
             return $queryvars;
         }
 
-        error_log($queryvars['einsatz']);
         preg_match($this->getSelectorRegEx(), $queryvars['einsatz'], $matches);
-        error_log(print_r($matches, true));
+
+        // The selector does not match the permalink structure, do nothing
         if (empty($matches)) {
             return $queryvars;
         }
 
-        $queryvars['p'] = $matches[1];
-        unset($queryvars['einsatz']);
-        unset($queryvars['name']);
-
-        return $queryvars;
+        return $this->modifyQueryVars($queryvars, $matches);
     }
 
     /**
@@ -157,5 +170,26 @@ class PermalinkController
         $link = get_post_type_archive_link(Report::SLUG);
         $link = ($wp_rewrite->using_permalinks() ? trailingslashit($link) : $link . '&year=') . $year;
         return user_trailingslashit($link);
+    }
+
+    /**
+     * Modifies the query variables to uniquely select a single report
+     *
+     * @param array $queryVars
+     * @param array $matches
+     *
+     * @return array
+     */
+    public function modifyQueryVars($queryVars, $matches)
+    {
+        if (empty($matches)) {
+            return $queryVars;
+        }
+
+        $queryVars['p'] = $matches[1];
+        unset($queryVars['einsatz']);
+        unset($queryVars['name']);
+
+        return $queryVars;
     }
 }

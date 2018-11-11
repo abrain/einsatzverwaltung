@@ -23,6 +23,16 @@ class PermalinkController
      */
     private $reportRewriteSlug;
 
+    private $rewriteTags = array(
+        '%postname%',
+        '%post_id%'
+    );
+
+    private $rewriteTagRegEx = array(
+        '(?<name>[A-Za-z0-9_-]+)',
+        '(?<id>[0-9]+)'
+    );
+
     /**
      * @param Report $report
      */
@@ -42,17 +52,6 @@ class PermalinkController
                 'top'
             );
             add_rewrite_rule($base . '/(\d{4})/?$', 'index.php?post_type=einsatz&year=$matches[1]', 'top');
-
-            // if the custom permalink contains a slash, the rewrite tag %einsatz% has to allow for slashes
-            if (strpos($this->reportPermalink, '/') !== false) {
-                $postType = get_post_type_object(Report::SLUG);
-                remove_rewrite_tag("%$postType->name%");
-                add_rewrite_tag(
-                    "%$postType->name%",
-                    '(.+?)',
-                    $postType->query_var ? "{$postType->query_var}=" : "post_type=$postType->name&name="
-                );
-            }
         }
 
         add_rewrite_tag('%einsatznummer%', '([^&]+)');
@@ -68,8 +67,11 @@ class PermalinkController
      */
     public function buildSelector(WP_Post $post, $structure)
     {
-        // TODO build link based on $structure
-        return $post->ID . '-seotitle';
+        $tagReplacements = array(
+            $post->post_name,
+            $post->ID
+        );
+        return str_replace($this->rewriteTags, $tagReplacements, $structure);
     }
 
     /**
@@ -132,29 +134,20 @@ class PermalinkController
             return $queryvars;
         }
 
-        if (!array_key_exists('einsatz', $queryvars)) {
-            return $queryvars;
-        }
-
-        preg_match($this->getSelectorRegEx(), $queryvars['einsatz'], $matches);
-
-        // The selector does not match the permalink structure, do nothing
-        if (empty($matches)) {
-            return $queryvars;
-        }
-
-        return $this->modifyQueryVars($queryvars, $matches);
+        return $this->modifyQueryVars($queryvars, $this->reportPermalink);
     }
 
     /**
      * Returns the regular expression necessary to disassemble the selector (part of the URL specifying a single report)
      *
+     * @param string $permalink
+     *
      * @return string
      */
-    public function getSelectorRegEx()
+    public function getSelectorRegEx($permalink)
     {
-        // TODO construct RegEx depending on permalink structure
-        return '/^(\d+)-.*$/';
+        $regex = str_replace($this->rewriteTags, $this->rewriteTagRegEx, $permalink);
+        return '/^' . str_replace('/', '\/', $regex) . '$/';
     }
 
     /**
@@ -176,19 +169,37 @@ class PermalinkController
      * Modifies the query variables to uniquely select a single report
      *
      * @param array $queryVars
-     * @param array $matches
+     * @param string $reportPermalink
      *
      * @return array
      */
-    public function modifyQueryVars($queryVars, $matches)
+    public function modifyQueryVars($queryVars, $reportPermalink)
     {
+        // Do nothing, if the request is not about reports
+        if (!array_key_exists('einsatz', $queryVars)) {
+            return $queryVars;
+        }
+
+        // Do nothing, if we would only mimic the WordPress default behavior
+        if ($reportPermalink === '%postname%') {
+            return $queryVars;
+        }
+
+        preg_match($this->getSelectorRegEx($reportPermalink), $queryVars['einsatz'], $matches);
+
+        // The selector does not match the permalink structure, do nothing
         if (empty($matches)) {
             return $queryVars;
         }
 
-        $queryVars['p'] = $matches[1];
-        unset($queryVars['einsatz']);
-        unset($queryVars['name']);
+        if (strpos($reportPermalink, '%post_id%') !== false) {
+            $queryVars['p'] = $matches['id'];
+            unset($queryVars['einsatz']);
+            unset($queryVars['name']);
+        } elseif (strpos($reportPermalink, '%postname%') !== false) {
+            $queryVars['name'] = $matches['name'];
+            unset($queryVars['einsatz']);
+        }
 
         return $queryVars;
     }

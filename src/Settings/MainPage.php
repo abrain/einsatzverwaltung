@@ -4,6 +4,7 @@ namespace abrain\Einsatzverwaltung\Settings;
 
 use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\Settings\Pages\About;
+use abrain\Einsatzverwaltung\Settings\Pages\Advanced;
 use abrain\Einsatzverwaltung\Settings\Pages\Capabilities;
 use abrain\Einsatzverwaltung\Settings\Pages\General;
 use abrain\Einsatzverwaltung\Settings\Pages\Numbers;
@@ -39,6 +40,7 @@ class MainPage
         $this->addSubPage(new Report());
         $this->addSubPage(new ReportList());
         $this->addSubPage(new Capabilities());
+        $this->addSubPage(new Advanced());
         $this->addSubPage(new About());
     }
 

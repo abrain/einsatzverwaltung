@@ -17,20 +17,12 @@ class General extends SubPage
     {
         parent::__construct('general', 'Allgemein');
 
-        add_filter('pre_update_option_einsatzvw_rewrite_slug', array($this, 'maybeRewriteSlugChanged'), 10, 2);
         add_filter('pre_update_option_einsatzvw_category', array($this, 'maybeCategoryChanged'), 10, 2);
         add_filter('pre_update_option_einsatzvw_loop_only_special', array($this, 'maybeCategorySpecialChanged'), 10, 2);
     }
 
     public function addSettingsFields()
     {
-        add_settings_field(
-            'einsatzvw_permalinks',
-            'Permalinks',
-            array($this, 'echoFieldPermalinks'),
-            $this->settingsApiPage,
-            'einsatzvw_settings_general'
-        );
         add_settings_field(
             'einsatzvw_einsatznummer_mainloop',
             'Einsatzbericht als Beitrag',
@@ -93,37 +85,6 @@ class General extends SubPage
         echo '</fieldset>';
     }
 
-    /**
-     * @since 1.0.0
-     */
-    public function echoFieldPermalinks()
-    {
-        global $wp_rewrite;
-        echo '<fieldset>';
-        $this->echoSettingsInput(
-            'einsatzvw_rewrite_slug',
-            sanitize_title(get_option('einsatzvw_rewrite_slug'), 'einsatzberichte')
-        );
-        echo '<p class="description">';
-        printf(
-            'Basis f&uuml;r Links zu Einsatzberichten, zum %s und zum %s.',
-            sprintf('<a href="%s">%s</a>', get_post_type_archive_link('einsatz'), 'Archiv'),
-            sprintf('<a href="%s">%s</a>', get_post_type_archive_feed_link('einsatz'), 'Feed')
-        );
-        if ($wp_rewrite->using_permalinks() === false) {
-            echo '</p><p class="description">';
-            printf(
-                __('Note: This setting has no effect, as WordPress currently uses plain %s', 'einsatzverwaltung'),
-                sprintf(
-                    '<a href="%s">%s</a>',
-                    admin_url('options-permalink.php'),
-                    __('permalinks', 'einsatzverwaltung')
-                )
-            );
-        }
-        echo '</p></fieldset>';
-    }
-
     public function echoFieldAnnotations()
     {
         echo '<fieldset>';
@@ -131,23 +92,6 @@ class General extends SubPage
         $this->echoColorPicker('einsatzvw_list_annotations_color_off', AnnotationIconBar::DEFAULT_COLOR_OFF);
         echo '<p class="description">Diese Farbe wird f&uuml;r die Symbole von inaktiven Vermerken verwendet, die von aktiven werden in der Textfarbe Deines Themes dargestellt.</p>';
         echo '</fieldset>';
-    }
-
-    /**
-     * Prüft, ob sich die Basis für die Links zu Einsatzberichten ändert und veranlasst gegebenenfalls ein Erneuern der
-     * Permalinkstruktur
-     *
-     * @param string $newValue Der neue Wert
-     * @param string $oldValue Der alte Wert
-     * @return string Der zu speichernde Wert
-     */
-    public function maybeRewriteSlugChanged($newValue, $oldValue)
-    {
-        if ($newValue != $oldValue) {
-            self::$options->setFlushRewriteRules(true);
-        }
-
-        return $newValue;
     }
 
     /**
@@ -250,11 +194,6 @@ class General extends SubPage
 
     public function registerSettings()
     {
-        register_setting(
-            'einsatzvw_settings_general',
-            'einsatzvw_rewrite_slug',
-            'sanitize_title'
-        );
         register_setting(
             'einsatzvw_settings_general',
             'einsatzvw_show_einsatzberichte_mainloop',

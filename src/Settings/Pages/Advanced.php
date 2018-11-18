@@ -2,6 +2,8 @@
 
 namespace abrain\Einsatzverwaltung\Settings\Pages;
 
+use abrain\Einsatzverwaltung\PermalinkController;
+
 /**
  * Settings page for advanced stuff
  *
@@ -9,6 +11,11 @@ namespace abrain\Einsatzverwaltung\Settings\Pages;
  */
 class Advanced extends SubPage
 {
+    private $permalinkOptions = array(
+        PermalinkController::DEFAULT_REPORT_PERMALINK => 'WordPress-Standard',
+        '%post_id%-%postname_nosuffix%' => 'ID und SEO-Titel'
+    );
+
     public function __construct()
     {
         parent::__construct('advanced', __('Advanced', 'einsatzverwaltung'));
@@ -19,9 +26,16 @@ class Advanced extends SubPage
     public function addSettingsFields()
     {
         add_settings_field(
-            'einsatzvw_permalinks',
+            'einsatzvw_permalinks_base',
             'Basis',
             array($this, 'echoFieldBase'),
+            $this->settingsApiPage,
+            'einsatzvw_settings_permalinks'
+        );
+        add_settings_field(
+            'einsatzvw_permalinks_struct',
+            'URL-Struktur',
+            array($this, 'echoFieldUrlStructure'),
             $this->settingsApiPage,
             'einsatzvw_settings_permalinks'
         );
@@ -67,6 +81,17 @@ class Advanced extends SubPage
         echo '</p></fieldset>';
     }
 
+    public function echoFieldUrlStructure()
+    {
+        echo '<fieldset>';
+        $this->echoRadioButtons(
+            'einsatz_permalink',
+            $this->permalinkOptions,
+            PermalinkController::DEFAULT_REPORT_PERMALINK
+        );
+        echo '</fieldset>';
+    }
+
     /**
      * Prüft, ob sich die Basis für die Links zu Einsatzberichten ändert und veranlasst gegebenenfalls ein Erneuern der
      * Permalinkstruktur
@@ -90,6 +115,11 @@ class Advanced extends SubPage
             'einsatzvw_settings_advanced',
             'einsatzvw_rewrite_slug',
             'sanitize_title'
+        );
+        register_setting(
+            'einsatzvw_settings_advanced',
+            'einsatz_permalink',
+            array('PermalinkController', 'sanitizePermalink')
         );
     }
 }

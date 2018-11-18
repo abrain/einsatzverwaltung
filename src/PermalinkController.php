@@ -206,4 +206,27 @@ class PermalinkController
 
         return $queryVars;
     }
+
+    /**
+     * Ensures that a permalink contains a unique identifier for reports and that different parts of the permalink are
+     * separated by dashes
+     *
+     * @param string $permalink
+     *
+     * @return string
+     */
+    public static function sanitizePermalink($permalink)
+    {
+        preg_match('/^(%[a-z_]+%)(-(%[a-z_]+%))*$/', $permalink, $matches);
+        if (empty($matches)) {
+            return self::DEFAULT_REPORT_PERMALINK;
+        }
+
+        // permalinks must contain at least one unique identifier
+        if (!in_array('%post_id%', $matches) && !in_array('%postname%', $matches)) {
+            return self::DEFAULT_REPORT_PERMALINK;
+        }
+
+        return $permalink;
+    }
 }

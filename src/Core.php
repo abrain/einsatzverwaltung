@@ -97,6 +97,7 @@ class Core
         $userRightsManager = new UserRightsManager();
         add_filter('user_has_cap', array($userRightsManager, 'userHasCap'), 10, 4);
 
+        add_filter('option_einsatz_permalink', array('abrain\Einsatzverwaltung\PermalinkController', 'sanitizePermalink'));
         add_action('parse_query', array($this->permalinkController, 'einsatznummerMetaQuery'));
         add_filter('post_type_link', array($this->permalinkController, 'filterPostTypeLink'), 10, 4);
         add_filter('request', array($this->permalinkController, 'filterRequest'));

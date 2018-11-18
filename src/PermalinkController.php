@@ -25,12 +25,14 @@ class PermalinkController
 
     private $rewriteTags = array(
         '%postname%',
-        '%post_id%'
+        '%post_id%',
+        '%postname_nosuffix%'
     );
 
     private $rewriteTagRegEx = array(
         '(?<name>[A-Za-z0-9_-]+)',
-        '(?<id>[0-9]+)'
+        '(?<id>[0-9]+)',
+        '([A-Za-z0-9_-]+)'
     );
 
     /**
@@ -69,7 +71,8 @@ class PermalinkController
     {
         $tagReplacements = array(
             $post->post_name,
-            $post->ID
+            $post->ID,
+            sanitize_title($post->post_title)
         );
         return str_replace($this->rewriteTags, $tagReplacements, $structure);
     }

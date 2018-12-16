@@ -204,19 +204,18 @@ class Data
             $alarmzeit = date_create($post->post_date);
         }
 
+        $updateArgs = array(
+            'ID' => $postId,
+            'meta_input' => array()
+        );
+
         // Solange der Einsatzbericht ein Entwurf ist, soll kein Datum gesetzt werden (vgl. wp_update_post()).
         if (in_array($post->post_status, array('draft', 'pending', 'auto-draft'))) {
             // Wird bis zur Veröffentlichung in Postmeta zwischengespeichert.
-            update_post_meta($postId, '_einsatz_timeofalerting', date_format($alarmzeit, 'Y-m-d H:i:s'));
+            $updateArgs['meta_input']['_einsatz_timeofalerting'] = date_format($alarmzeit, 'Y-m-d H:i:s');
         } else {
-            $updateArgs = array('ID' => $postId);
             $updateArgs['post_date'] = date_format($alarmzeit, 'Y-m-d H:i:s');
             $updateArgs['post_date_gmt'] = get_gmt_from_date($updateArgs['post_date']);
-
-            // save_post Filter kurzzeitig deaktivieren, damit keine Dauerschleife entsteht
-            remove_action('save_post_einsatz', array($this, 'savePostdata'));
-            wp_update_post($updateArgs);
-            add_action('save_post_einsatz', array($this, 'savePostdata'), 10, 2);
         }
 
         // Einsatznummer setzen, sofern sie nicht automatisch verwaltet wird
@@ -227,13 +226,24 @@ class Data
             );
         }
 
-        // Vermerke explizit deaktivieren, wenn sie nicht gesetzt wurden
+        // Einsatzdetails speichern
+        $metaFields = array('einsatz_einsatzende', 'einsatz_einsatzort', 'einsatz_einsatzleiter', 'einsatz_mannschaft');
+        foreach ($metaFields as $metaField) {
+            $value = filter_input(INPUT_POST, $metaField, FILTER_SANITIZE_STRING);
+            $updateArgs['meta_input'][$metaField] = empty($value) ? '' : $value;
+        }
+
+        // Vermerke speichern (werden explizit deaktiviert, wenn sie nicht gesetzt wurden)
         $annotations = array('einsatz_fehlalarm', 'einsatz_hasimages', 'einsatz_special');
         foreach ($annotations as $annotation) {
-            if (!array_key_exists($annotation, $_POST['meta_input'])) {
-                update_post_meta($postId, $annotation, '0');
-            }
+            $value = filter_input(INPUT_POST, $annotation, FILTER_SANITIZE_STRING);
+            $updateArgs['meta_input'][$annotation] = empty($value) ? '0' : $value;
         }
+
+        // save_post Filter kurzzeitig deaktivieren, damit keine Dauerschleife entsteht
+        remove_action('save_post_einsatz', array($this, 'savePostdata'));
+        wp_update_post($updateArgs);
+        add_action('save_post_einsatz', array($this, 'savePostdata'), 10, 2);
     }
 
     /**

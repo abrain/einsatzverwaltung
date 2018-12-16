@@ -34,7 +34,7 @@ class Report implements CustomType
             'name' => 'Einsatzberichte',
             'singular_name' => 'Einsatzbericht',
             'menu_name' => 'Einsatzberichte',
-            'add_new' => 'Neu',
+            'add_new' => 'Erstellen',
             'add_new_item' => 'Neuer Einsatzbericht',
             'edit' => 'Bearbeiten',
             'edit_item' => 'Einsatzbericht bearbeiten',

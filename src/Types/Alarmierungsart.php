@@ -43,6 +43,7 @@ class Alarmierungsart implements CustomType
                 'no_terms' => 'Keine Alarmierungsarten',
                 'items_list_navigation' => 'Navigation der Liste der Alarmierungsarten',
                 'items_list' => 'Liste der Alarmierungsarten',
+                'back_to_items' => '&larr; Zur&uuml;ck zu den Alarmierungsarten',
             ),
             'public' => true,
             'show_in_nav_menus' => false,

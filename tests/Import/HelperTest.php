@@ -197,7 +197,7 @@ class HelperTest extends \WP_UnitTestCase
         $this->assertEquals('so meta!', $insertArgs['meta_input']['someMetaField']);
     }
 
-    public function testPrepareArgsForInsertPost()
+    public function testPrepareArgsForInsertPostDraft()
     {
         $insertArgs = array(
             'post_date' => '29.12.2017 18:24',
@@ -218,9 +218,64 @@ class HelperTest extends \WP_UnitTestCase
         // It's not an update, a new post shall be created
         $this->assertArrayNotHasKey('ID', $insertArgs);
 
+        // Post date should not be touched
+        $this->assertArrayNotHasKey('post_date', $insertArgs);
+        //$this->assertEquals('2017-12-29 18:24', $insertArgs['post_date']);
+
+        // Same goes for the GMT date
+        $this->assertArrayNotHasKey('post_date_gmt', $insertArgs);
+        //$this->assertEquals('2017-12-29 17:24:00', $insertArgs['post_date_gmt']);
+
+        // Check if the post title has not been modified
+        $this->assertArrayHasKey('post_title', $insertArgs);
+        $this->assertEquals('Nr. 112 - Technische Hilfeleistung', $insertArgs['post_title']);
+
+        // The given post status should have been preserved
+        $this->assertArrayHasKey('post_status', $insertArgs);
+        $this->assertEquals($postStatus, $insertArgs['post_status']);
+
+        // The correct post_type must have been set
+        $this->assertArrayHasKey('post_type', $insertArgs);
+        $this->assertEquals('einsatz', $insertArgs['post_type']);
+
+        // The date and time of ending should be formatted according to the given format
+        $this->assertArrayHasKey('meta_input', $insertArgs);
+        $this->assertArrayHasKey('einsatz_einsatzende', $insertArgs['meta_input']);
+        $this->assertEquals('2017-12-29 23:42', $insertArgs['meta_input']['einsatz_einsatzende']);
+
+        // The time of alterting should have been stored temporarily in postmeta
+        $this->assertArrayHasKey('_einsatz_timeofalerting', $insertArgs['meta_input']);
+        $this->assertEquals('2017-12-29 18:24:00', $insertArgs['meta_input']['_einsatz_timeofalerting']);
+
+        // Check that the special flag is still present
+        $this->assertArrayHasKey('einsatz_special', $insertArgs['meta_input']);
+        $this->assertEquals('1', $insertArgs['meta_input']['einsatz_special']);
+    }
+
+    public function testPrepareArgsForInsertPostPublish()
+    {
+        $insertArgs = array(
+            'post_date' => '29.12.2017 18:24',
+            'meta_input' => array(
+                'einsatz_einsatzende' => '2017/12-29 23 42',
+                'einsatz_special' => '1'
+            ),
+            'post_title' => 'Nr. 112 - Technische Hilfeleistung'
+        );
+        try {
+            $postStatus = 'publish';
+            $alarmzeit = DateTime::createFromFormat('d.m.Y H:i', $insertArgs['post_date']);
+            self::$helper->prepareArgsForInsertPost($insertArgs, 'Y/m-d H i', $postStatus, $alarmzeit);
+        } catch (ImportPreparationException $e) {
+            $this->fail($e->getMessage());
+        }
+
+        // It's not an update, a new post shall be created
+        $this->assertArrayNotHasKey('ID', $insertArgs);
+
         // Date should be correctly formatted for the database
         $this->assertArrayHasKey('post_date', $insertArgs);
-        $this->assertEquals('2017-12-29 18:24', $insertArgs['post_date']);
+        $this->assertEquals('2017-12-29 18:24:00', $insertArgs['post_date']);
 
         // Same goes for the GMT date
         $this->assertArrayHasKey('post_date_gmt', $insertArgs);
@@ -242,6 +297,9 @@ class HelperTest extends \WP_UnitTestCase
         $this->assertArrayHasKey('meta_input', $insertArgs);
         $this->assertArrayHasKey('einsatz_einsatzende', $insertArgs['meta_input']);
         $this->assertEquals('2017-12-29 23:42', $insertArgs['meta_input']['einsatz_einsatzende']);
+
+        // The time of alterting should not have been stored temporarily in postmeta
+        $this->assertArrayNotHasKey('_einsatz_timeofalerting', $insertArgs['meta_input']);
 
         // Check that the special flag is still present
         $this->assertArrayHasKey('einsatz_special', $insertArgs['meta_input']);

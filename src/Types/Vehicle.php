@@ -44,6 +44,7 @@ class Vehicle implements CustomType
                 'no_terms' => 'Keine Fahrzeuge',
                 'items_list_navigation' => 'Navigation der Fahrzeugliste',
                 'items_list' => 'Fahrzeugliste',
+                'back_to_items' => '&larr; Zur&uuml;ck zu den Fahrzeugen',
             ),
             'public' => true,
             'show_in_nav_menus' => false,

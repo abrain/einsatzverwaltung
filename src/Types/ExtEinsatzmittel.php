@@ -44,6 +44,7 @@ class ExtEinsatzmittel implements CustomType
                 'no_terms' => 'Keine externen Einsatzmittel',
                 'items_list_navigation' => 'Navigation der Liste der externen Einsatzmittel',
                 'items_list' => 'Liste der externen Einsatzmittel',
+                'back_to_items' => '&larr; Zur&uuml;ck zu den externen Einsatzmitteln',
             ),
             'public' => true,
             'show_in_nav_menus' => false,

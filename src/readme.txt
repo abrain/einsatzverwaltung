@@ -3,9 +3,9 @@ Contributors: abrain
 Donate link: https://einsatzverwaltung.abrain.de/unterstuetzen/
 Tags: Feuerwehr, Hilfsorganisation, Öffentlichkeitsarbeit
 Requires at least: 4.6.0
-Tested up to: 4.9
+Tested up to: 5.0
 Requires PHP: 5.3.0
-Stable tag: 1.4.2
+Stable tag: 1.4.3
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -72,6 +72,12 @@ Nein, mehr gibt es [hier](https://einsatzverwaltung.abrain.de/faq/).
 
 == Changelog ==
 
+= 1.4.3 =
+* Kompatibilit&auml;t mit WordPress 5.0.1, 4.9.9, 4.8.8, 4.7.12, 4.6.13 wiederhergestellt
+* Import: Nicht kritischen Fehler mit dem Beitragsdatum beim Import als Entwurf behoben
+* Beschriftungen korrigiert
+* Getestet mit WordPress 5.0
+
 = 1.4.2 =
 * Templates: Behebt ein Problem, bei dem Shortcodes falsch geparst wurden
 * Templates: Neuer Platzhalter f&uuml;r die Mannschaftsst&auml;rke
@@ -128,6 +134,9 @@ Nein, mehr gibt es [hier](https://einsatzverwaltung.abrain.de/faq/).
 * Getestet mit WordPress 4.7
 
 == Upgrade Notice ==
+
+= 1.4.3 =
+Stellt die Kompatibilit&auml;t mit WordPress 5.0.1, 4.9.9, 4.8.8, 4.7.12, 4.6.13 wieder her
 
 = 1.4.0 =
 Templates f&uuml;r Einsatzberichte und Ausz&uuml;ge, Export von Einsatzberichten, und mehr

@@ -249,8 +249,16 @@ class Helper
             ));
         }
 
-        $insertArgs['post_date'] = $alarmzeit->format('Y-m-d H:i');
-        $insertArgs['post_date_gmt'] = get_gmt_from_date($insertArgs['post_date']);
+        // Solange der Einsatzbericht ein Entwurf ist, soll kein Datum gesetzt werden (vgl. wp_update_post()).
+        if ($postStatus === 'draft') {
+            // Wird bis zur Veröffentlichung in Postmeta zwischengespeichert.
+            $insertArgs['meta_input']['_einsatz_timeofalerting'] = date_format($alarmzeit, 'Y-m-d H:i:s');
+            unset($insertArgs['post_date']);
+            unset($insertArgs['post_date_gmt']);
+        } else {
+            $insertArgs['post_date'] = $alarmzeit->format('Y-m-d H:i:s');
+            $insertArgs['post_date_gmt'] = get_gmt_from_date($insertArgs['post_date']);
+        }
 
         // Einsatzende korrekt formatieren
         if (array_key_exists('einsatz_einsatzende', $insertArgs['meta_input']) &&

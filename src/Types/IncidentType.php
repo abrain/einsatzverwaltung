@@ -46,6 +46,7 @@ class IncidentType implements CustomType
                 'no_terms' => 'Keine Einsatzarten',
                 'items_list_navigation' => 'Navigation der Liste der Einsatzarten',
                 'items_list' => 'Liste der Einsatzarten',
+                'back_to_items' => '&larr; Zur&uuml;ck zu den Einsatzarten',
             ),
             'public' => true,
             'show_in_nav_menus' => false,

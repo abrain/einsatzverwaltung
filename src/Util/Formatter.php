@@ -25,6 +25,7 @@ class Formatter
         '%date%' => 'Datum der Alarmierung',
         '%time%' => 'Zeitpunkt der Alarmierung',
         '%duration%' => 'Dauer des Einsatzes',
+        '%incidentCommander%' => 'Einsatzleiter',
         '%incidentType%' => 'Art des Einsatzes',
         '%incidentTypeColor%' => 'Farbe der Art des Einsatzes',
         '%url%' => 'URL zum Einsatzbericht',
@@ -120,6 +121,9 @@ class Formatter
                 break;
             case '%duration%':
                 $replace = $this->getDurationString($incidentReport->getDuration());
+                break;
+            case '%incidentCommander%':
+                $replace = $incidentReport->getIncidentCommander();
                 break;
             case '%incidentType%':
                 $showTypeArchive = get_option('einsatzvw_show_einsatzart_archive') === '1';

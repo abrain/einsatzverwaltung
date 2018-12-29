@@ -13,7 +13,7 @@ class Advanced extends SubPage
 {
     private $permalinkOptions = array(
         PermalinkController::DEFAULT_REPORT_PERMALINK => 'WordPress-Standard',
-        '%post_id%-%postname_nosuffix%' => 'ID und SEO-Titel'
+        '%post_id%-%postname_nosuffix%' => 'Beitragsnummer und Beitragstitel ohne angehängten Zähler'
     );
 
     public function __construct()
@@ -47,7 +47,7 @@ class Advanced extends SubPage
             'einsatzvw_settings_permalinks',
             __('Permalinks', 'einsatzverwaltung'),
             function () {
-                echo '<p>TODO: Hinweis über die Folgen von Änderungen</p>';
+                echo '<p>Eine &Auml;nderung der Permalinkstruktur hat zur Folge, dass bisherige Links auf Einsatzberichte nicht mehr funktionieren. Dem solltest du als Seitenbetreiber mit Weiterleitungen entgegenwirken.</p>';
             },
             $this->settingsApiPage
         );
@@ -90,6 +90,19 @@ class Advanced extends SubPage
             PermalinkController::DEFAULT_REPORT_PERMALINK
         );
         echo '</fieldset>';
+
+        echo '<p class="description">';
+        _e('By default, WordPress uses the post name to build the URL. To ensure uniqueness across posts, the post name can have a number appended if there are other posts with the same title (e.g. some-title, some-title-2, some-title-3, ...).', 'einsatzverwaltung');
+        echo '</p></fieldset>';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function echoStaticContent()
+    {
+        echo '<p>Die erweiterten Einstellungen k&ouml;nnen weitreichende Konsequenzen haben und sollten entsprechend nicht leichtfertig ge&auml;ndert werden.</p>';
+        return;
     }
 
     /**

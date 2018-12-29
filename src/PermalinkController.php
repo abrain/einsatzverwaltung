@@ -43,8 +43,7 @@ class PermalinkController
         global $wp_rewrite;
 
         if ($wp_rewrite->using_permalinks()) {
-            $permalinkOption = get_option('einsatz_permalink', self::DEFAULT_REPORT_PERMALINK);
-            $this->reportPermalink = self::sanitizePermalink($permalinkOption);
+            $this->reportPermalink = get_option('einsatz_permalink', self::DEFAULT_REPORT_PERMALINK);
             $this->reportRewriteSlug = $report->rewriteSlug;
 
             // add rules for paginated year archive

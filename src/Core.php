@@ -69,6 +69,7 @@ class Core
         $this->data = new Data($this->options);
         new Frontend($this->options, $this->formatter);
         new Shortcodes($this, $this->formatter);
+        new ReportNumberController();
 
         $this->typeRegistry = new TypeRegistry();
 

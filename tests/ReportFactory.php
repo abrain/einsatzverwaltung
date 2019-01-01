@@ -79,7 +79,7 @@ class ReportFactory extends WP_UnitTest_Factory_For_Post
         $dates = array();
 
         $firstDate = strtotime('1 January ' . $year . ' 03:00:00');
-        $lastDate = strtotime($year == date('Y') ? '24 hours ago' : '31 December ' . $year . ' 20:59:59');
+        $lastDate = strtotime($year == date('Y') ? '1 hour ago' : '31 December ' . $year . ' 20:59:59');
 
         $dates[] = date('Y-m-d H:i:s', $firstDate);
 

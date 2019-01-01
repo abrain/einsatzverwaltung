@@ -75,7 +75,10 @@ class Data
         /** @var wpdb $wpdb */
         global $wpdb;
 
-        return $wpdb->get_col("SELECT DISTINCT YEAR(post_date) AS years FROM $wpdb->posts WHERE post_type = 'einsatz' AND post_status = 'publish';");
+        return $wpdb->get_col($wpdb->prepare(
+            "SELECT DISTINCT YEAR(post_date) AS years FROM {$wpdb->posts} WHERE post_type = %s AND post_status = %s;",
+            array('einsatz', 'publish')
+        ));
     }
 
     /**

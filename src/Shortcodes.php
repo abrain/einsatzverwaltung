@@ -102,17 +102,27 @@ class Shortcodes
      *
      * @return string
      */
-    public function einsatzjahre()
+    public function einsatzjahre($atts)
     {
         global $year;
         $thisYear = intval(date('Y'));
         $queriedYear = empty($year) ? $thisYear : $year;
         $yearsWithReports = Data::getYearsWithReports();
 
+        $shortcodeParams = shortcode_atts(array(
+            'sort' => 'DESC',
+        ), $atts);
+
         if (!in_array($queriedYear, $yearsWithReports)) {
             $yearsWithReports[] = $queriedYear;
         }
 
+
+        if ($shortcodeParams['sort'] === 'ASC') {
+            sort($yearsWithReports);
+        } else {
+            rsort($yearsWithReports);
+        }
 
         $links = array();
         foreach ($yearsWithReports as $currentYear) {

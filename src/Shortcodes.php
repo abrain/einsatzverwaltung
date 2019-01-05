@@ -106,13 +106,17 @@ class Shortcodes
     {
         global $year;
         $thisYear = intval(date('Y'));
+        $queriedYear = empty($year) ? $thisYear : $year;
         $yearsWithReports = Data::getYearsWithReports();
 
+        if (!in_array($queriedYear, $yearsWithReports)) {
+            $yearsWithReports[] = $queriedYear;
+        }
 
 
         $links = array();
         foreach ($yearsWithReports as $currentYear) {
-            $format = $year === $currentYear || empty($year) && $currentYear === $thisYear ? '<strong>%d</strong>' : '%d';
+            $format = $currentYear === $queriedYear ? '<strong>%d</strong>' : '%d';
             $text = sprintf($format, $currentYear);
 
             $links[] = sprintf(

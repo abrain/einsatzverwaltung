@@ -100,6 +100,8 @@ class Shortcodes
     /**
      * Gibt Links zu den Archivseiten der Jahre, in denen Einsatzberichte existieren, zurück
      *
+     * @param array $atts Parameter des Shortcodes
+     *
      * @return string
      */
     public function einsatzjahre($atts)
@@ -110,6 +112,7 @@ class Shortcodes
         $yearsWithReports = Data::getYearsWithReports();
 
         $shortcodeParams = shortcode_atts(array(
+            'limit' => 0,
             'sort' => 'DESC',
         ), $atts);
 
@@ -117,11 +120,14 @@ class Shortcodes
             $yearsWithReports[] = $queriedYear;
         }
 
+        rsort($yearsWithReports);
+
+        if (is_numeric($shortcodeParams['limit']) && $shortcodeParams['limit'] > 0) {
+            $yearsWithReports = array_slice($yearsWithReports, 0, $shortcodeParams['limit']);
+        }
 
         if ($shortcodeParams['sort'] === 'ASC') {
             sort($yearsWithReports);
-        } else {
-            rsort($yearsWithReports);
         }
 
         $links = array();

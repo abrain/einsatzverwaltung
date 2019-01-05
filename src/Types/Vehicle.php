@@ -48,6 +48,7 @@ class Vehicle implements CustomType
             ),
             'public' => true,
             'show_in_nav_menus' => false,
+            'show_in_rest' => true,
             'hierarchical' => true,
             'capabilities' => array(
                 'manage_terms' => 'edit_einsatzberichte',

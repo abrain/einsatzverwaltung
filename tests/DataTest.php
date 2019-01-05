@@ -18,7 +18,26 @@ class DataTest extends WP_UnitTestCase
         $reportFactory->generateManyForYear('2014', 2);
         $reportFactory->generateManyForYear('2015', 2);
         $reportFactory->generateManyForYear('2017', 2);
-        $this->assertEqualSets(array(2014, 2015, 2017), Data::getJahreMitEinsatz());
+        $jahreMitEinsatz = Data::getJahreMitEinsatz();
+        $this->assertEqualSets(array(2014, 2015, 2017), $jahreMitEinsatz);
+        foreach ($jahreMitEinsatz as $jahr) {
+            $this->assertInternalType('string', $jahr);
+        }
+    }
+
+    public function testGetYearsWithReports()
+    {
+        $this->assertEquals(array(), Data::getYearsWithReports());
+
+        $reportFactory = new ReportFactory();
+        $reportFactory->generateManyForYear('2014', 2);
+        $reportFactory->generateManyForYear('2016', 2);
+        $reportFactory->generateManyForYear('2017', 2);
+        $yearsWithReports = Data::getYearsWithReports();
+        $this->assertEqualSets(array(2014, 2016, 2017), $yearsWithReports);
+        foreach ($yearsWithReports as $year) {
+            $this->assertInternalType('int', $year);
+        }
     }
 
     public function testGetEinsatzberichte()

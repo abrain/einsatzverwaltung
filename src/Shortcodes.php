@@ -105,25 +105,23 @@ class Shortcodes
     public function einsatzjahre()
     {
         global $year;
-        $jahre = Data::getJahreMitEinsatz();
+        $thisYear = intval(date('Y'));
+        $yearsWithReports = Data::getYearsWithReports();
 
-        $string = '';
-        foreach ($jahre as $jahr) {
-            if (!empty($string)) {
-                $string .= ' | ';
-            }
 
-            $string .= sprintf('<a href="%s">', $this->core->getYearArchiveLink($jahr));
 
-            if ($year == $jahr || empty($year) && $jahr == date('Y')) {
-                $string .= "<strong>$jahr</strong>";
-            } else {
-                $string .= $jahr;
-            }
+        $links = array();
+        foreach ($yearsWithReports as $currentYear) {
+            $format = $year === $currentYear || empty($year) && $currentYear === $thisYear ? '<strong>%d</strong>' : '%d';
+            $text = sprintf($format, $currentYear);
 
-            $string .= '</a>';
+            $links[] = sprintf(
+                '<a href="%s">%s</a>',
+                esc_url($this->core->getYearArchiveLink($currentYear)),
+                $text
+            );
         }
 
-        return $string;
+        return join(' | ', $links);
     }
 }

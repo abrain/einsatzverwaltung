@@ -112,12 +112,13 @@ class Shortcodes
         $yearsWithReports = Data::getYearsWithReports();
 
         $shortcodeParams = shortcode_atts(array(
+            'add_queried_year' => 'yes',
             'force_current_year' => 'no',
             'limit' => 0,
             'sort' => 'DESC',
         ), $atts);
 
-        if (!in_array($queriedYear, $yearsWithReports)) {
+        if ($shortcodeParams['add_queried_year'] !== 'no' && !in_array($queriedYear, $yearsWithReports)) {
             $yearsWithReports[] = $queriedYear;
         }
 

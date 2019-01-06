@@ -1,14 +1,13 @@
 <?php
-namespace abrain\Einsatzverwaltung;
+namespace abrain\Einsatzverwaltung\Shortcodes;
 
-use abrain\Einsatzverwaltung\Shortcodes\ReportArchives;
-use abrain\Einsatzverwaltung\Shortcodes\ReportList;
+use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\Util\Formatter;
 
 /**
  * Registers shortcodes and sets up the classes rendering them
  */
-class Shortcodes
+class Initializer
 {
     /**
      * Constructor

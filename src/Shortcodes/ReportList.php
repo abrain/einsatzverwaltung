@@ -17,6 +17,11 @@ class ReportList
     private $formatter;
 
     /**
+     * @var array
+     */
+    private $defaultAttributes;
+
+    /**
      * ReportList constructor.
      *
      * @param Formatter $formatter
@@ -24,6 +29,16 @@ class ReportList
     public function __construct(Formatter $formatter)
     {
         $this->formatter = $formatter;
+
+        // Shortcodeparameter auslesen
+        $this->defaultAttributes = array(
+            'jahr' => date('Y'),
+            'sort' => 'ab',
+            'monatetrennen' => 'nein',
+            'link' => 'title',
+            'limit' => -1,
+            'options' => ''
+        );
     }
 
     /**
@@ -35,25 +50,15 @@ class ReportList
      */
     public function render($atts)
     {
-        $currentYear = date('Y');
-
-        // Shortcodeparameter auslesen
-        $shortcodeParams = shortcode_atts(array(
-            'jahr' => $currentYear,
-            'sort' => 'ab',
-            'monatetrennen' => 'nein',
-            'link' => 'title',
-            'limit' => -1,
-            'options' => ''
-        ), $atts);
-        $limit = $shortcodeParams['limit'];
+        $attributes = shortcode_atts($this->defaultAttributes, $atts);
+        $limit = $attributes['limit'];
 
         // Optionen auswerten
-        $rawOptions = array_map('trim', explode(',', $shortcodeParams['options']));
+        $rawOptions = array_map('trim', explode(',', $attributes['options']));
         $possibleOptions = array('special', 'noLinkWithoutContent', 'noHeading', 'compact');
         $filteredOptions = array_intersect($possibleOptions, $rawOptions);
-        $showOnlySpecialReports = in_array('special', $filteredOptions);
-        $columnsWithLink = explode(',', $shortcodeParams['link']);
+        $onlySpecialReports = in_array('special', $filteredOptions);
+        $columnsWithLink = explode(',', $attributes['link']);
         if (in_array('none', $columnsWithLink)) {
             $columnsWithLink = array();
         }
@@ -63,18 +68,18 @@ class ReportList
         if (is_numeric($limit) && $limit > 0) {
             $reportQuery->setLimit(intval($limit));
         }
-        $reportQuery->setOnlySpecialReports($showOnlySpecialReports);
-        $reportQuery->setOrderAsc($shortcodeParams['sort'] == 'auf');
+        $reportQuery->setOnlySpecialReports($onlySpecialReports);
+        $reportQuery->setOrderAsc($attributes['sort'] == 'auf');
 
-        if (is_numeric($shortcodeParams['jahr'])) {
-            $reportQuery->setYear($shortcodeParams['jahr']);
+        if (is_numeric($attributes['jahr'])) {
+            $reportQuery->setYear($attributes['jahr']);
         }
 
         $reports = $reportQuery->getReports();
 
         $reportList = new \abrain\Einsatzverwaltung\Frontend\ReportList($this->formatter);
         $parameters = new ReportListParameters();
-        $parameters->setSplitMonths($shortcodeParams['monatetrennen'] == 'ja');
+        $parameters->setSplitMonths($attributes['monatetrennen'] == 'ja');
         $parameters->setColumnsLinkingReport($columnsWithLink);
         $parameters->linkEmptyReports = (!in_array('noLinkWithoutContent', $filteredOptions));
         $parameters->showHeading = (!in_array('noHeading', $filteredOptions));

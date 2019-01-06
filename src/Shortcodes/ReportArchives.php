@@ -15,6 +15,13 @@ class ReportArchives
      */
     private $core;
 
+    private $defaultAttributes = array(
+        'add_queried_year' => 'yes',
+        'force_current_year' => 'no',
+        'limit' => 0,
+        'sort' => 'DESC',
+    );
+
     /**
      * ReportArchives constructor.
      *
@@ -39,43 +46,65 @@ class ReportArchives
         $queriedYear = empty($year) ? $thisYear : $year;
         $yearsWithReports = Data::getYearsWithReports();
 
-        $shortcodeParams = shortcode_atts(array(
-            'add_queried_year' => 'yes',
-            'force_current_year' => 'no',
-            'limit' => 0,
-            'sort' => 'DESC',
-        ), $atts);
+        $attributes = shortcode_atts($this->defaultAttributes, $atts);
 
-        if ($shortcodeParams['add_queried_year'] !== 'no' && !in_array($queriedYear, $yearsWithReports)) {
+        if ($attributes['add_queried_year'] !== 'no' && !in_array($queriedYear, $yearsWithReports)) {
             $yearsWithReports[] = $queriedYear;
         }
 
-        if ($shortcodeParams['force_current_year'] === 'yes' && !in_array($thisYear, $yearsWithReports)) {
+        if ($attributes['force_current_year'] === 'yes' && !in_array($thisYear, $yearsWithReports)) {
             $yearsWithReports[] = $thisYear;
         }
 
-        rsort($yearsWithReports);
+        $yearsWithReports = $this->sortAndLimit($yearsWithReports, $attributes['sort'], $attributes['limit']);
 
-        if (is_numeric($shortcodeParams['limit']) && $shortcodeParams['limit'] > 0) {
-            $yearsWithReports = array_slice($yearsWithReports, 0, $shortcodeParams['limit']);
-        }
+        return join(' | ', $this->getAnchorsForYears($yearsWithReports, $queriedYear));
+    }
 
-        if ($shortcodeParams['sort'] === 'ASC') {
-            sort($yearsWithReports);
-        }
-
-        $links = array();
+    /**
+     * @param int[] $yearsWithReports
+     * @param int $queriedYear
+     *
+     * @return string[]
+     */
+    private function getAnchorsForYears($yearsWithReports, $queriedYear)
+    {
+        $anchors = array();
         foreach ($yearsWithReports as $currentYear) {
             $format = $currentYear === $queriedYear ? '<strong>%d</strong>' : '%d';
             $text = sprintf($format, $currentYear);
 
-            $links[] = sprintf(
+            $anchors[] = sprintf(
                 '<a href="%s">%s</a>',
                 esc_url($this->core->getYearArchiveLink($currentYear)),
                 $text
             );
         }
+        return $anchors;
+    }
 
-        return join(' | ', $links);
+    /**
+     * @param array $yearsWithReports
+     * @param string $sort
+     * @param string $limit
+     *
+     * @return array
+     */
+    private function sortAndLimit($yearsWithReports, $sort, $limit)
+    {
+        // Always sort in descending order so that the most current year is at index 0
+        rsort($yearsWithReports);
+
+        // In case we need to limit, the most current years will remain
+        if (is_numeric($limit) && $limit > 0) {
+            $yearsWithReports = array_slice($yearsWithReports, 0, $limit);
+        }
+
+        // If desired we now can sort in ascending order
+        if ($sort === 'ASC') {
+            sort($yearsWithReports);
+        }
+
+        return $yearsWithReports;
     }
 }

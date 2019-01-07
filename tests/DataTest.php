@@ -25,6 +25,9 @@ class DataTest extends WP_UnitTestCase
         }
     }
 
+    /**
+     * @group unittests
+     */
     public function testGetYearsWithReports()
     {
         $options = $this->createMock('abrain\Einsatzverwaltung\Options');

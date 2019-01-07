@@ -2,6 +2,7 @@
 namespace abrain\Einsatzverwaltung\Shortcodes;
 
 use abrain\Einsatzverwaltung\Core;
+use abrain\Einsatzverwaltung\Data;
 use abrain\Einsatzverwaltung\Util\Formatter;
 
 /**
@@ -13,14 +14,15 @@ class Initializer
      * Constructor
      *
      * @param Core $core
+     * @param Data $data
      * @param Formatter $formatter
      */
-    public function __construct($core, $formatter)
+    public function __construct($core, $data, $formatter)
     {
         $reportList = new ReportList($formatter);
         add_shortcode('einsatzliste', array($reportList, 'render'));
 
-        $reportArchives = new ReportArchives($core);
+        $reportArchives = new ReportArchives($core, $data);
         add_shortcode('einsatzjahre', array($reportArchives, 'render'));
     }
 }

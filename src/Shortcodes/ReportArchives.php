@@ -15,6 +15,11 @@ class ReportArchives
      */
     private $core;
 
+    /**
+     * @var Data
+     */
+    private $data;
+
     private $defaultAttributes = array(
         'add_queried_year' => 'yes',
         'force_current_year' => 'no',
@@ -26,10 +31,12 @@ class ReportArchives
      * ReportArchives constructor.
      *
      * @param Core $core
+     * @param Data $data
      */
-    public function __construct(Core $core)
+    public function __construct(Core $core, Data $data)
     {
         $this->core = $core;
+        $this->data = $data;
     }
 
     /**
@@ -44,7 +51,7 @@ class ReportArchives
         global $year;
         $thisYear = intval(date('Y'));
         $queriedYear = empty($year) ? $thisYear : $year;
-        $yearsWithReports = Data::getYearsWithReports();
+        $yearsWithReports = $this->data->getYearsWithReports();
 
         $attributes = shortcode_atts($this->defaultAttributes, $atts);
 

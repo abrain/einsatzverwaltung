@@ -87,7 +87,7 @@ class Data
      * Returns the years
      * @return int[]
      */
-    public static function getYearsWithReports()
+    public function getYearsWithReports()
     {
         $yearStrings = self::getJahreMitEinsatz();
         return array_map('intval', $yearStrings);

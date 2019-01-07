@@ -1,13 +1,14 @@
 <?php
 namespace abrain\Einsatzverwaltung\Shortcodes;
 
-use WP_UnitTestCase;
+use PHPUnit_Framework_TestCase;
 
 /**
  * Class ReportArchivesTest
  * @package abrain\Einsatzverwaltung\Shortcodes
+ * @group unittests
  */
-class ReportArchivesTest extends WP_UnitTestCase
+class ReportArchivesTest extends PHPUnit_Framework_TestCase
 {
     const FAKE_URL = 'https://URL';
 

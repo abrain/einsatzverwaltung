@@ -1,6 +1,7 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
+use abrain\Einsatzverwaltung\Shortcodes\Initializer;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use abrain\Einsatzverwaltung\Widgets\RecentIncidents;
 use abrain\Einsatzverwaltung\Widgets\RecentIncidentsFormatted;
@@ -68,7 +69,7 @@ class Core
 
         $this->data = new Data($this->options);
         new Frontend($this->options, $this->formatter);
-        new Shortcodes($this, $this->formatter);
+        new Initializer($this, $this->data, $this->formatter);
         new ReportNumberController();
 
         $this->typeRegistry = new TypeRegistry();

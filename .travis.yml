@@ -44,6 +44,7 @@ jobs:
     before_install:
       - phpenv config-rm xdebug.ini
       - composer require phpunit/phpunit:4.8.* --dev
+    script: ./vendor/bin/phpunit --no-coverage --exclude-group unittests
   - stage: validate
     name: 'Latest versions'
     env: WP_VERSION=5.0.2 WP_MULTISITE=0

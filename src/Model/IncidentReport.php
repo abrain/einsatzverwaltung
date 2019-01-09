@@ -275,7 +275,7 @@ class IncidentReport
         }
 
         // Solange der Einsatzbericht ein Entwurf ist, wird die Alarmzeit in Postmeta vorgehalten
-        if ($this->isDraft()) {
+        if ($this->isDraft() || $this->isFuture()) {
             $time = $this->getPostMeta('_einsatz_timeofalerting');
         }
 
@@ -436,6 +436,16 @@ class IncidentReport
     public function isSpecial()
     {
         return ($this->getPostMeta('einsatz_special') == 1);
+    }
+
+    /**
+     * Gibt zurück, ob der Einsatzbericht geplant ist
+     *
+     * @return bool
+     */
+    private function isFuture()
+    {
+        return $this->post->post_status === 'future';
     }
 
     /**

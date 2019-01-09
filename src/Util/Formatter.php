@@ -25,6 +25,7 @@ class Formatter
         '%date%' => 'Datum der Alarmierung',
         '%time%' => 'Zeitpunkt der Alarmierung',
         '%duration%' => 'Dauer des Einsatzes',
+        '%incidentCommander%' => 'Einsatzleiter',
         '%incidentType%' => 'Art des Einsatzes',
         '%incidentTypeColor%' => 'Farbe der Art des Einsatzes',
         '%url%' => 'URL zum Einsatzbericht',
@@ -53,12 +54,20 @@ class Formatter
     private $options;
 
     /**
-     * Formatter constructor.
-     * @param Options $options
+     * @var PermalinkController
      */
-    public function __construct($options)
+    private $permalinkController;
+
+    /**
+     * Formatter constructor.
+     *
+     * @param Options $options
+     * @param PermalinkController $permalinkController
+     */
+    public function __construct(Options $options, PermalinkController $permalinkController)
     {
         $this->options = $options;
+        $this->permalinkController = $permalinkController;
         $this->annotationIconBar = AnnotationIconBar::getInstance();
     }
 
@@ -121,6 +130,9 @@ class Formatter
             case '%duration%':
                 $replace = $this->getDurationString($incidentReport->getDuration());
                 break;
+            case '%incidentCommander%':
+                $replace = $incidentReport->getIncidentCommander();
+                break;
             case '%incidentType%':
                 $showTypeArchive = get_option('einsatzvw_show_einsatzart_archive') === '1';
                 $replace = $this->getTypeOfIncident($incidentReport, ($context === 'post'), $showTypeArchive, false);
@@ -163,7 +175,7 @@ class Formatter
                 break;
             case '%yearArchive%':
                 $year = $timeOfAlerting->format('Y');
-                $replace = PermalinkController::getYearArchiveLink($year);
+                $replace = $this->permalinkController->getYearArchiveLink($year);
                 break;
             case '%workforce%':
                 $replace = $incidentReport->getWorkforce();

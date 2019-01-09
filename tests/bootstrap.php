@@ -16,6 +16,7 @@ tests_add_filter('muplugins_loaded', function () {
 
     // Zeitzone setzen
     update_option('timezone_string', 'Europe/Berlin');
+    date_default_timezone_set('Europe/Berlin');
 });
 
 require $_tests_dir . '/includes/bootstrap.php';

@@ -1,6 +1,7 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
+use abrain\Einsatzverwaltung\Shortcodes\Initializer as ShortcodeInitializer;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use abrain\Einsatzverwaltung\Widgets\RecentIncidents;
 use abrain\Einsatzverwaltung\Widgets\RecentIncidentsFormatted;
@@ -69,14 +70,15 @@ class Core
         $this->utilities = new Utilities();
         $this->options = new Options();
 
-        $this->formatter = new Formatter($this->options); // TODO In Singleton umwandeln
+        $this->typeRegistry = new TypeRegistry();
+        $this->permalinkController = new PermalinkController();
+
+        $this->formatter = new Formatter($this->options, $this->permalinkController); // TODO In Singleton umwandeln
 
         $this->data = new Data($this->options);
         new Frontend($this->options, $this->formatter);
-        new Shortcodes($this->formatter);
-
-        $this->typeRegistry = new TypeRegistry();
-        $this->permalinkController = new PermalinkController();
+        new ShortcodeInitializer($this->data, $this->formatter, $this->permalinkController);
+        new ReportNumberController();
 
         if (is_admin()) {
             new Admin\Initializer($this->data, $this->options, $this->utilities);

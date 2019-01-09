@@ -2,6 +2,8 @@
 namespace abrain\Einsatzverwaltung;
 
 use abrain\Einsatzverwaltung\Model\IncidentReport;
+use abrain\Einsatzverwaltung\Types\Report;
+use DateTime;
 use WP_Post;
 use wpdb;
 
@@ -41,6 +43,7 @@ class Data
         add_action('private_einsatz', array($this, 'onPublish'), 10, 2);
         add_action('publish_einsatz', array($this, 'onPublish'), 10, 2);
         add_action('trash_einsatz', array($this, 'onTrash'), 10, 2);
+        add_action('transition_post_status', array($this, 'onTransitionPostStatus'), 10, 3);
     }
 
     /**
@@ -66,13 +69,28 @@ class Data
 
     /**
      * Gibt ein Array mit Jahreszahlen zurück, in denen Einsätze vorliegen
+     *
+     * @return string[]
      */
     public static function getJahreMitEinsatz()
     {
         /** @var wpdb $wpdb */
         global $wpdb;
 
-        return $wpdb->get_col("SELECT DISTINCT YEAR(post_date) AS years FROM $wpdb->posts WHERE post_type = 'einsatz' AND post_status = 'publish';");
+        return $wpdb->get_col($wpdb->prepare(
+            "SELECT DISTINCT YEAR(post_date) AS years FROM {$wpdb->posts} WHERE post_type = %s AND post_status = %s;",
+            array('einsatz', 'publish')
+        ));
+    }
+
+    /**
+     * Returns the years
+     * @return int[]
+     */
+    public function getYearsWithReports()
+    {
+        $yearStrings = self::getJahreMitEinsatz();
+        return array_map('intval', $yearStrings);
     }
 
     /**
@@ -119,11 +137,13 @@ class Data
             'meta_input' => array()
         );
 
-        // Solange der Einsatzbericht ein Entwurf ist, soll kein Datum gesetzt werden (vgl. wp_update_post()).
-        if (in_array($post->post_status, array('draft', 'pending', 'auto-draft'))) {
-            // Wird bis zur Veröffentlichung in Postmeta zwischengespeichert.
+        /**
+         * Solange der Einsatzbericht ein Entwurf ist, soll kein Datum gesetzt werden (vgl. wp_update_post()). Deshalb
+         * wird bei diesen und bei geplanten Berichten der Alarmzeitpunkt in den Metadaten zwischengespeichert.
+         */
+        if (in_array($post->post_status, array('draft', 'pending', 'auto-draft', 'future'))) {
             $updateArgs['meta_input']['_einsatz_timeofalerting'] = date_format($alarmzeit, 'Y-m-d H:i:s');
-        } else {
+        } elseif ($post->post_status === 'publish') {
             $updateArgs['post_date'] = date_format($alarmzeit, 'Y-m-d H:i:s');
             $updateArgs['post_date_gmt'] = get_gmt_from_date($updateArgs['post_date']);
         }
@@ -213,9 +233,49 @@ class Data
                 Utilities::removePostFromCategory($postId, $category);
             }
         }
-        
+    }
+
+    /**
+     * @param string $newStatus
+     * @param string $oldStatus
+     * @param WP_Post $post
+     */
+    public function onTransitionPostStatus($newStatus, $oldStatus, WP_Post $post)
+    {
+        if (get_post_type($post) !== Report::SLUG) {
+            return;
+        }
+
+        if ($newStatus === 'publish' && $oldStatus !== 'publish') {
+            $this->adjustPostDate($post);
+        }
+    }
+
+    /**
+     * Set the publish date of the report to the time of alerting
+     *
+     * @param WP_Post $post
+     */
+    private function adjustPostDate(WP_Post $post)
+    {
+        $tempTimeOfAlerting = get_post_meta($post->ID, '_einsatz_timeofalerting', true);
+        if (empty($tempTimeOfAlerting)) {
+            return;
+        }
+
+        $dateTime = DateTime::createFromFormat('Y-m-d H:i:s', $tempTimeOfAlerting);
+        $updateArgs = array(
+            'ID' => $post->ID,
+            'post_date' => date_format($dateTime, 'Y-m-d H:i:s')
+        );
+        $updateArgs['post_date_gmt'] = get_gmt_from_date($updateArgs['post_date']);
+        $updateResult = wp_update_post($updateArgs);
+        if (is_wp_error($updateResult)) {
+            error_log($updateResult->get_error_message());
+        }
+
         // Zwischenspeicher wird nur in der Entwurfsphase benötigt
-        delete_post_meta($postId, '_einsatz_timeofalerting');
+        delete_post_meta($post->ID, '_einsatz_timeofalerting');
     }
 
     /**

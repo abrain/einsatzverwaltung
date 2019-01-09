@@ -160,7 +160,7 @@ class PermalinkController
      *
      * @return string
      */
-    public static function getYearArchiveLink($year)
+    public function getYearArchiveLink($year)
     {
         global $wp_rewrite;
         $link = get_post_type_archive_link(Report::SLUG);

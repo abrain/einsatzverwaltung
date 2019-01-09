@@ -19,7 +19,8 @@ class Initializer
      */
     public function __construct($core, $data, $formatter)
     {
-        $reportList = new ReportList($formatter);
+        $reportListRenderer = new \abrain\Einsatzverwaltung\Frontend\ReportList($formatter);
+        $reportList = new ReportList($reportListRenderer);
         add_shortcode('einsatzliste', array($reportList, 'render'));
 
         $reportArchives = new ReportArchives($core, $data);

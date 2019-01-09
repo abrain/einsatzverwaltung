@@ -132,10 +132,8 @@ class ReportList
      */
     public function getList($reports, ReportListParameters $parameters)
     {
-        if (empty($this->string)) {
-            $this->constructList($reports, $parameters);
-        }
-
+        $this->string = '';
+        $this->constructList($reports, $parameters);
         return $this->string;
     }
 

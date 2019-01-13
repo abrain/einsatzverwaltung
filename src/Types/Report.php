@@ -93,7 +93,7 @@ class Report implements CustomType
                 'feeds' => true,
                 'slug' => $this->rewriteSlug
             ),
-            'supports' => array('title', 'editor', 'thumbnail', 'publicize', 'author', 'revisions'),
+            'supports' => array('title', 'editor', 'thumbnail', 'publicize', 'author', 'revisions', 'excerpt'),
             'show_ui' => true,
             'show_in_menu' => true,
             'show_in_nav_menus' => false,

@@ -7,6 +7,7 @@ use abrain\Einsatzverwaltung\Data;
 use abrain\Einsatzverwaltung\Export\Tool as ExportTool;
 use abrain\Einsatzverwaltung\Import\Tool as ImportTool;
 use abrain\Einsatzverwaltung\Options;
+use abrain\Einsatzverwaltung\PermalinkController;
 use abrain\Einsatzverwaltung\Settings\MainPage;
 use abrain\Einsatzverwaltung\Utilities;
 
@@ -18,11 +19,13 @@ class Initializer
 {
     /**
      * Initializer constructor.
+     *
      * @param Data $data
      * @param Options $options
      * @param Utilities $utilities
+     * @param PermalinkController $permalinkController
      */
-    public function __construct(Data $data, Options $options, Utilities $utilities)
+    public function __construct(Data $data, Options $options, Utilities $utilities, PermalinkController $permalinkController)
     {
         $pluginBasename = plugin_basename(einsatzverwaltung_plugin_file());
         add_action('admin_menu', array($this, 'hideTaxonomies'));
@@ -40,7 +43,7 @@ class Initializer
         add_action('add_meta_boxes_einsatz', array($reportEditScreen, 'addMetaBoxes'));
 
         // Register Settings
-        $mainPage = new MainPage($options);
+        $mainPage = new MainPage($options, $permalinkController);
         add_action('admin_menu', array($mainPage, 'addToSettingsMenu'));
         add_action('admin_init', array($mainPage, 'registerSettings'));
 

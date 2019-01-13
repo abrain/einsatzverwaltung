@@ -3,6 +3,7 @@
 namespace abrain\Einsatzverwaltung\Settings\Pages;
 
 use abrain\Einsatzverwaltung\PermalinkController;
+use WP_Post;
 
 /**
  * Settings page for advanced stuff
@@ -12,13 +13,27 @@ use abrain\Einsatzverwaltung\PermalinkController;
 class Advanced extends SubPage
 {
     private $permalinkOptions = array(
-        PermalinkController::DEFAULT_REPORT_PERMALINK => 'WordPress-Standard',
-        '%post_id%-%postname_nosuffix%' => 'Beitragsnummer und Beitragstitel ohne angehängten Zähler'
+        PermalinkController::DEFAULT_REPORT_PERMALINK => array(
+            'label' => 'WordPress-Standard'
+        ),
+        '%post_id%-%postname_nosuffix%' => array(
+            'label' => 'Beitragsnummer und Beitragstitel ohne angehängten Zähler'
+        )
     );
+    /**
+     * @var PermalinkController
+     */
+    private $permalinkController;
 
-    public function __construct()
+    /**
+     * Advanced Settings page constructor.
+     *
+     * @param PermalinkController $permalinkController
+     */
+    public function __construct(PermalinkController $permalinkController)
     {
         parent::__construct('advanced', __('Advanced', 'einsatzverwaltung'));
+        $this->permalinkController = $permalinkController;
 
         add_filter('pre_update_option_einsatzvw_rewrite_slug', array($this, 'maybeRewriteSlugChanged'), 10, 2);
     }
@@ -51,6 +66,22 @@ class Advanced extends SubPage
             },
             $this->settingsApiPage
         );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function beforeContent()
+    {
+        $sampleSlug = _x('sample-incident', 'sample permalink structure', 'einsatzverwaltung');
+        $fakePost = new WP_Post((object) array(
+            'ID' => 1234,
+            'post_name' => "$sampleSlug-3",
+            'post_title' => $sampleSlug
+        ));
+        foreach (array_keys($this->permalinkOptions) as $permalinkStructure) {
+            $this->permalinkOptions[$permalinkStructure]['code'] = $this->getSampleUrl($fakePost, $permalinkStructure);
+        }
     }
 
     public function echoFieldBase()
@@ -92,7 +123,16 @@ class Advanced extends SubPage
         echo '</fieldset>';
 
         echo '<p class="description">';
-        _e('By default, WordPress uses the post name to build the URL. To ensure uniqueness across posts, the post name can have a number appended if there are other posts with the same title (e.g. some-title, some-title-2, some-title-3, ...).', 'einsatzverwaltung');
+        $sampleSlug = sanitize_title(
+            _x('sample-incident', 'sample permalink structure', 'einsatzverwaltung'),
+            'sample-incident'
+        );
+        printf(
+            __('By default, WordPress uses the post name to build the URL. To ensure uniqueness across posts, the post name can have a number appended if there are other posts with the same title (e.g. %1$s, %2$s, %3$s, ...).', 'einsatzverwaltung'),
+            $sampleSlug,
+            "$sampleSlug-2",
+            "$sampleSlug-3"
+        );
         echo '</p></fieldset>';
     }
 
@@ -103,6 +143,18 @@ class Advanced extends SubPage
     {
         echo '<p>Die erweiterten Einstellungen k&ouml;nnen weitreichende Konsequenzen haben und sollten entsprechend nicht leichtfertig ge&auml;ndert werden.</p>';
         return;
+    }
+
+    /**
+     * @param WP_Post $post
+     * @param string $permalinkStructure
+     *
+     * @return string
+     */
+    private function getSampleUrl(WP_Post $post, $permalinkStructure)
+    {
+        $selector = $this->permalinkController->buildSelector($post, $permalinkStructure);
+        return $this->permalinkController->getPermalink($selector);
     }
 
     /**

@@ -117,8 +117,8 @@ class PermalinkController
             return $postLink;
         }
 
-        $path = sprintf('%s/%s', $this->reportRewriteSlug, $this->buildSelector($post, $this->reportPermalink));
-        return home_url(user_trailingslashit($path));
+        $selector = $this->buildSelector($post, $this->reportPermalink);
+        return $this->getPermalink($selector);
     }
 
     /**
@@ -151,6 +151,17 @@ class PermalinkController
     {
         $regex = str_replace($this->rewriteTags, $this->rewriteTagRegEx, $permalink);
         return '/^' . str_replace('/', '\/', $regex) . '$/';
+    }
+
+    /**
+     * @param string $selector
+     *
+     * @return string
+     */
+    public function getPermalink($selector)
+    {
+        $path = sprintf('%s/%s', $this->reportRewriteSlug, $selector);
+        return home_url(user_trailingslashit($path));
     }
 
     /**

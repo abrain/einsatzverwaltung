@@ -81,7 +81,7 @@ class Core
         new ReportNumberController();
 
         if (is_admin()) {
-            new Admin\Initializer($this->data, $this->options, $this->utilities);
+            new Admin\Initializer($this->data, $this->options, $this->utilities, $this->permalinkController);
         }
 
         $this->addHooks();

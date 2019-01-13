@@ -5,6 +5,7 @@ plugins:
     config:
       file_extensions: "php"
       standard: "PSR1,PSR2"
+      encoding: utf-8
   phpmd:
     enabled: true
     config:

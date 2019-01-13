@@ -3,7 +3,9 @@
 namespace abrain\Einsatzverwaltung\Settings;
 
 use abrain\Einsatzverwaltung\Options;
+use abrain\Einsatzverwaltung\PermalinkController;
 use abrain\Einsatzverwaltung\Settings\Pages\About;
+use abrain\Einsatzverwaltung\Settings\Pages\Advanced;
 use abrain\Einsatzverwaltung\Settings\Pages\Capabilities;
 use abrain\Einsatzverwaltung\Settings\Pages\General;
 use abrain\Einsatzverwaltung\Settings\Pages\Numbers;
@@ -27,9 +29,11 @@ class MainPage
 
     /**
      * MainPage constructor.
+     *
      * @param Options $options
+     * @param PermalinkController $permalinkController
      */
-    public function __construct(Options $options)
+    public function __construct(Options $options, PermalinkController $permalinkController)
     {
         $this->subPages = array();
 
@@ -39,6 +43,7 @@ class MainPage
         $this->addSubPage(new Report());
         $this->addSubPage(new ReportList());
         $this->addSubPage(new Capabilities());
+        $this->addSubPage(new Advanced($permalinkController));
         $this->addSubPage(new About());
     }
 
@@ -105,6 +110,7 @@ class MainPage
         }
         echo "</h2>";
 
+        $currentSubPage->beforeContent();
         $currentSubPage->echoStaticContent();
 
         // Einstellungen ausgeben

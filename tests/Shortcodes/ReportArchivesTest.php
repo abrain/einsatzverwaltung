@@ -27,11 +27,11 @@ class ReportArchivesTest extends PHPUnit_Framework_TestCase
     public function setUp()
     {
         parent::setUp();
-        $core = $this->createMock('\abrain\Einsatzverwaltung\Core');
-        $core->method('getYearArchiveLink')->willReturn(self::FAKE_URL);
+        $permalinkController = $this->createMock('\abrain\Einsatzverwaltung\PermalinkController');
+        $permalinkController->method('getYearArchiveLink')->willReturn(self::FAKE_URL);
         $data = $this->createMock('\abrain\Einsatzverwaltung\Data');
         $data->method('getYearsWithReports')->willReturn(array(2013, 2014, 2016, 2017));
-        $this->reportArchives = new ReportArchives($core, $data);
+        $this->reportArchives = new ReportArchives($data, $permalinkController);
         $this->thisYear = intval(date('Y'));
     }
 

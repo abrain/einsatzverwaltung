@@ -29,7 +29,7 @@ jobs:
   include:
   - stage: validate
     name: "Basic Checks"
-    php: 7.2
+    php: '7.3'
     before_install:
       - phpenv config-rm xdebug.ini
       - composer require bartlett/php-compatinfo:5.* --dev

@@ -1,10 +1,10 @@
 <?php
 namespace abrain\Einsatzverwaltung\Util;
 
-use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Options;
+use abrain\Einsatzverwaltung\PermalinkController;
 use WP_Post;
 use WP_Term;
 
@@ -54,12 +54,20 @@ class Formatter
     private $options;
 
     /**
-     * Formatter constructor.
-     * @param Options $options
+     * @var PermalinkController
      */
-    public function __construct($options)
+    private $permalinkController;
+
+    /**
+     * Formatter constructor.
+     *
+     * @param Options $options
+     * @param PermalinkController $permalinkController
+     */
+    public function __construct(Options $options, PermalinkController $permalinkController)
     {
         $this->options = $options;
+        $this->permalinkController = $permalinkController;
         $this->annotationIconBar = AnnotationIconBar::getInstance();
     }
 
@@ -167,7 +175,7 @@ class Formatter
                 break;
             case '%yearArchive%':
                 $year = $timeOfAlerting->format('Y');
-                $replace = Core::getInstance()->getYearArchiveLink($year);
+                $replace = $this->permalinkController->getYearArchiveLink($year);
                 break;
             case '%workforce%':
                 $replace = $incidentReport->getWorkforce();

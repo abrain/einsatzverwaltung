@@ -69,6 +69,8 @@ class Data
 
     /**
      * Gibt ein Array mit Jahreszahlen zurück, in denen Einsätze vorliegen
+     *
+     * @return string[]
      */
     public static function getJahreMitEinsatz()
     {
@@ -79,6 +81,16 @@ class Data
             "SELECT DISTINCT YEAR(post_date) AS years FROM {$wpdb->posts} WHERE post_type = %s AND post_status = %s;",
             array('einsatz', 'publish')
         ));
+    }
+
+    /**
+     * Returns the years
+     * @return int[]
+     */
+    public function getYearsWithReports()
+    {
+        $yearStrings = self::getJahreMitEinsatz();
+        return array_map('intval', $yearStrings);
     }
 
     /**

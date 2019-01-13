@@ -50,6 +50,14 @@ abstract class SubPage
     abstract public function registerSettings();
 
     /**
+     * Override this method to do some preparations right before the page is rendered
+     */
+    public function beforeContent()
+    {
+        return;
+    }
+
+    /**
      * Gibt den von WordPress mitgelieferten Colorpicker aus
      *
      * @param string $optionName Name der Einstellung
@@ -96,13 +104,17 @@ abstract class SubPage
     protected function echoRadioButtons($name, $options, $defaultValue)
     {
         $currentValue = get_option($name, $defaultValue);
-        foreach ($options as $value => $label) {
+        foreach ($options as $value => $option) {
+            $label = esc_html($option['label']);
+            if (array_key_exists('code', $option) && !empty($option['code'])) {
+                $label .= sprintf('<code>%s</code>', esc_html($option['code']));
+            }
             printf(
                 '<label><input type="radio" name="%s" value="%s"%s>%s</label><br>',
                 esc_attr($name),
                 esc_attr($value),
                 checked($value, $currentValue, false),
-                esc_html($label)
+                $label
             );
         }
     }

@@ -15,14 +15,17 @@ class Report implements CustomType
     const SLUG = 'einsatz';
 
     /**
-     * @return string
+     * @var string
      */
-    private function getRewriteSlug()
+    public $rewriteSlug;
+
+    /**
+     * Report constructor.
+     */
+    public function __construct()
     {
-        return sanitize_title(
-            get_option('einsatzvw_rewrite_slug', self::DEFAULT_REWRITE_SLUG),
-            self::DEFAULT_REWRITE_SLUG
-        );
+        $rewriteSlug = get_option('einsatzvw_rewrite_slug', self::DEFAULT_REWRITE_SLUG);
+        $this->rewriteSlug = sanitize_title($rewriteSlug, self::DEFAULT_REWRITE_SLUG);
     }
 
     /**
@@ -88,9 +91,9 @@ class Report implements CustomType
             'has_archive' => true,
             'rewrite' => array(
                 'feeds' => true,
-                'slug' => $this->getRewriteSlug()
+                'slug' => $this->rewriteSlug
             ),
-            'supports' => array('title', 'editor', 'thumbnail', 'publicize', 'author', 'revisions'),
+            'supports' => array('title', 'editor', 'thumbnail', 'publicize', 'author', 'revisions', 'excerpt'),
             'show_ui' => true,
             'show_in_menu' => true,
             'show_in_nav_menus' => false,

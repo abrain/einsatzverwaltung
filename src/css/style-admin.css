@@ -98,3 +98,7 @@ li.dropzone {
 .aboutpage-icon a {
     text-decoration: none;
 }
+
+.settings_page_einsatzvw-settings label > code {
+    margin-left: 0.5em;
+}

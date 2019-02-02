@@ -14,7 +14,6 @@ php:
   - '7.2'
 
 env:
-  - WP_VERSION=4.6.13 WP_MULTISITE=0
   - WP_VERSION=4.7.12 WP_MULTISITE=0
   - WP_VERSION=4.8.8 WP_MULTISITE=0
   - WP_VERSION=4.9.9 WP_MULTISITE=0
@@ -38,7 +37,7 @@ jobs:
     script: ./vendor/bin/phpunit -c phpunit-checks.xml --no-coverage
   - stage: validate
     name: 'Minimum requirement'
-    env: WP_VERSION=4.6 WP_MULTISITE=0
+    env: WP_VERSION=4.7 WP_MULTISITE=0
     php: '5.3'
     dist: precise
     before_install:

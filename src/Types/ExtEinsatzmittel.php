@@ -48,6 +48,7 @@ class ExtEinsatzmittel implements CustomType
             ),
             'public' => true,
             'show_in_nav_menus' => false,
+            'show_in_rest' => true,
             'capabilities' => array(
                 'manage_terms' => 'edit_einsatzberichte',
                 'edit_terms' => 'edit_einsatzberichte',
@@ -70,5 +71,12 @@ class ExtEinsatzmittel implements CustomType
             'URL',
             'URL zu mehr Informationen &uuml;ber ein externes Einsatzmittel, beispielsweise dessen Webseite.'
         ));
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function registerHooks()
+    {
     }
 }

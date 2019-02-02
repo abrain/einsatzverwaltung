@@ -47,6 +47,7 @@ class Alarmierungsart implements CustomType
             ),
             'public' => true,
             'show_in_nav_menus' => false,
+            'show_in_rest' => true,
             'capabilities' => array(
                 'manage_terms' => 'edit_einsatzberichte',
                 'edit_terms' => 'edit_einsatzberichte',
@@ -60,6 +61,13 @@ class Alarmierungsart implements CustomType
      * @inheritdoc
      */
     public function registerCustomFields(TaxonomyCustomFields $taxonomyCustomFields)
+    {
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function registerHooks()
     {
     }
 }

@@ -24,7 +24,7 @@ Klassen werden automatisch geladen, die Dateien sind nach [PSR-4](https://www.ph
 
 ### Mindestvoraussetzungen
 * PHP: 5.3.0
-* WordPress: 4.6
+* WordPress: 4.7
 
 Auch wenn PHP 5.3 vorausgesetzt und derzeit noch als Minimum erhalten wird, werden die automatisierten Tests nur mit den [aktuellen PHP-Versionen](https://secure.php.net/supported-versions.php) durchgef&uuml;hrt.
 

@@ -3,6 +3,7 @@ namespace abrain\Einsatzverwaltung\Types;
 
 use abrain\Einsatzverwaltung\CustomFields\ColorPicker;
 use abrain\Einsatzverwaltung\TaxonomyCustomFields;
+use WP_REST_Response;
 
 /**
  * Description of the custom taxonomy 'Type of incident'
@@ -50,7 +51,8 @@ class IncidentType implements CustomType
             ),
             'public' => true,
             'show_in_nav_menus' => false,
-            'meta_box_cb' => array('abrain\Einsatzverwaltung\Admin\ReportEditScreen', 'displayMetaBoxEinsatzart'),
+            'show_in_rest' => true,
+            'meta_box_cb' => false,
             'capabilities' => array(
                 'manage_terms' => 'edit_einsatzberichte',
                 'edit_terms' => 'edit_einsatzberichte',
@@ -71,5 +73,22 @@ class IncidentType implements CustomType
             'Farbe',
             'Ordne dieser Einsatzart eine Farbe zu. Einsatzarten ohne Farbe erben diese gegebenenfalls von übergeordneten Einsatzarten.'
         ));
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function registerHooks()
+    {
+        /**
+         * Prevent the Gutenberg Editor from creating a UI for this taxonomy, so we can use our own
+         * https://github.com/WordPress/gutenberg/issues/6912#issuecomment-428403380
+         */
+        add_filter('rest_prepare_taxonomy', function (WP_REST_Response $response, $taxonomy) {
+            if ('einsatzart' === $taxonomy->name) {
+                $response->data['visibility']['show_ui'] = false;
+            }
+            return $response;
+        }, 10, 2);
     }
 }

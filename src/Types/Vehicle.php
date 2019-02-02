@@ -48,6 +48,7 @@ class Vehicle implements CustomType
             ),
             'public' => true,
             'show_in_nav_menus' => false,
+            'show_in_rest' => true,
             'hierarchical' => true,
             'capabilities' => array(
                 'manage_terms' => 'edit_einsatzberichte',
@@ -74,5 +75,12 @@ class Vehicle implements CustomType
             'Reihenfolge',
             'Optionale Angabe, mit der die Anzeigereihenfolge der Fahrzeuge beeinflusst werden kann. Fahrzeuge mit der kleineren Zahl werden zuerst angezeigt, anschlie&szlig;end diejenigen ohne Angabe bzw. dem Wert 0 in alphabetischer Reihenfolge.'
         ));
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function registerHooks()
+    {
     }
 }

@@ -40,6 +40,18 @@ class ReportEditScreen
                 '__back_compat_meta_box' => false
             )
         );
+        add_meta_box(
+            'einsatzartdiv',
+            'Einsatzart',
+            array('abrain\Einsatzverwaltung\Admin\ReportEditScreen', 'displayMetaBoxEinsatzart'),
+            'einsatz',
+            'side',
+            'default',
+            array(
+                '__block_editor_compatible_meta_box' => true,
+                '__back_compat_meta_box' => false
+            )
+        );
     }
 
     /**

@@ -63,4 +63,11 @@ class Alarmierungsart implements CustomType
     public function registerCustomFields(TaxonomyCustomFields $taxonomyCustomFields)
     {
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function registerHooks()
+    {
+    }
 }

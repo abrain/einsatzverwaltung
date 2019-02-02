@@ -24,4 +24,9 @@ interface CustomType
      * @return void
      */
     public function registerCustomFields(TaxonomyCustomFields $taxonomyCustomFields);
+
+    /**
+     * @return void
+     */
+    public function registerHooks();
 }

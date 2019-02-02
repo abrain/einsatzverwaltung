@@ -249,4 +249,11 @@ class Report implements CustomType
 
         return ($formattedDateTime === false ? '' : $formattedDateTime);
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function registerHooks()
+    {
+    }
 }

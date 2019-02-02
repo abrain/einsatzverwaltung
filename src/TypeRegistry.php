@@ -76,6 +76,7 @@ class TypeRegistry
         }
 
         $customType->registerCustomFields($this->taxonomyCustomFields);
+        $customType->registerHooks();
 
         $this->postTypes[$slug] = $postType;
     }
@@ -106,6 +107,7 @@ class TypeRegistry
         }
 
         $customTaxonomy->registerCustomFields($this->taxonomyCustomFields);
+        $customTaxonomy->registerHooks();
 
         array_push($this->taxonomies, $slug);
     }

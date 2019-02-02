@@ -76,4 +76,11 @@ class Vehicle implements CustomType
             'Optionale Angabe, mit der die Anzeigereihenfolge der Fahrzeuge beeinflusst werden kann. Fahrzeuge mit der kleineren Zahl werden zuerst angezeigt, anschlie&szlig;end diejenigen ohne Angabe bzw. dem Wert 0 in alphabetischer Reihenfolge.'
         ));
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function registerHooks()
+    {
+    }
 }

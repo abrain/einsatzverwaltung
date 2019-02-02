@@ -72,4 +72,11 @@ class ExtEinsatzmittel implements CustomType
             'URL zu mehr Informationen &uuml;ber ein externes Einsatzmittel, beispielsweise dessen Webseite.'
         ));
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function registerHooks()
+    {
+    }
 }

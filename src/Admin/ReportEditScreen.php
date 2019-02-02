@@ -22,14 +22,23 @@ class ReportEditScreen
             array($this, 'displayMetaBoxEinsatzdetails'),
             'einsatz',
             'normal',
-            'high'
+            'high',
+            array(
+                '__block_editor_compatible_meta_box' => true,
+                '__back_compat_meta_box' => false
+            )
         );
         add_meta_box(
             'einsatzverwaltung_meta_annotations',
             'Vermerke',
             array($this, 'displayMetaBoxAnnotations'),
             'einsatz',
-            'side'
+            'side',
+            'default',
+            array(
+                '__block_editor_compatible_meta_box' => true,
+                '__back_compat_meta_box' => false
+            )
         );
     }
 

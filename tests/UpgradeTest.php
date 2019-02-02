@@ -131,13 +131,13 @@ class UpgradeTest extends WP_UnitTestCase
     {
         $reportFactory = new ReportFactory();
         $reportIds = $reportFactory->create_many(3);
-        update_post_meta($reportIds[0], 'einsatz_mannschaft', 1);
-        update_post_meta($reportIds[1], 'einsatz_mannschaft', 0);
+        update_post_meta($reportIds[0], 'einsatz_mannschaft', '1');
+        update_post_meta($reportIds[1], 'einsatz_mannschaft', '0');
         update_post_meta($reportIds[2], 'einsatz_mannschaft', '1/8');
 
         $this->runUpgrade(3, 4);
 
-        self::assertEquals(1, get_post_meta($reportIds[0], 'einsatz_mannschaft', true));
+        self::assertEquals('1', get_post_meta($reportIds[0], 'einsatz_mannschaft', true));
         self::assertEquals('', get_post_meta($reportIds[1], 'einsatz_mannschaft', true));
         self::assertEquals('1/8', get_post_meta($reportIds[2], 'einsatz_mannschaft', true));
     }

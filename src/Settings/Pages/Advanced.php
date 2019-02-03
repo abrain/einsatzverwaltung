@@ -54,6 +54,13 @@ class Advanced extends SubPage
             $this->settingsApiPage,
             'einsatzvw_settings_permalinks'
         );
+        add_settings_field(
+            'einsatzvw_advreport_corefeatures',
+            __('Core features', 'einsatzverwaltung'),
+            array($this, 'echoFieldCoreFeatures'),
+            $this->settingsApiPage,
+            'einsatzvw_settings_advreport'
+        );
     }
 
     public function addSettingsSections()
@@ -64,6 +71,12 @@ class Advanced extends SubPage
             function () {
                 echo '<p>Eine &Auml;nderung der Permalinkstruktur hat zur Folge, dass bisherige Links auf Einsatzberichte nicht mehr funktionieren. Dem solltest du als Seitenbetreiber mit Weiterleitungen entgegenwirken.</p>';
             },
+            $this->settingsApiPage
+        );
+        add_settings_section(
+            'einsatzvw_settings_advreport',
+            'Einsatzberichte',
+            null,
             $this->settingsApiPage
         );
     }
@@ -110,6 +123,17 @@ class Advanced extends SubPage
             );
         }
         echo '</p></fieldset>';
+    }
+
+    public function echoFieldCoreFeatures()
+    {
+        echo '<fieldset>';
+        $this->echoSettingsCheckbox(
+            'einsatz_support_posttag',
+            __('Tags', 'einsatzverwaltung')
+        );
+        echo '<p class="description">Diese Funktionen, die du von Beitr&auml;gen kennst, k&ouml;nnen auch f&uuml;r Einsatzberichte aktiviert werden.</p>';
+        echo '</fieldset>';
     }
 
     public function echoFieldUrlStructure()
@@ -185,6 +209,11 @@ class Advanced extends SubPage
             'einsatzvw_settings_advanced',
             'einsatz_permalink',
             array('PermalinkController', 'sanitizePermalink')
+        );
+        register_setting(
+            'einsatzvw_settings_advanced',
+            'einsatz_support_posttag',
+            array('Utilities', 'sanitizeCheckbox')
         );
     }
 }

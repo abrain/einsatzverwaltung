@@ -381,4 +381,11 @@ class UpgradeTest extends WP_UnitTestCase
     {
         $this->runUpgrade(21, 30);
     }
+
+    public function testUpgrade150()
+    {
+        $this->runUpgrade(30, 40);
+
+        $this->assertEquals('1', get_option('einsatz_support_posttag'));
+    }
 }

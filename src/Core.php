@@ -12,7 +12,7 @@ use abrain\Einsatzverwaltung\Widgets\RecentIncidentsFormatted;
 class Core
 {
     const VERSION = '1.4.3';
-    const DB_VERSION = 30;
+    const DB_VERSION = 40;
 
    /**
     * Statische Variable, um die aktuelle (einzige!) Instanz dieser Klasse zu halten

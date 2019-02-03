@@ -104,7 +104,7 @@ class Report implements CustomType
             'capabilities' => $this->getCapabilities(),
             'menu_position' => 5,
             'menu_icon' => 'dashicons-media-document',
-            'taxonomies' => array('post_tag', 'category'),
+            'taxonomies' => $this->getTaxonomies(),
             'delete_with_user' => false,
         );
     }
@@ -115,6 +115,20 @@ class Report implements CustomType
     public function getSlug()
     {
         return self::SLUG;
+    }
+
+    /**
+     * @return array The taxonomies that are linked to this post type
+     */
+    private function getTaxonomies()
+    {
+        $taxonomies = array('category');
+
+        if (get_option('einsatz_support_posttag', '0') === '1') {
+            $taxonomies[] = 'post_tag';
+        }
+
+        return $taxonomies;
     }
 
     /**

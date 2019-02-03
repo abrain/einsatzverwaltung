@@ -81,6 +81,10 @@ class Update
         if ($currentDbVersion < 30 && $targetDbVersion >= 30) {
             $this->upgrade140();
         }
+
+        if ($currentDbVersion < 40 && $targetDbVersion >= 40) {
+            $this->upgrade150();
+        }
     }
 
     /**
@@ -339,6 +343,13 @@ class Update
         delete_option('einsatzvw_excerpt_type_feed');
 
         update_option('einsatzvw_db_version', 30);
+    }
+
+    private function upgrade150()
+    {
+        add_option('einsatz_support_posttag', '1');
+
+        update_option('einsatzvw_db_version', 40);
     }
 
     /**

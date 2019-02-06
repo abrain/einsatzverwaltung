@@ -66,9 +66,6 @@ class Initializer
      */
     public function hideTaxonomies()
     {
-        // Hide meta box for category selection when editing reports
-        remove_meta_box('categorydiv', 'einsatz', 'side');
-
         // Hide the submenu item to edit categories (still exists for posts)
         remove_submenu_page(
             'edit.php?post_type=einsatz',

@@ -54,6 +54,11 @@ class Report implements CustomType
             'uploaded_to_this_item' => 'Zu diesem Einsatzbericht hochgeladen',
             'view_items' => 'Einsatzberichte ansehen',
             //'attributes' => 'Attribute', // In WP 4.7 eingeführtes Label, für Einsatzberichte derzeit nicht relevant
+            'item_published' => 'Einsatzbericht veröffentlicht.',
+            'item_published_privately' => 'Einsatzbericht privat veröffentlicht.',
+            'item_reverted_to_draft' => 'Einsatzbericht auf Entwurf zurückgesetzt.',
+            'item_scheduled' => 'Einsatzbericht geplant.',
+            'item_updated' => 'Einsatzbericht aktualisiert.',
         );
     }
 

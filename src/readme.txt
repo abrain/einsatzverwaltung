@@ -33,12 +33,7 @@ Uses Font Awesome by Dave Gandy - http://fontawesome.io
 
 == Installation ==
 
-Das Plugin kann entweder aus WordPress heraus aus dem [Pluginverzeichnis](https://wordpress.org/plugins/einsatzverwaltung/) installiert werden oder aber durch Hochladen der Plugindateien in das Verzeichnis `/wp-content/plugins/`.
-
-In beiden F&auml;llen muss das Plugin erst aktiviert werden, bevor es benutzt werden kann.
-
-__Es wird PHP 5.3.0 oder neuer ben&ouml;tigt__
-(Getestet wird jedoch nur mit den [aktuellen PHP-Versionen](https://secure.php.net/supported-versions.php))
+The plugin does not require any setup but I recommend to take a look at the settings before you start publishing. Especially those in the Advanced section should not be changed inconsiderately later on.
 
 == Frequently Asked Questions ==
 

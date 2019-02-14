@@ -98,41 +98,6 @@ Nein, mehr gibt es [hier](https://einsatzverwaltung.abrain.de/faq/).
 * Verschiedene Leistungsverbesserungen
 * Font Awesome auf Version 4.7 aktualisiert
 
-= 1.3.6 =
-* Fehler behoben, bei dem in einem Export aus dem All-in-One Event Calendar von Time.ly Einsatzdetails in Ereignissen auftauchen konnten
-
-= 1.3.5 =
-* Unn&ouml;tige Dateien aus Font Awesome entfernt
-
-= 1.3.4 =
-* Fehler behoben, bei dem importierte Einsatzberichte, die nicht als besonders markiert waren, auf der Startseite angezeigt wurden, obwohl dort nur als besonders markierte auftauchen sollten
-
-= 1.3.3 =
-* Kompatibilit&auml;tsproblem mit "Page Builder by SiteOrigin" behoben
-* Getestet mit WordPress 4.9
-
-= 1.3.2 =
-* Widgets: Die Symbole f&uuml;r die Vermerke k&ouml;nnen nun angezeigt werden
-* Die Farbe f&uuml;r inaktive Vermerke kann nun eingestellt werden
-
-= 1.3.1 =
-* Anpassung der URLs: Zeitlimit entfernt
-* Einsatzliste: Text kann in der mobilen Ansicht auch direkt nach der Spalten&uuml;berschrift umbrechen
-* Import: Performance verbessert
-* Import aus wp-einsatz repariert
-* Getestet mit WordPress 4.8
-
-= 1.3.0 =
-* Neuer Vermerk 'Bilder im Bericht'
-* Einsatzliste: Neue Spalten f&uuml;r Vermerke 'Bilder im Bericht' und 'Besonderer Einsatz'
-* Vermerke werden in der &Uuml;bersicht im Adminbereich angezeigt
-* Einsatznummer ist nun nicht mehr Teil der URL
-* Import: Einsatznummer kann importiert werden
-* Einsatznummern k&ouml;nnen wahlweise automatisch oder manuell verwaltet werden
-* Werkzeug zum Reparieren der Einsatznummern entfernt
-* Mindestanforderung auf WordPress 4.4 angehoben
-* Getestet mit WordPress 4.7
-
 == Upgrade Notice ==
 
 = 1.4.3 =

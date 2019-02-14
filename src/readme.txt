@@ -45,21 +45,9 @@ Nein, dieses Plugin hat nichts mit einsatzverwaltung.eu zu tun.
 
 Die Dokumentation gibt es [hier](https://einsatzverwaltung.abrain.de/dokumentation/), wenn etwas fehlt oder missverst&auml;ndlich erkl&auml;rt ist, bitte melden.
 
-= Ich f&auml;nde es gut, wenn Funktionalit&auml;t X hinzugef&uuml;gt / verbessert werden k&ouml;nnte =
+= Where should I send feature requests and bug reports to? =
 
-Entweder einen Issue auf [GitHub](https://github.com/abrain/einsatzverwaltung/issues) er&ouml;ffnen (sofern es nicht schon einen solchen gibt) oder die anderen Kontaktm&ouml;glichkeiten nutzen.
-
-= Wie kann ich den Entwickler erreichen? =
-
-Entweder [per Mail](mailto:kontakt@abrain.de), per PN auf [Facebook](https://www.facebook.com/einsatzverwaltung) oder über [Twitter](https://twitter.com/einsatzvw). Bugs und Verbesserungsvorschl&auml;ge gerne auch als [Issue auf GitHub](https://github.com/abrain/einsatzverwaltung/issues).
-
-= Meine eMails mag ich am liebsten verschl&uuml;sselt und signiert, hast Du da was? =
-
-F&uuml;r eMails von/an [kontakt@abrain.de](mailto:kontakt@abrain.de) kann ich PGP anbieten, Schl&uuml;ssel-ID 8752EB8F.
-
-= Du oder Sie? =
-
-Das Du halte ich f&uuml;r die angenehmere Arbeitsgrundlage, aber man darf mich gerne auch siezen ohne dass ich mich alt f&uuml;hle.
+Ideally, you check the issues on [GitHub](https://github.com/abrain/einsatzverwaltung/issues) if this has been reported before. If not, feel free to open a new issue. You can also post a new topic on the support forum instead.
 
 = Sind das hier die ganzen FAQ? =
 

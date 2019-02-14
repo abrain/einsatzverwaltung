@@ -168,6 +168,10 @@ class Initializer
     {
         if (Core::$pluginBasename === $file) {
             $links[] = '<a href="https://einsatzverwaltung.abrain.de/feed/">Newsfeed</a>';
+            $links[] = sprintf(
+                '<a href="%s">Support &amp; Links</a>',
+                admin_url('options-general.php?page=' . MainPage::EVW_SETTINGS_SLUG . '&tab=about')
+            );
         }
 
         return $links;

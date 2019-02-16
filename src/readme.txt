@@ -55,6 +55,17 @@ Nein, mehr gibt es [hier](https://einsatzverwaltung.abrain.de/faq/).
 
 == Changelog ==
 
+= 1.5.0 =
+* Grundlegende Unterstützung für den neuen Blockeditor
+* API teilweise aktiviert
+* Permalinks für Einsatzberichte einstellbar gemacht
+* Templates: Neuer Platzhalter für Einsatzleiter
+* Shortcode einsatzjahre jetzt über Parameter konfigurierbar
+* Auszug für Einsatzberichte kann manuell definiert werden
+* Schlagwörter sind jetzt für Einsatzberichte abschaltbar
+* Fehler bei der Behandlung der Alarmzeit von geplanten Beiträgen behoben
+* Mindestanforderung auf WordPress 4.7 angehoben
+
 = 1.4.3 =
 * Kompatibilit&auml;t mit WordPress 5.0.1, 4.9.9, 4.8.8, 4.7.12, 4.6.13 wiederhergestellt
 * Import: Nicht kritischen Fehler mit dem Beitragsdatum beim Import als Entwurf behoben

@@ -14,10 +14,10 @@ class Advanced extends SubPage
 {
     private $permalinkOptions = array(
         PermalinkController::DEFAULT_REPORT_PERMALINK => array(
-            'label' => 'WordPress-Standard'
+            'label' => 'Beitragstitel mit angeh&auml;ngtem Z&auml;hler (Standard)'
         ),
         '%post_id%-%postname_nosuffix%' => array(
-            'label' => 'Beitragsnummer und Beitragstitel ohne angehängten Zähler'
+            'label' => 'Beitragsnummer und Beitragstitel ohne angeh&auml;ngten Z&auml;hler'
         )
     );
     /**
@@ -49,14 +49,14 @@ class Advanced extends SubPage
         );
         add_settings_field(
             'einsatzvw_permalinks_struct',
-            'URL-Struktur',
+            'URL-Struktur f&uuml;r Einsatzberichte',
             array($this, 'echoFieldUrlStructure'),
             $this->settingsApiPage,
             'einsatzvw_settings_permalinks'
         );
         add_settings_field(
             'einsatzvw_advreport_corefeatures',
-            __('Core features', 'einsatzverwaltung'),
+            'Beitragsfunktionen',
             array($this, 'echoFieldCoreFeatures'),
             $this->settingsApiPage,
             'einsatzvw_settings_advreport'

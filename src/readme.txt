@@ -47,7 +47,7 @@ Die Dokumentation gibt es [hier](https://einsatzverwaltung.abrain.de/dokumentati
 
 = Where should I send feature requests and bug reports to? =
 
-Ideally, you check the issues on [GitHub](https://github.com/abrain/einsatzverwaltung/issues) if this has been reported before. If not, feel free to open a new issue. You can also post a new topic on the support forum instead.
+Ideally, you check the issues on [GitHub](https://github.com/abrain/einsatzverwaltung/issues) if this has been addressed before. If not, feel free to open a new issue. You can also post a new topic on the support forum instead.
 
 = Sind das hier die ganzen FAQ? =
 

@@ -69,6 +69,21 @@ class Advanced extends SubPage
             'einsatzvw_settings_permalinks',
             __('Permalinks', 'einsatzverwaltung'),
             function () {
+                global $wp_rewrite;
+                if ($wp_rewrite->using_permalinks() === false) {
+                    echo '<p style="">';
+                    printf('<strong>%s</strong> ', esc_html(__('Note:', 'einsatzverwaltung')));
+                    printf(
+                        // Translators: %s: permalinks
+                        __('These settings currently have no effect, as WordPress uses plain %s', 'einsatzverwaltung'),
+                        sprintf(
+                            '<a href="%s">%s</a>',
+                            admin_url('options-permalink.php'),
+                            __('permalinks', 'einsatzverwaltung')
+                        )
+                    );
+                    echo '</p>';
+                }
                 echo '<p>Eine &Auml;nderung der Permalinkstruktur hat zur Folge, dass bisherige Links auf Einsatzberichte nicht mehr funktionieren. Dem solltest du als Seitenbetreiber mit Weiterleitungen entgegenwirken.</p>';
             },
             $this->settingsApiPage
@@ -99,7 +114,6 @@ class Advanced extends SubPage
 
     public function echoFieldBase()
     {
-        global $wp_rewrite;
         echo '<fieldset>';
         $this->echoSettingsInput(
             'einsatzvw_rewrite_slug',
@@ -111,17 +125,6 @@ class Advanced extends SubPage
             sprintf('<a href="%s">%s</a>', get_post_type_archive_link('einsatz'), 'Archiv'),
             sprintf('<a href="%s">%s</a>', get_post_type_archive_feed_link('einsatz'), 'Feed')
         );
-        if ($wp_rewrite->using_permalinks() === false) {
-            echo '</p><p class="description">';
-            printf(
-                __('Note: This setting has no effect, as WordPress currently uses plain %s', 'einsatzverwaltung'),
-                sprintf(
-                    '<a href="%s">%s</a>',
-                    admin_url('options-permalink.php'),
-                    __('permalinks', 'einsatzverwaltung')
-                )
-            );
-        }
         echo '</p></fieldset>';
     }
 

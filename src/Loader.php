@@ -35,7 +35,7 @@ if (!defined('ABSPATH')) {
     die('You shall not pass!');
 }
 
-$autoloaderRegistered = spl_autoload_register(__NAMESPACE__ . '\Loader::load');
+$autoloaderRegistered = spl_autoload_register(__NAMESPACE__ . '\Loader::load', false);
 
 if ($autoloaderRegistered === false) {
     add_action('admin_notices', function () {

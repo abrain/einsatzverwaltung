@@ -23,6 +23,7 @@ class ReportNumberController
         }
         add_action('updated_option', array($this, 'maybeAutoIncidentNumbersChanged'), 10, 3);
         add_action('updated_option', array($this, 'maybeIncidentNumberFormatChanged'), 10, 3);
+        add_action('add_option_einsatzverwaltung_incidentnumbers_auto', array($this, 'onOptionAdded'), 10, 2);
     }
 
     /**
@@ -73,6 +74,17 @@ class ReportNumberController
     public static function isAutoIncidentNumbers()
     {
         return (get_option('einsatzverwaltung_incidentnumbers_auto', '0') === '1');
+    }
+
+    /**
+     * @param string $option Name of the added option
+     * @param mixed $value Value of the added option
+     */
+    public function onOptionAdded($option, $value)
+    {
+        if ($option === 'einsatzverwaltung_incidentnumbers_auto') {
+            $this->maybeAutoIncidentNumbersChanged($option, '', $value);
+        }
     }
 
     /**

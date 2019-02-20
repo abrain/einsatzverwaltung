@@ -211,12 +211,12 @@ class Advanced extends SubPage
         register_setting(
             'einsatzvw_settings_advanced',
             'einsatz_permalink',
-            array('PermalinkController', 'sanitizePermalink')
+            array('\abrain\Einsatzverwaltung\PermalinkController', 'sanitizePermalink')
         );
         register_setting(
             'einsatzvw_settings_advanced',
             'einsatz_support_posttag',
-            array('Utilities', 'sanitizeCheckbox')
+            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
         );
     }
 }

@@ -197,7 +197,7 @@ class General extends SubPage
         register_setting(
             'einsatzvw_settings_general',
             'einsatzvw_show_einsatzberichte_mainloop',
-            array('Utilities', 'sanitizeCheckbox')
+            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_general',
@@ -207,7 +207,7 @@ class General extends SubPage
         register_setting(
             'einsatzvw_settings_general',
             'einsatzvw_loop_only_special',
-            array('Utilities', 'sanitizeCheckbox')
+            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_general',

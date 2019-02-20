@@ -76,17 +76,17 @@ class Numbers extends SubPage
         register_setting(
             'einsatzvw_settings_numbers',
             'einsatzverwaltung_incidentnumbers_auto',
-            array('Utilities', 'sanitizeCheckbox')
+            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_numbers',
             'einsatzvw_einsatznummer_stellen',
-            array('ReportNumberController', 'sanitizeEinsatznummerStellen')
+            array('\abrain\Einsatzverwaltung\ReportNumberController', 'sanitizeEinsatznummerStellen')
         );
         register_setting(
             'einsatzvw_settings_numbers',
             'einsatzvw_einsatznummer_lfdvorne',
-            array('Utilities', 'sanitizeCheckbox')
+            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
         );
     }
 }

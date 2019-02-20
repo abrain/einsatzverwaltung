@@ -46,7 +46,7 @@ class Utilities
      */
     public function printError($message)
     {
-        echo '<p class="evw_error"><i class="fa fa-exclamation-circle"></i>&nbsp;' . $message . '</p>';
+        echo '<p class="notice notice-error">' . $message . '</p>';
     }
 
 
@@ -57,7 +57,7 @@ class Utilities
      */
     public function printWarning($message)
     {
-        echo '<p class="evw_warning"><i class="fa fa-exclamation-triangle"></i>&nbsp;' . $message . '</p>';
+        echo '<p class="notice notice-warning">' . $message . '</p>';
     }
 
 
@@ -68,7 +68,7 @@ class Utilities
      */
     public function printSuccess($message)
     {
-        echo '<p class="evw_success"><i class="fa fa-check-circle"></i>&nbsp;' . $message . '</p>';
+        echo '<p class="notice notice-success">' . $message . '</p>';
     }
 
 
@@ -79,7 +79,7 @@ class Utilities
      */
     public function printInfo($message)
     {
-        echo '<p class="evw_info"><i class="fa fa-info-circle"></i>&nbsp;' . $message . '</p>';
+        echo '<p class="notice notice-info">' . $message . '</p>';
     }
 
     /**

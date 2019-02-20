@@ -199,8 +199,9 @@ class Tool
             echo '<p>Die CSV-Datei muss f&uuml;r den Import ein bestimmtes Format aufweisen. Jede Zeile in der Datei steht f&uuml;r einen Einsatzbericht und jede Spalte f&uuml;r ein Feld des Einsatzberichts (z.B. Alarmzeit, Einsatzort, ...). Die Reihenfolge der Spalten ist unerheblich, im n&auml;chsten Schritt k&ouml;nnen die Felder aus der Datei denen in der Einsatzverwaltung zugeordnet werden. Die erste Zeile in der Datei kann als Beschriftung der Spalten verwendet werden.</p>';
             $this->printDataNotice();
 
-            echo '<form method="post">';
-            wp_nonce_field($this->getNonceAction($this->currentSource, $this->nextAction['slug']));
+            echo '<h3>In der Mediathek gefundene CSV-Dateien</h3>';
+            echo 'Bevor eine Datei f&uuml;r den Import verwendet werden kann, muss sie in die <a href="' . admin_url('upload.php') . '">Mediathek</a> hochgeladen worden sein. Nach erfolgreichem Import kann die Datei gel&ouml;scht werden.';
+            $this->utilities->printWarning('Der Inhalt der Mediathek ist &ouml;ffentlich abrufbar. Achte darauf, dass die Importdatei keine sensiblen Daten enth&auml;lt.');
 
             $csvAttachments = get_posts(array(
                 'post_type' => 'attachment',
@@ -208,16 +209,21 @@ class Tool
             ));
 
             if (empty($csvAttachments)) {
-                $this->utilities->printInfo('Bitte lade die zu importierende CSV-Datei <a href="' . admin_url('media-new.php') . '">hier</a> in die Mediathek hoch. Nach dem Import kann und sollte die Datei aus der Mediathek gel&ouml;scht werden, sofern sie nicht &ouml;ffentlich zug&auml;nglich sein soll.');
+                echo '<p>Keine CSV-Dateien gefunden.</p>';
                 return;
             }
 
-            echo '<h3>In der Mediathek gefundene CSV-Dateien</h3>';
+            echo '<form method="post">';
+            wp_nonce_field($this->getNonceAction($this->currentSource, $this->nextAction['slug']));
+
             echo '<fieldset>';
             foreach ($csvAttachments as $csvAttachment) {
                 /** @var \WP_Post $csvAttachment */
-                echo '<label><input type="radio" name="csv_file_id" value="' . $csvAttachment->ID . '">';
-                echo $csvAttachment->post_title . '</label><br/>';
+                printf(
+                    '<label><input type="radio" name="csv_file_id" value="%d">%s</label><br/>',
+                    esc_attr($csvAttachment->ID),
+                    esc_html($csvAttachment->post_title)
+                );
             }
             echo '</fieldset>';
             ?>
@@ -251,7 +257,7 @@ class Tool
             $this->utilities->printError('Es wurden keine Felder gefunden');
             return;
         }
-        $this->utilities->printSuccess('Es wurden folgende Felder gefunden: ' . implode($felder, ', '));
+        $this->utilities->printSuccess('Es wurden ' . count($felder) . ' Feld(er) gefunden: ' . implode($felder, ', '));
 
         // Auf Pflichtfelder prüfen
         $mandatoryFieldsOk = true;

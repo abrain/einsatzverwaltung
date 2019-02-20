@@ -6,7 +6,7 @@ use abrain\Einsatzverwaltung\Exceptions\ImportException;
 use abrain\Einsatzverwaltung\Exceptions\ImportPreparationException;
 use abrain\Einsatzverwaltung\Import\Sources\AbstractSource;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
-use abrain\Einsatzverwaltung\Options;
+use abrain\Einsatzverwaltung\ReportNumberController;
 use abrain\Einsatzverwaltung\Utilities;
 use DateTime;
 
@@ -19,11 +19,6 @@ class Helper
      * @var Utilities
      */
     private $utilities;
-
-    /**
-     * @var Options
-     */
-    private $options;
 
     /**
      * @var Data
@@ -48,13 +43,11 @@ class Helper
     /**
      * Helper constructor.
      * @param Utilities $utilities
-     * @param Options $options
      * @param Data $data
      */
-    public function __construct(Utilities $utilities, Options $options, Data $data)
+    public function __construct(Utilities $utilities, Data $data)
     {
         $this->utilities = $utilities;
-        $this->options = $options;
         $this->data = $data;
     }
 
@@ -383,7 +376,7 @@ class Helper
         $fields = $source->getFields();
 
         $unmatchableFields = $source->getUnmatchableFields();
-        if ($this->options->isAutoIncidentNumbers()) {
+        if (ReportNumberController::isAutoIncidentNumbers()) {
             $this->utilities->printInfo('Einsatznummern können nur importiert werden, wenn die automatische Verwaltung deaktiviert ist.');
 
             $unmatchableFields[] = 'einsatz_incidentNumber';
@@ -481,7 +474,7 @@ class Helper
 
         $unmatchableFields = $source->getUnmatchableFields();
         $autoMatchFields = $source->getAutoMatchFields();
-        if ($this->options->isAutoIncidentNumbers()) {
+        if (ReportNumberController::isAutoIncidentNumbers()) {
             $unmatchableFields[] = 'einsatz_incidentNumber';
         }
         foreach ($unmatchableFields as $unmatchableField) {

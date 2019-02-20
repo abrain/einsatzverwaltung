@@ -10,37 +10,16 @@ use wpdb;
 class Update
 {
     /**
-     * @var Core
-     */
-    private $core;
-
-    /**
      * @var Data
      */
     private $data;
 
     /**
-     * @var Options
-     */
-    private $options;
-
-    /**
-     * @var Utilities
-     */
-    private $utilities;
-
-    /**
      * Update constructor.
-     * @param Core $core
-     * @param Options $options
-     * @param Utilities $utilities
      * @param Data $data
      */
-    public function __construct($core, $options, $utilities, $data)
+    public function __construct($data)
     {
-        $this->core = $core;
-        $this->options = $options;
-        $this->utilities = $utilities;
         $this->data = $data;
     }
 
@@ -102,6 +81,10 @@ class Update
         if ($currentDbVersion < 30 && $targetDbVersion >= 30) {
             $this->upgrade140();
         }
+
+        if ($currentDbVersion < 40 && $targetDbVersion >= 40) {
+            $this->upgrade150();
+        }
     }
 
     /**
@@ -112,7 +95,14 @@ class Update
         /** @var wpdb $wpdb */
         global $wpdb;
 
-        foreach (Data::getEinsatzberichte('') as $bericht) {
+        $allReports = get_posts(array(
+            'nopaging' => true,
+            'orderby' => 'post_date',
+            'order' => 'ASC',
+            'post_type' => 'einsatz',
+            'post_status' => array('publish', 'private')
+        ));
+        foreach ($allReports as $bericht) {
             $gmtdate = get_gmt_from_date($bericht->post_date);
             $result = $wpdb->update(
                 $wpdb->posts,
@@ -133,7 +123,7 @@ class Update
     {
         update_option('einsatzvw_cap_roles_administrator', 1);
         $roleObject = get_role('administrator');
-        foreach ($this->core->getCapabilities() as $cap) {
+        foreach (UserRightsManager::$capabilities as $cap) {
             $roleObject->add_cap($cap);
         }
 
@@ -188,7 +178,7 @@ class Update
         if (!empty($roles)) {
             foreach (array_keys($roles) as $roleSlug) {
                 $roleObject = get_role($roleSlug);
-                foreach ($this->core->getCapabilities() as $cap) {
+                foreach (UserRightsManager::$capabilities as $cap) {
                     $roleObject->remove_cap($cap);
                 }
             }
@@ -205,7 +195,7 @@ class Update
      */
     private function upgrade114()
     {
-        $this->options->setFlushRewriteRules(true);
+        update_option('einsatzvw_flush_rewrite_rules', 1);
         update_option('einsatzvw_db_version', 7);
     }
 
@@ -223,7 +213,7 @@ class Update
             require_once(ABSPATH . 'wp-admin/includes/taxonomy.php');
         }
 
-        $categoryId = $this->options->getEinsatzberichteCategory();
+        $categoryId = get_option('einsatzvw_category', -1);
         if (category_exists($categoryId)) {
             $posts = get_posts(array(
                 'post_type' => 'einsatz',
@@ -232,7 +222,7 @@ class Update
             ));
 
             foreach ($posts as $post) {
-                Utilities::addPostToCategory($post->ID, $categoryId);
+                wp_set_post_categories($post->ID, $categoryId, true);
             }
         }
 
@@ -353,6 +343,13 @@ class Update
         delete_option('einsatzvw_excerpt_type_feed');
 
         update_option('einsatzvw_db_version', 30);
+    }
+
+    private function upgrade150()
+    {
+        add_option('einsatz_support_posttag', '1');
+
+        update_option('einsatzvw_db_version', 40);
     }
 
     /**

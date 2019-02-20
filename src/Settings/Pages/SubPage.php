@@ -50,6 +50,14 @@ abstract class SubPage
     abstract public function registerSettings();
 
     /**
+     * Override this method to do some preparations right before the page is rendered
+     */
+    public function beforeContent()
+    {
+        return;
+    }
+
+    /**
      * Gibt den von WordPress mitgelieferten Colorpicker aus
      *
      * @param string $optionName Name der Einstellung
@@ -57,10 +65,15 @@ abstract class SubPage
      */
     protected function echoColorPicker($optionName, $defaultValue)
     {
+        $value = get_option($optionName, $defaultValue);
+        $sanitizedValue = sanitize_hex_color($value);
+        if (empty($sanitizedValue)) {
+            $sanitizedValue = $defaultValue;
+        }
         printf(
-            '<input type="text" name="%1$s" class="einsatzverwaltung-color-picker" value="%2$s" data-default-color="%3$s" />',
+            '<input type="text" name="%s" class="einsatzverwaltung-color-picker" value="%s" data-default-color="%s" />',
             esc_attr($optionName),
-            esc_attr(get_option($optionName, $defaultValue)),
+            esc_attr($sanitizedValue),
             esc_attr($defaultValue)
         );
     }
@@ -76,10 +89,10 @@ abstract class SubPage
     {
         $currentValue = get_option($checkboxId, $defaultValue);
         printf(
-            '<label for="%1$s"><input type="checkbox" value="1" id="%1$s" name="%1$s"%2$s>%3$s</label>',
+            '<label><input type="checkbox" value="1" id="%1$s" name="%1$s"%2$s>%3$s</label>',
             esc_attr($checkboxId),
             checked($currentValue, '1', false),
-            $text
+            esc_html($text)
         );
     }
 
@@ -91,11 +104,15 @@ abstract class SubPage
     protected function echoRadioButtons($name, $options, $defaultValue)
     {
         $currentValue = get_option($name, $defaultValue);
-        foreach ($options as $value => $label) {
+        foreach ($options as $value => $option) {
+            $label = esc_html($option['label']);
+            if (array_key_exists('code', $option) && !empty($option['code'])) {
+                $label .= sprintf('<code>%s</code>', esc_html($option['code']));
+            }
             printf(
                 '<label><input type="radio" name="%s" value="%s"%s>%s</label><br>',
-                $name,
-                $value,
+                esc_attr($name),
+                esc_attr($value),
                 checked($value, $currentValue, false),
                 $label
             );
@@ -111,10 +128,14 @@ abstract class SubPage
      */
     protected function echoSelect($name, $options, $selectedValue)
     {
-        echo '<select name="' . $name . '">';
+        printf('<select name="%s">', esc_attr($name));
         foreach ($options as $value => $label) {
-            echo '<option value="' . $value . '"' . ($selectedValue == $value ? ' selected="selected"' : '') . '>';
-            echo $label . '</option>';
+            printf(
+                '<option value="%s"%s>%s</option>',
+                esc_attr($value),
+                selected($value, $selectedValue),
+                esc_html($label)
+            );
         }
         echo '</select>';
     }
@@ -127,7 +148,7 @@ abstract class SubPage
         $currentValue = get_option($name, '');
         printf(
             '<p><textarea name="%s" class="large-text" rows="10" cols="50">%s</textarea></p>',
-            $name,
+            esc_attr($name),
             esc_textarea($currentValue)
         );
     }
@@ -138,16 +159,14 @@ abstract class SubPage
      * @since 1.0.0
      *
      * @param string $name Name des Parameters
-     * @param string $description Beschreibungstext
      * @param string $value Wert, der im Eingabefeld stehen soll
      */
-    protected function echoSettingsInput($name, $description, $value = '')
+    protected function echoSettingsInput($name, $value)
     {
         printf(
-            '<input type="text" value="%2$s" id="%1$s" name="%1$s" /><p class="description">%3$s</p>',
-            $name,
-            (empty($value) ? self::$options->getOption($name) : $value),
-            $description
+            '<input type="text" value="%2$s" id="%1$s" name="%1$s" />',
+            esc_attr($name),
+            esc_attr($value)
         );
     }
 

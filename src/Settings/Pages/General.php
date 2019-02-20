@@ -17,20 +17,12 @@ class General extends SubPage
     {
         parent::__construct('general', 'Allgemein');
 
-        add_filter('pre_update_option_einsatzvw_rewrite_slug', array($this, 'maybeRewriteSlugChanged'), 10, 2);
         add_filter('pre_update_option_einsatzvw_category', array($this, 'maybeCategoryChanged'), 10, 2);
         add_filter('pre_update_option_einsatzvw_loop_only_special', array($this, 'maybeCategorySpecialChanged'), 10, 2);
     }
 
     public function addSettingsFields()
     {
-        add_settings_field(
-            'einsatzvw_permalinks',
-            'Permalinks',
-            array($this, 'echoFieldPermalinks'),
-            $this->settingsApiPage,
-            'einsatzvw_settings_general'
-        );
         add_settings_field(
             'einsatzvw_einsatznummer_mainloop',
             'Einsatzbericht als Beitrag',
@@ -93,25 +85,6 @@ class General extends SubPage
         echo '</fieldset>';
     }
 
-    /**
-     * @since 1.0.0
-     */
-    public function echoFieldPermalinks()
-    {
-        echo '<fieldset>';
-        $this->echoSettingsInput(
-            'einsatzvw_rewrite_slug',
-            sprintf(
-                'Basis f&uuml;r Links zu Einsatzberichten, zum %1$sArchiv%2$s und zum %3$sFeed%2$s.',
-                '<a href="' . get_post_type_archive_link('einsatz') . '">',
-                '</a>',
-                '<a href="' . get_post_type_archive_feed_link('einsatz') . '">'
-            ),
-            sanitize_title(get_option('einsatzvw_rewrite_slug'), 'einsatzberichte')
-        );
-        echo '</fieldset>';
-    }
-
     public function echoFieldAnnotations()
     {
         echo '<fieldset>';
@@ -119,23 +92,6 @@ class General extends SubPage
         $this->echoColorPicker('einsatzvw_list_annotations_color_off', AnnotationIconBar::DEFAULT_COLOR_OFF);
         echo '<p class="description">Diese Farbe wird f&uuml;r die Symbole von inaktiven Vermerken verwendet, die von aktiven werden in der Textfarbe Deines Themes dargestellt.</p>';
         echo '</fieldset>';
-    }
-
-    /**
-     * Prüft, ob sich die Basis für die Links zu Einsatzberichten ändert und veranlasst gegebenenfalls ein Erneuern der
-     * Permalinkstruktur
-     *
-     * @param string $newValue Der neue Wert
-     * @param string $oldValue Der alte Wert
-     * @return string Der zu speichernde Wert
-     */
-    public function maybeRewriteSlugChanged($newValue, $oldValue)
-    {
-        if ($newValue != $oldValue) {
-            self::$options->setFlushRewriteRules(true);
-        }
-
-        return $newValue;
     }
 
     /**
@@ -175,7 +131,7 @@ class General extends SubPage
             /** @var IncidentReport $report */
             foreach ($reports as $report) {
                 if (!$onlySpecialInCategory || $report->isSpecial()) {
-                    Utilities::addPostToCategory($report->getPostId(), $newValue);
+                    $report->addToCategory($newValue);
                 }
             }
         }
@@ -216,7 +172,7 @@ class General extends SubPage
         if ($newValue == 0) {
             /** @var IncidentReport $report */
             foreach ($reports as $report) {
-                Utilities::addPostToCategory($report->getPostId(), $categoryId);
+                $report->addToCategory($categoryId);
             }
         }
 
@@ -226,7 +182,7 @@ class General extends SubPage
             /** @var IncidentReport $report */
             foreach ($reports as $report) {
                 if ($report->isSpecial()) {
-                    Utilities::addPostToCategory($report->getPostId(), $categoryId);
+                    $report->addToCategory($categoryId);
                 } else {
                     Utilities::removePostFromCategory($report->getPostId(), $categoryId);
                 }
@@ -240,13 +196,8 @@ class General extends SubPage
     {
         register_setting(
             'einsatzvw_settings_general',
-            'einsatzvw_rewrite_slug',
-            'sanitize_title'
-        );
-        register_setting(
-            'einsatzvw_settings_general',
             'einsatzvw_show_einsatzberichte_mainloop',
-            array('Utilities', 'sanitizeCheckbox')
+            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_general',
@@ -256,24 +207,12 @@ class General extends SubPage
         register_setting(
             'einsatzvw_settings_general',
             'einsatzvw_loop_only_special',
-            array('Utilities', 'sanitizeCheckbox')
+            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_general',
             'einsatzvw_list_annotations_color_off',
-            array($this, 'sanitizeAnnotationOffColor') // NEEDS_WP4.6 das globale sanitize_hex_color() verwenden
+            'sanitize_hex_color'
         );
-    }
-
-    /**
-     * Stellt sicher, dass die Farbe für die inaktiven Vermerke gültig ist
-     *
-     * @param string $input Der zu prüfende Farbwert
-     *
-     * @return string Der übergebene Farbwert, wenn er gültig ist, ansonsten die Standardeinstellung
-     */
-    public function sanitizeAnnotationOffColor($input)
-    {
-        return Utilities::sanitizeHexColor($input, AnnotationIconBar::DEFAULT_COLOR_OFF);
     }
 }

@@ -1,12 +1,4 @@
-#dashboard_right_now .einsatz-count a:before, #dashboard_right_now .einsatz-count span:before {
-	display: inline-block;
-	-webkit-font-smoothing: antialiased;
-	font: normal 20px/1 'dashicons';
-	vertical-align: top;
-	margin-right: 5px;
-}
-
-#dashboard_right_now .einsatz-count a:before, #dashboard_right_now .einsatz-count span:before {
+#dashboard_right_now a.einsatz-count:before, #dashboard_right_now span.einsatz-count:before {
     content: "\f497";
 }
 
@@ -105,4 +97,8 @@ li.dropzone {
 
 .aboutpage-icon a {
     text-decoration: none;
+}
+
+.settings_page_einsatzvw-settings label > code {
+    margin-left: 0.5em;
 }

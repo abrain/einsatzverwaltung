@@ -1,7 +1,6 @@
 <?php
-namespace abrain\Einsatzverwaltung\Tests;
+namespace abrain\Einsatzverwaltung;
 
-use abrain\Einsatzverwaltung\ReportFactory;
 use WP_UnitTestCase;
 
 /**
@@ -109,7 +108,7 @@ class SequenceNumberTest extends WP_UnitTestCase
         $this->assertSequenceNumber(5, $reportIds[4]);
 
         // Älteren Bericht zum neuesten Bericht machen
-        $lastDate = strtotime($year == date('Y') ? '3 hours ago' : '31 December ' . $year . ' 22:30:00');
+        $lastDate = strtotime($year == date('Y') ? '3 minutes ago' : '31 December ' . $year . ' 22:30:00');
         wp_update_post(array('ID' => $reportIds[1], 'post_date' => date('Y-m-d H:i:s', $lastDate)));
         $this->assertSequenceNumber(1, $reportIds[0]);
         $this->assertSequenceNumber(2, $reportIds[3]);

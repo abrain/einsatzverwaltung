@@ -131,13 +131,13 @@ class UpgradeTest extends WP_UnitTestCase
     {
         $reportFactory = new ReportFactory();
         $reportIds = $reportFactory->create_many(3);
-        update_post_meta($reportIds[0], 'einsatz_mannschaft', 1);
-        update_post_meta($reportIds[1], 'einsatz_mannschaft', 0);
+        update_post_meta($reportIds[0], 'einsatz_mannschaft', '1');
+        update_post_meta($reportIds[1], 'einsatz_mannschaft', '0');
         update_post_meta($reportIds[2], 'einsatz_mannschaft', '1/8');
 
         $this->runUpgrade(3, 4);
 
-        self::assertEquals(1, get_post_meta($reportIds[0], 'einsatz_mannschaft', true));
+        self::assertEquals('1', get_post_meta($reportIds[0], 'einsatz_mannschaft', true));
         self::assertEquals('', get_post_meta($reportIds[1], 'einsatz_mannschaft', true));
         self::assertEquals('1/8', get_post_meta($reportIds[2], 'einsatz_mannschaft', true));
     }
@@ -380,5 +380,12 @@ class UpgradeTest extends WP_UnitTestCase
     public function testUpgrade140()
     {
         $this->runUpgrade(21, 30);
+    }
+
+    public function testUpgrade150()
+    {
+        $this->runUpgrade(30, 40);
+
+        $this->assertEquals('1', get_option('einsatz_support_posttag'));
     }
 }

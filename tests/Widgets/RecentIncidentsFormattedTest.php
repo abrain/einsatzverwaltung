@@ -14,7 +14,7 @@ class RecentIncidentsFormattedTest extends WP_UnitTestCase
     public function testUpdate()
     {
         $core = Core::getInstance();
-        $widget = new RecentIncidentsFormatted($core->formatter, $core->utilities);
+        $widget = new RecentIncidentsFormatted($core->formatter);
         $new = array(
             'title' => '',
             'numIncidents' => '',
@@ -40,7 +40,7 @@ class RecentIncidentsFormattedTest extends WP_UnitTestCase
             'pattern' => '<li>%title%</li>',
             'afterContent' => '</ul>'
         );
-        $new['numIncidents'] = '-1';
+        $new['numIncidents'] = 'abc';
         $new['beforeContent'] = '<h1>Nix</h1><p>Text<br><script></script><span>';
         $new['pattern'] = '<li><strong>%title%</strong><a href="#">Link</a><br></li>';
         $new['afterContent'] = '';

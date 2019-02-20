@@ -1,10 +1,7 @@
 <?php
 namespace abrain\Einsatzverwaltung\Frontend;
 
-use abrain\Einsatzverwaltung\Core;
-use abrain\Einsatzverwaltung\Data;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
-use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use abrain\Einsatzverwaltung\Utilities;
 use DateTime;
@@ -18,24 +15,6 @@ use DateTime;
 class ReportList
 {
     const TABLECLASS = 'einsatzverwaltung-reportlist';
-    const DEFAULT_COLUMNS = 'number,date,time,title';
-
-    /**
-     * @var AnnotationIconBar
-     */
-    private $annotationIconBar;
-
-    /**
-     * @var array
-     */
-    private $columns;
-
-    /**
-     * Gibt an, ob die Tabelle in kompakter Form, also ohne Trennung zwischen den Jahren angezeigt werden soll
-     *
-     * @var bool
-     */
-    private $compact;
 
     /**
      * Array mit Spalten-IDs, die nicht mit einem Link zum Einsatzbericht versehen werden dürfen
@@ -46,71 +25,14 @@ class ReportList
         'incidentType');
 
     /**
-     * Array mit Spalten-IDs, die mit einem Link zum Einsatzbericht versehen werden sollen
-     *
-     * @var array
-     */
-    private $columnsWithLink;
-
-    /**
-     * @var Core
-     */
-    private $core;
-
-    /**
      * @var Formatter
      */
     private $formatter;
 
     /**
-     * Gibt an, ob ein Link für Einsatzberichte ohne Beitragstext erzeugt werden soll
-     *
-     * @var bool
-     */
-    private $linkEmptyReports;
-
-    /**
-     * Gibt an, ob die zusätzlichen Kräfte mit einem Link zu der ggf. gesetzten Adresse versehen werden sollen
-     *
-     * @var bool
-     */
-    private $linkToAddForces;
-
-    /**
-     * Gibt an, ob die Fahrzeuge mit einem Link zu der ggf. gesetzten Fahrzeugseite versehen werden sollen
-     *
-     * @var bool
-     */
-    private $linkToVehicles;
-
-    /**
-     * @var int
-     */
-    private $numberOfColumns;
-
-    /**
-     * @var Options
-     */
-    private $options;
-
-    /**
      * @var ReportListSettings
      */
     private static $settings;
-
-    /**
-     * Gibt an, ob oberhalb einer Tabelle die Überschrift mit der Jahreszahl angezeigt werden soll
-     *
-     * @var bool
-     */
-    private $showHeading;
-
-    /**
-     * Gibt an, ob nach jedem Monat eine Trennung eingefügt werden soll
-     *
-     * @var bool
-     */
-    private $splitMonths;
 
     /**
      * In diesem String wird der HTML-Code für die Liste aufgebaut
@@ -120,24 +42,12 @@ class ReportList
     private $string;
 
     /**
-     * @var Utilities
-     */
-    private $utilities;
-
-
-    /**
      * ReportList constructor.
      *
-     * @param Utilities $utilities
-     * @param Core $core
-     * @param Options $options
      * @param Formatter $formatter
      */
-    public function __construct($utilities, $core, $options, $formatter)
+    public function __construct($formatter)
     {
-        $this->utilities = $utilities;
-        $this->core = $core;
-        $this->options = $options;
         $this->formatter = $formatter;
     }
 
@@ -145,45 +55,16 @@ class ReportList
      * Generiert den HTML-Code für die Liste
      *
      * @param array $reports Eine Liste von IncidentReport-Objekten
-     * @param array $args
+     * @param ReportListParameters $parameters
      */
-    private function constructList($reports, $args)
+    private function constructList($reports, ReportListParameters $parameters)
     {
         if (empty($reports)) {
-            $this->string = '<span>F&uuml;r den gew&auml;hlten Zeitraum stehen keine Einsatzberichte zur Verf&uuml;gung</span>';
+            $this->string = sprintf(
+                '<span>%s</span>',
+                esc_html('F&uuml;r den gew&auml;hlten Zeitraum stehen keine Einsatzberichte zur Verf&uuml;gung')
+            );
             return;
-        }
-
-        // Argumente auswerten
-        $defaults = array(
-            'splitMonths' => false,
-            'columns' => array(),
-            'linkToVehicles' => $this->options->getBoolOption('einsatzvw_list_fahrzeuge_link'),
-            'linkToAddForces' => $this->options->getBoolOption('einsatzvw_list_ext_link'),
-            'columnsWithLink' => array('title'),
-            'linkEmptyReports' => true,
-            'showHeading' => true,
-            'compact' => false,
-        );
-        $parsedArgs = wp_parse_args($args, $defaults);
-
-        // Variablen setzen
-        $this->compact = (bool) $parsedArgs['compact'];
-        $this->splitMonths = (bool) $parsedArgs['splitMonths'] && !$this->compact;
-        $this->columns = ReportList::sanitizeColumnsArray($parsedArgs['columns']);
-        $this->numberOfColumns = count($this->columns);
-        $this->linkToVehicles = (true === $parsedArgs['linkToVehicles']);
-        $this->linkToAddForces = (true === $parsedArgs['linkToAddForces']);
-        $this->columnsWithLink = $parsedArgs['columnsWithLink'];
-        if ($this->columnsWithLink !== false) {
-            $this->columnsWithLink = ReportList::sanitizeColumnsArray($this->columnsWithLink);
-        }
-        $this->linkEmptyReports = (true === $parsedArgs['linkEmptyReports']);
-        $this->showHeading = (bool) $parsedArgs['showHeading'];
-
-        if (in_array('annotationImages', $this->columns) || in_array('annotationSpecial', $this->columns)) {
-            require_once dirname(__FILE__) . '/AnnotationIconBar.php';
-            $this->annotationIconBar = AnnotationIconBar::getInstance();
         }
 
         // Berichte abarbeiten
@@ -192,9 +73,10 @@ class ReportList
         $previousYear = null;
         $previousMonth = null;
         $monthlyCounter = 0;
-        if ($this->compact) {
-            $this->beginTable(false);
-            $this->insertTableHeader();
+        $numberOfColumns = count($parameters->getColumns());
+        if ($parameters->compact) {
+            $this->beginTable(false, $parameters);
+            $this->insertTableHeader($parameters);
         }
         /** @var IncidentReport $report */
         foreach ($reports as $report) {
@@ -203,34 +85,34 @@ class ReportList
             $currentMonth = intval($timeOfAlerting->format('m'));
 
             // Ein neues Jahr beginnt
-            if (!$this->compact && $currentYear != $previousYear) {
+            if (!$parameters->compact && $currentYear != $previousYear) {
                 // Wenn mindestens schon ein Jahr ausgegeben wurde
                 if ($previousYear != null) {
                     $previousMonth = null;
                     $this->endTable();
                 }
 
-                $this->beginTable($currentYear);
-                if (!$this->splitMonths) {
-                    $this->insertTableHeader();
-                    $this->insertZebraCorrection();
+                $this->beginTable($currentYear, $parameters);
+                if (!$parameters->isSplitMonths()) {
+                    $this->insertTableHeader($parameters);
+                    $this->insertZebraCorrection($numberOfColumns);
                 }
 
                 $monthlyCounter = 0;
             }
 
             // Monatswechsel bei aktivierter Monatstrennung
-            if ($this->splitMonths && $currentMonth != $previousMonth) {
+            if ($parameters->isSplitMonths() && $currentMonth != $previousMonth) {
                 if ($monthlyCounter > 0 && $monthlyCounter % 2 != 0) {
-                    $this->insertZebraCorrection();
+                    $this->insertZebraCorrection($numberOfColumns);
                 }
-                $this->insertMonthSeparator($timeOfAlerting);
-                $this->insertTableHeader();
+                $this->insertMonthSeparator($timeOfAlerting, $numberOfColumns);
+                $this->insertTableHeader($parameters);
                 $monthlyCounter = 0;
             }
 
             // Zeile für den aktuellen Bericht ausgeben
-            $this->insertRow($report);
+            $this->insertRow($report, $parameters);
             $monthlyCounter++;
 
             // Variablen für den nächsten Durchgang setzen
@@ -244,36 +126,35 @@ class ReportList
      * Gibt den HTML-Code für die Liste zurück
      *
      * @param array $reports Eine Liste von IncidentReport-Objekten
-     * @param array $args
+     * @param ReportListParameters $parameters
      *
      * @return string HTML-Code der Liste
      */
-    public function getList($reports, $args)
+    public function getList($reports, ReportListParameters $parameters)
     {
-        if (empty($this->string)) {
-            $this->constructList($reports, $args);
-        }
-
+        $this->string = '';
+        $this->constructList($reports, $parameters);
         return $this->string;
     }
 
     /**
      * @param array $reports Eine Liste von IncidentReport-Objekten
-     * @param array $args
+     * @param ReportListParameters $parameters
      */
-    public function printList($reports, $args)
+    public function printList($reports, ReportListParameters $parameters)
     {
-        echo $this->getList($reports, $args);
+        echo $this->getList($reports, $parameters);
     }
 
     /**
      * Beginnt eine neue Tabelle für ein bestimmtes Jahr
      *
      * @param bool|int $year Das Kalenderjahr für die Überschrift oder false um keine Überschrift auszugeben
+     * @param ReportListParameters $parameters
      */
-    private function beginTable($year)
+    private function beginTable($year, ReportListParameters $parameters)
     {
-        if ($this->showHeading && $year !== false) {
+        if ($parameters->showHeading && $year !== false) {
             $this->string .= '<h2>Eins&auml;tze '.$year.'</h2>';
         }
         $this->string .= '<table class="' . self::TABLECLASS . '"><tbody>';
@@ -284,62 +165,98 @@ class ReportList
         $this->string .= '</tbody></table>';
     }
 
-    private function insertTableHeader()
+    /**
+     * @param ReportListParameters $parameters
+     */
+    private function insertTableHeader(ReportListParameters $parameters)
     {
         $allColumns = self::getListColumns();
 
         $this->string .= '<tr class="einsatz-header">';
-        foreach ($this->columns as $colId) {
+        foreach ($parameters->getColumns() as $colId) {
             if (!array_key_exists($colId, $allColumns)) {
                 $this->string .= '<th>&nbsp;</th>';
                 continue;
             }
 
             $colInfo = $allColumns[$colId];
-            $style = $this->utilities->getArrayValueIfKey($colInfo, 'nowrap', false) ? 'white-space: nowrap;' : '';
-            $this->string .= '<th' . (empty($style) ? '' : ' style="' . $style . '"') . '>' . $colInfo['name'] . '</th>';
+            $style = Utilities::getArrayValueIfKey($colInfo, 'nowrap', false) ? 'white-space: nowrap;' : '';
+            $this->string .= sprintf('<th style="%s">%s</th>', esc_attr($style), esc_html($colInfo['name']));
         }
         $this->string .= '</tr>';
     }
 
     /**
      * @param DateTime $date
+     * @param int $numberOfColumns
      */
-    private function insertMonthSeparator($date)
+    private function insertMonthSeparator($date, $numberOfColumns)
     {
-        $this->string .= '<tr class="einsatz-title-month"><td colspan="' . $this->numberOfColumns . '">';
+        $this->string .= '<tr class="einsatz-title-month"><td colspan="' . $numberOfColumns . '">';
         $this->string .=  date_i18n('F', $date->getTimestamp()) . '</td></tr>';
     }
 
     /**
      * @param IncidentReport $report Der Einsatzbericht
+     * @param ReportListParameters $parameters
      */
-    private function insertRow($report)
+    private function insertRow($report, ReportListParameters $parameters)
     {
         $this->string .= '<tr class="report">';
-        foreach ($this->columns as $colId) {
-            $this->string .= '<td class="einsatz-column-' . $colId . '">';
-            $linkToReport = $this->linkEmptyReports || $report->hasContent();
-            $linkThisColumn = $linkToReport && !empty($this->columnsWithLink) &&
-                in_array($colId, $this->columnsWithLink) && !in_array($colId, $this->columnsLinkBlacklist);
-            if ($linkThisColumn) {
-                $this->string .= '<a href="' . get_permalink($report->getPostId()) . '" rel="bookmark">';
-            }
-            $this->string .= $this->getCellContent($report, $colId);
-            if ($linkThisColumn) {
-                $this->string .= '</a>';
-            }
-            $this->string .= '</td>';
+        foreach ($parameters->getColumns() as $colId) {
+            $this->string .= $this->getCellMarkup($report, $parameters, $colId);
         }
         $this->string .= '</tr>';
     }
 
     /**
-     * Fügt eine unsichtbare Zeile ein, um das Zebramuster in bestimmten Fällen zu erhalten
+     * @param IncidentReport $report
+     * @param ReportListParameters $parameters
+     * @param string $columnId
+     *
+     * @return string
      */
-    private function insertZebraCorrection()
+    private function getCellMarkup(IncidentReport $report, ReportListParameters $parameters, $columnId)
     {
-        $this->string .= '<tr class="zebracorrection"><td colspan="'.$this->numberOfColumns.'">&nbsp;</td></tr>';
+        $cellContent = $this->getCellContent($report, $columnId, $parameters);
+
+        if ($this->isCellLinkToReport($report, $columnId, $parameters)) {
+            $cellContent = sprintf(
+                '<a href="%s" rel="bookmark">%s</a>',
+                esc_url(get_permalink($report->getPostId())),
+                $cellContent
+            );
+        }
+
+        return sprintf('<td class="einsatz-column-%s">%s</td>', $columnId, $cellContent);
+    }
+
+    /**
+     * Determines if a certain table cell should contain a link to the report
+     *
+     * @param IncidentReport $report
+     * @param string $columnId
+     * @param ReportListParameters $parameters
+     *
+     * @return bool
+     */
+    private function isCellLinkToReport(IncidentReport $report, $columnId, ReportListParameters $parameters)
+    {
+        $linkToReport = $parameters->linkEmptyReports || $report->hasContent();
+        $columnsLinkingReport = $parameters->getColumnsLinkingReport();
+        $userWantsLink = !empty($columnsLinkingReport) && in_array($columnId, $columnsLinkingReport);
+
+        return $linkToReport && $userWantsLink && !in_array($columnId, $this->columnsLinkBlacklist);
+    }
+
+    /**
+     * Fügt eine unsichtbare Zeile ein, um das Zebramuster in bestimmten Fällen zu erhalten
+     *
+     * @param int $numberOfColumns
+     */
+    private function insertZebraCorrection($numberOfColumns)
+    {
+        $this->string .= '<tr class="zebracorrection"><td colspan="'.$numberOfColumns.'">&nbsp;</td></tr>';
     }
 
     /**
@@ -347,10 +264,11 @@ class ReportList
      *
      * @param IncidentReport $report
      * @param string $colId Eindeutige Kennung der Spalte
+     * @param ReportListParameters $parameters
      *
      * @return string
      */
-    private function getCellContent($report, $colId)
+    private function getCellContent($report, $colId, ReportListParameters $parameters)
     {
         if (empty($report)) {
             return '&nbsp;';
@@ -385,30 +303,30 @@ class ReportList
                 $cellContent = $report->getWorkforce();
                 break;
             case 'duration':
-                $minutes = Data::getDauer($report);
-                $cellContent = $this->utilities->getDurationString($minutes, true);
+                $minutes = $report->getDuration();
+                $cellContent = $this->formatter->getDurationString($minutes, true);
                 break;
             case 'vehicles':
-                $cellContent = $this->formatter->getVehicles($report, $this->linkToVehicles, false);
+                $cellContent = $this->formatter->getVehicles($report, $parameters->linkVehicles, false);
                 break;
             case 'alarmType':
                 $cellContent = $this->formatter->getTypesOfAlerting($report);
                 break;
             case 'additionalForces':
-                $cellContent = $this->formatter->getAdditionalForces($report, $this->linkToAddForces, false);
+                $cellContent = $this->formatter->getAdditionalForces($report, $parameters->linkAdditionalForces, false);
                 break;
             case 'incidentType':
-                $showHierarchy = $this->options->getBoolOption('einsatzvw_list_art_hierarchy');
+                $showHierarchy = (get_option('einsatzvw_list_art_hierarchy', '0') === '1');
                 $cellContent = $this->formatter->getTypeOfIncident($report, false, false, $showHierarchy);
                 break;
             case 'seqNum':
                 $cellContent = $report->getSequentialNumber();
                 break;
             case 'annotationImages':
-                $cellContent = $this->annotationIconBar->render($report, array('images'));
+                $cellContent = AnnotationIconBar::getInstance()->render($report, array('images'));
                 break;
             case 'annotationSpecial':
-                $cellContent = $this->annotationIconBar->render($report, array('special'));
+                $cellContent = AnnotationIconBar::getInstance()->render($report, array('special'));
                 break;
             default:
                 $cellContent = '';
@@ -509,69 +427,26 @@ class ReportList
 
         // Sollen Zebrastreifen angezeigt werden?
         if (self::$settings->isZebraTable()) {
-            $string .= '.einsatzverwaltung-reportlist tr.report:nth-child(' . self::$settings->getZebraNthChildArg() . ') {';
-            $string .= 'background-color: ' . self::$settings->getZebraColor() . '; }';
+            $string .= sprintf(
+                '.%s tr.report:nth-child(%s) { background-color: %s; }',
+                self::TABLECLASS,
+                self::$settings->getZebraNthChildArg(),
+                self::$settings->getZebraColor()
+            );
         }
 
         // Bei der responsiven Ansicht die selben Begriffe voranstellen wie im Tabellenkopf
         $string .= '@media (max-width: 767px) {';
         foreach (self::getListColumns() as $colId => $colInfo) {
-            $string .= "." . self::TABLECLASS . " td.einsatz-column-$colId:before ";
-            $string .= '{content: "' . (array_key_exists('cssname', $colInfo) ? $colInfo['cssname'] : $colInfo['name']) . ':";}';
+            $string .= sprintf(
+                '.%s td.einsatz-column-%s:before {content: "%s:";}',
+                self::TABLECLASS,
+                $colId,
+                (array_key_exists('cssname', $colInfo) ? $colInfo['cssname'] : $colInfo['name'])
+            ).PHP_EOL;
         }
         $string .= '}';
 
         return $string;
-    }
-
-    /**
-     * Stellt sicher, dass nur gültige Spalten-Ids gespeichert werden.
-     *
-     * @param string $input Kommaseparierte Spalten-Ids
-     *
-     * @return string Der Eingabestring ohne ungültige Spalten-Ids, bei Problemen werden die Standardspalten
-     * zurückgegeben
-     */
-    public static function sanitizeColumns($input)
-    {
-        if (empty($input)) {
-            return ReportList::DEFAULT_COLUMNS;
-        }
-
-        $inputArray = explode(',', $input);
-        $validColumnIds = self::sanitizeColumnsArray($inputArray);
-
-        if (empty($validColumnIds)) {
-            return ReportList::DEFAULT_COLUMNS;
-        }
-
-        return implode(',', $validColumnIds);
-    }
-
-    /**
-     * Bereinigt ein Array von Spalten-Ids, sodass nur gültige Ids darin verbleiben
-     *
-     * @param $inputArray
-     *
-     * @return array
-     */
-    public static function sanitizeColumnsArray($inputArray)
-    {
-        $columns = ReportList::getListColumns();
-        $columnIds = array_keys($columns);
-
-        $validColumnIds = array();
-        foreach ($inputArray as $colId) {
-            $colId = trim($colId);
-            if (in_array($colId, $columnIds)) {
-                $validColumnIds[] = $colId;
-            }
-        }
-
-        if (empty($validColumnIds)) {
-            $validColumnIds = explode(',', ReportList::DEFAULT_COLUMNS);
-        }
-
-        return $validColumnIds;
     }
 }

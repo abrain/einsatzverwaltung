@@ -1,50 +1,26 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
-use abrain\Einsatzverwaltung\Frontend\ReportList;
-
 /**
  * Bietet Schnittstellen zur Abfrage von Einstellungen
  */
 class Options
 {
     private $defaults = array(
-        'einsatzvw_list_columns' => 'number,date,time,title',
-        'einsatzvw_einsatznummer_stellen' => 3,
         'einsatzvw_show_einsatzart_archive' => false,
         'einsatzvw_show_exteinsatzmittel_archive' => false,
         'einsatzvw_show_fahrzeug_archive' => false,
         'einsatzvw_open_ext_in_new' => false,
         'einsatzvw_show_einsatzberichte_mainloop' => false,
         'einsatzvw_einsatz_hideemptydetails' => true,
-        'einsatzvw_einsatznummer_lfdvorne' => false,
         'date_format' => 'd.m.Y',
         'time_format' => 'H:i',
-        'einsatzvw_list_art_hierarchy' => false,
-        'einsatzvw_list_ext_link' => false,
-        'einsatzvw_list_fahrzeuge_link' => false,
-        'einsatzvw_rewrite_slug' => 'einsatzberichte',
         'einsatzvw_flush_rewrite_rules' => false,
         'einsatzvw_category' => false,
         'einsatzvw_loop_only_special' => false,
         'einsatzverwaltung_incidentnumbers_auto' => false,
         'einsatzverwaltung_use_excerpttemplate' => false,
     );
-
-    /**
-     * @var Utilities
-     */
-    private $utilities;
-
-    /**
-     * Options constructor.
-     *
-     * @param Utilities $utilities
-     */
-    public function __construct($utilities)
-    {
-        $this->utilities = $utilities;
-    }
 
     /**
      * Ruft die benannte Option aus der Datenbank ab
@@ -78,16 +54,6 @@ class Options
         return $this->toBoolean($option);
     }
 
-    public function getDefaultColumns()
-    {
-        return $this->defaults['einsatzvw_list_columns'];
-    }
-
-    public function getDefaultEinsatznummerStellen()
-    {
-        return $this->defaults['einsatzvw_einsatznummer_stellen'];
-    }
-
     /**
      * Gibt das Datumsformat von WordPress zurück
      */
@@ -110,62 +76,11 @@ class Options
     }
 
     /**
-     * Gibt die aktiven Spalten für die Einsatzliste zurück
-     *
-     * @return array Spalten-IDs der aktiven Spalten, geprüft auf Existenz. Bei Problemen die Standardspalten.
-     */
-    public function getEinsatzlisteEnabledColumns()
-    {
-        $enabledColumns = $this->getOption('einsatzvw_list_columns');
-        $enabledColumns = ReportList::sanitizeColumns($enabledColumns);
-        return explode(',', $enabledColumns);
-    }
-
-    /**
-     * @return int
-     */
-    public function getEinsatznummerStellen()
-    {
-        $option = $this->getOption('einsatzvw_einsatznummer_stellen');
-        return Utilities::sanitizeEinsatznummerStellen($option);
-    }
-
-    /**
-     * Gibt die Basis für die URL zu Einsatzberichten zurück
-     *
-     * @since 1.0.0
-     *
-     * @return string
-     */
-    public function getRewriteSlug()
-    {
-        $option = $this->getOption('einsatzvw_rewrite_slug');
-        return sanitize_title($option, $this->defaults['einsatzvw_rewrite_slug']);
-    }
-
-    /**
      * @return mixed
      */
     public function getTimeFormat()
     {
         return $this->getOption('time_format');
-    }
-
-    /**
-     * @return bool
-     */
-    public function isAutoIncidentNumbers()
-    {
-        return $this->getBoolOption('einsatzverwaltung_incidentnumbers_auto');
-    }
-
-    /**
-     * @return bool
-     */
-    public function isEinsatznummerLfdVorne()
-    {
-        $option = $this->getOption('einsatzvw_einsatznummer_lfdvorne');
-        return $this->toBoolean($option);
     }
 
     /**
@@ -207,21 +122,6 @@ class Options
     public function isOpenExtEinsatzmittelNewWindow()
     {
         $option = $this->getOption('einsatzvw_open_ext_in_new');
-        return $this->toBoolean($option);
-    }
-
-    /**
-     * @param $roleSlug
-     *
-     * @return bool
-     */
-    public function isRoleAllowedToEdit($roleSlug)
-    {
-        if ($roleSlug === 'administrator') {
-            return true;
-        }
-
-        $option = $this->getOption('einsatzvw_cap_roles_' . $roleSlug);
         return $this->toBoolean($option);
     }
 

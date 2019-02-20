@@ -22,10 +22,8 @@ class HelperTest extends \WP_UnitTestCase
      */
     public static function setUpBeforeClass()
     {
-        require_once dirname(dirname(dirname(__FILE__))) . '/src/Import/Helper.php';
-
         self::$core = Core::getInstance();
-        self::$helper = new Helper(self::$core->utilities, self::$core->options, self::$core->getData());
+        self::$helper = new Helper(self::$core->utilities, self::$core->getData());
 
         register_taxonomy('hierarchy', array(), array('hierarchical' => true));
         register_taxonomy('nohierarchy', array(), array('hierarchical' => false));

@@ -2,6 +2,8 @@
 
 namespace abrain\Einsatzverwaltung\Settings\Pages;
 
+use abrain\Einsatzverwaltung\ReportNumberController;
+
 /**
  * Numbers settings page
  *
@@ -60,7 +62,7 @@ class Numbers extends SubPage
         printf(
             'Jahreszahl + jahresbezogene, fortlaufende Nummer mit <input type="text" value="%2$s" size="2" id="%1$s" name="%1$s" /> Stellen',
             'einsatzvw_einsatznummer_stellen',
-            self::$options->getEinsatznummerStellen()
+            ReportNumberController::sanitizeEinsatznummerStellen(get_option('einsatzvw_einsatznummer_stellen'))
         );
         echo '<p class="description">Beispiel f&uuml;r den f&uuml;nften Einsatz in 2014:<br>bei 2 Stellen: 201405<br>bei 4 Stellen: 20140005</p><br>';
         $this->echoSettingsCheckbox('einsatzvw_einsatznummer_lfdvorne', 'Laufende Nummer vor das Jahr stellen');
@@ -74,17 +76,17 @@ class Numbers extends SubPage
         register_setting(
             'einsatzvw_settings_numbers',
             'einsatzverwaltung_incidentnumbers_auto',
-            array('Utilities', 'sanitizeCheckbox')
+            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_numbers',
             'einsatzvw_einsatznummer_stellen',
-            array('Utilities', 'sanitizeEinsatznummerStellen')
+            array('\abrain\Einsatzverwaltung\ReportNumberController', 'sanitizeEinsatznummerStellen')
         );
         register_setting(
             'einsatzvw_settings_numbers',
             'einsatzvw_einsatznummer_lfdvorne',
-            array('Utilities', 'sanitizeCheckbox')
+            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
         );
     }
 }

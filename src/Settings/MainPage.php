@@ -2,9 +2,10 @@
 
 namespace abrain\Einsatzverwaltung\Settings;
 
-use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\Options;
+use abrain\Einsatzverwaltung\PermalinkController;
 use abrain\Einsatzverwaltung\Settings\Pages\About;
+use abrain\Einsatzverwaltung\Settings\Pages\Advanced;
 use abrain\Einsatzverwaltung\Settings\Pages\Capabilities;
 use abrain\Einsatzverwaltung\Settings\Pages\General;
 use abrain\Einsatzverwaltung\Settings\Pages\Numbers;
@@ -28,19 +29,13 @@ class MainPage
 
     /**
      * MainPage constructor.
+     *
      * @param Options $options
+     * @param PermalinkController $permalinkController
      */
-    public function __construct(Options $options)
+    public function __construct(Options $options, PermalinkController $permalinkController)
     {
         $this->subPages = array();
-
-        require_once dirname(__FILE__) . '/Pages/SubPage.php';
-        require_once dirname(__FILE__) . '/Pages/General.php';
-        require_once dirname(__FILE__) . '/Pages/Numbers.php';
-        require_once dirname(__FILE__) . '/Pages/Report.php';
-        require_once dirname(__FILE__) . '/Pages/ReportList.php';
-        require_once dirname(__FILE__) . '/Pages/Capabilities.php';
-        require_once dirname(__FILE__) . '/Pages/About.php';
 
         SubPage::$options = $options;
         $this->addSubPage(new General());
@@ -48,6 +43,7 @@ class MainPage
         $this->addSubPage(new Report());
         $this->addSubPage(new ReportList());
         $this->addSubPage(new Capabilities());
+        $this->addSubPage(new Advanced($permalinkController));
         $this->addSubPage(new About());
     }
 
@@ -114,6 +110,7 @@ class MainPage
         }
         echo "</h2>";
 
+        $currentSubPage->beforeContent();
         $currentSubPage->echoStaticContent();
 
         // Einstellungen ausgeben

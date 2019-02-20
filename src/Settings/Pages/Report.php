@@ -10,10 +10,18 @@ namespace abrain\Einsatzverwaltung\Settings\Pages;
 class Report extends SubPage
 {
     private $useReportTemplateOptions = array(
-        'no' => 'Nicht verwenden (zeigt die klassische Einzelansicht)',
-        'singular' => 'In der Einzelansicht verwenden',
-        'loops' => 'In der Einzelansicht und in &Uuml;bersichten (Startseite, Archive, Suchergebnisse, ...) verwenden',
-        'everywhere' => '&Uuml;berall verwenden',
+        'no' => array(
+            'label' => 'Nicht verwenden (zeigt die klassische Einzelansicht)'
+        ),
+        'singular' => array(
+            'label' => 'In der Einzelansicht verwenden'
+        ),
+        'loops' => array(
+            'label' => 'In der Einzelansicht und in &Uuml;bersichten (Startseite, Archive, Suchergebnisse, ...) verwenden'
+        ),
+        'everywhere' => array(
+            'label' => '&Uuml;berall verwenden'
+        ),
     );
 
     public function __construct()
@@ -142,7 +150,7 @@ class Report extends SubPage
         echo '<fieldset>';
         $this->echoRadioButtons('einsatzverwaltung_use_reporttemplate', $this->useReportTemplateOptions, 'no');
         echo '<p class="description">';
-        printf('Die Option &quot;%s&quot; wird nicht empfohlen, ist aber bei manchen Themes die einzige M&ouml;glichkeit, das Template in &Uuml;bersichten nutzen zu k&ouml;nnen.', $this->useReportTemplateOptions['everywhere']);
+        printf('Die Option &quot;%s&quot; wird nicht empfohlen, ist aber bei manchen Themes die einzige M&ouml;glichkeit, das Template in &Uuml;bersichten nutzen zu k&ouml;nnen.', $this->useReportTemplateOptions['everywhere']['label']);
         echo '</p>';
         $this->echoTextarea('einsatzverwaltung_reporttemplate');
         echo '<p class="description">Es kann sein, dass das Theme in &Uuml;bersichten nur den Auszug anzeigt. Dessen Aussehen kann mit einem eigenen Template festgelegt werden (siehe unten).</p>';
@@ -166,27 +174,27 @@ class Report extends SubPage
         register_setting(
             'einsatzvw_settings_report',
             'einsatzvw_einsatz_hideemptydetails',
-            array('Utilities', 'sanitizeCheckbox')
+            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_report',
             'einsatzvw_show_exteinsatzmittel_archive',
-            array('Utilities', 'sanitizeCheckbox')
+            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_report',
             'einsatzvw_show_einsatzart_archive',
-            array('Utilities', 'sanitizeCheckbox')
+            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_report',
             'einsatzvw_show_fahrzeug_archive',
-            array('Utilities', 'sanitizeCheckbox')
+            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_report',
             'einsatzvw_open_ext_in_new',
-            array('Utilities', 'sanitizeCheckbox')
+            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_report',

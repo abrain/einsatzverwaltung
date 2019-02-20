@@ -22,11 +22,16 @@ class AnnotationIconBar
     private static $instance;
 
     /**
+     * @var string
+     */
+    private $iconColorOff;
+
+    /**
      * AnnotationIconBar constructor.
      */
     private function __construct()
     {
-        //
+        $this->iconColorOff = $this->getAnnotationColorOff();
     }
 
     /**
@@ -102,17 +107,29 @@ class AnnotationIconBar
      */
     private function getAnnotationIcon($icon, $titles, $state)
     {
-        if (is_admin()) {
-            $colorOff = self::DEFAULT_COLOR_OFF;
-        } else {
-            $colorOff = get_option('einsatzvw_list_annotations_color_off', self::DEFAULT_COLOR_OFF);
-        }
-
         return sprintf(
             '<i class="%s" aria-hidden="true" title="%s" style="%s"></i>',
             esc_attr('fa fa-' . $icon),
             esc_attr($titles[$state ? 1 : 0]),
-            esc_attr($state ? '' : 'color: ' . $colorOff . ';')
+            esc_attr($state ? '' : "color: {$this->iconColorOff};")
         );
+    }
+
+    /**
+     * @return string
+     */
+    private function getAnnotationColorOff()
+    {
+        if (is_admin()) {
+            return self::DEFAULT_COLOR_OFF;
+        }
+
+        $color = get_option('einsatzvw_list_annotations_color_off', self::DEFAULT_COLOR_OFF);
+        $sanitizedColor = sanitize_hex_color($color);
+        if (empty($sanitizedColor)) {
+            $sanitizedColor = self::DEFAULT_COLOR_OFF;
+        }
+
+        return $sanitizedColor;
     }
 }

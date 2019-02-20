@@ -132,6 +132,11 @@ class Advanced extends SubPage
     {
         echo '<fieldset>';
         $this->echoSettingsCheckbox(
+            'einsatz_support_excerpt',
+            'Auszug'
+        );
+        echo '<br>';
+        $this->echoSettingsCheckbox(
             'einsatz_support_posttag',
             __('Tags', 'einsatzverwaltung')
         );
@@ -212,6 +217,11 @@ class Advanced extends SubPage
             'einsatzvw_settings_advanced',
             'einsatz_permalink',
             array('\abrain\Einsatzverwaltung\PermalinkController', 'sanitizePermalink')
+        );
+        register_setting(
+            'einsatzvw_settings_advanced',
+            'einsatz_support_excerpt',
+            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_advanced',

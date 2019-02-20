@@ -98,7 +98,7 @@ class Report implements CustomType
                 'feeds' => true,
                 'slug' => $this->rewriteSlug
             ),
-            'supports' => array('title', 'editor', 'thumbnail', 'publicize', 'author', 'revisions', 'excerpt'),
+            'supports' => $this->getSupportedFeatures(),
             'show_ui' => true,
             'show_in_menu' => true,
             'show_in_nav_menus' => false,
@@ -120,6 +120,20 @@ class Report implements CustomType
     public function getSlug()
     {
         return self::SLUG;
+    }
+
+    /**
+     * @return array The core features that this post type supports
+     */
+    private function getSupportedFeatures()
+    {
+        $features = array('title', 'editor', 'thumbnail', 'publicize', 'author', 'revisions');
+
+        if (get_option('einsatz_support_excerpt', '0') === '1') {
+            $features[] = 'excerpt';
+        }
+
+        return $features;
     }
 
     /**

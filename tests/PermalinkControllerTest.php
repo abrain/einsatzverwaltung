@@ -24,6 +24,11 @@ class PermalinkControllerTest extends WP_UnitTestCase
         $this->assertEquals("prefix/$report->post_name/suffix", $controller->buildSelector($report, 'prefix/%postname%/suffix'));
     }
 
+    /**
+     * @group unittests
+     * It's not completely a unit test, but that way this test is skipped for the old PHP/PHPUnit version which doesn't
+     * support createMock().
+     */
     public function testGetPermalink()
     {
         $controller = new PermalinkController();

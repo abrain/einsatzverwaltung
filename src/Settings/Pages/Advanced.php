@@ -61,6 +61,13 @@ class Advanced extends SubPage
             $this->settingsApiPage,
             'einsatzvw_settings_advreport'
         );
+        add_settings_field(
+            'einsatzvw_advreport_gutenberg',
+            'Gutenberg',
+            array($this, 'echoFieldGutenberg'),
+            $this->settingsApiPage,
+            'einsatzvw_settings_advreport'
+        );
     }
 
     public function addSettingsSections()
@@ -141,6 +148,14 @@ class Advanced extends SubPage
             __('Tags', 'einsatzverwaltung')
         );
         echo '<p class="description">Diese Funktionen, die du von Beitr&auml;gen kennst, k&ouml;nnen auch f&uuml;r Einsatzberichte aktiviert werden.</p>';
+        echo '</fieldset>';
+    }
+
+    public function echoFieldGutenberg()
+    {
+        echo '<fieldset>';
+        $this->echoSettingsCheckbox('einsatz_disable_blockeditor', 'Block-Editor f&uuml;r Einsatzberichte deaktivieren');
+        echo '<p class="description">Diese Einstellung betrifft nur WordPress 5.0 und neuer.</p>';
         echo '</fieldset>';
     }
 
@@ -226,6 +241,11 @@ class Advanced extends SubPage
         register_setting(
             'einsatzvw_settings_advanced',
             'einsatz_support_posttag',
+            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+        );
+        register_setting(
+            'einsatzvw_settings_advanced',
+            'einsatz_disable_blockeditor',
             array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
         );
     }

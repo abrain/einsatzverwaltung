@@ -58,6 +58,14 @@ jobs:
     script: ./vendor/bin/phpunit
     after_script:
       - ./cc-test-reporter after-build --coverage-input-type clover --exit-code $TRAVIS_TEST_RESULT
+  - stage: test
+    name: 'Latest versions, pretty permalinks'
+    env: WP_VERSION=5.1 WP_MULTISITE=0 WP_TESTS_PERMALINK=PRETTY
+    php: '7.3'
+  - stage: test
+    name: 'Latest versions, PATHINFO permalinks'
+    env: WP_VERSION=5.1 WP_MULTISITE=0 WP_TESTS_PERMALINK=PATHINFO
+    php: '7.3'
 
 matrix:
   exclude:

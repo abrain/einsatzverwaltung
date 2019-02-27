@@ -9,6 +9,7 @@ use abrain\Einsatzverwaltung\Import\Tool as ImportTool;
 use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\PermalinkController;
 use abrain\Einsatzverwaltung\Settings\MainPage;
+use abrain\Einsatzverwaltung\Types\Report;
 use abrain\Einsatzverwaltung\Utilities;
 
 /**
@@ -34,6 +35,7 @@ class Initializer
         add_filter('dashboard_glance_items', array($this, 'addReportsToDashboard'));
         add_filter('plugin_row_meta', array($this, 'pluginMetaLinks'), 10, 2);
         add_filter("plugin_action_links_{$pluginBasename}", array($this,'addActionLinks'));
+        add_filter('use_block_editor_for_post_type', array($this, 'useBlockEditorForReports'), 10, 2);
 
         $reportListTable = new ReportListTable();
         add_filter('manage_edit-einsatz_columns', array($reportListTable, 'filterColumnsEinsatz'));
@@ -215,5 +217,20 @@ class Initializer
             echo '<strong>Die Anpassung kann durchaus eine Minute dauern, bitte nur einmal klicken.</strong><br>';
             echo '<a href="' . $url . '" class="button button-primary">Anpassung durchf&uuml;hren</a></p></div>';
         }
+    }
+
+    /**
+     * @param bool $useBlockEditor
+     * @param string $postType
+     *
+     * @return bool
+     */
+    public function useBlockEditorForReports($useBlockEditor, $postType)
+    {
+        if ($postType === Report::SLUG && get_option('einsatz_disable_blockeditor', '0') === '1') {
+            return false;
+        }
+
+        return $useBlockEditor;
     }
 }

@@ -17,6 +17,12 @@ tests_add_filter('muplugins_loaded', function () {
     // Zeitzone setzen
     update_option('timezone_string', 'Europe/Berlin');
     date_default_timezone_set('Europe/Berlin');
+
+    if (getenv('WP_TESTS_PERMALINK') === 'PRETTY') {
+        update_option('permalink_structure', '/%year%/%monthnum%/%postname%/');
+    } elseif (getenv('WP_TESTS_PERMALINK') === 'PATHINFO') {
+        update_option('permalink_structure', '/index.php/%year%/%monthnum%/%postname%/');
+    }
 });
 
 require $_tests_dir . '/includes/bootstrap.php';

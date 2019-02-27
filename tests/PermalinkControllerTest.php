@@ -25,6 +25,50 @@ class PermalinkControllerTest extends WP_UnitTestCase
     }
 
     /**
+     * @group unittests
+     * It's not completely a unit test, but that way this test is skipped for the old PHP/PHPUnit version which doesn't
+     * support createMock().
+     */
+    public function testGetPermalink()
+    {
+        $controller = new PermalinkController();
+        $report = $this->createMock('abrain\Einsatzverwaltung\Types\Report');
+        $report->rewriteSlug = 'customrewriteslug';
+        $controller->addRewriteRules($report);
+
+        if (getenv('WP_TESTS_PERMALINK') === 'PRETTY') {
+            $this->assertEquals(
+                'http://example.org/customrewriteslug/some-unique-selector/',
+                $controller->getPermalink('some-unique-selector')
+            );
+        } elseif (getenv('WP_TESTS_PERMALINK') === 'PATHINFO') {
+            $this->assertEquals(
+                'http://example.org/index.php/customrewriteslug/some-unique-selector/',
+                $controller->getPermalink('some-unique-selector')
+            );
+        }
+    }
+
+    /**
+     * @group unittests
+     */
+    public function testGetRewriteBase()
+    {
+        $controller = new PermalinkController();
+        $report = $this->createMock('abrain\Einsatzverwaltung\Types\Report');
+        $report->rewriteSlug = 'customrewriteslug';
+        $controller->addRewriteRules($report);
+
+        if (getenv('WP_TESTS_PERMALINK') === 'PRETTY') {
+            $this->assertEquals('customrewriteslug', $controller->getRewriteBase());
+        } elseif (getenv('WP_TESTS_PERMALINK') === 'PATHINFO') {
+            $this->assertEquals('index.php/customrewriteslug', $controller->getRewriteBase());
+        } else {
+            $this->assertEquals('', $controller->getRewriteBase());
+        }
+    }
+
+    /**
      * @dataProvider queryVarTests
      * @param string $input
      * @param string $permalinkStructure

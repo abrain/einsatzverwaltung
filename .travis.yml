@@ -18,6 +18,7 @@ env:
   - WP_VERSION=4.8.8 WP_MULTISITE=0
   - WP_VERSION=4.9.9 WP_MULTISITE=0
   - WP_VERSION=5.0.3 WP_MULTISITE=0
+  - WP_VERSION=5.1 WP_MULTISITE=0
   - WP_VERSION=nightly WP_MULTISITE=0
 
 stages:
@@ -46,7 +47,7 @@ jobs:
     script: ./vendor/bin/phpunit --no-coverage --exclude-group unittests
   - stage: validate
     name: 'Latest versions'
-    env: WP_VERSION=5.0.3 WP_MULTISITE=0
+    env: WP_VERSION=5.1 WP_MULTISITE=0
     php: '7.3'
     before_install: composer require phpunit/phpunit:5.7.* --dev
     before_script:
@@ -57,6 +58,14 @@ jobs:
     script: ./vendor/bin/phpunit
     after_script:
       - ./cc-test-reporter after-build --coverage-input-type clover --exit-code $TRAVIS_TEST_RESULT
+  - stage: test
+    name: 'Latest versions, pretty permalinks'
+    env: WP_VERSION=5.1 WP_MULTISITE=0 WP_TESTS_PERMALINK=PRETTY
+    php: '7.3'
+  - stage: test
+    name: 'Latest versions, PATHINFO permalinks'
+    env: WP_VERSION=5.1 WP_MULTISITE=0 WP_TESTS_PERMALINK=PATHINFO
+    php: '7.3'
 
 matrix:
   exclude:

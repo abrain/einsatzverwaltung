@@ -47,7 +47,7 @@ class PermalinkController
             $this->reportRewriteSlug = $report->rewriteSlug;
 
             // add rules for paginated year archive
-            $base = ltrim($wp_rewrite->front, '/') . $this->reportRewriteSlug;
+            $base = $this->getRewriteBase();
             add_rewrite_rule(
                 $base . '/(\d{4})/page/(\d{1,})/?$',
                 'index.php?post_type=einsatz&year=$matches[1]&paged=$matches[2]',
@@ -141,6 +141,15 @@ class PermalinkController
     }
 
     /**
+     * @return string
+     */
+    public function getRewriteBase()
+    {
+        global $wp_rewrite;
+        return ltrim($wp_rewrite->front, '/') . $this->reportRewriteSlug;
+    }
+
+    /**
      * Returns the regular expression necessary to disassemble the selector (part of the URL specifying a single report)
      *
      * @param string $permalink
@@ -160,7 +169,7 @@ class PermalinkController
      */
     public function getPermalink($selector)
     {
-        $path = sprintf('%s/%s', $this->reportRewriteSlug, $selector);
+        $path = sprintf('%s/%s', $this->getRewriteBase(), $selector);
         return home_url(user_trailingslashit($path));
     }
 

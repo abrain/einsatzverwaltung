@@ -19,7 +19,13 @@ class ReportListSettings
      */
     public function getZebraColor()
     {
-        return get_option('einsatzvw_list_zebracolor', self::DEFAULT_ZEBRACOLOR);
+        $option = get_option('einsatzvw_list_zebracolor', self::DEFAULT_ZEBRACOLOR);
+        $sanitized = sanitize_hex_color($option);
+        if (empty($sanitized)) {
+            $sanitized = self::DEFAULT_ZEBRACOLOR;
+        }
+
+        return $sanitized;
     }
 
     /**
@@ -40,7 +46,7 @@ class ReportListSettings
      */
     public function isZebraTable()
     {
-        return (bool) get_option('einsatzvw_list_zebra', true);
+        return (get_option('einsatzvw_list_zebra', '1') !== '0');
     }
 
     /**

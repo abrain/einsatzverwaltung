@@ -13,6 +13,16 @@ tests_add_filter('muplugins_loaded', function () {
     // DB-Version setzen, damit der Upgrade-Prozess nicht unnötig anläuft
     // Wird normal bei der Aktivierung des Plugins gemacht, aber diese Action wird bei den Tests nicht aufgerufen
     add_option('einsatzvw_db_version', \abrain\Einsatzverwaltung\Core::DB_VERSION);
+
+    // Zeitzone setzen
+    update_option('timezone_string', 'Europe/Berlin');
+    date_default_timezone_set('Europe/Berlin');
+
+    if (getenv('WP_TESTS_PERMALINK') === 'PRETTY') {
+        update_option('permalink_structure', '/%year%/%monthnum%/%postname%/');
+    } elseif (getenv('WP_TESTS_PERMALINK') === 'PATHINFO') {
+        update_option('permalink_structure', '/index.php/%year%/%monthnum%/%postname%/');
+    }
 });
 
 require $_tests_dir . '/includes/bootstrap.php';

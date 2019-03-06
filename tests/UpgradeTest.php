@@ -131,13 +131,13 @@ class UpgradeTest extends WP_UnitTestCase
     {
         $reportFactory = new ReportFactory();
         $reportIds = $reportFactory->create_many(3);
-        update_post_meta($reportIds[0], 'einsatz_mannschaft', 1);
-        update_post_meta($reportIds[1], 'einsatz_mannschaft', 0);
+        update_post_meta($reportIds[0], 'einsatz_mannschaft', '1');
+        update_post_meta($reportIds[1], 'einsatz_mannschaft', '0');
         update_post_meta($reportIds[2], 'einsatz_mannschaft', '1/8');
 
         $this->runUpgrade(3, 4);
 
-        self::assertEquals(1, get_post_meta($reportIds[0], 'einsatz_mannschaft', true));
+        self::assertEquals('1', get_post_meta($reportIds[0], 'einsatz_mannschaft', true));
         self::assertEquals('', get_post_meta($reportIds[1], 'einsatz_mannschaft', true));
         self::assertEquals('1/8', get_post_meta($reportIds[2], 'einsatz_mannschaft', true));
     }
@@ -283,14 +283,20 @@ class UpgradeTest extends WP_UnitTestCase
     public function testUpgrade130()
     {
         $ee1 = wp_create_term('Externes Einsatzmittel 1', 'exteinsatzmittel');
+        delete_term_meta($ee1['term_id'], 'url'); // Metafelder sollen noch nicht existieren
         add_option('evw_tax_exteinsatzmittel_'.$ee1['term_id'].'_url', 'website1');
         $ee2 = wp_create_term('Externes Einsatzmittel 2', 'exteinsatzmittel');
+        delete_term_meta($ee2['term_id'], 'url');
         add_option('evw_tax_exteinsatzmittel_'.$ee2['term_id'].'_url', 'website2');
 
         $vehicle1 = wp_create_term('Fahrzeug 1', 'fahrzeug');
+        delete_term_meta($vehicle1['term_id'], 'fahrzeugpid');
+        delete_term_meta($vehicle1['term_id'], 'vehicleorder');
         add_option('evw_tax_fahrzeug_'.$vehicle1['term_id'].'_fahrzeugpid', 46);
         add_option('evw_tax_fahrzeug_'.$vehicle1['term_id'].'_vehicleorder', 1);
         $vehicle2 = wp_create_term('Fahrzeug 2', 'fahrzeug');
+        delete_term_meta($vehicle2['term_id'], 'fahrzeugpid');
+        delete_term_meta($vehicle2['term_id'], 'vehicleorder');
         add_option('evw_tax_fahrzeug_'.$vehicle2['term_id'].'_vehicleorder', 147);
 
         // Unbehandelte Term-Splits
@@ -346,5 +352,40 @@ class UpgradeTest extends WP_UnitTestCase
         // Prüfe auf aktivierte Admin Notice
         self::assertInternalType('array', get_option('einsatzverwaltung_admin_notices'));
         self::assertContains('regenerateSlugs', get_option('einsatzverwaltung_admin_notices'));
+    }
+
+    public function testUpgrade134()
+    {
+        $reportFactory = new ReportFactory();
+        $reportIds = $reportFactory->create_many(5);
+        delete_post_meta($reportIds[1], 'einsatz_special');
+        delete_post_meta($reportIds[4], 'einsatz_special');
+        update_post_meta($reportIds[3], 'einsatz_special', 1);
+
+        self::assertEquals(0, get_post_meta($reportIds[0], 'einsatz_special', true));
+        self::assertEquals('', get_post_meta($reportIds[1], 'einsatz_special', true));
+        self::assertEquals(0, get_post_meta($reportIds[2], 'einsatz_special', true));
+        self::assertEquals(1, get_post_meta($reportIds[3], 'einsatz_special', true));
+        self::assertEquals('', get_post_meta($reportIds[4], 'einsatz_special', true));
+
+        $this->runUpgrade(20, 21);
+
+        self::assertEquals(0, get_post_meta($reportIds[0], 'einsatz_special', true));
+        self::assertEquals(0, get_post_meta($reportIds[1], 'einsatz_special', true));
+        self::assertEquals(0, get_post_meta($reportIds[2], 'einsatz_special', true));
+        self::assertEquals(1, get_post_meta($reportIds[3], 'einsatz_special', true));
+        self::assertEquals(0, get_post_meta($reportIds[4], 'einsatz_special', true));
+    }
+
+    public function testUpgrade140()
+    {
+        $this->runUpgrade(21, 30);
+    }
+
+    public function testUpgrade150()
+    {
+        $this->runUpgrade(30, 40);
+
+        $this->assertEquals('1', get_option('einsatz_support_posttag'));
     }
 }

@@ -1,21 +1,25 @@
-engines:
+version: "2"
+plugins:
   phpcodesniffer:
     enabled: true
+    config:
+      file_extensions: "php"
+      standard: "PSR1,PSR2"
+      encoding: utf-8
   phpmd:
     enabled: true
     config:
-      standard: "PSR1,PSR2"
+      file_extensions:
+        - php
+      rulesets: "phpmd.xml"
+  csslint:
+    enabled: true
   eslint:
     enabled: true
-  csslint:
+  duplication:
     enabled: true
   fixme:
     enabled: true
-ratings:
-  paths:
-  - src/**/*.php
-  - src/**/*.js
-  - src/**/*.css
-  - tests/**/*.php
-exclude_paths:
-- src/font-awesome/**/*
+exclude_patterns:
+- src/font-awesome/
+- vendor/

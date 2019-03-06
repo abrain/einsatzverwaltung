@@ -1,14 +1,12 @@
 <?php
 namespace abrain\Einsatzverwaltung\Util;
 
-use abrain\Einsatzverwaltung\Core;
-use abrain\Einsatzverwaltung\Data;
 use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Options;
-use abrain\Einsatzverwaltung\Taxonomies;
-use abrain\Einsatzverwaltung\Utilities;
+use abrain\Einsatzverwaltung\PermalinkController;
 use WP_Post;
+use WP_Term;
 
 /**
  * Formatierungen aller Art
@@ -18,6 +16,32 @@ use WP_Post;
 class Formatter
 {
     private $tagsNotNeedingPost = array('%feedUrl%');
+
+    /**
+     * @var array Ersetzbare Tags und ihre Beschreibungen
+     */
+    private static $availableTags = array(
+        '%title%' => 'Titel des Einsatzberichts',
+        '%date%' => 'Datum der Alarmierung',
+        '%time%' => 'Zeitpunkt der Alarmierung',
+        '%duration%' => 'Dauer des Einsatzes',
+        '%incidentCommander%' => 'Einsatzleiter',
+        '%incidentType%' => 'Art des Einsatzes',
+        '%incidentTypeColor%' => 'Farbe der Art des Einsatzes',
+        '%url%' => 'URL zum Einsatzbericht',
+        '%location%' => 'Ort des Einsatzes',
+        '%feedUrl%' => 'URL zum Feed',
+        '%number%' => 'Einsatznummer',
+        '%seqNum%' => 'Laufende Nummer',
+        '%annotations%' => 'Vermerke',
+        '%vehicles%' => 'Fahrzeuge',
+        '%additionalForces%' => 'Weitere Kr&auml;fte',
+        '%typesOfAlerting%' => 'Alarmierungsarten',
+        '%content%' => 'Berichtstext',
+        '%featuredImage%' => 'Beitragsbild',
+        '%yearArchive%' => 'Link zum Jahresarchiv',
+        '%workforce%' => 'Mannschaftsstärke',
+    );
 
     /**
      * @var AnnotationIconBar
@@ -30,21 +54,20 @@ class Formatter
     private $options;
 
     /**
-     * @var Utilities
+     * @var PermalinkController
      */
-    private $utilities;
+    private $permalinkController;
 
     /**
      * Formatter constructor.
+     *
      * @param Options $options
-     * @param Utilities $utilities
-     * @param Core $core
+     * @param PermalinkController $permalinkController
      */
-    public function __construct($options, $utilities, $core)
+    public function __construct(Options $options, PermalinkController $permalinkController)
     {
-        require_once dirname(__FILE__) . '/../Frontend/AnnotationIconBar.php';
         $this->options = $options;
-        $this->utilities = $utilities;
+        $this->permalinkController = $permalinkController;
         $this->annotationIconBar = AnnotationIconBar::getInstance();
     }
 
@@ -53,18 +76,24 @@ class Formatter
      * @param string $pattern
      * @param array $allowedTags
      * @param WP_Post $post
+     * @param string $context
      *
      * @return mixed
      */
-    public function formatIncidentData($pattern, $allowedTags = array(), $post = null)
+    public function formatIncidentData($pattern, $allowedTags = array(), $post = null, $context = 'post')
     {
         if (empty($allowedTags)) {
-            $allowedTags = array_keys($this->getTags());
+            $allowedTags = array_keys(self::$availableTags);
         }
+
+        // Content should be handled separately, so we will ignore it
+        $allowedTags = array_filter($allowedTags, function ($tag) {
+            return $tag !== '%content%';
+        });
 
         $formattedString = $pattern;
         foreach ($allowedTags as $tag) {
-            $formattedString = $this->format($post, $formattedString, $tag);
+            $formattedString = $this->format($post, $formattedString, $tag, $context);
         }
         return $formattedString;
     }
@@ -73,14 +102,13 @@ class Formatter
      * @param WP_Post $post
      * @param string $pattern
      * @param string $tag
+     * @param string $context
      * @return mixed|string
      */
-    private function format($post, $pattern, $tag)
+    private function format($post, $pattern, $tag, $context = 'post')
     {
         if ($post == null && !in_array($tag, $this->tagsNotNeedingPost)) {
-            $message = 'Alle Tags außer ' . implode(',', $this->tagsNotNeedingPost) . ' brauchen ein Post-Objekt';
-            _doing_it_wrong(__FUNCTION__, $message, null);
-            return '';
+            return $pattern;
         }
 
         $incidentReport = new IncidentReport($post);
@@ -89,6 +117,9 @@ class Formatter
         switch ($tag) {
             case '%title%':
                 $replace = get_the_title($post);
+                if (empty($replace)) {
+                    $replace = '(kein Titel)';
+                }
                 break;
             case '%date%':
                 $replace = date_i18n($this->options->getDateFormat(), $timeOfAlerting->getTimestamp());
@@ -97,10 +128,17 @@ class Formatter
                 $replace = date_i18n($this->options->getTimeFormat(), $timeOfAlerting->getTimestamp());
                 break;
             case '%duration%':
-                $replace = $this->utilities->getDurationString(Data::getDauer($incidentReport));
+                $replace = $this->getDurationString($incidentReport->getDuration());
+                break;
+            case '%incidentCommander%':
+                $replace = $incidentReport->getIncidentCommander();
                 break;
             case '%incidentType%':
-                $replace = $this->getTypeOfIncident($incidentReport, false, false, false);
+                $showTypeArchive = get_option('einsatzvw_show_einsatzart_archive') === '1';
+                $replace = $this->getTypeOfIncident($incidentReport, ($context === 'post'), $showTypeArchive, false);
+                break;
+            case '%incidentTypeColor%':
+                $replace = $this->getColorOfTypeOfIncident($incidentReport->getTypeOfIncident());
                 break;
             case '%url%':
                 $replace = get_permalink($post->ID);
@@ -120,6 +158,28 @@ class Formatter
             case '%annotations%':
                 $replace = $this->annotationIconBar->render($incidentReport);
                 break;
+            case '%vehicles%':
+                $replace = $this->getVehicles($incidentReport, ($context === 'post'), ($context === 'post'));
+                break;
+            case '%additionalForces%':
+                $replace = $this->getAdditionalForces($incidentReport, ($context === 'post'), ($context === 'post'));
+                break;
+            case '%typesOfAlerting%':
+                $replace = $this->getTypesOfAlerting($incidentReport);
+                break;
+            case '%content%':
+                $replace = $post->post_content;
+                break;
+            case '%featuredImage%':
+                $replace = current_theme_supports('post-thumbnails') ? get_the_post_thumbnail($post->ID) : '';
+                break;
+            case '%yearArchive%':
+                $year = $timeOfAlerting->format('Y');
+                $replace = $this->permalinkController->getYearArchiveLink($year);
+                break;
+            case '%workforce%':
+                $replace = $incidentReport->getWorkforce();
+                break;
             default:
                 return $pattern;
         }
@@ -128,23 +188,26 @@ class Formatter
     }
 
     /**
-     * @return array Ersetzbare Tags und ihre Beschreibungen
+     * @param WP_Term|false $typeOfIncident
+     * @return string
      */
-    public function getTags()
+    public function getColorOfTypeOfIncident($typeOfIncident)
     {
-        return array(
-            '%title%' => 'Titel des Einsatzberichts',
-            '%date%' => 'Datum der Alarmierung',
-            '%time%' => 'Zeitpunkt der Alarmierung',
-            '%duration%' => 'Dauer des Einsatzes',
-            '%incidentType%' => 'Art des Einsatzes',
-            '%url%' => 'URL zum Einsatzbericht',
-            '%location%' => 'Ort des Einsatzes',
-            '%feedUrl%' => 'URL zum Feed',
-            '%number%' => 'Einsatznummer',
-            '%seqNum%' => 'Laufende Nummer',
-            '%annotations%' => 'Vermerke'
-        );
+        if (empty($typeOfIncident)) {
+            return 'inherit';
+        }
+
+        $color = get_term_meta($typeOfIncident->term_id, 'typecolor', true);
+        while (empty($color) && $typeOfIncident->parent !== 0) {
+            $typeOfIncident = WP_Term::get_instance($typeOfIncident->parent);
+            $color = get_term_meta($typeOfIncident->term_id, 'typecolor', true);
+        }
+
+        if (empty($color)) {
+            return 'inherit';
+        }
+
+        return $color;
     }
 
     /**
@@ -203,9 +266,11 @@ class Formatter
             }
 
             if ($makeLinks && $showArchiveLinks) {
-                $title = 'Alle Eins&auml;tze vom Typ '. $typeOfIncident->name . ' anzeigen';
-                $url = get_term_link($typeOfIncident);
-                $link = '<a href="'.$url.'" class="fa fa-filter" style="text-decoration:none;" title="'.$title.'"></a>';
+                $link = sprintf(
+                    '<a href="%s" class="fa fa-filter" style="text-decoration:none;" title="%s"></a>',
+                    esc_url(get_term_link($typeOfIncident)),
+                    esc_attr(sprintf('Alle Eins&auml;tze vom Typ %s anzeigen', $typeOfIncident->name))
+                );
                 $string = '&nbsp;' . $link . $string;
             }
             $string = $typeOfIncident->name . $string;
@@ -237,22 +302,40 @@ class Formatter
             $name = $vehicle->name;
 
             if ($makeLinks) {
-                $pageid = Taxonomies::getTermField($vehicle->term_id, 'fahrzeug', 'fahrzeugpid');
-                if (!empty($pageid)) {
-                    $pageurl = get_permalink($pageid);
-                    if ($pageurl !== false) {
-                        $name = '<a href="'.$pageurl.'" title="Mehr Informationen zu '.$vehicle->name.'">'.$vehicle->name.'</a>';
-                    }
-                }
+                $name = $this->addVehicleLink($vehicle);
             }
 
             if ($makeLinks && $showArchiveLinks && $this->options->isShowFahrzeugArchive()) {
-                $name .= '&nbsp;<a href="'.get_term_link($vehicle).'" class="fa fa-filter" style="text-decoration:none;" title="Eins&auml;tze unter Beteiligung von '.$vehicle->name.' anzeigen"></a>';
+                $name .= '&nbsp;' . $this->getFilterLink($vehicle);
             }
 
             $names[] = $name;
         }
         return join(", ", $names);
+    }
+
+    /**
+     * @param WP_Term $vehicle
+     * @return string A link to the page associated with the vehicle (if any), otherwise the name without a link
+     */
+    private function addVehicleLink($vehicle)
+    {
+        $pageid = get_term_meta($vehicle->term_id, 'fahrzeugpid', true);
+        if (empty($pageid)) {
+            return $vehicle->name;
+        }
+
+        $pageurl = get_permalink($pageid);
+        if ($pageurl === false) {
+            return $vehicle->name;
+        }
+
+        return sprintf(
+            '<a href="%s" title="Mehr Informationen zu %s">%s</a>',
+            esc_url($pageurl),
+            esc_attr($vehicle->name),
+            esc_html($vehicle->name)
+        );
     }
 
     /**
@@ -279,22 +362,92 @@ class Formatter
             $name = $force->name;
 
             if ($makeLinks) {
-                $url = Taxonomies::getTermField($force->term_id, 'exteinsatzmittel', 'url');
-                if (!empty($url)) {
-                    $openInNewWindow = $this->options->isOpenExtEinsatzmittelNewWindow();
-                    $name = '<a href="'.$url.'" title="Mehr Informationen zu '.$force->name.'"';
-                    $name .= ($openInNewWindow ? ' target="_blank"' : '') . '>'.$force->name.'</a>';
-                }
+                $name = $this->getAdditionalForceLink($force);
             }
 
             if ($makeLinks && $showArchiveLinks && $this->options->isShowExtEinsatzmittelArchive()) {
-                $title = 'Eins&auml;tze unter Beteiligung von ' . $force->name . ' anzeigen';
-                $name .= '&nbsp;<a href="'.get_term_link($force).'" class="fa fa-filter" ';
-                $name .= 'style="text-decoration:none;" title="' . $title . '"></a>';
+                $name .= '&nbsp;' . $this->getFilterLink($force);
             }
 
             $names[] = $name;
         }
         return join(", ", $names);
+    }
+
+    /**
+     * @param WP_Term $additionalForce
+     * @return string
+     */
+    private function getAdditionalForceLink($additionalForce)
+    {
+        $url = get_term_meta($additionalForce->term_id, 'url', true);
+        if (empty($url)) {
+            return $additionalForce->name;
+        }
+
+        $openInNewWindow = $this->options->isOpenExtEinsatzmittelNewWindow();
+        return sprintf(
+            '<a href="%s" title="%s" target="%s">%s</a>',
+            esc_url($url),
+            esc_attr(sprintf('Mehr Informationen zu %s', $additionalForce->name)),
+            esc_attr($openInNewWindow ? '_blank' : '_self'),
+            esc_html($additionalForce->name)
+        );
+    }
+
+    /**
+     * @param WP_Term $term
+     * @return string
+     */
+    private function getFilterLink(WP_Term $term)
+    {
+        return sprintf(
+            '<a href="%s" class="fa fa-filter" style="text-decoration: none;" title="%s"></a>',
+            get_term_link($term),
+            sprintf('Eins&auml;tze unter Beteiligung von %s anzeigen', $term->name)
+        );
+    }
+
+    /**
+     * Gibt eine lesbare Angabe einer Dauer zurück (z.B. 2 Stunden 12 Minuten)
+     *
+     * @param int $minutes Dauer in Minuten
+     * @param bool $abbreviated
+     *
+     * @return string
+     */
+    public static function getDurationString($minutes, $abbreviated = false)
+    {
+        if (!is_numeric($minutes) || $minutes < 0) {
+            return '';
+        }
+
+        if ($minutes < 60) {
+            $unit = $abbreviated ? 'min' : _n('minute', 'minutes', $minutes, 'einsatzverwaltung');
+            return sprintf('%d %s', $minutes, $unit);
+        }
+
+        $hours = intval($minutes / 60);
+        $remainingMinutes = $minutes % 60;
+        $dauerstring = $hours . ' ' . ($abbreviated ? 'h' : _n('hour', 'hours', $hours, 'einsatzverwaltung'));
+        if ($remainingMinutes > 0) {
+            $unit = $abbreviated ? 'min' : _n('minute', 'minutes', $remainingMinutes, 'einsatzverwaltung');
+            $dauerstring .= sprintf(' %d %s', $remainingMinutes, $unit);
+        }
+
+        return $dauerstring;
+    }
+
+    /**
+     * @param string $tag
+     * @return string
+     */
+    public static function getLabelForTag($tag)
+    {
+        if (!array_key_exists($tag, self::$availableTags)) {
+            return '';
+        }
+
+        return self::$availableTags[$tag];
     }
 }

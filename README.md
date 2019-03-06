@@ -1,7 +1,7 @@
 # Einsatzverwaltung
 ## Plugin zur Verwaltung von Feuerwehreins&auml;tzen
 
-[![Build Status](https://travis-ci.org/abrain/einsatzverwaltung.svg)](https://travis-ci.org/abrain/einsatzverwaltung) [![Code Climate](https://codeclimate.com/github/abrain/einsatzverwaltung/badges/gpa.svg)](https://codeclimate.com/github/abrain/einsatzverwaltung) [![Test Coverage](https://codeclimate.com/github/abrain/einsatzverwaltung/badges/coverage.svg)](https://codeclimate.com/github/abrain/einsatzverwaltung/coverage)
+[![Build Status](https://travis-ci.org/abrain/einsatzverwaltung.svg)](https://travis-ci.org/abrain/einsatzverwaltung) [![Maintainability](https://api.codeclimate.com/v1/badges/e977859ca4c209053b79/maintainability)](https://codeclimate.com/github/abrain/einsatzverwaltung/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/e977859ca4c209053b79/test_coverage)](https://codeclimate.com/github/abrain/einsatzverwaltung/test_coverage)
 
 Dieses Plugin f&uuml;gt WordPress eine neue Beitragsart "Einsatzbericht" hinzu. Diese Einsatzberichte werden wie gew&ouml;hnliche WordPress-Beitr&auml;ge erstellt, es k&ouml;nnen aber zus&auml;tzliche Informationen wie Alarmzeit, Art des Einsatzes, eingesetzte Fahrzeuge und vieles mehr angegeben werden. Zudem stellt das Plugin verschiedene M&ouml;glichkeiten zur Darstellung der Einsatzberichte zur Verf&uuml;gung.
 
@@ -19,16 +19,17 @@ Pull Requests werden nur im Branch `develop` angenommen.
 Das Plugin an sich liegt im Ordner `src`, alles andere dient der Unterst&uuml;tzung bei der Entwicklung.
 Code aus einem anderen Branch als `master` sollte nicht f&uuml;r Produktivsysteme verwendet werden.
 
-Der PHP-Code wird gem&auml;&szlig; dem Coding Style Guide [PSR-2](http://www.php-fig.org/psr/psr-2/) formatiert.
+Der PHP-Code wird gem&auml;&szlig; dem Coding Style Guide [PSR-2](https://www.php-fig.org/psr/psr-2/) formatiert.
+Klassen werden automatisch geladen, die Dateien sind nach [PSR-4](https://www.php-fig.org/psr/psr-4/) zu organisieren.
 
 ### Mindestvoraussetzungen
 * PHP: 5.3.0
-* WordPress: 4.4
+* WordPress: 4.7
 
 Auch wenn PHP 5.3 vorausgesetzt und derzeit noch als Minimum erhalten wird, werden die automatisierten Tests nur mit den [aktuellen PHP-Versionen](https://secure.php.net/supported-versions.php) durchgef&uuml;hrt.
 
 ### Social Media
 
 * Twitter: [@einsatzvw](https://twitter.com/einsatzvw)
+* Mastodon: [@einsatzverwaltung](https://chaos.social/@einsatzverwaltung)
 * Facebook: [Einsatzverwaltung](https://www.facebook.com/einsatzverwaltung/)
-* GNU social: [@einsatzverwaltung](https://gnusocial.abrain.de/einsatzverwaltung)

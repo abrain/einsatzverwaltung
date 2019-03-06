@@ -1,8 +1,7 @@
 <?php
-namespace abrain\Einsatzverwaltung\Tests;
+namespace abrain\Einsatzverwaltung;
 
 use abrain\Einsatzverwaltung\Model\ReportAnnotation;
-use abrain\Einsatzverwaltung\ReportAnnotationRepository;
 
 class ReportAnnotationRepositoryTest extends \WP_UnitTestCase
 {

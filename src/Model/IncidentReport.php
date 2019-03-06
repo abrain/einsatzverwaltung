@@ -2,9 +2,9 @@
 
 namespace abrain\Einsatzverwaltung\Model;
 
-use abrain\Einsatzverwaltung\Taxonomies;
 use DateTime;
 use WP_Post;
+use WP_Term;
 
 /**
  * Datenmodellklasse für Einsatzberichte
@@ -97,6 +97,27 @@ class IncidentReport
                 'label' => 'Einsatznummer'
             ),
         );
+    }
+
+    /**
+     * Gibt die Einsatzdauer in Minuten zurück
+     *
+     * @return bool|int Dauer in Minuten oder false, wenn Alarmzeit und/oder Einsatzende nicht verfügbar sind
+     */
+    public function getDuration()
+    {
+        $timeOfAlerting = $this->getTimeOfAlerting();
+        $timeOfEnding = $this->getTimeOfEnding();
+
+        if (empty($timeOfAlerting) || empty($timeOfEnding)) {
+            return false;
+        }
+
+        $timestamp1 = $timeOfAlerting->getTimestamp();
+        $timestamp2 = strtotime($timeOfEnding);
+        $differenz = $timestamp2 - $timestamp1;
+
+        return intval($differenz / 60);
     }
 
     /**
@@ -267,7 +288,7 @@ class IncidentReport
         }
 
         // Solange der Einsatzbericht ein Entwurf ist, wird die Alarmzeit in Postmeta vorgehalten
-        if ($this->isDraft()) {
+        if ($this->isDraft() || $this->isFuture()) {
             $time = $this->getPostMeta('_einsatz_timeofalerting');
         }
 
@@ -304,7 +325,7 @@ class IncidentReport
      *
      * @param string $taxonomy Der eindeutige Bezeichner der Taxonomie
      *
-     * @return array Die Terms oder ein leeres Array
+     * @return WP_Term[] Die Terms oder ein leeres Array
      */
     private function getTheTerms($taxonomy)
     {
@@ -325,14 +346,14 @@ class IncidentReport
      * Gibt die Einsatzart eines bestimmten Einsatzes zurück. Auch wenn die Taxonomie 'einsatzart' mehrere Werte
      * speichern kann, wird nur der erste zurückgegeben.
      *
-     * @return object|false
+     * @return WP_Term
      */
     public function getTypeOfIncident()
     {
         $terms = $this->getTheTerms('einsatzart');
 
         if (empty($terms)) {
-            return false;
+            return null;
         }
 
         $keys = array_keys($terms);
@@ -342,7 +363,7 @@ class IncidentReport
     /**
      * Gibt die Fahrzeuge eines Einsatzberichts aus
      *
-     * @return array
+     * @return WP_Term[]
      */
     public function getVehicles()
     {
@@ -358,7 +379,7 @@ class IncidentReport
                 continue;
             }
 
-            $vehicleOrder = Taxonomies::getTermField($vehicle->term_id, 'fahrzeug', 'vehicleorder');
+            $vehicleOrder = get_term_meta($vehicle->term_id, 'vehicleorder', true);
             if (!empty($vehicleOrder)) {
                 $vehicle->vehicle_order = $vehicleOrder;
             }
@@ -428,5 +449,25 @@ class IncidentReport
     public function isSpecial()
     {
         return ($this->getPostMeta('einsatz_special') == 1);
+    }
+
+    /**
+     * Gibt zurück, ob der Einsatzbericht geplant ist
+     *
+     * @return bool
+     */
+    private function isFuture()
+    {
+        return $this->post->post_status === 'future';
+    }
+
+    /**
+     * Veranlasst die Zuordnung des Einsatzberichts zu einer Kategorie
+     *
+     * @param int $category Die ID der Kategorie
+     */
+    public function addToCategory($category)
+    {
+        wp_set_post_categories($this->getPostId(), $category, true);
     }
 }

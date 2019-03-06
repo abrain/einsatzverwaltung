@@ -4,6 +4,8 @@ namespace abrain\Einsatzverwaltung\Admin;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\ReportFactory;
 use DateTime;
+use Exception;
+use WP_Post;
 use WP_UnitTestCase;
 use WP_User;
 
@@ -141,5 +143,91 @@ class ReportEditTest extends WP_UnitTestCase
             $report->getTimeOfAlerting()->format('Y-m-d H:i:s'),
             'Alarmzeit wurde nicht im veröffentlichten Bericht gespeichert'
         );
+    }
+
+    public function testSanitizeTimeOfEnd()
+    {
+        $reportFactory = new ReportFactory();
+
+        /** @var WP_Post $post */
+        $post = $reportFactory->create_and_get(array(
+            'meta_input' => array(
+                'einsatz_einsatzende' => ''
+            )
+        ));
+        $this->assertEmpty(get_post_meta($post->ID, 'einsatz_einsatzende', true));
+
+        $post = $reportFactory->create_and_get(array(
+            'meta_input' => array(
+                'einsatz_einsatzende' => 'invaliddate'
+            )
+        ));
+        $this->assertEmpty(get_post_meta($post->ID, 'einsatz_einsatzende', true));
+
+        $post = $reportFactory->create_and_get(array(
+            'meta_input' => array(
+                'einsatz_einsatzende' => '2018-06-24 13:46'
+            )
+        ));
+        $this->assertEquals('2018-06-24 13:46', get_post_meta($post->ID, 'einsatz_einsatzende', true));
+    }
+
+    public function testPublishFuture()
+    {
+        $reportFactory = new ReportFactory();
+
+        /** @var WP_User $userEditor */
+        $userEditor = $this->factory->user->create_and_get();
+        $userEditor->add_cap('edit_einsatzberichte');
+        $userEditor->add_cap('edit_others_einsatzberichte');
+        $userEditor->add_cap('edit_published_einsatzberichte');
+        $userEditor->add_cap('publish_einsatzberichte');
+        wp_set_current_user($userEditor->ID);
+
+        try {
+            $reportDateTime = new DateTime('1 hour ago');
+            $reportDate = $reportDateTime->format('Y-m-d H:i:s');
+
+            $publishDateTime = new DateTime('+ 1 hour');
+            $futureDate= $publishDateTime->format('Y-m-d H:i:s');
+
+            $newPublishDateTime = new DateTime('5 seconds ago');
+            $newPublishDate= $newPublishDateTime->format('Y-m-d H:i:s');
+        } catch (Exception $e) {
+            $this->fail('Could not generate dates');
+            return;
+        }
+        $_POST = array(
+            'einsatzverwaltung_nonce' => wp_create_nonce('save_einsatz_details'),
+            'einsatzverwaltung_alarmzeit' => $reportDate,
+        );
+        /** @var WP_Post $post */
+        $post = $reportFactory->create_and_get(array(
+            'post_status' => 'future',
+            'post_date' => $futureDate
+        ));
+
+        $this->assertEquals('future', get_post_status($post));
+        $this->assertEquals($futureDate, $post->post_date);
+        $this->assertEquals($reportDate, get_post_meta($post->ID, '_einsatz_timeofalerting', true));
+
+        // publish the report
+        $result = wp_update_post(array(
+            'ID' => $post->ID,
+            'post_date' => $newPublishDate,
+            'post_date_gmt' => get_gmt_from_date($newPublishDate),
+            'post_status' => 'publish'
+        ), true);
+        if (is_wp_error($result)) {
+            $this->fail('Could not update post: ' . $result->get_error_message());
+            return;
+        }
+
+        // Refresh post data
+        $post = get_post($post->ID);
+
+        $this->assertEquals('publish', get_post_status($post));
+        $this->assertEquals($reportDate, $post->post_date);
+        $this->assertEquals('', get_post_meta($post->ID, '_einsatz_timeofalerting', true));
     }
 }

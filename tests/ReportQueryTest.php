@@ -6,7 +6,35 @@ use WP_UnitTestCase;
 
 class ReportQueryTest extends WP_UnitTestCase
 {
+    /**
+     * @var int
+     */
+    private static $incidentType1Id;
+
+    /**
+     * @var int
+     */
+    private static $incidentType1aId;
+
     private $postIds;
+
+    /**
+     * @inheritDoc
+     */
+    public static function setUpBeforeClass()
+    {
+        parent::setUpBeforeClass();
+        $parentTerm = wp_insert_term('Type 1', 'einsatzart');
+        if (is_wp_error($parentTerm)) {
+            self::fail('Could not create parent term');
+        }
+        self::$incidentType1Id = $parentTerm['term_id'];
+        $childTerm = wp_insert_term('Type 1 a', 'einsatzart', array('parent' => self::$incidentType1Id));
+        if (is_wp_error($childTerm)) {
+            self::fail('Could not create child term');
+        }
+        self::$incidentType1aId = $childTerm['term_id'];
+    }
 
     public function setUp()
     {
@@ -34,6 +62,11 @@ class ReportQueryTest extends WP_UnitTestCase
         // Zwei Berichte als besonders markieren
         update_post_meta($this->postIds[3], 'einsatz_special', 1);
         update_post_meta($this->postIds[5], 'einsatz_special', 1);
+
+        // Einsatzarten zuweisen
+        wp_set_object_terms($this->postIds[2], array(self::$incidentType1Id), 'einsatzart');
+        wp_set_object_terms($this->postIds[5], array(self::$incidentType1aId), 'einsatzart');
+        wp_set_object_terms($this->postIds[8], array(self::$incidentType1aId), 'einsatzart');
     }
 
     public function testGetAllPublishedReports()
@@ -147,5 +180,36 @@ class ReportQueryTest extends WP_UnitTestCase
         }, $reports);
         $expectedPostIds = array_diff_key($this->postIds, array_flip(array(0,1,4,7)));
         self::assertEmpty(array_diff($queriedPostIds, $expectedPostIds));
+    }
+
+    public function testFilterIncidentTypeChild()
+    {
+        $query = new ReportQuery();
+        $query->setIncidentTypeId(self::$incidentType1aId);
+        $reports = $query->getReports();
+        $this->assertCount(2, $reports);
+        /** @var IncidentReport $report */
+        foreach ($reports as $report) {
+            $typeOfIncident = $report->getTypeOfIncident();
+            $this->assertNotNull($typeOfIncident);
+            $this->assertEquals(self::$incidentType1aId, $typeOfIncident->term_id);
+        }
+    }
+
+    public function testFilterIncidentTypeParent()
+    {
+        $query = new ReportQuery();
+        $query->setIncidentTypeId(self::$incidentType1Id);
+        $reports = $query->getReports();
+        $this->assertCount(3, $reports);
+        /** @var IncidentReport $report */
+        foreach ($reports as $report) {
+            $typeOfIncident = $report->getTypeOfIncident();
+            $this->assertNotNull($typeOfIncident);
+            $this->assertTrue(in_array(
+                $typeOfIncident->term_id,
+                array(self::$incidentType1Id, self::$incidentType1aId)
+            ));
+        }
     }
 }

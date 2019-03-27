@@ -17,6 +17,13 @@ class ReportQuery
     private $excludePostId;
 
     /**
+     * Die Term-ID der Einsatzart, nach der gefiltert werden soll
+     *
+     * @var int
+     */
+    private $incidentTypeId = 0;
+
+    /**
      * Zeigt an, ob als privat markierte Berichte mit abgefragt werden sollen
      *
      * @var bool
@@ -38,7 +45,7 @@ class ReportQuery
     private $onlySpecialReports;
 
     /**
-     * Gibt ob aufsteigend sortiert werden soll
+     * Gibt an, ob aufsteigend sortiert werden soll
      *
      * @var bool
      */
@@ -120,6 +127,7 @@ class ReportQuery
         $postArgs = array(
             'date_query' => $this->getDateQuery(),
             'meta_query' => $this->getMetaQuery(),
+            'tax_query' => $this->getTaxQuery(),
             'order' => $this->orderAsc ? 'ASC' : 'DESC',
             'orderby' => 'post_date',
             'post_status' => $postStatus,
@@ -139,11 +147,33 @@ class ReportQuery
     }
 
     /**
+     * @return array
+     */
+    private function getTaxQuery()
+    {
+        $taxQuery = array();
+
+        if (!empty($this->incidentTypeId)) {
+            $taxQuery[] = array('taxonomy' => 'einsatzart', 'terms' => array($this->incidentTypeId));
+        }
+
+        return $taxQuery;
+    }
+
+    /**
      * @param array $postIds
      */
     public function setExcludePostIds($postIds)
     {
         $this->excludePostId = $postIds;
+    }
+
+    /**
+     * @param int $incidentTypeId
+     */
+    public function setIncidentTypeId($incidentTypeId)
+    {
+        $this->incidentTypeId = $incidentTypeId;
     }
 
     /**

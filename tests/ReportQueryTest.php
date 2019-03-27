@@ -142,17 +142,10 @@ class ReportQueryTest extends WP_UnitTestCase
         $query->setExcludePostIds(array($this->postIds[4], $this->postIds[7]));
         $reports = $query->getReports();
         $this->assertCount(6, $reports);
-        $queriedPostIds = array_map(array($this, 'extractPostId'), $reports);
+        $queriedPostIds = array_map(function (IncidentReport $report) {
+            return $report->getPostId();
+        }, $reports);
         $expectedPostIds = array_diff_key($this->postIds, array_flip(array(0,1,4,7)));
         self::assertEmpty(array_diff($queriedPostIds, $expectedPostIds));
-    }
-
-    /**
-     * @param IncidentReport $report
-     * @return mixed
-     */
-    private function extractPostId($report)
-    {
-        return $report->getPostId();
     }
 }

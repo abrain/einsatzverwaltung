@@ -72,21 +72,10 @@ class ReportQuery
     /**
      * @return array
      */
-    public function getReports()
+    private function getDateQuery()
     {
-        $postStatus = array('publish');
-        if ($this->includePrivateReports) {
-            $postStatus[] = 'private';
-        }
-
-        // Abfrage der Metainformationen zusammenbasteln
-        $metaQuery = array();
-        if ($this->onlySpecialReports) {
-            $metaQuery[] = array('key' => 'einsatz_special', 'value' => '1');
-        }
-
-        // Abfrage basierend auf Datumsparametern zusammenbasteln
         $dateQuery = array();
+
         if (is_numeric($this->year)) {
             if ($this->year < 0) {
                 $currentYear = date('Y');
@@ -101,7 +90,36 @@ class ReportQuery
             }
         }
 
+        return $dateQuery;
+    }
+
+    /**
+     * @return array
+     */
+    private function getMetaQuery()
+    {
+        $metaQuery = array();
+
+        if ($this->onlySpecialReports) {
+            $metaQuery[] = array('key' => 'einsatz_special', 'value' => '1');
+        }
+
+        return $metaQuery;
+    }
+
+    /**
+     * @return array
+     */
+    public function getReports()
+    {
+        $postStatus = array('publish');
+        if ($this->includePrivateReports) {
+            $postStatus[] = 'private';
+        }
+
         $postArgs = array(
+            'date_query' => $this->getDateQuery(),
+            'meta_query' => $this->getMetaQuery(),
             'order' => $this->orderAsc ? 'ASC' : 'DESC',
             'orderby' => 'post_date',
             'post_status' => $postStatus,
@@ -109,26 +127,15 @@ class ReportQuery
             'posts_per_page' => $this->limit,
         );
 
-        if (!empty($metaQuery)) {
-            $postArgs['meta_query'] = $metaQuery;
-        }
-
-        if (!empty($dateQuery)) {
-            $postArgs['date_query'] = $dateQuery;
-        }
-
         if (!empty($this->excludePostId)) {
             $postArgs['post__not_in'] = $this->excludePostId;
         }
 
         $posts = get_posts($postArgs);
 
-        $reports = array();
-        foreach ($posts as $post) {
-            $reports[] = new IncidentReport($post);
-        }
-
-        return $reports;
+        return array_map(function ($post) {
+            return new IncidentReport($post);
+        }, $posts);
     }
 
     /**

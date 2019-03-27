@@ -36,6 +36,7 @@ class ReportList
             'monatetrennen' => 'nein',
             'link' => 'title',
             'limit' => -1,
+            'einsatzart' => 0,
             'options' => ''
         );
     }
@@ -111,6 +112,10 @@ class ReportList
 
         if (is_numeric($attributes['jahr'])) {
             $reportQuery->setYear(intval($attributes['jahr']));
+        }
+
+        if (is_numeric($attributes['einsatzart'])) {
+            $reportQuery->setIncidentTypeId(intval($attributes['einsatzart']));
         }
     }
 }

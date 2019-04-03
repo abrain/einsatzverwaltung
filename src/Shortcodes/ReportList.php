@@ -114,7 +114,7 @@ class ReportList
             $reportQuery->setYear(intval($attributes['jahr']));
         }
 
-        if (is_numeric($attributes['einsatzart'])) {
+        if (array_key_exists('einsatzart', $attributes) && is_numeric($attributes['einsatzart'])) {
             $reportQuery->setIncidentTypeId(intval($attributes['einsatzart']));
         }
     }

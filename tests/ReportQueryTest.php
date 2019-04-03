@@ -9,36 +9,29 @@ class ReportQueryTest extends WP_UnitTestCase
     /**
      * @var int
      */
-    private static $incidentType1Id;
+    private $incidentType1Id;
 
     /**
      * @var int
      */
-    private static $incidentType1aId;
+    private $incidentType1aId;
 
     private $postIds;
-
-    /**
-     * @inheritDoc
-     */
-    public static function setUpBeforeClass()
-    {
-        parent::setUpBeforeClass();
-        $parentTerm = wp_insert_term('Type 1', 'einsatzart');
-        if (is_wp_error($parentTerm)) {
-            self::fail('Could not create parent term');
-        }
-        self::$incidentType1Id = $parentTerm['term_id'];
-        $childTerm = wp_insert_term('Type 1 a', 'einsatzart', array('parent' => self::$incidentType1Id));
-        if (is_wp_error($childTerm)) {
-            self::fail('Could not create child term');
-        }
-        self::$incidentType1aId = $childTerm['term_id'];
-    }
 
     public function setUp()
     {
         parent::setUp();
+
+        $parentTerm = wp_insert_term('Type 1', 'einsatzart');
+        if (is_wp_error($parentTerm)) {
+            self::fail('Could not create parent term');
+        }
+        $this->incidentType1Id = $parentTerm['term_id'];
+        $childTerm = wp_insert_term('Type 1 a', 'einsatzart', array('parent' => $this->incidentType1Id));
+        if (is_wp_error($childTerm)) {
+            self::fail('Could not create child term');
+        }
+        $this->incidentType1aId = $childTerm['term_id'];
 
         $currentYear = date('Y');
         $this->postIds = $this->factory->post->create_many(10, array('post_type' => 'einsatz'));
@@ -64,9 +57,9 @@ class ReportQueryTest extends WP_UnitTestCase
         update_post_meta($this->postIds[5], 'einsatz_special', 1);
 
         // Einsatzarten zuweisen
-        wp_set_object_terms($this->postIds[2], array(self::$incidentType1Id), 'einsatzart');
-        wp_set_object_terms($this->postIds[5], array(self::$incidentType1aId), 'einsatzart');
-        wp_set_object_terms($this->postIds[8], array(self::$incidentType1aId), 'einsatzart');
+        wp_set_object_terms($this->postIds[2], array($this->incidentType1Id), 'einsatzart');
+        wp_set_object_terms($this->postIds[5], array($this->incidentType1aId), 'einsatzart');
+        wp_set_object_terms($this->postIds[8], array($this->incidentType1aId), 'einsatzart');
     }
 
     public function testGetAllPublishedReports()
@@ -185,21 +178,21 @@ class ReportQueryTest extends WP_UnitTestCase
     public function testFilterIncidentTypeChild()
     {
         $query = new ReportQuery();
-        $query->setIncidentTypeId(self::$incidentType1aId);
+        $query->setIncidentTypeId($this->incidentType1aId);
         $reports = $query->getReports();
         $this->assertCount(2, $reports);
         /** @var IncidentReport $report */
         foreach ($reports as $report) {
             $typeOfIncident = $report->getTypeOfIncident();
             $this->assertNotNull($typeOfIncident);
-            $this->assertEquals(self::$incidentType1aId, $typeOfIncident->term_id);
+            $this->assertEquals($this->incidentType1aId, $typeOfIncident->term_id);
         }
     }
 
     public function testFilterIncidentTypeParent()
     {
         $query = new ReportQuery();
-        $query->setIncidentTypeId(self::$incidentType1Id);
+        $query->setIncidentTypeId($this->incidentType1Id);
         $reports = $query->getReports();
         $this->assertCount(3, $reports);
         /** @var IncidentReport $report */
@@ -208,7 +201,7 @@ class ReportQueryTest extends WP_UnitTestCase
             $this->assertNotNull($typeOfIncident);
             $this->assertTrue(in_array(
                 $typeOfIncident->term_id,
-                array(self::$incidentType1Id, self::$incidentType1aId)
+                array($this->incidentType1Id, $this->incidentType1aId)
             ));
         }
     }

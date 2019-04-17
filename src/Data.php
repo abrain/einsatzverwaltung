@@ -172,6 +172,19 @@ class Data
         remove_action('save_post_einsatz', array($this, 'savePostdata'));
         wp_update_post($updateArgs);
         add_action('save_post_einsatz', array($this, 'savePostdata'), 10, 2);
+
+        // Save Units
+        $units = (array) filter_input(INPUT_POST, 'evw_units', FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY);
+        $assignedUnits = get_post_meta($post->ID, '_evw_unit');
+        $unitsToAdd = array_diff($units, $assignedUnits);
+        $unitsToDelete = array_diff($assignedUnits, $units);
+
+        foreach ($unitsToDelete as $unitId) {
+            delete_post_meta($post->ID, '_evw_unit', $unitId);
+        }
+        foreach ($unitsToAdd as $unitId) {
+            add_post_meta($post->ID, '_evw_unit', $unitId);
+        }
     }
 
     /**

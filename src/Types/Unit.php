@@ -60,6 +60,7 @@ class Unit implements CustomPostType
             'show_in_admin_bar' => false,
             'show_in_rest' => true,
             'capability_type' => $this->getSlug(),
+            'map_meta_cap' => true,
             'menu_icon' => 'dashicons-networking',
         );
     }

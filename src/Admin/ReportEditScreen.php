@@ -198,7 +198,10 @@ class ReportEditScreen
             return;
         }
 
-        $assignedUnits = get_post_meta($post->ID, '_evw_unit');
+        $report = new IncidentReport($post);
+        $assignedUnits = array_map(function (WP_Post $unit) {
+            return $unit->ID;
+        }, $report->getUnits());
         echo '<div><ul>';
         foreach ($units as $unit) {
             $assigned = in_array($unit->ID, $assignedUnits);

@@ -280,6 +280,21 @@ class Formatter
 
     /**
      * @param IncidentReport $report
+     *
+     * @return string
+     */
+    public function getUnits(IncidentReport $report)
+    {
+        $units = $report->getUnits();
+        $unitNames = array_map(function (WP_Post $unit) {
+            return sanitize_post_field('post_title', $unit->post_title, $unit->ID);
+        }, $units);
+
+        return join(', ', $unitNames);
+    }
+
+    /**
+     * @param IncidentReport $report
      * @param bool $makeLinks Fahrzeugname als Link zur Fahrzeugseite angeben, wenn diese eingetragen wurde
      * @param bool $showArchiveLinks Generiere zusätzlichen Link zur Archivseite des Fahrzeugs
      *

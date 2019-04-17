@@ -8,6 +8,7 @@ use abrain\Einsatzverwaltung\Types\CustomTaxonomy;
 use abrain\Einsatzverwaltung\Types\ExtEinsatzmittel;
 use abrain\Einsatzverwaltung\Types\IncidentType;
 use abrain\Einsatzverwaltung\Types\Report;
+use abrain\Einsatzverwaltung\Types\Unit;
 use abrain\Einsatzverwaltung\Types\Vehicle;
 
 /**
@@ -48,6 +49,9 @@ class TypeRegistry
         $this->registerTaxonomy(new Vehicle(), $report->getSlug());
         $this->registerTaxonomy(new ExtEinsatzmittel(), $report->getSlug());
         $this->registerTaxonomy(new Alarmierungsart(), $report->getSlug());
+
+        $unit = new Unit();
+        $this->registerPostType($unit);
 
         $permalinkController->addRewriteRules($report);
     }

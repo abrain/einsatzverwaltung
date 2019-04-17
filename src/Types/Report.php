@@ -3,13 +3,12 @@ namespace abrain\Einsatzverwaltung\Types;
 
 use abrain\Einsatzverwaltung\Model\ReportAnnotation;
 use abrain\Einsatzverwaltung\ReportAnnotationRepository;
-use abrain\Einsatzverwaltung\TaxonomyCustomFields;
 
 /**
  * Description of the custom post type for the reports
  * @package abrain\Einsatzverwaltung\Types
  */
-class Report implements CustomType
+class Report implements CustomPostType
 {
     const DEFAULT_REWRITE_SLUG = 'einsatzberichte';
     const SLUG = 'einsatz';
@@ -153,7 +152,7 @@ class Report implements CustomType
     /**
      * @inheritdoc
      */
-    public function registerCustomFields(TaxonomyCustomFields $taxonomyCustomFields)
+    public function registerCustomFields()
     {
         $this->registerPostMeta();
         $this->registerAnnotations();

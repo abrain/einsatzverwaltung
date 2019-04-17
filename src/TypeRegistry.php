@@ -3,7 +3,8 @@ namespace abrain\Einsatzverwaltung;
 
 use abrain\Einsatzverwaltung\Exceptions\TypeRegistrationException;
 use abrain\Einsatzverwaltung\Types\Alarmierungsart;
-use abrain\Einsatzverwaltung\Types\CustomType;
+use abrain\Einsatzverwaltung\Types\CustomPostType;
+use abrain\Einsatzverwaltung\Types\CustomTaxonomy;
 use abrain\Einsatzverwaltung\Types\ExtEinsatzmittel;
 use abrain\Einsatzverwaltung\Types\IncidentType;
 use abrain\Einsatzverwaltung\Types\Report;
@@ -54,19 +55,20 @@ class TypeRegistry
     /**
      * Registers a custom post type
      *
-     * @param CustomType $customType Object that describes the custom post type
+     * @param CustomPostType $customPostType Object that describes the custom post type
+     *
      * @throws TypeRegistrationException
      */
-    private function registerPostType(CustomType $customType)
+    private function registerPostType(CustomPostType $customPostType)
     {
-        $slug = $customType->getSlug();
+        $slug = $customPostType->getSlug();
         if (array_key_exists($slug, $this->postTypes)) {
             throw new TypeRegistrationException(
                 sprintf(__('Post type with slug "%s" already exists', 'einsatzverwaltung'), $slug)
             );
         }
 
-        $postType = register_post_type($slug, $customType->getRegistrationArgs());
+        $postType = register_post_type($slug, $customPostType->getRegistrationArgs());
         if (is_wp_error($postType)) {
             throw new TypeRegistrationException(sprintf(
                 __('Failed to register post type with slug "%s": %s', 'einsatzverwaltung'),
@@ -75,8 +77,8 @@ class TypeRegistry
             ));
         }
 
-        $customType->registerCustomFields($this->taxonomyCustomFields);
-        $customType->registerHooks();
+        $customPostType->registerCustomFields();
+        $customPostType->registerHooks();
 
         $this->postTypes[$slug] = $postType;
     }
@@ -84,11 +86,12 @@ class TypeRegistry
     /**
      * Registers a custom taxonomy for a certain post type
      *
-     * @param CustomType $customTaxonomy Object that describes the custom taxonomy
+     * @param CustomTaxonomy $customTaxonomy Object that describes the custom taxonomy
      * @param string $postType
+     *
      * @throws TypeRegistrationException
      */
-    private function registerTaxonomy(CustomType $customTaxonomy, $postType)
+    private function registerTaxonomy(CustomTaxonomy $customTaxonomy, $postType)
     {
         $slug = $customTaxonomy->getSlug();
         if (get_taxonomy($slug) !== false) {

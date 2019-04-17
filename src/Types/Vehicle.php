@@ -9,7 +9,7 @@ use abrain\Einsatzverwaltung\TaxonomyCustomFields;
  * Description of the custom taxonomy 'Vehicle'
  * @package abrain\Einsatzverwaltung\Types
  */
-class Vehicle implements CustomType
+class Vehicle implements CustomTaxonomy
 {
     /**
      * @return string

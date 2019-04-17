@@ -7,6 +7,8 @@ namespace abrain\Einsatzverwaltung\Types;
  */
 class Unit implements CustomPostType
 {
+    const POST_TYPE = 'evw_unit';
+
     /**
      * @return array
      */
@@ -67,7 +69,7 @@ class Unit implements CustomPostType
      */
     public function getSlug()
     {
-        return 'evw_unit';
+        return self::POST_TYPE;
     }
 
     /**

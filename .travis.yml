@@ -4,7 +4,8 @@ notifications:
   email:
     on_success: never
     on_failure: always
-
+  slack:
+    secure: i6jy0Y/EiplpnJVw47cJuB3isSh19qI5F9bj299/jGb+4IBXkZh6k8jjn13Amg3P59ydOowPtI+tyYw9vu84rTQ03giddcyyPK7qxZziyJ+y5/fhsA8gHPgexA0pxA/wt6Hp6QzDC+jmPVSXSZ6ImYTDz6dk+arfQd5oGVHcfgRB+o6enw6J3Q+yt6YugyJoVpETO71aj7u/LE44yVk49SJTnQBaqXGLrWPT1uBaINzheAvPO0oICHCoqUK3XKR3b5UCvILywBkbyc01gyPO0CpT3TPPyfXR8nburkzEG+b2bKbrMD9kWnIXxNiue+zOB0jLKK2yJw7AHOewUek9J93mvzk7204CNeu5uA8xAEO2BiiRky+KhL+HHhnUHe7YlvL1xHZMlw/u0BzAgUsoELnFZb5FawiQ2lw8CuNTxCL91sQqvpMCTYAmJqZpWjZRaj8wSUm/3jiMjgIrhWv5rDnmeQJEPN+v5ZGs91yyXwEMVnsXePNx+13/3HrCFYpCawfb8S+1UljR+kZ4YJuX0+zE86x8pCGl4AOHGafvUY3T014ma0CWTvvW264fvS9NmJirRkTVsilvQACuL2RW3yl7gXqhCaTWRAm4P3F5V2K5+SKqaHVz4+Hd/jSXTr5Q0UKfdW9EuDU9YId+89JkDRq+nRwNMgv4wrrD6T7mo6E=
 branches:
   except:
   - /^feature\/[-\w]+$/

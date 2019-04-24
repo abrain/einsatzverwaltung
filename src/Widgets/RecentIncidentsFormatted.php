@@ -120,7 +120,8 @@ class RecentIncidentsFormatted extends WP_Widget
     );
     private $allowedTagsPattern = array('%title%', '%date%', '%time%', '%location%', '%duration%',
         '%incidentCommander%', '%incidentType%', '%incidentTypeColor%', '%url%', '%number%', '%seqNum%',
-        '%annotations%', '%vehicles%', '%additionalForces%', '%typesOfAlerting%', '%featuredImage%', '%workforce%');
+        '%annotations%', '%vehicles%', '%units%', '%additionalForces%', '%typesOfAlerting%', '%featuredImage%',
+        '%workforce%');
     private $allowedTagsAfter = array('%feedUrl%');
 
     /**

@@ -41,6 +41,7 @@ class Formatter
         '%featuredImage%' => 'Beitragsbild',
         '%yearArchive%' => 'Link zum Jahresarchiv',
         '%workforce%' => 'Mannschaftsstärke',
+        '%units%' => 'Einheiten',
     );
 
     /**
@@ -179,6 +180,10 @@ class Formatter
                 break;
             case '%workforce%':
                 $replace = $incidentReport->getWorkforce();
+                break;
+            case '%units%':
+                $unitNames = array_map('get_the_title', $incidentReport->getUnits());
+                $replace = join(', ', $unitNames);
                 break;
             default:
                 return $pattern;

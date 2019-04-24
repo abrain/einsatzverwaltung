@@ -52,6 +52,11 @@ class ReportQuery
     private $orderAsc;
 
     /**
+     * @var int[]
+     */
+    private $units;
+
+    /**
      * @var int
      */
     private $year;
@@ -109,6 +114,14 @@ class ReportQuery
 
         if ($this->onlySpecialReports) {
             $metaQuery[] = array('key' => 'einsatz_special', 'value' => '1');
+        }
+
+        if (!empty($this->units)) {
+            $unitSubQuery = array('relation' => 'OR');
+            foreach ($this->units as $unit) {
+                $unitSubQuery[] = array('key' => '_evw_unit', 'value' => $unit);
+            }
+            $metaQuery[] = $unitSubQuery;
         }
 
         return $metaQuery;
@@ -208,6 +221,14 @@ class ReportQuery
     public function setOrderAsc($orderAsc)
     {
         $this->orderAsc = $orderAsc;
+    }
+
+    /**
+     * @param int[] $units
+     */
+    public function setUnits($units)
+    {
+        $this->units = $units;
     }
 
     /**

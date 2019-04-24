@@ -93,6 +93,7 @@ class RecentIncidents extends WP_Widget
     private function echoReports($instance)
     {
         $reportQuery = new ReportQuery();
+        $reportQuery->setOrderAsc(false);
         $reportQuery->setLimit(absint($instance['anzahl']));
         $reports = $reportQuery->getReports();
 

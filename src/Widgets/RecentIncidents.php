@@ -4,9 +4,9 @@ namespace abrain\Einsatzverwaltung\Widgets;
 use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Options;
+use abrain\Einsatzverwaltung\ReportQuery;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use abrain\Einsatzverwaltung\Utilities;
-use WP_Post;
 use WP_Widget;
 
 /**
@@ -92,48 +92,44 @@ class RecentIncidents extends WP_Widget
      */
     private function echoReports($instance)
     {
-        $posts = get_posts(array(
-            'post_type' => 'einsatz',
-            'post_status' => 'publish',
-            'posts_per_page' => absint($instance['anzahl'])
-        ));
+        $reportQuery = new ReportQuery();
+        $reportQuery->setLimit(absint($instance['anzahl']));
+        $reports = $reportQuery->getReports();
 
-        if (empty($posts)) {
+        if (empty($reports)) {
             echo '<p>Keine Eins&auml;tze</p>';
             return;
         }
 
         echo '<ul class="einsatzberichte">';
-        foreach ($posts as $post) {
+        foreach ($reports as $report) {
             echo '<li class="einsatzbericht">';
-            $this->echoSingleReport($post, $instance);
+            $this->echoSingleReport($report, $instance);
             echo "</li>";
         }
         echo '</ul>';
     }
 
     /**
-     * @param WP_Post $post
+     * @param IncidentReport $report
      * @param array $instance
      */
-    private function echoSingleReport(WP_Post $post, $instance)
+    private function echoSingleReport(IncidentReport $report, $instance)
     {
-        $report = new IncidentReport($post);
-
         if (true === ($instance['showAnnotations'])) {
             $annotationIconBar = AnnotationIconBar::getInstance();
             printf('<div class="annotation-icon-bar">%s</div>', $annotationIconBar->render($report));
         }
 
-        $meldung = get_the_title($post->ID);
+        $meldung = get_the_title($report->getPostId());
         printf(
             '<a href="%s" rel="bookmark" class="einsatzmeldung">%s</a>',
-            esc_attr(get_permalink($post->ID)),
+            esc_attr(get_permalink($report->getPostId())),
             (empty($meldung) ? "(kein Titel)" : $meldung)
         );
 
         if ($instance['zeigeDatum']) {
-            $timestamp = strtotime($post->post_date);
+            $timestamp = $report->getTimeOfAlerting()->getTimestamp();
             $datumsformat = $this->options->getDateFormat();
             printf('<br><span class="einsatzdatum">%s</span>', date_i18n($datumsformat, $timestamp));
             if ($instance['zeigeZeit']) {

@@ -182,8 +182,7 @@ class Formatter
                 $replace = $incidentReport->getWorkforce();
                 break;
             case '%units%':
-                $unitNames = array_map('get_the_title', $incidentReport->getUnits());
-                $replace = join(', ', $unitNames);
+                $replace = $this->getUnits($incidentReport);
                 break;
             default:
                 return $pattern;

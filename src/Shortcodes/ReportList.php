@@ -37,6 +37,7 @@ class ReportList
             'link' => 'title',
             'limit' => -1,
             'einsatzart' => 0,
+            'units' => '',
             'options' => ''
         );
     }
@@ -116,6 +117,13 @@ class ReportList
 
         if (array_key_exists('einsatzart', $attributes) && is_numeric($attributes['einsatzart'])) {
             $reportQuery->setIncidentTypeId(intval($attributes['einsatzart']));
+        }
+
+        if (array_key_exists('units', $attributes)) {
+            $unitIds = explode(',', $attributes['units']);
+            $unitIds = array_map('trim', $unitIds);
+            $unitIds = array_filter($unitIds, 'is_numeric');
+            $reportQuery->setUnits(array_map('intval', $unitIds));
         }
     }
 }

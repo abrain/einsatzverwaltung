@@ -8,14 +8,13 @@ use abrain\Einsatzverwaltung\ReportQuery;
 use abrain\Einsatzverwaltung\Types\Unit;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use abrain\Einsatzverwaltung\Utilities;
-use WP_Widget;
 
 /**
  * WordPress-Widget für die letzten X Einsätze
  *
  * @author Andreas Brain
  */
-class RecentIncidents extends WP_Widget
+class RecentIncidents extends AbstractWidget
 {
     /**
      * @var Formatter
@@ -47,12 +46,7 @@ class RecentIncidents extends WP_Widget
     }
 
     /**
-     * Front-end display of widget.
-     *
-     * @see WP_Widget::widget()
-     *
-     * @param array $args     Widget arguments.
-     * @param array $instance Saved values from database.
+     * @inheritDoc
      */
     public function widget($args, $instance)
     {
@@ -163,14 +157,7 @@ class RecentIncidents extends WP_Widget
     }
 
     /**
-     * Sanitize widget form values as they are saved.
-     *
-     * @see WP_Widget::update()
-     *
-     * @param array $newInstance Values just sent to be saved.
-     * @param array $oldInstance Previously saved values from database.
-     *
-     * @return array Updated safe values to be saved.
+     * @inheritDoc
      */
     public function update($newInstance, $oldInstance)
     {
@@ -197,12 +184,7 @@ class RecentIncidents extends WP_Widget
     }
 
     /**
-     * Back-end widget form.
-     *
-     * @see WP_Widget::form()
-     *
-     * @param array $instance Previously saved values from database.
-     * @return string
+     * @inheritDoc
      */
     public function form($instance)
     {
@@ -233,33 +215,13 @@ class RecentIncidents extends WP_Widget
             esc_attr($anzahl)
         );
 
-        printf('<label>%s</label>', esc_html__('Only show reports for these units:', 'einsatzverwaltung'));
-        $units = get_posts(array(
-            'post_type' => Unit::POST_TYPE,
-            'numberposts' => -1,
-            'order' => 'ASC',
-            'orderby' => 'name'
-        ));
-        if (empty($units)) {
-            $postTypeObject = get_post_type_object(Unit::POST_TYPE);
-            printf('<div class="checkboxlist">%s</div>', esc_html($postTypeObject->labels->not_found));
-        } else {
-            echo '<div class="checkboxlist"><ul>';
-            foreach ($units as $unit) {
-                $selected = in_array($unit->ID, $selectedUnits);
-                printf(
-                    '<li><label><input type="checkbox" name="%s[]" value="%d"%s>%s</label></li>',
-                    $this->get_field_name('units'),
-                    esc_attr($unit->ID),
-                    checked($selected, true, false),
-                    esc_html($unit->post_title)
-                );
-            }
-            printf(
-                '</ul><small>%s</small></div>',
-                esc_html__('Select no unit to show all reports', 'einsatzverwaltung')
-            );
-        }
+        $this->echoChecklistBox(
+            get_post_type_object(Unit::POST_TYPE),
+            'units',
+            __('Only show reports for these units:', 'einsatzverwaltung'),
+            $selectedUnits,
+            __('Select no unit to show all reports', 'einsatzverwaltung')
+        );
 
         printf(
             '<p><input id="%1$s" name="%2$s" type="checkbox" %3$s />&nbsp;<label for="%1$s">%4$s</label></p>',

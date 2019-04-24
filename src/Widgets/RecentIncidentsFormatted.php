@@ -274,7 +274,7 @@ class RecentIncidentsFormatted extends WP_Widget
         echo '<br><small>';
         _e('The following tags will be replaced:', 'einsatzverwaltung');
         foreach ($allowedTags as $tag) {
-            printf('<br><strong>%s</strong> (%s)', esc_html($tag), esc_html(Formatter::getLabelForTag($tag)));
+            printf('<br><strong>%s</strong> (%s)', esc_html($tag), esc_html($this->formatter->getLabelForTag($tag)));
         }
         echo '</small>';
     }

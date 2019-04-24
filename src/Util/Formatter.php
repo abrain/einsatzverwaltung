@@ -20,7 +20,7 @@ class Formatter
     /**
      * @var array Ersetzbare Tags und ihre Beschreibungen
      */
-    private static $availableTags = array(
+    private $availableTags = array(
         '%title%' => 'Titel des Einsatzberichts',
         '%date%' => 'Datum der Alarmierung',
         '%time%' => 'Zeitpunkt der Alarmierung',
@@ -83,7 +83,7 @@ class Formatter
     public function formatIncidentData($pattern, $allowedTags = array(), $post = null, $context = 'post')
     {
         if (empty($allowedTags)) {
-            $allowedTags = array_keys(self::$availableTags);
+            $allowedTags = array_keys($this->availableTags);
         }
 
         // Content should be handled separately, so we will ignore it
@@ -457,12 +457,12 @@ class Formatter
      * @param string $tag
      * @return string
      */
-    public static function getLabelForTag($tag)
+    public function getLabelForTag($tag)
     {
-        if (!array_key_exists($tag, self::$availableTags)) {
+        if (!array_key_exists($tag, $this->availableTags)) {
             return '';
         }
 
-        return self::$availableTags[$tag];
+        return $this->availableTags[$tag];
     }
 }

@@ -128,7 +128,7 @@ class ReportQuery
     }
 
     /**
-     * @return array
+     * @return IncidentReport[]
      */
     public function getReports()
     {

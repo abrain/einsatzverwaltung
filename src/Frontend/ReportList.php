@@ -54,7 +54,7 @@ class ReportList
     /**
      * Generiert den HTML-Code für die Liste
      *
-     * @param array $reports Eine Liste von IncidentReport-Objekten
+     * @param IncidentReport[] $reports Eine Liste von IncidentReport-Objekten
      * @param ReportListParameters $parameters
      */
     private function constructList($reports, ReportListParameters $parameters)
@@ -78,7 +78,6 @@ class ReportList
             $this->beginTable(false, $parameters);
             $this->insertTableHeader($parameters);
         }
-        /** @var IncidentReport $report */
         foreach ($reports as $report) {
             $timeOfAlerting = $report->getTimeOfAlerting();
             $currentYear = intval($timeOfAlerting->format('Y'));
@@ -125,7 +124,7 @@ class ReportList
     /**
      * Gibt den HTML-Code für die Liste zurück
      *
-     * @param array $reports Eine Liste von IncidentReport-Objekten
+     * @param IncidentReport[] $reports Eine Liste von IncidentReport-Objekten
      * @param ReportListParameters $parameters
      *
      * @return string HTML-Code der Liste
@@ -138,7 +137,7 @@ class ReportList
     }
 
     /**
-     * @param array $reports Eine Liste von IncidentReport-Objekten
+     * @param IncidentReport[] $reports Eine Liste von IncidentReport-Objekten
      * @param ReportListParameters $parameters
      */
     public function printList($reports, ReportListParameters $parameters)

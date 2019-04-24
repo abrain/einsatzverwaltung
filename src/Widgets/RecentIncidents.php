@@ -5,6 +5,7 @@ use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\ReportQuery;
+use abrain\Einsatzverwaltung\Types\Unit;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use abrain\Einsatzverwaltung\Utilities;
 use WP_Widget;
@@ -58,6 +59,7 @@ class RecentIncidents extends WP_Widget
         $defaults = array(
             'title' => 'Letzte Eins&auml;tze',
             'anzahl' => 3,
+            'units' => array(),
             'zeigeDatum' => false,
             'zeigeZeit' => false,
             'zeigeFeedlink' => false,
@@ -95,6 +97,7 @@ class RecentIncidents extends WP_Widget
         $reportQuery = new ReportQuery();
         $reportQuery->setOrderAsc(false);
         $reportQuery->setLimit(absint($instance['anzahl']));
+        $reportQuery->setUnits($instance['units']);
         $reports = $reportQuery->getReports();
 
         if (empty($reports)) {
@@ -181,6 +184,7 @@ class RecentIncidents extends WP_Widget
             $instance['anzahl'] = $newInstance['anzahl'];
         }
 
+        $instance['units'] = Utilities::getArrayValueIfKey($newInstance, 'units', array());
         $instance['zeigeDatum'] = Utilities::getArrayValueIfKey($newInstance, 'zeigeDatum', false);
         $instance['zeigeZeit'] = Utilities::getArrayValueIfKey($newInstance, 'zeigeZeit', false);
         $instance['zeigeOrt'] = Utilities::getArrayValueIfKey($newInstance, 'zeigeOrt', false);
@@ -204,6 +208,7 @@ class RecentIncidents extends WP_Widget
     {
         $title = Utilities::getArrayValueIfKey($instance, 'title', 'Letzte Eins&auml;tze');
         $anzahl = Utilities::getArrayValueIfKey($instance, 'anzahl', 3);
+        $selectedUnits = Utilities::getArrayValueIfKey($instance, 'units', array());
         $zeigeDatum = Utilities::getArrayValueIfKey($instance, 'zeigeDatum', false);
         $zeigeZeit = Utilities::getArrayValueIfKey($instance, 'zeigeZeit', false);
         $zeigeFeedlink = Utilities::getArrayValueIfKey($instance, 'zeigeFeedlink', false);
@@ -227,6 +232,34 @@ class RecentIncidents extends WP_Widget
             $this->get_field_name('anzahl'),
             esc_attr($anzahl)
         );
+
+        printf('<label>%s</label>', esc_html__('Only show reports for these units:', 'einsatzverwaltung'));
+        $units = get_posts(array(
+            'post_type' => Unit::POST_TYPE,
+            'numberposts' => -1,
+            'order' => 'ASC',
+            'orderby' => 'name'
+        ));
+        if (empty($units)) {
+            $postTypeObject = get_post_type_object(Unit::POST_TYPE);
+            printf('<div class="checkboxlist">%s</div>', esc_html($postTypeObject->labels->not_found));
+        } else {
+            echo '<div class="checkboxlist"><ul>';
+            foreach ($units as $unit) {
+                $selected = in_array($unit->ID, $selectedUnits);
+                printf(
+                    '<li><label><input type="checkbox" name="%s[]" value="%d"%s>%s</label></li>',
+                    $this->get_field_name('units'),
+                    esc_attr($unit->ID),
+                    checked($selected, true, false),
+                    esc_html($unit->post_title)
+                );
+            }
+            printf(
+                '</ul><small>%s</small></div>',
+                esc_html__('Select no unit to show all reports', 'einsatzverwaltung')
+            );
+        }
 
         printf(
             '<p><input id="%1$s" name="%2$s" type="checkbox" %3$s />&nbsp;<label for="%1$s">%4$s</label></p>',

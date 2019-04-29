@@ -69,6 +69,14 @@ class Frontend
             Core::VERSION
         );
         wp_add_inline_style('einsatzverwaltung-frontend', ReportList::getDynamicCss());
+
+        if ($this->options->isGMapActivate()) {
+            wp_enqueue_script('einsatzvw_GoogleMap');
+            wp_enqueue_script(
+                'einsatzverwaltung-gmap',
+                $this->core->scriptUrl . 'einsatzverwaltung-gmaps.js'
+            );
+        }
     }
 
     /**
@@ -126,6 +134,33 @@ class Frontend
         return "";
     }
 
+    /**
+     * Erzeugt eine Google Map des Einsatzortes
+     *
+     * @return string Code zum Erzeugen der Google-Map mit Markierten einsatzort
+     */
+    public function getEinsatzberichtMap($post)
+    {
+        $report = new IncidentReport($post);
+        $location = $report->getGmapsLocation();
+        if ($this->options->isGMapActivate() && $location) {
+            $latLon = explode(",", $location);
+
+            $mapstring = "<style>#map-canvas {height: 300px; position: relative; overflow: hidden;";
+            $mapstring .= " transform: translateZ(0px); background-color: rgb(229, 227, 223);}</style>";
+            $mapstring .= "<div class='einsatzliste-map'>";
+            $mapstring .= "<div id='map-canvas'></div>";
+            $mapstring .= "</div>";
+            $mapstring .= "<div style='clear:both'></div>";
+            $mapstring .= "<script>";
+            $mapstring .= "google.maps.event.addDomListener(window, 'load', initializeMap(";
+            $mapstring .= $latLon[0] . ", " . $latLon[1] . "));";
+            $mapstring .= "addMarker( " . $latLon[0] . ", " . $latLon[1] . ", '" . $report->getLocation() . "', true )";
+            $mapstring .= "</script>";
+
+            return "<p>$mapstring</p>";
+        }
+    }
 
     /**
      * Erzeugt eine Zeile für die Einsatzdetails
@@ -168,7 +203,7 @@ class Frontend
             if (empty($template)) {
                 return $content;
             }
-            
+
             $templateWithData = $this->formatter->formatIncidentData($template, array(), $post, 'post');
             $templateWithContent = str_replace('%content%', $content, $templateWithData);
             return stripslashes(wp_filter_post_kses(addslashes($templateWithContent)));
@@ -181,8 +216,12 @@ class Frontend
         // Fallback auf das klassische Layout
         $header = $this->getEinsatzberichtHeader($post, true, true);
         $content = $this->prepareContent($content);
+        $map = "";
+        if ($this->options->isGMapActivate()) {
+            $map = $this->getEinsatzberichtMap($post);
+        }
 
-        return $header . '<hr>' . $content;
+        return $header . $map . '<hr>' . $content;
     }
 
     /**
@@ -287,7 +326,7 @@ class Frontend
             } else {
                 $postTypes = array('post');
             }
-            
+
             // Einsatzberichte nur zusammen mit Beiträgen abfragen
             if (!in_array('post', $postTypes)) {
                 return;

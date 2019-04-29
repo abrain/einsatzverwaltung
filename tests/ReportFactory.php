@@ -14,6 +14,7 @@ class ReportFactory extends WP_UnitTest_Factory_For_Post
         'einsatz_einsatzende' => '',
         'einsatz_einsatzleiter' => '',
         'einsatz_einsatzort' => '',
+        'einsatz_location' => '',
         'einsatz_fehlalarm' => 0,
         'einsatz_incidentNumber' => '',
         'einsatz_mannschaft' => '',

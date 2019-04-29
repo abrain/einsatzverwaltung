@@ -75,6 +75,9 @@ class IncidentReport
             'einsatz_einsatzort' => array(
                 'label' => 'Einsatzort'
             ),
+            'einsatz_location' => array(
+                'label' => 'Google Maps Position'
+            ),
             'einsatz_einsatzleiter' => array(
                 'label' => 'Einsatzleiter'
             ),
@@ -213,6 +216,16 @@ class IncidentReport
     public function getLocation()
     {
         return $this->getPostMeta('einsatz_einsatzort');
+    }
+
+    /**
+     * Gibt den eingetragenen Einsatzort als googlemaps koordinate zurück
+     *
+     * @return string
+     */
+    public function getGmapsLocation()
+    {
+        return $this->getPostMeta('einsatz_location');
     }
 
     /**

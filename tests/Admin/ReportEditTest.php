@@ -50,10 +50,11 @@ class ReportEditTest extends WP_UnitTestCase
             'einsatzverwaltung_nonce' => wp_create_nonce('save_einsatz_details'),
             'einsatzverwaltung_nummer' => '',
             'einsatzverwaltung_alarmzeit' => $timeOfAlerting,
-            'einsatz_einsatzende' => '',
-            'einsatz_einsatzort' => '',
-            'einsatz_einsatzleiter' => '',
-            'einsatz_mannschaft' => ''
+            'einsatzverwaltung_einsatzende' => '',
+            'einsatzverwaltung_einsatzort' => '',
+            'einsatzverwaltung_einsatzleiter' => '',
+            'einsatzverwaltung_mannschaft' => '',
+            'einsatzverwaltung_location' => '',
         );
         wp_update_post(array(
             'ID' => $post->ID,
@@ -99,10 +100,11 @@ class ReportEditTest extends WP_UnitTestCase
             'einsatzverwaltung_nonce' => wp_create_nonce('save_einsatz_details'),
             'einsatzverwaltung_nummer' => '',
             'einsatzverwaltung_alarmzeit' => $timeOfAlerting,
-            'einsatz_einsatzende' => '',
-            'einsatz_einsatzort' => '',
-            'einsatz_einsatzleiter' => '',
-            'einsatz_mannschaft' => ''
+            'einsatzverwaltung_einsatzende' => '',
+            'einsatzverwaltung_einsatzort' => '',
+            'einsatzverwaltung_einsatzleiter' => '',
+            'einsatzverwaltung_mannschaft' => '',
+            'einsatzverwaltung_location' => '',
         );
         wp_update_post(array(
             'ID' => $post->ID,
@@ -123,10 +125,11 @@ class ReportEditTest extends WP_UnitTestCase
             'einsatzverwaltung_nonce' => wp_create_nonce('save_einsatz_details'),
             'einsatzverwaltung_nummer' => '',
             'einsatzverwaltung_alarmzeit' => $pendingReport->getTimeOfAlerting()->format('Y-m-d H:i:s'),
-            'einsatz_einsatzende' => '',
-            'einsatz_einsatzort' => '',
-            'einsatz_einsatzleiter' => '',
-            'einsatz_mannschaft' => ''
+            'einsatzverwaltung_einsatzende' => '',
+            'einsatzverwaltung_einsatzort' => '',
+            'einsatzverwaltung_einsatzleiter' => '',
+            'einsatzverwaltung_mannschaft' => '',
+            'einsatzverwaltung_location' => '',
         );
         wp_update_post(array(
             'ID' => $post->ID,

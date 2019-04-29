@@ -19,6 +19,9 @@ class Options
         'einsatzvw_category' => false,
         'einsatzvw_loop_only_special' => false,
         'einsatzverwaltung_incidentnumbers_auto' => false,
+        'einsatzvw_gmap' => false,
+        'einsatzvw_gmap_api' => '',
+        'einsatzvw_gmap_default_pos' => '53.523463,9.482329',
         'einsatzverwaltung_use_excerpttemplate' => false,
     );
 
@@ -73,6 +76,85 @@ class Options
     {
         $categoryId = $this->getOption('einsatzvw_category');
         return (false === $categoryId ? -1 : intval($categoryId));
+    }
+
+    /**
+     * Gibt die aktiven Spalten für die Einsatzliste zurück
+     *
+     * @return array Spalten-IDs der aktiven Spalten, geprüft auf Existenz. Bei Problemen die Standardspalten.
+     */
+    public function getEinsatzlisteEnabledColumns()
+    {
+        $enabledColumns = $this->getOption('einsatzvw_list_columns');
+        $enabledColumns = $this->utilities->sanitizeColumns($enabledColumns);
+        return explode(',', $enabledColumns);
+    }
+
+    /**
+     * @return int
+     */
+    public function getEinsatznummerStellen()
+    {
+        $option = $this->getOption('einsatzvw_einsatznummer_stellen');
+        return $this->utilities->sanitizeEinsatznummerStellen($option);
+    }
+
+    /**
+     * @return string
+     */
+    public function getExcerptType()
+    {
+        $option = $this->getOption('einsatzvw_excerpt_type');
+        return $this->utilities->sanitizeExcerptType($option);
+    }
+
+    /**
+     * @return string
+     */
+    public function getExcerptTypeFeed()
+    {
+        $option = $this->getOption('einsatzvw_excerpt_type_feed');
+        return $this->utilities->sanitizeExcerptType($option);
+    }
+
+    /**
+     * @return string
+     */
+    public function getGMapAPI()
+    {
+        $option = $this->getOption('einsatzvw_gmap_api');
+        return $option;
+    }
+
+    /**
+     * @return string
+     */
+    public function getGMapDefaultPos()
+    {
+        $option = $this->getOption('einsatzvw_gmap_default_pos');
+        return $option;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isGMapActivate()
+    {
+        $option = $this->getOption('einsatzvw_gmap');
+        return $this->toBoolean($option);
+    }
+
+    /**
+     * Gibt die Basis für die URL zu Einsatzberichten zurück
+     *
+     * @since 1.0.0
+     *
+     * @return string
+     */
+    public function getRewriteSlug()
+    {
+        $option = $this->getOption('einsatzvw_rewrite_slug');
+        return sanitize_title($option, $this->defaults['einsatzvw_rewrite_slug']);
     }
 
     /**

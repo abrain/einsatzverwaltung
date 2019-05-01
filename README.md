@@ -1,7 +1,12 @@
 # Einsatzverwaltung
 ## Plugin zur Verwaltung von Feuerwehreins&auml;tzen
 
-[![Build Status](https://travis-ci.org/abrain/einsatzverwaltung.svg)](https://travis-ci.org/abrain/einsatzverwaltung) [![Maintainability](https://api.codeclimate.com/v1/badges/e977859ca4c209053b79/maintainability)](https://codeclimate.com/github/abrain/einsatzverwaltung/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/e977859ca4c209053b79/test_coverage)](https://codeclimate.com/github/abrain/einsatzverwaltung/test_coverage)
+![Wordpress Plugin: Required WP Version](https://img.shields.io/wordpress/plugin/wp-version/einsatzverwaltung.svg)
+![Wordpress Plugin: Tested WP Version](https://img.shields.io/wordpress/plugin/tested/einsatzverwaltung.svg)
+![Wordpress Plugin Active Installs](https://img.shields.io/wordpress/plugin/installs/einsatzverwaltung.svg)
+[![Wordpress Plugin Rating](https://img.shields.io/wordpress/plugin/rating/einsatzverwaltung.svg)](https://wordpress.org/support/plugin/einsatzverwaltung/reviews/)
+[![Build Status](https://travis-ci.org/abrain/einsatzverwaltung.svg)](https://travis-ci.org/abrain/einsatzverwaltung)
+[![Liberapay receiving](https://img.shields.io/liberapay/receives/abrain.svg)](https://liberapay.com/abrain)
 
 Dieses Plugin f&uuml;gt WordPress eine neue Beitragsart "Einsatzbericht" hinzu. Diese Einsatzberichte werden wie gew&ouml;hnliche WordPress-Beitr&auml;ge erstellt, es k&ouml;nnen aber zus&auml;tzliche Informationen wie Alarmzeit, Art des Einsatzes, eingesetzte Fahrzeuge und vieles mehr angegeben werden. Zudem stellt das Plugin verschiedene M&ouml;glichkeiten zur Darstellung der Einsatzberichte zur Verf&uuml;gung.
 

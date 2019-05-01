@@ -58,7 +58,7 @@ class Unit implements CustomPostType
             'show_ui' => true,
             'show_in_menu' => 'edit.php?post_type=' . Report::SLUG,
             'show_in_admin_bar' => false,
-            'show_in_rest' => true,
+            'show_in_rest' => false,
             'capability_type' => $this->getSlug(),
             'map_meta_cap' => true,
             'menu_icon' => 'dashicons-networking',

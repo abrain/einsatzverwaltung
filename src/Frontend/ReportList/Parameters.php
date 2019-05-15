@@ -1,11 +1,11 @@
 <?php
-namespace abrain\Einsatzverwaltung\Frontend;
+namespace abrain\Einsatzverwaltung\Frontend\ReportList;
 
 /**
  * Defines how
- * @package abrain\Einsatzverwaltung\Frontend
+ * @package abrain\Einsatzverwaltung\Frontend\ReportList
  */
-class ReportListParameters
+class Parameters
 {
     const DEFAULT_COLUMNS = 'number,date,time,title';
 
@@ -183,7 +183,7 @@ class ReportListParameters
      */
     public static function sanitizeColumnsArrayNoDefault($inputArray)
     {
-        $columns = ReportList::getListColumns();
+        $columns = Renderer::getListColumns();
         $columnIds = array_keys($columns);
 
         $validColumnIds = array();

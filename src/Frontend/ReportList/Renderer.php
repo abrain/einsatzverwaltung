@@ -1,6 +1,7 @@
 <?php
-namespace abrain\Einsatzverwaltung\Frontend;
+namespace abrain\Einsatzverwaltung\Frontend\ReportList;
 
+use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use abrain\Einsatzverwaltung\Utilities;
@@ -10,9 +11,9 @@ use DateTime;
  * Tabellarische Übersicht für Einsatzberichte
  *
  * @author Andreas Brain
- * @package abrain\Einsatzverwaltung\Frontend
+ * @package abrain\Einsatzverwaltung\Frontend\ReportList
  */
-class ReportList
+class Renderer
 {
     const TABLECLASS = 'einsatzverwaltung-reportlist';
 
@@ -52,7 +53,7 @@ class ReportList
     private $rowsSinceLastHeader = 0;
 
     /**
-     * @var ReportListSettings
+     * @var Settings
      */
     private static $settings;
 
@@ -77,9 +78,9 @@ class ReportList
      * Generiert den HTML-Code für die Liste
      *
      * @param IncidentReport[] $reports Eine Liste von IncidentReport-Objekten
-     * @param ReportListParameters $parameters
+     * @param Parameters $parameters
      */
-    private function constructList($reports, ReportListParameters $parameters)
+    private function constructList($reports, Parameters $parameters)
     {
         if (empty($reports)) {
             $this->string = sprintf(
@@ -130,11 +131,11 @@ class ReportList
      * Gibt den HTML-Code für die Liste zurück
      *
      * @param IncidentReport[] $reports Eine Liste von IncidentReport-Objekten
-     * @param ReportListParameters $parameters
+     * @param Parameters $parameters
      *
      * @return string HTML-Code der Liste
      */
-    public function getList($reports, ReportListParameters $parameters)
+    public function getList($reports, Parameters $parameters)
     {
         $this->string = '';
         $this->constructList($reports, $parameters);
@@ -143,9 +144,9 @@ class ReportList
 
     /**
      * @param IncidentReport[] $reports Eine Liste von IncidentReport-Objekten
-     * @param ReportListParameters $parameters
+     * @param Parameters $parameters
      */
-    public function printList($reports, ReportListParameters $parameters)
+    public function printList($reports, Parameters $parameters)
     {
         echo $this->getList($reports, $parameters);
     }
@@ -154,9 +155,9 @@ class ReportList
      * Beginnt eine neue Tabelle für ein bestimmtes Jahr
      *
      * @param bool|int $year Das Kalenderjahr für die Überschrift oder false um keine Überschrift auszugeben
-     * @param ReportListParameters $parameters
+     * @param Parameters $parameters
      */
-    private function beginTable($year, ReportListParameters $parameters)
+    private function beginTable($year, Parameters $parameters)
     {
         if ($parameters->showHeading && $year !== false) {
             $this->string .= '<h2>Eins&auml;tze '.$year.'</h2>';
@@ -171,9 +172,9 @@ class ReportList
     }
 
     /**
-     * @param ReportListParameters $parameters
+     * @param Parameters $parameters
      */
-    private function insertTableHeader(ReportListParameters $parameters)
+    private function insertTableHeader(Parameters $parameters)
     {
         $allColumns = self::getListColumns();
 
@@ -210,9 +211,9 @@ class ReportList
 
     /**
      * @param IncidentReport $report Der Einsatzbericht
-     * @param ReportListParameters $parameters
+     * @param Parameters $parameters
      */
-    private function insertRow($report, ReportListParameters $parameters)
+    private function insertRow($report, Parameters $parameters)
     {
         $this->string .= '<tr class="report">';
         foreach ($parameters->getColumns() as $colId) {
@@ -224,12 +225,12 @@ class ReportList
 
     /**
      * @param IncidentReport $report
-     * @param ReportListParameters $parameters
+     * @param Parameters $parameters
      * @param string $columnId
      *
      * @return string
      */
-    private function getCellMarkup(IncidentReport $report, ReportListParameters $parameters, $columnId)
+    private function getCellMarkup(IncidentReport $report, Parameters $parameters, $columnId)
     {
         $cellContent = $this->getCellContent($report, $columnId, $parameters);
 
@@ -249,11 +250,11 @@ class ReportList
      *
      * @param IncidentReport $report
      * @param string $columnId
-     * @param ReportListParameters $parameters
+     * @param Parameters $parameters
      *
      * @return bool
      */
-    private function isCellLinkToReport(IncidentReport $report, $columnId, ReportListParameters $parameters)
+    private function isCellLinkToReport(IncidentReport $report, $columnId, Parameters $parameters)
     {
         $linkToReport = $parameters->linkEmptyReports || $report->hasContent();
         $columnsLinkingReport = $parameters->getColumnsLinkingReport();
@@ -277,11 +278,11 @@ class ReportList
      *
      * @param IncidentReport $report
      * @param string $colId Eindeutige Kennung der Spalte
-     * @param ReportListParameters $parameters
+     * @param Parameters $parameters
      *
      * @return string
      */
-    private function getCellContent($report, $colId, ReportListParameters $parameters)
+    private function getCellContent($report, $colId, Parameters $parameters)
     {
         if (empty($report)) {
             return '&nbsp;';
@@ -357,9 +358,9 @@ class ReportList
     }
 
     /**
-     * @param ReportListParameters $parameters
+     * @param Parameters $parameters
      */
-    private function onYearChange(ReportListParameters $parameters)
+    private function onYearChange(Parameters $parameters)
     {
         if ($parameters->compact) {
             return;
@@ -379,10 +380,10 @@ class ReportList
     }
 
     /**
-     * @param ReportListParameters $parameters
+     * @param Parameters $parameters
      * @param DateTime $dateTime
      */
-    private function onMonthChange(ReportListParameters $parameters, DateTime $dateTime)
+    private function onMonthChange(Parameters $parameters, DateTime $dateTime)
     {
         if (!$parameters->isSplitMonths()) {
             return;
@@ -481,7 +482,7 @@ class ReportList
         $reportListSettings = self::$settings; // FIXME Verrenkung, um PHP 5.3.0 als Minimum zu ermöglichen, solange das
                                                // Ende der Untersützung nicht im Blog angekündigt wurde.
         if (empty($reportListSettings)) {      // NEEDS_PHP5.5 direkt empty(self::$settings) prüfen
-            self::$settings = new ReportListSettings();
+            self::$settings = new Settings();
         }
 
         $string = '';

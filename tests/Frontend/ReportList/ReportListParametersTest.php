@@ -1,11 +1,12 @@
 <?php
-namespace abrain\Einsatzverwaltung\Frontend;
+namespace abrain\Einsatzverwaltung\Frontend\ReportList;
 
 use WP_UnitTestCase;
+use abrain\Einsatzverwaltung\Frontend\ReportList\Parameters as ReportListParameters;
 
 /**
  * Class ReportListParametersTest
- * @package abrain\Einsatzverwaltung\Frontend
+ * @package abrain\Einsatzverwaltung\Frontend\ReportList
  */
 class ReportListParametersTest extends WP_UnitTestCase
 {

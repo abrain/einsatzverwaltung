@@ -2,7 +2,8 @@
 
 namespace abrain\Einsatzverwaltung\Shortcodes;
 
-use abrain\Einsatzverwaltung\Frontend\ReportListParameters;
+use abrain\Einsatzverwaltung\Frontend\ReportList\Parameters as ReportListParameters;
+use abrain\Einsatzverwaltung\Frontend\ReportList\Renderer as ReportListRenderer;
 use abrain\Einsatzverwaltung\ReportQuery;
 
 /**
@@ -16,16 +17,16 @@ class ReportList
     private $defaultAttributes;
 
     /**
-     * @var \abrain\Einsatzverwaltung\Frontend\ReportList
+     * @var ReportListRenderer
      */
     private $reportList;
 
     /**
      * ReportList constructor.
      *
-     * @param \abrain\Einsatzverwaltung\Frontend\ReportList $reportList
+     * @param ReportListRenderer $reportList
      */
-    public function __construct(\abrain\Einsatzverwaltung\Frontend\ReportList $reportList)
+    public function __construct(ReportListRenderer $reportList)
     {
         $this->reportList = $reportList;
 

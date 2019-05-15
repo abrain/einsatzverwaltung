@@ -8,7 +8,7 @@ use abrain\Einsatzverwaltung\TaxonomyCustomFields;
  * Description of the custom taxonomy 'Externes Einsatzmittel'
  * @package abrain\Einsatzverwaltung\Types
  */
-class ExtEinsatzmittel implements CustomType
+class ExtEinsatzmittel implements CustomTaxonomy
 {
     /**
      * @return string

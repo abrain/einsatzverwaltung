@@ -20,7 +20,7 @@ class Formatter
     /**
      * @var array Ersetzbare Tags und ihre Beschreibungen
      */
-    private static $availableTags = array(
+    private $availableTags = array(
         '%title%' => 'Titel des Einsatzberichts',
         '%date%' => 'Datum der Alarmierung',
         '%time%' => 'Zeitpunkt der Alarmierung',
@@ -41,6 +41,7 @@ class Formatter
         '%featuredImage%' => 'Beitragsbild',
         '%yearArchive%' => 'Link zum Jahresarchiv',
         '%workforce%' => 'Mannschaftsstärke',
+        '%units%' => 'Einheiten',
     );
 
     /**
@@ -83,7 +84,7 @@ class Formatter
     public function formatIncidentData($pattern, $allowedTags = array(), $post = null, $context = 'post')
     {
         if (empty($allowedTags)) {
-            $allowedTags = array_keys(self::$availableTags);
+            $allowedTags = array_keys($this->availableTags);
         }
 
         // Content should be handled separately, so we will ignore it
@@ -179,6 +180,9 @@ class Formatter
                 break;
             case '%workforce%':
                 $replace = $incidentReport->getWorkforce();
+                break;
+            case '%units%':
+                $replace = $this->getUnits($incidentReport);
                 break;
             default:
                 return $pattern;
@@ -276,6 +280,21 @@ class Formatter
             $string = $typeOfIncident->name . $string;
         } while ($showHierarchy && $typeOfIncident->parent != 0);
         return $string;
+    }
+
+    /**
+     * @param IncidentReport $report
+     *
+     * @return string
+     */
+    public function getUnits(IncidentReport $report)
+    {
+        $units = $report->getUnits();
+        $unitNames = array_map(function (WP_Post $unit) {
+            return sanitize_post_field('post_title', $unit->post_title, $unit->ID);
+        }, $units);
+
+        return join(', ', $unitNames);
     }
 
     /**
@@ -442,12 +461,12 @@ class Formatter
      * @param string $tag
      * @return string
      */
-    public static function getLabelForTag($tag)
+    public function getLabelForTag($tag)
     {
-        if (!array_key_exists($tag, self::$availableTags)) {
+        if (!array_key_exists($tag, $this->availableTags)) {
             return '';
         }
 
-        return self::$availableTags[$tag];
+        return $this->availableTags[$tag];
     }
 }

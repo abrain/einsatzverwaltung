@@ -44,6 +44,9 @@ class Initializer
         $reportEditScreen = new ReportEditScreen();
         add_action('add_meta_boxes_einsatz', array($reportEditScreen, 'addMetaBoxes'));
 
+        $unitEditScreen = new UnitEditScreen();
+        add_filter('default_hidden_meta_boxes', array($unitEditScreen, 'filterDefaultHiddenMetaboxes'), 10, 2);
+
         // Register Settings
         $mainPage = new MainPage($options, $permalinkController);
         add_action('admin_menu', array($mainPage, 'addToSettingsMenu'));

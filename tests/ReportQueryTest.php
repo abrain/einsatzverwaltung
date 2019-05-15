@@ -2,6 +2,7 @@
 namespace abrain\Einsatzverwaltung;
 
 use abrain\Einsatzverwaltung\Model\IncidentReport;
+use abrain\Einsatzverwaltung\Types\Unit;
 use WP_UnitTestCase;
 
 class ReportQueryTest extends WP_UnitTestCase
@@ -17,11 +18,13 @@ class ReportQueryTest extends WP_UnitTestCase
     private $incidentType1aId;
 
     private $postIds;
+    private $unitIds;
 
     public function setUp()
     {
         parent::setUp();
 
+        // Einsatzarten anlegen
         $parentTerm = wp_insert_term('Type 1', 'einsatzart');
         if (is_wp_error($parentTerm)) {
             self::fail('Could not create parent term');
@@ -32,6 +35,9 @@ class ReportQueryTest extends WP_UnitTestCase
             self::fail('Could not create child term');
         }
         $this->incidentType1aId = $childTerm['term_id'];
+
+        // Units anlegen
+        $this->unitIds = $this->factory->post->create_many(2, array('post_type' => Unit::POST_TYPE));
 
         $currentYear = date('Y');
         $this->postIds = $this->factory->post->create_many(10, array('post_type' => 'einsatz'));
@@ -60,6 +66,13 @@ class ReportQueryTest extends WP_UnitTestCase
         wp_set_object_terms($this->postIds[2], array($this->incidentType1Id), 'einsatzart');
         wp_set_object_terms($this->postIds[5], array($this->incidentType1aId), 'einsatzart');
         wp_set_object_terms($this->postIds[8], array($this->incidentType1aId), 'einsatzart');
+
+        // Units zuweisen
+        add_post_meta($this->postIds[2], '_evw_unit', $this->unitIds[0]);
+        add_post_meta($this->postIds[4], '_evw_unit', $this->unitIds[1]);
+        add_post_meta($this->postIds[5], '_evw_unit', $this->unitIds[0]);
+        add_post_meta($this->postIds[6], '_evw_unit', $this->unitIds[0]);
+        add_post_meta($this->postIds[6], '_evw_unit', $this->unitIds[1]);
     }
 
     public function testGetAllPublishedReports()
@@ -203,6 +216,50 @@ class ReportQueryTest extends WP_UnitTestCase
                 $typeOfIncident->term_id,
                 array($this->incidentType1Id, $this->incidentType1aId)
             ));
+        }
+    }
+
+    public function testFilterUnits()
+    {
+        $query = new ReportQuery();
+        $query->setUnits(array($this->unitIds[0]));
+        $reports = $query->getReports();
+        $this->assertCount(3, $reports);
+        /** @var IncidentReport $report */
+        foreach ($reports as $report) {
+            $units = $report->getUnits();
+            $unitIds = array_map(function ($unit) {
+                return $unit->ID;
+            }, $units);
+            $this->assertContains($this->unitIds[0], $unitIds);
+        }
+
+        $query->setUnits(array($this->unitIds[1]));
+        $reports = $query->getReports();
+        $this->assertCount(2, $reports);
+        /** @var IncidentReport $report */
+        foreach ($reports as $report) {
+            $units = $report->getUnits();
+            $unitIds = array_map(function ($unit) {
+                return $unit->ID;
+            }, $units);
+            $this->assertContains($this->unitIds[1], $unitIds);
+        }
+
+        $query->setUnits($this->unitIds);
+        $reports = $query->getReports();
+        $this->assertCount(4, $reports);
+        /** @var IncidentReport $report */
+        foreach ($reports as $report) {
+            $units = $report->getUnits();
+            $this->assertNotEmpty($units);
+            $unitIds = array_map(function ($unit) {
+                return $unit->ID;
+            }, $units);
+
+            // Make sure at least one of the requested unit IDs is assigned to the returned report
+            $notAssignedUnitIds = array_diff($this->unitIds, $unitIds);
+            $this->assertLessThan(count($this->unitIds), count($notAssignedUnitIds));
         }
     }
 }

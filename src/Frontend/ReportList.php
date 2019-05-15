@@ -22,7 +22,7 @@ class ReportList
      * @var array
      */
     private $columnsLinkBlacklist = array('incidentCommander', 'location', 'vehicles', 'alarmType', 'additionalForces',
-        'incidentType');
+        'incidentType', 'units');
 
     /**
      * @var Formatter
@@ -54,7 +54,7 @@ class ReportList
     /**
      * Generiert den HTML-Code für die Liste
      *
-     * @param array $reports Eine Liste von IncidentReport-Objekten
+     * @param IncidentReport[] $reports Eine Liste von IncidentReport-Objekten
      * @param ReportListParameters $parameters
      */
     private function constructList($reports, ReportListParameters $parameters)
@@ -78,7 +78,6 @@ class ReportList
             $this->beginTable(false, $parameters);
             $this->insertTableHeader($parameters);
         }
-        /** @var IncidentReport $report */
         foreach ($reports as $report) {
             $timeOfAlerting = $report->getTimeOfAlerting();
             $currentYear = intval($timeOfAlerting->format('Y'));
@@ -125,7 +124,7 @@ class ReportList
     /**
      * Gibt den HTML-Code für die Liste zurück
      *
-     * @param array $reports Eine Liste von IncidentReport-Objekten
+     * @param IncidentReport[] $reports Eine Liste von IncidentReport-Objekten
      * @param ReportListParameters $parameters
      *
      * @return string HTML-Code der Liste
@@ -138,7 +137,7 @@ class ReportList
     }
 
     /**
-     * @param array $reports Eine Liste von IncidentReport-Objekten
+     * @param IncidentReport[] $reports Eine Liste von IncidentReport-Objekten
      * @param ReportListParameters $parameters
      */
     public function printList($reports, ReportListParameters $parameters)
@@ -315,6 +314,9 @@ class ReportList
             case 'additionalForces':
                 $cellContent = $this->formatter->getAdditionalForces($report, $parameters->linkAdditionalForces, false);
                 break;
+            case 'units':
+                $cellContent = $this->formatter->getUnits($report);
+                break;
             case 'incidentType':
                 $showHierarchy = (get_option('einsatzvw_list_art_hierarchy', '0') === '1');
                 $cellContent = $this->formatter->getTypeOfIncident($report, false, false, $showHierarchy);
@@ -391,6 +393,9 @@ class ReportList
             'additionalForces' => array(
                 'name' => 'Weitere Kr&auml;fte',
                 'cssname' => 'Weitere Kr\0000E4fte',
+            ),
+            'units' => array(
+                'name' => __('Units', 'einsatzverwaltung')
             ),
             'incidentType' => array(
                 'name' => 'Einsatzart'

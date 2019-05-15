@@ -4,12 +4,13 @@ namespace abrain\Einsatzverwaltung\Types;
 use abrain\Einsatzverwaltung\CustomFields\NumberInput;
 use abrain\Einsatzverwaltung\CustomFields\PostSelector;
 use abrain\Einsatzverwaltung\TaxonomyCustomFields;
+use WP_Term;
 
 /**
  * Description of the custom taxonomy 'Vehicle'
  * @package abrain\Einsatzverwaltung\Types
  */
-class Vehicle implements CustomType
+class Vehicle implements CustomTaxonomy
 {
     /**
      * @return string
@@ -82,5 +83,55 @@ class Vehicle implements CustomType
      */
     public function registerHooks()
     {
+        add_action("{$this->getSlug()}_pre_add_form", array($this, 'deprectatedHierarchyNotice'));
+        add_action('admin_menu', array($this, 'addBadgeToMenu'));
+    }
+
+    /**
+     * Check if there are vehicles with parents, as that is now deprecated
+     */
+    public function deprectatedHierarchyNotice()
+    {
+        $termsWithParentCount = $this->getTermsWithParentCount();
+        if ($termsWithParentCount > 0) {
+            printf(
+                '<div class="notice notice-warning"><p>%s</p></div>',
+                esc_html__('The vehicles will soon be reworked and only vehicles without children will remain. Please use the recently introduced Units instead.', 'einsatzverwaltung')
+            );
+        }
+    }
+
+    public function addBadgeToMenu()
+    {
+        global $submenu;
+        $termsWithParentCount = $this->getTermsWithParentCount();
+        if ($termsWithParentCount > 0) {
+            $submenuKey = 'edit.php?post_type=' . Report::SLUG;
+            if (array_key_exists($submenuKey, $submenu)) {
+                $vehicleEntry = array_filter($submenu[$submenuKey], function ($entry) {
+                    return $entry[2] === 'edit-tags.php?taxonomy=fahrzeug&amp;post_type=einsatz';
+                });
+
+                foreach ($vehicleEntry as $id => $entry) {
+                    $entry[0] .= sprintf(
+                        ' <span class="awaiting-mod"><span class="pending-count">%d</span></span>',
+                        esc_html($termsWithParentCount)
+                    );
+                    $submenu[$submenuKey][$id] = $entry;
+                }
+            }
+        }
+    }
+
+    /**
+     * @return int Returns the number of terms in this taxonomy that have a parent term.
+     */
+    private function getTermsWithParentCount()
+    {
+        $terms = get_terms(array('taxonomy' => $this->getSlug(), 'hide_empty' => false));
+        $childTerms = array_filter($terms, function (WP_Term $term) {
+            return $term->parent !== 0;
+        });
+        return count($childTerms);
     }
 }

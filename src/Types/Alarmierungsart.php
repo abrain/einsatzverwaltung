@@ -7,7 +7,7 @@ use abrain\Einsatzverwaltung\TaxonomyCustomFields;
  * Description of the custom taxonomy 'Alarmierungsart'
  * @package abrain\Einsatzverwaltung\Types
  */
-class Alarmierungsart implements CustomType
+class Alarmierungsart implements CustomTaxonomy
 {
     /**
      * @return string

@@ -26,6 +26,7 @@ class RecentIncidentsFormattedTest extends WP_UnitTestCase
         $defaults = array(
             'title' => '',
             'numIncidents' => 3,
+            'units' => array(),
             'beforeContent' => '',
             'pattern' => '',
             'afterContent' => ''

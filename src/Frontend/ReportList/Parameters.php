@@ -59,9 +59,9 @@ class Parameters
     /**
      * Gibt an, ob nach jedem Monat eine Trennung eingefügt werden soll
      *
-     * @var bool
+     * @var int
      */
-    private $splitMonths;
+    private $splitType;
 
     /**
      * Initialize the parameters with default values
@@ -76,7 +76,7 @@ class Parameters
         $this->linkAdditionalForces = (get_option('einsatzvw_list_ext_link') === '1');
         $this->linkVehicles = (get_option('einsatzvw_list_fahrzeuge_link') === '1');
         $this->showHeading = true;
-        $this->splitMonths = false;
+        $this->splitType = SplitType::NONE;
     }
 
     /**
@@ -124,15 +124,15 @@ class Parameters
      */
     public function isSplitMonths()
     {
-        return $this->splitMonths && !$this->compact;
+        return $this->splitType === SplitType::MONTHLY && !$this->compact;
     }
 
     /**
-     * @param bool $splitMonths
+     * @param int $splitType
      */
-    public function setSplitMonths($splitMonths)
+    public function setSplitType($splitType)
     {
-        $this->splitMonths = $splitMonths;
+        $this->splitType = $splitType;
     }
 
     /**

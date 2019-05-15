@@ -4,6 +4,7 @@ namespace abrain\Einsatzverwaltung\Shortcodes;
 
 use abrain\Einsatzverwaltung\Frontend\ReportList\Parameters as ReportListParameters;
 use abrain\Einsatzverwaltung\Frontend\ReportList\Renderer as ReportListRenderer;
+use abrain\Einsatzverwaltung\Frontend\ReportList\SplitType;
 use abrain\Einsatzverwaltung\ReportQuery;
 
 /**
@@ -84,7 +85,9 @@ class ReportList
      */
     public function configureListParameters(ReportListParameters &$parameters, $attributes, $filteredOptions)
     {
-        $parameters->setSplitMonths($attributes['monatetrennen'] == 'ja');
+        if ($attributes['monatetrennen'] == 'ja') {
+            $parameters->setSplitType(SplitType::MONTHLY);
+        }
 
         $columnsWithLink = explode(',', $attributes['link']);
         if (in_array('none', $columnsWithLink)) {

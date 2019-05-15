@@ -54,7 +54,7 @@ class ReportListParametersTest extends WP_UnitTestCase
     {
         $parameters = new ReportListParameters();
         $this->assertFalse($parameters->isSplitMonths());
-        $parameters->setSplitMonths(true);
+        $parameters->setSplitType(SplitType::MONTHLY);
         $this->assertTrue($parameters->isSplitMonths());
         $parameters->compact = true;
         $this->assertFalse($parameters->isSplitMonths());

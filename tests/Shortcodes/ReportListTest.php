@@ -2,6 +2,7 @@
 namespace abrain\Einsatzverwaltung\Shortcodes;
 
 use abrain\Einsatzverwaltung\Frontend\ReportList\Renderer as ReportListRenderer;
+use abrain\Einsatzverwaltung\Frontend\ReportList\SplitType;
 use PHPUnit_Framework_TestCase;
 
 /**
@@ -113,7 +114,7 @@ class ReportListTest extends PHPUnit_Framework_TestCase
     {
         $parameters = $this->createMock('\abrain\Einsatzverwaltung\Frontend\ReportList\Parameters');
         $parameters->expects($this->once())->method('setColumnsLinkingReport')->with(array('title'));
-        $parameters->expects($this->once())->method('setSplitMonths')->with($this->isFalse());
+        $parameters->expects($this->never())->method('setSplitType');
         // TODO test that public fields have been set
         $this->reportList->configureListParameters($parameters, array(
             'monatetrennen' => 'nein',
@@ -135,7 +136,7 @@ class ReportListTest extends PHPUnit_Framework_TestCase
     {
         $parameters = $this->createMock('\abrain\Einsatzverwaltung\Frontend\ReportList\Parameters');
         $parameters->expects($this->once())->method('setColumnsLinkingReport')->with(array('title'));
-        $parameters->expects($this->once())->method('setSplitMonths')->with($this->isTrue());
+        $parameters->expects($this->once())->method('setSplitType')->with(SplitType::MONTHLY);
         $this->reportList->configureListParameters($parameters, array(
             'monatetrennen' => 'ja',
             'link' => 'title'

@@ -25,9 +25,31 @@ class ReportList
         'incidentType', 'units');
 
     /**
+     * @var int
+     */
+    private $currentYear = 0;
+
+    /**
      * @var Formatter
      */
     private $formatter;
+
+    /**
+     * @var int
+     */
+    private $previousMonth = 0;
+
+    /**
+     * @var int
+     */
+    private $previousYear = 0;
+
+    /**
+     * Counts how many rows have been inserted since the last table header, necessary for zebra stripe correction
+     *
+     * @var int
+     */
+    private $rowsSinceLastHeader = 0;
 
     /**
      * @var ReportListSettings
@@ -40,13 +62,6 @@ class ReportList
      * @var string
      */
     private $string;
-
-    /**
-     * Counts how many rows have been inserted since the last table header, necessary for zebra stripe correction
-     *
-     * @var int
-     */
-    private $rowsSinceLastHeader = 0;
 
     /**
      * ReportList constructor.
@@ -75,10 +90,10 @@ class ReportList
         }
 
         // Berichte abarbeiten
-        $currentYear = null;
+        $this->currentYear = 0;
         $currentMonth = null;
-        $previousYear = null;
-        $previousMonth = null;
+        $this->previousYear = 0;
+        $this->previousMonth = 0;
         $this->rowsSinceLastHeader = 0;
         $numberOfColumns = count($parameters->getColumns());
         if ($parameters->compact) {
@@ -88,39 +103,25 @@ class ReportList
         }
         foreach ($reports as $report) {
             $timeOfAlerting = $report->getTimeOfAlerting();
-            $currentYear = intval($timeOfAlerting->format('Y'));
+            $this->currentYear = intval($timeOfAlerting->format('Y'));
             $currentMonth = intval($timeOfAlerting->format('m'));
 
             // Ein neues Jahr beginnt
-            if (!$parameters->compact && $currentYear != $previousYear) {
-                // Wenn mindestens schon ein Jahr ausgegeben wurde
-                if ($previousYear != null) {
-                    $previousMonth = null;
-                    $this->endTable();
-                }
-
-                $this->beginTable($currentYear, $parameters);
-                if (!$parameters->isSplitMonths()) {
-                    $this->insertTableHeader($parameters);
-                    $this->insertZebraCorrection($numberOfColumns);
-                }
+            if ($this->currentYear != $this->previousYear) {
+                $this->onYearChange($parameters);
             }
 
-            // Monatswechsel bei aktivierter Monatstrennung
-            if ($parameters->isSplitMonths() && $currentMonth != $previousMonth) {
-                if ($this->rowsSinceLastHeader > 0 && $this->rowsSinceLastHeader % 2 != 0) {
-                    $this->insertZebraCorrection($numberOfColumns);
-                }
-                $this->insertMonthSeparator($timeOfAlerting, $numberOfColumns);
-                $this->insertTableHeader($parameters);
+            // Ein neuer Monat beginnt
+            if ($currentMonth != $this->previousMonth) {
+                $this->onMonthChange($parameters, $timeOfAlerting);
             }
 
             // Zeile für den aktuellen Bericht ausgeben
             $this->insertRow($report, $parameters);
 
             // Variablen für den nächsten Durchgang setzen
-            $previousYear = $currentYear;
-            $previousMonth = $currentMonth;
+            $this->previousYear = $this->currentYear;
+            $this->previousMonth = $currentMonth;
         }
         $this->endTable();
     }
@@ -193,13 +194,18 @@ class ReportList
     }
 
     /**
-     * @param DateTime $date
      * @param int $numberOfColumns
+     * @param string $class
+     * @param string $text
      */
-    private function insertMonthSeparator($date, $numberOfColumns)
+    private function insertFullWidthRow($numberOfColumns, $class, $text = '&nbsp;')
     {
-        $this->string .= '<tr class="einsatz-title-month"><td colspan="' . $numberOfColumns . '">';
-        $this->string .=  date_i18n('F', $date->getTimestamp()) . '</td></tr>';
+        $this->string .= sprintf(
+            '<tr class="%s"><td colspan="%d">%s</td></tr>',
+            esc_attr($class),
+            esc_attr($numberOfColumns),
+            esc_html($text)
+        );
     }
 
     /**
@@ -263,7 +269,7 @@ class ReportList
      */
     private function insertZebraCorrection($numberOfColumns)
     {
-        $this->string .= '<tr class="zebracorrection"><td colspan="'.$numberOfColumns.'">&nbsp;</td></tr>';
+        $this->insertFullWidthRow($numberOfColumns, 'zebracorrection');
     }
 
     /**
@@ -348,6 +354,48 @@ class ReportList
         }
 
         return $cellContent;
+    }
+
+    /**
+     * @param ReportListParameters $parameters
+     */
+    private function onYearChange(ReportListParameters $parameters)
+    {
+        if ($parameters->compact) {
+            return;
+        }
+
+        // Wenn mindestens schon ein Jahr ausgegeben wurde
+        if ($this->previousYear != 0) {
+            $this->previousMonth = 0;
+            $this->endTable();
+        }
+
+        $this->beginTable($this->currentYear, $parameters);
+        if (!$parameters->isSplitMonths()) {
+            $this->insertTableHeader($parameters);
+            $this->insertZebraCorrection($parameters->getColumnCount());
+        }
+    }
+
+    /**
+     * @param ReportListParameters $parameters
+     * @param DateTime $dateTime
+     */
+    private function onMonthChange(ReportListParameters $parameters, DateTime $dateTime)
+    {
+        if (!$parameters->isSplitMonths()) {
+            return;
+        }
+
+        $numberOfColumns = $parameters->getColumnCount();
+
+        if ($this->rowsSinceLastHeader > 0 && $this->rowsSinceLastHeader % 2 != 0) {
+            $this->insertZebraCorrection($numberOfColumns);
+        }
+
+        $this->insertFullWidthRow($numberOfColumns, 'einsatz-title-month', date_i18n('F', $dateTime->getTimestamp()));
+        $this->insertTableHeader($parameters);
     }
 
     /**

@@ -88,6 +88,14 @@ class ReportListParameters
     }
 
     /**
+     * @return int
+     */
+    public function getColumnCount()
+    {
+        return count($this->columns);
+    }
+
+    /**
      * @param array $columns
      */
     public function setColumns($columns)

@@ -84,6 +84,7 @@ class ReportList
         if ($parameters->compact) {
             $this->beginTable(false, $parameters);
             $this->insertTableHeader($parameters);
+            $this->insertZebraCorrection($numberOfColumns);
         }
         foreach ($reports as $report) {
             $timeOfAlerting = $report->getTimeOfAlerting();

@@ -103,8 +103,6 @@ class ReportList
                     $this->insertTableHeader($parameters);
                     $this->insertZebraCorrection($numberOfColumns);
                 }
-
-                $this->rowsSinceLastHeader = 0;
             }
 
             // Monatswechsel bei aktivierter Monatstrennung
@@ -114,12 +112,10 @@ class ReportList
                 }
                 $this->insertMonthSeparator($timeOfAlerting, $numberOfColumns);
                 $this->insertTableHeader($parameters);
-                $this->rowsSinceLastHeader = 0;
             }
 
             // Zeile für den aktuellen Bericht ausgeben
             $this->insertRow($report, $parameters);
-            $this->rowsSinceLastHeader++;
 
             // Variablen für den nächsten Durchgang setzen
             $previousYear = $currentYear;
@@ -164,6 +160,7 @@ class ReportList
             $this->string .= '<h2>Eins&auml;tze '.$year.'</h2>';
         }
         $this->string .= '<table class="' . self::TABLECLASS . '"><tbody>';
+        $this->rowsSinceLastHeader = 0;
     }
 
     private function endTable()
@@ -190,6 +187,8 @@ class ReportList
             $this->string .= sprintf('<th style="%s">%s</th>', esc_attr($style), esc_html($colInfo['name']));
         }
         $this->string .= '</tr>';
+
+        $this->rowsSinceLastHeader = 0;
     }
 
     /**
@@ -213,6 +212,7 @@ class ReportList
             $this->string .= $this->getCellMarkup($report, $parameters, $colId);
         }
         $this->string .= '</tr>';
+        $this->rowsSinceLastHeader++;
     }
 
     /**

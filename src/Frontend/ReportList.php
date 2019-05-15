@@ -42,6 +42,13 @@ class ReportList
     private $string;
 
     /**
+     * Counts how many rows have been inserted since the last table header, necessary for zebra stripe correction
+     *
+     * @var int
+     */
+    private $rowsSinceLastHeader = 0;
+
+    /**
      * ReportList constructor.
      *
      * @param Formatter $formatter
@@ -72,7 +79,7 @@ class ReportList
         $currentMonth = null;
         $previousYear = null;
         $previousMonth = null;
-        $monthlyCounter = 0;
+        $this->rowsSinceLastHeader = 0;
         $numberOfColumns = count($parameters->getColumns());
         if ($parameters->compact) {
             $this->beginTable(false, $parameters);
@@ -97,22 +104,22 @@ class ReportList
                     $this->insertZebraCorrection($numberOfColumns);
                 }
 
-                $monthlyCounter = 0;
+                $this->rowsSinceLastHeader = 0;
             }
 
             // Monatswechsel bei aktivierter Monatstrennung
             if ($parameters->isSplitMonths() && $currentMonth != $previousMonth) {
-                if ($monthlyCounter > 0 && $monthlyCounter % 2 != 0) {
+                if ($this->rowsSinceLastHeader > 0 && $this->rowsSinceLastHeader % 2 != 0) {
                     $this->insertZebraCorrection($numberOfColumns);
                 }
                 $this->insertMonthSeparator($timeOfAlerting, $numberOfColumns);
                 $this->insertTableHeader($parameters);
-                $monthlyCounter = 0;
+                $this->rowsSinceLastHeader = 0;
             }
 
             // Zeile für den aktuellen Bericht ausgeben
             $this->insertRow($report, $parameters);
-            $monthlyCounter++;
+            $this->rowsSinceLastHeader++;
 
             // Variablen für den nächsten Durchgang setzen
             $previousYear = $currentYear;

@@ -35,7 +35,7 @@ class ReportList
         $this->defaultAttributes = array(
             'jahr' => date('Y'),
             'sort' => 'ab',
-            'monatetrennen' => 'nein',
+            'split' => 'no',
             'link' => 'title',
             'limit' => -1,
             'einsatzart' => 0,
@@ -47,13 +47,13 @@ class ReportList
     /**
      * Gibt eine Tabelle mit Einsätzen aus dem gegebenen Jahr zurück
      *
-     * @param array $atts Parameter des Shortcodes
+     * @param array|string $atts Parameter des Shortcodes
      *
      * @return string
      */
     public function render($atts)
     {
-        $attributes = shortcode_atts($this->defaultAttributes, $atts);
+        $attributes = $this->getAttributes($atts);
         $filteredOptions = $this->extractOptions($attributes);
 
         $reportQuery = new ReportQuery();
@@ -64,6 +64,28 @@ class ReportList
         $this->configureListParameters($parameters, $attributes, $filteredOptions);
 
         return $this->reportList->getList($reports, $parameters);
+    }
+
+    /**
+     * @param array|string $attributes
+     *
+     * @return array
+     */
+    private function getAttributes($attributes)
+    {
+        // See https://core.trac.wordpress.org/ticket/45929
+        if ($attributes === '') {
+            $attributes = array();
+        }
+
+        // Ensure backwards compatibility
+        if (array_key_exists('monatetrennen', $attributes) && !array_key_exists('split', $attributes) &&
+            $attributes['monatetrennen'] == 'ja'
+        ) {
+            $attributes['split'] = 'monthly';
+        }
+
+        return shortcode_atts($this->defaultAttributes, $attributes);
     }
 
     /**
@@ -85,8 +107,15 @@ class ReportList
      */
     public function configureListParameters(ReportListParameters &$parameters, $attributes, $filteredOptions)
     {
-        if ($attributes['monatetrennen'] == 'ja') {
-            $parameters->setSplitType(SplitType::MONTHLY);
+        switch ($attributes['split']) {
+            case 'monthly':
+                $parameters->setSplitType(SplitType::MONTHLY);
+                break;
+            case 'quarterly':
+                $parameters->setSplitType(SplitType::QUARTERLY);
+                break;
+            default:
+                $parameters->setSplitType(SplitType::NONE);
         }
 
         $columnsWithLink = explode(',', $attributes['link']);

@@ -114,10 +114,10 @@ class ReportListTest extends PHPUnit_Framework_TestCase
     {
         $parameters = $this->createMock('\abrain\Einsatzverwaltung\Frontend\ReportList\Parameters');
         $parameters->expects($this->once())->method('setColumnsLinkingReport')->with(array('title'));
-        $parameters->expects($this->never())->method('setSplitType');
+        $parameters->expects($this->once())->method('setSplitType')->with(SplitType::NONE);
         // TODO test that public fields have been set
         $this->reportList->configureListParameters($parameters, array(
-            'monatetrennen' => 'nein',
+            'split' => 'no',
             'link' => 'title'
         ), array('special', 'noLinkWithoutContent', 'noHeading', 'compact'));
     }
@@ -127,18 +127,29 @@ class ReportListTest extends PHPUnit_Framework_TestCase
         $parameters = $this->createMock('\abrain\Einsatzverwaltung\Frontend\ReportList\Parameters');
         $parameters->expects($this->once())->method('setColumnsLinkingReport')->with(array());
         $this->reportList->configureListParameters($parameters, array(
-            'monatetrennen' => 'nein',
+            'split' => 'no',
             'link' => 'title,none'
         ), array());
     }
 
-    public function testConfigureListParametersSplitMonths()
+    public function testConfigureListParametersSplitMonthly()
     {
         $parameters = $this->createMock('\abrain\Einsatzverwaltung\Frontend\ReportList\Parameters');
         $parameters->expects($this->once())->method('setColumnsLinkingReport')->with(array('title'));
         $parameters->expects($this->once())->method('setSplitType')->with(SplitType::MONTHLY);
         $this->reportList->configureListParameters($parameters, array(
-            'monatetrennen' => 'ja',
+            'split' => 'monthly',
+            'link' => 'title'
+        ), array());
+    }
+
+    public function testConfigureListParametersSplitQuarterly()
+    {
+        $parameters = $this->createMock('\abrain\Einsatzverwaltung\Frontend\ReportList\Parameters');
+        $parameters->expects($this->once())->method('setColumnsLinkingReport')->with(array('title'));
+        $parameters->expects($this->once())->method('setSplitType')->with(SplitType::QUARTERLY);
+        $this->reportList->configureListParameters($parameters, array(
+            'split' => 'quarterly',
             'link' => 'title'
         ), array());
     }

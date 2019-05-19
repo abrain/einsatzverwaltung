@@ -96,11 +96,10 @@ class Renderer
         $this->previousYear = 0;
         $this->previousMonth = 0;
         $this->rowsSinceLastHeader = 0;
-        $numberOfColumns = count($parameters->getColumns());
         if ($parameters->compact) {
             $this->beginTable(false, $parameters);
             $this->insertTableHeader($parameters);
-            $this->insertZebraCorrection($numberOfColumns);
+            $this->insertZebraCorrection($parameters->getColumnCount());
         }
         foreach ($reports as $report) {
             $timeOfAlerting = $report->getTimeOfAlerting();

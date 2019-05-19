@@ -128,6 +128,14 @@ class Parameters
     }
 
     /**
+     * @return bool
+     */
+    public function isSplitQuarterly()
+    {
+        return $this->splitType === SplitType::QUARTERLY && !$this->compact;
+    }
+
+    /**
      * @param int $splitType
      */
     public function setSplitType($splitType)

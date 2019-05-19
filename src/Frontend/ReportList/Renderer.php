@@ -93,6 +93,8 @@ class Renderer
         // Berichte abarbeiten
         $this->currentYear = 0;
         $currentMonth = null;
+        $currentQuarter = null;
+        $previousQuarter = null;
         $this->previousYear = 0;
         $this->previousMonth = 0;
         $this->rowsSinceLastHeader = 0;
@@ -113,6 +115,10 @@ class Renderer
 
             // Ein neuer Monat beginnt
             if ($currentMonth != $this->previousMonth) {
+                $currentQuarter = intdiv($currentMonth - 1, 3) + 1;
+                if ($currentQuarter !== $previousQuarter) {
+                    $this->onQuarterChange($parameters, $currentQuarter);
+                }
                 $this->onMonthChange($parameters, $timeOfAlerting);
             }
 
@@ -121,6 +127,7 @@ class Renderer
 
             // Variablen für den nächsten Durchgang setzen
             $this->previousYear = $this->currentYear;
+            $previousQuarter = $currentQuarter;
             $this->previousMonth = $currentMonth;
         }
         $this->endTable();
@@ -372,10 +379,30 @@ class Renderer
         }
 
         $this->beginTable($this->currentYear, $parameters);
-        if (!$parameters->isSplitMonths()) {
+        if (!$parameters->isSplitMonths() && !$parameters->isSplitQuarterly()) {
             $this->insertTableHeader($parameters);
             $this->insertZebraCorrection($parameters->getColumnCount());
         }
+    }
+
+    /**
+     * @param Parameters $parameters
+     * @param int $quarter
+     */
+    private function onQuarterChange(Parameters $parameters, $quarter)
+    {
+        if (!$parameters->isSplitQuarterly()) {
+            return;
+        }
+
+        $numberOfColumns = $parameters->getColumnCount();
+
+        if ($this->rowsSinceLastHeader > 0 && $this->rowsSinceLastHeader % 2 != 0) {
+            $this->insertZebraCorrection($numberOfColumns);
+        }
+
+        $this->insertFullWidthRow($numberOfColumns, 'einsatz-title-quarter', sprintf('Q%d', $quarter));
+        $this->insertTableHeader($parameters);
     }
 
     /**

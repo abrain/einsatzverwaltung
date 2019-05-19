@@ -395,14 +395,8 @@ class Renderer
             return;
         }
 
-        $numberOfColumns = $parameters->getColumnCount();
-
-        if ($this->rowsSinceLastHeader > 0 && $this->rowsSinceLastHeader % 2 != 0) {
-            $this->insertZebraCorrection($numberOfColumns);
-        }
-
-        $this->insertFullWidthRow($numberOfColumns, 'einsatz-title-quarter', sprintf('Q%d', $quarter));
-        $this->insertTableHeader($parameters);
+        $heading = sprintf('%d. Quartal', $quarter);
+        $this->insertSplit($parameters, 'einsatz-title-quarter', $heading);
     }
 
     /**
@@ -415,13 +409,24 @@ class Renderer
             return;
         }
 
+        $heading = date_i18n('F', $dateTime->getTimestamp());
+        $this->insertSplit($parameters, 'einsatz-title-month', $heading);
+    }
+
+    /**
+     * @param Parameters $parameters
+     * @param $class
+     * @param $heading
+     */
+    private function insertSplit(Parameters $parameters, $class, $heading)
+    {
         $numberOfColumns = $parameters->getColumnCount();
 
         if ($this->rowsSinceLastHeader > 0 && $this->rowsSinceLastHeader % 2 != 0) {
             $this->insertZebraCorrection($numberOfColumns);
         }
 
-        $this->insertFullWidthRow($numberOfColumns, 'einsatz-title-month', date_i18n('F', $dateTime->getTimestamp()));
+        $this->insertFullWidthRow($numberOfColumns, $class, $heading);
         $this->insertTableHeader($parameters);
     }
 

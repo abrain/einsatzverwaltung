@@ -115,7 +115,7 @@ class Renderer
 
             // Ein neuer Monat beginnt
             if ($currentMonth != $this->previousMonth) {
-                $currentQuarter = intdiv($currentMonth - 1, 3) + 1;
+                $currentQuarter = floor(($currentMonth - 1) / 3) + 1;
                 if ($currentQuarter !== $previousQuarter) {
                     $this->onQuarterChange($parameters, $currentQuarter);
                 }

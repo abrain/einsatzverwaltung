@@ -1,7 +1,8 @@
 <?php
-namespace abrain\Einsatzverwaltung\Frontend;
+namespace abrain\Einsatzverwaltung\Frontend\ReportList;
 
 use WP_UnitTestCase;
+use abrain\Einsatzverwaltung\Frontend\ReportList\Settings as ReportListSettings;
 
 class ReportListSettingsTest extends WP_UnitTestCase
 {

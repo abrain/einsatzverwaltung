@@ -2,7 +2,9 @@
 
 namespace abrain\Einsatzverwaltung\Shortcodes;
 
-use abrain\Einsatzverwaltung\Frontend\ReportListParameters;
+use abrain\Einsatzverwaltung\Frontend\ReportList\Parameters as ReportListParameters;
+use abrain\Einsatzverwaltung\Frontend\ReportList\Renderer as ReportListRenderer;
+use abrain\Einsatzverwaltung\Frontend\ReportList\SplitType;
 use abrain\Einsatzverwaltung\ReportQuery;
 
 /**
@@ -16,16 +18,16 @@ class ReportList
     private $defaultAttributes;
 
     /**
-     * @var \abrain\Einsatzverwaltung\Frontend\ReportList
+     * @var ReportListRenderer
      */
     private $reportList;
 
     /**
      * ReportList constructor.
      *
-     * @param \abrain\Einsatzverwaltung\Frontend\ReportList $reportList
+     * @param ReportListRenderer $reportList
      */
-    public function __construct(\abrain\Einsatzverwaltung\Frontend\ReportList $reportList)
+    public function __construct(ReportListRenderer $reportList)
     {
         $this->reportList = $reportList;
 
@@ -33,7 +35,7 @@ class ReportList
         $this->defaultAttributes = array(
             'jahr' => date('Y'),
             'sort' => 'ab',
-            'monatetrennen' => 'nein',
+            'split' => 'no',
             'link' => 'title',
             'limit' => -1,
             'einsatzart' => 0,
@@ -45,13 +47,13 @@ class ReportList
     /**
      * Gibt eine Tabelle mit Einsätzen aus dem gegebenen Jahr zurück
      *
-     * @param array $atts Parameter des Shortcodes
+     * @param array|string $atts Parameter des Shortcodes
      *
      * @return string
      */
     public function render($atts)
     {
-        $attributes = shortcode_atts($this->defaultAttributes, $atts);
+        $attributes = $this->getAttributes($atts);
         $filteredOptions = $this->extractOptions($attributes);
 
         $reportQuery = new ReportQuery();
@@ -62,6 +64,28 @@ class ReportList
         $this->configureListParameters($parameters, $attributes, $filteredOptions);
 
         return $this->reportList->getList($reports, $parameters);
+    }
+
+    /**
+     * @param array|string $attributes
+     *
+     * @return array
+     */
+    private function getAttributes($attributes)
+    {
+        // See https://core.trac.wordpress.org/ticket/45929
+        if ($attributes === '') {
+            $attributes = array();
+        }
+
+        // Ensure backwards compatibility
+        if (array_key_exists('monatetrennen', $attributes) && !array_key_exists('split', $attributes) &&
+            $attributes['monatetrennen'] == 'ja'
+        ) {
+            $attributes['split'] = 'monthly';
+        }
+
+        return shortcode_atts($this->defaultAttributes, $attributes);
     }
 
     /**
@@ -83,7 +107,16 @@ class ReportList
      */
     public function configureListParameters(ReportListParameters &$parameters, $attributes, $filteredOptions)
     {
-        $parameters->setSplitMonths($attributes['monatetrennen'] == 'ja');
+        switch ($attributes['split']) {
+            case 'monthly':
+                $parameters->setSplitType(SplitType::MONTHLY);
+                break;
+            case 'quarterly':
+                $parameters->setSplitType(SplitType::QUARTERLY);
+                break;
+            default:
+                $parameters->setSplitType(SplitType::NONE);
+        }
 
         $columnsWithLink = explode(',', $attributes['link']);
         if (in_array('none', $columnsWithLink)) {

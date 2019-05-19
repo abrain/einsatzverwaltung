@@ -1,6 +1,8 @@
 <?php
 namespace abrain\Einsatzverwaltung\Shortcodes;
 
+use abrain\Einsatzverwaltung\Frontend\ReportList\Renderer as ReportListRenderer;
+use abrain\Einsatzverwaltung\Frontend\ReportList\SplitType;
 use PHPUnit_Framework_TestCase;
 
 /**
@@ -32,7 +34,7 @@ class ReportListTest extends PHPUnit_Framework_TestCase
         parent::setUp();
         $formatter = $this->createMock('\abrain\Einsatzverwaltung\Util\Formatter');
         $formatter->method('getDurationString')->willReturn('DURATION');
-        $reportListRenderer = new \abrain\Einsatzverwaltung\Frontend\ReportList($formatter);
+        $reportListRenderer = new ReportListRenderer($formatter);
         $this->reportList = new ReportList($reportListRenderer);
         $this->thisYear = intval(date('Y'));
     }
@@ -110,33 +112,44 @@ class ReportListTest extends PHPUnit_Framework_TestCase
 
     public function testConfigureListParameters()
     {
-        $parameters = $this->createMock('\abrain\Einsatzverwaltung\Frontend\ReportListParameters');
+        $parameters = $this->createMock('\abrain\Einsatzverwaltung\Frontend\ReportList\Parameters');
         $parameters->expects($this->once())->method('setColumnsLinkingReport')->with(array('title'));
-        $parameters->expects($this->once())->method('setSplitMonths')->with($this->isFalse());
+        $parameters->expects($this->once())->method('setSplitType')->with(SplitType::NONE);
         // TODO test that public fields have been set
         $this->reportList->configureListParameters($parameters, array(
-            'monatetrennen' => 'nein',
+            'split' => 'no',
             'link' => 'title'
         ), array('special', 'noLinkWithoutContent', 'noHeading', 'compact'));
     }
 
     public function testConfigureListParametersNoLinks()
     {
-        $parameters = $this->createMock('\abrain\Einsatzverwaltung\Frontend\ReportListParameters');
+        $parameters = $this->createMock('\abrain\Einsatzverwaltung\Frontend\ReportList\Parameters');
         $parameters->expects($this->once())->method('setColumnsLinkingReport')->with(array());
         $this->reportList->configureListParameters($parameters, array(
-            'monatetrennen' => 'nein',
+            'split' => 'no',
             'link' => 'title,none'
         ), array());
     }
 
-    public function testConfigureListParametersSplitMonths()
+    public function testConfigureListParametersSplitMonthly()
     {
-        $parameters = $this->createMock('\abrain\Einsatzverwaltung\Frontend\ReportListParameters');
+        $parameters = $this->createMock('\abrain\Einsatzverwaltung\Frontend\ReportList\Parameters');
         $parameters->expects($this->once())->method('setColumnsLinkingReport')->with(array('title'));
-        $parameters->expects($this->once())->method('setSplitMonths')->with($this->isTrue());
+        $parameters->expects($this->once())->method('setSplitType')->with(SplitType::MONTHLY);
         $this->reportList->configureListParameters($parameters, array(
-            'monatetrennen' => 'ja',
+            'split' => 'monthly',
+            'link' => 'title'
+        ), array());
+    }
+
+    public function testConfigureListParametersSplitQuarterly()
+    {
+        $parameters = $this->createMock('\abrain\Einsatzverwaltung\Frontend\ReportList\Parameters');
+        $parameters->expects($this->once())->method('setColumnsLinkingReport')->with(array('title'));
+        $parameters->expects($this->once())->method('setSplitType')->with(SplitType::QUARTERLY);
+        $this->reportList->configureListParameters($parameters, array(
+            'split' => 'quarterly',
             'link' => 'title'
         ), array());
     }

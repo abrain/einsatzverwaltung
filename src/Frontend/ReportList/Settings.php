@@ -1,13 +1,13 @@
 <?php
-namespace abrain\Einsatzverwaltung\Frontend;
+namespace abrain\Einsatzverwaltung\Frontend\ReportList;
 
 /**
  * Einstellungsobjekt für die ReportList
  *
  * @author Andreas Brain
- * @package abrain\Einsatzverwaltung\Frontend
+ * @package abrain\Einsatzverwaltung\Frontend\ReportList
  */
-class ReportListSettings
+class Settings
 {
     const DEFAULT_NTHCHILD = 'even';
     const DEFAULT_ZEBRACOLOR = '#eee';

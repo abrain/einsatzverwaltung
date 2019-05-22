@@ -11,14 +11,58 @@ use abrain\Einsatzverwaltung\ReportQuery;
 class ReportCount
 {
     /**
-     * @param array|string $atts Attributes of the shortcode
+     * @var array
+     */
+    private $defaultAttributes = array(
+        'year' => ''
+    );
+
+    /**
+     * @param array|string $attributes Attributes of the shortcode
      *
      * @return string
      */
-    public function render($atts)
+    public function render($attributes)
     {
+        // See https://core.trac.wordpress.org/ticket/45929
+        if ($attributes === '') {
+            $attributes = array();
+        }
+
+        $attributes = shortcode_atts($this->defaultAttributes, $attributes);
+        $year = $this->getYear($attributes['year']);
+
         $reportQuery = new ReportQuery();
+        if (is_int($year)) {
+            $reportQuery->setYear(intval($year));
+        }
         $incidentReports = $reportQuery->getReports();
         return sprintf('%d', count($incidentReports));
+    }
+
+    /**
+     * Converts the value of the shortcode's year attribute to a number that can be used in a query for posts.
+     *
+     * @param string $value Value of the year attribute
+     *
+     * @return int|string A numeric year or an empty string in case of an empty or erroneous attribute
+     */
+    private function getYear($value)
+    {
+        $currentYear = intval(date('Y'));
+        if ($value === 'current') {
+            return $currentYear;
+        }
+
+        if ($value === '' || !is_numeric($value)) {
+            return '';
+        }
+
+        $number = intval($value);
+        if ($number < 0) {
+            return $currentYear + $number;
+        }
+
+        return $number;
     }
 }

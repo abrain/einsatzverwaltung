@@ -27,6 +27,7 @@ class Formatter
         '%duration%' => 'Dauer des Einsatzes',
         '%incidentCommander%' => 'Einsatzleiter',
         '%incidentType%' => 'Art des Einsatzes',
+        '%incidentTypeHierarchical%' =>'Art des Einsatzes inkl. übergeordneten Einsatzarten',
         '%incidentTypeColor%' => 'Farbe der Art des Einsatzes',
         '%url%' => 'URL zum Einsatzbericht',
         '%location%' => 'Ort des Einsatzes',
@@ -135,8 +136,10 @@ class Formatter
                 $replace = $incidentReport->getIncidentCommander();
                 break;
             case '%incidentType%':
-                $showTypeArchive = get_option('einsatzvw_show_einsatzart_archive') === '1';
-                $replace = $this->getTypeOfIncident($incidentReport, ($context === 'post'), $showTypeArchive, false);
+                $replace = $this->getTypeOfIncidentString($incidentReport, $context, false);
+                break;
+            case '%incidentTypeHierarchical%':
+                $replace = $this->getTypeOfIncidentString($incidentReport, $context, true);
                 break;
             case '%incidentTypeColor%':
                 $replace = $this->getColorOfTypeOfIncident($incidentReport->getTypeOfIncident());
@@ -280,6 +283,19 @@ class Formatter
             $string = $typeOfIncident->name . $string;
         } while ($showHierarchy && $typeOfIncident->parent != 0);
         return $string;
+    }
+
+    /**
+     * @param IncidentReport $incidentReport
+     * @param string $context
+     * @param bool $showHierarchy
+     *
+     * @return string
+     */
+    private function getTypeOfIncidentString(IncidentReport $incidentReport, $context, $showHierarchy = false)
+    {
+        $showTypeArchive = get_option('einsatzvw_show_einsatzart_archive') === '1';
+        return $this->getTypeOfIncident($incidentReport, ($context === 'post'), $showTypeArchive, $showHierarchy);
     }
 
     /**

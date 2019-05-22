@@ -121,9 +121,9 @@ class RecentIncidentsFormatted extends AbstractWidget
         'afterContent' => ''
     );
     private $allowedTagsPattern = array('%title%', '%date%', '%time%', '%location%', '%duration%',
-        '%incidentCommander%', '%incidentType%', '%incidentTypeColor%', '%url%', '%number%', '%seqNum%',
-        '%annotations%', '%vehicles%', '%units%', '%additionalForces%', '%typesOfAlerting%', '%featuredImage%',
-        '%workforce%');
+        '%incidentCommander%', '%incidentType%', '%incidentTypeHierarchical%', '%incidentTypeColor%', '%url%',
+        '%number%', '%seqNum%', '%annotations%', '%vehicles%', '%units%', '%additionalForces%', '%typesOfAlerting%',
+        '%featuredImage%', '%workforce%');
     private $allowedTagsAfter = array('%feedUrl%');
 
     /**

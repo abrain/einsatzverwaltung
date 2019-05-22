@@ -2,6 +2,8 @@
 
 namespace abrain\Einsatzverwaltung\Shortcodes;
 
+use abrain\Einsatzverwaltung\ReportQuery;
+
 /**
  * Shows a number of incident reports for the shortcode [reportcount]
  * @package abrain\Einsatzverwaltung\Shortcodes
@@ -15,6 +17,8 @@ class ReportCount
      */
     public function render($atts)
     {
-        return '42';
+        $reportQuery = new ReportQuery();
+        $incidentReports = $reportQuery->getReports();
+        return sprintf('%d', count($incidentReports));
     }
 }

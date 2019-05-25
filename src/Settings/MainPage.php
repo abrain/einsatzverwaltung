@@ -98,7 +98,10 @@ class MainPage
             return;
         }
 
-        echo "<h2 class=\"nav-tab-wrapper\">";
+        printf(
+            '<nav class="nav-tab-wrapper wp-clearfix" aria-label="%s">',
+            esc_attr__('Secondary menu', 'einsatzverwaltung')
+        );
         foreach ($this->subPages as $subPage) {
             printf(
                 '<a href="?page=%s&tab=%s" class="%s">%s</a>',
@@ -108,7 +111,7 @@ class MainPage
                 $subPage->title
             );
         }
-        echo "</h2>";
+        echo '</nav>';
 
         $currentSubPage->beforeContent();
         $currentSubPage->echoStaticContent();

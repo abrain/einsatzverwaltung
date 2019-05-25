@@ -15,6 +15,7 @@ class ReportCount extends AbstractShortcode
      */
     private $defaultAttributes = array(
         'einsatzart' => '',
+        'units' => '',
         'year' => ''
     );
 
@@ -41,6 +42,8 @@ class ReportCount extends AbstractShortcode
         if (array_key_exists('einsatzart', $attributes) && is_numeric($attributes['einsatzart'])) {
             $reportQuery->setIncidentTypeId(intval($attributes['einsatzart']));
         }
+
+        $reportQuery->setUnits($this->getIntegerList($attributes, 'units'));
 
         $incidentReports = $reportQuery->getReports();
         return sprintf('%d', count($incidentReports));

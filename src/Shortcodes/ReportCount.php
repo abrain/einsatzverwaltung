@@ -8,7 +8,7 @@ use abrain\Einsatzverwaltung\ReportQuery;
  * Shows a number of incident reports for the shortcode [reportcount]
  * @package abrain\Einsatzverwaltung\Shortcodes
  */
-class ReportCount
+class ReportCount extends AbstractShortcode
 {
     /**
      * @var array

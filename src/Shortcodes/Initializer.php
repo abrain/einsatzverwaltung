@@ -26,5 +26,8 @@ class Initializer
 
         $reportArchives = new ReportArchives($data, $permalinkController);
         add_shortcode('einsatzjahre', array($reportArchives, 'render'));
+
+        $reportStatistics = new ReportCount();
+        add_shortcode('reportcount', array($reportStatistics, 'render'));
     }
 }

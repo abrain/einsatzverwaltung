@@ -10,7 +10,7 @@ use abrain\Einsatzverwaltung\ReportQuery;
 /**
  * Renders the list of reports for the shortcode [einsatzliste]
  */
-class ReportList
+class ReportList extends AbstractShortcode
 {
     /**
      * @var array
@@ -152,11 +152,6 @@ class ReportList
             $reportQuery->setIncidentTypeId(intval($attributes['einsatzart']));
         }
 
-        if (array_key_exists('units', $attributes)) {
-            $unitIds = explode(',', $attributes['units']);
-            $unitIds = array_map('trim', $unitIds);
-            $unitIds = array_filter($unitIds, 'is_numeric');
-            $reportQuery->setUnits(array_map('intval', $unitIds));
-        }
+        $reportQuery->setUnits($this->getIntegerList($attributes, 'units'));
     }
 }

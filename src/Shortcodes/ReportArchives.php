@@ -8,7 +8,7 @@ use abrain\Einsatzverwaltung\PermalinkController;
 /**
  * Renders links to yearly archives for the shortcode [einsatzjahre]
  */
-class ReportArchives
+class ReportArchives extends AbstractShortcode
 {
     /**
      * @var Data

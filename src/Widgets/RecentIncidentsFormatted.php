@@ -28,6 +28,7 @@ class RecentIncidentsFormatted extends AbstractWidget
         ),
         'abbr' => array(),
         'acronym' => array(),
+        'b' => array(),
         'br' => array(),
         'div' => array(
             'align' => true,
@@ -35,6 +36,19 @@ class RecentIncidentsFormatted extends AbstractWidget
             'dir' => true,
             'lang' => true,
             'style' => true,
+            'xml:lang' => true,
+        ),
+        'em' => array(),
+        'figure' => array(
+            'align' => true,
+            'dir' => true,
+            'lang' => true,
+            'xml:lang' => true,
+        ),
+        'figcaption' => array(
+            'align' => true,
+            'dir' => true,
+            'lang' => true,
             'xml:lang' => true,
         ),
         'h3' => array(
@@ -92,6 +106,7 @@ class RecentIncidentsFormatted extends AbstractWidget
             'style' => true,
             'xml:lang' => true,
         ),
+        'small' => array(),
         'span' => array(
             'dir' => true,
             'align' => true,
@@ -100,6 +115,8 @@ class RecentIncidentsFormatted extends AbstractWidget
             'style' => true,
             'xml:lang' => true,
         ),
+        'strong' => array(),
+        'u' => array(),
         'ul' => array(
             'class' => true,
             'style' => true,

@@ -177,6 +177,8 @@ class RecentIncidentsFormatted extends AbstractWidget
         }
         $widgetContent .= $this->formatter->formatIncidentData($settings['afterContent'], $this->allowedTagsAfter, null, 'widget');
 
+        $widgetContent = do_shortcode($widgetContent);
+
         echo wp_kses($widgetContent, $this->allowedHtmlTags);
         echo $args['after_widget'];
     }

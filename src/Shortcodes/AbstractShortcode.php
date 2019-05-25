@@ -26,7 +26,7 @@ abstract class AbstractShortcode
      */
     protected function getIntegerList($attributes, $key)
     {
-        if (array_key_exists($key, $attributes)) {
+        if (!array_key_exists($key, $attributes)) {
             return array();
         }
 

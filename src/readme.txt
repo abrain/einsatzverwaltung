@@ -55,6 +55,18 @@ Nein, mehr gibt es [hier](https://einsatzverwaltung.abrain.de/faq/).
 
 == Changelog ==
 
+= 1.6.0 =
+* Added support for multiple units
+* Added a shortcode to display the number of reports
+* Templates: Added placeholder for units
+* Templates: Added placeholder for type of incident incl. its hierarchy
+* Templates: Added support for shortcodes
+* Templates: Whitelisted more HTML tags
+* Report list: Added option for quarterly subheadings
+* Report list: Added parameter to limit to certain units
+* Report list: Added parameter to limit to certain types of incident
+* Improved accessibility of the navigation tabs on the Settings page
+
 = 1.5.1 =
 * URLs für PATHINFO-Permalinks (beginnen mit /index.php/) repariert
 * Block-Editor kann für Einsatzberichte deaktiviert werden
@@ -73,7 +85,7 @@ Nein, mehr gibt es [hier](https://einsatzverwaltung.abrain.de/faq/).
 == Upgrade Notice ==
 
 = 1.6.0 =
-TODO
+Support for multiple units, report count shortcode and more
 
 == Social Media ==
 

@@ -70,39 +70,10 @@ Nein, mehr gibt es [hier](https://einsatzverwaltung.abrain.de/faq/).
 * Fehler bei der Behandlung der Alarmzeit von geplanten Beiträgen behoben
 * Mindestanforderung auf WordPress 4.7 angehoben
 
-= 1.4.3 =
-* Kompatibilit&auml;t mit WordPress 5.0.1, 4.9.9, 4.8.8, 4.7.12, 4.6.13 wiederhergestellt
-* Import: Nicht kritischen Fehler mit dem Beitragsdatum beim Import als Entwurf behoben
-* Beschriftungen korrigiert
-* Getestet mit WordPress 5.0
-
-= 1.4.2 =
-* Templates: Behebt ein Problem, bei dem Shortcodes falsch geparst wurden
-* Templates: Neuer Platzhalter f&uuml;r die Mannschaftsst&auml;rke
-* Deaktivierung des Zeitlimits bei Updates, Importen etc. entfernt, da es bei manchen Hostern Probleme gab
-
-= 1.4.1 =
-* Abs&auml;tze wurden bei der Verwendung von Templates nicht richtig dargestellt
-* Einstellungen f&uuml;r Ausz&uuml;ge gelten jetzt auch f&uuml;r oEmbeds
-
-= 1.4.0 =
-* Gestaltung von Einsatzberichten und Ausz&uuml;gen mit Hilfe von Templates
-* Export von Einsatzberichten in den Formaten CSV und JSON (Dank an [Heiko](https://github.com/heikobornholdt/))
-* Templates: Neue Platzhalter f&uuml;r Farbe der Einsatzart, Fahrzeuge, weitere Kr&auml;fte, Alarmierungsarten, Beitragstext, Beitragsbild, URL des Jahresarchivs
-* Einsatzarten kann eine Farbe zugewiesen werden
-* Farben k&ouml;nnen per Colorpicker ausgew&auml;hlt werden
-* Import akzeptiert bei Wahrheitswerten neben 1/0 jetzt auch ja/nein
-* Einstellungen auf mehrere Tabs aufgeteilt
-* Verschiedene Leistungsverbesserungen
-* Font Awesome auf Version 4.7 aktualisiert
-
 == Upgrade Notice ==
 
-= 1.4.3 =
-Stellt die Kompatibilit&auml;t mit WordPress 5.0.1, 4.9.9, 4.8.8, 4.7.12, 4.6.13 wieder her
-
-= 1.4.0 =
-Templates f&uuml;r Einsatzberichte und Ausz&uuml;ge, Export von Einsatzberichten, und mehr
+= 1.6.0 =
+TODO
 
 == Social Media ==
 

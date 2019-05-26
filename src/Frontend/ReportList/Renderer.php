@@ -1,6 +1,7 @@
 <?php
-namespace abrain\Einsatzverwaltung\Frontend;
+namespace abrain\Einsatzverwaltung\Frontend\ReportList;
 
+use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use abrain\Einsatzverwaltung\Utilities;
@@ -10,9 +11,9 @@ use DateTime;
  * Tabellarische Übersicht für Einsatzberichte
  *
  * @author Andreas Brain
- * @package abrain\Einsatzverwaltung\Frontend
+ * @package abrain\Einsatzverwaltung\Frontend\ReportList
  */
-class ReportList
+class Renderer
 {
     const TABLECLASS = 'einsatzverwaltung-reportlist';
 
@@ -22,7 +23,12 @@ class ReportList
      * @var array
      */
     private $columnsLinkBlacklist = array('incidentCommander', 'location', 'vehicles', 'alarmType', 'additionalForces',
-        'incidentType');
+        'incidentType', 'units');
+
+    /**
+     * @var int
+     */
+    private $currentYear = 0;
 
     /**
      * @var Formatter
@@ -30,7 +36,24 @@ class ReportList
     private $formatter;
 
     /**
-     * @var ReportListSettings
+     * @var int
+     */
+    private $previousMonth = 0;
+
+    /**
+     * @var int
+     */
+    private $previousYear = 0;
+
+    /**
+     * Counts how many rows have been inserted since the last table header, necessary for zebra stripe correction
+     *
+     * @var int
+     */
+    private $rowsSinceLastHeader = 0;
+
+    /**
+     * @var Settings
      */
     private static $settings;
 
@@ -54,10 +77,10 @@ class ReportList
     /**
      * Generiert den HTML-Code für die Liste
      *
-     * @param array $reports Eine Liste von IncidentReport-Objekten
-     * @param ReportListParameters $parameters
+     * @param IncidentReport[] $reports Eine Liste von IncidentReport-Objekten
+     * @param Parameters $parameters
      */
-    private function constructList($reports, ReportListParameters $parameters)
+    private function constructList($reports, Parameters $parameters)
     {
         if (empty($reports)) {
             $this->string = sprintf(
@@ -68,56 +91,44 @@ class ReportList
         }
 
         // Berichte abarbeiten
-        $currentYear = null;
+        $this->currentYear = 0;
         $currentMonth = null;
-        $previousYear = null;
-        $previousMonth = null;
-        $monthlyCounter = 0;
-        $numberOfColumns = count($parameters->getColumns());
+        $currentQuarter = null;
+        $previousQuarter = null;
+        $this->previousYear = 0;
+        $this->previousMonth = 0;
+        $this->rowsSinceLastHeader = 0;
         if ($parameters->compact) {
             $this->beginTable(false, $parameters);
             $this->insertTableHeader($parameters);
+            $this->insertZebraCorrection($parameters->getColumnCount());
         }
-        /** @var IncidentReport $report */
         foreach ($reports as $report) {
             $timeOfAlerting = $report->getTimeOfAlerting();
-            $currentYear = intval($timeOfAlerting->format('Y'));
+            $this->currentYear = intval($timeOfAlerting->format('Y'));
             $currentMonth = intval($timeOfAlerting->format('m'));
 
             // Ein neues Jahr beginnt
-            if (!$parameters->compact && $currentYear != $previousYear) {
-                // Wenn mindestens schon ein Jahr ausgegeben wurde
-                if ($previousYear != null) {
-                    $previousMonth = null;
-                    $this->endTable();
-                }
-
-                $this->beginTable($currentYear, $parameters);
-                if (!$parameters->isSplitMonths()) {
-                    $this->insertTableHeader($parameters);
-                    $this->insertZebraCorrection($numberOfColumns);
-                }
-
-                $monthlyCounter = 0;
+            if ($this->currentYear != $this->previousYear) {
+                $this->onYearChange($parameters);
             }
 
-            // Monatswechsel bei aktivierter Monatstrennung
-            if ($parameters->isSplitMonths() && $currentMonth != $previousMonth) {
-                if ($monthlyCounter > 0 && $monthlyCounter % 2 != 0) {
-                    $this->insertZebraCorrection($numberOfColumns);
+            // Ein neuer Monat beginnt
+            if ($currentMonth != $this->previousMonth) {
+                $currentQuarter = floor(($currentMonth - 1) / 3) + 1;
+                if ($currentQuarter !== $previousQuarter) {
+                    $this->onQuarterChange($parameters, $currentQuarter);
                 }
-                $this->insertMonthSeparator($timeOfAlerting, $numberOfColumns);
-                $this->insertTableHeader($parameters);
-                $monthlyCounter = 0;
+                $this->onMonthChange($parameters, $timeOfAlerting);
             }
 
             // Zeile für den aktuellen Bericht ausgeben
             $this->insertRow($report, $parameters);
-            $monthlyCounter++;
 
             // Variablen für den nächsten Durchgang setzen
-            $previousYear = $currentYear;
-            $previousMonth = $currentMonth;
+            $this->previousYear = $this->currentYear;
+            $previousQuarter = $currentQuarter;
+            $this->previousMonth = $currentMonth;
         }
         $this->endTable();
     }
@@ -125,12 +136,12 @@ class ReportList
     /**
      * Gibt den HTML-Code für die Liste zurück
      *
-     * @param array $reports Eine Liste von IncidentReport-Objekten
-     * @param ReportListParameters $parameters
+     * @param IncidentReport[] $reports Eine Liste von IncidentReport-Objekten
+     * @param Parameters $parameters
      *
      * @return string HTML-Code der Liste
      */
-    public function getList($reports, ReportListParameters $parameters)
+    public function getList($reports, Parameters $parameters)
     {
         $this->string = '';
         $this->constructList($reports, $parameters);
@@ -138,10 +149,10 @@ class ReportList
     }
 
     /**
-     * @param array $reports Eine Liste von IncidentReport-Objekten
-     * @param ReportListParameters $parameters
+     * @param IncidentReport[] $reports Eine Liste von IncidentReport-Objekten
+     * @param Parameters $parameters
      */
-    public function printList($reports, ReportListParameters $parameters)
+    public function printList($reports, Parameters $parameters)
     {
         echo $this->getList($reports, $parameters);
     }
@@ -150,14 +161,15 @@ class ReportList
      * Beginnt eine neue Tabelle für ein bestimmtes Jahr
      *
      * @param bool|int $year Das Kalenderjahr für die Überschrift oder false um keine Überschrift auszugeben
-     * @param ReportListParameters $parameters
+     * @param Parameters $parameters
      */
-    private function beginTable($year, ReportListParameters $parameters)
+    private function beginTable($year, Parameters $parameters)
     {
         if ($parameters->showHeading && $year !== false) {
             $this->string .= '<h2>Eins&auml;tze '.$year.'</h2>';
         }
         $this->string .= '<table class="' . self::TABLECLASS . '"><tbody>';
+        $this->rowsSinceLastHeader = 0;
     }
 
     private function endTable()
@@ -166,9 +178,9 @@ class ReportList
     }
 
     /**
-     * @param ReportListParameters $parameters
+     * @param Parameters $parameters
      */
-    private function insertTableHeader(ReportListParameters $parameters)
+    private function insertTableHeader(Parameters $parameters)
     {
         $allColumns = self::getListColumns();
 
@@ -184,39 +196,47 @@ class ReportList
             $this->string .= sprintf('<th style="%s">%s</th>', esc_attr($style), esc_html($colInfo['name']));
         }
         $this->string .= '</tr>';
+
+        $this->rowsSinceLastHeader = 0;
     }
 
     /**
-     * @param DateTime $date
      * @param int $numberOfColumns
+     * @param string $class
+     * @param string $text
      */
-    private function insertMonthSeparator($date, $numberOfColumns)
+    private function insertFullWidthRow($numberOfColumns, $class, $text = '&nbsp;')
     {
-        $this->string .= '<tr class="einsatz-title-month"><td colspan="' . $numberOfColumns . '">';
-        $this->string .=  date_i18n('F', $date->getTimestamp()) . '</td></tr>';
+        $this->string .= sprintf(
+            '<tr class="%s"><td colspan="%d">%s</td></tr>',
+            esc_attr($class),
+            esc_attr($numberOfColumns),
+            esc_html($text)
+        );
     }
 
     /**
      * @param IncidentReport $report Der Einsatzbericht
-     * @param ReportListParameters $parameters
+     * @param Parameters $parameters
      */
-    private function insertRow($report, ReportListParameters $parameters)
+    private function insertRow($report, Parameters $parameters)
     {
         $this->string .= '<tr class="report">';
         foreach ($parameters->getColumns() as $colId) {
             $this->string .= $this->getCellMarkup($report, $parameters, $colId);
         }
         $this->string .= '</tr>';
+        $this->rowsSinceLastHeader++;
     }
 
     /**
      * @param IncidentReport $report
-     * @param ReportListParameters $parameters
+     * @param Parameters $parameters
      * @param string $columnId
      *
      * @return string
      */
-    private function getCellMarkup(IncidentReport $report, ReportListParameters $parameters, $columnId)
+    private function getCellMarkup(IncidentReport $report, Parameters $parameters, $columnId)
     {
         $cellContent = $this->getCellContent($report, $columnId, $parameters);
 
@@ -236,11 +256,11 @@ class ReportList
      *
      * @param IncidentReport $report
      * @param string $columnId
-     * @param ReportListParameters $parameters
+     * @param Parameters $parameters
      *
      * @return bool
      */
-    private function isCellLinkToReport(IncidentReport $report, $columnId, ReportListParameters $parameters)
+    private function isCellLinkToReport(IncidentReport $report, $columnId, Parameters $parameters)
     {
         $linkToReport = $parameters->linkEmptyReports || $report->hasContent();
         $columnsLinkingReport = $parameters->getColumnsLinkingReport();
@@ -256,7 +276,7 @@ class ReportList
      */
     private function insertZebraCorrection($numberOfColumns)
     {
-        $this->string .= '<tr class="zebracorrection"><td colspan="'.$numberOfColumns.'">&nbsp;</td></tr>';
+        $this->insertFullWidthRow($numberOfColumns, 'zebracorrection');
     }
 
     /**
@@ -264,11 +284,11 @@ class ReportList
      *
      * @param IncidentReport $report
      * @param string $colId Eindeutige Kennung der Spalte
-     * @param ReportListParameters $parameters
+     * @param Parameters $parameters
      *
      * @return string
      */
-    private function getCellContent($report, $colId, ReportListParameters $parameters)
+    private function getCellContent($report, $colId, Parameters $parameters)
     {
         if (empty($report)) {
             return '&nbsp;';
@@ -315,6 +335,9 @@ class ReportList
             case 'additionalForces':
                 $cellContent = $this->formatter->getAdditionalForces($report, $parameters->linkAdditionalForces, false);
                 break;
+            case 'units':
+                $cellContent = $this->formatter->getUnits($report);
+                break;
             case 'incidentType':
                 $showHierarchy = (get_option('einsatzvw_list_art_hierarchy', '0') === '1');
                 $cellContent = $this->formatter->getTypeOfIncident($report, false, false, $showHierarchy);
@@ -338,6 +361,73 @@ class ReportList
         }
 
         return $cellContent;
+    }
+
+    /**
+     * @param Parameters $parameters
+     */
+    private function onYearChange(Parameters $parameters)
+    {
+        if ($parameters->compact) {
+            return;
+        }
+
+        // Wenn mindestens schon ein Jahr ausgegeben wurde
+        if ($this->previousYear != 0) {
+            $this->previousMonth = 0;
+            $this->endTable();
+        }
+
+        $this->beginTable($this->currentYear, $parameters);
+        if (!$parameters->isSplitMonths() && !$parameters->isSplitQuarterly()) {
+            $this->insertTableHeader($parameters);
+            $this->insertZebraCorrection($parameters->getColumnCount());
+        }
+    }
+
+    /**
+     * @param Parameters $parameters
+     * @param int $quarter
+     */
+    private function onQuarterChange(Parameters $parameters, $quarter)
+    {
+        if (!$parameters->isSplitQuarterly()) {
+            return;
+        }
+
+        $heading = sprintf('%d. Quartal', $quarter);
+        $this->insertSplit($parameters, 'einsatz-title-quarter', $heading);
+    }
+
+    /**
+     * @param Parameters $parameters
+     * @param DateTime $dateTime
+     */
+    private function onMonthChange(Parameters $parameters, DateTime $dateTime)
+    {
+        if (!$parameters->isSplitMonths()) {
+            return;
+        }
+
+        $heading = date_i18n('F', $dateTime->getTimestamp());
+        $this->insertSplit($parameters, 'einsatz-title-month', $heading);
+    }
+
+    /**
+     * @param Parameters $parameters
+     * @param $class
+     * @param $heading
+     */
+    private function insertSplit(Parameters $parameters, $class, $heading)
+    {
+        $numberOfColumns = $parameters->getColumnCount();
+
+        if ($this->rowsSinceLastHeader > 0 && $this->rowsSinceLastHeader % 2 != 0) {
+            $this->insertZebraCorrection($numberOfColumns);
+        }
+
+        $this->insertFullWidthRow($numberOfColumns, $class, $heading);
+        $this->insertTableHeader($parameters);
     }
 
     /**
@@ -392,6 +482,9 @@ class ReportList
                 'name' => 'Weitere Kr&auml;fte',
                 'cssname' => 'Weitere Kr\0000E4fte',
             ),
+            'units' => array(
+                'name' => __('Units', 'einsatzverwaltung')
+            ),
             'incidentType' => array(
                 'name' => 'Einsatzart'
             ),
@@ -420,7 +513,7 @@ class ReportList
         $reportListSettings = self::$settings; // FIXME Verrenkung, um PHP 5.3.0 als Minimum zu ermöglichen, solange das
                                                // Ende der Untersützung nicht im Blog angekündigt wurde.
         if (empty($reportListSettings)) {      // NEEDS_PHP5.5 direkt empty(self::$settings) prüfen
-            self::$settings = new ReportListSettings();
+            self::$settings = new Settings();
         }
 
         $string = '';

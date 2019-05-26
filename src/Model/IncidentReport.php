@@ -348,6 +348,15 @@ class IncidentReport
     }
 
     /**
+     * @return WP_Post[]
+     */
+    public function getUnits()
+    {
+        $unitIds = get_post_meta($this->getPostId(), '_evw_unit');
+        return array_map('get_post', $unitIds);
+    }
+
+    /**
      * Gibt die Fahrzeuge eines Einsatzberichts aus
      *
      * @return WP_Term[]

@@ -2,8 +2,9 @@
 
 namespace abrain\Einsatzverwaltung\Settings\Pages;
 
-use abrain\Einsatzverwaltung\Frontend\ReportListParameters;
-use abrain\Einsatzverwaltung\Frontend\ReportListSettings;
+use abrain\Einsatzverwaltung\Frontend\ReportList\Parameters as ReportListParameters;
+use abrain\Einsatzverwaltung\Frontend\ReportList\Renderer as ReportListRenderer;
+use abrain\Einsatzverwaltung\Frontend\ReportList\Settings;
 
 /**
  * ReportList settings page
@@ -13,7 +14,7 @@ use abrain\Einsatzverwaltung\Frontend\ReportListSettings;
 class ReportList extends SubPage
 {
     /**
-     * @var ReportListSettings
+     * @var Settings
      */
     private $reportListSettings;
 
@@ -21,7 +22,7 @@ class ReportList extends SubPage
     {
         parent::__construct('list', 'Einsatzliste');
 
-        $this->reportListSettings = new ReportListSettings();
+        $this->reportListSettings = new Settings();
     }
 
     public function addSettingsFields()
@@ -63,7 +64,7 @@ class ReportList extends SubPage
 
     public function echoFieldColumns()
     {
-        $columns = \abrain\Einsatzverwaltung\Frontend\ReportList::getListColumns();
+        $columns = ReportListRenderer::getListColumns();
         $enabledColumnsString = ReportListParameters::sanitizeColumns(get_option('einsatzvw_list_columns', ''));
         $enabledColumns = explode(',', $enabledColumnsString);
 
@@ -130,7 +131,7 @@ class ReportList extends SubPage
         echo '<p class="description">Die Zeilen der Tabelle werden abwechselnd eingef&auml;rbt, um die Lesbarkeit zu verbessern. Wenn das Theme das ebenfalls tut, sollte diese Option deaktiviert werden, um Probleme bei der Darstellung zu vermeiden.</p>';
 
         echo '<p>Farbe f&uuml;r Zebrastreifen:</p>';
-        $this->echoColorPicker('einsatzvw_list_zebracolor', ReportListSettings::DEFAULT_ZEBRACOLOR);
+        $this->echoColorPicker('einsatzvw_list_zebracolor', Settings::DEFAULT_ZEBRACOLOR);
         echo '<p class="description">Diese Farbe wird f&uuml;r jede zweite Zeile verwendet, die jeweils andere Zeile beh&auml;lt die vom Theme vorgegebene Farbe.</p>';
 
         echo '<p><fieldset><label><input type="radio" name="einsatzvw_list_zebra_nth" value="even" ';
@@ -147,7 +148,7 @@ class ReportList extends SubPage
         register_setting(
             'einsatzvw_settings_list',
             'einsatzvw_list_columns',
-            array('\abrain\Einsatzverwaltung\Frontend\ReportListParameters', 'sanitizeColumns')
+            array('\abrain\Einsatzverwaltung\Frontend\ReportList\Parameters', 'sanitizeColumns')
         );
         register_setting(
             'einsatzvw_settings_list',

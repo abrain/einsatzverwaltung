@@ -17,6 +17,13 @@ class ReportQuery
     private $excludePostId;
 
     /**
+     * Die Term-ID der Einsatzart, nach der gefiltert werden soll
+     *
+     * @var int
+     */
+    private $incidentTypeId = 0;
+
+    /**
      * Zeigt an, ob als privat markierte Berichte mit abgefragt werden sollen
      *
      * @var bool
@@ -38,11 +45,16 @@ class ReportQuery
     private $onlySpecialReports;
 
     /**
-     * Gibt ob aufsteigend sortiert werden soll
+     * Gibt an, ob aufsteigend sortiert werden soll
      *
      * @var bool
      */
     private $orderAsc;
+
+    /**
+     * @var int[]
+     */
+    private $units;
 
     /**
      * @var int
@@ -72,21 +84,10 @@ class ReportQuery
     /**
      * @return array
      */
-    public function getReports()
+    private function getDateQuery()
     {
-        $postStatus = array('publish');
-        if ($this->includePrivateReports) {
-            $postStatus[] = 'private';
-        }
-
-        // Abfrage der Metainformationen zusammenbasteln
-        $metaQuery = array();
-        if ($this->onlySpecialReports) {
-            $metaQuery[] = array('key' => 'einsatz_special', 'value' => '1');
-        }
-
-        // Abfrage basierend auf Datumsparametern zusammenbasteln
         $dateQuery = array();
+
         if (is_numeric($this->year)) {
             if ($this->year < 0) {
                 $currentYear = date('Y');
@@ -101,7 +102,45 @@ class ReportQuery
             }
         }
 
+        return $dateQuery;
+    }
+
+    /**
+     * @return array
+     */
+    private function getMetaQuery()
+    {
+        $metaQuery = array();
+
+        if ($this->onlySpecialReports) {
+            $metaQuery[] = array('key' => 'einsatz_special', 'value' => '1');
+        }
+
+        if (!empty($this->units)) {
+            $unitSubQuery = array('relation' => 'OR');
+            foreach ($this->units as $unit) {
+                $unitSubQuery[] = array('key' => '_evw_unit', 'value' => $unit);
+            }
+            $metaQuery[] = $unitSubQuery;
+        }
+
+        return $metaQuery;
+    }
+
+    /**
+     * @return IncidentReport[]
+     */
+    public function getReports()
+    {
+        $postStatus = array('publish');
+        if ($this->includePrivateReports) {
+            $postStatus[] = 'private';
+        }
+
         $postArgs = array(
+            'date_query' => $this->getDateQuery(),
+            'meta_query' => $this->getMetaQuery(),
+            'tax_query' => $this->getTaxQuery(),
             'order' => $this->orderAsc ? 'ASC' : 'DESC',
             'orderby' => 'post_date',
             'post_status' => $postStatus,
@@ -109,26 +148,29 @@ class ReportQuery
             'posts_per_page' => $this->limit,
         );
 
-        if (!empty($metaQuery)) {
-            $postArgs['meta_query'] = $metaQuery;
-        }
-
-        if (!empty($dateQuery)) {
-            $postArgs['date_query'] = $dateQuery;
-        }
-
         if (!empty($this->excludePostId)) {
             $postArgs['post__not_in'] = $this->excludePostId;
         }
 
         $posts = get_posts($postArgs);
 
-        $reports = array();
-        foreach ($posts as $post) {
-            $reports[] = new IncidentReport($post);
+        return array_map(function ($post) {
+            return new IncidentReport($post);
+        }, $posts);
+    }
+
+    /**
+     * @return array
+     */
+    private function getTaxQuery()
+    {
+        $taxQuery = array();
+
+        if (!empty($this->incidentTypeId)) {
+            $taxQuery[] = array('taxonomy' => 'einsatzart', 'terms' => array($this->incidentTypeId));
         }
 
-        return $reports;
+        return $taxQuery;
     }
 
     /**
@@ -137,6 +179,14 @@ class ReportQuery
     public function setExcludePostIds($postIds)
     {
         $this->excludePostId = $postIds;
+    }
+
+    /**
+     * @param int $incidentTypeId
+     */
+    public function setIncidentTypeId($incidentTypeId)
+    {
+        $this->incidentTypeId = $incidentTypeId;
     }
 
     /**
@@ -171,6 +221,14 @@ class ReportQuery
     public function setOrderAsc($orderAsc)
     {
         $this->orderAsc = $orderAsc;
+    }
+
+    /**
+     * @param int[] $units
+     */
+    public function setUnits($units)
+    {
+        $this->units = $units;
     }
 
     /**

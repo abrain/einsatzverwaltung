@@ -4,17 +4,17 @@ namespace abrain\Einsatzverwaltung\Widgets;
 use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Options;
+use abrain\Einsatzverwaltung\ReportQuery;
+use abrain\Einsatzverwaltung\Types\Unit;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use abrain\Einsatzverwaltung\Utilities;
-use WP_Post;
-use WP_Widget;
 
 /**
  * WordPress-Widget für die letzten X Einsätze
  *
  * @author Andreas Brain
  */
-class RecentIncidents extends WP_Widget
+class RecentIncidents extends AbstractWidget
 {
     /**
      * @var Formatter
@@ -46,18 +46,14 @@ class RecentIncidents extends WP_Widget
     }
 
     /**
-     * Front-end display of widget.
-     *
-     * @see WP_Widget::widget()
-     *
-     * @param array $args     Widget arguments.
-     * @param array $instance Saved values from database.
+     * @inheritDoc
      */
     public function widget($args, $instance)
     {
         $defaults = array(
             'title' => 'Letzte Eins&auml;tze',
             'anzahl' => 3,
+            'units' => array(),
             'zeigeDatum' => false,
             'zeigeZeit' => false,
             'zeigeFeedlink' => false,
@@ -92,48 +88,46 @@ class RecentIncidents extends WP_Widget
      */
     private function echoReports($instance)
     {
-        $posts = get_posts(array(
-            'post_type' => 'einsatz',
-            'post_status' => 'publish',
-            'posts_per_page' => absint($instance['anzahl'])
-        ));
+        $reportQuery = new ReportQuery();
+        $reportQuery->setOrderAsc(false);
+        $reportQuery->setLimit(absint($instance['anzahl']));
+        $reportQuery->setUnits($instance['units']);
+        $reports = $reportQuery->getReports();
 
-        if (empty($posts)) {
+        if (empty($reports)) {
             echo '<p>Keine Eins&auml;tze</p>';
             return;
         }
 
         echo '<ul class="einsatzberichte">';
-        foreach ($posts as $post) {
+        foreach ($reports as $report) {
             echo '<li class="einsatzbericht">';
-            $this->echoSingleReport($post, $instance);
+            $this->echoSingleReport($report, $instance);
             echo "</li>";
         }
         echo '</ul>';
     }
 
     /**
-     * @param WP_Post $post
+     * @param IncidentReport $report
      * @param array $instance
      */
-    private function echoSingleReport(WP_Post $post, $instance)
+    private function echoSingleReport(IncidentReport $report, $instance)
     {
-        $report = new IncidentReport($post);
-
         if (true === ($instance['showAnnotations'])) {
             $annotationIconBar = AnnotationIconBar::getInstance();
             printf('<div class="annotation-icon-bar">%s</div>', $annotationIconBar->render($report));
         }
 
-        $meldung = get_the_title($post->ID);
+        $meldung = get_the_title($report->getPostId());
         printf(
             '<a href="%s" rel="bookmark" class="einsatzmeldung">%s</a>',
-            esc_attr(get_permalink($post->ID)),
+            esc_attr(get_permalink($report->getPostId())),
             (empty($meldung) ? "(kein Titel)" : $meldung)
         );
 
         if ($instance['zeigeDatum']) {
-            $timestamp = strtotime($post->post_date);
+            $timestamp = $report->getTimeOfAlerting()->getTimestamp();
             $datumsformat = $this->options->getDateFormat();
             printf('<br><span class="einsatzdatum">%s</span>', date_i18n($datumsformat, $timestamp));
             if ($instance['zeigeZeit']) {
@@ -163,14 +157,7 @@ class RecentIncidents extends WP_Widget
     }
 
     /**
-     * Sanitize widget form values as they are saved.
-     *
-     * @see WP_Widget::update()
-     *
-     * @param array $newInstance Values just sent to be saved.
-     * @param array $oldInstance Previously saved values from database.
-     *
-     * @return array Updated safe values to be saved.
+     * @inheritDoc
      */
     public function update($newInstance, $oldInstance)
     {
@@ -184,6 +171,7 @@ class RecentIncidents extends WP_Widget
             $instance['anzahl'] = $newInstance['anzahl'];
         }
 
+        $instance['units'] = Utilities::getArrayValueIfKey($newInstance, 'units', array());
         $instance['zeigeDatum'] = Utilities::getArrayValueIfKey($newInstance, 'zeigeDatum', false);
         $instance['zeigeZeit'] = Utilities::getArrayValueIfKey($newInstance, 'zeigeZeit', false);
         $instance['zeigeOrt'] = Utilities::getArrayValueIfKey($newInstance, 'zeigeOrt', false);
@@ -196,17 +184,13 @@ class RecentIncidents extends WP_Widget
     }
 
     /**
-     * Back-end widget form.
-     *
-     * @see WP_Widget::form()
-     *
-     * @param array $instance Previously saved values from database.
-     * @return string
+     * @inheritDoc
      */
     public function form($instance)
     {
         $title = Utilities::getArrayValueIfKey($instance, 'title', 'Letzte Eins&auml;tze');
         $anzahl = Utilities::getArrayValueIfKey($instance, 'anzahl', 3);
+        $selectedUnits = Utilities::getArrayValueIfKey($instance, 'units', array());
         $zeigeDatum = Utilities::getArrayValueIfKey($instance, 'zeigeDatum', false);
         $zeigeZeit = Utilities::getArrayValueIfKey($instance, 'zeigeZeit', false);
         $zeigeFeedlink = Utilities::getArrayValueIfKey($instance, 'zeigeFeedlink', false);
@@ -229,6 +213,14 @@ class RecentIncidents extends WP_Widget
             'Anzahl der Einsatzberichte, die angezeigt werden:',
             $this->get_field_name('anzahl'),
             esc_attr($anzahl)
+        );
+
+        $this->echoChecklistBox(
+            get_post_type_object(Unit::POST_TYPE),
+            'units',
+            __('Only show reports for these units:', 'einsatzverwaltung'),
+            $selectedUnits,
+            __('Select no unit to show all reports', 'einsatzverwaltung')
         );
 
         printf(

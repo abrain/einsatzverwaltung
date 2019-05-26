@@ -18,7 +18,7 @@
     display: none;
 }
 
-.einsatzverwaltung-reportlist .einsatz-title-month td {
+.einsatzverwaltung-reportlist .einsatz-title-month td, .einsatzverwaltung-reportlist .einsatz-title-quarter td {
     border: none;
     font-size: 1.3em;
     padding: 3px 8px;
@@ -37,7 +37,7 @@
         padding-bottom: 5px;
     }
 
-    .einsatzverwaltung-reportlist tr.einsatz-title-month {
+    .einsatzverwaltung-reportlist tr.einsatz-title-month, .einsatzverwaltung-reportlist tr.einsatz-title-quarter {
         padding-top: 0;
         padding-bottom: 0;
     }

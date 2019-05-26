@@ -1,11 +1,11 @@
 <?php
-namespace abrain\Einsatzverwaltung\Frontend;
+namespace abrain\Einsatzverwaltung\Frontend\ReportList;
 
 /**
  * Defines how
- * @package abrain\Einsatzverwaltung\Frontend
+ * @package abrain\Einsatzverwaltung\Frontend\ReportList
  */
-class ReportListParameters
+class Parameters
 {
     const DEFAULT_COLUMNS = 'number,date,time,title';
 
@@ -59,9 +59,9 @@ class ReportListParameters
     /**
      * Gibt an, ob nach jedem Monat eine Trennung eingefügt werden soll
      *
-     * @var bool
+     * @var int
      */
-    private $splitMonths;
+    private $splitType;
 
     /**
      * Initialize the parameters with default values
@@ -76,7 +76,7 @@ class ReportListParameters
         $this->linkAdditionalForces = (get_option('einsatzvw_list_ext_link') === '1');
         $this->linkVehicles = (get_option('einsatzvw_list_fahrzeuge_link') === '1');
         $this->showHeading = true;
-        $this->splitMonths = false;
+        $this->splitType = SplitType::NONE;
     }
 
     /**
@@ -85,6 +85,14 @@ class ReportListParameters
     public function getColumns()
     {
         return $this->columns;
+    }
+
+    /**
+     * @return int
+     */
+    public function getColumnCount()
+    {
+        return count($this->columns);
     }
 
     /**
@@ -116,15 +124,23 @@ class ReportListParameters
      */
     public function isSplitMonths()
     {
-        return $this->splitMonths && !$this->compact;
+        return $this->splitType === SplitType::MONTHLY && !$this->compact;
     }
 
     /**
-     * @param bool $splitMonths
+     * @return bool
      */
-    public function setSplitMonths($splitMonths)
+    public function isSplitQuarterly()
     {
-        $this->splitMonths = $splitMonths;
+        return $this->splitType === SplitType::QUARTERLY && !$this->compact;
+    }
+
+    /**
+     * @param int $splitType
+     */
+    public function setSplitType($splitType)
+    {
+        $this->splitType = $splitType;
     }
 
     /**
@@ -175,7 +191,7 @@ class ReportListParameters
      */
     public static function sanitizeColumnsArrayNoDefault($inputArray)
     {
-        $columns = ReportList::getListColumns();
+        $columns = Renderer::getListColumns();
         $columnIds = array_keys($columns);
 
         $validColumnIds = array();

@@ -9,7 +9,7 @@ use WP_REST_Response;
  * Description of the custom taxonomy 'Type of incident'
  * @package abrain\Einsatzverwaltung\Types
  */
-class IncidentType implements CustomType
+class IncidentType implements CustomTaxonomy
 {
     /**
      * @return string

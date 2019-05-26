@@ -1,15 +1,16 @@
 <?php
 namespace abrain\Einsatzverwaltung\Widgets;
 
+use abrain\Einsatzverwaltung\ReportQuery;
+use abrain\Einsatzverwaltung\Types\Unit;
 use abrain\Einsatzverwaltung\Util\Formatter;
-use WP_Widget;
 
 /**
  * Widget für die neuesten Einsätze, das Aussehen wird vom Benutzer per HTML-Templates bestimmt
  *
  * @author Andreas Brain
  */
-class RecentIncidentsFormatted extends WP_Widget
+class RecentIncidentsFormatted extends AbstractWidget
 {
     /**
      * @var Formatter
@@ -27,6 +28,7 @@ class RecentIncidentsFormatted extends WP_Widget
         ),
         'abbr' => array(),
         'acronym' => array(),
+        'b' => array(),
         'br' => array(),
         'div' => array(
             'align' => true,
@@ -34,6 +36,19 @@ class RecentIncidentsFormatted extends WP_Widget
             'dir' => true,
             'lang' => true,
             'style' => true,
+            'xml:lang' => true,
+        ),
+        'em' => array(),
+        'figure' => array(
+            'align' => true,
+            'dir' => true,
+            'lang' => true,
+            'xml:lang' => true,
+        ),
+        'figcaption' => array(
+            'align' => true,
+            'dir' => true,
+            'lang' => true,
             'xml:lang' => true,
         ),
         'h3' => array(
@@ -91,6 +106,7 @@ class RecentIncidentsFormatted extends WP_Widget
             'style' => true,
             'xml:lang' => true,
         ),
+        'small' => array(),
         'span' => array(
             'dir' => true,
             'align' => true,
@@ -99,6 +115,8 @@ class RecentIncidentsFormatted extends WP_Widget
             'style' => true,
             'xml:lang' => true,
         ),
+        'strong' => array(),
+        'u' => array(),
         'ul' => array(
             'class' => true,
             'style' => true,
@@ -114,13 +132,15 @@ class RecentIncidentsFormatted extends WP_Widget
     private $defaults = array(
         'title' => '',
         'numIncidents' => 3,
+        'units' => array(),
         'beforeContent' => '',
         'pattern' => '',
         'afterContent' => ''
     );
     private $allowedTagsPattern = array('%title%', '%date%', '%time%', '%location%', '%duration%',
-        '%incidentCommander%', '%incidentType%', '%incidentTypeColor%', '%url%', '%number%', '%seqNum%',
-        '%annotations%', '%vehicles%', '%additionalForces%', '%typesOfAlerting%', '%featuredImage%', '%workforce%');
+        '%incidentCommander%', '%incidentType%', '%incidentTypeHierarchical%', '%incidentTypeColor%', '%url%',
+        '%number%', '%seqNum%', '%annotations%', '%vehicles%', '%units%', '%additionalForces%', '%typesOfAlerting%',
+        '%featuredImage%', '%workforce%');
     private $allowedTagsAfter = array('%feedUrl%');
 
     /**
@@ -161,17 +181,20 @@ class RecentIncidentsFormatted extends WP_Widget
         echo $args['before_widget'];
         echo $args['before_title'] . apply_filters('widget_title', $settings['title']) . $args['after_title'];
 
-        $incidents = get_posts(array(
-            'post_type' => 'einsatz',
-            'post_status' => 'publish',
-            'posts_per_page' => $settings['numIncidents']
-        ));
+        $reportQuery = new ReportQuery();
+        $reportQuery->setOrderAsc(false);
+        $reportQuery->setLimit($settings['numIncidents']);
+        $reportQuery->setUnits($settings['units']);
+        $reports = $reportQuery->getReports();
 
         $widgetContent = $settings['beforeContent'];
-        foreach ($incidents as $incident) {
-            $widgetContent .= $this->formatter->formatIncidentData($settings['pattern'], $this->allowedTagsPattern, $incident, 'widget');
+        foreach ($reports as $report) {
+            $post = get_post($report->getPostId()); // FIXME converting back and forth between WP_Post and IncidenReport
+            $widgetContent .= $this->formatter->formatIncidentData($settings['pattern'], $this->allowedTagsPattern, $post, 'widget');
         }
         $widgetContent .= $this->formatter->formatIncidentData($settings['afterContent'], $this->allowedTagsAfter, null, 'widget');
+
+        $widgetContent = do_shortcode($widgetContent);
 
         echo wp_kses($widgetContent, $this->allowedHtmlTags);
         echo $args['after_widget'];
@@ -192,6 +215,11 @@ class RecentIncidentsFormatted extends WP_Widget
         $instance['numIncidents'] = absint($newInstance['numIncidents']);
         if ($instance['numIncidents'] === 0) {
             $instance['numIncidents'] = $this->defaults['numIncidents'];
+        }
+        if (array_key_exists('units', $newInstance)) {
+            $instance['units'] = array_filter($newInstance['units'], 'is_numeric');
+        } else {
+            $instance['units'] = array();
         }
         $instance['beforeContent'] = wp_kses($newInstance['beforeContent'], $this->allowedHtmlTags);
         $instance['pattern'] = wp_kses($newInstance['pattern'], $this->allowedHtmlTags);
@@ -230,6 +258,14 @@ class RecentIncidentsFormatted extends WP_Widget
             esc_attr($values['numIncidents'])
         );
         echo '</p>';
+
+        $this->echoChecklistBox(
+            get_post_type_object(Unit::POST_TYPE),
+            'units',
+            __('Only show reports for these units:', 'einsatzverwaltung'),
+            $values['units'],
+            __('Select no unit to show all reports', 'einsatzverwaltung')
+        );
 
         echo '<p>';
         printf(
@@ -274,7 +310,7 @@ class RecentIncidentsFormatted extends WP_Widget
         echo '<br><small>';
         _e('The following tags will be replaced:', 'einsatzverwaltung');
         foreach ($allowedTags as $tag) {
-            printf('<br><strong>%s</strong> (%s)', esc_html($tag), esc_html(Formatter::getLabelForTag($tag)));
+            printf('<br><strong>%s</strong> (%s)', esc_html($tag), esc_html($this->formatter->getLabelForTag($tag)));
         }
         echo '</small>';
     }

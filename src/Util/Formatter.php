@@ -20,13 +20,14 @@ class Formatter
     /**
      * @var array Ersetzbare Tags und ihre Beschreibungen
      */
-    private static $availableTags = array(
+    private $availableTags = array(
         '%title%' => 'Titel des Einsatzberichts',
         '%date%' => 'Datum der Alarmierung',
         '%time%' => 'Zeitpunkt der Alarmierung',
         '%duration%' => 'Dauer des Einsatzes',
         '%incidentCommander%' => 'Einsatzleiter',
         '%incidentType%' => 'Art des Einsatzes',
+        '%incidentTypeHierarchical%' =>'Art des Einsatzes inkl. übergeordneten Einsatzarten',
         '%incidentTypeColor%' => 'Farbe der Art des Einsatzes',
         '%url%' => 'URL zum Einsatzbericht',
         '%location%' => 'Ort des Einsatzes',
@@ -41,6 +42,7 @@ class Formatter
         '%featuredImage%' => 'Beitragsbild',
         '%yearArchive%' => 'Link zum Jahresarchiv',
         '%workforce%' => 'Mannschaftsstärke',
+        '%units%' => 'Einheiten',
     );
 
     /**
@@ -83,7 +85,7 @@ class Formatter
     public function formatIncidentData($pattern, $allowedTags = array(), $post = null, $context = 'post')
     {
         if (empty($allowedTags)) {
-            $allowedTags = array_keys(self::$availableTags);
+            $allowedTags = array_keys($this->availableTags);
         }
 
         // Content should be handled separately, so we will ignore it
@@ -134,8 +136,10 @@ class Formatter
                 $replace = $incidentReport->getIncidentCommander();
                 break;
             case '%incidentType%':
-                $showTypeArchive = get_option('einsatzvw_show_einsatzart_archive') === '1';
-                $replace = $this->getTypeOfIncident($incidentReport, ($context === 'post'), $showTypeArchive, false);
+                $replace = $this->getTypeOfIncidentString($incidentReport, $context, false);
+                break;
+            case '%incidentTypeHierarchical%':
+                $replace = $this->getTypeOfIncidentString($incidentReport, $context, true);
                 break;
             case '%incidentTypeColor%':
                 $replace = $this->getColorOfTypeOfIncident($incidentReport->getTypeOfIncident());
@@ -179,6 +183,9 @@ class Formatter
                 break;
             case '%workforce%':
                 $replace = $incidentReport->getWorkforce();
+                break;
+            case '%units%':
+                $replace = $this->getUnits($incidentReport);
                 break;
             default:
                 return $pattern;
@@ -276,6 +283,34 @@ class Formatter
             $string = $typeOfIncident->name . $string;
         } while ($showHierarchy && $typeOfIncident->parent != 0);
         return $string;
+    }
+
+    /**
+     * @param IncidentReport $incidentReport
+     * @param string $context
+     * @param bool $showHierarchy
+     *
+     * @return string
+     */
+    private function getTypeOfIncidentString(IncidentReport $incidentReport, $context, $showHierarchy = false)
+    {
+        $showTypeArchive = get_option('einsatzvw_show_einsatzart_archive') === '1';
+        return $this->getTypeOfIncident($incidentReport, ($context === 'post'), $showTypeArchive, $showHierarchy);
+    }
+
+    /**
+     * @param IncidentReport $report
+     *
+     * @return string
+     */
+    public function getUnits(IncidentReport $report)
+    {
+        $units = $report->getUnits();
+        $unitNames = array_map(function (WP_Post $unit) {
+            return sanitize_post_field('post_title', $unit->post_title, $unit->ID);
+        }, $units);
+
+        return join(', ', $unitNames);
     }
 
     /**
@@ -442,12 +477,12 @@ class Formatter
      * @param string $tag
      * @return string
      */
-    public static function getLabelForTag($tag)
+    public function getLabelForTag($tag)
     {
-        if (!array_key_exists($tag, self::$availableTags)) {
+        if (!array_key_exists($tag, $this->availableTags)) {
             return '';
         }
 
-        return self::$availableTags[$tag];
+        return $this->availableTags[$tag];
     }
 }

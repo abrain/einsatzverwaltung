@@ -1,7 +1,7 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
-use abrain\Einsatzverwaltung\Frontend\ReportList;
+use abrain\Einsatzverwaltung\Frontend\ReportList\Renderer as ReportListRenderer;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use WP_Post;
@@ -68,7 +68,7 @@ class Frontend
             array(),
             Core::VERSION
         );
-        wp_add_inline_style('einsatzverwaltung-frontend', ReportList::getDynamicCss());
+        wp_add_inline_style('einsatzverwaltung-frontend', ReportListRenderer::getDynamicCss());
     }
 
     /**

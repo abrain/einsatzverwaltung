@@ -102,3 +102,14 @@ li.dropzone {
 .settings_page_einsatzvw-settings label > code {
     margin-left: 0.5em;
 }
+
+.widgets-holder-wrap .checkboxlist, .customize-control-widget_form .checkboxlist {
+    border: 1px solid #ddd;
+    background-color: #fdfdfd;
+    padding: 8px;
+    margin: 4px 0 0 0;
+}
+
+.widgets-holder-wrap .checkboxlist ul {
+    margin-top: 0;
+}

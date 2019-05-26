@@ -32,6 +32,7 @@ class ReportListTable
         $columns['e_alarmzeit'] = 'Alarmzeit';
         $columns['e_einsatzende'] = 'Einsatzende';
         $columns['e_art'] = 'Art';
+        $columns['einsatzverwaltung_units'] = __('Units', 'einsatzverwaltung');
         $columns['e_fzg'] = 'Fahrzeuge';
 
         return $columns;
@@ -84,6 +85,9 @@ class ReportListTable
                 return join(', ', $vehicleLinks);
             case 'einsatzverwaltung_annotations':
                 return AnnotationIconBar::getInstance()->render($report);
+            case 'einsatzverwaltung_units':
+                $unitNames = array_map('get_the_title', $report->getUnits());
+                return join(', ', $unitNames);
         }
 
         return '';

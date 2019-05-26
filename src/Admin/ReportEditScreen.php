@@ -2,6 +2,7 @@
 namespace abrain\Einsatzverwaltung\Admin;
 
 use abrain\Einsatzverwaltung\Model\IncidentReport;
+use abrain\Einsatzverwaltung\Types\Unit;
 use WP_Post;
 use wpdb;
 
@@ -44,6 +45,18 @@ class ReportEditScreen
             'einsatzartdiv',
             'Einsatzart',
             array('abrain\Einsatzverwaltung\Admin\ReportEditScreen', 'displayMetaBoxEinsatzart'),
+            'einsatz',
+            'side',
+            'default',
+            array(
+                '__block_editor_compatible_meta_box' => true,
+                '__back_compat_meta_box' => false
+            )
+        );
+        add_meta_box(
+            'einsatzverwaltung_units',
+            __('Units', 'einsatzverwaltung'),
+            array($this, 'displayMetaBoxUnits'),
             'einsatz',
             'side',
             'default',
@@ -166,6 +179,40 @@ class ReportEditScreen
         $report = new IncidentReport($post);
         $typeOfIncident = $report->getTypeOfIncident();
         self::dropdownEinsatzart($typeOfIncident ? $typeOfIncident->term_id : 0);
+    }
+
+    /**
+     * @param WP_Post $post
+     */
+    public function displayMetaBoxUnits(WP_Post $post)
+    {
+        $units = get_posts(array(
+            'post_type' => Unit::POST_TYPE,
+            'numberposts' => -1,
+            'order' => 'ASC',
+            'orderby' => 'name'
+        ));
+        if (empty($units)) {
+            $postTypeObject = get_post_type_object(Unit::POST_TYPE);
+            printf("<div>%s</div>", esc_html($postTypeObject->labels->not_found));
+            return;
+        }
+
+        $report = new IncidentReport($post);
+        $assignedUnits = array_map(function (WP_Post $unit) {
+            return $unit->ID;
+        }, $report->getUnits());
+        echo '<div><ul>';
+        foreach ($units as $unit) {
+            $assigned = in_array($unit->ID, $assignedUnits);
+            printf(
+                '<li><label><input type="checkbox" name="evw_units[]" value="%d"%s>%s</label></li>',
+                esc_attr($unit->ID),
+                checked($assigned, true, false),
+                esc_html($unit->post_title)
+            );
+        }
+        echo '</ul></div>';
     }
 
     /**

@@ -26,6 +26,7 @@ class RecentIncidentsFormattedTest extends WP_UnitTestCase
         $defaults = array(
             'title' => '',
             'numIncidents' => 3,
+            'units' => array(),
             'beforeContent' => '',
             'pattern' => '',
             'afterContent' => ''
@@ -42,12 +43,12 @@ class RecentIncidentsFormattedTest extends WP_UnitTestCase
         );
         $new['numIncidents'] = 'abc';
         $new['beforeContent'] = '<h1>Nix</h1><p>Text<br><script></script><span>';
-        $new['pattern'] = '<li><strong>%title%</strong><a href="#">Link</a><br></li>';
+        $new['pattern'] = '<li><strong>%title%</strong><a href="#">Link</a><br><table></table></li>';
         $new['afterContent'] = '';
         $result = $widget->update($new, $old);
         $this->assertEquals($old['numIncidents'], $result['numIncidents']);
         $this->assertEquals('Nix<p>Text<br><span>', $result['beforeContent']);
-        $this->assertEquals('<li>%title%<a href="#">Link</a><br></li>', $result['pattern']);
+        $this->assertEquals('<li><strong>%title%</strong><a href="#">Link</a><br></li>', $result['pattern']);
         $this->assertEquals('', $result['afterContent']);
     }
 }

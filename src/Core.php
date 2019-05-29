@@ -11,7 +11,7 @@ use abrain\Einsatzverwaltung\Widgets\RecentIncidentsFormatted;
  */
 class Core
 {
-    const VERSION = '1.6.0';
+    const VERSION = '1.6.1';
     const DB_VERSION = 40;
 
    /**

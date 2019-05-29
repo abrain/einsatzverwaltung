@@ -5,7 +5,7 @@ Tags: Feuerwehr, Hilfsorganisation, Öffentlichkeitsarbeit
 Requires at least: 4.7.0
 Tested up to: 5.2
 Requires PHP: 5.3.0
-Stable tag: 1.6.0
+Stable tag: 1.6.1
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,6 +54,9 @@ Ideally, you check the issues on [GitHub](https://github.com/abrain/einsatzverwa
 Nein, mehr gibt es [hier](https://einsatzverwaltung.abrain.de/faq/).
 
 == Changelog ==
+
+= 1.6.1 =
+* Fixed user privileges for editing units
 
 = 1.6.0 =
 * Added support for multiple units

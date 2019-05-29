@@ -84,8 +84,6 @@ Nein, mehr gibt es [hier](https://einsatzverwaltung.abrain.de/faq/).
 
 == Upgrade Notice ==
 
-= 1.6.0 =
-Support for multiple units, report count shortcode and more
 
 == Social Media ==
 

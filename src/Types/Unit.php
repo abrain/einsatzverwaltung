@@ -54,7 +54,7 @@ class Unit implements CustomPostType
         return array(
             'labels' => $this->getLabels(),
             'public' => false,
-            'supports' => array('title', 'editor', 'thumbnail', 'revisions', 'custom-fields'),
+            'supports' => array('title', 'editor', 'thumbnail', 'revisions', 'custom-fields', 'author'),
             'show_ui' => true,
             'show_in_menu' => 'edit.php?post_type=' . Report::SLUG,
             'show_in_admin_bar' => false,

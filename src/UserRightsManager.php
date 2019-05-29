@@ -22,6 +22,19 @@ class UserRightsManager
         'delete_others_einsatzberichte'
     );
 
+    private $capabilitiesUnit = array(
+        'edit_evw_units',
+        'edit_private_evw_units',
+        'edit_published_evw_units',
+        'edit_others_evw_units',
+        'publish_evw_units',
+        'read_private_evw_units',
+        'delete_evw_units',
+        'delete_private_evw_units',
+        'delete_published_evw_units',
+        'delete_others_evw_units'
+    );
+
     /**
      * @param $roleSlug
      *
@@ -48,7 +61,8 @@ class UserRightsManager
      */
     public function userHasCap($allcaps, $caps, $args, $user)
     {
-        $requestedCaps = array_intersect(self::$capabilities, $caps);
+        $allCapabilities = array_merge(self::$capabilities, $this->capabilitiesUnit);
+        $requestedCaps = array_intersect($allCapabilities, $caps);
 
         // Wenn es nicht um Berechtigungen aus der Einsatzverwaltung geht, können wir uns den Rest sparen
         if (count($requestedCaps) == 0) {

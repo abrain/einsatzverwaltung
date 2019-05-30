@@ -102,6 +102,7 @@ class Frontend
             $mannschaft = $report->getWorkforce();
 
             $vehicles = $this->formatter->getVehicles($report, $mayContainLinks, $showArchiveLinks);
+            $units = $this->formatter->getUnits($report);
             $additionalForces = $this->formatter->getAdditionalForces($report, $mayContainLinks, $showArchiveLinks);
 
             $timeOfAlerting = $report->getTimeOfAlerting();
@@ -119,6 +120,7 @@ class Frontend
             $headerstring .= $this->getDetailString('Einsatzleiter:', $einsatzleiter);
             $headerstring .= $this->getDetailString('Mannschaftsst&auml;rke:', $mannschaft);
             $headerstring .= $this->getDetailString('Fahrzeuge:', $vehicles);
+            $headerstring .= $this->getDetailString('Einheiten:', $units);
             $headerstring .= $this->getDetailString('Weitere Kr&auml;fte:', $additionalForces);
 
             return "<p>$headerstring</p>";

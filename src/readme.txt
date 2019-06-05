@@ -5,7 +5,7 @@ Tags: Feuerwehr, Hilfsorganisation, Öffentlichkeitsarbeit
 Requires at least: 4.7.0
 Tested up to: 5.2
 Requires PHP: 5.3.0
-Stable tag: 1.6.1
+Stable tag: 1.6.2
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 

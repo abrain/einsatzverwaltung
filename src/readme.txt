@@ -9,7 +9,7 @@ Stable tag: 1.6.1
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Verwaltung und Darstellung von Einsatzberichten der Feuerwehr und anderer Hilfsorganisationen
+Public incident reports for fire brigades and other rescue services
 
 == Description ==
 

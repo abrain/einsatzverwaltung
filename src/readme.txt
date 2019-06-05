@@ -23,9 +23,11 @@ Funktionen im &Uuml;berblick:
 
 * Einsatzberichte als vollwertige Beitr&auml;ge ver&ouml;ffentlichen
 * Information &uuml;ber Einsatzart, eingesetzte Fahrzeuge, Dauer und vieles mehr
-* Shortcode zum Einbinden von Einsatzlisten
+* Unterscheidung von mehreren Einheiten
+* Shortcodes zum Einbinden von Einsatzlisten und Einsatzzahlen
 * Widget zeigt die aktuellsten Einsatzberichte
 * Import aus wp-einsatz und CSV-Dateien
+* Export als CSV und JSON
 * Newsfeed f&uuml;r Einsatzberichte
 * Pflege der Einsatzberichte kann auf bestimmte Benutzerrollen beschr&auml;nkt werden
 

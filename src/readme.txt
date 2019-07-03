@@ -57,6 +57,12 @@ Nein, mehr gibt es [hier](https://einsatzverwaltung.abrain.de/faq/).
 
 == Changelog ==
 
+= 1.6.2 =
+* Classic singular view of reports now also shows units
+* Vehicles: Hide events of Pro Event Calendar from selector for vehicle page
+* Settings: Placeholder text for empty reports can be set
+* Resolved compatibility issue with NextGEN Gallery
+
 = 1.6.1 =
 * Fixed user privileges for editing units
 

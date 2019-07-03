@@ -126,7 +126,7 @@ class Report implements CustomPostType
      */
     private function getSupportedFeatures()
     {
-        $features = array('title', 'editor', 'thumbnail', 'publicize', 'author', 'revisions');
+        $features = array('title', 'editor', 'thumbnail', 'publicize', 'author', 'revisions', 'custom-fields');
 
         if (get_option('einsatz_support_excerpt', '0') === '1') {
             $features[] = 'excerpt';

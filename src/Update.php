@@ -85,6 +85,10 @@ class Update
         if ($currentDbVersion < 40 && $targetDbVersion >= 40) {
             $this->upgrade150();
         }
+
+        if ($currentDbVersion < 41 && $targetDbVersion >= 41) {
+            $this->upgrade162();
+        }
     }
 
     /**
@@ -350,6 +354,47 @@ class Update
         add_option('einsatz_support_posttag', '1');
 
         update_option('einsatzvw_db_version', 40);
+    }
+
+    /**
+     * - Transforms replacement text for empty content into an option
+     * - Makes sure custom-field metabox is properly hidden
+     *
+     * @since 1.6.2
+     */
+    private function upgrade162()
+    {
+        global $wpdb;
+
+        /**
+         * Transforms the replacement text for empty content into an option, while maintaining the current behaviour
+         * that empty content is not replaced when using templates
+         */
+        $replacementText = '';
+        if (get_option('einsatzverwaltung_use_reporttemplate', 'no') === 'no') {
+            $replacementText = 'Kein Einsatzbericht vorhanden';
+        }
+        add_option('einsatzverwaltung_report_contentifempty', $replacementText);
+
+        /**
+         * Makes sure, the custom-field metabox is also hidden for users, who already have hidden metaboxes on the edit
+         * screen for the reports before. The default hidden metaboxes do not apply to them.
+         */
+        $userIds = $wpdb->get_col("SELECT user_id FROM $wpdb->usermeta WHERE meta_key = 'metaboxhidden_einsatz'");
+        foreach ($userIds as $userId) {
+            $hidden = get_user_option('metaboxhidden_einsatz', $userId);
+
+            if (!is_array($hidden)) {
+                continue;
+            }
+
+            if (!in_array('postcustom', $hidden)) {
+                $hidden[] = 'postcustom';
+                update_user_option($userId, 'metaboxhidden_einsatz', $hidden, true);
+            }
+        }
+
+        update_option('einsatzvw_db_version', 41);
     }
 
     /**

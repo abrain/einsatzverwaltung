@@ -53,6 +53,13 @@ class Report extends SubPage
             'einsatzvw_settings_einsatzberichte'
         );
         add_settings_field(
+            'einsatzvw_settings_reportcontent',
+            'Platzhalter f&uuml;r Berichtstext',
+            array($this, 'echoFieldReportContent'),
+            $this->settingsApiPage,
+            'einsatzvw_settings_einsatzberichte'
+        );
+        add_settings_field(
             'einsatzvw_settings_reporttemplate',
             'Template f&uuml;r Einsatzbericht',
             array($this, 'echoFieldReportTemplate'),
@@ -143,6 +150,21 @@ class Report extends SubPage
     }
 
     /**
+     * Einstellungen für den Ersatztext bei leerem Berichtstext
+     */
+    public function echoFieldReportContent()
+    {
+        echo '<fieldset>';
+        echo '<label for="einsatzverwaltung_report_contentifempty">Anzuzeigender Text, wenn kein Berichtstext vorliegt:</label>&nbsp;';
+        $this->echoSettingsInput(
+            'einsatzverwaltung_report_contentifempty',
+            sanitize_text_field(get_option('einsatzverwaltung_report_contentifempty', '')),
+            60
+        );
+        echo '</fieldset>';
+    }
+
+    /**
      * Einstellungen für die Gestaltung der Einsatzberichte per Template
      */
     public function echoFieldReportTemplate()
@@ -195,6 +217,11 @@ class Report extends SubPage
             'einsatzvw_settings_report',
             'einsatzvw_open_ext_in_new',
             array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+        );
+        register_setting(
+            'einsatzvw_settings_report',
+            'einsatzverwaltung_report_contentifempty',
+            'sanitize_text_field'
         );
         register_setting(
             'einsatzvw_settings_report',

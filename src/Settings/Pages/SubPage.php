@@ -160,13 +160,16 @@ abstract class SubPage
      *
      * @param string $name Name des Parameters
      * @param string $value Wert, der im Eingabefeld stehen soll
+     * @param int $size Number of characters visible at the same time
+     *
      */
-    protected function echoSettingsInput($name, $value)
+    protected function echoSettingsInput($name, $value, $size = 20)
     {
         printf(
-            '<input type="text" value="%2$s" id="%1$s" name="%1$s" />',
+            '<input type="text" value="%2$s" id="%1$s" name="%1$s" size="%3$d" />',
             esc_attr($name),
-            esc_attr($value)
+            esc_attr($value),
+            esc_attr($size)
         );
     }
 

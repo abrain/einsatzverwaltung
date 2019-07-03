@@ -43,6 +43,7 @@ class Initializer
 
         $reportEditScreen = new ReportEditScreen();
         add_action('add_meta_boxes_einsatz', array($reportEditScreen, 'addMetaBoxes'));
+        add_filter('default_hidden_meta_boxes', array($reportEditScreen, 'filterDefaultHiddenMetaboxes'), 10, 2);
 
         $unitEditScreen = new UnitEditScreen();
         add_filter('default_hidden_meta_boxes', array($unitEditScreen, 'filterDefaultHiddenMetaboxes'), 10, 2);

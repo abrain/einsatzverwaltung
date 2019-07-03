@@ -388,4 +388,18 @@ class UpgradeTest extends WP_UnitTestCase
 
         $this->assertEquals('1', get_option('einsatz_support_posttag'));
     }
+
+    public function testUpgrade162()
+    {
+        update_option('einsatzverwaltung_use_reporttemplate', 'no');
+        $this->runUpgrade(40, 41);
+        $this->assertNotEmpty(get_option('einsatzverwaltung_report_contentifempty'));
+    }
+
+    public function testUpgrade162WithTemplate()
+    {
+        update_option('einsatzverwaltung_use_reporttemplate', 'singular');
+        $this->runUpgrade(40, 41);
+        $this->assertTrue('' === get_option('einsatzverwaltung_report_contentifempty'));
+    }
 }

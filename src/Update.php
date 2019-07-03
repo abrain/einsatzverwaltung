@@ -85,6 +85,10 @@ class Update
         if ($currentDbVersion < 40 && $targetDbVersion >= 40) {
             $this->upgrade150();
         }
+
+        if ($currentDbVersion < 41 && $targetDbVersion >= 41) {
+            $this->upgrade162();
+        }
     }
 
     /**
@@ -350,6 +354,26 @@ class Update
         add_option('einsatz_support_posttag', '1');
 
         update_option('einsatzvw_db_version', 40);
+    }
+
+    /**
+     * - Transforms replacement text for empty content into an option
+     *
+     * @since 1.6.2
+     */
+    private function upgrade162()
+    {
+        /**
+         * Transforms the replacement text for empty content into an option, while maintaining the current behaviour
+         * that empty content is not replaced when using templates
+         */
+        $replacementText = '';
+        if (get_option('einsatzverwaltung_use_reporttemplate', 'no') === 'no') {
+            $replacementText = 'Kein Einsatzbericht vorhanden';
+        }
+        add_option('einsatzverwaltung_report_contentifempty', $replacementText);
+
+        update_option('einsatzvw_db_version', 41);
     }
 
     /**

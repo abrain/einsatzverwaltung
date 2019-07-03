@@ -170,6 +170,11 @@ class Frontend
             if (empty($template)) {
                 return $content;
             }
+
+            $replacementText = get_option('einsatzverwaltung_report_contentifempty', '');
+            if (empty($content) && !empty($replacementText)) {
+                $content = sprintf('<p>%s</p>', esc_html($replacementText));
+            }
             
             $templateWithData = $this->formatter->formatIncidentData($template, array(), $post, 'post');
             $templateWithContent = str_replace('%content%', $content, $templateWithData);
@@ -225,7 +230,12 @@ class Frontend
      */
     private function prepareContent($content)
     {
-        return empty($content) ? '<p>Kein Einsatzbericht vorhanden</p>' : '<h3>Einsatzbericht:</h3>' . $content;
+        $replacementText = get_option('einsatzverwaltung_report_contentifempty', '');
+        if (!empty($replacementText)) {
+            $replacementText = sprintf('<p>%s</p>', esc_html($replacementText));
+        }
+
+        return empty($content) ? $replacementText : '<h3>Einsatzbericht:</h3>' . $content;
     }
 
 

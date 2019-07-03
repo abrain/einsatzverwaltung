@@ -69,7 +69,7 @@ class Vehicle implements CustomTaxonomy
             'fahrzeugpid',
             'Fahrzeugseite',
             'Seite mit mehr Informationen &uuml;ber das Fahrzeug. Wird in Einsatzberichten mit diesem Fahrzeug verlinkt.',
-            array('einsatz', 'attachment', 'ai1ec_event', 'tribe_events')
+            array('einsatz', 'attachment', 'ai1ec_event', 'tribe_events', 'pec-events')
         ));
         $taxonomyCustomFields->addNumberInput($this->getSlug(), new NumberInput(
             'vehicleorder',

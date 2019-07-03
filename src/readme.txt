@@ -5,11 +5,11 @@ Tags: Feuerwehr, Hilfsorganisation, Öffentlichkeitsarbeit
 Requires at least: 4.7.0
 Tested up to: 5.2
 Requires PHP: 5.3.0
-Stable tag: 1.6.1
+Stable tag: 1.6.2
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Verwaltung und Darstellung von Einsatzberichten der Feuerwehr und anderer Hilfsorganisationen
+Public incident reports for fire brigades and other rescue services
 
 == Description ==
 
@@ -23,9 +23,11 @@ Funktionen im &Uuml;berblick:
 
 * Einsatzberichte als vollwertige Beitr&auml;ge ver&ouml;ffentlichen
 * Information &uuml;ber Einsatzart, eingesetzte Fahrzeuge, Dauer und vieles mehr
-* Shortcode zum Einbinden von Einsatzlisten
+* Unterscheidung von mehreren Einheiten
+* Shortcodes zum Einbinden von Einsatzlisten und Einsatzzahlen
 * Widget zeigt die aktuellsten Einsatzberichte
 * Import aus wp-einsatz und CSV-Dateien
+* Export als CSV und JSON
 * Newsfeed f&uuml;r Einsatzberichte
 * Pflege der Einsatzberichte kann auf bestimmte Benutzerrollen beschr&auml;nkt werden
 
@@ -54,6 +56,12 @@ Ideally, you check the issues on [GitHub](https://github.com/abrain/einsatzverwa
 Nein, mehr gibt es [hier](https://einsatzverwaltung.abrain.de/faq/).
 
 == Changelog ==
+
+= 1.6.2 =
+* Classic singular view of reports now also shows units
+* Vehicles: Hide events of Pro Event Calendar from selector for vehicle page
+* Settings: Placeholder text for empty reports can be set
+* Resolved compatibility issue with NextGEN Gallery
 
 = 1.6.1 =
 * Fixed user privileges for editing units

@@ -2,8 +2,10 @@
 namespace abrain\Einsatzverwaltung\Admin;
 
 use abrain\Einsatzverwaltung\Model\IncidentReport;
+use abrain\Einsatzverwaltung\Types\Report;
 use abrain\Einsatzverwaltung\Types\Unit;
 use WP_Post;
+use WP_Screen;
 use wpdb;
 
 /**
@@ -274,6 +276,22 @@ class ReportEditScreen
             checked($state, '1', false),
             $label
         );
+    }
+
+    /**
+     * @param string[] $hidden
+     * @param WP_Screen $screen
+     *
+     * @return string[]
+     */
+    public function filterDefaultHiddenMetaboxes($hidden, WP_Screen $screen)
+    {
+        if ($screen->post_type !== Report::SLUG) {
+            return $hidden;
+        }
+
+        $hidden[] = 'postcustom';
+        return $hidden;
     }
 
     /**

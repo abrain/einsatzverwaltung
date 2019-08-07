@@ -40,6 +40,9 @@ class Initializer
         $reportListTable = new ReportListTable();
         add_filter('manage_edit-einsatz_columns', array($reportListTable, 'filterColumnsEinsatz'));
         add_action('manage_einsatz_posts_custom_column', array($reportListTable, 'filterColumnContentEinsatz'), 10, 2);
+        add_action('quick_edit_custom_box', array($reportListTable, 'quickEditCustomBox'), 10, 3);
+        add_action('bulk_edit_custom_box', array($reportListTable, 'bulkEditCustomBox'), 10, 2);
+        add_action('add_inline_data', array($reportListTable, 'addInlineData'), 10, 2);
 
         $reportEditScreen = new ReportEditScreen();
         add_action('add_meta_boxes_einsatz', array($reportEditScreen, 'addMetaBoxes'));

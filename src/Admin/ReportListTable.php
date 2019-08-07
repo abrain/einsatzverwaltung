@@ -5,6 +5,9 @@ namespace abrain\Einsatzverwaltung\Admin;
 use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Types\Report;
+use abrain\Einsatzverwaltung\Types\Unit;
+use WP_Post;
+use WP_Post_Type;
 use WP_Term;
 
 /**
@@ -13,6 +16,78 @@ use WP_Term;
  */
 class ReportListTable
 {
+    /**
+     * Additional columns for the report listing.
+     *
+     * @var array
+     */
+    private $customColumns = array();
+
+    /**
+     * ReportListTable constructor.
+     */
+    public function __construct()
+    {
+        $this->customColumns = array(
+            'title' => array(
+                'label' => 'Einsatzbericht',
+                'quickedit' => false
+            ),
+            'e_nummer' => array(
+                'label' => 'Nummer',
+                'quickedit' => false
+            ),
+            'einsatzverwaltung_annotations' => array(
+                'label' => 'Vermerke',
+                'quickedit' => false
+            ),
+            'e_alarmzeit' => array(
+                'label' => 'Alarmzeit',
+                'quickedit' => false
+            ),
+            'e_einsatzende' => array(
+                'label' => 'Einsatzende',
+                'quickedit' => false
+            ),
+            'e_art' => array(
+                'label' => 'Art',
+                'quickedit' => false
+            ),
+            'einsatzverwaltung_units' => array(
+                'label' => __('Units', 'einsatzverwaltung'),
+                'quickedit' => true
+            ),
+            'e_fzg' => array(
+                'label' => 'Fahrzeuge',
+                'quickedit' => false
+            )
+        );
+    }
+
+    /**
+     * Echo the values of custom columns for a post, to be used for Quick Edit mode.
+     *
+     * @param WP_Post $post
+     * @param WP_Post_Type $post_type_object
+     */
+    public function addInlineData(WP_Post $post, WP_Post_Type $post_type_object)
+    {
+        if ($post_type_object->name !== Report::SLUG) {
+            return;
+        }
+
+        $report = new IncidentReport($post);
+        $unitIds = array_map(function (WP_Post $unit) {
+            return $unit->ID;
+        }, $report->getUnits());
+        $unitIds = join(',', $unitIds);
+        printf(
+            '<div id="%s" class="post_category">%s</div>',
+            esc_attr(Unit::POST_TYPE . '_' . $post->ID),
+            esc_html($unitIds)
+        );
+    }
+
     /**
      * Legt fest, welche Spalten bei der Übersicht der Einsatzberichte im
      * Adminbereich angezeigt werden
@@ -26,14 +101,10 @@ class ReportListTable
         unset($columns['author']);
         unset($columns['date']);
         unset($columns['categories']);
-        $columns['title'] = 'Einsatzbericht';
-        $columns['e_nummer'] = 'Nummer';
-        $columns['einsatzverwaltung_annotations'] = 'Vermerke';
-        $columns['e_alarmzeit'] = 'Alarmzeit';
-        $columns['e_einsatzende'] = 'Einsatzende';
-        $columns['e_art'] = 'Art';
-        $columns['einsatzverwaltung_units'] = __('Units', 'einsatzverwaltung');
-        $columns['e_fzg'] = 'Fahrzeuge';
+        $columnLabels = array_map(function ($column) {
+            return $column['label'];
+        }, $this->customColumns);
+        $columns = array_merge($columns, $columnLabels);
 
         return $columns;
     }
@@ -106,5 +177,110 @@ class ReportListTable
         $url = add_query_arg(array('post_type' => Report::SLUG, $term->taxonomy => $term->slug), 'edit.php');
         $text = sanitize_term_field('name', $term->name, $term->term_id, $term->taxonomy, 'display');
         return sprintf('<a href="%s">%s</a>', esc_url($url), esc_html($text));
+    }
+
+    /**
+     * Gets called for each custom column to output a custom edit box for Quick Edit mode.
+     *
+     * @param string $columnName Name of the column to edit.
+     * @param string $postType The post type slug, or current screen name if this is a taxonomy list table.
+     * @param string $taxonomy The taxonomy name, if any.
+     */
+    public function quickEditCustomBox($columnName, $postType, $taxonomy)
+    {
+        if (!empty($taxonomy) || $postType !== Report::SLUG) {
+            return;
+        }
+
+        if ($this->columnHasCustomBox($columnName)) {
+            echo '<fieldset class="inline-edit-col-right"><div class="inline-edit-col">';
+            $this->echoEditCustomBox($columnName);
+            echo '</div></fieldset>';
+        }
+    }
+
+    /**
+     * Gets called for each custom column to output a custom edit box for Bulk Edit mode.
+     *
+     * @param string $columnName Name of the column to edit.
+     * @param string $postType
+     */
+    public function bulkEditCustomBox($columnName, $postType)
+    {
+        if ($postType !== Report::SLUG) {
+            return;
+        }
+
+        if ($this->columnHasCustomBox($columnName)) {
+            echo '<fieldset class="inline-edit-col-right"><div class="inline-edit-col">';
+            $this->echoEditCustomBox($columnName);
+            echo '</div></fieldset>';
+        }
+    }
+
+    /**
+     * Echo form elements for custom columns used in Quick Edit and Bulk Edit mode.
+     *
+     * @param string $columnName Identifier of the custom column
+     */
+    private function echoEditCustomBox($columnName)
+    {
+        printf(
+            '<span class="title inline-edit-categories-label">%s</span>',
+            esc_html($this->getColumnLabel($columnName))
+        );
+        if ($columnName === 'einsatzverwaltung_units') {
+            $units = get_posts(array(
+                'post_type' => Unit::POST_TYPE,
+                'numberposts' => -1,
+                'order' => 'ASC',
+                'orderby' => 'name'
+            ));
+            if (empty($units)) {
+                $postTypeObject = get_post_type_object(Unit::POST_TYPE);
+                printf("<div>%s</div>", esc_html($postTypeObject->labels->not_found));
+                return;
+            }
+
+            echo '<ul class="cat-checklist evw_unit-checklist">';
+            foreach ($units as $unit) {
+                $identifier = Unit::POST_TYPE . '-' . $unit->ID;
+                printf(
+                    '<li id="%1$s"><label><input type="checkbox" name="evw_units[]" value="%2$d">%3$s</label></li>',
+                    esc_attr($identifier),
+                    esc_attr($unit->ID),
+                    esc_html($unit->post_title)
+                );
+            }
+            echo '</ul>';
+        }
+    }
+
+    /**
+     * Checks wether a custom column should have a custom edit box in Quick Edit / Bulk Edit mode.
+     *
+     * @param string $columnName
+     *
+     * @return bool
+     */
+    private function columnHasCustomBox($columnName)
+    {
+        return array_key_exists($columnName, $this->customColumns) && $this->customColumns[$columnName]['quickedit'];
+    }
+
+    /**
+     * Returns the label of a custom column.
+     *
+     * @param string $columnName
+     *
+     * @return string
+     */
+    private function getColumnLabel($columnName)
+    {
+        if (!array_key_exists($columnName, $this->customColumns)) {
+            return '';
+        }
+
+        return $this->customColumns[$columnName]['label'];
     }
 }

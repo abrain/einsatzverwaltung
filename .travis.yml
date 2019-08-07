@@ -37,7 +37,9 @@ jobs:
     php: '7.3'
     before_install:
       - phpenv config-rm xdebug.ini
-      - composer require bartlett/php-compatinfo:5.* --dev --no-update
+      - composer remove phpunit/phpunit --dev
+      - composer require bartlett/php-compatinfo:5.* --dev
+      - composer require phpunit/phpunit:5.7.27 --dev
     before_script: skip
     script: ./vendor/bin/phpunit -c phpunit-checks.xml --no-coverage
   - stage: validate

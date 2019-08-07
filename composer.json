@@ -19,8 +19,16 @@
     "source": "https://github.com/abrain/einsatzverwaltung",
     "docs": "https://einsatzverwaltung.abrain.de/dokumentation/"
   },
+  "config": {
+    "platform": {
+      "php": "5.6"
+    }
+  },
+  "require": {
+    "php": ">=5.6.0"
+  },
   "require-dev": {
-    "php": ">=5.3.29",
+    "php": ">=5.6.0",
     "phpunit/phpunit": "5.7.27"
   }
 }

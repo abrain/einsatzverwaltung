@@ -31,7 +31,15 @@ Funktionen im &Uuml;berblick:
 * Newsfeed f&uuml;r Einsatzberichte
 * Pflege der Einsatzberichte kann auf bestimmte Benutzerrollen beschr&auml;nkt werden
 
+= Aknowledgements =
+
 Uses Font Awesome by Dave Gandy - http://fontawesome.io
+
+= Social Media =
+
+* Twitter: [@einsatzvw](https://twitter.com/einsatzvw)
+* Mastodon: [@einsatzverwaltung](https://chaos.social/@einsatzverwaltung)
+* Facebook: [Einsatzverwaltung](https://www.facebook.com/einsatzverwaltung/)
 
 == Installation ==
 
@@ -98,9 +106,3 @@ Nein, mehr gibt es [hier](https://einsatzverwaltung.abrain.de/faq/).
 
 == Upgrade Notice ==
 
-
-== Social Media ==
-
-* Twitter: [@einsatzvw](https://twitter.com/einsatzvw)
-* Mastodon: [@einsatzverwaltung](https://chaos.social/@einsatzverwaltung)
-* Facebook: [Einsatzverwaltung](https://www.facebook.com/einsatzverwaltung/)

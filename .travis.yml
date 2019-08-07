@@ -38,7 +38,6 @@ jobs:
     before_install:
       - phpenv config-rm xdebug.ini
       - composer require bartlett/php-compatinfo:5.* --dev
-      - composer require phpunit/phpunit:5.7.* --dev
     before_script: skip
     script: ./vendor/bin/phpunit -c phpunit-checks.xml --no-coverage
   - stage: validate
@@ -48,13 +47,14 @@ jobs:
     dist: precise
     before_install:
       - phpenv config-rm xdebug.ini
+      - composer remove phpunit/phpunit:5.7.* --dev
       - composer require phpunit/phpunit:4.8.* --dev
     script: ./vendor/bin/phpunit --no-coverage --exclude-group unittests
   - stage: validate
     name: 'Latest versions'
     env: WP_VERSION=latest WP_MULTISITE=0
     php: '7.3'
-    before_install: composer require phpunit/phpunit:5.7.* --dev
+    before_install: skip
     before_script:
       - bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
       - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
@@ -80,9 +80,7 @@ matrix:
     - env: WP_VERSION=nightly WP_MULTISITE=0
   fast_finish: true
 
-before_install:
-  - phpenv config-rm xdebug.ini
-  - composer require phpunit/phpunit:5.7.* --dev
+before_install: phpenv config-rm xdebug.ini
 install: composer install --prefer-source
 before_script: bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
 script: ./vendor/bin/phpunit --no-coverage

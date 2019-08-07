@@ -20,5 +20,6 @@
     "docs": "https://einsatzverwaltung.abrain.de/dokumentation/"
   },
   "require-dev": {
+    "phpunit/phpunit": "5.7.27"
   }
 }

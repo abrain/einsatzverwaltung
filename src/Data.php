@@ -101,6 +101,11 @@ class Data
      */
     public function savePostdata($postId, $post)
     {
+        // Schreibrechte prüfen
+        if (!current_user_can('edit_einsatzbericht', $postId)) {
+            return;
+        }
+
         // Automatische Speicherungen sollen nicht berücksichtigt werden
         if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
             return;
@@ -108,11 +113,14 @@ class Data
 
         // Fängt Speichervorgänge per QuickEdit ab
         if (defined('DOING_AJAX') && DOING_AJAX) {
+            $units = (array)filter_input(INPUT_POST, 'evw_units', FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY);
+            $this->saveUnits($post, $units);
             return;
         }
 
-        // Schreibrechte prüfen
-        if (!current_user_can('edit_einsatzbericht', $postId)) {
+        if ($this->isBulkEdit()) {
+            $unitsToAdd = (array)filter_input(INPUT_GET, 'evw_units', FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY);
+            $this->saveUnits($post, $unitsToAdd, false);
             return;
         }
 
@@ -174,17 +182,8 @@ class Data
         add_action('save_post_einsatz', array($this, 'savePostdata'), 10, 2);
 
         // Save Units
-        $units = (array) filter_input(INPUT_POST, 'evw_units', FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY);
-        $assignedUnits = get_post_meta($post->ID, '_evw_unit');
-        $unitsToAdd = array_diff($units, $assignedUnits);
-        $unitsToDelete = array_diff($assignedUnits, $units);
-
-        foreach ($unitsToDelete as $unitId) {
-            delete_post_meta($post->ID, '_evw_unit', $unitId);
-        }
-        foreach ($unitsToAdd as $unitId) {
-            add_post_meta($post->ID, '_evw_unit', $unitId);
-        }
+        $units = (array)filter_input(INPUT_POST, 'evw_units', FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY);
+        $this->saveUnits($post, $units);
     }
 
     /**
@@ -336,5 +335,43 @@ class Data
         }
 
         update_post_meta($postId, 'einsatz_seqNum', $seqNum);
+    }
+
+    /**
+     * @param WP_Post $post
+     * @param string[] $units
+     * @param bool $removeUnits Whether to remove the association with units not mentioned in $units. Default true.
+     */
+    private function saveUnits(WP_Post $post, $units, $removeUnits = true)
+    {
+        $assignedUnits = get_post_meta($post->ID, '_evw_unit');
+        $unitsToAdd = array_diff($units, $assignedUnits);
+
+        if ($removeUnits === true) {
+            $unitsToDelete = array_diff($assignedUnits, $units);
+            foreach ($unitsToDelete as $unitId) {
+                delete_post_meta($post->ID, '_evw_unit', $unitId);
+            }
+        }
+
+        foreach ($unitsToAdd as $unitId) {
+            add_post_meta($post->ID, '_evw_unit', $unitId);
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    private function isBulkEdit()
+    {
+        if (isset($_REQUEST['filter_action']) && ! empty($_REQUEST['filter_action'])) {
+            return false;
+        }
+
+        if (!isset($_REQUEST['action']) || -1 == $_REQUEST['action'] || 'edit' !== $_REQUEST['action']) {
+            return false;
+        }
+
+        return isset($_REQUEST['bulk_edit']);
     }
 }

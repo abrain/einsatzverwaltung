@@ -368,10 +368,12 @@ class Data
             return false;
         }
 
-        if (!isset($_REQUEST['action']) || -1 == $_REQUEST['action'] || 'edit' !== $_REQUEST['action']) {
-            return false;
+        if ((isset($_REQUEST['action']) && -1 != $_REQUEST['action'] && 'edit' === $_REQUEST['action']) ||
+            (isset($_REQUEST['action2']) && -1 != $_REQUEST['action2'] && 'edit' === $_REQUEST['action2'])
+        ) {
+            return isset($_REQUEST['bulk_edit']);
         }
 
-        return isset($_REQUEST['bulk_edit']);
+        return false;
     }
 }

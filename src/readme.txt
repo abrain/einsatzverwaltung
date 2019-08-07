@@ -89,20 +89,5 @@ Nein, mehr gibt es [hier](https://einsatzverwaltung.abrain.de/faq/).
 * Report list: Added parameter to limit to certain types of incident
 * Improved accessibility of the navigation tabs on the Settings page
 
-= 1.5.1 =
-* URLs für PATHINFO-Permalinks (beginnen mit /index.php/) repariert
-* Block-Editor kann für Einsatzberichte deaktiviert werden
-
-= 1.5.0 =
-* Grundlegende Unterstützung für den neuen Blockeditor
-* API teilweise aktiviert
-* Permalinks für Einsatzberichte einstellbar gemacht
-* Templates: Neuer Platzhalter für Einsatzleiter
-* Shortcode einsatzjahre jetzt über Parameter konfigurierbar
-* Auszug für Einsatzberichte kann manuell definiert werden
-* Schlagwörter sind jetzt für Einsatzberichte abschaltbar
-* Fehler bei der Behandlung der Alarmzeit von geplanten Beiträgen behoben
-* Mindestanforderung auf WordPress 4.7 angehoben
-
 == Upgrade Notice ==
 

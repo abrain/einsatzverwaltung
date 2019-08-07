@@ -23,7 +23,7 @@ class FileCheck extends \PHPUnit_Framework_TestCase
         $actualRequirement = $matches[1];
 
         $this->assertTrue(
-            version_compare($actualRequirement, $phpHeader, '='),
+            version_compare($actualRequirement, $phpHeader, '<='),
             sprintf(
                 'Der Header "Requires PHP" (%s) spiegelt nicht die tatsächliche Mindestanforderung (%s) wider.',
                 $phpHeader,

@@ -1,6 +1,8 @@
 <?php
 namespace abrain\Einsatzverwaltung\CustomFields;
 
+use WP_Query;
+
 /**
  * Represents an additional dropdown of a taxonomy for selecting posts
  * @package abrain\Einsatzverwaltung\CustomFields
@@ -59,7 +61,7 @@ class PostSelector extends CustomField
             $parsedArgs['id'] = $parsedArgs['name'];
         }
 
-        $wpQuery = new \WP_Query(array(
+        $wpQuery = new WP_Query(array(
             'post_type' => $parsedArgs['post_type'],
             'post_status' => 'publish',
             'orderby' => 'type title',

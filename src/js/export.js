@@ -1,12 +1,12 @@
 jQuery(function($) {
-    let form = $('#export-form'),
+    var form = $('#export-form'),
         options = form.find('.export-options'),
         inputs = form.find('input[name="format"]');
     
     inputs.change(function() {
-        let formatkey = $(this).val();
+        var formatkey = $(this).val();
         options.each(function () {
-            let optionContainer = $(this);
+            var optionContainer = $(this);
             if (optionContainer.attr('id') === formatkey + '-options') {
                 optionContainer.show();
             } else {

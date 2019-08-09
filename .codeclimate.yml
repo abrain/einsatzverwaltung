@@ -22,4 +22,5 @@ plugins:
     enabled: true
 exclude_patterns:
 - src/font-awesome/
+- .idea/
 - vendor/

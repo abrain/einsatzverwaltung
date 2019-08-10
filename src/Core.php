@@ -3,8 +3,6 @@ namespace abrain\Einsatzverwaltung;
 
 use abrain\Einsatzverwaltung\Shortcodes\Initializer as ShortcodeInitializer;
 use abrain\Einsatzverwaltung\Util\Formatter;
-use abrain\Einsatzverwaltung\Widgets\RecentIncidents;
-use abrain\Einsatzverwaltung\Widgets\RecentIncidentsFormatted;
 
 /**
  * Grundlegende Funktionen
@@ -79,6 +77,7 @@ class Core
         new Frontend($this->options, $this->formatter);
         new ShortcodeInitializer($this->data, $this->formatter, $this->permalinkController);
         new ReportNumberController();
+        new Widgets\Initializer($this->formatter, $this->options);
 
         if (is_admin()) {
             new Admin\Initializer($this->data, $this->options, $this->utilities, $this->permalinkController);
@@ -94,7 +93,6 @@ class Core
         add_action('plugins_loaded', array($this, 'onPluginsLoaded'));
         register_activation_hook(self::$pluginFile, array($this, 'onActivation'));
         register_deactivation_hook(self::$pluginFile, array($this, 'onDeactivation'));
-        add_action('widgets_init', array($this, 'registerWidgets'));
 
         $userRightsManager = new UserRightsManager();
         add_filter('user_has_cap', array($userRightsManager, 'userHasCap'), 10, 4);
@@ -171,12 +169,6 @@ class Core
             $message = sprintf('Plugin %s: %s', $pluginData['Name'], $errorMessage);
             printf('<div class="%1$s"><p>%2$s</p></div>', esc_attr('notice notice-error'), esc_html($message));
         }
-    }
-
-    public function registerWidgets()
-    {
-        register_widget(new RecentIncidents($this->options, $this->formatter));
-        register_widget(new RecentIncidentsFormatted($this->formatter));
     }
 
     private function maybeUpdate()

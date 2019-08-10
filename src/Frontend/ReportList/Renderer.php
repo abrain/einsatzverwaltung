@@ -4,7 +4,6 @@ namespace abrain\Einsatzverwaltung\Frontend\ReportList;
 use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Util\Formatter;
-use abrain\Einsatzverwaltung\Utilities;
 use DateTime;
 
 /**
@@ -182,18 +181,10 @@ class Renderer
      */
     private function insertTableHeader(Parameters $parameters)
     {
-        $allColumns = self::getListColumns();
-
         $this->string .= '<tr class="einsatz-header">';
-        foreach ($parameters->getColumns() as $colId) {
-            if (!array_key_exists($colId, $allColumns)) {
-                $this->string .= '<th>&nbsp;</th>';
-                continue;
-            }
-
-            $colInfo = $allColumns[$colId];
-            $style = Utilities::getArrayValueIfKey($colInfo, 'nowrap', false) ? 'white-space: nowrap;' : '';
-            $this->string .= sprintf('<th style="%s">%s</th>', esc_attr($style), esc_html($colInfo['name']));
+        foreach ($parameters->getColumns() as $column) {
+            $style = $column->isNoWrap() ? 'white-space: nowrap;' : '';
+            $this->string .= sprintf('<th style="%s">%s</th>', esc_attr($style), esc_html($column->getName()));
         }
         $this->string .= '</tr>';
 
@@ -222,8 +213,8 @@ class Renderer
     private function insertRow($report, Parameters $parameters)
     {
         $this->string .= '<tr class="report">';
-        foreach ($parameters->getColumns() as $colId) {
-            $this->string .= $this->getCellMarkup($report, $parameters, $colId);
+        foreach ($parameters->getColumns() as $column) {
+            $this->string .= $this->getCellMarkup($report, $parameters, $column->getIdentifier());
         }
         $this->string .= '</tr>';
         $this->rowsSinceLastHeader++;
@@ -431,79 +422,6 @@ class Renderer
     }
 
     /**
-     * Gibt die möglichen Spalten für die Tabelle zurück
-     *
-     * @return array
-     */
-    public static function getListColumns()
-    {
-        return array(
-            'number' => array(
-                'name' => 'Nummer',
-                'nowrap' => true
-            ),
-            'date' => array(
-                'name' => 'Datum',
-                'nowrap' => true
-            ),
-            'time' => array(
-                'name' => 'Zeit',
-                'nowrap' => true
-            ),
-            'datetime' => array(
-                'name' => 'Datum',
-                'longName' => 'Datum + Zeit',
-                'nowrap' => true
-            ),
-            'title' => array(
-                'name' => 'Einsatzmeldung'
-            ),
-            'incidentCommander' => array(
-                'name' => 'Einsatzleiter'
-            ),
-            'location' => array(
-                'name' => 'Einsatzort'
-            ),
-            'workforce' => array(
-                'name' => 'Mannschaftsst&auml;rke',
-                'cssname' => 'Mannschaftsst\0000E4rke',
-            ),
-            'duration' => array(
-                'name' => 'Dauer',
-                'nowrap' => true
-            ),
-            'vehicles' => array(
-                'name' => 'Fahrzeuge'
-            ),
-            'alarmType' => array(
-                'name' => 'Alarmierungsart'
-            ),
-            'additionalForces' => array(
-                'name' => 'Weitere Kr&auml;fte',
-                'cssname' => 'Weitere Kr\0000E4fte',
-            ),
-            'units' => array(
-                'name' => __('Units', 'einsatzverwaltung')
-            ),
-            'incidentType' => array(
-                'name' => 'Einsatzart'
-            ),
-            'seqNum' => array(
-                'name' => 'Lfd.',
-                'longName' => 'Laufende Nummer'
-            ),
-            'annotationImages' => array(
-                'name' => '',
-                'longName' => 'Vermerk &quot;Bilder im Bericht&quot;'
-            ),
-            'annotationSpecial' => array(
-                'name' => '',
-                'longName' => 'Vermerk &quot;Besonderer Einsatz&quot;'
-            )
-        );
-    }
-
-    /**
      * Generiert CSS-Code, der von Einstellungen abhängt oder nicht gut von Hand zu pflegen ist
      *
      * @return string
@@ -528,12 +446,13 @@ class Renderer
 
         // Bei der responsiven Ansicht die selben Begriffe voranstellen wie im Tabellenkopf
         $string .= '@media (max-width: 767px) {';
-        foreach (self::getListColumns() as $colId => $colInfo) {
+        $columnRepository = ColumnRepository::getInstance();
+        foreach ($columnRepository->getAvailableColumns() as $column) {
             $string .= sprintf(
                 '.%s td.einsatz-column-%s:before {content: "%s:";}',
                 self::TABLECLASS,
-                $colId,
-                (array_key_exists('cssname', $colInfo) ? $colInfo['cssname'] : $colInfo['name'])
+                $column->getIdentifier(),
+                $column->getCssName()
             ).PHP_EOL;
         }
         $string .= '}';

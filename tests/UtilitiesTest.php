@@ -1,7 +1,6 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
-use abrain\Einsatzverwaltung\Model\IncidentReport;
 use WP_UnitTestCase;
 
 /**
@@ -12,36 +11,6 @@ use WP_UnitTestCase;
  */
 class UtilitiesTest extends WP_UnitTestCase
 {
-    /**
-     * @var Utilities
-     */
-    private $utilities;
-
-    /**
-     * @inheritDoc
-     */
-    public function setUp()
-    {
-        parent::setUp();
-        $this->utilities = new Utilities(null);
-    }
-
-    /**
-     * @covers ::postsToIncidentReports
-     */
-    public function testPostsToIncidentReports()
-    {
-        $posts = $this->factory->post->create_many(5, array('post_type' => 'einsatz'));
-
-        $reports = $this->utilities->postsToIncidentReports($posts);
-        $this->assertCount(5, $reports);
-
-        foreach ($reports as $key => $report) {
-            /** @var IncidentReport $report */
-            $this->assertEquals($posts[$key], $report->getPostId());
-        }
-    }
-
     /**
      * @covers ::removePostFromCategory
      */

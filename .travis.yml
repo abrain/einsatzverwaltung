@@ -41,7 +41,7 @@ jobs:
     name: 'Minimum requirement'
     env: WP_VERSION=4.7 WP_MULTISITE=0
     php: '5.6'
-    script: ./vendor/bin/phpunit --no-coverage --exclude-group unittests
+    script: ./vendor/bin/phpunit --no-coverage
   - stage: validate
     name: 'Latest versions'
     env: WP_VERSION=latest WP_MULTISITE=0

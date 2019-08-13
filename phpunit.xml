@@ -16,9 +16,6 @@
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="false">
             <directory suffix=".php">./src</directory>
-            <exclude>
-                <file>./tests/unit/bootstrap.php</file>
-            </exclude>
         </whitelist>
     </filter>
 

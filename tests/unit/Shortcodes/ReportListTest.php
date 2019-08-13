@@ -1,14 +1,14 @@
 <?php
 namespace abrain\Einsatzverwaltung\Shortcodes;
 
-use abrain\Einsatzverwaltung\Frontend\ReportList\Renderer as ReportListRenderer;
 use abrain\Einsatzverwaltung\Frontend\ReportList\SplitType;
 use abrain\Einsatzverwaltung\UnitTestCase;
 
 /**
  * Class ReportListTest
+ * @covers \abrain\Einsatzverwaltung\Shortcodes\AbstractShortcode
+ * @covers \abrain\Einsatzverwaltung\Shortcodes\ReportList
  * @package abrain\Einsatzverwaltung\Shortcodes
- * @group unittests
  */
 class ReportListTest extends UnitTestCase
 {
@@ -32,9 +32,7 @@ class ReportListTest extends UnitTestCase
     public function setUp()
     {
         parent::setUp();
-        $formatter = $this->createMock('\abrain\Einsatzverwaltung\Util\Formatter');
-        $formatter->method('getDurationString')->willReturn('DURATION');
-        $reportListRenderer = new ReportListRenderer($formatter);
+        $reportListRenderer = $this->createMock('\abrain\Einsatzverwaltung\Frontend\ReportList\Renderer');
         $this->reportList = new ReportList($reportListRenderer);
         $this->thisYear = intval(date('Y'));
     }

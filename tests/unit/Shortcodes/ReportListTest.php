@@ -151,16 +151,4 @@ class ReportListTest extends UnitTestCase
             'link' => 'title'
         ), array());
     }
-
-    /**
-     * Copied from WP_UnitTestCase
-     * @param array $expected
-     * @param array $actual
-     */
-    public function assertEqualSets($expected, $actual)
-    {
-        sort($expected);
-        sort($actual);
-        $this->assertEquals($expected, $actual);
-    }
 }

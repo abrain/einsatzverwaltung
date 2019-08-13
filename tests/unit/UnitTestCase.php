@@ -25,4 +25,16 @@ class UnitTestCase extends PHPUnit_Framework_TestCase
         Monkey\tearDown();
         parent::tearDown();
     }
+
+    /**
+     * Copied from WP_UnitTestCase
+     * @param array $expected
+     * @param array $actual
+     */
+    protected function assertEqualSets($expected, $actual)
+    {
+        sort($expected);
+        sort($actual);
+        $this->assertEquals($expected, $actual);
+    }
 }

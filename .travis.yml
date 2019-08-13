@@ -41,7 +41,6 @@ jobs:
     name: 'Minimum requirement'
     env: WP_VERSION=4.7 WP_MULTISITE=0
     php: '5.6'
-    script: ./vendor/bin/phpunit --no-coverage
   - stage: validate
     name: 'Latest versions'
     env: WP_VERSION=latest WP_MULTISITE=0
@@ -52,7 +51,7 @@ jobs:
       - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
       - chmod +x ./cc-test-reporter
       - ./cc-test-reporter before-build
-    script: ./vendor/bin/phpunit
+    script: ./vendor/bin/phpunit -c phpunit-unit.xml
     after_script:
       - ./cc-test-reporter after-build --coverage-input-type clover --exit-code $TRAVIS_TEST_RESULT
   - stage: test
@@ -77,4 +76,4 @@ matrix:
 before_install: phpenv config-rm xdebug.ini
 install: composer install --prefer-source
 before_script: bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
-script: ./vendor/bin/phpunit --no-coverage
+script: ./vendor/bin/phpunit -c phpunit-integration.xml --no-coverage

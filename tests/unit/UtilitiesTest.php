@@ -1,0 +1,60 @@
+<?php
+namespace abrain\Einsatzverwaltung;
+
+use function Brain\Monkey\Functions\expect;
+
+/**
+ * Class UtilitiesTest
+ * @covers \abrain\Einsatzverwaltung\Utilities
+ * @package abrain\Einsatzverwaltung
+ */
+class UtilitiesTest extends UnitTestCase
+{
+
+    /**
+     * @dataProvider dataForGetArrayValue
+     * @param $array
+     * @param $key
+     * @param $defaultValue
+     * @param $expected
+     */
+    public function testGetArrayValueIfKey($array, $key, $defaultValue, $expected)
+    {
+        $this->assertEquals($expected, Utilities::getArrayValueIfKey($array, $key, $defaultValue));
+    }
+
+    /**
+     * @return array
+     */
+    public function dataForGetArrayValue()
+    {
+        return array(
+            array(array(), 'key', 'defaultValue', 'defaultValue'),
+            array(array('stringkey' => false, 3 => 'null'), '3', 'defaultValue', 'null'),
+            array(array('stringkey' => false, 3 => 'null'), 3, 'defaultValue', 'null'),
+            array(array('stringkey' => false, 3 => 'null'), 'stringkey', 'defaultValue', false)
+        );
+    }
+
+    public function testRemovePostFromCategory()
+    {
+        $postId = 24;
+        expect('wp_get_post_categories')->once()->with($postId)->andReturn(array(22,33,99,123,150));
+        expect('wp_set_post_categories')->once()->with($postId, array(22,33,123,150));
+        Utilities::removePostFromCategory($postId, 99);
+    }
+
+    public function testSanitizeCheckbox()
+    {
+        $this->assertEquals(0, Utilities::sanitizeCheckbox(''));
+        $this->assertEquals(0, Utilities::sanitizeCheckbox(' '));
+        $this->assertEquals(0, Utilities::sanitizeCheckbox('adsf'));
+        $this->assertEquals(0, Utilities::sanitizeCheckbox(null));
+        $this->assertEquals(0, Utilities::sanitizeCheckbox(false));
+        $this->assertEquals(0, Utilities::sanitizeCheckbox('23'));
+        $this->assertEquals(0, Utilities::sanitizeCheckbox(23));
+        $this->assertEquals(1, Utilities::sanitizeCheckbox(true));
+        $this->assertEquals(1, Utilities::sanitizeCheckbox('1'));
+        $this->assertEquals(1, Utilities::sanitizeCheckbox(1));
+    }
+}

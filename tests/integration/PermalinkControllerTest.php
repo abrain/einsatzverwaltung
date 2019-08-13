@@ -6,7 +6,6 @@ use WP_UnitTestCase;
 /**
  * Class PermalinkControllerTest
  * @package abrain\Einsatzverwaltung
- * @covers \abrain\Einsatzverwaltung\PermalinkController
  */
 class PermalinkControllerTest extends WP_UnitTestCase
 {

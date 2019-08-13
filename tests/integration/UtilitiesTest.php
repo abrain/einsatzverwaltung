@@ -7,13 +7,9 @@ use WP_UnitTestCase;
  * Tests für diverse Hilfsfunktionen
  *
  * @author Andreas Brain
- * @coversDefaultClass \abrain\Einsatzverwaltung\Utilities
  */
 class UtilitiesTest extends WP_UnitTestCase
 {
-    /**
-     * @covers ::removePostFromCategory
-     */
     public function testRemovePostFromCategory()
     {
         // Einsatzbericht anlegen und allen Kategorien zuweisen

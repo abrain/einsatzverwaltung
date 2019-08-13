@@ -6,8 +6,9 @@ use function Brain\Monkey\Functions\when;
 
 /**
  * Class ReportArchivesTest
+ * @covers \abrain\Einsatzverwaltung\Shortcodes\AbstractShortcode
+ * @covers \abrain\Einsatzverwaltung\Shortcodes\ReportArchives
  * @package abrain\Einsatzverwaltung\Shortcodes
- * @group unittests
  */
 class ReportArchivesTest extends UnitTestCase
 {

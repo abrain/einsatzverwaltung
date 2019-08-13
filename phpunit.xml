@@ -6,6 +6,7 @@
     beStrictAboutTestsThatDoNotTestAnything="true"
     beStrictAboutCoversAnnotation="true"
     colors="true"
+    forceCoversAnnotation="true"
     >
     <testsuites>
         <testsuite name="unit">

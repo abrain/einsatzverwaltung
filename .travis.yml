@@ -39,8 +39,9 @@ jobs:
     script: ./vendor/bin/phpunit -c phpunit-checks.xml --no-coverage
   - stage: validate
     name: 'Minimum requirement'
-    env: WP_VERSION=4.7 WP_MULTISITE=0
     php: '5.6'
+    before_script: skip
+    script: ./vendor/bin/phpunit -c phpunit-unit.xml --no-coverage
   - stage: validate
     name: 'Latest versions'
     php: '7.3'

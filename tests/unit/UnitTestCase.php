@@ -2,6 +2,7 @@
 namespace abrain\Einsatzverwaltung;
 
 use Brain\Monkey;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit_Framework_TestCase;
 
 /**
@@ -10,6 +11,8 @@ use PHPUnit_Framework_TestCase;
  */
 class UnitTestCase extends PHPUnit_Framework_TestCase
 {
+    use MockeryPHPUnitIntegration;
+
     protected function setUp()
     {
         parent::setUp();

@@ -83,13 +83,15 @@ class ReportListTest extends UnitTestCase
     public function testGetReports()
     {
         $reportQuery = $this->createMock('\abrain\Einsatzverwaltung\ReportQuery');
+        $reportQuery->expects($this->once())->method('setIncidentTypeId')->with($this->equalTo(16));
         $reportQuery->expects($this->once())->method('setLimit')->with($this->equalTo(4));
         $reportQuery->expects($this->once())->method('setOnlySpecialReports')->with($this->isTrue());
         $reportQuery->expects($this->once())->method('setOrderAsc')->with($this->isTrue());
+        $reportQuery->expects($this->once())->method('setUnits')->with($this->equalTo(array(433, 457, 560)));
         $reportQuery->expects($this->once())->method('setYear')->with($this->equalTo('2017'));
         $this->reportList->configureReportQuery(
             $reportQuery,
-            array('limit' => 4, 'sort' => 'auf', 'jahr' => '2017'),
+            array('einsatzart' => '16', 'limit' => 4, 'sort' => 'auf', 'jahr' => '2017', 'units' => '433,457,560'),
             array('special')
         );
     }

@@ -1,14 +1,14 @@
 <?php
 namespace abrain\Einsatzverwaltung\Shortcodes;
 
-use PHPUnit_Framework_TestCase;
+use abrain\Einsatzverwaltung\UnitTestCase;
 
 /**
  * Class ReportArchivesTest
  * @package abrain\Einsatzverwaltung\Shortcodes
  * @group unittests
  */
-class ReportArchivesTest extends PHPUnit_Framework_TestCase
+class ReportArchivesTest extends UnitTestCase
 {
     const FAKE_URL = 'https://URL';
 

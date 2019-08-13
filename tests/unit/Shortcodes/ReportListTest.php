@@ -3,14 +3,14 @@ namespace abrain\Einsatzverwaltung\Shortcodes;
 
 use abrain\Einsatzverwaltung\Frontend\ReportList\Renderer as ReportListRenderer;
 use abrain\Einsatzverwaltung\Frontend\ReportList\SplitType;
-use PHPUnit_Framework_TestCase;
+use abrain\Einsatzverwaltung\UnitTestCase;
 
 /**
  * Class ReportListTest
  * @package abrain\Einsatzverwaltung\Shortcodes
  * @group unittests
  */
-class ReportListTest extends PHPUnit_Framework_TestCase
+class ReportListTest extends UnitTestCase
 {
     /**
      * Arbitrary URL used instead of asking WordPress for an actual URL.

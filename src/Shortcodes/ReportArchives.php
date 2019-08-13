@@ -4,6 +4,8 @@ namespace abrain\Einsatzverwaltung\Shortcodes;
 
 use abrain\Einsatzverwaltung\Data;
 use abrain\Einsatzverwaltung\PermalinkController;
+use function esc_url;
+use function shortcode_atts;
 
 /**
  * Renders links to yearly archives for the shortcode [einsatzjahre]

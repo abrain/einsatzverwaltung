@@ -1,6 +1,12 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
+use function get_plugin_data;
+use function plugin_basename;
+use function plugin_dir_path;
+use function plugin_dir_url;
+use function spl_autoload_register;
+
 /**
  * Takes care of loading classes whereever they are needed
  *

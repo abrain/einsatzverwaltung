@@ -6,6 +6,7 @@ use abrain\Einsatzverwaltung\CustomFields\CustomField;
 use abrain\Einsatzverwaltung\CustomFields\NumberInput;
 use abrain\Einsatzverwaltung\CustomFields\PostSelector;
 use abrain\Einsatzverwaltung\CustomFields\TextInput;
+use function add_action;
 
 /**
  * Class TaxonomyCustomFields

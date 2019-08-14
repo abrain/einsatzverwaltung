@@ -178,19 +178,11 @@ class Core
             return;
         }
 
-        $update = $this->getUpdater();
+        $update = new Update();
         $updateResult = $update->doUpdate($currentDbVersion, self::DB_VERSION);
         if (is_wp_error($updateResult)) {
             error_log("Das Datenbank-Upgrade wurde mit folgendem Fehler beendet: {$updateResult->get_error_message()}");
         }
-    }
-
-    /**
-     * @return Update
-     */
-    public function getUpdater()
-    {
-        return new Update($this->data);
     }
 
     /**

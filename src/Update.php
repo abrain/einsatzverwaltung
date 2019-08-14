@@ -10,20 +10,6 @@ use wpdb;
 class Update
 {
     /**
-     * @var Data
-     */
-    private $data;
-
-    /**
-     * Update constructor.
-     * @param Data $data
-     */
-    public function __construct($data)
-    {
-        $this->data = $data;
-    }
-
-    /**
      * Fürt ein Update der Datenbank duch
      *
      * @param int $currentDbVersion derzeitige Version der Datenbank
@@ -211,6 +197,8 @@ class Update
      */
     private function upgrade120()
     {
+        global $wpdb;
+
         // Alle veröffentlichten Einsatzberichte einer Kategorie hinzufügen, wenn diese in den Einstellungen für die
         // Einsatzberichte gesetzt wurde
         if (!function_exists('category_exists')) {
@@ -231,7 +219,29 @@ class Update
         }
 
         // Aktualisiert sämtliche laufenden Nummern der Einsatzberichte
-        $this->data->updateSequenceNumbers();
+        $years = $wpdb->get_col($wpdb->prepare(
+            "SELECT DISTINCT YEAR(post_date) AS years FROM {$wpdb->posts} WHERE post_type = %s AND post_status = %s;",
+            array('einsatz', 'publish')
+        ));
+        foreach ($years as $year) {
+            $posts = get_posts(array(
+                'nopaging' => true,
+                'orderby' => 'post_date',
+                'order' => 'ASC',
+                'post_type' => 'einsatz',
+                'post_status' => array('publish', 'private'),
+                'year' => $year
+            ));
+
+            $expectedNumber = 1;
+            foreach ($posts as $post) {
+                $actualNumber = get_post_meta($post->ID, 'einsatz_seqNum', true);
+                if ($expectedNumber != $actualNumber) {
+                    update_post_meta($post->ID, 'einsatz_seqNum', $expectedNumber);
+                }
+                $expectedNumber++;
+            }
+        }
 
         // Setzt alle alten Einsatzberichte auf 'nicht als besonders markiert', wichtig für das Einfügen in die
         // Mainloop. Außerdem wird die Option, ob nur besondere Einsatzberichte zwischen den WordPress-Beiträgen

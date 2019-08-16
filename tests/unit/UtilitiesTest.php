@@ -36,6 +36,34 @@ class UtilitiesTest extends UnitTestCase
         );
     }
 
+    public function testPrintError()
+    {
+        $utilities = new Utilities();
+        $this->expectOutputRegex('/<p class="[^"]*error[^"]*">Some random string<\/p>/');
+        $utilities->printError('Some random string');
+    }
+
+    public function testPrintInfo()
+    {
+        $utilities = new Utilities();
+        $this->expectOutputRegex('/<p class="[^"]*info[^"]*">Some random string<\/p>/');
+        $utilities->printInfo('Some random string');
+    }
+
+    public function testPrintSuccess()
+    {
+        $utilities = new Utilities();
+        $this->expectOutputRegex('/<p class="[^"]*success[^"]*">Some random string<\/p>/');
+        $utilities->printSuccess('Some random string');
+    }
+
+    public function testPrintWarning()
+    {
+        $utilities = new Utilities();
+        $this->expectOutputRegex('/<p class="[^"]*warning[^"]*">Some random string<\/p>/');
+        $utilities->printWarning('Some random string');
+    }
+
     public function testRemovePostFromCategory()
     {
         $postId = 24;

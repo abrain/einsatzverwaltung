@@ -44,6 +44,17 @@ class UtilitiesTest extends UnitTestCase
         Utilities::removePostFromCategory($postId, 99);
     }
 
+    /**
+     * If we want to remove a category that is not even set, nothing should be changed.
+     */
+    public function testRemovePostFromCategoryBail()
+    {
+        $postId = 36;
+        expect('wp_get_post_categories')->once()->with($postId)->andReturn(array(22,33,99,123,150));
+        expect('wp_set_post_categories')->never();
+        Utilities::removePostFromCategory($postId, 50);
+    }
+
     public function testSanitizeCheckbox()
     {
         $this->assertEquals(0, Utilities::sanitizeCheckbox(''));

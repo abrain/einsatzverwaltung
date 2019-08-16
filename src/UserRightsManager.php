@@ -36,11 +36,11 @@ class UserRightsManager
     );
 
     /**
-     * @param $roleSlug
+     * @param string $roleSlug
      *
      * @return bool
      */
-    public function isRoleAllowedToEdit($roleSlug)
+    private function isRoleAllowedToEdit($roleSlug)
     {
         if ($roleSlug === 'administrator') {
             return true;

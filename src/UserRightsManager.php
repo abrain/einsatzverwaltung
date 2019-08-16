@@ -52,10 +52,11 @@ class UserRightsManager
     /**
      * Prüft und vergibt Benutzerrechte zur Laufzeit
      *
-     * @param array $allcaps Effektive Nutzerrechte
-     * @param array $caps Die angefragten Nutzerrechte
-     * @param array $args Zusätzliche Parameter wie Objekt-ID
-     * @param WP_User $user Benutzerobjekt
+     * @param bool[] $allcaps Array of key/value pairs where keys represent a capability name and boolean values
+     * represent whether the user has that capability.
+     * @param string[] $caps Required primitive capabilities for the requested capability.
+     * @param array $args Arguments that accompany the requested capability check.
+     * @param WP_User $user The user object.
      *
      * @return array Die gefilterten oder erweiterten Nutzerrechte
      */

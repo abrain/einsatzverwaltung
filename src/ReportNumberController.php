@@ -60,7 +60,7 @@ class ReportNumberController
      *
      * @return string Formatierte Einsatznummer
      */
-    public function formatEinsatznummer($jahr, $nummer)
+    private function formatEinsatznummer($jahr, $nummer)
     {
         $stellen = self::sanitizeEinsatznummerStellen(get_option('einsatzvw_einsatznummer_stellen'));
         $lfdvorne = (get_option('einsatzvw_einsatznummer_lfdvorne', false) === '1');
@@ -111,7 +111,7 @@ class ReportNumberController
     /**
      * Generiert für alle Einsatzberichte eine Einsatznummer gemäß dem aktuell konfigurierten Format.
      */
-    public function updateAllIncidentNumbers()
+    private function updateAllIncidentNumbers()
     {
         $years = Data::getJahreMitEinsatz();
         foreach ($years as $year) {

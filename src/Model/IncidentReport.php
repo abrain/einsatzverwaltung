@@ -5,6 +5,9 @@ namespace abrain\Einsatzverwaltung\Model;
 use DateTime;
 use WP_Post;
 use WP_Term;
+use function _doing_it_wrong;
+use function get_post;
+use function get_post_type;
 
 /**
  * Datenmodellklasse für Einsatzberichte

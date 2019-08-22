@@ -24,18 +24,6 @@ class ReportNumberController
     const DEFAULT_SEQNUM_DIGITS = 3;
 
     /**
-     * ReportNumberController constructor.
-     */
-    public function __construct()
-    {
-        add_action('updated_postmeta', array($this, 'onPostMetaChanged'), 10, 4);
-        add_action('added_post_meta', array($this, 'onPostMetaChanged'), 10, 4);
-        add_action('updated_option', array($this, 'maybeAutoIncidentNumbersChanged'), 10, 3);
-        add_action('updated_option', array($this, 'maybeIncidentNumberFormatChanged'), 10, 3);
-        add_action('add_option_einsatzverwaltung_incidentnumbers_auto', array($this, 'onOptionAdded'), 10, 2);
-    }
-
-    /**
      * Sobald die laufende Nummer aktualisiert wird, muss die Einsatznummer neu generiert werden.
      *
      * @param int $metaId ID des postmeta-Eintrags

@@ -74,9 +74,22 @@ class Core
         $this->formatter = new Formatter($this->options, $this->permalinkController); // TODO In Singleton umwandeln
 
         $this->data = new Data($this->options);
+        add_action('save_post_einsatz', array($this->data, 'savePostdata'), 10, 2);
+        add_action('private_einsatz', array($this->data, 'onPublish'), 10, 2);
+        add_action('publish_einsatz', array($this->data, 'onPublish'), 10, 2);
+        add_action('trash_einsatz', array($this->data, 'onTrash'), 10, 2);
+        add_action('transition_post_status', array($this->data, 'onTransitionPostStatus'), 10, 3);
+
         new Frontend($this->options, $this->formatter);
         new ShortcodeInitializer($this->data, $this->formatter, $this->permalinkController);
-        new ReportNumberController();
+
+        $numberController = new ReportNumberController();
+        add_action('updated_postmeta', array($numberController, 'onPostMetaChanged'), 10, 4);
+        add_action('added_post_meta', array($numberController, 'onPostMetaChanged'), 10, 4);
+        add_action('updated_option', array($numberController, 'maybeAutoIncidentNumbersChanged'), 10, 3);
+        add_action('updated_option', array($numberController, 'maybeIncidentNumberFormatChanged'), 10, 3);
+        add_action('add_option_einsatzverwaltung_incidentnumbers_auto', array($numberController, 'onOptionAdded'), 10, 2);
+
         new Widgets\Initializer($this->formatter, $this->options);
 
         if (is_admin()) {

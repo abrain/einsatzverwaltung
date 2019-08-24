@@ -90,7 +90,7 @@ class Core
         add_action('updated_option', array($numberController, 'maybeIncidentNumberFormatChanged'), 10, 3);
         add_action('add_option_einsatzverwaltung_incidentnumbers_auto', array($numberController, 'onOptionAdded'), 10, 2);
 
-        new Widgets\Initializer($this->formatter, $this->options);
+        new Widgets\Initializer($this->formatter);
 
         if (is_admin()) {
             new Admin\Initializer($this->data, $this->options, $this->utilities, $this->permalinkController);

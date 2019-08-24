@@ -36,28 +36,20 @@ class Data
     }
 
     /**
-     * Gibt ein Array mit Jahreszahlen zurück, in denen Einsätze vorliegen
+     * Returns the years that contain reports
      *
-     * @return string[]
-     */
-    public static function getJahreMitEinsatz()
-    {
-        /** @var wpdb $wpdb */
-        global $wpdb;
-
-        return $wpdb->get_col($wpdb->prepare(
-            "SELECT DISTINCT YEAR(post_date) AS years FROM {$wpdb->posts} WHERE post_type = %s AND post_status = %s;",
-            array('einsatz', 'publish')
-        ));
-    }
-
-    /**
-     * Returns the years
      * @return int[]
      */
     public function getYearsWithReports()
     {
-        $yearStrings = self::getJahreMitEinsatz();
+        /** @var wpdb $wpdb */
+        global $wpdb;
+
+        $yearStrings = $wpdb->get_col($wpdb->prepare(
+            "SELECT DISTINCT YEAR(post_date) AS years FROM {$wpdb->posts} WHERE post_type = %s AND post_status = %s;",
+            array('einsatz', 'publish')
+        ));
+
         return array_map('intval', $yearStrings);
     }
 
@@ -163,7 +155,7 @@ class Data
     public function updateSequenceNumbers($yearToUpdate = null)
     {
         if (empty($yearToUpdate)) {
-            $years = self::getJahreMitEinsatz();
+            $years = self::getYearsWithReports();
         }
 
         if (!is_array($yearToUpdate) && is_string($yearToUpdate) && is_numeric($yearToUpdate)) {

@@ -1,6 +1,7 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
+use Mockery;
 use function Brain\Monkey\Functions\expect;
 
 /**
@@ -25,7 +26,8 @@ class ReportNumberControllerTest extends UnitTestCase
 
     public function testChangeOfSequenceNumber()
     {
-        $controller = new ReportNumberController();
+        $data = Mockery::mock('\abrain\Einsatzverwaltung\Data');
+        $controller = new ReportNumberController($data);
         $postId = 158;
         expect('get_post_type')->once()->with($postId)->andReturn('einsatz');
         expect('get_option')->once()->with('einsatzverwaltung_incidentnumbers_auto', '0')->andReturn('1');
@@ -38,7 +40,8 @@ class ReportNumberControllerTest extends UnitTestCase
 
     public function testChangeOfForeignPostMeta()
     {
-        $controller = new ReportNumberController();
+        $data = Mockery::mock('\abrain\Einsatzverwaltung\Data');
+        $controller = new ReportNumberController($data);
         $postId = 4652;
         expect('get_post_type')->atMost()->once()->with($postId)->andReturn('einsatz');
         expect('update_post_meta')->never();
@@ -47,7 +50,8 @@ class ReportNumberControllerTest extends UnitTestCase
 
     public function testChangeOfPostMetaOfForeignPostType()
     {
-        $controller = new ReportNumberController();
+        $data = Mockery::mock('\abrain\Einsatzverwaltung\Data');
+        $controller = new ReportNumberController($data);
         $postId = 176;
         expect('get_post_type')->once()->with($postId)->andReturn('unkown_cpt');
         expect('update_post_meta')->never();

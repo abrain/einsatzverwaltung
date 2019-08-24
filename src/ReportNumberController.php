@@ -23,6 +23,21 @@ class ReportNumberController
     const DEFAULT_SEQNUM_DIGITS = 3;
 
     /**
+     * @var Data
+     */
+    private $data;
+
+    /**
+     * ReportNumberController constructor.
+     *
+     * @param Data $data
+     */
+    public function __construct(Data $data)
+    {
+        $this->data = $data;
+    }
+
+    /**
      * Sobald die laufende Nummer aktualisiert wird, muss die Einsatznummer neu generiert werden.
      *
      * @param int $metaId ID des postmeta-Eintrags
@@ -114,7 +129,7 @@ class ReportNumberController
      */
     private function updateAllIncidentNumbers()
     {
-        $years = Data::getJahreMitEinsatz();
+        $years = $this->data->getYearsWithReports();
         foreach ($years as $year) {
             $reportQuery = new ReportQuery();
             $reportQuery->setOrderAsc(true);

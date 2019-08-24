@@ -83,7 +83,7 @@ class Core
         new Frontend($this->options, $this->formatter);
         new ShortcodeInitializer($this->data, $this->formatter, $this->permalinkController);
 
-        $numberController = new ReportNumberController();
+        $numberController = new ReportNumberController($this->data);
         add_action('updated_postmeta', array($numberController, 'onPostMetaChanged'), 10, 4);
         add_action('added_post_meta', array($numberController, 'onPostMetaChanged'), 10, 4);
         add_action('updated_option', array($numberController, 'maybeAutoIncidentNumbersChanged'), 10, 3);

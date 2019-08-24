@@ -1,7 +1,6 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
-use WP_Post;
 use WP_UnitTestCase;
 
 /**
@@ -43,29 +42,5 @@ class DataTest extends WP_UnitTestCase
         foreach ($yearsWithReports as $year) {
             $this->assertInternalType('int', $year);
         }
-    }
-
-    public function testGetEinsatzberichte()
-    {
-        $reportFactory = new ReportFactory();
-        $reportIds2014 = $reportFactory->generateManyForYear('2014', 3);
-        $reportIds2015 = $reportFactory->generateManyForYear('2015', 4);
-        $reportFactory->generateManyForYear('2017', 2);
-
-        // check a certain year
-        $reports = Data::getEinsatzberichte(2015);
-        $this->assertCount(4, $reports);
-        $reportIds = array_map(function (WP_Post $report) {
-            return $report->ID;
-        }, $reports);
-        $this->assertEqualSets($reportIds2015, $reportIds);
-
-        // check a different year
-        $reports = Data::getEinsatzberichte(2014);
-        $this->assertCount(3, $reports);
-        $reportIds = array_map(function (WP_Post $report) {
-            return $report->ID;
-        }, $reports);
-        $this->assertEqualSets($reportIds2014, $reportIds);
     }
 }

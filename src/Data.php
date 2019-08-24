@@ -36,27 +36,6 @@ class Data
     }
 
     /**
-     * @param $kalenderjahr
-     *
-     * @return WP_Post[]
-     */
-    public static function getEinsatzberichte($kalenderjahr)
-    {
-        if (empty($kalenderjahr) || strlen($kalenderjahr)!=4 || !is_numeric($kalenderjahr)) {
-            $kalenderjahr = '';
-        }
-
-        return get_posts(array(
-            'nopaging' => true,
-            'orderby' => 'post_date',
-            'order' => 'ASC',
-            'post_type' => 'einsatz',
-            'post_status' => array('publish', 'private'),
-            'year' => $kalenderjahr
-        ));
-    }
-
-    /**
      * Gibt ein Array mit Jahreszahlen zurück, in denen Einsätze vorliegen
      *
      * @return string[]
@@ -196,13 +175,17 @@ class Data
         }
 
         foreach ($years as $year) {
-            $posts = self::getEinsatzberichte($year);
+            $reportQuery = new ReportQuery();
+            $reportQuery->setOrderAsc(true);
+            $reportQuery->setIncludePrivateReports(true);
+            $reportQuery->setYear($year);
+            $reports = $reportQuery->getReports();
 
             $expectedNumber = 1;
-            foreach ($posts as $post) {
-                $actualNumber = get_post_meta($post->ID, 'einsatz_seqNum', true);
+            foreach ($reports as $report) {
+                $actualNumber = $report->getSequentialNumber();
                 if ($expectedNumber != $actualNumber) {
-                    $this->setSequenceNumber($post->ID, $expectedNumber);
+                    $this->setSequenceNumber($report->getPostId(), $expectedNumber);
                 }
                 $expectedNumber++;
             }

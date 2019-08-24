@@ -2,7 +2,6 @@
 
 namespace abrain\Einsatzverwaltung;
 
-use abrain\Einsatzverwaltung\Model\IncidentReport;
 use function date_create;
 use function date_format;
 use function get_option;
@@ -117,12 +116,15 @@ class ReportNumberController
     {
         $years = Data::getJahreMitEinsatz();
         foreach ($years as $year) {
-            $posts = Data::getEinsatzberichte($year);
-            foreach ($posts as $post) {
-                $incidentReport = new IncidentReport($post);
-                $seqNum = $incidentReport->getSequentialNumber();
-                $newIncidentNumber = $this->formatEinsatznummer($year, $seqNum);
-                update_post_meta($post->ID, 'einsatz_incidentNumber', $newIncidentNumber);
+            $reportQuery = new ReportQuery();
+            $reportQuery->setOrderAsc(true);
+            $reportQuery->setIncludePrivateReports(true);
+            $reportQuery->setYear($year);
+            $reports = $reportQuery->getReports();
+
+            foreach ($reports as $report) {
+                $newIncidentNumber = $this->formatEinsatznummer($year, $report->getSequentialNumber());
+                update_post_meta($report->getPostId(), 'einsatz_incidentNumber', $newIncidentNumber);
             }
         }
     }

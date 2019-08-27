@@ -1,31 +1,24 @@
 <?php
 namespace abrain\Einsatzverwaltung\Frontend\ReportList;
 
-use WP_UnitTestCase;
+use abrain\Einsatzverwaltung\UnitTestCase;
 use abrain\Einsatzverwaltung\Frontend\ReportList\Parameters as ReportListParameters;
+use function Brain\Monkey\Functions\when;
 
 /**
  * Class ReportListParametersTest
+ * @covers \abrain\Einsatzverwaltung\Frontend\ReportList\Parameters
  * @package abrain\Einsatzverwaltung\Frontend\ReportList
+ * @uses \abrain\Einsatzverwaltung\Frontend\ReportList\Column
+ * @uses \abrain\Einsatzverwaltung\Frontend\ReportList\ColumnRepository
  */
-class ReportListParametersTest extends WP_UnitTestCase
+class ReportListParametersTest extends UnitTestCase
 {
-    public function testSanitizeColumns()
-    {
-        $this->assertEquals(ColumnRepository::DEFAULT_COLUMNS, ColumnRepository::sanitizeColumns(''));
-        $this->assertEquals(ColumnRepository::DEFAULT_COLUMNS, ColumnRepository::sanitizeColumns(','));
-        $this->assertEquals(ColumnRepository::DEFAULT_COLUMNS, ColumnRepository::sanitizeColumns('bla'));
-        $this->assertEquals(ColumnRepository::DEFAULT_COLUMNS, ColumnRepository::sanitizeColumns('bla,invalid'));
-        $this->assertEquals('title', ColumnRepository::sanitizeColumns('title'));
-        $this->assertEquals('title', ColumnRepository::sanitizeColumns('title,invalid'));
-        $this->assertEquals('title,date', ColumnRepository::sanitizeColumns('title,invalid,date'));
-    }
-
     public function testConstructDefaults()
     {
-        delete_option('einsatzvw_list_columns');
-        delete_option('einsatzvw_list_ext_link');
-        delete_option('einsatzvw_list_fahrzeuge_link');
+        when('get_option')->alias(function ($name, $default = false) {
+            return $default;
+        });
         $parameters = new ReportListParameters();
         $this->assertFalse($parameters->compact);
         $this->assertTrue($parameters->showHeading);
@@ -38,14 +31,18 @@ class ReportListParametersTest extends WP_UnitTestCase
 
     public function testConstructInvalidColumns()
     {
-        update_option('einsatzvw_list_columns', 'invalid,bla');
+        when('get_option')->alias(function ($name, $default = false) {
+            return $name === 'einsatzvw_list_columns' ? 'invalid,bla' : $default;
+        });
         $parameters = new ReportListParameters();
         $this->assertColumnsById(explode(',', ColumnRepository::DEFAULT_COLUMNS), $parameters->getColumns());
     }
 
     public function testConstructMixedColumns()
     {
-        update_option('einsatzvw_list_columns', 'invalid,title,bla,date');
+        when('get_option')->alias(function ($name, $default = false) {
+            return $name === 'einsatzvw_list_columns' ? 'invalid,title,bla,date' : $default;
+        });
         $parameters = new ReportListParameters();
         $this->assertColumnsById(array('title', 'date'), $parameters->getColumns());
     }
@@ -67,6 +64,9 @@ class ReportListParametersTest extends WP_UnitTestCase
 
     public function testIsSplitMonths()
     {
+        when('get_option')->alias(function ($name, $default = false) {
+            return $default;
+        });
         $parameters = new ReportListParameters();
         $this->assertFalse($parameters->isSplitMonths());
         $parameters->setSplitType(SplitType::MONTHLY);
@@ -75,27 +75,11 @@ class ReportListParametersTest extends WP_UnitTestCase
         $this->assertFalse($parameters->isSplitMonths());
     }
 
-    public function testSanitizeColumnsArrayNoDefault()
-    {
-        $this->assertEquals(array(), ColumnRepository::sanitizeColumnsArrayNoDefault(array()));
-        $this->assertEquals(array(), ColumnRepository::sanitizeColumnsArrayNoDefault(array('bla', 'inexistent')));
-        $this->assertEquals(array('title', 'vehicles'), ColumnRepository::sanitizeColumnsArrayNoDefault(array('title', 'invalid', 'vehicles')));
-        $this->assertEquals(array('title'), ColumnRepository::sanitizeColumnsArrayNoDefault(array('title', 9)));
-        $this->assertEquals(array(), ColumnRepository::sanitizeColumnsArrayNoDefault(array(12)));
-    }
-
-    public function testSanitizeColumnsArray()
-    {
-        $defaultColumns = explode(',', ColumnRepository::DEFAULT_COLUMNS);
-        $this->assertEquals($defaultColumns, ColumnRepository::sanitizeColumnsArray(array()));
-        $this->assertEquals($defaultColumns, ColumnRepository::sanitizeColumnsArray(array('bla', 'inexistent')));
-        $this->assertEquals(array('title', 'vehicles'), ColumnRepository::sanitizeColumnsArray(array('title', 'invalid', 'vehicles')));
-        $this->assertEquals(array('title'), ColumnRepository::sanitizeColumnsArray(array('title', 9)));
-        $this->assertEquals($defaultColumns, ColumnRepository::sanitizeColumnsArray(array(12)));
-    }
-
     public function testGetColumnsLinkingReport()
     {
+        when('get_option')->alias(function ($name, $default = false) {
+            return $default;
+        });
         $parameters = new ReportListParameters();
         $this->assertEquals(array('title'), $parameters->getColumnsLinkingReport());
 

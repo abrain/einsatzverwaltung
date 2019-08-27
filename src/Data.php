@@ -33,63 +33,23 @@ class Data
     public function __construct($options)
     {
         $this->options = $options;
-
-        $this->addHooks();
-    }
-
-    private function addHooks()
-    {
-        add_action('save_post_einsatz', array($this, 'savePostdata'), 10, 2);
-        add_action('private_einsatz', array($this, 'onPublish'), 10, 2);
-        add_action('publish_einsatz', array($this, 'onPublish'), 10, 2);
-        add_action('trash_einsatz', array($this, 'onTrash'), 10, 2);
-        add_action('transition_post_status', array($this, 'onTransitionPostStatus'), 10, 3);
     }
 
     /**
-     * @param $kalenderjahr
+     * Returns the years that contain reports
      *
-     * @return WP_Post[]
-     */
-    public static function getEinsatzberichte($kalenderjahr)
-    {
-        if (empty($kalenderjahr) || strlen($kalenderjahr)!=4 || !is_numeric($kalenderjahr)) {
-            $kalenderjahr = '';
-        }
-
-        return get_posts(array(
-            'nopaging' => true,
-            'orderby' => 'post_date',
-            'order' => 'ASC',
-            'post_type' => 'einsatz',
-            'post_status' => array('publish', 'private'),
-            'year' => $kalenderjahr
-        ));
-    }
-
-    /**
-     * Gibt ein Array mit Jahreszahlen zurück, in denen Einsätze vorliegen
-     *
-     * @return string[]
-     */
-    public static function getJahreMitEinsatz()
-    {
-        /** @var wpdb $wpdb */
-        global $wpdb;
-
-        return $wpdb->get_col($wpdb->prepare(
-            "SELECT DISTINCT YEAR(post_date) AS years FROM {$wpdb->posts} WHERE post_type = %s AND post_status = %s;",
-            array('einsatz', 'publish')
-        ));
-    }
-
-    /**
-     * Returns the years
      * @return int[]
      */
     public function getYearsWithReports()
     {
-        $yearStrings = self::getJahreMitEinsatz();
+        /** @var wpdb $wpdb */
+        global $wpdb;
+
+        $yearStrings = $wpdb->get_col($wpdb->prepare(
+            "SELECT DISTINCT YEAR(post_date) AS years FROM {$wpdb->posts} WHERE post_type = %s AND post_status = %s;",
+            array('einsatz', 'publish')
+        ));
+
         return array_map('intval', $yearStrings);
     }
 
@@ -195,7 +155,7 @@ class Data
     public function updateSequenceNumbers($yearToUpdate = null)
     {
         if (empty($yearToUpdate)) {
-            $years = self::getJahreMitEinsatz();
+            $years = self::getYearsWithReports();
         }
 
         if (!is_array($yearToUpdate) && is_string($yearToUpdate) && is_numeric($yearToUpdate)) {
@@ -207,13 +167,17 @@ class Data
         }
 
         foreach ($years as $year) {
-            $posts = self::getEinsatzberichte($year);
+            $reportQuery = new ReportQuery();
+            $reportQuery->setOrderAsc(true);
+            $reportQuery->setIncludePrivateReports(true);
+            $reportQuery->setYear($year);
+            $reports = $reportQuery->getReports();
 
             $expectedNumber = 1;
-            foreach ($posts as $post) {
-                $actualNumber = get_post_meta($post->ID, 'einsatz_seqNum', true);
+            foreach ($reports as $report) {
+                $actualNumber = $report->getSequentialNumber();
                 if ($expectedNumber != $actualNumber) {
-                    $this->setSequenceNumber($post->ID, $expectedNumber);
+                    $this->setSequenceNumber($report->getPostId(), $expectedNumber);
                 }
                 $expectedNumber++;
             }

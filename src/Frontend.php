@@ -106,8 +106,8 @@ class Frontend
             $additionalForces = $this->formatter->getAdditionalForces($report, $mayContainLinks, $showArchiveLinks);
 
             $timeOfAlerting = $report->getTimeOfAlerting();
-            $datumsformat = $this->options->getDateFormat();
-            $zeitformat = $this->options->getTimeFormat();
+            $datumsformat = get_option('date_format', 'd.m.Y');
+            $zeitformat = get_option('time_format', 'H:i');
             $einsatz_datum = ($timeOfAlerting ? date_i18n($datumsformat, $timeOfAlerting->getTimestamp()) : '-');
             $einsatz_zeit = ($timeOfAlerting ? date_i18n($zeitformat, $timeOfAlerting->getTimestamp()).' Uhr' : '-');
 

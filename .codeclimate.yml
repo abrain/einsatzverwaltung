@@ -23,4 +23,5 @@ plugins:
 exclude_patterns:
 - src/font-awesome/
 - .idea/
+- tests/
 - vendor/

@@ -124,10 +124,10 @@ class Formatter
                 }
                 break;
             case '%date%':
-                $replace = date_i18n($this->options->getDateFormat(), $timeOfAlerting->getTimestamp());
+                $replace = date_i18n(get_option('date_format', 'd.m.Y'), $timeOfAlerting->getTimestamp());
                 break;
             case '%time%':
-                $replace = date_i18n($this->options->getTimeFormat(), $timeOfAlerting->getTimestamp());
+                $replace = date_i18n(get_option('time_format', 'H:i'), $timeOfAlerting->getTimestamp());
                 break;
             case '%duration%':
                 $replace = $this->getDurationString($incidentReport->getDuration());

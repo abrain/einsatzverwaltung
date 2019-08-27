@@ -28,3 +28,4 @@ build
 setupLocalTest.sh
 vendor
 .DS_Store
+.php_cs.cache

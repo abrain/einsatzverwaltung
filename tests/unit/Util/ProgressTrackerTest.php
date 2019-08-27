@@ -1,15 +1,20 @@
 <?php
 namespace abrain\Einsatzverwaltung\Util;
 
+use abrain\Einsatzverwaltung\UnitTestCase;
+use Mockery;
+
 /**
  * Class ProgressTrackerTest
+ * @covers \abrain\Einsatzverwaltung\Util\ProgressTracker
  * @package abrain\Einsatzverwaltung\Util
  */
-class ProgressTrackerTest extends \WP_UnitTestCase
+class ProgressTrackerTest extends UnitTestCase
 {
     public function testAddStep()
     {
-        $progressTracker = new ProgressTracker();
+        $utilities = Mockery::mock('\abrain\Einsatzverwaltung\Utilities');
+        $progressTracker = new ProgressTracker($utilities);
         $this->assertEquals(0, $progressTracker->currentStep);
         $progressTracker->addStep();
         $this->assertEquals(1, $progressTracker->currentStep);
@@ -20,7 +25,8 @@ class ProgressTrackerTest extends \WP_UnitTestCase
 
     public function testGetPercentage()
     {
-        $progressTracker = new ProgressTracker(6);
+        $utilities = Mockery::mock('\abrain\Einsatzverwaltung\Utilities');
+        $progressTracker = new ProgressTracker($utilities, 6);
         $this->assertEquals(0, $progressTracker->getPercentage());
         $progressTracker->addStep();
         $this->assertEquals(16, $progressTracker->getPercentage());
@@ -31,7 +37,8 @@ class ProgressTrackerTest extends \WP_UnitTestCase
 
     public function testGetPercentageUnspecifiedTotal()
     {
-        $progressTracker = new ProgressTracker();
+        $utilities = Mockery::mock('\abrain\Einsatzverwaltung\Utilities');
+        $progressTracker = new ProgressTracker($utilities);
         $this->assertEquals(0, $progressTracker->getPercentage());
         $progressTracker->addStep();
         $this->assertEquals(0, $progressTracker->getPercentage());
@@ -42,7 +49,8 @@ class ProgressTrackerTest extends \WP_UnitTestCase
 
     public function testPercentageNegativeTotalSteps()
     {
-        $progressTracker = new ProgressTracker(-5);
+        $utilities = Mockery::mock('\abrain\Einsatzverwaltung\Utilities');
+        $progressTracker = new ProgressTracker($utilities, -5);
         $this->assertEquals(0, $progressTracker->getPercentage());
         $progressTracker->addStep();
         $this->assertEquals(0, $progressTracker->getPercentage());
@@ -53,16 +61,18 @@ class ProgressTrackerTest extends \WP_UnitTestCase
 
     public function testFinish()
     {
-        $progressTracker = new ProgressTracker(4);
+        $utilities = Mockery::mock('\abrain\Einsatzverwaltung\Utilities');
+        $progressTracker = new ProgressTracker($utilities, 4);
         $this->assertEquals(0, $progressTracker->getPercentage());
-        $this->expectOutputRegex('/Test message for finish method/');
+        $utilities->expects('printSuccess')->once()->with('Test message for finish method');
         $progressTracker->finish('Test message for finish method');
         $this->assertEquals(100, $progressTracker->getPercentage());
     }
 
     public function testFinishUnspecifiedTotal()
     {
-        $progressTracker = new ProgressTracker();
+        $utilities = Mockery::mock('\abrain\Einsatzverwaltung\Utilities');
+        $progressTracker = new ProgressTracker($utilities);
         $this->assertEquals(0, $progressTracker->getPercentage());
         $progressTracker->finish();
         $this->assertEquals(100, $progressTracker->getPercentage());
@@ -70,18 +80,20 @@ class ProgressTrackerTest extends \WP_UnitTestCase
 
     public function testDisplayMessage()
     {
-        $progressTracker = new ProgressTracker();
+        $utilities = Mockery::mock('\abrain\Einsatzverwaltung\Utilities');
+        $progressTracker = new ProgressTracker($utilities);
         $this->expectOutputRegex('/Some test message/');
         $progressTracker->displayMessage('Some test message');
     }
 
     public function testAbort()
     {
-        $progressTracker = new ProgressTracker(9);
+        $utilities = Mockery::mock('\abrain\Einsatzverwaltung\Utilities');
+        $progressTracker = new ProgressTracker($utilities, 9);
         $progressTracker->addStep();
         $progressTracker->addStep();
         $this->assertEquals(22, $progressTracker->getPercentage());
-        $this->expectOutputRegex('/Some message about a failure/');
+        $utilities->expects('printError')->once()->with('Some message about a failure');
         $progressTracker->abort('Some message about a failure');
         $this->assertEquals(22, $progressTracker->getPercentage());
     }

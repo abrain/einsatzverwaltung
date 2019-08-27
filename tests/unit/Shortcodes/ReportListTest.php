@@ -1,16 +1,16 @@
 <?php
 namespace abrain\Einsatzverwaltung\Shortcodes;
 
-use abrain\Einsatzverwaltung\Frontend\ReportList\Renderer as ReportListRenderer;
 use abrain\Einsatzverwaltung\Frontend\ReportList\SplitType;
-use PHPUnit_Framework_TestCase;
+use abrain\Einsatzverwaltung\UnitTestCase;
 
 /**
  * Class ReportListTest
+ * @covers \abrain\Einsatzverwaltung\Shortcodes\AbstractShortcode
+ * @covers \abrain\Einsatzverwaltung\Shortcodes\ReportList
  * @package abrain\Einsatzverwaltung\Shortcodes
- * @group unittests
  */
-class ReportListTest extends PHPUnit_Framework_TestCase
+class ReportListTest extends UnitTestCase
 {
     /**
      * Arbitrary URL used instead of asking WordPress for an actual URL.
@@ -32,9 +32,7 @@ class ReportListTest extends PHPUnit_Framework_TestCase
     public function setUp()
     {
         parent::setUp();
-        $formatter = $this->createMock('\abrain\Einsatzverwaltung\Util\Formatter');
-        $formatter->method('getDurationString')->willReturn('DURATION');
-        $reportListRenderer = new ReportListRenderer($formatter);
+        $reportListRenderer = $this->createMock('\abrain\Einsatzverwaltung\Frontend\ReportList\Renderer');
         $this->reportList = new ReportList($reportListRenderer);
         $this->thisYear = intval(date('Y'));
     }
@@ -85,13 +83,15 @@ class ReportListTest extends PHPUnit_Framework_TestCase
     public function testGetReports()
     {
         $reportQuery = $this->createMock('\abrain\Einsatzverwaltung\ReportQuery');
+        $reportQuery->expects($this->once())->method('setIncidentTypeId')->with($this->equalTo(16));
         $reportQuery->expects($this->once())->method('setLimit')->with($this->equalTo(4));
         $reportQuery->expects($this->once())->method('setOnlySpecialReports')->with($this->isTrue());
         $reportQuery->expects($this->once())->method('setOrderAsc')->with($this->isTrue());
+        $reportQuery->expects($this->once())->method('setUnits')->with($this->equalTo(array(433, 457, 560)));
         $reportQuery->expects($this->once())->method('setYear')->with($this->equalTo('2017'));
         $this->reportList->configureReportQuery(
             $reportQuery,
-            array('limit' => 4, 'sort' => 'auf', 'jahr' => '2017'),
+            array('einsatzart' => '16', 'limit' => 4, 'sort' => 'auf', 'jahr' => '2017', 'units' => '433,457,560'),
             array('special')
         );
     }
@@ -152,17 +152,5 @@ class ReportListTest extends PHPUnit_Framework_TestCase
             'split' => 'quarterly',
             'link' => 'title'
         ), array());
-    }
-
-    /**
-     * Copied from WP_UnitTestCase
-     * @param array $expected
-     * @param array $actual
-     */
-    public function assertEqualSets($expected, $actual)
-    {
-        sort($expected);
-        sort($actual);
-        $this->assertEquals($expected, $actual);
     }
 }

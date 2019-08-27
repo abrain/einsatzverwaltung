@@ -9,20 +9,6 @@ use WP_UnitTestCase;
  */
 class UserRightsManagerTest extends WP_UnitTestCase
 {
-
-    public function testIsRoleAllowedToEdit()
-    {
-        $userRightsManager = new UserRightsManager();
-        $this->assertTrue($userRightsManager->isRoleAllowedToEdit('administrator'));
-
-        delete_option('einsatzvw_cap_roles_randomrole');
-        $this->assertFalse($userRightsManager->isRoleAllowedToEdit('randomrole'));
-        update_option('einsatzvw_cap_roles_randomrole', '0');
-        $this->assertFalse($userRightsManager->isRoleAllowedToEdit('randomrole'));
-        update_option('einsatzvw_cap_roles_randomrole', '1');
-        $this->assertTrue($userRightsManager->isRoleAllowedToEdit('randomrole'));
-    }
-
     /**
      * Testet, ob die Benutzerberechtigungen korrekt vergeben werden. Die Implementierung könnte schöner sein, aber
      * bei der Entkopplung von den Benutzerrollen ändert sich ohnehin wieder vieles/alles.

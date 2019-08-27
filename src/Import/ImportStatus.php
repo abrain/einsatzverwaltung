@@ -2,6 +2,7 @@
 namespace abrain\Einsatzverwaltung\Import;
 
 use abrain\Einsatzverwaltung\Util\ProgressTracker;
+use abrain\Einsatzverwaltung\Utilities;
 
 /**
  * Class ImportStatus
@@ -13,11 +14,13 @@ class ImportStatus extends ProgressTracker
 
     /**
      * ImportStatus constructor.
+     *
+     * @param Utilities $utilities
      * @param int $numReports
      */
-    public function __construct($numReports)
+    public function __construct(Utilities $utilities, $numReports)
     {
-        parent::__construct($numReports);
+        parent::__construct($utilities, $numReports);
         $this->postIds = array();
     }
 

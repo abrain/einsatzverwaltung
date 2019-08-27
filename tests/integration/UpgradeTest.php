@@ -21,8 +21,7 @@ class UpgradeTest extends WP_UnitTestCase
     {
         parent::setUp();
 
-        $core = Core::getInstance();
-        $this->updater = $core->getUpdater();
+        $this->updater = new Update();
     }
 
     /**

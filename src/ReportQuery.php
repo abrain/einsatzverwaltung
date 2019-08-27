@@ -154,6 +154,11 @@ class ReportQuery
 
         $posts = get_posts($postArgs);
 
+        // Make sure, array_map is satisfied
+        if (empty($posts)) {
+            $posts = array();
+        }
+
         return array_map(function ($post) {
             return new IncidentReport($post);
         }, $posts);

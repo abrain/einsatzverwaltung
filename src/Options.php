@@ -13,8 +13,6 @@ class Options
         'einsatzvw_open_ext_in_new' => false,
         'einsatzvw_show_einsatzberichte_mainloop' => false,
         'einsatzvw_einsatz_hideemptydetails' => true,
-        'date_format' => 'd.m.Y',
-        'time_format' => 'H:i',
         'einsatzvw_flush_rewrite_rules' => false,
         'einsatzvw_category' => false,
         'einsatzvw_loop_only_special' => false,
@@ -55,14 +53,6 @@ class Options
     }
 
     /**
-     * Gibt das Datumsformat von WordPress zurück
-     */
-    public function getDateFormat()
-    {
-        return $this->getOption('date_format');
-    }
-
-    /**
      * Gibt die Kategorie zurück, in der neben Beiträgen auch Einsatzberichte angezeigt werden sollen
      *
      * @since 1.0.0
@@ -73,14 +63,6 @@ class Options
     {
         $categoryId = $this->getOption('einsatzvw_category');
         return (false === $categoryId ? -1 : intval($categoryId));
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getTimeFormat()
-    {
-        return $this->getOption('time_format');
     }
 
     /**

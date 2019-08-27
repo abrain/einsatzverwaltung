@@ -3,7 +3,7 @@
 namespace abrain\Einsatzverwaltung\Settings\Pages;
 
 use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
-use abrain\Einsatzverwaltung\Model\IncidentReport;
+use abrain\Einsatzverwaltung\ReportQuery;
 use abrain\Einsatzverwaltung\Utilities;
 
 /**
@@ -110,16 +110,12 @@ class General extends SubPage
             return $newValue;
         }
 
-        $posts = get_posts(array(
-            'post_type' => 'einsatz',
-            'post_status' => array('publish', 'private'),
-            'numberposts' => -1
-        ));
-        $reports = Utilities::postsToIncidentReports($posts);
+        $reportQuery = new ReportQuery();
+        $reportQuery->setIncludePrivateReports(true);
+        $reports = $reportQuery->getReports();
 
         // Wenn zuvor eine Kategorie gesetzt war, müssen die Einsatzberichte aus dieser entfernt werden
         if ($oldValue != -1) {
-            /** @var IncidentReport $report */
             foreach ($reports as $report) {
                 Utilities::removePostFromCategory($report->getPostId(), $oldValue);
             }
@@ -128,7 +124,6 @@ class General extends SubPage
         // Wenn eine neue Kategorie gesetzt wird, müssen Einsatzberichte dieser zugeordnet werden
         if ($newValue != -1) {
             $onlySpecialInCategory = self::$options->isOnlySpecialInLoop();
-            /** @var IncidentReport $report */
             foreach ($reports as $report) {
                 if (!$onlySpecialInCategory || $report->isSpecial()) {
                     $report->addToCategory($newValue);
@@ -161,16 +156,12 @@ class General extends SubPage
             return $newValue;
         }
 
-        $posts = get_posts(array(
-            'post_type' => 'einsatz',
-            'post_status' => array('publish', 'private'),
-            'numberposts' => -1
-        ));
-        $reports = Utilities::postsToIncidentReports($posts);
+        $reportQuery = new ReportQuery();
+        $reportQuery->setIncludePrivateReports(true);
+        $reports = $reportQuery->getReports();
 
         // Wenn die Einstellung abgewählt wurde, werden alle Einsatzberichte zur Kategorie hinzugefügt
         if ($newValue == 0) {
-            /** @var IncidentReport $report */
             foreach ($reports as $report) {
                 $report->addToCategory($categoryId);
             }
@@ -179,7 +170,6 @@ class General extends SubPage
         // Wenn die Einstellung aktiviert wurde, werden nur die als besonders markierten Einsatzberichte zur Kategorie
         // hinzugefügt, alle anderen daraus entfernt
         if ($newValue == 1) {
-            /** @var IncidentReport $report */
             foreach ($reports as $report) {
                 if ($report->isSpecial()) {
                     $report->addToCategory($categoryId);

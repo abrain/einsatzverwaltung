@@ -17,6 +17,9 @@ class ReportAnnotationRepository
      */
     private static $instance;
 
+    /**
+     * @var ReportAnnotation[]
+     */
     private $annotations;
 
     /**
@@ -44,13 +47,13 @@ class ReportAnnotationRepository
     /**
      * @param ReportAnnotation $annotation
      */
-    public function addAnnotation($annotation)
+    public function addAnnotation(ReportAnnotation $annotation)
     {
         $this->annotations[$annotation->getIdentifier()] = $annotation;
     }
 
     /**
-     * @return mixed
+     * @return ReportAnnotation[]
      */
     public function getAnnotations()
     {
@@ -58,7 +61,7 @@ class ReportAnnotationRepository
     }
 
     /**
-     * @return array
+     * @return string[]
      */
     public function getAnnotationIdentifiers()
     {

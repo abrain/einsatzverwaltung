@@ -1,13 +1,14 @@
 <?php
 namespace abrain\Einsatzverwaltung\Util;
 
-use WP_UnitTestCase;
+use abrain\Einsatzverwaltung\UnitTestCase;
 
 /**
  * Class FormatterTest
+ * @covers \abrain\Einsatzverwaltung\Util\Formatter
  * @package abrain\Einsatzverwaltung\Util
  */
-class FormatterTest extends WP_UnitTestCase
+class FormatterTest extends UnitTestCase
 {
     public function testGetDurationString()
     {

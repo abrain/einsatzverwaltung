@@ -327,7 +327,7 @@ class Tool
 
         // Import starten
         echo '<p>Die Daten werden eingelesen, das kann einen Moment dauern.</p>';
-        $importStatus = new ImportStatus(0);
+        $importStatus = new ImportStatus($this->utilities, 0);
         try {
             $this->helper->import($this->currentSource, $mapping, $importStatus);
         } catch (ImportException $e) {

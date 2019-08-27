@@ -19,7 +19,9 @@ class UnitTestCase extends PHPUnit_Framework_TestCase
         Monkey\setUp();
         Monkey\Functions\when('__')->returnArg(1);
         Monkey\Functions\when('_e')->echoArg(1);
-        Monkey\Functions\when('_n')->returnArg(1);
+        Monkey\Functions\when('_n')->alias(function ($single, $plural, $number) {
+            return $number === 1 ? $single : $plural;
+        });
         Monkey\Functions\when('esc_url')->returnArg(1);
     }
 

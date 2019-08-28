@@ -25,6 +25,10 @@
     background: #ddd none repeat scroll 0 0;
 }
 
+.einsatzverwaltung-reportlist td.smallscreen {
+    display: none;
+}
+
 @media (max-width: 767px) {
     .einsatzverwaltung-reportlist tr {
         padding-top: 5px;
@@ -38,6 +42,10 @@
 
     .einsatzverwaltung-reportlist td {
         display: none;
+    }
+
+    .einsatzverwaltung-reportlist td.smallscreen {
+        display: block;
     }
 
     .einsatzverwaltung-reportlist tr.einsatz-title-month td,.einsatzverwaltung-reportlist tr.einsatz-title-quarter td {

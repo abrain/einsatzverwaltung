@@ -213,11 +213,28 @@ class Renderer
     private function insertRow($report, Parameters $parameters)
     {
         $this->string .= '<tr class="report">';
+        $this->string .= $this->getSmallScreenCell($report, $parameters);
         foreach ($parameters->getColumns() as $column) {
             $this->string .= $this->getCellMarkup($report, $parameters, $column->getIdentifier());
         }
         $this->string .= '</tr>';
         $this->rowsSinceLastHeader++;
+    }
+
+    /**
+     * @param IncidentReport $report
+     * @param Parameters $parameters
+     *
+     * @return string HTML markup for the table cell only visible on devices with a small screen (e.g. smartphones)
+     */
+    private function getSmallScreenCell(IncidentReport $report, Parameters $parameters)
+    {
+        $content = "Content of the mobile view for report {$report->getNumber()}";
+        return sprintf(
+            '<td class="smallscreen" colspan="%d">%s</td>',
+            esc_attr($parameters->getColumnCount()),
+            esc_html($content)
+        );
     }
 
     /**

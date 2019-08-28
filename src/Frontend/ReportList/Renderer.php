@@ -444,19 +444,6 @@ class Renderer
             );
         }
 
-        // Bei der responsiven Ansicht die selben Begriffe voranstellen wie im Tabellenkopf
-        $string .= '@media (max-width: 767px) {';
-        $columnRepository = ColumnRepository::getInstance();
-        foreach ($columnRepository->getAvailableColumns() as $column) {
-            $string .= sprintf(
-                '.%s td.einsatz-column-%s:before {content: "%s:";}',
-                self::TABLECLASS,
-                $column->getIdentifier(),
-                $column->getCssName()
-            ).PHP_EOL;
-        }
-        $string .= '}';
-
         return $string;
     }
 }

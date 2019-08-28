@@ -54,14 +54,6 @@ class Column
     /**
      * @return string
      */
-    public function getCssName()
-    {
-        return str_replace(array('&auml;'), array('\0000E4'), $this->name);
-    }
-
-    /**
-     * @return string
-     */
     public function getIdentifier()
     {
         return $this->identifier;

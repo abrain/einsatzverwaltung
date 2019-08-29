@@ -215,7 +215,8 @@ class Renderer
         $this->string .= '<tr class="report">';
         $this->string .= $this->getSmallScreenCell($report, $parameters);
         foreach ($parameters->getColumns() as $column) {
-            $this->string .= $this->getCellMarkup($report, $parameters, $column->getIdentifier());
+            $cellMarkup = $this->getCellMarkup($report, $parameters, $column->getIdentifier());
+            $this->string .= sprintf('<td class="einsatz-column-%s">%s</td>', $column->getIdentifier(), $cellMarkup);
         }
         $this->string .= '</tr>';
         $this->rowsSinceLastHeader++;
@@ -233,7 +234,7 @@ class Renderer
         $annotations = '';
 
         foreach ($parameters->getColumns() as $column) {
-            $columnValue = $this->getCellContent($report, $column->getIdentifier(), $parameters);
+            $columnValue = $this->getCellMarkup($report, $parameters, $column->getIdentifier());
 
             // Annotation icons get appended to a different variable
             if (strpos($column->getIdentifier(), 'annotation') === 0) {
@@ -276,7 +277,7 @@ class Renderer
             );
         }
 
-        return sprintf('<td class="einsatz-column-%s">%s</td>', $columnId, $cellContent);
+        return $cellContent;
     }
 
     /**

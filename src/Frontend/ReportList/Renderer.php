@@ -213,11 +213,53 @@ class Renderer
     private function insertRow($report, Parameters $parameters)
     {
         $this->string .= '<tr class="report">';
+        $this->string .= $this->getSmallScreenCell($report, $parameters);
         foreach ($parameters->getColumns() as $column) {
-            $this->string .= $this->getCellMarkup($report, $parameters, $column->getIdentifier());
+            $cellMarkup = $this->getCellMarkup($report, $parameters, $column->getIdentifier());
+            $this->string .= sprintf('<td class="einsatz-column-%s">%s</td>', $column->getIdentifier(), $cellMarkup);
         }
         $this->string .= '</tr>';
         $this->rowsSinceLastHeader++;
+    }
+
+    /**
+     * @param IncidentReport $report
+     * @param Parameters $parameters
+     *
+     * @return string HTML markup for the table cell only visible on devices with a small screen (e.g. smartphones)
+     */
+    private function getSmallScreenCell(IncidentReport $report, Parameters $parameters)
+    {
+        $content = '';
+        $annotations = '';
+
+        foreach ($parameters->getColumns() as $column) {
+            $columnValue = $this->getCellMarkup($report, $parameters, $column->getIdentifier());
+
+            // Annotation icons get appended to a different variable
+            if (strpos($column->getIdentifier(), 'annotation') === 0) {
+                $annotations .= $columnValue;
+                continue;
+            }
+
+            $columnContent = sprintf('<strong>%1$s:</strong> %2$s', esc_html($column->getName()), $columnValue);
+
+            $content .= sprintf('<span class="einsatz-%s">%s</span><br>', $column->getIdentifier(), $columnContent);
+        }
+
+        if (!empty($annotations)) {
+            $content = '<div class="annotation-icon-bar">' . $annotations . '</div>' . $content;
+        }
+
+        $linkToReport = $parameters->linkEmptyReports || $report->hasContent();
+        $permalink = $linkToReport ? get_permalink($report->getPostId()) : '';
+
+        return sprintf(
+            '<td class="smallscreen" colspan="%d" data-permalink="%s">%s</td>',
+            esc_attr($parameters->getColumnCount()),
+            $permalink,
+            $content
+        );
     }
 
     /**
@@ -239,7 +281,7 @@ class Renderer
             );
         }
 
-        return sprintf('<td class="einsatz-column-%s">%s</td>', $columnId, $cellContent);
+        return $cellContent;
     }
 
     /**
@@ -443,19 +485,6 @@ class Renderer
                 self::$settings->getZebraColor()
             );
         }
-
-        // Bei der responsiven Ansicht die selben Begriffe voranstellen wie im Tabellenkopf
-        $string .= '@media (max-width: 767px) {';
-        $columnRepository = ColumnRepository::getInstance();
-        foreach ($columnRepository->getAvailableColumns() as $column) {
-            $string .= sprintf(
-                '.%s td.einsatz-column-%s:before {content: "%s:";}',
-                self::TABLECLASS,
-                $column->getIdentifier(),
-                $column->getCssName()
-            ).PHP_EOL;
-        }
-        $string .= '}';
 
         return $string;
     }

@@ -229,11 +229,31 @@ class Renderer
      */
     private function getSmallScreenCell(IncidentReport $report, Parameters $parameters)
     {
-        $content = "Content of the mobile view for report {$report->getNumber()}";
+        $content = '';
+        $annotations = '';
+
+        foreach ($parameters->getColumns() as $column) {
+            $columnValue = $this->getCellContent($report, $column->getIdentifier(), $parameters);
+
+            // Annotation icons get appended to a different variable
+            if (strpos($column->getIdentifier(), 'annotation') === 0) {
+                $annotations .= $columnValue;
+                continue;
+            }
+
+            $columnContent = sprintf('<strong>%1$s:</strong> %2$s', esc_html($column->getName()), $columnValue);
+
+            $content .= sprintf('<span class="einsatz-%s">%s</span><br>', $column->getIdentifier(), $columnContent);
+        }
+
+        if (!empty($annotations)) {
+            $content = '<div class="annotation-icon-bar">' . $annotations . '</div>' . $content;
+        }
+
         return sprintf(
             '<td class="smallscreen" colspan="%d">%s</td>',
             esc_attr($parameters->getColumnCount()),
-            esc_html($content)
+            $content
         );
     }
 

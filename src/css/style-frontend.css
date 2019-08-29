@@ -44,8 +44,9 @@
         display: none;
     }
 
-    .einsatzverwaltung-reportlist td.smallscreen {
+    .einsatzverwaltung-reportlist tr.report > td.smallscreen {
         display: block;
+        white-space: normal;
     }
 
     .einsatzverwaltung-reportlist tr.einsatz-title-month td,.einsatzverwaltung-reportlist tr.einsatz-title-quarter td {
@@ -54,6 +55,15 @@
 
     .einsatzverwaltung-reportlist .einsatz-header {
         display: none;
+    }
+
+    .einsatzverwaltung-reportlist .annotation-icon-bar {
+        float: right;
+        margin-left: 10px;
+    }
+
+    .einsatzverwaltung-reportlist .annotation-icon-bar > i {
+        margin: 0 2px;
     }
 }
 

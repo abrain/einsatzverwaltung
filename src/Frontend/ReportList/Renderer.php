@@ -251,9 +251,13 @@ class Renderer
             $content = '<div class="annotation-icon-bar">' . $annotations . '</div>' . $content;
         }
 
+        $linkToReport = $parameters->linkEmptyReports || $report->hasContent();
+        $permalink = $linkToReport ? get_permalink($report->getPostId()) : '';
+
         return sprintf(
-            '<td class="smallscreen" colspan="%d">%s</td>',
+            '<td class="smallscreen" colspan="%d" data-permalink="%s">%s</td>',
             esc_attr($parameters->getColumnCount()),
+            $permalink,
             $content
         );
     }

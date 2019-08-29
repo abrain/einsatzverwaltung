@@ -69,6 +69,7 @@ class Frontend
             Core::VERSION
         );
         wp_add_inline_style('einsatzverwaltung-frontend', ReportListRenderer::getDynamicCss());
+        wp_enqueue_script('einsatzverwaltung-reportlist', Core::$scriptUrl . 'reportlist.js');
     }
 
     /**

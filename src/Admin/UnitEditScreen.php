@@ -1,29 +1,20 @@
 <?php
-
 namespace abrain\Einsatzverwaltung\Admin;
 
 use abrain\Einsatzverwaltung\Types\Unit;
-use WP_Screen;
 
 /**
- * Class UnitEditScreen
+ * Customizations for the edit screen for the Unit custom post type.
+ *
  * @package abrain\Einsatzverwaltung\Admin
  */
-class UnitEditScreen
+class UnitEditScreen extends EditScreen
 {
     /**
-     * @param string[] $hidden
-     * @param WP_Screen $screen
-     *
-     * @return string[]
+     * UnitEditScreen constructor.
      */
-    public function filterDefaultHiddenMetaboxes($hidden, WP_Screen $screen)
+    public function __construct()
     {
-        if ($screen->post_type !== Unit::POST_TYPE) {
-            return $hidden;
-        }
-
-        $hidden[] = 'postcustom';
-        return $hidden;
+        $this->customTypeSlug = Unit::POST_TYPE;
     }
 }

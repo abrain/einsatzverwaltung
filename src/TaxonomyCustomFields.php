@@ -6,6 +6,8 @@ use abrain\Einsatzverwaltung\CustomFields\CustomField;
 use abrain\Einsatzverwaltung\CustomFields\NumberInput;
 use abrain\Einsatzverwaltung\CustomFields\PostSelector;
 use abrain\Einsatzverwaltung\CustomFields\TextInput;
+use abrain\Einsatzverwaltung\Types\CustomTaxonomy;
+use abrain\Einsatzverwaltung\Types\CustomType;
 use function add_action;
 
 /**
@@ -31,56 +33,60 @@ class TaxonomyCustomFields
     }
 
     /**
-     * @param string $taxonomy The slug of the taxonomy.
+     * @param CustomType $customType
      * @param TextInput $textInput
      */
-    public function addTextInput($taxonomy, TextInput $textInput)
+    public function addTextInput(CustomType $customType, TextInput $textInput)
     {
-        $this->add($taxonomy, $textInput);
+        $this->add($customType, $textInput);
     }
 
     /**
-     * @param string $taxonomy The slug of the taxonomy.
+     * @param CustomType $customType
      * @param ColorPicker $colorPicker
      */
-    public function addColorpicker($taxonomy, ColorPicker $colorPicker)
+    public function addColorpicker(CustomType $customType, ColorPicker $colorPicker)
     {
-        $this->add($taxonomy, $colorPicker);
+        $this->add($customType, $colorPicker);
     }
 
     /**
-     * @param string $taxonomy The slug of the taxonomy.
+     * @param CustomType $customType
      * @param NumberInput $numberInput
      */
-    public function addNumberInput($taxonomy, NumberInput $numberInput)
+    public function addNumberInput(CustomType $customType, NumberInput $numberInput)
     {
-        $this->add($taxonomy, $numberInput);
+        $this->add($customType, $numberInput);
     }
 
     /**
-     * @param string $taxonomy The slug of the taxonomy.
+     * @param CustomType $customType
      * @param PostSelector $postSelector
      */
-    public function addPostSelector($taxonomy, PostSelector $postSelector)
+    public function addPostSelector(CustomType $customType, PostSelector $postSelector)
     {
-        $this->add($taxonomy, $postSelector);
+        $this->add($customType, $postSelector);
     }
 
     /**
-     * @param string $taxonomy
+     * @param CustomType $customType
      * @param CustomField $customField
      */
-    private function add($taxonomy, CustomField $customField)
+    private function add(CustomType $customType, CustomField $customField)
     {
-        if (!array_key_exists($taxonomy, $this->taxonomyFields)) {
-            $this->taxonomyFields[$taxonomy] = array();
-            add_action("{$taxonomy}_add_form_fields", array($this, 'onAddFormFields'));
-            add_action("{$taxonomy}_edit_form_fields", array($this, 'onEditFormFields'), 10, 2);
-            add_action("manage_edit-{$taxonomy}_columns", array($this, 'onCustomColumns'));
-            add_action("manage_{$taxonomy}_custom_column", array($this, 'onColumnContent'), 10, 3);
-        }
+        if ($customType instanceof CustomTaxonomy) {
+            $taxonomy = $customType->getSlug();
 
-        $this->taxonomyFields[$taxonomy][$customField->key] = $customField;
+            if (!array_key_exists($taxonomy, $this->taxonomyFields)) {
+                $this->taxonomyFields[$taxonomy] = array();
+                add_action("{$taxonomy}_add_form_fields", array($this, 'onAddFormFields'));
+                add_action("{$taxonomy}_edit_form_fields", array($this, 'onEditFormFields'), 10, 2);
+                add_action("manage_edit-{$taxonomy}_columns", array($this, 'onCustomColumns'));
+                add_action("manage_{$taxonomy}_custom_column", array($this, 'onColumnContent'), 10, 3);
+            }
+
+            $this->taxonomyFields[$taxonomy][$customField->key] = $customField;
+        }
     }
 
     /**

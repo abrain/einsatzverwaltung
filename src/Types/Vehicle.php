@@ -64,13 +64,13 @@ class Vehicle implements CustomTaxonomy
      */
     public function registerCustomFields(TaxonomyCustomFields $taxonomyCustomFields)
     {
-        $taxonomyCustomFields->addPostSelector($this->getSlug(), new PostSelector(
+        $taxonomyCustomFields->addPostSelector($this, new PostSelector(
             'fahrzeugpid',
             'Fahrzeugseite',
             'Seite mit mehr Informationen &uuml;ber das Fahrzeug. Wird in Einsatzberichten mit diesem Fahrzeug verlinkt.',
             array('einsatz', 'attachment', 'ai1ec_event', 'tribe_events', 'pec-events')
         ));
-        $taxonomyCustomFields->addNumberInput($this->getSlug(), new NumberInput(
+        $taxonomyCustomFields->addNumberInput($this, new NumberInput(
             'vehicleorder',
             'Reihenfolge',
             'Optionale Angabe, mit der die Anzeigereihenfolge der Fahrzeuge beeinflusst werden kann. Fahrzeuge mit der kleineren Zahl werden zuerst angezeigt, anschlie&szlig;end diejenigen ohne Angabe bzw. dem Wert 0 in alphabetischer Reihenfolge.'

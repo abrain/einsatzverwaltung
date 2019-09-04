@@ -45,10 +45,10 @@ class TypeRegistry
     {
         $report = new Report();
         $this->registerPostType($report);
-        $this->registerTaxonomy(new IncidentType(), $report->getSlug());
-        $this->registerTaxonomy(new Vehicle(), $report->getSlug());
-        $this->registerTaxonomy(new ExtEinsatzmittel(), $report->getSlug());
-        $this->registerTaxonomy(new Alarmierungsart(), $report->getSlug());
+        $this->registerTaxonomy(new IncidentType(), $report::getSlug());
+        $this->registerTaxonomy(new Vehicle(), $report::getSlug());
+        $this->registerTaxonomy(new ExtEinsatzmittel(), $report::getSlug());
+        $this->registerTaxonomy(new Alarmierungsart(), $report::getSlug());
 
         $unit = new Unit();
         $this->registerPostType($unit);
@@ -65,7 +65,7 @@ class TypeRegistry
      */
     private function registerPostType(CustomPostType $customPostType)
     {
-        $slug = $customPostType->getSlug();
+        $slug = $customPostType::getSlug();
         if (array_key_exists($slug, $this->postTypes)) {
             throw new TypeRegistrationException(
                 sprintf(__('Post type with slug "%s" already exists', 'einsatzverwaltung'), $slug)
@@ -97,7 +97,7 @@ class TypeRegistry
      */
     private function registerTaxonomy(CustomTaxonomy $customTaxonomy, $postType)
     {
-        $slug = $customTaxonomy->getSlug();
+        $slug = $customTaxonomy::getSlug();
         if (get_taxonomy($slug) !== false) {
             throw new TypeRegistrationException(
                 sprintf(__('Taxonomy with slug "%s" already exists', 'einsatzverwaltung'), $slug)

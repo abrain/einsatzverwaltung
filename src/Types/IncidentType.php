@@ -14,7 +14,7 @@ class IncidentType implements CustomTaxonomy
     /**
      * @return string
      */
-    public function getSlug()
+    public static function getSlug()
     {
         return 'einsatzart';
     }

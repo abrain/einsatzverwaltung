@@ -75,7 +75,7 @@ class TaxonomyCustomFields
     private function add(CustomType $customType, CustomField $customField)
     {
         if ($customType instanceof CustomTaxonomy) {
-            $taxonomy = $customType->getSlug();
+            $taxonomy = $customType::getSlug();
 
             if (!array_key_exists($taxonomy, $this->taxonomyFields)) {
                 $this->taxonomyFields[$taxonomy] = array();

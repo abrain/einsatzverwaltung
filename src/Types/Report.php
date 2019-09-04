@@ -116,7 +116,7 @@ class Report implements CustomPostType
     /**
      * @inheritdoc
      */
-    public function getSlug()
+    public static function getSlug()
     {
         return self::SLUG;
     }

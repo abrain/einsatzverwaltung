@@ -10,7 +10,7 @@ interface CustomType
     /**
      * @return string
      */
-    public function getSlug();
+    public static function getSlug();
 
     /**
      * @return array

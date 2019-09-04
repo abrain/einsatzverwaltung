@@ -17,14 +17,14 @@ class TaxonomyCustomFields
     /**
      * @var array
      */
-    private $fields;
+    private $taxonomyFields;
 
     /**
      * TaxonomyCustomFields constructor.
      */
     public function __construct()
     {
-        $this->fields = array();
+        $this->taxonomyFields = array();
 
         add_action('edited_term', array($this, 'saveTerm'), 10, 3);
         add_action('created_term', array($this, 'saveTerm'), 10, 3);
@@ -72,15 +72,15 @@ class TaxonomyCustomFields
      */
     private function add($taxonomy, CustomField $customField)
     {
-        if (!array_key_exists($taxonomy, $this->fields)) {
-            $this->fields[$taxonomy] = array();
+        if (!array_key_exists($taxonomy, $this->taxonomyFields)) {
+            $this->taxonomyFields[$taxonomy] = array();
             add_action("{$taxonomy}_add_form_fields", array($this, 'onAddFormFields'));
             add_action("{$taxonomy}_edit_form_fields", array($this, 'onEditFormFields'), 10, 2);
             add_action("manage_edit-{$taxonomy}_columns", array($this, 'onCustomColumns'));
             add_action("manage_{$taxonomy}_custom_column", array($this, 'onColumnContent'), 10, 3);
         }
 
-        $this->fields[$taxonomy][$customField->key] = $customField;
+        $this->taxonomyFields[$taxonomy][$customField->key] = $customField;
     }
 
     /**
@@ -88,12 +88,12 @@ class TaxonomyCustomFields
      */
     public function onAddFormFields($taxonomy)
     {
-        if (!array_key_exists($taxonomy, $this->fields) || !is_array($this->fields[$taxonomy])) {
+        if (!array_key_exists($taxonomy, $this->taxonomyFields) || !is_array($this->taxonomyFields[$taxonomy])) {
             return;
         }
 
         /** @var CustomField $field */
-        foreach ($this->fields[$taxonomy] as $field) {
+        foreach ($this->taxonomyFields[$taxonomy] as $field) {
             echo $field->getAddTermMarkup();
         }
     }
@@ -104,12 +104,12 @@ class TaxonomyCustomFields
      */
     public function onEditFormFields($tag, $taxonomy)
     {
-        if (!array_key_exists($taxonomy, $this->fields) || !is_array($this->fields[$taxonomy])) {
+        if (!array_key_exists($taxonomy, $this->taxonomyFields) || !is_array($this->taxonomyFields[$taxonomy])) {
             return;
         }
 
         /** @var CustomField $field */
-        foreach ($this->fields[$taxonomy] as $field) {
+        foreach ($this->taxonomyFields[$taxonomy] as $field) {
             echo $field->getEditTermMarkup($tag);
         }
     }
@@ -129,7 +129,7 @@ class TaxonomyCustomFields
         }
 
         $taxonomy = $screen->taxonomy;
-        if (!array_key_exists($taxonomy, $this->fields) || !is_array($this->fields[$taxonomy])) {
+        if (!array_key_exists($taxonomy, $this->taxonomyFields) || !is_array($this->taxonomyFields[$taxonomy])) {
             return $columns;
         }
 
@@ -139,7 +139,7 @@ class TaxonomyCustomFields
             $filteredColumns[$slug] = $name;
             if ($slug == 'description') {
                 /** @var CustomField $field */
-                foreach ($this->fields[$taxonomy] as $field) {
+                foreach ($this->taxonomyFields[$taxonomy] as $field) {
                     $filteredColumns[$field->key] = $field->label;
                 }
             }
@@ -165,11 +165,11 @@ class TaxonomyCustomFields
         }
 
         $taxonomy = $term->taxonomy;
-        if (!array_key_exists($taxonomy, $this->fields) || !is_array($this->fields[$taxonomy])) {
+        if (!array_key_exists($taxonomy, $this->taxonomyFields) || !is_array($this->taxonomyFields[$taxonomy])) {
             return '';
         }
 
-        $fields = $this->fields[$taxonomy];
+        $fields = $this->taxonomyFields[$taxonomy];
         if (!array_key_exists($columnName, $fields)) {
             return '';
         }
@@ -188,12 +188,12 @@ class TaxonomyCustomFields
      */
     public function saveTerm($termId, $ttId, $taxonomy)
     {
-        if (!array_key_exists($taxonomy, $this->fields) || !is_array($this->fields[$taxonomy])) {
+        if (!array_key_exists($taxonomy, $this->taxonomyFields) || !is_array($this->taxonomyFields[$taxonomy])) {
             return;
         }
 
         /** @var CustomField $field */
-        foreach ($this->fields[$taxonomy] as $field) {
+        foreach ($this->taxonomyFields[$taxonomy] as $field) {
             $value = filter_input(INPUT_POST, $field->key, FILTER_SANITIZE_STRING);
 
             update_term_meta($termId, $field->key, empty($value) ? $field->defaultValue : $value);

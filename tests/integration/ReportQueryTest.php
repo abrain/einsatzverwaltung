@@ -37,7 +37,7 @@ class ReportQueryTest extends WP_UnitTestCase
         $this->incidentType1aId = $childTerm['term_id'];
 
         // Units anlegen
-        $this->unitIds = $this->factory->post->create_many(2, array('post_type' => Unit::POST_TYPE));
+        $this->unitIds = $this->factory->post->create_many(2, array('post_type' => Unit::getSlug()));
 
         $currentYear = date('Y');
         $this->postIds = $this->factory->post->create_many(10, array('post_type' => 'einsatz'));

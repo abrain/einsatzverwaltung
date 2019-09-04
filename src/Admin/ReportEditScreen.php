@@ -197,13 +197,13 @@ class ReportEditScreen extends EditScreen
     public function displayMetaBoxUnits(WP_Post $post)
     {
         $units = get_posts(array(
-            'post_type' => Unit::POST_TYPE,
+            'post_type' => Unit::getSlug(),
             'numberposts' => -1,
             'order' => 'ASC',
             'orderby' => 'name'
         ));
         if (empty($units)) {
-            $postTypeObject = get_post_type_object(Unit::POST_TYPE);
+            $postTypeObject = get_post_type_object(Unit::getSlug());
             printf("<div>%s</div>", esc_html($postTypeObject->labels->not_found));
             return;
         }

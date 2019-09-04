@@ -15,6 +15,6 @@ class UnitEditScreen extends EditScreen
      */
     public function __construct()
     {
-        $this->customTypeSlug = Unit::POST_TYPE;
+        $this->customTypeSlug = Unit::getSlug();
     }
 }

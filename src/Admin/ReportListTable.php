@@ -83,7 +83,7 @@ class ReportListTable
         $unitIds = join(',', $unitIds);
         printf(
             '<div id="%s" class="post_category">%s</div>',
-            esc_attr(Unit::POST_TYPE . '_' . $post->ID),
+            esc_attr(Unit::getSlug() . '_' . $post->ID),
             esc_html($unitIds)
         );
     }
@@ -231,20 +231,20 @@ class ReportListTable
         );
         if ($columnName === 'einsatzverwaltung_units') {
             $units = get_posts(array(
-                'post_type' => Unit::POST_TYPE,
+                'post_type' => Unit::getSlug(),
                 'numberposts' => -1,
                 'order' => 'ASC',
                 'orderby' => 'name'
             ));
             if (empty($units)) {
-                $postTypeObject = get_post_type_object(Unit::POST_TYPE);
+                $postTypeObject = get_post_type_object(Unit::getSlug());
                 printf("<div>%s</div>", esc_html($postTypeObject->labels->not_found));
                 return;
             }
 
             echo '<ul class="cat-checklist evw_unit-checklist">';
             foreach ($units as $unit) {
-                $identifier = Unit::POST_TYPE . '-' . $unit->ID;
+                $identifier = Unit::getSlug() . '-' . $unit->ID;
                 printf(
                     '<li id="%1$s"><label><input type="checkbox" name="evw_units[]" value="%2$d">%3$s</label></li>',
                     esc_attr($identifier),

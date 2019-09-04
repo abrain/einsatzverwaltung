@@ -11,7 +11,6 @@ use abrain\Einsatzverwaltung\ReportAnnotationRepository;
 class Report implements CustomPostType
 {
     const DEFAULT_REWRITE_SLUG = 'einsatzberichte';
-    const SLUG = 'einsatz';
 
     /**
      * @var string
@@ -118,7 +117,7 @@ class Report implements CustomPostType
      */
     public static function getSlug()
     {
-        return self::SLUG;
+        return 'einsatz';
     }
 
     /**
@@ -190,7 +189,7 @@ class Report implements CustomPostType
     private function registerPostMeta()
     {
         register_meta('post', 'einsatz_einsatzende', array(
-            'object_subtype' => self::SLUG,
+            'object_subtype' => self::getSlug(),
             'type' => 'string',
             'description' => 'Datum und Uhrzeit, zu der der Einsatz endete.',
             'single' => true,
@@ -199,7 +198,7 @@ class Report implements CustomPostType
         ));
 
         register_meta('post', 'einsatz_einsatzleiter', array(
-            'object_subtype' => self::SLUG,
+            'object_subtype' => self::getSlug(),
             'type' => 'string',
             'description' => 'Name der Person, die die Einsatzleitung innehatte.',
             'single' => true,
@@ -208,7 +207,7 @@ class Report implements CustomPostType
         ));
 
         register_meta('post', 'einsatz_einsatzort', array(
-            'object_subtype' => self::SLUG,
+            'object_subtype' => self::getSlug(),
             'type' => 'string',
             'description' => 'Die Örtlichkeit, an der der Einsatz stattgefunden hat.',
             'single' => true,
@@ -217,7 +216,7 @@ class Report implements CustomPostType
         ));
 
         register_meta('post', 'einsatz_fehlalarm', array(
-            'object_subtype' => self::SLUG,
+            'object_subtype' => self::getSlug(),
             'type' => 'boolean',
             'description' => 'Vermerk, ob es sich um einen Fehlalarm handelte.',
             'single' => true,
@@ -226,7 +225,7 @@ class Report implements CustomPostType
         ));
 
         register_meta('post', 'einsatz_hasimages', array(
-            'object_subtype' => self::SLUG,
+            'object_subtype' => self::getSlug(),
             'type' => 'boolean',
             'description' => 'Vermerk, ob der Einsatzbericht Bilder enthält.',
             'single' => true,
@@ -235,7 +234,7 @@ class Report implements CustomPostType
         ));
 
         register_meta('post', 'einsatz_incidentNumber', array(
-            'object_subtype' => self::SLUG,
+            'object_subtype' => self::getSlug(),
             'type' => 'string',
             'description' => 'Einsatznummer.',
             'single' => true,
@@ -244,7 +243,7 @@ class Report implements CustomPostType
         ));
 
         register_meta('post', 'einsatz_mannschaft', array(
-            'object_subtype' => self::SLUG,
+            'object_subtype' => self::getSlug(),
             'type' => 'string',
             'description' => 'Angaben über die Personalstärke für diesen Einsatz.',
             'single' => true,
@@ -253,7 +252,7 @@ class Report implements CustomPostType
         ));
 
         register_meta('post', 'einsatz_special', array(
-            'object_subtype' => self::SLUG,
+            'object_subtype' => self::getSlug(),
             'type' => 'boolean',
             'description' => 'Vermerk, ob es sich um einen besonderen Einsatzbericht handelt.',
             'single' => true,

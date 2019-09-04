@@ -19,7 +19,7 @@ class ReportEditScreen extends EditScreen
      */
     public function __construct()
     {
-        $this->customTypeSlug = Report::SLUG;
+        $this->customTypeSlug = Report::getSlug();
     }
 
     /**

@@ -234,7 +234,7 @@ class Initializer
      */
     public function useBlockEditorForReports($useBlockEditor, $postType)
     {
-        if ($postType === Report::SLUG && get_option('einsatz_disable_blockeditor', '0') === '1') {
+        if ($postType === Report::getSlug() && get_option('einsatz_disable_blockeditor', '0') === '1') {
             return false;
         }
 

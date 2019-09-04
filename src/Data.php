@@ -218,7 +218,7 @@ class Data
      */
     public function onTransitionPostStatus($newStatus, $oldStatus, WP_Post $post)
     {
-        if (get_post_type($post) !== Report::SLUG) {
+        if (get_post_type($post) !== Report::getSlug()) {
             return;
         }
 

@@ -54,7 +54,7 @@ class Unit implements CustomPostType
             'public' => false,
             'supports' => array('title', 'editor', 'thumbnail', 'revisions', 'custom-fields', 'author'),
             'show_ui' => true,
-            'show_in_menu' => 'edit.php?post_type=' . Report::SLUG,
+            'show_in_menu' => 'edit.php?post_type=' . Report::getSlug(),
             'show_in_admin_bar' => false,
             'show_in_rest' => false,
             'capability_type' => self::getSlug(),

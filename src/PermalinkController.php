@@ -84,7 +84,7 @@ class PermalinkController
     {
         $enr = $query->get('einsatznummer');
         if (!empty($enr)) {
-            $query->set('post_type', Report::SLUG);
+            $query->set('post_type', Report::getSlug());
             $query->set('meta_key', 'einsatz_incidentNumber');
             $query->set('meta_value', $enr);
         }
@@ -103,7 +103,7 @@ class PermalinkController
         global $wp_rewrite;
 
         // not our business
-        if (empty($post) || get_post_type($post) !== Report::SLUG) {
+        if (empty($post) || get_post_type($post) !== Report::getSlug()) {
             return $postLink;
         }
 
@@ -183,7 +183,7 @@ class PermalinkController
     public function getYearArchiveLink($year)
     {
         global $wp_rewrite;
-        $link = get_post_type_archive_link(Report::SLUG);
+        $link = get_post_type_archive_link(Report::getSlug());
         $link = ($wp_rewrite->using_permalinks() ? trailingslashit($link) : $link . '&year=') . $year;
         return user_trailingslashit($link);
     }

@@ -72,7 +72,7 @@ class ReportListTable
      */
     public function addInlineData(WP_Post $post, WP_Post_Type $post_type_object)
     {
-        if ($post_type_object->name !== Report::SLUG) {
+        if ($post_type_object->name !== Report::getSlug()) {
             return;
         }
 
@@ -174,7 +174,7 @@ class ReportListTable
             return '';
         }
 
-        $url = add_query_arg(array('post_type' => Report::SLUG, $term->taxonomy => $term->slug), 'edit.php');
+        $url = add_query_arg(array('post_type' => Report::getSlug(), $term->taxonomy => $term->slug), 'edit.php');
         $text = sanitize_term_field('name', $term->name, $term->term_id, $term->taxonomy, 'display');
         return sprintf('<a href="%s">%s</a>', esc_url($url), esc_html($text));
     }
@@ -188,7 +188,7 @@ class ReportListTable
      */
     public function quickEditCustomBox($columnName, $postType, $taxonomy)
     {
-        if (!empty($taxonomy) || $postType !== Report::SLUG) {
+        if (!empty($taxonomy) || $postType !== Report::getSlug()) {
             return;
         }
 
@@ -207,7 +207,7 @@ class ReportListTable
      */
     public function bulkEditCustomBox($columnName, $postType)
     {
-        if ($postType !== Report::SLUG) {
+        if ($postType !== Report::getSlug()) {
             return;
         }
 

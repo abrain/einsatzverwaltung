@@ -66,7 +66,7 @@ class TypeRegistry
     private function registerPostType(CustomPostType $customPostType)
     {
         $slug = $customPostType::getSlug();
-        if (array_key_exists($slug, $this->postTypes)) {
+        if (post_type_exists($slug)) {
             throw new TypeRegistrationException(
                 sprintf(__('Post type with slug "%s" already exists', 'einsatzverwaltung'), $slug)
             );
@@ -104,12 +104,12 @@ class TypeRegistry
             );
         }
 
-        $postType = register_taxonomy($slug, $postType, $customTaxonomy->getRegistrationArgs());
-        if (is_wp_error($postType)) {
+        $result = register_taxonomy($slug, $postType, $customTaxonomy->getRegistrationArgs());
+        if (is_wp_error($result)) {
             throw new TypeRegistrationException(sprintf(
-                __('Failed to register post type with slug "%s": %s', 'einsatzverwaltung'),
+                __('Failed to register taxonomy with slug "%s": %s', 'einsatzverwaltung'),
                 $slug,
-                $postType->get_error_message()
+                $result->get_error_message()
             ));
         }
 

@@ -64,7 +64,6 @@ Core::$scriptUrl = Core::$pluginUrl . 'js/';
 Core::$styleUrl = Core::$pluginUrl . 'css/';
 
 $core = Core::getInstance();
-add_action('plugins_loaded', array($core, 'onPluginsLoaded'));
 add_action('init', array($core, 'onInit'));
 register_activation_hook($pluginFile, array($core, 'onActivation'));
 register_deactivation_hook($pluginFile, array($core, 'onDeactivation'));

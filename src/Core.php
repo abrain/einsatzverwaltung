@@ -98,6 +98,9 @@ class Core
      */
     public function onInit()
     {
+        $this->maybeUpdate();
+        update_option('einsatzvw_version', self::VERSION);
+
         $this->utilities = new Utilities();
         $options = new Options();
 
@@ -149,12 +152,6 @@ class Core
             flush_rewrite_rules();
             $options->setFlushRewriteRules(false);
         }
-    }
-
-    public function onPluginsLoaded()
-    {
-        $this->maybeUpdate();
-        update_option('einsatzvw_version', self::VERSION);
     }
 
     public function onAdminNotices()

@@ -51,6 +51,9 @@ class Initializer
         $unitEditScreen = new UnitEditScreen();
         add_filter('default_hidden_meta_boxes', array($unitEditScreen, 'filterDefaultHiddenMetaboxes'), 10, 2);
 
+        $vehicleEditScreen = new VehicleEditScreen();
+        add_filter('default_hidden_meta_boxes', array($vehicleEditScreen, 'filterDefaultHiddenMetaboxes'), 10, 2);
+
         // Register Settings
         $mainPage = new MainPage($options, $permalinkController);
         add_action('admin_menu', array($mainPage, 'addToSettingsMenu'));

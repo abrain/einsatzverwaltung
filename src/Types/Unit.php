@@ -32,7 +32,7 @@ class Unit implements CustomPostType
             'insert_into_item' => __('Insert into unit', 'einsatzverwaltung'),
             'uploaded_to_this_item' => __('Uploaded to this unit', 'einsatzverwaltung'),
             'featured_image' => _x('Featured Image', 'unit', 'einsatzverwaltung'),
-            'set_featured_image' => __('Set featured image', 'unit', 'einsatzverwaltung'),
+            'set_featured_image' => _x('Set featured image', 'unit', 'einsatzverwaltung'),
             'remove_featured_image' => _x('Remove featured image', 'unit', 'einsatzverwaltung'),
             'use_featured_image' => _x('Use as featured image', 'unit', 'einsatzverwaltung'),
             'filter_items_list' => __('Filter units list', 'einsatzverwaltung'),

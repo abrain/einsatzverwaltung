@@ -3,6 +3,22 @@ namespace abrain\Einsatzverwaltung;
 
 use WP_Error;
 use wpdb;
+use function add_option;
+use function add_post_meta;
+use function array_keys;
+use function category_exists;
+use function delete_option;
+use function error_log;
+use function function_exists;
+use function get_gmt_from_date;
+use function get_post_meta;
+use function get_posts;
+use function get_role;
+use function get_user_option;
+use function update_option;
+use function update_post_meta;
+use function update_user_option;
+use function wp_set_post_categories;
 
 /**
  *
@@ -56,6 +72,16 @@ class Update
             $this->upgrade120();
         }
 
+        // The updates to versions 1.3.0 until 1.7.0 require the now removed taxonomy 'fahrzeug'
+        if ($currentDbVersion < 50 && $targetDbVersion >= 20) {
+            register_taxonomy('fahrzeug', 'einsatz', array(
+                'label' => 'Fahrzeuge',
+                'public' => false,
+                'show_in_rest' => false,
+                'hierarchical' => true
+            ));
+        }
+
         if ($currentDbVersion < 20 && $targetDbVersion >= 20) {
             $this->upgrade130();
         }
@@ -75,6 +101,13 @@ class Update
         if ($currentDbVersion < 41 && $targetDbVersion >= 41) {
             $this->upgrade162();
         }
+
+        if ($currentDbVersion < 50 && $targetDbVersion >= 50) {
+            $this->upgrade170();
+        }
+
+        // From version 1.7.0 on this taxonomy does no longer exist
+        unregister_taxonomy('fahrzeug');
     }
 
     /**
@@ -405,6 +438,38 @@ class Update
         }
 
         update_option('einsatzvw_db_version', 41);
+    }
+
+    private function upgrade170()
+    {
+        $oldVehicles = get_terms(array('taxonomy' => 'fahrzeug', 'hide_empty' => false, 'childless' => true));
+        foreach ($oldVehicles as $oldVehicle) {
+            $newVehicle = wp_insert_post(array(
+                'post_type' => 'evw_vehicle',
+                'post_title' => $oldVehicle->name,
+                'post_name' => $oldVehicle->slug,
+                'post_content' => $oldVehicle->description,
+                'post_status' => 'publish',
+                'menu_order' => get_term_meta($oldVehicle->term_id, 'vehicleorder', true),
+                'meta_input' => array(
+                    '_page_id' => get_term_meta($oldVehicle->term_id, 'fahrzeugpid', true)
+                )
+            ));
+
+            if (is_wp_error($newVehicle)) {
+                error_log("Vehicle could no be created: {$newVehicle->get_error_message()}");
+                $this->addAdminNotice('failedVehicleMigration');
+                continue;
+            }
+
+            // Assign new vehicle to the reports that have the current term assigned
+            $reportsWithVehicle = get_objects_in_term($oldVehicle->term_id, 'fahrzeug');
+            foreach ($reportsWithVehicle as $reportId) {
+                add_post_meta($reportId, '_evw_vehicle', $newVehicle);
+            }
+        }
+
+        update_option('einsatzvw_db_version', 50);
     }
 
     /**

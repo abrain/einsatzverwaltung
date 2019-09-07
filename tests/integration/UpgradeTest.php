@@ -281,6 +281,14 @@ class UpgradeTest extends WP_UnitTestCase
 
     public function testUpgrade130()
     {
+        // Needed to prepare fake data
+        register_taxonomy('fahrzeug', 'einsatz', array(
+            'label' => 'Fahrzeuge',
+            'public' => false,
+            'show_in_rest' => false,
+            'hierarchical' => true
+        ));
+
         $ee1 = wp_create_term('Externes Einsatzmittel 1', 'exteinsatzmittel');
         delete_term_meta($ee1['term_id'], 'url'); // Metafelder sollen noch nicht existieren
         add_option('evw_tax_exteinsatzmittel_'.$ee1['term_id'].'_url', 'website1');
@@ -297,6 +305,9 @@ class UpgradeTest extends WP_UnitTestCase
         delete_term_meta($vehicle2['term_id'], 'fahrzeugpid');
         delete_term_meta($vehicle2['term_id'], 'vehicleorder');
         add_option('evw_tax_fahrzeug_'.$vehicle2['term_id'].'_vehicleorder', 147);
+
+        // Removing the taxonomy again, the Updater must take care of that
+        unregister_taxonomy('fahrzeug');
 
         // Unbehandelte Term-Splits
         $fakeTermId = 987;
@@ -400,5 +411,64 @@ class UpgradeTest extends WP_UnitTestCase
         update_option('einsatzverwaltung_use_reporttemplate', 'singular');
         $this->runUpgrade(40, 41);
         $this->assertTrue('' === get_option('einsatzverwaltung_report_contentifempty'));
+    }
+
+    public function testUpgrade170()
+    {
+        // Needed to prepare fake data
+        register_taxonomy('fahrzeug', 'einsatz', array(
+            'label' => 'Fahrzeuge',
+            'public' => false,
+            'show_in_rest' => false,
+            'hierarchical' => true
+        ));
+
+        // Create some vehicles
+        $pids = ['6481', ''];
+        $order = ['0', '3'];
+        $term1 = wp_insert_term('Some vehicle', 'fahrzeug', array('description' => 'Descriptive text'));
+        update_term_meta($term1['term_id'], 'fahrzeugpid', $pids[0]);
+        update_term_meta($term1['term_id'], 'vehicleorder', $order[0]);
+        $term2 = wp_insert_term('Another vehicle', 'fahrzeug', array('description' => 'Will not be migrated'));
+        update_term_meta($term2['term_id'], 'fahrzeugpid', '948');
+        update_term_meta($term2['term_id'], 'vehicleorder', '5');
+        $term3 = wp_insert_term('Child vehicle', 'fahrzeug', array('description' => '', 'parent' => $term2['term_id']));
+        update_term_meta($term3['term_id'], 'fahrzeugpid', $pids[1]);
+        update_term_meta($term3['term_id'], 'vehicleorder', $order[1]);
+
+        $vehicle1 = get_term($term1['term_id']);
+        $vehicle2 = get_term($term2['term_id']);
+        $vehicle3 = get_term($term3['term_id']);
+
+        $reportFactory = new ReportFactory();
+        $reportIds = $reportFactory->create_many(6);
+        wp_set_object_terms($reportIds[0], array(), 'fahrzeug');
+        wp_set_object_terms($reportIds[1], array($vehicle1->term_id), 'fahrzeug');
+        wp_set_object_terms($reportIds[2], array($vehicle1->term_id, $vehicle3->term_id), 'fahrzeug');
+        wp_set_object_terms($reportIds[3], array($vehicle3->term_id, $vehicle2->term_id), 'fahrzeug');
+        wp_set_object_terms($reportIds[4], array($vehicle3->term_id, $vehicle1->term_id), 'fahrzeug');
+        wp_set_object_terms($reportIds[5], array($vehicle2->term_id), 'fahrzeug');
+
+        // Removing the taxonomy again, the Updater must take care of that
+        unregister_taxonomy('fahrzeug');
+
+        $this->runUpgrade(41, 50);
+
+        $vehicles = get_posts(array('post_type' => 'evw_vehicle', 'post_status' => 'publish'));
+        $this->assertCount(2, $vehicles);
+        foreach (array($vehicle1, $vehicle3) as $key => $oldVehicle) {
+            $this->assertEquals($oldVehicle->name, $vehicles[$key]->post_title);
+            $this->assertEquals($oldVehicle->slug, $vehicles[$key]->post_name);
+            $this->assertEquals($oldVehicle->description, $vehicles[$key]->post_content);
+            $this->assertEquals($pids[$key], get_post_meta($vehicles[$key]->ID, '_page_id', true));
+            $this->assertEquals($order[$key], $vehicles[$key]->menu_order);
+        }
+
+        $this->assertEqualSets(array(), get_post_meta($reportIds[0], '_evw_vehicle'));
+        $this->assertEqualSets(array($vehicles[0]->ID), get_post_meta($reportIds[1], '_evw_vehicle'));
+        $this->assertEqualSets(array($vehicles[0]->ID, $vehicles[1]->ID), get_post_meta($reportIds[2], '_evw_vehicle'));
+        $this->assertEqualSets(array($vehicles[1]->ID), get_post_meta($reportIds[3], '_evw_vehicle'));
+        $this->assertEqualSets(array($vehicles[1]->ID, $vehicles[0]->ID), get_post_meta($reportIds[4], '_evw_vehicle'));
+        $this->assertEqualSets(array(), get_post_meta($reportIds[5], '_evw_vehicle'));
     }
 }

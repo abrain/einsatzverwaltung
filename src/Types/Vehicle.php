@@ -16,7 +16,7 @@ class Vehicle implements CustomTaxonomy
      */
     public static function getSlug()
     {
-        return 'fahrzeug';
+        return 'evw_vehicle';
     }
 
     /**

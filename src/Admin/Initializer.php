@@ -227,6 +227,13 @@ class Initializer
             echo '<strong>Die Anpassung kann durchaus eine Minute dauern, bitte nur einmal klicken.</strong><br>';
             echo '<a href="' . $url . '" class="button button-primary">Anpassung durchf&uuml;hren</a></p></div>';
         }
+
+        if (in_array('failedVehicleMigration', $notices)) {
+            printf(
+                '<div class="notice notice-error"><p>%s</p></div>',
+                __('Unfortunately, something went wrong while converting the existing vehicles to the new format. Please check the server logs for error messages.', 'einsatzverwaltung')
+            );
+        }
     }
 
     /**

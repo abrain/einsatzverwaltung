@@ -18,7 +18,6 @@ class Core
      */
     private static $instance = null;
 
-    public static $pluginFile;
     public static $pluginBasename;
     public static $pluginDir;
     public static $pluginUrl;
@@ -102,10 +101,6 @@ class Core
     private function addHooks()
     {
         add_action('admin_notices', array($this, 'onAdminNotices'));
-        add_action('init', array($this, 'onInit'));
-        add_action('plugins_loaded', array($this, 'onPluginsLoaded'));
-        register_activation_hook(self::$pluginFile, array($this, 'onActivation'));
-        register_deactivation_hook(self::$pluginFile, array($this, 'onDeactivation'));
 
         $userRightsManager = new UserRightsManager();
         add_filter('user_has_cap', array($userRightsManager, 'userHasCap'), 10, 4);

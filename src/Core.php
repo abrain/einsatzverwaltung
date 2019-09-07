@@ -64,6 +64,45 @@ class Core
      */
     private function __construct()
     {
+        // Empty, but private constructor. Use ::getInstance() instead.
+    }
+
+    /**
+     * Wird beim Aktivieren des Plugins aufgerufen
+     */
+    public function onActivation()
+    {
+        add_option('einsatzvw_db_version', self::DB_VERSION);
+
+        $this->maybeUpdate();
+        update_option('einsatzvw_version', self::VERSION);
+
+        // Posttypen registrieren
+        try {
+            $this->typeRegistry->registerTypes($this->permalinkController);
+        } catch (Exceptions\TypeRegistrationException $e) {
+            array_push($this->adminErrorMessages, $e->getMessage());
+            return;
+        }
+
+        // Permalinks aktualisieren
+        flush_rewrite_rules();
+    }
+
+    /**
+     * Wird beim Deaktivieren des Plugins aufgerufen
+     */
+    public function onDeactivation()
+    {
+        // Permalinks aktualisieren (derzeit ohne Effekt, siehe https://core.trac.wordpress.org/ticket/29118)
+        flush_rewrite_rules();
+    }
+
+    /**
+     * Plugin initialisieren
+     */
+    public function onInit()
+    {
         $this->utilities = new Utilities();
         $this->options = new Options();
 
@@ -103,44 +142,7 @@ class Core
 
         $userRightsManager = new UserRightsManager();
         add_filter('user_has_cap', array($userRightsManager, 'userHasCap'), 10, 4);
-    }
 
-    /**
-     * Wird beim Aktivieren des Plugins aufgerufen
-     */
-    public function onActivation()
-    {
-        add_option('einsatzvw_db_version', self::DB_VERSION);
-
-        $this->maybeUpdate();
-        update_option('einsatzvw_version', self::VERSION);
-
-        // Posttypen registrieren
-        try {
-            $this->typeRegistry->registerTypes($this->permalinkController);
-        } catch (Exceptions\TypeRegistrationException $e) {
-            array_push($this->adminErrorMessages, $e->getMessage());
-            return;
-        }
-
-        // Permalinks aktualisieren
-        flush_rewrite_rules();
-    }
-
-    /**
-     * Wird beim Deaktivieren des Plugins aufgerufen
-     */
-    public function onDeactivation()
-    {
-        // Permalinks aktualisieren (derzeit ohne Effekt, siehe https://core.trac.wordpress.org/ticket/29118)
-        flush_rewrite_rules();
-    }
-
-    /**
-     * Plugin initialisieren
-     */
-    public function onInit()
-    {
         try {
             $this->typeRegistry->registerTypes($this->permalinkController);
         } catch (Exceptions\TypeRegistrationException $e) {

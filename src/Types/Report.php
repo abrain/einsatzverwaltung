@@ -1,6 +1,7 @@
 <?php
 namespace abrain\Einsatzverwaltung\Types;
 
+use abrain\Einsatzverwaltung\CustomFieldsRepository;
 use abrain\Einsatzverwaltung\Model\ReportAnnotation;
 use abrain\Einsatzverwaltung\ReportAnnotationRepository;
 
@@ -151,7 +152,7 @@ class Report implements CustomPostType
     /**
      * @inheritdoc
      */
-    public function registerCustomFields()
+    public function registerCustomFields(CustomFieldsRepository $customFields)
     {
         $this->registerPostMeta();
         $this->registerAnnotations();

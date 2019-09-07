@@ -81,7 +81,7 @@ class TypeRegistry
             ));
         }
 
-        $customPostType->registerCustomFields();
+        $customPostType->registerCustomFields($this->customFields);
         $customPostType->registerHooks();
 
         $this->postTypes[$slug] = $postType;

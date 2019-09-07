@@ -1,6 +1,8 @@
 <?php
 namespace abrain\Einsatzverwaltung\Types;
 
+use abrain\Einsatzverwaltung\CustomFieldsRepository;
+
 /**
  * Description of the custom post type for units
  * @package abrain\Einsatzverwaltung\Types
@@ -45,7 +47,7 @@ class Unit implements CustomPostType
     }
 
     /**
-     * @return array
+     * @inheritDoc
      */
     public function getRegistrationArgs()
     {
@@ -64,7 +66,7 @@ class Unit implements CustomPostType
     }
 
     /**
-     * @return string
+     * @inheritDoc
      */
     public static function getSlug()
     {
@@ -72,14 +74,14 @@ class Unit implements CustomPostType
     }
 
     /**
-     * @return void
+     * @inheritDoc
      */
-    public function registerCustomFields()
+    public function registerCustomFields(CustomFieldsRepository $customFields)
     {
     }
 
     /**
-     * @return void
+     * @inheritDoc
      */
     public function registerHooks()
     {

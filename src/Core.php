@@ -30,11 +30,6 @@ class Core
     private $data;
     
     /**
-     * @var Options
-     */
-    public $options;
-    
-    /**
      * @var Utilities
      */
     public $utilities;
@@ -104,7 +99,7 @@ class Core
     public function onInit()
     {
         $this->utilities = new Utilities();
-        $this->options = new Options();
+        $options = new Options();
 
         $this->typeRegistry = new TypeRegistry();
 
@@ -114,16 +109,16 @@ class Core
         add_filter('post_type_link', array($this->permalinkController, 'filterPostTypeLink'), 10, 4);
         add_filter('request', array($this->permalinkController, 'filterRequest'));
 
-        $this->formatter = new Formatter($this->options, $this->permalinkController);
+        $this->formatter = new Formatter($options, $this->permalinkController);
 
-        $this->data = new Data($this->options);
+        $this->data = new Data($options);
         add_action('save_post_einsatz', array($this->data, 'savePostdata'), 10, 2);
         add_action('private_einsatz', array($this->data, 'onPublish'), 10, 2);
         add_action('publish_einsatz', array($this->data, 'onPublish'), 10, 2);
         add_action('trash_einsatz', array($this->data, 'onTrash'), 10, 2);
         add_action('transition_post_status', array($this->data, 'onTransitionPostStatus'), 10, 3);
 
-        new Frontend($this->options, $this->formatter);
+        new Frontend($options, $this->formatter);
         new ShortcodeInitializer($this->data, $this->formatter, $this->permalinkController);
 
         $numberController = new ReportNumberController($this->data);
@@ -137,7 +132,7 @@ class Core
 
         if (is_admin()) {
             add_action('admin_notices', array($this, 'onAdminNotices'));
-            new Admin\Initializer($this->data, $this->options, $this->utilities, $this->permalinkController);
+            new Admin\Initializer($this->data, $options, $this->utilities, $this->permalinkController);
         }
 
         $userRightsManager = new UserRightsManager();
@@ -150,9 +145,9 @@ class Core
             return;
         }
 
-        if ($this->options->isFlushRewriteRules()) {
+        if ($options->isFlushRewriteRules()) {
             flush_rewrite_rules();
-            $this->options->setFlushRewriteRules(false);
+            $options->setFlushRewriteRules(false);
         }
     }
 

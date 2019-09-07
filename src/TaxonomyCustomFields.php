@@ -90,11 +90,23 @@ class TaxonomyCustomFields
     }
 
     /**
+     * Checks if we can iterate over custom fields for a certain taxonomy.
+     *
+     * @param string $taxonomy
+     *
+     * @return bool
+     */
+    private function hasTaxonomy($taxonomy)
+    {
+        return array_key_exists($taxonomy, $this->taxonomyFields) && is_array($this->taxonomyFields[$taxonomy]);
+    }
+
+    /**
      * @param string $taxonomy The taxonomy slug.
      */
     public function onAddFormFields($taxonomy)
     {
-        if (!array_key_exists($taxonomy, $this->taxonomyFields) || !is_array($this->taxonomyFields[$taxonomy])) {
+        if (!$this->hasTaxonomy($taxonomy)) {
             return;
         }
 
@@ -110,7 +122,7 @@ class TaxonomyCustomFields
      */
     public function onEditFormFields($tag, $taxonomy)
     {
-        if (!array_key_exists($taxonomy, $this->taxonomyFields) || !is_array($this->taxonomyFields[$taxonomy])) {
+        if (!$this->hasTaxonomy($taxonomy)) {
             return;
         }
 
@@ -135,7 +147,7 @@ class TaxonomyCustomFields
         }
 
         $taxonomy = $screen->taxonomy;
-        if (!array_key_exists($taxonomy, $this->taxonomyFields) || !is_array($this->taxonomyFields[$taxonomy])) {
+        if (!$this->hasTaxonomy($taxonomy)) {
             return $columns;
         }
 
@@ -171,7 +183,7 @@ class TaxonomyCustomFields
         }
 
         $taxonomy = $term->taxonomy;
-        if (!array_key_exists($taxonomy, $this->taxonomyFields) || !is_array($this->taxonomyFields[$taxonomy])) {
+        if (!$this->hasTaxonomy($taxonomy)) {
             return '';
         }
 
@@ -194,7 +206,7 @@ class TaxonomyCustomFields
      */
     public function saveTerm($termId, $ttId, $taxonomy)
     {
-        if (!array_key_exists($taxonomy, $this->taxonomyFields) || !is_array($this->taxonomyFields[$taxonomy])) {
+        if (!$this->hasTaxonomy($taxonomy)) {
             return;
         }
 

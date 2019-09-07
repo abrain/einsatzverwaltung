@@ -10,7 +10,7 @@ use abrain\Einsatzverwaltung\Util\Formatter;
 class Core
 {
     const VERSION = '1.6.3';
-    const DB_VERSION = 41;
+    const DB_VERSION = 50;
 
     /**
      * Statische Variable, um die aktuelle (einzige!) Instanz dieser Klasse zu halten

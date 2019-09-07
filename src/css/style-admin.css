@@ -113,3 +113,18 @@ li.dropzone {
 .widgets-holder-wrap .checkboxlist ul {
     margin-top: 0;
 }
+
+/* Custom icon for the vehicles in the main menu */
+.menu-icon-evw_vehicle .wp-menu-image.dashicons-before::before {
+    content: "\f0f9";
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: 20px;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.menu-icon-evw_vehicle .wp-menu-image img {
+    display: none;
+}

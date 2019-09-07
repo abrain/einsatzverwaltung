@@ -35,6 +35,19 @@ class UserRightsManager
         'delete_others_evw_units'
     );
 
+    private $capabilitiesVehicle = array(
+        'edit_evw_vehicles',
+        'edit_private_evw_vehicles',
+        'edit_published_evw_vehicles',
+        'edit_others_evw_vehicles',
+        'publish_evw_vehicles',
+        'read_private_evw_vehicles',
+        'delete_evw_vehicles',
+        'delete_private_evw_vehicles',
+        'delete_published_evw_vehicles',
+        'delete_others_evw_vehicles'
+    );
+
     /**
      * @param string $roleSlug
      *
@@ -62,7 +75,7 @@ class UserRightsManager
      */
     public function userHasCap($allcaps, $caps, $args, $user)
     {
-        $allCapabilities = array_merge(self::$capabilities, $this->capabilitiesUnit);
+        $allCapabilities = array_merge(self::$capabilities, $this->capabilitiesUnit, $this->capabilitiesVehicle);
         $requestedCaps = array_intersect($allCapabilities, $caps);
 
         // Wenn es nicht um Berechtigungen aus der Einsatzverwaltung geht, können wir uns den Rest sparen

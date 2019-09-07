@@ -46,10 +46,10 @@ class TypeRegistry
         $report = new Report();
         $this->registerPostType($report);
         $this->registerTaxonomy(new IncidentType(), $report::getSlug());
-        $this->registerTaxonomy(new Vehicle(), $report::getSlug());
         $this->registerTaxonomy(new ExtEinsatzmittel(), $report::getSlug());
         $this->registerTaxonomy(new Alarmierungsart(), $report::getSlug());
 
+        $this->registerPostType(new Vehicle());
         $unit = new Unit();
         $this->registerPostType($unit);
 

@@ -12,10 +12,10 @@ class Core
     const VERSION = '1.6.3';
     const DB_VERSION = 41;
 
-   /**
-    * Statische Variable, um die aktuelle (einzige!) Instanz dieser Klasse zu halten
-    * @var Core
-    */
+    /**
+     * Statische Variable, um die aktuelle (einzige!) Instanz dieser Klasse zu halten
+     * @var Core
+     */
     private static $instance = null;
 
     public static $pluginFile;

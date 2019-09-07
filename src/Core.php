@@ -68,9 +68,14 @@ class Core
         $this->options = new Options();
 
         $this->typeRegistry = new TypeRegistry();
-        $this->permalinkController = new PermalinkController();
 
-        $this->formatter = new Formatter($this->options, $this->permalinkController); // TODO In Singleton umwandeln
+        $this->permalinkController = new PermalinkController();
+        add_filter('option_einsatz_permalink', array(PermalinkController::class, 'sanitizePermalink'));
+        add_action('parse_query', array($this->permalinkController, 'einsatznummerMetaQuery'));
+        add_filter('post_type_link', array($this->permalinkController, 'filterPostTypeLink'), 10, 4);
+        add_filter('request', array($this->permalinkController, 'filterRequest'));
+
+        $this->formatter = new Formatter($this->options, $this->permalinkController);
 
         $this->data = new Data($this->options);
         add_action('save_post_einsatz', array($this->data, 'savePostdata'), 10, 2);
@@ -92,23 +97,12 @@ class Core
         new Widgets\Initializer($this->formatter);
 
         if (is_admin()) {
+            add_action('admin_notices', array($this, 'onAdminNotices'));
             new Admin\Initializer($this->data, $this->options, $this->utilities, $this->permalinkController);
         }
 
-        $this->addHooks();
-    }
-
-    private function addHooks()
-    {
-        add_action('admin_notices', array($this, 'onAdminNotices'));
-
         $userRightsManager = new UserRightsManager();
         add_filter('user_has_cap', array($userRightsManager, 'userHasCap'), 10, 4);
-
-        add_filter('option_einsatz_permalink', array('abrain\Einsatzverwaltung\PermalinkController', 'sanitizePermalink'));
-        add_action('parse_query', array($this->permalinkController, 'einsatznummerMetaQuery'));
-        add_filter('post_type_link', array($this->permalinkController, 'filterPostTypeLink'), 10, 4);
-        add_filter('request', array($this->permalinkController, 'filterRequest'));
     }
 
     /**

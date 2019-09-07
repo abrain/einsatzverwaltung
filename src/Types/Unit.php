@@ -62,6 +62,7 @@ class Unit implements CustomPostType
             'capability_type' => self::getSlug(),
             'map_meta_cap' => true,
             'menu_icon' => 'dashicons-networking',
+            'delete_with_user' => false,
         );
     }
 

@@ -2,7 +2,7 @@
 
 namespace abrain\Einsatzverwaltung\Types;
 
-use abrain\Einsatzverwaltung\TaxonomyCustomFields;
+use abrain\Einsatzverwaltung\CustomFieldsRepository;
 
 /**
  * Interface CustomTaxonomy
@@ -11,9 +11,9 @@ use abrain\Einsatzverwaltung\TaxonomyCustomFields;
 interface CustomTaxonomy extends CustomType
 {
     /**
-     * @param TaxonomyCustomFields $taxonomyCustomFields
+     * @param CustomFieldsRepository $customFields
      *
      * @return void
      */
-    public function registerCustomFields(TaxonomyCustomFields $taxonomyCustomFields);
+    public function registerCustomFields(CustomFieldsRepository $customFields);
 }

@@ -11,10 +11,11 @@ use abrain\Einsatzverwaltung\Types\CustomType;
 use function add_action;
 
 /**
- * Class TaxonomyCustomFields
+ * Keeps track of the custom fields of our custom types
+ *
  * @package abrain\Einsatzverwaltung
  */
-class TaxonomyCustomFields
+class CustomFieldsRepository
 {
     /**
      * @var array

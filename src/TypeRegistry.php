@@ -22,16 +22,16 @@ class TypeRegistry
     private $taxonomies = array();
 
     /**
-     * @var TaxonomyCustomFields
+     * @var CustomFieldsRepository
      */
-    private $taxonomyCustomFields;
+    private $customFields;
 
     /**
      * TypeRegistry constructor.
      */
     public function __construct()
     {
-        $this->taxonomyCustomFields = new TaxonomyCustomFields();
+        $this->customFields = new CustomFieldsRepository();
     }
 
     /**
@@ -113,7 +113,7 @@ class TypeRegistry
             ));
         }
 
-        $customTaxonomy->registerCustomFields($this->taxonomyCustomFields);
+        $customTaxonomy->registerCustomFields($this->customFields);
         $customTaxonomy->registerHooks();
 
         array_push($this->taxonomies, $slug);

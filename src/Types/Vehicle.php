@@ -3,7 +3,7 @@ namespace abrain\Einsatzverwaltung\Types;
 
 use abrain\Einsatzverwaltung\CustomFields\NumberInput;
 use abrain\Einsatzverwaltung\CustomFields\PostSelector;
-use abrain\Einsatzverwaltung\TaxonomyCustomFields;
+use abrain\Einsatzverwaltung\CustomFieldsRepository;
 
 /**
  * Description of the custom taxonomy 'Vehicle'
@@ -62,7 +62,7 @@ class Vehicle implements CustomTaxonomy
     /**
      * @inheritdoc
      */
-    public function registerCustomFields(TaxonomyCustomFields $taxonomyCustomFields)
+    public function registerCustomFields(CustomFieldsRepository $taxonomyCustomFields)
     {
         $taxonomyCustomFields->addPostSelector($this, new PostSelector(
             'fahrzeugpid',

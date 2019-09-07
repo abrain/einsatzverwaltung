@@ -2,7 +2,7 @@
 namespace abrain\Einsatzverwaltung\Types;
 
 use abrain\Einsatzverwaltung\CustomFields\ColorPicker;
-use abrain\Einsatzverwaltung\TaxonomyCustomFields;
+use abrain\Einsatzverwaltung\CustomFieldsRepository;
 use WP_REST_Response;
 
 /**
@@ -66,9 +66,9 @@ class IncidentType implements CustomTaxonomy
     /**
      * @inheritdoc
      */
-    public function registerCustomFields(TaxonomyCustomFields $taxonomyCustomFields)
+    public function registerCustomFields(CustomFieldsRepository $customFields)
     {
-        $taxonomyCustomFields->addColorpicker($this, new ColorPicker(
+        $customFields->addColorpicker($this, new ColorPicker(
             'typecolor',
             'Farbe',
             'Ordne dieser Einsatzart eine Farbe zu. Einsatzarten ohne Farbe erben diese gegebenenfalls von übergeordneten Einsatzarten.'

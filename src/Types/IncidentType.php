@@ -68,7 +68,7 @@ class IncidentType implements CustomTaxonomy
      */
     public function registerCustomFields(CustomFieldsRepository $customFields)
     {
-        $customFields->addColorpicker($this, new ColorPicker(
+        $customFields->add($this, new ColorPicker(
             'typecolor',
             'Farbe',
             'Ordne dieser Einsatzart eine Farbe zu. Einsatzarten ohne Farbe erben diese gegebenenfalls von übergeordneten Einsatzarten.'

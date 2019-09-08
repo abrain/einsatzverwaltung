@@ -1,11 +1,7 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
-use abrain\Einsatzverwaltung\CustomFields\ColorPicker;
 use abrain\Einsatzverwaltung\CustomFields\CustomField;
-use abrain\Einsatzverwaltung\CustomFields\NumberInput;
-use abrain\Einsatzverwaltung\CustomFields\PostSelector;
-use abrain\Einsatzverwaltung\CustomFields\TextInput;
 use abrain\Einsatzverwaltung\Types\CustomPostType;
 use abrain\Einsatzverwaltung\Types\CustomTaxonomy;
 use abrain\Einsatzverwaltung\Types\CustomType;
@@ -43,45 +39,9 @@ class CustomFieldsRepository
 
     /**
      * @param CustomType $customType
-     * @param TextInput $textInput
-     */
-    public function addTextInput(CustomType $customType, TextInput $textInput)
-    {
-        $this->add($customType, $textInput);
-    }
-
-    /**
-     * @param CustomType $customType
-     * @param ColorPicker $colorPicker
-     */
-    public function addColorpicker(CustomType $customType, ColorPicker $colorPicker)
-    {
-        $this->add($customType, $colorPicker);
-    }
-
-    /**
-     * @param CustomType $customType
-     * @param NumberInput $numberInput
-     */
-    public function addNumberInput(CustomType $customType, NumberInput $numberInput)
-    {
-        $this->add($customType, $numberInput);
-    }
-
-    /**
-     * @param CustomType $customType
-     * @param PostSelector $postSelector
-     */
-    public function addPostSelector(CustomType $customType, PostSelector $postSelector)
-    {
-        $this->add($customType, $postSelector);
-    }
-
-    /**
-     * @param CustomType $customType
      * @param CustomField $customField
      */
-    private function add(CustomType $customType, CustomField $customField)
+    public function add(CustomType $customType, CustomField $customField)
     {
         if ($customType instanceof CustomTaxonomy) {
             $taxonomy = $customType::getSlug();

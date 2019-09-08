@@ -66,7 +66,7 @@ class ExtEinsatzmittel implements CustomTaxonomy
      */
     public function registerCustomFields(CustomFieldsRepository $customFields)
     {
-        $customFields->addTextInput($this, new TextInput(
+        $customFields->add($this, new TextInput(
             'url',
             'URL',
             'URL zu mehr Informationen &uuml;ber ein externes Einsatzmittel, beispielsweise dessen Webseite.'

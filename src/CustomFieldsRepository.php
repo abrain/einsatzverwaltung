@@ -91,7 +91,7 @@ class CustomFieldsRepository
                 add_action("{$taxonomy}_add_form_fields", array($this, 'onAddFormFields'));
                 add_action("{$taxonomy}_edit_form_fields", array($this, 'onEditFormFields'), 10, 2);
                 add_action("manage_edit-{$taxonomy}_columns", array($this, 'onCustomColumns'));
-                add_action("manage_{$taxonomy}_custom_column", array($this, 'onTaxonomyColumnContent'), 10, 3);
+                add_filter("manage_{$taxonomy}_custom_column", array($this, 'onTaxonomyColumnContent'), 10, 3);
             }
 
             $this->taxonomyFields[$taxonomy][$customField->key] = $customField;

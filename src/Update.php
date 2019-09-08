@@ -457,7 +457,7 @@ class Update
             ));
 
             if (is_wp_error($newVehicle)) {
-                error_log("Vehicle could no be created: {$newVehicle->get_error_message()}");
+                error_log("Vehicle could not be created: {$newVehicle->get_error_message()}");
                 $this->addAdminNotice('failedVehicleMigration');
                 continue;
             }
@@ -469,6 +469,7 @@ class Update
             }
         }
 
+        update_option('einsatzvw_flush_rewrite_rules', 1);
         update_option('einsatzvw_db_version', 50);
     }
 

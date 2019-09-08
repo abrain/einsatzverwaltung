@@ -62,10 +62,9 @@ class Vehicle implements CustomPostType
     public function getRegistrationArgs()
     {
         return array(
-            'label' => 'dings',
             'labels' => $this->getLabels(),
             'public' => true,
-            'supports' => array('title', 'editor', 'thumbnail', 'revisions', 'custom-fields', 'author'),
+            'supports' => array('title', 'editor', 'thumbnail', 'revisions', 'custom-fields', 'author', 'page-attributes'),
             'menu_position' => 20,
             'show_in_admin_bar' => false,
             'show_in_rest' => true,

@@ -2,6 +2,7 @@
 
 namespace abrain\Einsatzverwaltung\Model;
 
+use abrain\Einsatzverwaltung\Types\Vehicle;
 use DateTime;
 use WP_Post;
 use WP_Term;
@@ -121,33 +122,6 @@ class IncidentReport
     }
 
     /**
-     * Komparator für Fahrzeuge
-     *
-     * @param object $vehicle1
-     * @param object $vehicle2
-     *
-     * @return int
-     */
-    private function compareVehicles($vehicle1, $vehicle2)
-    {
-        if (empty($vehicle1->vehicle_order) && !empty($vehicle2->vehicle_order)) {
-            return 1;
-        }
-
-        if (!empty($vehicle1->vehicle_order) && empty($vehicle2->vehicle_order)) {
-            return -1;
-        }
-
-        if (empty($vehicle1->vehicle_order) && empty($vehicle2->vehicle_order) ||
-            $vehicle1->vehicle_order == $vehicle2->vehicle_order
-        ) {
-            return strcasecmp($vehicle1->name, $vehicle2->name);
-        }
-
-        return ($vehicle1->vehicle_order < $vehicle2->vehicle_order) ? -1 : 1;
-    }
-
-    /**
      * Gibt die slugs und Namen der Taxonomien zurück
      *
      * @return array
@@ -160,9 +134,6 @@ class IncidentReport
             ),
             'einsatzart' => array(
                 'label' => 'Einsatzart'
-            ),
-            'fahrzeug' => array(
-                'label' => 'Fahrzeuge'
             ),
             'exteinsatzmittel' => array(
                 'label' => 'Externe Einsatzmittel'
@@ -362,32 +333,24 @@ class IncidentReport
     /**
      * Gibt die Fahrzeuge eines Einsatzberichts aus
      *
-     * @return WP_Term[]
+     * @return WP_Post[]
      */
     public function getVehicles()
     {
-        $vehicles = $this->getTheTerms('fahrzeug');
+        $vehicleIds = get_post_meta($this->getPostId(), '_evw_vehicle');
 
-        if (empty($vehicles)) {
+        if (empty($vehicleIds)) {
             return array();
         }
 
-        // Reihenfolge abfragen
-        foreach ($vehicles as $vehicle) {
-            if (!isset($vehicle->term_id)) {
-                continue;
-            }
-
-            $vehicleOrder = get_term_meta($vehicle->term_id, 'vehicleorder', true);
-            if (!empty($vehicleOrder)) {
-                $vehicle->vehicle_order = $vehicleOrder;
-            }
-        }
-
-        // Fahrzeuge vor Rückgabe sortieren
-        usort($vehicles, array($this, 'compareVehicles'));
-
-        return $vehicles;
+        return get_posts(array(
+            'nopaging' => true,
+            'orderby' => 'menu_order title',
+            'order' => 'ASC',
+            'post__in' => $vehicleIds,
+            'post_status' => 'publish',
+            'post_type' => Vehicle::getSlug(),
+        ));
     }
 
     /**

@@ -124,12 +124,18 @@ abstract class AbstractFormat implements Format
     }
 
     /**
-     * @param WP_Term $object
+     * @param WP_Post|WP_Term $object
      * @return string
      */
     private function getName($object)
     {
-        return $object->name;
+        if ($object instanceof WP_Term) {
+            return $object->name;
+        } elseif ($object instanceof WP_Post) {
+            return get_the_title($object);
+        }
+
+        return '';
     }
 
     /**

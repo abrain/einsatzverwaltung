@@ -152,8 +152,8 @@ class ReportListTable
                 return $this->getTermFilterLink($term);
             case 'e_fzg':
                 $vehicles = $report->getVehicles();
-                $vehicleLinks = array_map(array($this, 'getTermFilterLink'), $vehicles);
-                return join(', ', $vehicleLinks);
+                $vehicleNames = array_map('get_the_title', $vehicles);
+                return join(', ', $vehicleNames);
             case 'einsatzverwaltung_annotations':
                 return AnnotationIconBar::getInstance()->render($report);
             case 'einsatzverwaltung_units':

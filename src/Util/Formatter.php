@@ -328,13 +328,9 @@ class Formatter
 
         $vehicles = $report->getVehicles();
 
-        if (empty($vehicles)) {
-            return '';
-        }
-
         $names = array();
         foreach ($vehicles as $vehicle) {
-            $name = $vehicle->name;
+            $name = get_the_title($vehicle);
 
             if ($makeLinks) {
                 $name = $this->addVehicleLink($vehicle);
@@ -350,26 +346,28 @@ class Formatter
     }
 
     /**
-     * @param WP_Term $vehicle
+     * @param WP_Post $vehicle
      * @return string A link to the page associated with the vehicle (if any), otherwise the name without a link
      */
-    private function addVehicleLink($vehicle)
+    private function addVehicleLink(WP_Post $vehicle)
     {
-        $pageid = get_term_meta($vehicle->term_id, 'fahrzeugpid', true);
+        $name = get_the_title($vehicle);
+
+        $pageid = get_post_meta($vehicle->ID, '_page_id', true);
         if (empty($pageid)) {
-            return $vehicle->name;
+            return $name;
         }
 
         $pageurl = get_permalink($pageid);
         if ($pageurl === false) {
-            return $vehicle->name;
+            return $name;
         }
 
         return sprintf(
             '<a href="%s" title="Mehr Informationen zu %s">%s</a>',
             esc_url($pageurl),
-            esc_attr($vehicle->name),
-            esc_html($vehicle->name)
+            esc_attr($name),
+            esc_html($name)
         );
     }
 
@@ -431,15 +429,26 @@ class Formatter
     }
 
     /**
-     * @param WP_Term $term
+     * @param WP_Post|WP_Term $object
+     *
      * @return string
      */
-    private function getFilterLink(WP_Term $term)
+    private function getFilterLink($object)
     {
+        if ($object instanceof WP_Post) {
+            $url = ''; // TODO
+            $name = get_the_title($object);
+        } elseif ($object instanceof WP_Term) {
+            $url = get_term_link($object);
+            $name = $object->name;
+        } else {
+            return '';
+        }
+
         return sprintf(
             '<a href="%s" class="fa fa-filter" style="text-decoration: none;" title="%s"></a>',
-            get_term_link($term),
-            sprintf('Eins&auml;tze unter Beteiligung von %s anzeigen', $term->name)
+            esc_url($url),
+            esc_attr(sprintf('Eins&auml;tze unter Beteiligung von %s anzeigen', $name))
         );
     }
 

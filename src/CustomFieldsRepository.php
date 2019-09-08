@@ -212,12 +212,24 @@ class CustomFieldsRepository
     }
 
     /**
-     * @param string $column
+     * @param string $columnId
      * @param int $postId
      */
-    public function onPostColumnContent($column, $postId)
+    public function onPostColumnContent($columnId, $postId)
     {
-        echo 'content'; // TODO
+        $postType = get_post_type($postId);
+        if (!$this->hasPostType($postType)) {
+            return;
+        }
+
+        $fields = $this->postTypeFields[$postType];
+        if (!array_key_exists($columnId, $fields)) {
+            return;
+        }
+
+        /** @var CustomField $customField */
+        $customField = $fields[$columnId];
+        echo $customField->getColumnContent($postId);
     }
 
     /**

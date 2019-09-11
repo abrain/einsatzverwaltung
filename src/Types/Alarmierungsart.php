@@ -58,6 +58,14 @@ class Alarmierungsart implements CustomTaxonomy
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getRewriteSlug()
+    {
+        return self::getSlug();
+    }
+
+    /**
      * @inheritdoc
      */
     public function registerCustomFields(CustomFieldsRepository $customFields)

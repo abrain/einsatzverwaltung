@@ -76,6 +76,14 @@ class Vehicle implements CustomPostType
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getRewriteSlug()
+    {
+        return self::getSlug();
+    }
+
+    /**
      * @inheritdoc
      */
     public function registerCustomFields(CustomFieldsRepository $taxonomyCustomFields)

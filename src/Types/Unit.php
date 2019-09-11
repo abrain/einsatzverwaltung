@@ -69,6 +69,14 @@ class Unit implements CustomPostType
     /**
      * @inheritDoc
      */
+    public function getRewriteSlug()
+    {
+        return self::getSlug();
+    }
+
+    /**
+     * @inheritDoc
+     */
     public static function getSlug()
     {
         return 'evw_unit';

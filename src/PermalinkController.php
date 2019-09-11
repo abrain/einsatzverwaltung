@@ -44,7 +44,7 @@ class PermalinkController
 
         if ($wp_rewrite->using_permalinks()) {
             $this->reportPermalink = get_option('einsatz_permalink', self::DEFAULT_REPORT_PERMALINK);
-            $this->reportRewriteSlug = $report->rewriteSlug;
+            $this->reportRewriteSlug = $report->getRewriteSlug();
 
             // add rules for paginated year archive
             $base = $this->getRewriteBase();

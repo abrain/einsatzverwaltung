@@ -14,20 +14,6 @@ class Report implements CustomPostType
     const DEFAULT_REWRITE_SLUG = 'einsatzberichte';
 
     /**
-     * @var string
-     */
-    public $rewriteSlug;
-
-    /**
-     * Report constructor.
-     */
-    public function __construct()
-    {
-        $rewriteSlug = get_option('einsatzvw_rewrite_slug', self::DEFAULT_REWRITE_SLUG);
-        $this->rewriteSlug = sanitize_title($rewriteSlug, self::DEFAULT_REWRITE_SLUG);
-    }
-
-    /**
      * @return array
      */
     private function getLabels()
@@ -95,7 +81,7 @@ class Report implements CustomPostType
             'has_archive' => true,
             'rewrite' => array(
                 'feeds' => true,
-                'slug' => $this->rewriteSlug
+                'slug' => $this->getRewriteSlug()
             ),
             'supports' => $this->getSupportedFeatures(),
             'show_ui' => true,
@@ -111,6 +97,15 @@ class Report implements CustomPostType
             'taxonomies' => $this->getTaxonomies(),
             'delete_with_user' => false,
         );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getRewriteSlug()
+    {
+        $rewriteSlug = get_option('einsatzvw_rewrite_slug', self::DEFAULT_REWRITE_SLUG);
+        return sanitize_title($rewriteSlug, self::DEFAULT_REWRITE_SLUG);
     }
 
     /**

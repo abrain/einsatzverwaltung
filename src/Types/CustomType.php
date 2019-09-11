@@ -20,6 +20,11 @@ interface CustomType
     public function getRegistrationArgs();
 
     /**
+     * @return string
+     */
+    public function getRewriteSlug();
+
+    /**
      * @param CustomFieldsRepository $customFields
      *
      * @return void

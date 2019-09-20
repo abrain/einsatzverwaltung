@@ -71,6 +71,9 @@ class Vehicle implements CustomPostType
             'capability_type' => self::getSlug(),
             'map_meta_cap' => true,
             'menu_icon' => 'none',
+            'rewrite' => array(
+                'slug' => $this->getRewriteSlug()
+            ),
             'delete_with_user' => false,
         );
     }
@@ -80,7 +83,9 @@ class Vehicle implements CustomPostType
      */
     public function getRewriteSlug()
     {
-        return self::getSlug();
+        $default = 'vehicle';
+        $rewriteSlug = get_option('evw_vehicle_rewrite_slug', $default);
+        return sanitize_title($rewriteSlug, $default);
     }
 
     /**

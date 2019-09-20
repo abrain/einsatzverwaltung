@@ -469,6 +469,9 @@ class Update
             }
         }
 
+        // Maintain the old permalink structure for vehicles
+        add_option('evw_vehicle_rewrite_slug', 'fahrzeug');
+
         update_option('einsatzvw_flush_rewrite_rules', 1);
         update_option('einsatzvw_db_version', 50);
     }

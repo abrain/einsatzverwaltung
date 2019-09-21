@@ -9,7 +9,7 @@ use abrain\Einsatzverwaltung\Util\Formatter;
  */
 class Core
 {
-    const VERSION = '1.6.3';
+    const VERSION = '1.6.4';
     const DB_VERSION = 50;
 
     /**

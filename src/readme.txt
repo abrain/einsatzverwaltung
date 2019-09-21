@@ -5,7 +5,7 @@ Tags: Feuerwehr, Hilfsorganisation, Öffentlichkeitsarbeit
 Requires at least: 4.7.0
 Tested up to: 5.2
 Requires PHP: 5.3.0
-Stable tag: 1.6.3
+Stable tag: 1.6.4
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -56,6 +56,9 @@ Ideally, you check the issues on [GitHub](https://github.com/abrain/einsatzverwa
 Nein, mehr gibt es [hier](https://einsatzverwaltung.abrain.de/faq/).
 
 == Changelog ==
+
+= 1.6.4 =
+* Fix incompatibility with themes based on Gantry 5 framework
 
 = 1.6.3 =
 * Units can be assigned to reports in Quick Edit and Bulk Edit mode

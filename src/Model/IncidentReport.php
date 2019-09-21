@@ -27,19 +27,16 @@ class IncidentReport
      */
     public function __construct($post = null)
     {
-        if (!empty($post) && !is_int($post) && !is_a($post, 'WP_Post')) {
-            _doing_it_wrong(__FUNCTION__, 'Parameter post muss null oder vom Typ Integer oder WP_Post sein', null);
+        if (empty($post)) {
             return;
         }
 
-        if (!empty($post)) {
-            if (get_post_type($post) != 'einsatz') {
-                _doing_it_wrong(__FUNCTION__, 'WP_Post-Objekt ist kein Einsatzbericht', null);
-                return;
-            }
-
-            $this->post = get_post($post);
+        if (get_post_type($post) !== 'einsatz') {
+            error_log('The given post object is not an incident report'); // TODO throw exception
+            return;
         }
+
+        $this->post = get_post($post);
     }
 
     /**

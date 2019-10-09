@@ -4,6 +4,10 @@ namespace abrain\Einsatzverwaltung\Settings\Pages;
 
 use abrain\Einsatzverwaltung\PermalinkController;
 use WP_Post;
+use function add_settings_field;
+use function add_settings_section;
+use function register_setting;
+use function sanitize_title;
 
 /**
  * Settings page for advanced stuff
@@ -36,6 +40,7 @@ class Advanced extends SubPage
         $this->permalinkController = $permalinkController;
 
         add_filter('pre_update_option_einsatzvw_rewrite_slug', array($this, 'maybeRewriteSlugChanged'), 10, 2);
+        add_filter('pre_update_option_evw_vehicle_rewrite_slug', array($this, 'maybeRewriteSlugChanged'), 10, 2);
     }
 
     public function addSettingsFields()
@@ -68,6 +73,13 @@ class Advanced extends SubPage
             $this->settingsApiPage,
             'einsatzvw_settings_advreport'
         );
+        add_settings_field(
+            'einsatzvw_advvehicle_base',
+            __('Vehicle base', 'einsatzverwaltung'),
+            array($this, 'echoFieldVehicleBase'),
+            $this->settingsApiPage,
+            'einsatzvw_settings_advvehicles'
+        );
     }
 
     public function addSettingsSections()
@@ -98,6 +110,12 @@ class Advanced extends SubPage
         add_settings_section(
             'einsatzvw_settings_advreport',
             'Einsatzberichte',
+            null,
+            $this->settingsApiPage
+        );
+        add_settings_section(
+            'einsatzvw_settings_advvehicles',
+            __('Vehicles', 'einsatzverwaltung'),
             null,
             $this->settingsApiPage
         );
@@ -183,6 +201,17 @@ class Advanced extends SubPage
         echo '</p></fieldset>';
     }
 
+    public function echoFieldVehicleBase()
+    {
+        echo '<fieldset>';
+        $fallback = _x('vehicles', 'default permalink base', 'einsatzverwaltung');
+        $this->echoSettingsInput(
+            'evw_vehicle_rewrite_slug',
+            sanitize_title(get_option('evw_vehicle_rewrite_slug'), $fallback)
+        );
+        echo '</fieldset>';
+    }
+
     /**
      * @inheritDoc
      */
@@ -247,6 +276,11 @@ class Advanced extends SubPage
             'einsatzvw_settings_advanced',
             'einsatz_disable_blockeditor',
             array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+        );
+        register_setting(
+            'einsatzvw_settings_advanced',
+            'evw_vehicle_rewrite_slug',
+            'sanitize_title'
         );
     }
 }

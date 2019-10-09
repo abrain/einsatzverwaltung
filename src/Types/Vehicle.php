@@ -83,7 +83,7 @@ class Vehicle implements CustomPostType
      */
     public function getRewriteSlug()
     {
-        $default = 'vehicle';
+        $default = _x('vehicles', 'default permalink base', 'einsatzverwaltung');
         $rewriteSlug = get_option('evw_vehicle_rewrite_slug', $default);
         return sanitize_title($rewriteSlug, $default);
     }

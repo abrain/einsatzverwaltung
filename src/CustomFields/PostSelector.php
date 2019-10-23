@@ -1,6 +1,7 @@
 <?php
 namespace abrain\Einsatzverwaltung\CustomFields;
 
+use WP_Post;
 use WP_Query;
 
 /**
@@ -150,5 +151,18 @@ class PostSelector extends CustomField
             esc_attr($title),
             esc_html($title)
         );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getEditPostInput(WP_Post $post)
+    {
+        return $this->dropdownPosts(array(
+            'echo' => false,
+            'selected' => $this->getValue($post->ID),
+            'name' => $this->key,
+            'post_type' => $this->getDropdownPostTypes()
+        ));
     }
 }

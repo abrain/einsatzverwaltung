@@ -69,6 +69,24 @@ class CustomFieldsRepository
     }
 
     /**
+     * Get all CustomFields for a given custom type.
+     *
+     * @param string $slug The post_type or taxonomy slug
+     *
+     * @return CustomField[]
+     */
+    public function getFieldsForType($slug)
+    {
+        if ($this->hasPostType($slug)) {
+            return $this->postTypeFields[$slug];
+        } elseif ($this->hasTaxonomy($slug)) {
+            return $this->taxonomyFields[$slug];
+        }
+
+        return array();
+    }
+
+    /**
      * Checks if we can iterate over custom fields for a certain post type.
      *
      * @param string $postType

@@ -28,10 +28,12 @@ class TypeRegistry
 
     /**
      * TypeRegistry constructor.
+     *
+     * @param CustomFieldsRepository $customFieldsRepo
      */
-    public function __construct()
+    public function __construct(CustomFieldsRepository $customFieldsRepo)
     {
-        $this->customFields = new CustomFieldsRepository();
+        $this->customFields = $customFieldsRepo;
     }
 
     /**

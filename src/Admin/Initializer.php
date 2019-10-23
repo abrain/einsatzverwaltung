@@ -3,6 +3,7 @@
 namespace abrain\Einsatzverwaltung\Admin;
 
 use abrain\Einsatzverwaltung\Core;
+use abrain\Einsatzverwaltung\CustomFieldsRepository;
 use abrain\Einsatzverwaltung\Data;
 use abrain\Einsatzverwaltung\Export\Tool as ExportTool;
 use abrain\Einsatzverwaltung\Import\Tool as ImportTool;
@@ -25,8 +26,9 @@ class Initializer
      * @param Options $options
      * @param Utilities $utilities
      * @param PermalinkController $permalinkController
+     * @param CustomFieldsRepository $customFieldsRepo
      */
-    public function __construct(Data $data, Options $options, Utilities $utilities, PermalinkController $permalinkController)
+    public function __construct(Data $data, Options $options, Utilities $utilities, PermalinkController $permalinkController, CustomFieldsRepository $customFieldsRepo)
     {
         $pluginBasename = plugin_basename(einsatzverwaltung_plugin_file());
         add_action('admin_menu', array($this, 'hideTaxonomies'));
@@ -51,7 +53,8 @@ class Initializer
         $unitEditScreen = new UnitEditScreen();
         add_filter('default_hidden_meta_boxes', array($unitEditScreen, 'filterDefaultHiddenMetaboxes'), 10, 2);
 
-        $vehicleEditScreen = new VehicleEditScreen();
+        $vehicleEditScreen = new VehicleEditScreen($customFieldsRepo);
+        add_action('add_meta_boxes_evw_vehicle', array($vehicleEditScreen, 'addMetaBoxes'));
         add_filter('default_hidden_meta_boxes', array($vehicleEditScreen, 'filterDefaultHiddenMetaboxes'), 10, 2);
 
         // Register Settings

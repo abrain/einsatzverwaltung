@@ -104,7 +104,8 @@ class Core
         $this->utilities = new Utilities();
         $options = new Options();
 
-        $this->typeRegistry = new TypeRegistry();
+        $customFieldsRepo = new CustomFieldsRepository();
+        $this->typeRegistry = new TypeRegistry($customFieldsRepo);
 
         $this->permalinkController = new PermalinkController();
         add_filter('option_einsatz_permalink', array(PermalinkController::class, 'sanitizePermalink'));
@@ -135,7 +136,7 @@ class Core
 
         if (is_admin()) {
             add_action('admin_notices', array($this, 'onAdminNotices'));
-            new Admin\Initializer($this->data, $options, $this->utilities, $this->permalinkController);
+            new Admin\Initializer($this->data, $options, $this->utilities, $this->permalinkController, $customFieldsRepo);
         }
 
         $userRightsManager = new UserRightsManager();

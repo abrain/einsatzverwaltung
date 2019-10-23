@@ -91,6 +91,12 @@ abstract class CustomField
     abstract public function getColumnContent($termId);
 
     /**
+     * @param WP_Post $post Currently edited post object
+     * @return string HTML markup for the input
+     */
+    abstract public function getEditPostInput(WP_Post $post);
+
+    /**
      * @param object $tag Current taxonomy term object.
      * @return string The markup for the input shown when editing an existing term.
      */

@@ -95,8 +95,8 @@ class Vehicle implements CustomPostType
     {
         $taxonomyCustomFields->add($this, new PostSelector(
             '_page_id',
-            'Fahrzeugseite',
-            'Seite mit mehr Informationen &uuml;ber das Fahrzeug. Wird in Einsatzberichten mit diesem Fahrzeug verlinkt.',
+            __('Alternative page', 'einsatzverwaltung'),
+            __('Should you already have a content page about this vehicle, select it here. Visitors will be directed to that page instead.', 'einsatzverwaltung'),
             array('einsatz', Vehicle::getSlug(), 'attachment', 'ai1ec_event', 'tribe_events', 'pec-events')
         ));
         $taxonomyCustomFields->add($this, new NumberInput(

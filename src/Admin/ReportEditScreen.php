@@ -4,8 +4,17 @@ namespace abrain\Einsatzverwaltung\Admin;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Types\Report;
 use abrain\Einsatzverwaltung\Types\Unit;
+use abrain\Einsatzverwaltung\Types\Vehicle;
 use WP_Post;
 use wpdb;
+use function add_meta_box;
+use function array_map;
+use function checked;
+use function esc_html;
+use function get_post_type_object;
+use function get_posts;
+use function in_array;
+use function printf;
 
 /**
  * Customizations for the edit screen for the IncidentReport custom post type.
@@ -67,6 +76,18 @@ class ReportEditScreen extends EditScreen
             'einsatzverwaltung_units',
             __('Units', 'einsatzverwaltung'),
             array($this, 'displayMetaBoxUnits'),
+            'einsatz',
+            'side',
+            'default',
+            array(
+                '__block_editor_compatible_meta_box' => true,
+                '__back_compat_meta_box' => false
+            )
+        );
+        add_meta_box(
+            'einsatzverwaltung_vehicles',
+            __('Vehicles', 'einsatzverwaltung'),
+            array($this, 'displayMetaBoxVehicles'),
             'einsatz',
             'side',
             'default',
@@ -220,6 +241,40 @@ class ReportEditScreen extends EditScreen
                 esc_attr($unit->ID),
                 checked($assigned, true, false),
                 esc_html($unit->post_title)
+            );
+        }
+        echo '</ul></div>';
+    }
+
+    /**
+     * @param WP_Post $post
+     */
+    public function displayMetaBoxVehicles(WP_Post $post)
+    {
+        $vehicles = get_posts(array(
+            'post_type' => Vehicle::getSlug(),
+            'numberposts' => -1,
+            'order' => 'ASC',
+            'orderby' => 'name'
+        ));
+        if (empty($vehicles)) {
+            $postTypeObject = get_post_type_object(Vehicle::getSlug());
+            printf("<div>%s</div>", esc_html($postTypeObject->labels->not_found));
+            return;
+        }
+
+        $report = new IncidentReport($post);
+        $assignedVehicles = array_map(function (WP_Post $vehicle) {
+            return $vehicle->ID;
+        }, $report->getVehicles());
+        echo '<div><ul>';
+        foreach ($vehicles as $vehicle) {
+            $assigned = in_array($vehicle->ID, $assignedVehicles);
+            printf(
+                '<li><label><input type="checkbox" name="evw_vehicles[]" value="%d"%s>%s</label></li>',
+                esc_attr($vehicle->ID),
+                checked($assigned, true, false),
+                esc_html($vehicle->post_title)
             );
         }
         echo '</ul></div>';

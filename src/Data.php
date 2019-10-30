@@ -160,6 +160,10 @@ class Data
         // Save Units
         $units = (array)filter_input(INPUT_POST, 'evw_units', FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY);
         $this->savePostRelation('_evw_unit', $post, $units);
+
+        // Save Vehicles
+        $vehicles = (array)filter_input(INPUT_POST, 'evw_vehicles', FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY);
+        $this->savePostRelation('_evw_vehicle', $post, $vehicles);
     }
 
     /**

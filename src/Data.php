@@ -6,11 +6,15 @@ use abrain\Einsatzverwaltung\Types\Report;
 use DateTime;
 use WP_Post;
 use wpdb;
+use function add_post_meta;
+use function array_diff;
 use function array_key_exists;
 use function current_user_can;
 use function defined;
+use function delete_post_meta;
 use function error_log;
 use function filter_input;
+use function get_post_meta;
 use function update_post_meta;
 use function wp_verify_nonce;
 use const FILTER_REQUIRE_ARRAY;
@@ -86,13 +90,13 @@ class Data
         // Fängt Speichervorgänge per QuickEdit ab
         if (defined('DOING_AJAX') && DOING_AJAX) {
             $units = (array)filter_input(INPUT_POST, 'evw_units', FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY);
-            $this->saveUnits($post, $units);
+            $this->savePostRelation('_evw_unit', $post, $units);
             return;
         }
 
         if ($this->isBulkEdit()) {
             $unitsToAdd = (array)filter_input(INPUT_GET, 'evw_units', FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY);
-            $this->saveUnits($post, $unitsToAdd, false);
+            $this->savePostRelation('_evw_unit', $post, $unitsToAdd, false);
             return;
         }
 
@@ -155,7 +159,7 @@ class Data
 
         // Save Units
         $units = (array)filter_input(INPUT_POST, 'evw_units', FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY);
-        $this->saveUnits($post, $units);
+        $this->savePostRelation('_evw_unit', $post, $units);
     }
 
     /**
@@ -314,24 +318,25 @@ class Data
     }
 
     /**
+     * @param string $relationKey
      * @param WP_Post $post
-     * @param string[] $units
-     * @param bool $removeUnits Whether to remove the association with units not mentioned in $units. Default true.
+     * @param string[] $items
+     * @param bool $removeItems Whether to remove the association with items not mentioned in $items. Default true.
      */
-    private function saveUnits(WP_Post $post, $units, $removeUnits = true)
+    private function savePostRelation($relationKey, WP_Post $post, $items, $removeItems = true)
     {
-        $assignedUnits = get_post_meta($post->ID, '_evw_unit');
-        $unitsToAdd = array_diff($units, $assignedUnits);
+        $assignedItems = get_post_meta($post->ID, $relationKey);
+        $itemsToAdd = array_diff($items, $assignedItems);
 
-        if ($removeUnits === true) {
-            $unitsToDelete = array_diff($assignedUnits, $units);
-            foreach ($unitsToDelete as $unitId) {
-                delete_post_meta($post->ID, '_evw_unit', $unitId);
+        if ($removeItems === true) {
+            $itemsToDelete = array_diff($assignedItems, $items);
+            foreach ($itemsToDelete as $itemId) {
+                delete_post_meta($post->ID, $relationKey, $itemId);
             }
         }
 
-        foreach ($unitsToAdd as $unitId) {
-            add_post_meta($post->ID, '_evw_unit', $unitId);
+        foreach ($itemsToAdd as $itemId) {
+            add_post_meta($post->ID, $relationKey, $itemId);
         }
     }
 

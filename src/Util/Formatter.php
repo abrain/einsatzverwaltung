@@ -336,10 +336,6 @@ class Formatter
                 $name = $this->addVehicleLink($vehicle);
             }
 
-            if ($makeLinks && $showArchiveLinks && $this->options->isShowFahrzeugArchive()) {
-                $name .= '&nbsp;' . $this->getFilterLink($vehicle);
-            }
-
             $names[] = $name;
         }
         return join(", ", $names);

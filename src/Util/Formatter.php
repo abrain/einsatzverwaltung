@@ -355,7 +355,7 @@ class Formatter
 
         $pageid = get_post_meta($vehicle->ID, '_page_id', true);
         if (empty($pageid)) {
-            return $name;
+            $pageid = $vehicle->ID;
         }
 
         $pageurl = get_permalink($pageid);

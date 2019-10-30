@@ -6,6 +6,18 @@ use abrain\Einsatzverwaltung\Types\Report;
 use DateTime;
 use WP_Post;
 use wpdb;
+use function array_key_exists;
+use function current_user_can;
+use function defined;
+use function error_log;
+use function filter_input;
+use function update_post_meta;
+use function wp_verify_nonce;
+use const FILTER_REQUIRE_ARRAY;
+use const FILTER_SANITIZE_NUMBER_INT;
+use const FILTER_SANITIZE_STRING;
+use const INPUT_GET;
+use const INPUT_POST;
 
 /**
  * Stellt Methoden zur Datenabfrage und Datenmanipulation bereit
@@ -339,5 +351,41 @@ class Data
         }
 
         return false;
+    }
+
+    /**
+     * @param int $postId Post ID
+     */
+    public function saveVehiclePostdata($postId)
+    {
+        // Check access rights
+        if (!current_user_can('edit_evw_vehicle', $postId)) {
+            return;
+        }
+
+        // Skip auto-save
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+            return;
+        }
+
+        // Handle QuickEdit
+        if (defined('DOING_AJAX') && DOING_AJAX) {
+            return;
+        }
+
+        // Handle bulk edit
+        if ($this->isBulkEdit()) {
+            return;
+        }
+
+        // Check if the request originated from a page with the meta box
+        if (!array_key_exists('evw_vehicle_nonce', $_POST) ||
+            !wp_verify_nonce($_POST['evw_vehicle_nonce'], 'save_vehicle_meta')
+        ) {
+            return;
+        }
+
+        $pageId = filter_input(INPUT_POST, '_page_id', FILTER_SANITIZE_NUMBER_INT);
+        update_post_meta($postId, '_page_id', $pageId);
     }
 }

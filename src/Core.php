@@ -117,6 +117,7 @@ class Core
 
         $this->data = new Data($options);
         add_action('save_post_einsatz', array($this->data, 'savePostdata'), 10, 2);
+        add_action('save_post_evw_vehicle', array($this->data, 'saveVehiclePostdata'));
         add_action('private_einsatz', array($this->data, 'onPublish'), 10, 2);
         add_action('publish_einsatz', array($this->data, 'onPublish'), 10, 2);
         add_action('trash_einsatz', array($this->data, 'onTrash'), 10, 2);

@@ -9,6 +9,7 @@ use function array_key_exists;
 use function esc_attr;
 use function esc_html;
 use function printf;
+use function wp_nonce_field;
 
 /**
  * Customizations for the edit screen for the Vehicle custom post type.
@@ -57,6 +58,8 @@ class VehicleEditScreen extends EditScreen
      */
     public function displayMetaBox(WP_Post $post)
     {
+        wp_nonce_field('save_vehicle_meta', 'evw_vehicle_nonce');
+
         $customFields = $this->customFieldsRepo->getFieldsForType($this->customTypeSlug);
 
         if (array_key_exists('_page_id', $customFields)) {

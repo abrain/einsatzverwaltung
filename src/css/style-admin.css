@@ -116,7 +116,7 @@ li.dropzone {
 
 /* Custom icon for the vehicles in the main menu */
 .menu-icon-evw_vehicle .wp-menu-image.dashicons-before::before {
-    content: "\f0f9";
+    content: "\f0d1";
     display: inline-block;
     font: normal normal normal 14px/1 FontAwesome;
     font-size: 20px;

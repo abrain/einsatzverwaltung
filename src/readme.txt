@@ -3,9 +3,9 @@ Contributors: abrain
 Donate link: https://einsatzverwaltung.abrain.de/unterstuetzen/
 Tags: Feuerwehr, Hilfsorganisation, Öffentlichkeitsarbeit
 Requires at least: 4.7.0
-Tested up to: 5.2
+Tested up to: 5.3
 Requires PHP: 5.6.0
-Stable tag: 1.6.4
+Stable tag: 1.6.5
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -64,6 +64,9 @@ Ideally, you check the issues on [GitHub](https://github.com/abrain/einsatzverwa
 Nein, mehr gibt es [hier](https://einsatzverwaltung.abrain.de/faq/).
 
 == Changelog ==
+
+= 1.6.5 =
+* Fix: Publishing reports privately would overwrite the time of alerting with the current time
 
 = 1.6.4 =
 * Fix incompatibility with themes based on Gantry 5 framework

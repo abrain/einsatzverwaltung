@@ -127,7 +127,7 @@ class Data
          */
         if (in_array($post->post_status, array('draft', 'pending', 'auto-draft', 'future'))) {
             $updateArgs['meta_input']['_einsatz_timeofalerting'] = date_format($alarmzeit, 'Y-m-d H:i:s');
-        } elseif ($post->post_status === 'publish') {
+        } elseif (in_array($post->post_status, array('publish', 'private'))) {
             $updateArgs['post_date'] = date_format($alarmzeit, 'Y-m-d H:i:s');
             $updateArgs['post_date_gmt'] = get_gmt_from_date($updateArgs['post_date']);
         }

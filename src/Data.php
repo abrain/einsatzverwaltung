@@ -6,6 +6,7 @@ use abrain\Einsatzverwaltung\Types\Report;
 use DateTime;
 use WP_Post;
 use wpdb;
+use function in_array;
 
 /**
  * Stellt Methoden zur Datenabfrage und Datenmanipulation bereit
@@ -151,7 +152,7 @@ class Data
          */
         if (in_array($post->post_status, array('draft', 'pending', 'auto-draft', 'future'))) {
             $updateArgs['meta_input']['_einsatz_timeofalerting'] = date_format($alarmzeit, 'Y-m-d H:i:s');
-        } elseif ($post->post_status === 'publish') {
+        } elseif (in_array($post->post_status, array('publish', 'private'))) {
             $updateArgs['post_date'] = date_format($alarmzeit, 'Y-m-d H:i:s');
             $updateArgs['post_date_gmt'] = get_gmt_from_date($updateArgs['post_date']);
         }

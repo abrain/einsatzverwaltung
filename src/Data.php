@@ -6,7 +6,6 @@ use abrain\Einsatzverwaltung\Types\Report;
 use DateTime;
 use WP_Post;
 use wpdb;
-use function in_array;
 
 /**
  * Stellt Methoden zur Datenabfrage und Datenmanipulation bereit

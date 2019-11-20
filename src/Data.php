@@ -296,6 +296,19 @@ class Data
         }
     }
 
+    /**
+     * Gets called after a post has been deleted.
+     *
+     * @param int $postId Post ID
+     */
+    public function onDeleted($postId)
+    {
+        global $wpdb;
+        
+        // Delete references in case the post was a vehicle
+        $wpdb->delete($wpdb->postmeta, array('meta_key' => '_evw_vehicle', 'meta_value' => $postId));
+    }
+
     public function pauseAutoSequenceNumbers()
     {
         $this->assignSequenceNumbers = false;

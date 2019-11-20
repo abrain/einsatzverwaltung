@@ -3,6 +3,7 @@ namespace abrain\Einsatzverwaltung;
 
 use abrain\Einsatzverwaltung\Shortcodes\Initializer as ShortcodeInitializer;
 use abrain\Einsatzverwaltung\Util\Formatter;
+use function add_action;
 
 /**
  * Grundlegende Funktionen
@@ -116,6 +117,7 @@ class Core
         $this->formatter = new Formatter($options, $this->permalinkController);
 
         $this->data = new Data($options);
+        add_action('deleted_post', array($this->data, 'onDeleted'));
         add_action('save_post_einsatz', array($this->data, 'savePostdata'), 10, 2);
         add_action('save_post_evw_vehicle', array($this->data, 'saveVehiclePostdata'));
         add_action('private_einsatz', array($this->data, 'onPublish'), 10, 2);

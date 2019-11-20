@@ -42,7 +42,20 @@ class VehicleEditScreen extends EditScreen
         add_meta_box(
             'meta_box_vehicle_altpage',
             __('Alternative page', 'einsatzverwaltung'),
-            array($this, 'displayMetaBox'),
+            array($this, 'displayMetaBoxAltpage'),
+            $this->customTypeSlug,
+            'side',
+            'default',
+            array(
+                '__block_editor_compatible_meta_box' => true,
+                '__back_compat_meta_box' => false
+            )
+        );
+
+        add_meta_box(
+            'meta_box_vehicle_order',
+            __('Order', 'einsatzverwaltung'),
+            array($this, 'displayMetaBoxOrder'),
             $this->customTypeSlug,
             'side',
             'default',
@@ -56,7 +69,7 @@ class VehicleEditScreen extends EditScreen
     /**
      * @param WP_Post $post The post object currently being edited
      */
-    public function displayMetaBox(WP_Post $post)
+    public function displayMetaBoxAltpage(WP_Post $post)
     {
         wp_nonce_field('save_vehicle_meta', 'evw_vehicle_nonce');
 
@@ -70,5 +83,19 @@ class VehicleEditScreen extends EditScreen
             echo '</div>';
             printf('<p class="description">%s</p>', esc_html($customField->description));
         }
+    }
+
+    /**
+     * @param WP_Post $post The post object currently being edited
+     */
+    public function displayMetaBoxOrder(WP_Post $post)
+    {
+        $customFields = $this->customFieldsRepo->getFieldsForType($this->customTypeSlug);
+        echo '<div class="components-panel__row">';
+        $customField = $customFields['vehicle_order'];
+        printf('<label for="%s" class="screen-reader-text">%s</label>', esc_attr($customField->key), esc_html($customField->label));
+        echo $customField->getEditPostInput($post);
+        echo '</div>';
+        printf('<p class="description">%s</p>', esc_html($customField->description));
     }
 }

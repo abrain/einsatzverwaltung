@@ -69,11 +69,7 @@ abstract class CustomField
         if (term_exists($objectId) !== null) {
             $value = get_term_meta($objectId, $this->key, true);
         } elseif (get_post($objectId) instanceof WP_Post) {
-            if (in_array($this->key, array('menu_order'))) {
-                $value = get_post_field($this->key, $objectId);
-            } else {
-                $value = get_post_meta($objectId, $this->key, true);
-            }
+            $value = get_post_meta($objectId, $this->key, true);
         }
 
         return (false === $value ? $this->defaultValue : $value);

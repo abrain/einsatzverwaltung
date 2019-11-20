@@ -14,6 +14,7 @@ use function get_gmt_from_date;
 use function get_post_meta;
 use function get_posts;
 use function get_role;
+use function get_term_meta;
 use function get_user_option;
 use function update_option;
 use function update_post_meta;
@@ -450,9 +451,9 @@ class Update
                 'post_name' => $oldVehicle->slug,
                 'post_content' => $oldVehicle->description,
                 'post_status' => 'publish',
-                'menu_order' => get_term_meta($oldVehicle->term_id, 'vehicleorder', true),
                 'meta_input' => array(
-                    '_page_id' => get_term_meta($oldVehicle->term_id, 'fahrzeugpid', true)
+                    '_page_id' => get_term_meta($oldVehicle->term_id, 'fahrzeugpid', true),
+                    'vehicle_order' => get_term_meta($oldVehicle->term_id, 'vehicleorder', true),
                 )
             ));
 

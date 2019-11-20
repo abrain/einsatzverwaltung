@@ -64,7 +64,7 @@ class Vehicle implements CustomPostType
         return array(
             'labels' => $this->getLabels(),
             'public' => true,
-            'supports' => array('title', 'editor', 'thumbnail', 'revisions', 'custom-fields', 'author', 'page-attributes'),
+            'supports' => array('title', 'editor', 'thumbnail', 'revisions', 'custom-fields', 'author'),
             'menu_position' => 20,
             'show_in_admin_bar' => false,
             'show_in_rest' => true,
@@ -100,7 +100,7 @@ class Vehicle implements CustomPostType
             array('einsatz', Vehicle::getSlug(), 'attachment', 'ai1ec_event', 'tribe_events', 'pec-events')
         ));
         $taxonomyCustomFields->add($this, new NumberInput(
-            'menu_order',
+            'vehicle_order',
             'Reihenfolge',
             'Optionale Angabe, mit der die Anzeigereihenfolge der Fahrzeuge beeinflusst werden kann. Fahrzeuge mit der kleineren Zahl werden zuerst angezeigt, anschlie&szlig;end diejenigen ohne Angabe bzw. dem Wert 0 in alphabetischer Reihenfolge.'
         ));

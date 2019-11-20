@@ -304,7 +304,7 @@ class Data
     public function onDeleted($postId)
     {
         global $wpdb;
-        
+
         // Delete references in case the post was a vehicle
         $wpdb->delete($wpdb->postmeta, array('meta_key' => '_evw_vehicle', 'meta_value' => $postId));
     }
@@ -409,5 +409,8 @@ class Data
 
         $pageId = filter_input(INPUT_POST, '_page_id', FILTER_SANITIZE_NUMBER_INT);
         update_post_meta($postId, '_page_id', $pageId);
+
+        $vehicleOrder = filter_input(INPUT_POST, 'vehicle_order', FILTER_SANITIZE_NUMBER_INT);
+        update_post_meta($postId, 'vehicle_order', $vehicleOrder);
     }
 }

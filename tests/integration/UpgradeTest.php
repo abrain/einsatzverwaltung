@@ -461,7 +461,7 @@ class UpgradeTest extends WP_UnitTestCase
             $this->assertEquals($oldVehicle->slug, $vehicles[$key]->post_name);
             $this->assertEquals($oldVehicle->description, $vehicles[$key]->post_content);
             $this->assertEquals($pids[$key], get_post_meta($vehicles[$key]->ID, '_page_id', true));
-            $this->assertEquals($order[$key], $vehicles[$key]->menu_order);
+            $this->assertEquals($order[$key], get_post_meta($vehicles[$key]->ID, 'vehicle_order', true));
         }
 
         $this->assertEqualSets(array(), get_post_meta($reportIds[0], '_evw_vehicle'));

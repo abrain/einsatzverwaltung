@@ -4,6 +4,7 @@ namespace abrain\Einsatzverwaltung\Types;
 use abrain\Einsatzverwaltung\CustomFields\NumberInput;
 use abrain\Einsatzverwaltung\CustomFields\PostSelector;
 use abrain\Einsatzverwaltung\CustomFieldsRepository;
+use function strcasecmp;
 
 /**
  * Description of the custom taxonomy 'Vehicle'
@@ -11,6 +12,35 @@ use abrain\Einsatzverwaltung\CustomFieldsRepository;
  */
 class Vehicle implements CustomPostType
 {
+    /**
+     * Comparison function for vehicles
+     *
+     * @param object $vehicle1
+     * @param object $vehicle2
+     *
+     * @return int
+     */
+    public static function compareVehicles($vehicle1, $vehicle2)
+    {
+        $order1 = $vehicle1->vehicle_order;
+        $order2 = $vehicle2->vehicle_order;
+
+        if (empty($order1) && !empty($order2)) {
+            return 1;
+        }
+
+        if (!empty($order1) && empty($order2)) {
+            return -1;
+        }
+
+        // If no order is set on both or if they are equal, sort by name
+        if (empty($order1) && empty($order2) || $order1 == $order2) {
+            return strcasecmp($vehicle1->name, $vehicle2->name);
+        }
+
+        return ($order1 < $order2) ? -1 : 1;
+    }
+
     /**
      * @return string
      */

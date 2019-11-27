@@ -118,35 +118,6 @@ class IncidentReport
     }
 
     /**
-     * Comparison function for vehicles
-     *
-     * @param object $vehicle1
-     * @param object $vehicle2
-     *
-     * @return int
-     */
-    private function compareVehicles($vehicle1, $vehicle2)
-    {
-        $order1 = $vehicle1->vehicle_order;
-        $order2 = $vehicle2->vehicle_order;
-
-        if (empty($order1) && !empty($order2)) {
-            return 1;
-        }
-
-        if (!empty($order1) && empty($order2)) {
-            return -1;
-        }
-
-        // If no order is set on both or if they are equal, sort by name
-        if (empty($order1) && empty($order2) || $order1 == $order2) {
-            return strcasecmp($vehicle1->name, $vehicle2->name);
-        }
-
-        return ($order1 < $order2) ? -1 : 1;
-    }
-
-    /**
      * Gibt die slugs und Namen der Taxonomien zurück
      *
      * @return array
@@ -377,7 +348,7 @@ class IncidentReport
             'post_type' => Vehicle::getSlug(),
         ));
 
-        usort($vehicles, array($this, 'compareVehicles'));
+        usort($vehicles, array(Vehicle::class, 'compareVehicles'));
 
         return $vehicles;
     }

@@ -3,6 +3,7 @@ namespace abrain\Einsatzverwaltung;
 
 use WP_UnitTestCase;
 use wpdb;
+use function get_posts;
 
 /**
  * Class UpgradeTest
@@ -454,7 +455,10 @@ class UpgradeTest extends WP_UnitTestCase
 
         $this->runUpgrade(41, 50);
 
-        $vehicles = get_posts(array('post_type' => 'evw_vehicle', 'post_status' => 'publish'));
+        $publicVehicles = get_posts(array('post_type' => 'evw_vehicle', 'post_status' => 'publish'));
+        $this->assertCount(0, $publicVehicles);
+
+        $vehicles = get_posts(array('post_type' => 'evw_vehicle', 'post_status' => 'private'));
         $this->assertCount(2, $vehicles);
         foreach (array($vehicle1, $vehicle3) as $key => $oldVehicle) {
             $this->assertEquals($oldVehicle->name, $vehicles[$key]->post_title);

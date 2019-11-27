@@ -450,7 +450,7 @@ class Update
                 'post_title' => $oldVehicle->name,
                 'post_name' => $oldVehicle->slug,
                 'post_content' => $oldVehicle->description,
-                'post_status' => 'publish',
+                'post_status' => 'private',
                 'meta_input' => array(
                     '_page_id' => get_term_meta($oldVehicle->term_id, 'fahrzeugpid', true),
                     'vehicle_order' => get_term_meta($oldVehicle->term_id, 'vehicleorder', true),

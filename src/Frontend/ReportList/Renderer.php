@@ -360,7 +360,7 @@ class Renderer
                 $cellContent = $this->formatter->getDurationString($minutes, true);
                 break;
             case 'vehicles':
-                $cellContent = $this->formatter->getVehicles($report, $parameters->linkVehicles, false);
+                $cellContent = $this->formatter->getVehicles($report, $parameters->linkVehicles);
                 break;
             case 'alarmType':
                 $cellContent = $this->formatter->getTypesOfAlerting($report);

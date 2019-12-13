@@ -102,7 +102,7 @@ class Frontend
             $einsatzleiter = $report->getIncidentCommander();
             $mannschaft = $report->getWorkforce();
 
-            $vehicles = $this->formatter->getVehicles($report, $mayContainLinks, $showArchiveLinks);
+            $vehicles = $this->formatter->getVehicles($report, $mayContainLinks);
             $units = $this->formatter->getUnits($report);
             $additionalForces = $this->formatter->getAdditionalForces($report, $mayContainLinks, $showArchiveLinks);
 

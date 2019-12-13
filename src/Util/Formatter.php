@@ -163,7 +163,7 @@ class Formatter
                 $replace = $this->annotationIconBar->render($incidentReport);
                 break;
             case '%vehicles%':
-                $replace = $this->getVehicles($incidentReport, ($context === 'post'), ($context === 'post'));
+                $replace = $this->getVehicles($incidentReport, ($context === 'post'));
                 break;
             case '%additionalForces%':
                 $replace = $this->getAdditionalForces($incidentReport, ($context === 'post'), ($context === 'post'));
@@ -316,11 +316,10 @@ class Formatter
     /**
      * @param IncidentReport $report
      * @param bool $makeLinks Fahrzeugname als Link zur Fahrzeugseite angeben, wenn diese eingetragen wurde
-     * @param bool $showArchiveLinks Generiere zusätzlichen Link zur Archivseite des Fahrzeugs
      *
      * @return string
      */
-    public function getVehicles($report, $makeLinks, $showArchiveLinks)
+    public function getVehicles($report, $makeLinks)
     {
         if (empty($report)) {
             return '';

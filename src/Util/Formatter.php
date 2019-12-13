@@ -349,8 +349,14 @@ class Formatter
         $name = get_the_title($vehicle);
 
         $pageid = get_post_meta($vehicle->ID, '_page_id', true);
-        if (empty($pageid)) {
+
+        // If the vehicle is public and no alternative page is specified, link to the vehicle singular page
+        if (empty($pageid) && $vehicle->post_status === 'publish') {
             $pageid = $vehicle->ID;
+        }
+
+        if (empty($pageid)) {
+            return $name;
         }
 
         $pageurl = get_permalink($pageid);

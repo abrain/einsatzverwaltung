@@ -253,6 +253,7 @@ class ReportEditScreen extends EditScreen
     {
         $vehicles = get_posts(array(
             'post_type' => Vehicle::getSlug(),
+            'post_status' => array('publish', 'private'),
             'numberposts' => -1,
             'order' => 'ASC',
             'orderby' => 'name'

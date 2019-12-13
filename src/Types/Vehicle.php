@@ -4,6 +4,8 @@ namespace abrain\Einsatzverwaltung\Types;
 use abrain\Einsatzverwaltung\CustomFields\NumberInput;
 use abrain\Einsatzverwaltung\CustomFields\PostSelector;
 use abrain\Einsatzverwaltung\CustomFieldsRepository;
+use WP_Post;
+use function add_filter;
 use function strcasecmp;
 
 /**
@@ -141,5 +143,13 @@ class Vehicle implements CustomPostType
      */
     public function registerHooks()
     {
+        // Do not prepend 'Private: ' for privately published vehicles
+        add_filter('private_title_format', function ($prepend, WP_Post $post) {
+            if ($post->post_type === self::getSlug()) {
+                $prepend = '%s';
+            }
+
+            return $prepend;
+        }, 10, 2);
     }
 }

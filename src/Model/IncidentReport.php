@@ -344,7 +344,7 @@ class IncidentReport
             'orderby' => 'title',
             'order' => 'ASC',
             'post__in' => $vehicleIds,
-            'post_status' => 'publish',
+            'post_status' => array('publish', 'private'),
             'post_type' => Vehicle::getSlug(),
         ));
 

@@ -93,6 +93,9 @@ class IncidentReport
             'einsatz_incidentNumber' => array(
                 'label' => 'Einsatznummer'
             ),
+            '_evw_vehicle' => array(
+                'label' => 'Fahrzeuge'
+            ),
         );
     }
 

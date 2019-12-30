@@ -7,8 +7,18 @@ use abrain\Einsatzverwaltung\Exceptions\ImportPreparationException;
 use abrain\Einsatzverwaltung\Import\Sources\AbstractSource;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\ReportNumberController;
+use abrain\Einsatzverwaltung\Types\Vehicle;
 use abrain\Einsatzverwaltung\Utilities;
 use DateTime;
+use function add_post_meta;
+use function array_key_exists;
+use function array_keys;
+use function explode;
+use function get_posts;
+use function in_array;
+use function is_wp_error;
+use function sprintf;
+use function wp_insert_post;
 
 /**
  * Verschiedene Funktionen für den Import von Einsatzberichten
@@ -38,6 +48,11 @@ class Helper
     /**
      * @var array
      */
+    private $relations;
+
+    /**
+     * @var array
+     */
     public $taxonomies;
 
     /**
@@ -49,6 +64,8 @@ class Helper
     {
         $this->utilities = $utilities;
         $this->data = $data;
+
+        $this->relations = array('_evw_vehicle' => Vehicle::getSlug());
     }
 
     /**
@@ -122,6 +139,13 @@ class Helper
             $sourceValue = trim($sourceEntry[$sourceField]);
             if (array_key_exists($ownField, $this->metaFields)) {
                 // Wert gehört in ein Metafeld
+
+                // Post-to-post relations are treated separately
+                if (in_array($ownField, array_keys($this->relations))) {
+                    $insertArgs[$ownField] = $sourceValue;
+                    continue;
+                }
+
                 $insertArgs['meta_input'][$ownField] = $sourceValue;
             } elseif (array_key_exists($ownField, $this->taxonomies)) {
                 // Wert gehört zu einer Taxonomie
@@ -296,6 +320,63 @@ class Helper
     }
 
     /**
+     * Resolves related posts by their given name and creates missing posts.
+     *
+     * @param array $allInsertArgs
+     *
+     * @throws ImportPreparationException
+     */
+    private function resolvePostRelations(&$allInsertArgs)
+    {
+        foreach ($this->relations as $key => $postType) {
+            $posts = get_posts(array(
+                'post_type' => $postType,
+                'nopaging' => true,
+                'post_status' => array('publish', 'private')
+            ));
+            $existingPosts = array();
+            foreach ($posts as $post) {
+                $existingPosts[$post->post_title] = $post->ID;
+            }
+
+            foreach ($allInsertArgs as $index => $insertArgs) {
+                if (!array_key_exists($key, $insertArgs)) {
+                    continue;
+                }
+
+                $names = explode(',', $insertArgs[$key]);
+                $ids = array();
+
+                foreach ($names as $name) {
+                    if (!array_key_exists($name, $existingPosts)) {
+                        $postId = wp_insert_post(array(
+                            'post_title' => $name,
+                            'post_type' => $postType,
+                            'post_status' => 'private'
+                        ), true);
+
+                        if (is_wp_error($postId)) {
+                            $message = sprintf(
+                                // Translators: 1: post type, 2: name of the new post
+                                __('Could not create post with type %1$s and name %2$s.', 'einsatzverwaltung'),
+                                $postType,
+                                $name
+                            );
+                            throw new ImportPreparationException($message);
+                        }
+
+                        $existingPosts[$name] = $postId;
+                    }
+
+                    $ids[] = $existingPosts[$name];
+                }
+
+                $allInsertArgs[$index][$key] = $ids;
+            }
+        }
+    }
+
+    /**
      * Stellt sicher, dass boolsche Werte durch 0 und 1 dargestellt werden
      * @param string $value
      * @return string
@@ -348,6 +429,9 @@ class Helper
             $preparedInsertArgs[] = $insertArgs;
             $yearsAffected[$alarmzeit->format('Y')] = 1;
         }
+
+        // Reference post-to-post relations with the post ID and create missing posts
+        $this->resolvePostRelations($preparedInsertArgs);
     }
 
     /**
@@ -435,10 +519,28 @@ class Helper
         }
 
         foreach ($preparedInsertArgs as $insertArgs) {
+            // Extract meta data that can only be added after the post has been created
+            $extraMeta = array();
+            foreach (array_keys($this->relations) as $key) {
+                if (!array_key_exists($key, $insertArgs)) {
+                    continue;
+                }
+
+                $extraMeta[$key] = $insertArgs[$key];
+                unset($insertArgs[$key]);
+            }
+
             // Neuen Beitrag anlegen
             $postId = wp_insert_post($insertArgs, true);
             if (is_wp_error($postId)) {
                 throw new ImportException('Konnte Einsatz nicht importieren: ' . $postId->get_error_message());
+            }
+
+            // Add extra meta data
+            foreach ($extraMeta as $metaKey => $values) {
+                foreach ($values as $value) {
+                    add_post_meta($postId, $metaKey, $value);
+                }
             }
 
             $importStatus->importSuccesss($postId);

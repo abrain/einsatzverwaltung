@@ -9,7 +9,6 @@ class Options
     private $defaults = array(
         'einsatzvw_show_einsatzart_archive' => false,
         'einsatzvw_show_exteinsatzmittel_archive' => false,
-        'einsatzvw_show_fahrzeug_archive' => false,
         'einsatzvw_open_ext_in_new' => false,
         'einsatzvw_show_einsatzberichte_mainloop' => false,
         'einsatzvw_einsatz_hideemptydetails' => true,
@@ -131,15 +130,6 @@ class Options
     public function isShowExtEinsatzmittelArchive()
     {
         $option = $this->getOption('einsatzvw_show_exteinsatzmittel_archive');
-        return $this->toBoolean($option);
-    }
-
-    /**
-     * @return bool
-     */
-    public function isShowFahrzeugArchive()
-    {
-        $option = $this->getOption('einsatzvw_show_fahrzeug_archive');
         return $this->toBoolean($option);
     }
 

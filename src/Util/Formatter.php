@@ -7,6 +7,7 @@ use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\PermalinkController;
 use WP_Post;
 use WP_Term;
+use function get_term_link;
 
 /**
  * Formatierungen aller Art
@@ -436,20 +437,14 @@ class Formatter
      */
     private function getFilterLink($object)
     {
-        if ($object instanceof WP_Post) {
-            $url = ''; // TODO
-            $name = get_the_title($object);
-        } elseif ($object instanceof WP_Term) {
-            $url = get_term_link($object);
-            $name = $object->name;
-        } else {
+        if ($object instanceof WP_Term === false) {
             return '';
         }
 
         return sprintf(
             '<a href="%s" class="fa fa-filter" style="text-decoration: none;" title="%s"></a>',
-            esc_url($url),
-            esc_attr(sprintf('Eins&auml;tze unter Beteiligung von %s anzeigen', $name))
+            esc_url(get_term_link($object)),
+            esc_attr(sprintf('Eins&auml;tze unter Beteiligung von %s anzeigen', $object->name))
         );
     }
 

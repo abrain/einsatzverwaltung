@@ -125,11 +125,6 @@ class Report extends SubPage
             'einsatzvw_show_exteinsatzmittel_archive',
             'Externe Einsatzkr&auml;fte'
         );
-        echo '<br>';
-        $this->echoSettingsCheckbox(
-            'einsatzvw_show_fahrzeug_archive',
-            'Fahrzeuge'
-        );
         echo '<p class="description">F&uuml;r alle hier aktivierten Arten von Einsatzdetails werden im Kopfbereich des Einsatzberichts f&uuml;r alle auftretenden Werte Links zu einer gefilterten Einsatz&uuml;bersicht angezeigt. Beispielsweise kann man damit alle Eins&auml;tze unter Beteiligung einer bestimmten externen Einsatzkraft auflisten lassen.</p>';
         echo '</fieldset>';
     }
@@ -206,11 +201,6 @@ class Report extends SubPage
         register_setting(
             'einsatzvw_settings_report',
             'einsatzvw_show_einsatzart_archive',
-            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
-        );
-        register_setting(
-            'einsatzvw_settings_report',
-            'einsatzvw_show_fahrzeug_archive',
             array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
         );
         register_setting(

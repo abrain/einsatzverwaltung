@@ -4,10 +4,12 @@ namespace abrain\Einsatzverwaltung\Admin;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\ReportFactory;
 use DateTime;
+use DateTimeZone;
 use Exception;
 use WP_Post;
 use WP_UnitTestCase;
 use WP_User;
+use function get_option;
 
 /**
  * Testet die Erstellung und Bearbeitung von Einsatzberichten
@@ -182,13 +184,14 @@ class ReportEditTest extends WP_UnitTestCase
         wp_set_current_user($userEditor->ID);
 
         try {
-            $reportDateTime = new DateTime('1 hour ago');
+            $dateTimeZone = new DateTimeZone(get_option('timezone_string'));
+            $reportDateTime = new DateTime('1 hour ago', $dateTimeZone);
             $reportDate = $reportDateTime->format('Y-m-d H:i:s');
 
-            $publishDateTime = new DateTime('+ 1 hour');
+            $publishDateTime = new DateTime('+ 1 hour', $dateTimeZone);
             $futureDate= $publishDateTime->format('Y-m-d H:i:s');
 
-            $newPublishDateTime = new DateTime('5 seconds ago');
+            $newPublishDateTime = new DateTime('5 seconds ago', $dateTimeZone);
             $newPublishDate= $newPublishDateTime->format('Y-m-d H:i:s');
         } catch (Exception $e) {
             $this->fail('Could not generate dates');

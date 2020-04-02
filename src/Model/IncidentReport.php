@@ -2,15 +2,11 @@
 
 namespace abrain\Einsatzverwaltung\Model;
 
-use Cassandra\Date;
-use DateInterval;
 use DateTime;
 use DateTimeZone;
 use WP_Post;
 use WP_Term;
-use function date_create;
 use function error_log;
-use function fann_length_train_data;
 use function get_option;
 
 /**

@@ -6,8 +6,6 @@ use DateTime;
 use DateTimeZone;
 use WP_Post;
 use WP_Term;
-use function error_log;
-use function get_option;
 
 /**
  * Datenmodellklasse für Einsatzberichte

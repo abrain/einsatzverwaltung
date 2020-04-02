@@ -3,11 +3,13 @@
 namespace abrain\Einsatzverwaltung\Model;
 
 use DateTime;
+use DateTimeZone;
 use WP_Post;
 use WP_Term;
-use function _doing_it_wrong;
 use function get_post;
 use function get_post_type;
+use function error_log;
+use function get_option;
 
 /**
  * Datenmodellklasse für Einsatzberichte
@@ -103,15 +105,23 @@ class IncidentReport
      */
     public function getDuration()
     {
-        $timeOfAlerting = $this->getTimeOfAlerting();
+        $timeOfAlerting = $this->getPostDate();
         $timeOfEnding = $this->getTimeOfEnding();
 
         if (empty($timeOfAlerting) || empty($timeOfEnding)) {
             return false;
         }
 
-        $timestamp1 = $timeOfAlerting->getTimestamp();
-        $timestamp2 = strtotime($timeOfEnding);
+        // Create DateTime objects with the proper time zone information
+        $dateTimeZone = new DateTimeZone(get_option('timezone_string'));
+        $startDateTime = DateTime::createFromFormat('Y-m-d H:i:s', $timeOfAlerting, $dateTimeZone);
+        $endDateTime = DateTime::createFromFormat('Y-m-d H:i', $timeOfEnding, $dateTimeZone);
+        if ($startDateTime === false || $endDateTime === false) {
+            return false;
+        }
+
+        $timestamp1 = $startDateTime->getTimestamp();
+        $timestamp2 = $endDateTime->getTimestamp();
         $differenz = $timestamp2 - $timestamp1;
 
         return intval($differenz / 60);
@@ -270,20 +280,34 @@ class IncidentReport
      */
     public function getTimeOfAlerting()
     {
+        $postDate = $this->getPostDate();
+
+        if ($postDate === false) {
+            return false;
+        }
+
+        return DateTime::createFromFormat('Y-m-d H:i:s', $postDate);
+    }
+
+    /**
+     * @return bool|string
+     */
+    private function getPostDate()
+    {
         if (empty($this->post)) {
             return false;
         }
 
         // Solange der Einsatzbericht ein Entwurf ist, wird die Alarmzeit in Postmeta vorgehalten
         if ($this->isDraft() || $this->isFuture()) {
-            $time = $this->getPostMeta('_einsatz_timeofalerting');
+            $postDate = $this->getPostMeta('_einsatz_timeofalerting');
         }
 
-        if (empty($time)) {
-            $time = $this->post->post_date;
+        if (empty($postDate)) {
+            $postDate = $this->post->post_date;
         }
 
-        return DateTime::createFromFormat('Y-m-d H:i:s', $time);
+        return $postDate;
     }
 
     /**

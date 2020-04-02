@@ -36,7 +36,7 @@ jobs:
   include:
   - stage: validate
     name: "Basic Checks"
-    php: '7.3'
+    php: '7.4'
     before_install:
       - phpenv config-rm xdebug.ini
       - composer require bartlett/php-compatinfo:5.* --dev
@@ -73,8 +73,6 @@ jobs:
     name: 'Latest versions, PATHINFO permalinks'
     env: WP_VERSION=latest WP_MULTISITE=0 WP_TESTS_PERMALINK=PATHINFO
     php: '7.3'
-
-matrix:
   exclude:
     - env: WP_VERSION=nightly WP_MULTISITE=0
       php: '5.6'

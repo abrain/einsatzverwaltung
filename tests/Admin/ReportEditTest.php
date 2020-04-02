@@ -9,7 +9,6 @@ use Exception;
 use WP_Post;
 use WP_UnitTestCase;
 use WP_User;
-use function get_option;
 
 /**
  * Testet die Erstellung und Bearbeitung von Einsatzberichten

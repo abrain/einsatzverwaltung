@@ -5,7 +5,7 @@ Tags: Feuerwehr, Hilfsorganisation, Öffentlichkeitsarbeit
 Requires at least: 4.7.0
 Tested up to: 5.4
 Requires PHP: 5.3.0
-Stable tag: 1.6.6
+Stable tag: 1.6.7
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -56,6 +56,9 @@ Ideally, you check the issues on [GitHub](https://github.com/abrain/einsatzverwa
 Nein, mehr gibt es [hier](https://einsatzverwaltung.abrain.de/faq/).
 
 == Changelog ==
+
+= 1.6.7 =
+* Fix: Calculation of the duration could fail, if the time zone was specified as offset from UTC
 
 = 1.6.6 =
 * Fix: The duration was calculated incorrectly, when a switch to/from Daylight Saving Time happened during the incident

@@ -36,7 +36,7 @@ jobs:
   include:
   - stage: validate
     name: "Basic Checks"
-    php: '7.3'
+    php: '7.4'
     before_install:
       - phpenv config-rm xdebug.ini
       - composer require bartlett/php-compatinfo:5.* --dev
@@ -55,7 +55,7 @@ jobs:
   - stage: validate
     name: 'Latest versions'
     env: WP_VERSION=latest WP_MULTISITE=0
-    php: '7.3'
+    php: '7.4'
     before_install: composer require phpunit/phpunit:5.7.* --dev
     before_script:
       - bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
@@ -68,11 +68,11 @@ jobs:
   - stage: test
     name: 'Latest versions, pretty permalinks'
     env: WP_VERSION=latest WP_MULTISITE=0 WP_TESTS_PERMALINK=PRETTY
-    php: '7.3'
+    php: '7.4'
   - stage: test
     name: 'Latest versions, PATHINFO permalinks'
     env: WP_VERSION=latest WP_MULTISITE=0 WP_TESTS_PERMALINK=PATHINFO
-    php: '7.3'
+    php: '7.4'
 
 matrix:
   exclude:

@@ -50,4 +50,5 @@ if (version_compare($php_version, einsatzverwaltung_minPHPversion()) < 0) {
     );
 }
 
+require_once dirname(__FILE__) . '/backcompat.php';
 require_once dirname(__FILE__) . '/Loader.php';

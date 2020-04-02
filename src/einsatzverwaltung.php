@@ -3,7 +3,7 @@
 Plugin Name: Einsatzverwaltung
 Plugin URI: https://einsatzverwaltung.abrain.de
 Description: Public incident reports for fire brigades and other rescue services
-Version: 1.6.6
+Version: 1.6.7
 Author: Andreas Brain
 Author URI: https://www.abrain.de
 License: GPLv2

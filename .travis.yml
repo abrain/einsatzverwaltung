@@ -56,7 +56,7 @@ jobs:
     name: 'Latest versions'
     env: WP_VERSION=latest WP_MULTISITE=0
     php: '7.4'
-    before_install: composer require phpunit/phpunit:5.7.* --dev
+    before_install: composer require --dev phpunit/phpunit ^6
     before_script:
       - bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
       - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter

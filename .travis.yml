@@ -35,7 +35,7 @@ jobs:
   include:
   - stage: validate
     name: "Basic Checks"
-    php: '7.3'
+    php: '7.4'
     before_script: skip
     script: ./vendor/bin/phpunit -c phpunit-checks.xml --no-coverage
   - stage: validate
@@ -62,8 +62,6 @@ jobs:
     name: 'Latest versions, PATHINFO permalinks'
     env: WP_VERSION=latest WP_MULTISITE=0 WP_TESTS_PERMALINK=PATHINFO
     php: '7.3'
-
-matrix:
   allow_failures:
     - env: WP_VERSION=nightly WP_MULTISITE=0
   fast_finish: true

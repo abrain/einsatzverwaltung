@@ -3,13 +3,11 @@
 namespace abrain\Einsatzverwaltung\Model;
 
 use DateTime;
-use DateTimeZone;
 use WP_Post;
 use WP_Term;
 use function get_post;
 use function get_post_type;
 use function error_log;
-use function get_option;
 
 /**
  * Datenmodellklasse für Einsatzberichte
@@ -113,7 +111,7 @@ class IncidentReport
         }
 
         // Create DateTime objects with the proper time zone information
-        $dateTimeZone = new DateTimeZone(get_option('timezone_string'));
+        $dateTimeZone = wp_timezone();
         $startDateTime = DateTime::createFromFormat('Y-m-d H:i:s', $timeOfAlerting, $dateTimeZone);
         $endDateTime = DateTime::createFromFormat('Y-m-d H:i', $timeOfEnding, $dateTimeZone);
         if ($startDateTime === false || $endDateTime === false) {

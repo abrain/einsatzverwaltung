@@ -113,3 +113,12 @@ li.dropzone {
 .widgets-holder-wrap .checkboxlist ul {
     margin-top: 0;
 }
+
+.form-wrap .fakelabel {
+    display: block;
+    padding: 2px 0;
+}
+
+.form-wrap .checkboxlabel {
+    display: unset;
+}

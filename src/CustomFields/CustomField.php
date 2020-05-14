@@ -2,6 +2,7 @@
 namespace abrain\Einsatzverwaltung\CustomFields;
 
 use WP_Post;
+use WP_Term;
 
 /**
  * Base class for additional fields of taxonomies
@@ -44,7 +45,7 @@ abstract class CustomField
     }
 
     /**
-     * @param object $tag Current taxonomy term object.
+     * @param WP_Term $tag Current taxonomy term object.
      * @return string The markup for the form field shown when editing an existing term.
      */
     public function getEditTermMarkup($tag)
@@ -93,7 +94,7 @@ abstract class CustomField
     abstract public function getEditPostInput(WP_Post $post);
 
     /**
-     * @param object $tag Current taxonomy term object.
+     * @param WP_Term $tag Current taxonomy term object.
      * @return string The markup for the input shown when editing an existing term.
      */
     abstract public function getEditTermInput($tag);

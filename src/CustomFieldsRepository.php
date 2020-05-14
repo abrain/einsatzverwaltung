@@ -6,6 +6,7 @@ use abrain\Einsatzverwaltung\Types\CustomPostType;
 use abrain\Einsatzverwaltung\Types\CustomTaxonomy;
 use abrain\Einsatzverwaltung\Types\CustomType;
 use abrain\Einsatzverwaltung\Types\Report;
+use WP_Term;
 use function add_action;
 
 /**
@@ -126,7 +127,7 @@ class CustomFieldsRepository
     }
 
     /**
-     * @param object $tag Current taxonomy term object.
+     * @param WP_Term $tag Current taxonomy term object.
      * @param string $taxonomy Current taxonomy slug.
      */
     public function onEditFormFields($tag, $taxonomy)

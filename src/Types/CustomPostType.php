@@ -8,8 +8,5 @@ namespace abrain\Einsatzverwaltung\Types;
  */
 interface CustomPostType extends CustomType
 {
-    /**
-     * @return void
-     */
-    public function registerCustomFields();
+
 }

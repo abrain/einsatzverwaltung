@@ -3,8 +3,9 @@ namespace abrain\Einsatzverwaltung\Types;
 
 use abrain\Einsatzverwaltung\CustomFields\NumberInput;
 use abrain\Einsatzverwaltung\CustomFields\PostSelector;
-use abrain\Einsatzverwaltung\TaxonomyCustomFields;
 use WP_Term;
+use abrain\Einsatzverwaltung\CustomFieldsRepository;
+use function strcasecmp;
 
 /**
  * Description of the custom taxonomy 'Vehicle'
@@ -13,9 +14,38 @@ use WP_Term;
 class Vehicle implements CustomTaxonomy
 {
     /**
+     * Comparison function for vehicles
+     *
+     * @param object $vehicle1
+     * @param object $vehicle2
+     *
+     * @return int
+     */
+    public static function compareVehicles($vehicle1, $vehicle2)
+    {
+        $order1 = $vehicle1->vehicle_order;
+        $order2 = $vehicle2->vehicle_order;
+
+        if (empty($order1) && !empty($order2)) {
+            return 1;
+        }
+
+        if (!empty($order1) && empty($order2)) {
+            return -1;
+        }
+
+        // If no order is set on both or if they are equal, sort by name
+        if (empty($order1) && empty($order2) || $order1 == $order2) {
+            return strcasecmp($vehicle1->name, $vehicle2->name);
+        }
+
+        return ($order1 < $order2) ? -1 : 1;
+    }
+
+    /**
      * @return string
      */
-    public function getSlug()
+    public static function getSlug()
     {
         return 'fahrzeug';
     }
@@ -61,17 +91,25 @@ class Vehicle implements CustomTaxonomy
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getRewriteSlug()
+    {
+        return self::getSlug();
+    }
+
+    /**
      * @inheritdoc
      */
-    public function registerCustomFields(TaxonomyCustomFields $taxonomyCustomFields)
+    public function registerCustomFields(CustomFieldsRepository $taxonomyCustomFields)
     {
-        $taxonomyCustomFields->addPostSelector($this->getSlug(), new PostSelector(
+        $taxonomyCustomFields->add($this, new PostSelector(
             'fahrzeugpid',
             'Fahrzeugseite',
             'Seite mit mehr Informationen &uuml;ber das Fahrzeug. Wird in Einsatzberichten mit diesem Fahrzeug verlinkt.',
             array('einsatz', 'attachment', 'ai1ec_event', 'tribe_events', 'pec-events')
         ));
-        $taxonomyCustomFields->addNumberInput($this->getSlug(), new NumberInput(
+        $taxonomyCustomFields->add($this, new NumberInput(
             'vehicleorder',
             'Reihenfolge',
             'Optionale Angabe, mit der die Anzeigereihenfolge der Fahrzeuge beeinflusst werden kann. Fahrzeuge mit der kleineren Zahl werden zuerst angezeigt, anschlie&szlig;end diejenigen ohne Angabe bzw. dem Wert 0 in alphabetischer Reihenfolge.'
@@ -106,7 +144,7 @@ class Vehicle implements CustomTaxonomy
         global $submenu;
         $termsWithParentCount = $this->getTermsWithParentCount();
         if ($termsWithParentCount > 0) {
-            $submenuKey = 'edit.php?post_type=' . Report::SLUG;
+            $submenuKey = 'edit.php?post_type=' . Report::getSlug();
             if (array_key_exists($submenuKey, $submenu)) {
                 $vehicleEntry = array_filter($submenu[$submenuKey], function ($entry) {
                     return $entry[2] === 'edit-tags.php?taxonomy=fahrzeug&amp;post_type=einsatz';
@@ -128,7 +166,7 @@ class Vehicle implements CustomTaxonomy
      */
     private function getTermsWithParentCount()
     {
-        $terms = get_terms(array('taxonomy' => $this->getSlug(), 'hide_empty' => false));
+        $terms = get_terms(array('taxonomy' => self::getSlug(), 'hide_empty' => false));
         $childTerms = array_filter($terms, function (WP_Term $term) {
             return $term->parent !== 0;
         });

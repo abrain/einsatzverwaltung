@@ -2,6 +2,7 @@
 
 namespace abrain\Einsatzverwaltung\Model;
 
+use abrain\Einsatzverwaltung\Types\Vehicle;
 use DateTime;
 use WP_Post;
 use WP_Term;
@@ -123,33 +124,6 @@ class IncidentReport
         $differenz = $timestamp2 - $timestamp1;
 
         return intval($differenz / 60);
-    }
-
-    /**
-     * Komparator für Fahrzeuge
-     *
-     * @param object $vehicle1
-     * @param object $vehicle2
-     *
-     * @return int
-     */
-    private function compareVehicles($vehicle1, $vehicle2)
-    {
-        if (empty($vehicle1->vehicle_order) && !empty($vehicle2->vehicle_order)) {
-            return 1;
-        }
-
-        if (!empty($vehicle1->vehicle_order) && empty($vehicle2->vehicle_order)) {
-            return -1;
-        }
-
-        if (empty($vehicle1->vehicle_order) && empty($vehicle2->vehicle_order) ||
-            $vehicle1->vehicle_order == $vehicle2->vehicle_order
-        ) {
-            return strcasecmp($vehicle1->name, $vehicle2->name);
-        }
-
-        return ($vehicle1->vehicle_order < $vehicle2->vehicle_order) ? -1 : 1;
     }
 
     /**
@@ -403,8 +377,7 @@ class IncidentReport
             }
         }
 
-        // Fahrzeuge vor Rückgabe sortieren
-        usort($vehicles, array($this, 'compareVehicles'));
+        usort($vehicles, array(Vehicle::class, 'compareVehicles'));
 
         return $vehicles;
     }

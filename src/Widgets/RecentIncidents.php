@@ -213,7 +213,7 @@ class RecentIncidents extends AbstractWidget
         );
 
         $this->echoChecklistBox(
-            get_post_type_object(Unit::POST_TYPE),
+            get_post_type_object(Unit::getSlug()),
             'units',
             __('Only show reports for these units:', 'einsatzverwaltung'),
             $selectedUnits,

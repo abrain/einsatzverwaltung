@@ -3,6 +3,7 @@
 namespace abrain\Einsatzverwaltung\Admin;
 
 use abrain\Einsatzverwaltung\Core;
+use abrain\Einsatzverwaltung\CustomFieldsRepository;
 use abrain\Einsatzverwaltung\Data;
 use abrain\Einsatzverwaltung\Export\Tool as ExportTool;
 use abrain\Einsatzverwaltung\Import\Tool as ImportTool;
@@ -25,8 +26,9 @@ class Initializer
      * @param Options $options
      * @param Utilities $utilities
      * @param PermalinkController $permalinkController
+     * @param CustomFieldsRepository $customFieldsRepo
      */
-    public function __construct(Data $data, Options $options, Utilities $utilities, PermalinkController $permalinkController)
+    public function __construct(Data $data, Options $options, Utilities $utilities, PermalinkController $permalinkController, CustomFieldsRepository $customFieldsRepo)
     {
         $pluginBasename = plugin_basename(einsatzverwaltung_plugin_file());
         add_action('admin_menu', array($this, 'hideTaxonomies'));
@@ -234,7 +236,7 @@ class Initializer
      */
     public function useBlockEditorForReports($useBlockEditor, $postType)
     {
-        if ($postType === Report::SLUG && get_option('einsatz_disable_blockeditor', '0') === '1') {
+        if ($postType === Report::getSlug() && get_option('einsatz_disable_blockeditor', '0') === '1') {
             return false;
         }
 

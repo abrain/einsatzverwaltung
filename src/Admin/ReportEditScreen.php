@@ -5,15 +5,31 @@ use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Types\Report;
 use abrain\Einsatzverwaltung\Types\Unit;
 use WP_Post;
-use WP_Screen;
 use wpdb;
+use function add_meta_box;
+use function array_map;
+use function checked;
+use function esc_html;
+use function get_post_type_object;
+use function get_posts;
+use function in_array;
+use function printf;
 
 /**
- * Regelt das Erscheinungsbild des Editors für Einsatzberichte
+ * Customizations for the edit screen for the IncidentReport custom post type.
+ *
  * @package abrain\Einsatzverwaltung\Admin
  */
-class ReportEditScreen
+class ReportEditScreen extends EditScreen
 {
+    /**
+     * ReportEditScreen constructor.
+     */
+    public function __construct()
+    {
+        $this->customTypeSlug = Report::getSlug();
+    }
+
     /**
      * Fügt die Metabox zum Bearbeiten der Einsatzdetails ein
      */
@@ -189,13 +205,13 @@ class ReportEditScreen
     public function displayMetaBoxUnits(WP_Post $post)
     {
         $units = get_posts(array(
-            'post_type' => Unit::POST_TYPE,
+            'post_type' => Unit::getSlug(),
             'numberposts' => -1,
             'order' => 'ASC',
             'orderby' => 'name'
         ));
         if (empty($units)) {
-            $postTypeObject = get_post_type_object(Unit::POST_TYPE);
+            $postTypeObject = get_post_type_object(Unit::getSlug());
             printf("<div>%s</div>", esc_html($postTypeObject->labels->not_found));
             return;
         }
@@ -276,22 +292,6 @@ class ReportEditScreen
             checked($state, '1', false),
             $label
         );
-    }
-
-    /**
-     * @param string[] $hidden
-     * @param WP_Screen $screen
-     *
-     * @return string[]
-     */
-    public function filterDefaultHiddenMetaboxes($hidden, WP_Screen $screen)
-    {
-        if ($screen->post_type !== Report::SLUG) {
-            return $hidden;
-        }
-
-        $hidden[] = 'postcustom';
-        return $hidden;
     }
 
     /**

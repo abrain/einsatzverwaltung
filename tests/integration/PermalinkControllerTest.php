@@ -28,7 +28,7 @@ class PermalinkControllerTest extends WP_UnitTestCase
     {
         $controller = new PermalinkController();
         $report = $this->createMock('abrain\Einsatzverwaltung\Types\Report');
-        $report->rewriteSlug = 'customrewriteslug';
+        $report->method('getRewriteSlug')->willReturn('customrewriteslug');
         $controller->addRewriteRules($report);
 
         if (getenv('WP_TESTS_PERMALINK') === 'PRETTY') {
@@ -51,7 +51,7 @@ class PermalinkControllerTest extends WP_UnitTestCase
     {
         $controller = new PermalinkController();
         $report = $this->createMock('abrain\Einsatzverwaltung\Types\Report');
-        $report->rewriteSlug = 'customrewriteslug';
+        $report->method('getRewriteSlug')->willReturn('customrewriteslug');
         $controller->addRewriteRules($report);
 
         if (getenv('WP_TESTS_PERMALINK') === 'PRETTY') {

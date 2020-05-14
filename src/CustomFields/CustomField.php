@@ -1,6 +1,8 @@
 <?php
 namespace abrain\Einsatzverwaltung\CustomFields;
 
+use WP_Post;
+
 /**
  * Base class for additional fields of taxonomies
  * @package abrain\Einsatzverwaltung\CustomFields
@@ -57,13 +59,20 @@ abstract class CustomField
     }
 
     /**
-     * @param int $termId
+     * @param int $objectId
+     *
      * @return mixed
      */
-    public function getValue($termId)
+    public function getValue($objectId)
     {
-        $termMeta = get_term_meta($termId, $this->key, true);
-        return (false === $termMeta ? $this->defaultValue : $termMeta);
+        $value = '';
+        if (term_exists($objectId) !== null) {
+            $value = get_term_meta($objectId, $this->key, true);
+        } elseif (get_post($objectId) instanceof WP_Post) {
+            $value = get_post_meta($objectId, $this->key, true);
+        }
+
+        return (false === $value ? $this->defaultValue : $value);
     }
 
     /**
@@ -76,6 +85,12 @@ abstract class CustomField
      * @return string
      */
     abstract public function getColumnContent($termId);
+
+    /**
+     * @param WP_Post $post Currently edited post object
+     * @return string HTML markup for the input
+     */
+    abstract public function getEditPostInput(WP_Post $post);
 
     /**
      * @param object $tag Current taxonomy term object.

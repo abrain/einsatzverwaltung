@@ -23,8 +23,6 @@ class Initializer
     public function __construct(Formatter $formatter)
     {
         $this->formatter = $formatter;
-
-        add_action('widgets_init', array($this, 'registerWidgets'));
     }
 
     public function registerWidgets()

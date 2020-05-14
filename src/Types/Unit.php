@@ -1,14 +1,14 @@
 <?php
 namespace abrain\Einsatzverwaltung\Types;
 
+use abrain\Einsatzverwaltung\CustomFieldsRepository;
+
 /**
  * Description of the custom post type for units
  * @package abrain\Einsatzverwaltung\Types
  */
 class Unit implements CustomPostType
 {
-    const POST_TYPE = 'evw_unit';
-
     /**
      * @return array
      */
@@ -32,7 +32,7 @@ class Unit implements CustomPostType
             'insert_into_item' => __('Insert into unit', 'einsatzverwaltung'),
             'uploaded_to_this_item' => __('Uploaded to this unit', 'einsatzverwaltung'),
             'featured_image' => _x('Featured Image', 'unit', 'einsatzverwaltung'),
-            'set_featured_image' => __('Set featured image', 'unit', 'einsatzverwaltung'),
+            'set_featured_image' => _x('Set featured image', 'unit', 'einsatzverwaltung'),
             'remove_featured_image' => _x('Remove featured image', 'unit', 'einsatzverwaltung'),
             'use_featured_image' => _x('Use as featured image', 'unit', 'einsatzverwaltung'),
             'filter_items_list' => __('Filter units list', 'einsatzverwaltung'),
@@ -47,7 +47,7 @@ class Unit implements CustomPostType
     }
 
     /**
-     * @return array
+     * @inheritDoc
      */
     public function getRegistrationArgs()
     {
@@ -56,32 +56,41 @@ class Unit implements CustomPostType
             'public' => false,
             'supports' => array('title', 'editor', 'thumbnail', 'revisions', 'custom-fields', 'author'),
             'show_ui' => true,
-            'show_in_menu' => 'edit.php?post_type=' . Report::SLUG,
+            'show_in_menu' => 'edit.php?post_type=' . Report::getSlug(),
             'show_in_admin_bar' => false,
             'show_in_rest' => false,
-            'capability_type' => $this->getSlug(),
+            'capability_type' => self::getSlug(),
             'map_meta_cap' => true,
             'menu_icon' => 'dashicons-networking',
+            'delete_with_user' => false,
         );
     }
 
     /**
-     * @return string
+     * @inheritDoc
      */
-    public function getSlug()
+    public function getRewriteSlug()
     {
-        return self::POST_TYPE;
+        return self::getSlug();
     }
 
     /**
-     * @return void
+     * @inheritDoc
      */
-    public function registerCustomFields()
+    public static function getSlug()
+    {
+        return 'evw_unit';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function registerCustomFields(CustomFieldsRepository $customFields)
     {
     }
 
     /**
-     * @return void
+     * @inheritDoc
      */
     public function registerHooks()
     {

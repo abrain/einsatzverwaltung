@@ -7,6 +7,7 @@ use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\PermalinkController;
 use WP_Post;
 use WP_Term;
+use function get_term_link;
 
 /**
  * Formatierungen aller Art
@@ -438,8 +439,8 @@ class Formatter
     {
         return sprintf(
             '<a href="%s" class="fa fa-filter" style="text-decoration: none;" title="%s"></a>',
-            get_term_link($term),
-            sprintf('Eins&auml;tze unter Beteiligung von %s anzeigen', $term->name)
+            esc_url(get_term_link($term)),
+            esc_attr(sprintf('Eins&auml;tze unter Beteiligung von %s anzeigen', $term->name))
         );
     }
 

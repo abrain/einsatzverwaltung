@@ -22,6 +22,7 @@ plugins:
     enabled: true
 exclude_patterns:
 - src/font-awesome/
+- src/backcompat.php
 - .idea/
 - tests/
 - vendor/

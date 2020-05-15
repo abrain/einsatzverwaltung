@@ -122,3 +122,7 @@ li.dropzone {
 .form-wrap .checkboxlabel {
     display: unset;
 }
+
+#fahrzeugdiv summary {
+    margin-bottom: 0.5em;
+}

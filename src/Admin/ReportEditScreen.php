@@ -6,19 +6,25 @@ use abrain\Einsatzverwaltung\Types\Report;
 use abrain\Einsatzverwaltung\Types\Unit;
 use abrain\Einsatzverwaltung\Types\Vehicle;
 use WP_Post;
+use WP_Taxonomy;
 use WP_Term;
 use wpdb;
 use function add_meta_box;
+use function array_filter;
+use function array_intersect;
 use function array_map;
 use function checked;
+use function esc_attr;
 use function esc_html;
 use function get_post_type_object;
 use function get_posts;
 use function get_taxonomy;
+use function get_term_meta;
 use function get_terms;
 use function get_the_terms;
 use function in_array;
 use function printf;
+use function str_replace;
 
 /**
  * Customizations for the edit screen for the IncidentReport custom post type.
@@ -257,35 +263,50 @@ class ReportEditScreen extends EditScreen
      */
     public function displayMetaBoxVehicles(WP_Post $post)
     {
+        $taxonomyObject = get_taxonomy(Vehicle::getSlug());
+        if (empty($taxonomyObject)) {
+            return;
+        }
+
         $allVehicles = get_terms(array(
             'taxonomy' => Vehicle::getSlug(),
             'hide_empty' => false
         ));
         if (empty($allVehicles)) {
-            $taxonomyObject = get_taxonomy(Vehicle::getSlug());
             printf("<div>%s</div>", esc_html($taxonomyObject->labels->no_terms));
             return;
         }
+        $outOfServiceVehicles = array_filter($allVehicles, function (WP_Term $vehicle) {
+            return get_term_meta($vehicle->term_id, 'out_of_service', true) === '1';
+        });
+        $inServiceVehicles = array_filter($allVehicles, function (WP_Term $vehicle) {
+            return get_term_meta($vehicle->term_id, 'out_of_service', true) !== '1';
+        });
 
         $terms = get_the_terms($post, Vehicle::getSlug());
         if (is_wp_error($terms) || $terms === false) {
             $terms = array();
         }
-        $assignedVehicles = array_map(function (WP_Term $vehicle) {
+        $assignedVehicleIds = array_map(function (WP_Term $vehicle) {
             return $vehicle->term_id;
         }, $terms);
 
         // Output the checkboxes
         echo '<div><ul>';
-        foreach ($allVehicles as $vehicle) {
-            $assigned = in_array($vehicle->term_id, $assignedVehicles);
-            printf(
-                '<li><label><input type="checkbox" name="tax_input[%1$s][]" value="%2$d" %3$s>%4$s</label></li>',
-                Vehicle::getSlug(),
-                esc_attr($vehicle->term_id),
-                checked($assigned, true, false),
-                esc_html($vehicle->name)
-            );
+        $this->echoTermCheckboxes($inServiceVehicles, $taxonomyObject, $assignedVehicleIds);
+
+        if (!empty($outOfServiceVehicles)) {
+            echo '<hr>';
+
+            // Automatically expand the details tag, if vehicles in there are assigned to the current post
+            $outOfServiceIds = array_map(function (WP_Term $vehicle) {
+                return $vehicle->term_id;
+            }, $outOfServiceVehicles);
+            echo empty(array_intersect($assignedVehicleIds, $outOfServiceIds)) ? '<details>' : '<details open="open">';
+
+            echo '<summary>Fahrzeuge au&szlig;er Dienst</summary>';
+            $this->echoTermCheckboxes($outOfServiceVehicles, $taxonomyObject, $assignedVehicleIds);
+            echo '</details>';
         }
         echo '</ul></div>';
     }
@@ -349,6 +370,29 @@ class ReportEditScreen extends EditScreen
             checked($state, '1', false),
             $label
         );
+    }
+
+    /**
+     * @param WP_Term[] $terms
+     * @param WP_Taxonomy $taxonomy
+     * @param int[] $assignedIds
+     */
+    private function echoTermCheckboxes($terms, $taxonomy, $assignedIds)
+    {
+        $format = '<li><label><input type="checkbox" name="tax_input[%1$s][]" value="%2$s" %3$s>%4$s</label></li>';
+        if ($taxonomy->hierarchical) {
+            $format = str_replace('%2$s', '%2$d', $format);
+        }
+        foreach ($terms as $term) {
+            $assigned = in_array($term->term_id, $assignedIds);
+            printf(
+                $format,
+                $taxonomy->name,
+                ($taxonomy->hierarchical ? esc_attr($term->term_id) : esc_attr($term->name)),
+                checked($assigned, true, false),
+                esc_html($term->name)
+            );
+        }
     }
 
     /**

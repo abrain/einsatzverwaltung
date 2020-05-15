@@ -3,6 +3,7 @@ namespace abrain\Einsatzverwaltung\Types;
 
 use abrain\Einsatzverwaltung\CustomFields\NumberInput;
 use abrain\Einsatzverwaltung\CustomFields\PostSelector;
+use WP_REST_Response;
 use WP_Term;
 use abrain\Einsatzverwaltung\CustomFieldsRepository;
 use function strcasecmp;
@@ -80,6 +81,7 @@ class Vehicle implements CustomTaxonomy
             'public' => true,
             'show_in_nav_menus' => false,
             'show_in_rest' => true,
+            'meta_box_cb' => false,
             'hierarchical' => true,
             'capabilities' => array(
                 'manage_terms' => 'edit_einsatzberichte',
@@ -123,6 +125,17 @@ class Vehicle implements CustomTaxonomy
     {
         add_action("{$this->getSlug()}_pre_add_form", array($this, 'deprectatedHierarchyNotice'));
         add_action('admin_menu', array($this, 'addBadgeToMenu'));
+
+        /**
+         * Prevent the Gutenberg Editor from creating a UI for this taxonomy, so we can use our own
+         * https://github.com/WordPress/gutenberg/issues/6912#issuecomment-428403380
+         */
+        add_filter('rest_prepare_taxonomy', function (WP_REST_Response $response, $taxonomy) {
+            if (self::getSlug() === $taxonomy->name) {
+                $response->data['visibility']['show_ui'] = false;
+            }
+            return $response;
+        }, 10, 2);
     }
 
     /**

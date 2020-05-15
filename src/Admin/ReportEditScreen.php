@@ -83,6 +83,18 @@ class ReportEditScreen extends EditScreen
                 '__back_compat_meta_box' => false
             )
         );
+        add_meta_box(
+            'fahrzeugdiv',
+            __('Vehicles', 'einsatzverwaltung'),
+            array($this, 'displayMetaBoxVehicles'),
+            $this->customTypeSlug,
+            'side',
+            'default',
+            array(
+                '__block_editor_compatible_meta_box' => true,
+                '__back_compat_meta_box' => false
+            )
+        );
     }
 
     /**
@@ -231,6 +243,16 @@ class ReportEditScreen extends EditScreen
             );
         }
         echo '</ul></div>';
+    }
+
+    /**
+     * A custom meta box for selecting the vehicles
+     *
+     * @param WP_Post $post
+     */
+    public function displayMetaBoxVehicles(WP_Post $post)
+    {
+        echo 'TODO';
     }
 
     /**

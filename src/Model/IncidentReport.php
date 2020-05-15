@@ -405,7 +405,7 @@ class IncidentReport
      *
      * @return bool
      */
-    private function isDraft()
+    public function isDraft()
     {
         return in_array($this->post->post_status, array('draft', 'pending', 'auto-draft'));
     }

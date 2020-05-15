@@ -163,7 +163,8 @@ class ReportEditScreen extends EditScreen
         echo '<table><tbody>';
 
         if (get_option('einsatzverwaltung_incidentnumbers_auto', '0') === '1') {
-            echo '<tr><td>Einsatznummer</td><td>' . esc_html($nummer) . '</td></tr>';
+            $numberText = $report->isDraft() ? __('Will be generated upon publication', 'einsatzverwaltung') : $nummer;
+            printf('<tr><td>Einsatznummer</td><td class="incidentnumber">%s</td></tr>', esc_html($numberText));
         } else {
             $this->echoInputText(
                 'Einsatznummer',

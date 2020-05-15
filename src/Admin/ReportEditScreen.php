@@ -4,7 +4,9 @@ namespace abrain\Einsatzverwaltung\Admin;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Types\Report;
 use abrain\Einsatzverwaltung\Types\Unit;
+use abrain\Einsatzverwaltung\Types\Vehicle;
 use WP_Post;
+use WP_Term;
 use wpdb;
 use function add_meta_box;
 use function array_map;
@@ -12,6 +14,9 @@ use function checked;
 use function esc_html;
 use function get_post_type_object;
 use function get_posts;
+use function get_taxonomy;
+use function get_terms;
+use function get_the_terms;
 use function in_array;
 use function printf;
 
@@ -252,7 +257,37 @@ class ReportEditScreen extends EditScreen
      */
     public function displayMetaBoxVehicles(WP_Post $post)
     {
-        echo 'TODO';
+        $allVehicles = get_terms(array(
+            'taxonomy' => Vehicle::getSlug(),
+            'hide_empty' => false
+        ));
+        if (empty($allVehicles)) {
+            $taxonomyObject = get_taxonomy(Vehicle::getSlug());
+            printf("<div>%s</div>", esc_html($taxonomyObject->labels->no_terms));
+            return;
+        }
+
+        $terms = get_the_terms($post, Vehicle::getSlug());
+        if (is_wp_error($terms) || $terms === false) {
+            $terms = array();
+        }
+        $assignedVehicles = array_map(function (WP_Term $vehicle) {
+            return $vehicle->term_id;
+        }, $terms);
+
+        // Output the checkboxes
+        echo '<div><ul>';
+        foreach ($allVehicles as $vehicle) {
+            $assigned = in_array($vehicle->term_id, $assignedVehicles);
+            printf(
+                '<li><label><input type="checkbox" name="tax_input[%1$s][]" value="%2$s" %3$s>%4$s</label></li>',
+                Vehicle::getSlug(),
+                esc_attr($vehicle->name),
+                checked($assigned, true, false),
+                esc_html($vehicle->name)
+            );
+        }
+        echo '</ul></div>';
     }
 
     /**

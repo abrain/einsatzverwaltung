@@ -365,18 +365,6 @@ class IncidentReport
             return array();
         }
 
-        // Reihenfolge abfragen
-        foreach ($vehicles as $vehicle) {
-            if (!isset($vehicle->term_id)) {
-                continue;
-            }
-
-            $vehicleOrder = get_term_meta($vehicle->term_id, 'vehicleorder', true);
-            if (!empty($vehicleOrder)) {
-                $vehicle->vehicle_order = $vehicleOrder;
-            }
-        }
-
         usort($vehicles, array(Vehicle::class, 'compareVehicles'));
 
         return $vehicles;

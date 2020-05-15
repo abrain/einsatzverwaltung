@@ -25,6 +25,7 @@ use function get_the_terms;
 use function in_array;
 use function printf;
 use function str_replace;
+use function usort;
 
 /**
  * Customizations for the edit screen for the IncidentReport custom post type.
@@ -276,6 +277,8 @@ class ReportEditScreen extends EditScreen
             printf("<div>%s</div>", esc_html($taxonomyObject->labels->no_terms));
             return;
         }
+
+        // Distinguish by 'out of service' flag
         $outOfServiceVehicles = array_filter($allVehicles, function (WP_Term $vehicle) {
             return get_term_meta($vehicle->term_id, 'out_of_service', true) === '1';
         });
@@ -283,6 +286,11 @@ class ReportEditScreen extends EditScreen
             return get_term_meta($vehicle->term_id, 'out_of_service', true) !== '1';
         });
 
+        // Sort the vehicles according to the custom order numbers
+        usort($inServiceVehicles, array(Vehicle::class, 'compareVehicles'));
+        usort($outOfServiceVehicles, array(Vehicle::class, 'compareVehicles'));
+
+        // Determine vehicles assigned to the current report
         $terms = get_the_terms($post, Vehicle::getSlug());
         if (is_wp_error($terms) || $terms === false) {
             $terms = array();
@@ -298,7 +306,7 @@ class ReportEditScreen extends EditScreen
         if (!empty($outOfServiceVehicles)) {
             echo '<hr>';
 
-            // Automatically expand the details tag, if vehicles in there are assigned to the current post
+            // Automatically expand the details tag, if vehicles in there are assigned to the current report
             $outOfServiceIds = array_map(function (WP_Term $vehicle) {
                 return $vehicle->term_id;
             }, $outOfServiceVehicles);

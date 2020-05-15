@@ -7,6 +7,7 @@ use abrain\Einsatzverwaltung\CustomFields\PostSelector;
 use WP_REST_Response;
 use WP_Term;
 use abrain\Einsatzverwaltung\CustomFieldsRepository;
+use function get_term_meta;
 use function strcasecmp;
 
 /**
@@ -18,15 +19,15 @@ class Vehicle implements CustomTaxonomy
     /**
      * Comparison function for vehicles
      *
-     * @param object $vehicle1
-     * @param object $vehicle2
+     * @param WP_Term $vehicle1
+     * @param WP_Term $vehicle2
      *
      * @return int
      */
     public static function compareVehicles($vehicle1, $vehicle2)
     {
-        $order1 = $vehicle1->vehicle_order;
-        $order2 = $vehicle2->vehicle_order;
+        $order1 = get_term_meta($vehicle1->term_id, 'vehicleorder', true);
+        $order2 = get_term_meta($vehicle2->term_id, 'vehicleorder', true);
 
         if (empty($order1) && !empty($order2)) {
             return 1;

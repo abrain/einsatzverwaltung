@@ -1,10 +1,13 @@
 <?php
 namespace abrain\Einsatzverwaltung\Types;
 
+use abrain\Einsatzverwaltung\CustomFields\Checkbox;
 use abrain\Einsatzverwaltung\CustomFields\NumberInput;
 use abrain\Einsatzverwaltung\CustomFields\PostSelector;
+use WP_REST_Response;
 use WP_Term;
 use abrain\Einsatzverwaltung\CustomFieldsRepository;
+use function get_term_meta;
 use function strcasecmp;
 
 /**
@@ -16,15 +19,15 @@ class Vehicle implements CustomTaxonomy
     /**
      * Comparison function for vehicles
      *
-     * @param object $vehicle1
-     * @param object $vehicle2
+     * @param WP_Term $vehicle1
+     * @param WP_Term $vehicle2
      *
      * @return int
      */
     public static function compareVehicles($vehicle1, $vehicle2)
     {
-        $order1 = $vehicle1->vehicle_order;
-        $order2 = $vehicle2->vehicle_order;
+        $order1 = get_term_meta($vehicle1->term_id, 'vehicleorder', true);
+        $order2 = get_term_meta($vehicle2->term_id, 'vehicleorder', true);
 
         if (empty($order1) && !empty($order2)) {
             return 1;
@@ -80,6 +83,7 @@ class Vehicle implements CustomTaxonomy
             'public' => true,
             'show_in_nav_menus' => false,
             'show_in_rest' => true,
+            'meta_box_cb' => false,
             'hierarchical' => true,
             'capabilities' => array(
                 'manage_terms' => 'edit_einsatzberichte',
@@ -101,18 +105,25 @@ class Vehicle implements CustomTaxonomy
     /**
      * @inheritdoc
      */
-    public function registerCustomFields(CustomFieldsRepository $taxonomyCustomFields)
+    public function registerCustomFields(CustomFieldsRepository $customFields)
     {
-        $taxonomyCustomFields->add($this, new PostSelector(
+        $customFields->add($this, new PostSelector(
             'fahrzeugpid',
             'Fahrzeugseite',
             'Seite mit mehr Informationen &uuml;ber das Fahrzeug. Wird in Einsatzberichten mit diesem Fahrzeug verlinkt.',
             array('einsatz', 'attachment', 'ai1ec_event', 'tribe_events', 'pec-events')
         ));
-        $taxonomyCustomFields->add($this, new NumberInput(
+        $customFields->add($this, new NumberInput(
             'vehicleorder',
             'Reihenfolge',
             'Optionale Angabe, mit der die Anzeigereihenfolge der Fahrzeuge beeinflusst werden kann. Fahrzeuge mit der kleineren Zahl werden zuerst angezeigt, anschlie&szlig;end diejenigen ohne Angabe bzw. dem Wert 0 in alphabetischer Reihenfolge.'
+        ));
+        $customFields->add($this, new Checkbox(
+            'out_of_service',
+            __('Out of service', 'einsatzverwaltung'),
+            __('This vehicle is no longer in service', 'einsatzverwaltung'),
+            'Beim Bearbeiten von Einsatzberichten werden Fahrzeuge, die nicht außer Dienst sind, zuerst aufgelistet.',
+            '0'
         ));
     }
 
@@ -123,6 +134,17 @@ class Vehicle implements CustomTaxonomy
     {
         add_action("{$this->getSlug()}_pre_add_form", array($this, 'deprectatedHierarchyNotice'));
         add_action('admin_menu', array($this, 'addBadgeToMenu'));
+
+        /**
+         * Prevent the Gutenberg Editor from creating a UI for this taxonomy, so we can use our own
+         * https://github.com/WordPress/gutenberg/issues/6912#issuecomment-428403380
+         */
+        add_filter('rest_prepare_taxonomy', function (WP_REST_Response $response, $taxonomy) {
+            if (self::getSlug() === $taxonomy->name) {
+                $response->data['visibility']['show_ui'] = false;
+            }
+            return $response;
+        }, 10, 2);
     }
 
     /**

@@ -2,6 +2,8 @@
 namespace abrain\Einsatzverwaltung\CustomFields;
 
 use WP_Post;
+use WP_Term;
+use function intval;
 
 /**
  * Base class for additional fields of taxonomies
@@ -44,7 +46,7 @@ abstract class CustomField
     }
 
     /**
-     * @param object $tag Current taxonomy term object.
+     * @param WP_Term $tag Current taxonomy term object.
      * @return string The markup for the form field shown when editing an existing term.
      */
     public function getEditTermMarkup($tag)
@@ -66,7 +68,7 @@ abstract class CustomField
     public function getValue($objectId)
     {
         $value = '';
-        if (term_exists($objectId) !== null) {
+        if (term_exists(intval($objectId)) !== null) {
             $value = get_term_meta($objectId, $this->key, true);
         } elseif (get_post($objectId) instanceof WP_Post) {
             $value = get_post_meta($objectId, $this->key, true);
@@ -93,7 +95,7 @@ abstract class CustomField
     abstract public function getEditPostInput(WP_Post $post);
 
     /**
-     * @param object $tag Current taxonomy term object.
+     * @param WP_Term $tag Current taxonomy term object.
      * @return string The markup for the input shown when editing an existing term.
      */
     abstract public function getEditTermInput($tag);

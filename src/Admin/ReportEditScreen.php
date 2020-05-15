@@ -280,9 +280,9 @@ class ReportEditScreen extends EditScreen
         foreach ($allVehicles as $vehicle) {
             $assigned = in_array($vehicle->term_id, $assignedVehicles);
             printf(
-                '<li><label><input type="checkbox" name="tax_input[%1$s][]" value="%2$s" %3$s>%4$s</label></li>',
+                '<li><label><input type="checkbox" name="tax_input[%1$s][]" value="%2$d" %3$s>%4$s</label></li>',
                 Vehicle::getSlug(),
-                esc_attr($vehicle->name),
+                esc_attr($vehicle->term_id),
                 checked($assigned, true, false),
                 esc_html($vehicle->name)
             );

@@ -1,6 +1,7 @@
 <?php
 namespace abrain\Einsatzverwaltung\Types;
 
+use abrain\Einsatzverwaltung\CustomFields\Checkbox;
 use abrain\Einsatzverwaltung\CustomFields\NumberInput;
 use abrain\Einsatzverwaltung\CustomFields\PostSelector;
 use WP_REST_Response;
@@ -115,6 +116,13 @@ class Vehicle implements CustomTaxonomy
             'vehicleorder',
             'Reihenfolge',
             'Optionale Angabe, mit der die Anzeigereihenfolge der Fahrzeuge beeinflusst werden kann. Fahrzeuge mit der kleineren Zahl werden zuerst angezeigt, anschlie&szlig;end diejenigen ohne Angabe bzw. dem Wert 0 in alphabetischer Reihenfolge.'
+        ));
+        $customFields->add($this, new Checkbox(
+            'out_of_service',
+            __('Out of service', 'einsatzverwaltung'),
+            __('This vehicle is no longer in service', 'einsatzverwaltung'),
+            'Beim Bearbeiten von Einsatzberichten werden Fahrzeuge, die nicht außer Dienst sind, zuerst aufgelistet.',
+            '0'
         ));
     }
 

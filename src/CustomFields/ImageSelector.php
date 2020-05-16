@@ -78,7 +78,12 @@ class ImageSelector extends CustomField
      */
     public function getColumnContent($termId)
     {
-        // TODO: Implement getColumnContent() method.
+        $imageId = $this->getValue($termId);
+        if (empty($imageId) || $imageId === $this->defaultValue) {
+            return '';
+        }
+
+        return '<span class="fa fa-picture-o"></span>';
     }
 
     /**

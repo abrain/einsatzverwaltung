@@ -4,9 +4,9 @@ namespace abrain\Einsatzverwaltung\CustomFields;
 use WP_Post;
 use WP_Term;
 use function __;
+use function array_key_exists;
 use function esc_attr;
 use function get_option;
-use function in_array;
 use function intval;
 use function sprintf;
 use function wp_get_additional_image_sizes;
@@ -45,7 +45,7 @@ class ImageSelector extends CustomField
     {
         parent::__construct($key, $label, $description, '-1');
         $additionalImageSizes = wp_get_additional_image_sizes();
-        if (in_array($imageSizeName, $additionalImageSizes)) {
+        if (array_key_exists($imageSizeName, $additionalImageSizes)) {
             $this->imageSizeName = $imageSizeName;
             $imageSize = $additionalImageSizes[$imageSizeName];
             $this->height = $imageSize['height'];

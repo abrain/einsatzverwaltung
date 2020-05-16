@@ -6,17 +6,16 @@ function selectVehicleMedia(selector, requestedSize)
         requestedSize = 'thumbnail'
     }
 
-    console.log('Selecting image for', selector)
     vehicle_media_uploader = wp.media({
-        frame:    "post",
-        state:    "insert",
-        multiple: false
+        multiple: false,
+        library: {
+            type: 'image'
+        }
     });
 
-    vehicle_media_uploader.on("insert", function () {
+    vehicle_media_uploader.on("select", function () {
         var json = vehicle_media_uploader.state().get("selection").first().toJSON();
 
-        console.log(json);
         var input = document.getElementById(selector);
         input.value = json.id;
         var previewImg = document.getElementById('img-' + selector);

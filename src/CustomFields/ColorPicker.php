@@ -2,6 +2,7 @@
 namespace abrain\Einsatzverwaltung\CustomFields;
 
 use WP_Post;
+use WP_Term;
 use function sprintf;
 
 /**
@@ -32,7 +33,7 @@ class ColorPicker extends CustomField
     /**
      * @inheritdoc
      */
-    public function getEditTermInput($tag)
+    public function getEditTermInput(WP_Term $tag)
     {
         return sprintf(
             '<input name="%1$s" id="%1$s" type="text" value="%2$s" class="einsatzverwaltung-color-picker" />',

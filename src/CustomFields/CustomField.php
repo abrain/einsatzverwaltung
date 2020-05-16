@@ -98,5 +98,5 @@ abstract class CustomField
      * @param WP_Term $tag Current taxonomy term object.
      * @return string The markup for the input shown when editing an existing term.
      */
-    abstract public function getEditTermInput($tag);
+    abstract public function getEditTermInput(WP_Term $tag);
 }

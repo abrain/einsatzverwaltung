@@ -3,6 +3,7 @@ namespace abrain\Einsatzverwaltung\CustomFields;
 
 use WP_Post;
 use WP_Query;
+use WP_Term;
 
 /**
  * Represents an additional dropdown of a taxonomy for selecting posts
@@ -123,7 +124,7 @@ class PostSelector extends CustomField
     /**
      * @inheritdoc
      */
-    public function getEditTermInput($tag)
+    public function getEditTermInput(WP_Term $tag)
     {
         return $this->dropdownPosts(array(
             'echo' => false,

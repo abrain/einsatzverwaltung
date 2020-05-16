@@ -2,6 +2,7 @@
 namespace abrain\Einsatzverwaltung\CustomFields;
 
 use WP_Post;
+use WP_Term;
 use function sprintf;
 
 /**
@@ -33,7 +34,7 @@ class NumberInput extends CustomField
     /**
      * @inheritdoc
      */
-    public function getEditTermInput($tag)
+    public function getEditTermInput(WP_Term $tag)
     {
         return sprintf(
             '<input id="tag-%1$s" type="number" min="0" value="%2$d" name="%1$s">',

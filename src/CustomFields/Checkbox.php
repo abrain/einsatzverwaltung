@@ -2,6 +2,7 @@
 namespace abrain\Einsatzverwaltung\CustomFields;
 
 use WP_Post;
+use WP_Term;
 use function checked;
 use function esc_html;
 use function sprintf;
@@ -77,7 +78,7 @@ class Checkbox extends CustomField
     /**
      * @inheritDoc
      */
-    public function getEditTermInput($tag)
+    public function getEditTermInput(WP_Term $tag)
     {
         return sprintf(
             '<input name="%1$s" id="%1$s" type="checkbox" value="1" %2$s />',

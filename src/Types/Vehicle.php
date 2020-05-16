@@ -133,6 +133,12 @@ class Vehicle implements CustomTaxonomy
             'Beim Bearbeiten von Einsatzberichten werden Fahrzeuge, die nicht außer Dienst sind, zuerst aufgelistet.',
             '0'
         ));
+
+        // Register custom image size
+        $width = get_option('evw_vehicle_image_w', 150);
+        $height = get_option('evw_vehicle_image_h', 150);
+        add_image_size('evw_vehicle_image', $width, $height, true);
+
         $customFields->add($this, new ImageSelector(
             'featured_image',
             'Bild',
@@ -172,11 +178,6 @@ class Vehicle implements CustomTaxonomy
                 wp_enqueue_script('einsatzverwaltung-admin-vehicles', Core::$scriptUrl . 'admin-vehicles.js');
             }
         });
-
-        // Register custom image size
-        $width = get_option('evw_vehicle_image_w', 150);
-        $height = get_option('evw_vehicle_image_h', 150);
-        add_image_size('evw_vehicle_image', $width, $height, true);
     }
 
     /**

@@ -1,14 +1,21 @@
 <?php
 namespace abrain\Einsatzverwaltung\Types;
 
+use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\CustomFields\Checkbox;
+use abrain\Einsatzverwaltung\CustomFields\ImageSelector;
 use abrain\Einsatzverwaltung\CustomFields\NumberInput;
 use abrain\Einsatzverwaltung\CustomFields\PostSelector;
 use WP_REST_Response;
 use WP_Term;
 use abrain\Einsatzverwaltung\CustomFieldsRepository;
+use function add_action;
+use function get_current_screen;
 use function get_term_meta;
+use function in_array;
 use function strcasecmp;
+use function wp_enqueue_media;
+use function wp_enqueue_script;
 
 /**
  * Description of the custom taxonomy 'Vehicle'
@@ -125,6 +132,12 @@ class Vehicle implements CustomTaxonomy
             'Beim Bearbeiten von Einsatzberichten werden Fahrzeuge, die nicht außer Dienst sind, zuerst aufgelistet.',
             '0'
         ));
+        $customFields->add($this, new ImageSelector(
+            'featured_image',
+            'Bild',
+            'Ein Bild',
+            '-1'
+        ));
     }
 
     /**
@@ -145,6 +158,19 @@ class Vehicle implements CustomTaxonomy
             }
             return $response;
         }, 10, 2);
+
+        add_action('admin_enqueue_scripts', function () {
+            $screen = get_current_screen();
+            if ($screen === false) {
+                return;
+            }
+
+            // Enqueue the scripts to handle media upload and selection
+            if ($screen->taxonomy === self::getSlug() && in_array($screen->base, array('edit-tags', 'term'))) {
+                wp_enqueue_media();
+                wp_enqueue_script('einsatzverwaltung-admin-vehicles', Core::$scriptUrl . 'admin-vehicles.js');
+            }
+        });
     }
 
     /**

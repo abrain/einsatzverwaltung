@@ -94,6 +94,27 @@ class ImageSelector extends CustomField
      */
     public function getEditTermInput(WP_Term $term)
     {
-        // TODO: Implement getEditTermInput() method.
+        $imageId = $this->getValue($term->term_id);
+        if (empty($imageId)) {
+            $imageId = $this->defaultValue;
+            $previewUrl = '';
+        } else {
+            $previewUrl = wp_get_attachment_image_url($imageId);
+            if ($previewUrl === false) {
+                $previewUrl = '';
+            }
+        }
+
+        return sprintf(
+            '<input id="%1$s" name="%2$s" type="hidden" value="%4$d"><img id="img-%1$s" src="%5$s" alt="" width="%6$d" height="%7$d"><br><input type="button" class="button" onclick="selectVehicleMedia(\'%1$s\', \'%8$s\')" value="%3$s"/>',
+            esc_attr('evw-mediasel-' . $this->key),
+            esc_attr($this->key),
+            __('Select Image', 'einsatzverwaltung'),
+            esc_attr($imageId),
+            esc_attr($previewUrl),
+            esc_attr($this->width),
+            esc_attr($this->height),
+            esc_attr($this->imageSizeName)
+        );
     }
 }

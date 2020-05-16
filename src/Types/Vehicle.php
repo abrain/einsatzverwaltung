@@ -136,7 +136,7 @@ class Vehicle implements CustomTaxonomy
             'featured_image',
             'Bild',
             'Ein Bild',
-            '-1'
+            'evw_vehicle_image'
         ));
     }
 

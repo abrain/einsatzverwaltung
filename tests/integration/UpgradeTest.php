@@ -3,6 +3,8 @@ namespace abrain\Einsatzverwaltung;
 
 use WP_UnitTestCase;
 use wpdb;
+use function has_image_size;
+use function update_option;
 
 /**
  * Class UpgradeTest
@@ -400,5 +402,17 @@ class UpgradeTest extends WP_UnitTestCase
         update_option('einsatzverwaltung_use_reporttemplate', 'singular');
         $this->runUpgrade(40, 41);
         $this->assertTrue('' === get_option('einsatzverwaltung_report_contentifempty'));
+    }
+
+    public function testUpgrade170()
+    {
+        $this->assertFalse(get_option('evw_vehicle_image_h'));
+        $this->assertFalse(get_option('evw_vehicle_image_w'));
+        update_option('thumbnail_size_h', 123);
+        update_option('thumbnail_size_w', 456);
+        $this->runUpgrade(41, 50);
+        $this->assertTrue(has_image_size('evw_vehicle_image'));
+        $this->assertEquals(123, get_option('evw_vehicle_image_h'));
+        $this->assertEquals(456, get_option('evw_vehicle_image_w'));
     }
 }

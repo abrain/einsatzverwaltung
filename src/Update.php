@@ -3,6 +3,7 @@ namespace abrain\Einsatzverwaltung;
 
 use WP_Error;
 use wpdb;
+use function update_option;
 
 /**
  *
@@ -74,6 +75,10 @@ class Update
 
         if ($currentDbVersion < 41 && $targetDbVersion >= 41) {
             $this->upgrade162();
+        }
+
+        if ($currentDbVersion < 50 && $targetDbVersion >= 50) {
+            $this->upgrade170();
         }
     }
 
@@ -405,6 +410,18 @@ class Update
         }
 
         update_option('einsatzvw_db_version', 41);
+    }
+
+    /**
+     * - Creates a custom image size class for vehicle based on the thumbnail setting
+     */
+    private function upgrade170()
+    {
+        $width = get_option('thumbnail_size_w', 150);
+        $height = get_option('thumbnail_size_h', 150);
+        update_option('evw_vehicle_image_w', $width);
+        update_option('evw_vehicle_image_h', $height);
+        update_option('einsatzvw_db_version', 50);
     }
 
     /**

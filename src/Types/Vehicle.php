@@ -10,6 +10,7 @@ use WP_REST_Response;
 use WP_Term;
 use abrain\Einsatzverwaltung\CustomFieldsRepository;
 use function add_action;
+use function add_image_size;
 use function get_current_screen;
 use function get_term_meta;
 use function in_array;
@@ -171,6 +172,11 @@ class Vehicle implements CustomTaxonomy
                 wp_enqueue_script('einsatzverwaltung-admin-vehicles', Core::$scriptUrl . 'admin-vehicles.js');
             }
         });
+
+        // Register custom image size
+        $width = get_option('evw_vehicle_image_w', 150);
+        $height = get_option('evw_vehicle_image_h', 150);
+        add_image_size('evw_vehicle_image', $width, $height, true);
     }
 
     /**

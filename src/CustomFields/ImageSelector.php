@@ -63,12 +63,10 @@ class ImageSelector extends CustomField
     public function getAddTermInput()
     {
         return sprintf(
-            '<input id="%1$s" name="%2$s" type="hidden" value=""><img id="img-%1$s" src="" alt="" width="%4$d" height="%5$d"><br><input type="button" class="button" onclick="selectVehicleMedia(\'%1$s\', \'%6$s\')" value="%3$s"/>',
+            '<input id="%1$s" name="%2$s" type="hidden" value=""><img id="img-%1$s" src="" alt=""><br><input type="button" class="button" onclick="selectVehicleMedia(\'%1$s\', \'%4$s\')" value="%3$s"/>',
             esc_attr('evw-mediasel-' . $this->key),
             esc_attr($this->key),
             __('Select Image', 'einsatzverwaltung'),
-            esc_attr($this->width),
-            esc_attr($this->height),
             esc_attr($this->imageSizeName)
         );
     }
@@ -111,14 +109,12 @@ class ImageSelector extends CustomField
         }
 
         return sprintf(
-            '<input id="%1$s" name="%2$s" type="hidden" value="%4$d"><img id="img-%1$s" src="%5$s" alt="" width="%6$d" height="%7$d"><br><input type="button" class="button" onclick="selectVehicleMedia(\'%1$s\', \'%8$s\')" value="%3$s"/>',
+            '<input id="%1$s" name="%2$s" type="hidden" value="%4$d"><img id="img-%1$s" src="%5$s" alt=""><br><input type="button" class="button" onclick="selectVehicleMedia(\'%1$s\', \'%6$s\')" value="%3$s"/>',
             esc_attr('evw-mediasel-' . $this->key),
             esc_attr($this->key),
             __('Select Image', 'einsatzverwaltung'),
             esc_attr($imageId),
             esc_attr($previewUrl),
-            esc_attr($this->width),
-            esc_attr($this->height),
             esc_attr($this->imageSizeName)
         );
     }

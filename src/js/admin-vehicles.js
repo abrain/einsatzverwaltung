@@ -31,3 +31,10 @@ function selectVehicleMedia(selector, requestedSize)
 
     vehicle_media_uploader.open();
 }
+
+function clearVehicleMedia(selector) {
+    var input = document.getElementById(selector);
+    input.value = '';
+    var previewImg = document.getElementById('img-' + selector);
+    previewImg.src = '';
+}

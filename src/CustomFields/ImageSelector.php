@@ -103,7 +103,7 @@ class ImageSelector extends CustomField
             $imageId = $this->defaultValue;
             $previewUrl = '';
         } else {
-            $previewUrl = wp_get_attachment_image_url($imageId);
+            $previewUrl = wp_get_attachment_image_url($imageId, $this->imageSizeName);
             if ($previewUrl === false) {
                 $previewUrl = '';
             }

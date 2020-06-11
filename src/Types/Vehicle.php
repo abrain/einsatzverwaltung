@@ -4,9 +4,12 @@ namespace abrain\Einsatzverwaltung\Types;
 use abrain\Einsatzverwaltung\CustomFields\Checkbox;
 use abrain\Einsatzverwaltung\CustomFields\NumberInput;
 use abrain\Einsatzverwaltung\CustomFields\PostSelector;
+use abrain\Einsatzverwaltung\CustomFields\UrlInput;
 use WP_REST_Response;
 use WP_Term;
 use abrain\Einsatzverwaltung\CustomFieldsRepository;
+use function array_key_exists;
+use function esc_url;
 use function get_term_meta;
 use function strcasecmp;
 
@@ -113,6 +116,11 @@ class Vehicle implements CustomTaxonomy
             'Seite mit mehr Informationen &uuml;ber das Fahrzeug. Wird in Einsatzberichten mit diesem Fahrzeug verlinkt.',
             array('einsatz', 'attachment', 'ai1ec_event', 'tribe_events', 'pec-events')
         ));
+        $customFields->add($this, new UrlInput(
+            'vehicle_exturl',
+            __('External URL', 'einsatzverwaltung'),
+            __('You can specify a URL that points to more information about this vehicle. If set, this takes precedence over the page selected above.', 'einsatzverwaltung')
+        ));
         $customFields->add($this, new NumberInput(
             'vehicleorder',
             'Reihenfolge',
@@ -132,7 +140,8 @@ class Vehicle implements CustomTaxonomy
      */
     public function registerHooks()
     {
-        add_action("{$this->getSlug()}_pre_add_form", array($this, 'deprectatedHierarchyNotice'));
+        $taxonomySlug = self::getSlug();
+        add_action("{$taxonomySlug}_pre_add_form", array($this, 'deprectatedHierarchyNotice'));
         add_action('admin_menu', array($this, 'addBadgeToMenu'));
 
         /**
@@ -145,6 +154,10 @@ class Vehicle implements CustomTaxonomy
             }
             return $response;
         }, 10, 2);
+
+        // Manipulate the columns of the term list after the automatically generated ones have been added
+        add_action("manage_edit-{$taxonomySlug}_columns", array($this, 'onCustomColumns'), 20);
+        add_filter("manage_{$taxonomySlug}_custom_column", array($this, 'onTaxonomyColumnContent'), 20, 3);
     }
 
     /**
@@ -193,5 +206,47 @@ class Vehicle implements CustomTaxonomy
             return $term->parent !== 0;
         });
         return count($childTerms);
+    }
+
+    /**
+     * Filters the columns shown in the WP_List_Table for this taxonomy.
+     *
+     * @param array $columns
+     *
+     * @return array
+     */
+    public function onCustomColumns($columns)
+    {
+        // Remove the column for the external URL. We'll combine it with the vehicle page column.
+        unset($columns['vehicle_exturl']);
+        // Rename the vehicle page column
+        $columns['fahrzeugpid'] = __('Linking', 'einsatzverwaltung');
+        return $columns;
+    }
+
+    /**
+     * Filters the content of the columns of the WP_List_Table for this taxonomy.
+     *
+     * @param string $content Content of the column that has been defined by the previous filters
+     * @param string $columnName Name of the column
+     * @param int $termId Term ID
+     *
+     * @return string
+     */
+    public function onTaxonomyColumnContent($content, $columnName, $termId)
+    {
+        // We only want to change the column of the vehicle page
+        if ($columnName !== 'fahrzeugpid') {
+            return $content;
+        }
+
+        $externalUrl = get_term_meta($termId, 'vehicle_exturl', true);
+        // If no external URL is set, there's nothing to change
+        if (empty($externalUrl)) {
+            return $content;
+        }
+
+        // The external URL takes precedence over the internal vehicle page
+        return sprintf('<a href="%1$s">%2$s</a>', esc_url($externalUrl), __('External URL', 'einsatzverwaltung'));
     }
 }

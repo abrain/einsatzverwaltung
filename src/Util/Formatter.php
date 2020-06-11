@@ -7,7 +7,9 @@ use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\PermalinkController;
 use WP_Post;
 use WP_Term;
+use function get_permalink;
 use function get_term_link;
+use function get_term_meta;
 
 /**
  * Formatierungen aller Art
@@ -356,22 +358,45 @@ class Formatter
      */
     private function addVehicleLink($vehicle)
     {
-        $pageid = get_term_meta($vehicle->term_id, 'fahrzeugpid', true);
-        if (empty($pageid)) {
-            return $vehicle->name;
-        }
-
-        $pageurl = get_permalink($pageid);
-        if ($pageurl === false) {
+        $url = $this->getUrlForVehicle($vehicle);
+        if (empty($url)) {
             return $vehicle->name;
         }
 
         return sprintf(
             '<a href="%s" title="Mehr Informationen zu %s">%s</a>',
-            esc_url($pageurl),
+            esc_url($url),
             esc_attr($vehicle->name),
             esc_html($vehicle->name)
         );
+    }
+
+    /**
+     * @param WP_Term $vehicle
+     *
+     * @return string
+     */
+    private function getUrlForVehicle(WP_Term $vehicle)
+    {
+        // The external URL takes precedence over an internal page
+        $extUrl = get_term_meta($vehicle->term_id, 'vehicle_exturl', true);
+        if (!empty($extUrl)) {
+            return $extUrl;
+        }
+
+        // Figure out if an internal page has been assigned
+        $pageid = get_term_meta($vehicle->term_id, 'fahrzeugpid', true);
+        if (empty($pageid)) {
+            return '';
+        }
+
+        // Try to get the permalink of this page
+        $pageUrl = get_permalink($pageid);
+        if ($pageUrl === false) {
+            return '';
+        }
+
+        return $pageUrl;
     }
 
     /**

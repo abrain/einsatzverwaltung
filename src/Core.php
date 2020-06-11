@@ -129,7 +129,6 @@ class Core
         add_filter('request', array($this->permalinkController, 'filterRequest'));
 
         $this->data = new Data($this->options);
-        add_action('deleted_post', array($this->data, 'onDeleted'));
         add_action('save_post_einsatz', array($this->data, 'savePostdata'), 10, 2);
         add_action('private_einsatz', array($this->data, 'onPublish'), 10, 2);
         add_action('publish_einsatz', array($this->data, 'onPublish'), 10, 2);

@@ -8,6 +8,10 @@ use abrain\Einsatzverwaltung\PermalinkController;
 use WP_Post;
 use WP_Term;
 use function get_term_link;
+use function get_term_meta;
+use function join;
+use function str_replace;
+use function wp_get_attachment_image;
 
 /**
  * Formatierungen aller Art
@@ -37,6 +41,7 @@ class Formatter
         '%seqNum%' => 'Laufende Nummer',
         '%annotations%' => 'Vermerke',
         '%vehicles%' => 'Fahrzeuge',
+        '%vehicles_images%' => 'Fahrzeuge als Bilder',
         '%additionalForces%' => 'Weitere Kr&auml;fte',
         '%typesOfAlerting%' => 'Alarmierungsarten',
         '%content%' => 'Berichtstext',
@@ -165,6 +170,9 @@ class Formatter
                 break;
             case '%vehicles%':
                 $replace = $this->getVehicles($incidentReport, ($context === 'post'), ($context === 'post'));
+                break;
+            case '%vehicles_images%':
+                $replace = $this->getVehiclesAsImages($incidentReport);
                 break;
             case '%additionalForces%':
                 $replace = $this->getAdditionalForces($incidentReport, ($context === 'post'), ($context === 'post'));
@@ -372,6 +380,40 @@ class Formatter
             esc_attr($vehicle->name),
             esc_html($vehicle->name)
         );
+    }
+
+    /**
+     * @param IncidentReport $report
+     *
+     * @return string
+     */
+    private function getVehiclesAsImages(IncidentReport $report)
+    {
+        if (empty($report)) {
+            return '';
+        }
+
+        $vehicles = $report->getVehicles();
+
+        if (empty($vehicles)) {
+            return '';
+        }
+
+        $placeholders = array('%vehicle_img%', '%vehicle_name%', '%vehicle_filter%');
+        $pattern = '<div class="evw-vehicle">%vehicle_img%<br>%vehicle_name%</div>';
+        $markup = '<div class="evw-vehicle-images">';
+        foreach ($vehicles as $vehicle) {
+            $imageId = get_term_meta($vehicle->term_id, 'featured_image', true);
+            // The replacements for the entries in $placeholders
+            $replacements = array(
+                wp_get_attachment_image($imageId, 'evw_vehicle_image'),
+                $vehicle->name,
+                $this->getFilterLink($vehicle)
+            );
+            $markup .= str_replace($placeholders, $replacements, $pattern);
+        }
+        $markup .= '</div>';
+        return $markup;
     }
 
     /**

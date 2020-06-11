@@ -29,6 +29,20 @@
     display: none;
 }
 
+.evw-vehicle-images {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.evw-vehicle {
+    border: 1px solid lightgray;
+    padding: 0 5px;
+    width: 120px;
+    height: 120px;
+    text-align: center;
+}
+
 @media (max-width: 767px) {
     .einsatzverwaltung-reportlist tr {
         padding-top: 5px;

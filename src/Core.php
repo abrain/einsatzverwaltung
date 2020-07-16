@@ -11,7 +11,7 @@ use function add_action;
 class Core
 {
     const VERSION = '1.6.7';
-    const DB_VERSION = 41;
+    const DB_VERSION = 50;
 
     /**
      * Statische Variable, um die aktuelle (einzige!) Instanz dieser Klasse zu halten

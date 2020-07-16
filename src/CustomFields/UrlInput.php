@@ -37,9 +37,14 @@ class UrlInput extends CustomField
      */
     public function getColumnContent($termId)
     {
+        $url = $this->getValue($termId);
+        if (empty($url)) {
+            return '';
+        }
+
         return sprintf(
             '<a href="%1$s">%2$s</a>',
-            esc_url($this->getValue($termId)),
+            esc_url($url),
             esc_html($this->label)
         );
     }

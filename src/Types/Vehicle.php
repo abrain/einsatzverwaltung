@@ -124,7 +124,7 @@ class Vehicle implements CustomTaxonomy
         $customFields->add($this, new NumberInput(
             'vehicleorder',
             'Reihenfolge',
-            'Optionale Angabe, mit der die Anzeigereihenfolge der Fahrzeuge beeinflusst werden kann. Fahrzeuge mit der kleineren Zahl werden zuerst angezeigt, anschlie&szlig;end diejenigen ohne Angabe bzw. dem Wert 0 in alphabetischer Reihenfolge.'
+            'Optionale Angabe, mit der die Anzeigereihenfolge der Fahrzeuge beeinflusst werden kann. Fahrzeuge mit der kleineren Zahl werden zuerst angezeigt, anschlie&szlig;end diejenigen ohne Angabe bzw. dem Wert 0. Haben mehrere Fahrzeuge den gleichen Wert, werden sie in alphabetischer Reihenfolge ausgegeben.'
         ));
         $customFields->add($this, new Checkbox(
             'out_of_service',

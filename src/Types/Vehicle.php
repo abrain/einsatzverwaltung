@@ -117,7 +117,7 @@ class Vehicle implements CustomTaxonomy
             'fahrzeugpid',
             'Fahrzeugseite',
             'Seite mit mehr Informationen &uuml;ber das Fahrzeug. Wird in Einsatzberichten mit diesem Fahrzeug verlinkt.',
-            array('einsatz', 'attachment', 'ai1ec_event', 'tribe_events', 'pec-events')
+            array('page')
         ));
         $customFields->add($this, new UrlInput(
             'vehicle_exturl',

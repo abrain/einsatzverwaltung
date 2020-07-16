@@ -9,9 +9,12 @@ use WP_REST_Response;
 use WP_Term;
 use abrain\Einsatzverwaltung\CustomFieldsRepository;
 use function array_key_exists;
+use function esc_html;
 use function esc_url;
 use function get_term_meta;
+use function get_the_title;
 use function strcasecmp;
+use function url_to_postid;
 
 /**
  * Description of the custom taxonomy 'Vehicle'
@@ -246,7 +249,16 @@ class Vehicle implements CustomTaxonomy
             return $content;
         }
 
-        // The external URL takes precedence over the internal vehicle page
-        return sprintf('<a href="%1$s">%2$s</a>', esc_url($externalUrl), __('External URL', 'einsatzverwaltung'));
+        // The external URL takes precedence over the internal vehicle page, so we will return that
+
+        // Check if it is a local link after all so we can display the post title
+        $linkTitle = __('External URL', 'einsatzverwaltung');
+        $postId = url_to_postid($externalUrl);
+        if ($postId !== 0) {
+            $title = get_the_title($postId);
+            $linkTitle = empty($title) ? __('Internal URL', 'einsatzverwaltung') : $title;
+        }
+
+        return sprintf('<a href="%1$s">%2$s</a>', esc_url($externalUrl), esc_html($linkTitle));
     }
 }

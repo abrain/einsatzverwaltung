@@ -3,6 +3,13 @@ namespace abrain\Einsatzverwaltung;
 
 use WP_Error;
 use wpdb;
+use function delete_term_meta;
+use function error_log;
+use function get_permalink;
+use function get_post_type;
+use function get_term_meta;
+use function update_option;
+use function update_term_meta;
 
 /**
  *
@@ -74,6 +81,10 @@ class Update
 
         if ($currentDbVersion < 41 && $targetDbVersion >= 41) {
             $this->upgrade162();
+        }
+
+        if ($currentDbVersion < 50 && $targetDbVersion >= 50) {
+            $this->upgrade170();
         }
     }
 
@@ -405,6 +416,33 @@ class Update
         }
 
         update_option('einsatzvw_db_version', 41);
+    }
+
+    private function upgrade170()
+    {
+        global $wpdb;
+
+        /**
+         * From now on only pages should be stored in the fahrzeugpid term meta (as it used to be). All other post types
+         * should utilize the new 'external URL' term meta.
+         */
+        $termIds = $wpdb->get_col("SELECT term_id FROM $wpdb->termmeta WHERE meta_key = 'fahrzeugpid' AND `meta_value` != '' AND term_id IN (SELECT term_id FROM $wpdb->term_taxonomy WHERE taxonomy = 'fahrzeug')");
+        foreach ($termIds as $termId) {
+            $postId = get_term_meta($termId, 'fahrzeugpid', true);
+            if (empty($postId) || get_post_type($postId) === 'page') {
+                // Either there is nothing to convert or it's a page (pages are the only post types to remain)
+                continue;
+            }
+
+            // Move anything that is not a page to the 'external URL' field
+            $permalink = get_permalink($postId);
+            if ($permalink !== false) {
+                update_term_meta($termId, 'vehicle_exturl', $permalink);
+            }
+            delete_term_meta($termId, 'fahrzeugpid');
+        }
+
+        update_option('einsatzvw_db_version', 50);
     }
 
     /**

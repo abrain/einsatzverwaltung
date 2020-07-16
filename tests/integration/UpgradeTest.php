@@ -3,6 +3,13 @@ namespace abrain\Einsatzverwaltung;
 
 use WP_UnitTestCase;
 use wpdb;
+use function get_permalink;
+use function get_term_meta;
+use function is_wp_error;
+use function update_option;
+use function update_term_meta;
+use function wp_create_term;
+use function wp_insert_post;
 
 /**
  * Class UpgradeTest
@@ -400,5 +407,41 @@ class UpgradeTest extends WP_UnitTestCase
         update_option('einsatzverwaltung_use_reporttemplate', 'singular');
         $this->runUpgrade(40, 41);
         $this->assertTrue('' === get_option('einsatzverwaltung_report_contentifempty'));
+    }
+
+    public function testUpgrade170ConvertPageIdToUrl()
+    {
+        // Create some terms for testing
+        $vehicle1 = wp_create_term('Test Vehicle 1', 'fahrzeug');
+        $vehicle1Id = $vehicle1['term_id'];
+        $vehicle2 = wp_create_term('Test Vehicle 2', 'fahrzeug');
+        $vehicle2Id = $vehicle2['term_id'];
+        $postTag = wp_create_term('Some tag');
+        $tagId = $postTag['term_id'];
+
+        // Create some test posts/pages and associate them with the terms
+        $post1Id = wp_insert_post(array('post_type' => 'post', 'post_title' => 'Some post'), true);
+        $pageId = wp_insert_post(array('post_type' => 'page', 'post_title' => 'Some page'), true);
+        $post2Id = wp_insert_post(array('post_type' => 'post', 'post_title' => 'Another post'), true);
+        if (is_wp_error($post1Id) || is_wp_error($pageId) || is_wp_error($post2Id)) {
+            $this->fail('Could not create posts');
+        }
+        update_term_meta($vehicle1Id, 'fahrzeugpid', $post1Id);
+        update_term_meta($vehicle2Id, 'fahrzeugpid', $pageId);
+        update_term_meta($tagId, 'fahrzeugpid', $post2Id);
+
+        $this->runUpgrade(41, 50);
+
+        // Check that the associated post got moved to the external URL field
+        $this->assertEmpty(get_term_meta($vehicle1Id, 'fahrzeugpid', true));
+        $this->assertEquals(get_permalink($post1Id), get_term_meta($vehicle1Id, 'vehicle_exturl', true));
+
+        // Check that the associated page stayed as it was
+        $this->assertEquals($pageId, get_term_meta($vehicle2Id, 'fahrzeugpid', true));
+        $this->assertEmpty(get_term_meta($vehicle2Id, 'vehicle_exturl', true));
+
+        // Check that another taxonomy term with the same term meta did not get changed
+        $this->assertEquals($post2Id, get_term_meta($tagId, 'fahrzeugpid', true));
+        $this->assertEmpty(get_term_meta($tagId, 'vehicle_exturl', true));
     }
 }

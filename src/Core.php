@@ -91,7 +91,6 @@ class Core
         add_option('einsatzvw_db_version', self::DB_VERSION);
 
         $this->maybeUpdate();
-        update_option('einsatzvw_version', self::VERSION);
 
         // Posttypen registrieren
         try {
@@ -120,7 +119,6 @@ class Core
     public function onInit()
     {
         $this->maybeUpdate();
-        update_option('einsatzvw_version', self::VERSION);
 
         $this->utilities = new Utilities();
 

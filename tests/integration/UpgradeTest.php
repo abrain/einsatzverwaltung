@@ -444,4 +444,11 @@ class UpgradeTest extends WP_UnitTestCase
         $this->assertEquals($post2Id, get_term_meta($tagId, 'fahrzeugpid', true));
         $this->assertEmpty(get_term_meta($tagId, 'vehicle_exturl', true));
     }
+
+    public function testUpgrade170RemoveVersionFromDb()
+    {
+        update_option('einsatzvw_version', '1.7.0');
+        $this->runUpgrade(41, 50);
+        $this->assertFalse(get_option('einsatzvw_version'));
+    }
 }

@@ -3,6 +3,7 @@ namespace abrain\Einsatzverwaltung;
 
 use WP_Error;
 use wpdb;
+use function delete_option;
 use function delete_term_meta;
 use function error_log;
 use function get_permalink;
@@ -441,6 +442,11 @@ class Update
             }
             delete_term_meta($termId, 'fahrzeugpid');
         }
+
+        /**
+         * The current version number is written to the database on every page load and never used. Let's remove it.
+         */
+        delete_option('einsatzvw_version');
 
         update_option('einsatzvw_db_version', 50);
     }

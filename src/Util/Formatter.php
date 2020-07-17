@@ -10,6 +10,7 @@ use DateTime;
 use WP_Post;
 use WP_Term;
 use function array_map;
+use function date;
 use function date_i18n;
 use function esc_html;
 use function esc_url;
@@ -27,7 +28,7 @@ use function sprintf;
  */
 class Formatter
 {
-    private $tagsNotNeedingPost = array('%feedUrl%');
+    private $tagsNotNeedingPost = array('%feedUrl%', '%yearArchive%');
 
     /**
      * @var array Ersetzbare Tags und ihre Beschreibungen
@@ -203,7 +204,8 @@ class Formatter
                 $replace = current_theme_supports('post-thumbnails') ? get_the_post_thumbnail($post->ID) : '';
                 break;
             case '%yearArchive%':
-                $year = $timeOfAlerting->format('Y');
+                // Take the year of the report, or the current year if used outside a specific report
+                $year = $timeOfAlerting ? $timeOfAlerting->format('Y') : date('Y');
                 $replace = $this->permalinkController->getYearArchiveLink($year);
                 break;
             case '%workforce%':

@@ -141,7 +141,7 @@ class RecentIncidentsFormatted extends AbstractWidget
         '%incidentCommander%', '%incidentType%', '%incidentTypeHierarchical%', '%incidentTypeColor%', '%url%',
         '%number%', '%seqNum%', '%annotations%', '%vehicles%', '%units%', '%additionalForces%', '%typesOfAlerting%',
         '%featuredImage%', '%workforce%');
-    private $allowedTagsAfter = array('%feedUrl%');
+    private $allowedTagsAfter = array('%feedUrl%', '%yearArchive%');
 
     /**
      * Konstruktor, generiert und registriert das Widget

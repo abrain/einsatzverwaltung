@@ -2,6 +2,7 @@
 namespace abrain\Einsatzverwaltung;
 
 use abrain\Einsatzverwaltung\Shortcodes\Initializer as ShortcodeInitializer;
+use abrain\Einsatzverwaltung\Types\Unit;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use function add_action;
 
@@ -134,6 +135,8 @@ class Core
         add_action('publish_einsatz', array($this->data, 'onPublish'), 10, 2);
         add_action('trash_einsatz', array($this->data, 'onTrash'), 10, 2);
         add_action('transition_post_status', array($this->data, 'onTransitionPostStatus'), 10, 3);
+        $unitSlug = Unit::getSlug();
+        add_action("save_post_$unitSlug", array($this->data, 'saveUnitData'), 10, 2);
 
         new Frontend($this->options, $this->formatter);
         new ShortcodeInitializer($this->data, $this->formatter, $this->permalinkController);

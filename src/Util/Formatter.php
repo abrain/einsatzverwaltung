@@ -5,11 +5,18 @@ use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\PermalinkController;
+use abrain\Einsatzverwaltung\Types\Unit;
 use WP_Post;
 use WP_Term;
+use function array_map;
+use function esc_html;
+use function esc_url;
 use function get_permalink;
 use function get_term_link;
 use function get_term_meta;
+use function join;
+use function sanitize_post_field;
+use function sprintf;
 
 /**
  * Formatierungen aller Art
@@ -188,7 +195,7 @@ class Formatter
                 $replace = $incidentReport->getWorkforce();
                 break;
             case '%units%':
-                $replace = $this->getUnits($incidentReport);
+                $replace = $this->getUnits($incidentReport, $context === 'post');
                 break;
             default:
                 return $pattern;
@@ -303,17 +310,40 @@ class Formatter
 
     /**
      * @param IncidentReport $report
+     * @param bool $addLinks
      *
      * @return string
      */
-    public function getUnits(IncidentReport $report)
+    public function getUnits(IncidentReport $report, $addLinks = false)
     {
         $units = $report->getUnits();
-        $unitNames = array_map(function (WP_Post $unit) {
-            return sanitize_post_field('post_title', $unit->post_title, $unit->ID);
+
+        if (!$addLinks) {
+            // Only return the names
+            $unitNames = array_map(function (WP_Post $unit) {
+                return sanitize_post_field('post_title', $unit->post_title, $unit->ID);
+            }, $units);
+            return join(', ', $unitNames);
+        }
+
+        // Return the names, linked to the respective info page if URL has been set
+        $linkedUnitNames = array_map(function (WP_Post $unit) {
+            $name = sanitize_post_field('post_title', $unit->post_title, $unit->ID);
+
+            $infoUrl = Unit::getInfoUrl($unit);
+            if (empty($infoUrl)) {
+                return $name;
+            }
+
+            return sprintf(
+                '<a href="%s" title="Mehr Informationen zu %s">%s</a>',
+                esc_url($infoUrl),
+                esc_attr($name),
+                esc_html($name)
+            );
         }, $units);
 
-        return join(', ', $unitNames);
+        return join(', ', $linkedUnitNames);
     }
 
     /**

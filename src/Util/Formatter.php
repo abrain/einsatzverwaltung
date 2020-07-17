@@ -6,9 +6,11 @@ use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\PermalinkController;
 use abrain\Einsatzverwaltung\Types\Unit;
+use DateTime;
 use WP_Post;
 use WP_Term;
 use function array_map;
+use function date_i18n;
 use function esc_html;
 use function esc_url;
 use function get_permalink;
@@ -34,6 +36,7 @@ class Formatter
         '%title%' => 'Titel des Einsatzberichts',
         '%date%' => 'Datum der Alarmierung',
         '%time%' => 'Zeitpunkt der Alarmierung',
+        '%endTime%' => 'Datum und Uhrzeit des Einsatzendes',
         '%duration%' => 'Dauer des Einsatzes',
         '%incidentCommander%' => 'Einsatzleiter',
         '%incidentType%' => 'Art des Einsatzes',
@@ -141,6 +144,18 @@ class Formatter
                 break;
             case '%duration%':
                 $replace = $this->getDurationString($incidentReport->getDuration());
+                break;
+            case '%endTime%':
+                $endTime = $incidentReport->getTimeOfEnding();
+                if (empty($endTime)) {
+                    $replace = '';
+                    break;
+                }
+
+                $dateFormat = get_option('date_format', 'd.m.Y');
+                $timeFormat = get_option('time_format', 'H:i');
+                $endDateTime = DateTime::createFromFormat('Y-m-d H:i', $endTime);
+                $replace = date_i18n("$dateFormat $timeFormat", $endDateTime->getTimestamp());
                 break;
             case '%incidentCommander%':
                 $replace = $incidentReport->getIncidentCommander();

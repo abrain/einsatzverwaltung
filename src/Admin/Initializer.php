@@ -11,6 +11,7 @@ use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\PermalinkController;
 use abrain\Einsatzverwaltung\Settings\MainPage;
 use abrain\Einsatzverwaltung\Types\Report;
+use abrain\Einsatzverwaltung\Types\Unit;
 use abrain\Einsatzverwaltung\Utilities;
 
 /**
@@ -50,7 +51,13 @@ class Initializer
         add_action('add_meta_boxes_einsatz', array($reportEditScreen, 'addMetaBoxes'));
         add_filter('default_hidden_meta_boxes', array($reportEditScreen, 'filterDefaultHiddenMetaboxes'), 10, 2);
 
-        $unitEditScreen = new UnitEditScreen();
+        $unitSlug = Unit::getSlug();
+        $unitListTable = new UnitListTable();
+        add_filter("manage_edit-{$unitSlug}_columns", array($unitListTable, 'filterColumns'), 20);
+        add_action("manage_{$unitSlug}_posts_custom_column", array($unitListTable, 'filterColumnContent'), 20, 2);
+
+        $unitEditScreen = new UnitEditScreen($customFieldsRepo);
+        add_action("add_meta_boxes_$unitSlug", array($unitEditScreen, 'addMetaBoxes'));
         add_filter('default_hidden_meta_boxes', array($unitEditScreen, 'filterDefaultHiddenMetaboxes'), 10, 2);
 
         // Register Settings

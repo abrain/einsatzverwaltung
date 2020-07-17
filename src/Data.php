@@ -20,6 +20,7 @@ use function wp_verify_nonce;
 use const FILTER_REQUIRE_ARRAY;
 use const FILTER_SANITIZE_NUMBER_INT;
 use const FILTER_SANITIZE_STRING;
+use const FILTER_SANITIZE_URL;
 use const INPUT_GET;
 use const INPUT_POST;
 
@@ -356,5 +357,45 @@ class Data
         }
 
         return false;
+    }
+
+    public function saveUnitData($postId, WP_Post $post)
+    {
+        // Check if the user is allowed to edit this unit
+        if (!current_user_can('edit_evw_unit', $postId)) {
+            return;
+        }
+
+        // Don't react to autosave
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+            return;
+        }
+
+        // Handle QuickEdit
+        if (defined('DOING_AJAX') && DOING_AJAX) {
+            // No additional work to do at the moment
+            return;
+        }
+
+        // Handle bulk edit
+        if ($this->isBulkEdit()) {
+            // No additional work to do at the moment
+            return;
+        }
+
+        // Check if the save was actually triggered by using the form on the edit page
+        if (!array_key_exists('einsatzverwaltung_nonce', $_POST) ||
+            !wp_verify_nonce($_POST['einsatzverwaltung_nonce'], 'save_evw_unit_details')
+        ) {
+            return;
+        }
+
+        // Save the ID of the info page
+        $pid = filter_input(INPUT_POST, 'unit_pid', FILTER_SANITIZE_NUMBER_INT);
+        update_post_meta($postId, 'unit_pid', $pid);
+
+        // Save the external URL
+        $url = filter_input(INPUT_POST, 'unit_exturl', FILTER_SANITIZE_URL);
+        update_post_meta($postId, 'unit_exturl', $url);
     }
 }

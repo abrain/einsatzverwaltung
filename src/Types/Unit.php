@@ -1,7 +1,12 @@
 <?php
 namespace abrain\Einsatzverwaltung\Types;
 
+use abrain\Einsatzverwaltung\CustomFields\PostSelector;
+use abrain\Einsatzverwaltung\CustomFields\UrlInput;
 use abrain\Einsatzverwaltung\CustomFieldsRepository;
+use WP_Post;
+use function get_permalink;
+use function get_post_meta;
 
 /**
  * Description of the custom post type for units
@@ -9,6 +14,36 @@ use abrain\Einsatzverwaltung\CustomFieldsRepository;
  */
 class Unit implements CustomPostType
 {
+    /**
+     * Retrieve the URL to more info about a given Unit. This can be a permalink to an internal page or an external URL.
+     *
+     * @param WP_Post $unit
+     *
+     * @return string A URL or an empty string
+     */
+    public static function getInfoUrl(WP_Post $unit)
+    {
+        // The external URL takes precedence over an internal page
+        $extUrl = get_post_meta($unit->ID, 'unit_exturl', true);
+        if (!empty($extUrl)) {
+            return $extUrl;
+        }
+
+        // Figure out if an internal page has been assigned
+        $pageid = get_post_meta($unit->ID, 'unit_pid', true);
+        if (empty($pageid)) {
+            return '';
+        }
+
+        // Try to get the permalink of this page
+        $pageUrl = get_permalink($pageid);
+        if ($pageUrl === false) {
+            return '';
+        }
+
+        return $pageUrl;
+    }
+
     /**
      * @return array
      */
@@ -87,6 +122,17 @@ class Unit implements CustomPostType
      */
     public function registerCustomFields(CustomFieldsRepository $customFields)
     {
+        $customFields->add($this, new PostSelector(
+            'unit_pid',
+            __('Info page', 'einsatzverwaltung'),
+            'Seite mit mehr Informationen &uuml;ber die Einheit. Wird in Einsatzberichten mit dieser Einheit verlinkt.',
+            array('page')
+        ));
+        $customFields->add($this, new UrlInput(
+            'unit_exturl',
+            __('External URL', 'einsatzverwaltung'),
+            __('You can specify a URL that points to more information about this unit. If set, this takes precedence over the page selected above.', 'einsatzverwaltung')
+        ));
     }
 
     /**

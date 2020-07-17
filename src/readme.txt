@@ -65,6 +65,17 @@ Nein, mehr gibt es [hier](https://einsatzverwaltung.abrain.de/faq/).
 
 == Changelog ==
 
+= 1.7.0 =
+* Vehicles: Can be marked as out of service so they are initially hidden when composing reports
+* Vehicles: Custom sort order is respected when composing or editing reports
+* Vehicles: Can now be linked with a page from the same site or an arbitrary URL
+* Units: Can now be linked with a page from the same site or an arbitrary URL
+* Templates: Added placeholder for end date and time of an incident
+* Templates: Placeholder for yearly archive permalink can be used in widget footer
+* Report list: Made the entire row clickable on mobile devices
+* Improved compatibility with Essential Addons for Elementor
+* Requires PHP 5.6 or newer
+
 = 1.6.7 =
 * Fix: Calculation of the duration could fail, if the time zone was specified as offset from UTC
 

@@ -115,7 +115,7 @@ class Vehicle implements CustomTaxonomy
     {
         $customFields->add($this, new PostSelector(
             'fahrzeugpid',
-            'Fahrzeugseite',
+            __('Page with further information', 'einsatzverwaltung'),
             'Seite mit mehr Informationen &uuml;ber das Fahrzeug. Wird in Einsatzberichten mit diesem Fahrzeug verlinkt.',
             array('page')
         ));

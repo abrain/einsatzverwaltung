@@ -124,7 +124,7 @@ class Unit implements CustomPostType
     {
         $customFields->add($this, new PostSelector(
             'unit_pid',
-            __('Info page', 'einsatzverwaltung'),
+            __('Page with further information', 'einsatzverwaltung'),
             'Seite mit mehr Informationen &uuml;ber die Einheit. Wird in Einsatzberichten mit dieser Einheit verlinkt.',
             array('page')
         ));

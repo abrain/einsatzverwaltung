@@ -137,11 +137,11 @@ class RecentIncidentsFormatted extends AbstractWidget
         'pattern' => '',
         'afterContent' => ''
     );
-    private $allowedTagsPattern = array('%title%', '%date%', '%time%', '%location%', '%duration%',
+    private $allowedTagsPattern = array('%title%', '%date%', '%time%', '%endTime%', '%location%', '%duration%',
         '%incidentCommander%', '%incidentType%', '%incidentTypeHierarchical%', '%incidentTypeColor%', '%url%',
         '%number%', '%seqNum%', '%annotations%', '%vehicles%', '%units%', '%additionalForces%', '%typesOfAlerting%',
         '%featuredImage%', '%workforce%');
-    private $allowedTagsAfter = array('%feedUrl%');
+    private $allowedTagsAfter = array('%feedUrl%', '%yearArchive%');
 
     /**
      * Konstruktor, generiert und registriert das Widget
@@ -260,7 +260,7 @@ class RecentIncidentsFormatted extends AbstractWidget
         echo '</p>';
 
         $this->echoChecklistBox(
-            get_post_type_object(Unit::POST_TYPE),
+            get_post_type_object(Unit::getSlug()),
             'units',
             __('Only show reports for these units:', 'einsatzverwaltung'),
             $values['units'],

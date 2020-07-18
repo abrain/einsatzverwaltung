@@ -25,13 +25,11 @@
     background: #ddd none repeat scroll 0 0;
 }
 
-@media (max-width: 767px) {
-    .einsatzverwaltung-reportlist tr,
-    .einsatzverwaltung-reportlist th,
-    .einsatzverwaltung-reportlist td {
-        display: block;
-    }
+.einsatzverwaltung-reportlist td.smallscreen {
+    display: none;
+}
 
+@media (max-width: 767px) {
     .einsatzverwaltung-reportlist tr {
         padding-top: 5px;
         padding-bottom: 5px;
@@ -43,21 +41,29 @@
     }
 
     .einsatzverwaltung-reportlist td {
-        padding: 0 10px;
-        border: none;
+        display: none;
     }
+
+    .einsatzverwaltung-reportlist tr.report > td.smallscreen {
+        display: block;
+        white-space: normal;
+    }
+
+    .einsatzverwaltung-reportlist tr.einsatz-title-month td,.einsatzverwaltung-reportlist tr.einsatz-title-quarter td {
+        display: block;
+    }
+
     .einsatzverwaltung-reportlist .einsatz-header {
         display: none;
     }
-    .einsatzverwaltung-reportlist td:before {
-        font-weight: bold;
-        margin-right: 5px;
-        display: inline-block;
+
+    .einsatzverwaltung-reportlist .annotation-icon-bar {
+        float: right;
+        margin-left: 10px;
     }
 
-    .einsatzverwaltung-reportlist td.einsatz-column-annotationImages,
-    .einsatzverwaltung-reportlist td.einsatz-column-annotationSpecial {
-        display: none;
+    .einsatzverwaltung-reportlist .annotation-icon-bar > i {
+        margin: 0 2px;
     }
 }
 

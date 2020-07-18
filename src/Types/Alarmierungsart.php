@@ -1,7 +1,7 @@
 <?php
 namespace abrain\Einsatzverwaltung\Types;
 
-use abrain\Einsatzverwaltung\TaxonomyCustomFields;
+use abrain\Einsatzverwaltung\CustomFieldsRepository;
 
 /**
  * Description of the custom taxonomy 'Alarmierungsart'
@@ -12,7 +12,7 @@ class Alarmierungsart implements CustomTaxonomy
     /**
      * @return string
      */
-    public function getSlug()
+    public static function getSlug()
     {
         return 'alarmierungsart';
     }
@@ -58,9 +58,17 @@ class Alarmierungsart implements CustomTaxonomy
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getRewriteSlug()
+    {
+        return self::getSlug();
+    }
+
+    /**
      * @inheritdoc
      */
-    public function registerCustomFields(TaxonomyCustomFields $taxonomyCustomFields)
+    public function registerCustomFields(CustomFieldsRepository $customFields)
     {
     }
 

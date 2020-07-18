@@ -1,6 +1,10 @@
 <?php
 namespace abrain\Einsatzverwaltung\CustomFields;
 
+use WP_Post;
+use WP_Term;
+use function intval;
+
 /**
  * Base class for additional fields of taxonomies
  * @package abrain\Einsatzverwaltung\CustomFields
@@ -42,7 +46,7 @@ abstract class CustomField
     }
 
     /**
-     * @param object $tag Current taxonomy term object.
+     * @param WP_Term $tag Current taxonomy term object.
      * @return string The markup for the form field shown when editing an existing term.
      */
     public function getEditTermMarkup($tag)
@@ -57,13 +61,20 @@ abstract class CustomField
     }
 
     /**
-     * @param int $termId
+     * @param int $objectId
+     *
      * @return mixed
      */
-    public function getValue($termId)
+    public function getValue($objectId)
     {
-        $termMeta = get_term_meta($termId, $this->key, true);
-        return (false === $termMeta ? $this->defaultValue : $termMeta);
+        $value = '';
+        if (term_exists(intval($objectId)) !== null) {
+            $value = get_term_meta($objectId, $this->key, true);
+        } elseif (get_post($objectId) instanceof WP_Post) {
+            $value = get_post_meta($objectId, $this->key, true);
+        }
+
+        return (false === $value ? $this->defaultValue : $value);
     }
 
     /**
@@ -78,7 +89,13 @@ abstract class CustomField
     abstract public function getColumnContent($termId);
 
     /**
-     * @param object $tag Current taxonomy term object.
+     * @param WP_Post $post Currently edited post object
+     * @return string HTML markup for the input
+     */
+    abstract public function getEditPostInput(WP_Post $post);
+
+    /**
+     * @param WP_Term $tag Current taxonomy term object.
      * @return string The markup for the input shown when editing an existing term.
      */
     abstract public function getEditTermInput($tag);

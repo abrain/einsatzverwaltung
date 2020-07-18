@@ -3,26 +3,20 @@ namespace abrain\Einsatzverwaltung;
 
 use WP_Error;
 use wpdb;
+use function delete_option;
+use function delete_term_meta;
+use function error_log;
+use function get_permalink;
+use function get_post_type;
+use function get_term_meta;
+use function update_option;
+use function update_term_meta;
 
 /**
  *
  */
 class Update
 {
-    /**
-     * @var Data
-     */
-    private $data;
-
-    /**
-     * Update constructor.
-     * @param Data $data
-     */
-    public function __construct($data)
-    {
-        $this->data = $data;
-    }
-
     /**
      * Fürt ein Update der Datenbank duch
      *
@@ -88,6 +82,10 @@ class Update
 
         if ($currentDbVersion < 41 && $targetDbVersion >= 41) {
             $this->upgrade162();
+        }
+
+        if ($currentDbVersion < 50 && $targetDbVersion >= 50) {
+            $this->upgrade170();
         }
     }
 
@@ -211,6 +209,8 @@ class Update
      */
     private function upgrade120()
     {
+        global $wpdb;
+
         // Alle veröffentlichten Einsatzberichte einer Kategorie hinzufügen, wenn diese in den Einstellungen für die
         // Einsatzberichte gesetzt wurde
         if (!function_exists('category_exists')) {
@@ -231,7 +231,29 @@ class Update
         }
 
         // Aktualisiert sämtliche laufenden Nummern der Einsatzberichte
-        $this->data->updateSequenceNumbers();
+        $years = $wpdb->get_col($wpdb->prepare(
+            "SELECT DISTINCT YEAR(post_date) AS years FROM {$wpdb->posts} WHERE post_type = %s AND post_status = %s;",
+            array('einsatz', 'publish')
+        ));
+        foreach ($years as $year) {
+            $posts = get_posts(array(
+                'nopaging' => true,
+                'orderby' => 'post_date',
+                'order' => 'ASC',
+                'post_type' => 'einsatz',
+                'post_status' => array('publish', 'private'),
+                'year' => $year
+            ));
+
+            $expectedNumber = 1;
+            foreach ($posts as $post) {
+                $actualNumber = get_post_meta($post->ID, 'einsatz_seqNum', true);
+                if ($expectedNumber != $actualNumber) {
+                    update_post_meta($post->ID, 'einsatz_seqNum', $expectedNumber);
+                }
+                $expectedNumber++;
+            }
+        }
 
         // Setzt alle alten Einsatzberichte auf 'nicht als besonders markiert', wichtig für das Einfügen in die
         // Mainloop. Außerdem wird die Option, ob nur besondere Einsatzberichte zwischen den WordPress-Beiträgen
@@ -395,6 +417,38 @@ class Update
         }
 
         update_option('einsatzvw_db_version', 41);
+    }
+
+    private function upgrade170()
+    {
+        global $wpdb;
+
+        /**
+         * From now on only pages should be stored in the fahrzeugpid term meta (as it used to be). All other post types
+         * should utilize the new 'external URL' term meta.
+         */
+        $termIds = $wpdb->get_col("SELECT term_id FROM $wpdb->termmeta WHERE meta_key = 'fahrzeugpid' AND `meta_value` != '' AND term_id IN (SELECT term_id FROM $wpdb->term_taxonomy WHERE taxonomy = 'fahrzeug')");
+        foreach ($termIds as $termId) {
+            $postId = get_term_meta($termId, 'fahrzeugpid', true);
+            if (empty($postId) || get_post_type($postId) === 'page') {
+                // Either there is nothing to convert or it's a page (pages are the only post types to remain)
+                continue;
+            }
+
+            // Move anything that is not a page to the 'external URL' field
+            $permalink = get_permalink($postId);
+            if ($permalink !== false) {
+                update_term_meta($termId, 'vehicle_exturl', $permalink);
+            }
+            delete_term_meta($termId, 'fahrzeugpid');
+        }
+
+        /**
+         * The current version number is written to the database on every page load and never used. Let's remove it.
+         */
+        delete_option('einsatzvw_version');
+
+        update_option('einsatzvw_db_version', 50);
     }
 
     /**

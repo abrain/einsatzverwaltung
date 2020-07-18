@@ -149,7 +149,7 @@ class Csv extends AbstractSource
      * @param array $fields Felder der Importquelle, die abgefragt werden sollen. Ist dieser Parameter null, werden alle
      * Felder abgefragt.
      *
-     * @return array
+     * @return array|bool
      */
     public function getEntries($fields)
     {
@@ -178,7 +178,7 @@ class Csv extends AbstractSource
         $fields = $this->readFile(1);
 
         if (empty($fields)) {
-            return false;
+            return array();
         }
 
         // Gebe nummerierte Spalten zurück, wenn es keine Überschriften gibt

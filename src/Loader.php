@@ -1,6 +1,12 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
+use function get_plugin_data;
+use function plugin_basename;
+use function plugin_dir_path;
+use function plugin_dir_url;
+use function spl_autoload_register;
+
 /**
  * Takes care of loading classes whereever they are needed
  *
@@ -50,11 +56,14 @@ if ($autoloaderRegistered === false) {
 }
 
 // Initialize some basic paths and URLs
-Core::$pluginFile = einsatzverwaltung_plugin_file();
-Core::$pluginBasename = plugin_basename(Core::$pluginFile);
-Core::$pluginDir = plugin_dir_path(Core::$pluginFile);
-Core::$pluginUrl = plugin_dir_url(Core::$pluginFile);
+$pluginFile = einsatzverwaltung_plugin_file();
+Core::$pluginBasename = plugin_basename($pluginFile);
+Core::$pluginDir = plugin_dir_path($pluginFile);
+Core::$pluginUrl = plugin_dir_url($pluginFile);
 Core::$scriptUrl = Core::$pluginUrl . 'js/';
 Core::$styleUrl = Core::$pluginUrl . 'css/';
 
-Core::getInstance();
+$core = Core::getInstance();
+add_action('init', array($core, 'onInit'));
+register_activation_hook($pluginFile, array($core, 'onActivation'));
+register_deactivation_hook($pluginFile, array($core, 'onDeactivation'));

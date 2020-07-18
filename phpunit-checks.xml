@@ -1,12 +1,11 @@
 <phpunit
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/5.7/phpunit.xsd"
     backupGlobals="false"
     colors="true"
-    convertErrorsToExceptions="true"
-    convertNoticesToExceptions="true"
-    convertWarningsToExceptions="true"
     >
     <testsuites>
-        <testsuite>
+        <testsuite name="Basic checks">
             <file>tests/FileCheck.php</file>
         </testsuite>
     </testsuites>

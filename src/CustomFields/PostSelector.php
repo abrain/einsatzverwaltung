@@ -1,6 +1,9 @@
 <?php
 namespace abrain\Einsatzverwaltung\CustomFields;
 
+use WP_Post;
+use WP_Query;
+
 /**
  * Represents an additional dropdown of a taxonomy for selecting posts
  * @package abrain\Einsatzverwaltung\CustomFields
@@ -10,24 +13,18 @@ class PostSelector extends CustomField
     /**
      * @var array
      */
-    private $excludedTypes;
+    private $postTypes;
 
     /**
-     * @inheritDoc
+     * @param string $key
+     * @param string $label
+     * @param string $description
+     * @param string[] $postTypes The slugs of the post types that should be included in the dropdown.
      */
-    public function __construct($key, $label, $description, $excludedTypes = array())
+    public function __construct($key, $label, $description, $postTypes = array('post'))
     {
         parent::__construct($key, $label, $description, '');
-        $this->excludedTypes = $excludedTypes;
-    }
-
-    /**
-     * @return array
-     */
-    private function getDropdownPostTypes()
-    {
-        $postTypes = get_post_types(array('public' => true));
-        return array_diff($postTypes, $this->excludedTypes);
+        $this->postTypes = $postTypes;
     }
 
     /**
@@ -59,7 +56,7 @@ class PostSelector extends CustomField
             $parsedArgs['id'] = $parsedArgs['name'];
         }
 
-        $wpQuery = new \WP_Query(array(
+        $wpQuery = new WP_Query(array(
             'post_type' => $parsedArgs['post_type'],
             'post_status' => 'publish',
             'orderby' => 'type title',
@@ -113,7 +110,7 @@ class PostSelector extends CustomField
         return $this->dropdownPosts(array(
             'echo' => false,
             'name' => $this->key,
-            'post_type' => $this->getDropdownPostTypes()
+            'post_type' => $this->postTypes
         ));
     }
 
@@ -126,7 +123,7 @@ class PostSelector extends CustomField
             'echo' => false,
             'selected' => $this->getValue($tag->term_id),
             'name' => $this->key,
-            'post_type' => $this->getDropdownPostTypes()
+            'post_type' => $this->postTypes
         ));
     }
 
@@ -148,5 +145,18 @@ class PostSelector extends CustomField
             esc_attr($title),
             esc_html($title)
         );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getEditPostInput(WP_Post $post)
+    {
+        return $this->dropdownPosts(array(
+            'echo' => false,
+            'selected' => $this->getValue($post->ID),
+            'name' => $this->key,
+            'post_type' => $this->postTypes
+        ));
     }
 }

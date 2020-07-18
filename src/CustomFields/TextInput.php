@@ -1,6 +1,9 @@
 <?php
 namespace abrain\Einsatzverwaltung\CustomFields;
 
+use WP_Post;
+use function sprintf;
+
 /**
  * Represents an additional text input of a taxonomy
  * @package abrain\Einsatzverwaltung\CustomFields
@@ -44,5 +47,17 @@ class TextInput extends CustomField
     public function getColumnContent($termId)
     {
         return esc_html($this->getValue($termId));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getEditPostInput(WP_Post $post)
+    {
+        return sprintf(
+            '<input name="%1$s" id="%1$s" type="text" value="%2$s" size="40" />',
+            esc_attr($this->key),
+            esc_attr($this->getValue($post->ID))
+        );
     }
 }

@@ -1,8 +1,6 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
-use abrain\Einsatzverwaltung\Model\IncidentReport;
-
 /**
  * Stellt nützliche Helferlein zur Verfügung
  *
@@ -20,23 +18,6 @@ class Utilities
     public static function getArrayValueIfKey($array, $key, $default)
     {
         return (array_key_exists($key, $array) ? $array[$key] : $default);
-    }
-
-    /**
-     * Wandelt ein Array von WP_Post-Objekten in ein Array von IncidentReport-Objekten um
-     *
-     * @param array $arr Array mit WP_Post-Objekten
-     *
-     * @return array Array mit IncidentReport-Objekten
-     */
-    public static function postsToIncidentReports($arr)
-    {
-        $reports = array();
-        foreach ($arr as $post) {
-            $reports[] = new IncidentReport($post);
-        }
-
-        return $reports;
     }
 
     /**

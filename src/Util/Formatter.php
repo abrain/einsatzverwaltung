@@ -5,8 +5,21 @@ use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\PermalinkController;
+use abrain\Einsatzverwaltung\Types\Unit;
+use DateTime;
 use WP_Post;
 use WP_Term;
+use function array_map;
+use function date;
+use function date_i18n;
+use function esc_html;
+use function esc_url;
+use function get_permalink;
+use function get_term_link;
+use function get_term_meta;
+use function join;
+use function sanitize_post_field;
+use function sprintf;
 
 /**
  * Formatierungen aller Art
@@ -15,7 +28,7 @@ use WP_Term;
  */
 class Formatter
 {
-    private $tagsNotNeedingPost = array('%feedUrl%');
+    private $tagsNotNeedingPost = array('%feedUrl%', '%yearArchive%');
 
     /**
      * @var array Ersetzbare Tags und ihre Beschreibungen
@@ -24,6 +37,7 @@ class Formatter
         '%title%' => 'Titel des Einsatzberichts',
         '%date%' => 'Datum der Alarmierung',
         '%time%' => 'Zeitpunkt der Alarmierung',
+        '%endTime%' => 'Datum und Uhrzeit des Einsatzendes',
         '%duration%' => 'Dauer des Einsatzes',
         '%incidentCommander%' => 'Einsatzleiter',
         '%incidentType%' => 'Art des Einsatzes',
@@ -124,13 +138,25 @@ class Formatter
                 }
                 break;
             case '%date%':
-                $replace = date_i18n($this->options->getDateFormat(), $timeOfAlerting->getTimestamp());
+                $replace = date_i18n(get_option('date_format', 'd.m.Y'), $timeOfAlerting->getTimestamp());
                 break;
             case '%time%':
-                $replace = date_i18n($this->options->getTimeFormat(), $timeOfAlerting->getTimestamp());
+                $replace = date_i18n(get_option('time_format', 'H:i'), $timeOfAlerting->getTimestamp());
                 break;
             case '%duration%':
                 $replace = $this->getDurationString($incidentReport->getDuration());
+                break;
+            case '%endTime%':
+                $endTime = $incidentReport->getTimeOfEnding();
+                if (empty($endTime)) {
+                    $replace = '';
+                    break;
+                }
+
+                $dateFormat = get_option('date_format', 'd.m.Y');
+                $timeFormat = get_option('time_format', 'H:i');
+                $endDateTime = DateTime::createFromFormat('Y-m-d H:i', $endTime);
+                $replace = date_i18n("$dateFormat $timeFormat", $endDateTime->getTimestamp());
                 break;
             case '%incidentCommander%':
                 $replace = $incidentReport->getIncidentCommander();
@@ -178,14 +204,15 @@ class Formatter
                 $replace = current_theme_supports('post-thumbnails') ? get_the_post_thumbnail($post->ID) : '';
                 break;
             case '%yearArchive%':
-                $year = $timeOfAlerting->format('Y');
+                // Take the year of the report, or the current year if used outside a specific report
+                $year = $timeOfAlerting ? $timeOfAlerting->format('Y') : date('Y');
                 $replace = $this->permalinkController->getYearArchiveLink($year);
                 break;
             case '%workforce%':
                 $replace = $incidentReport->getWorkforce();
                 break;
             case '%units%':
-                $replace = $this->getUnits($incidentReport);
+                $replace = $this->getUnits($incidentReport, $context === 'post');
                 break;
             default:
                 return $pattern;
@@ -300,17 +327,40 @@ class Formatter
 
     /**
      * @param IncidentReport $report
+     * @param bool $addLinks
      *
      * @return string
      */
-    public function getUnits(IncidentReport $report)
+    public function getUnits(IncidentReport $report, $addLinks = false)
     {
         $units = $report->getUnits();
-        $unitNames = array_map(function (WP_Post $unit) {
-            return sanitize_post_field('post_title', $unit->post_title, $unit->ID);
+
+        if (!$addLinks) {
+            // Only return the names
+            $unitNames = array_map(function (WP_Post $unit) {
+                return sanitize_post_field('post_title', $unit->post_title, $unit->ID);
+            }, $units);
+            return join(', ', $unitNames);
+        }
+
+        // Return the names, linked to the respective info page if URL has been set
+        $linkedUnitNames = array_map(function (WP_Post $unit) {
+            $name = sanitize_post_field('post_title', $unit->post_title, $unit->ID);
+
+            $infoUrl = Unit::getInfoUrl($unit);
+            if (empty($infoUrl)) {
+                return $name;
+            }
+
+            return sprintf(
+                '<a href="%s" title="Mehr Informationen zu %s">%s</a>',
+                esc_url($infoUrl),
+                esc_attr($name),
+                esc_html($name)
+            );
         }, $units);
 
-        return join(', ', $unitNames);
+        return join(', ', $linkedUnitNames);
     }
 
     /**
@@ -355,22 +405,45 @@ class Formatter
      */
     private function addVehicleLink($vehicle)
     {
-        $pageid = get_term_meta($vehicle->term_id, 'fahrzeugpid', true);
-        if (empty($pageid)) {
-            return $vehicle->name;
-        }
-
-        $pageurl = get_permalink($pageid);
-        if ($pageurl === false) {
+        $url = $this->getUrlForVehicle($vehicle);
+        if (empty($url)) {
             return $vehicle->name;
         }
 
         return sprintf(
             '<a href="%s" title="Mehr Informationen zu %s">%s</a>',
-            esc_url($pageurl),
+            esc_url($url),
             esc_attr($vehicle->name),
             esc_html($vehicle->name)
         );
+    }
+
+    /**
+     * @param WP_Term $vehicle
+     *
+     * @return string
+     */
+    private function getUrlForVehicle(WP_Term $vehicle)
+    {
+        // The external URL takes precedence over an internal page
+        $extUrl = get_term_meta($vehicle->term_id, 'vehicle_exturl', true);
+        if (!empty($extUrl)) {
+            return $extUrl;
+        }
+
+        // Figure out if an internal page has been assigned
+        $pageid = get_term_meta($vehicle->term_id, 'fahrzeugpid', true);
+        if (empty($pageid)) {
+            return '';
+        }
+
+        // Try to get the permalink of this page
+        $pageUrl = get_permalink($pageid);
+        if ($pageUrl === false) {
+            return '';
+        }
+
+        return $pageUrl;
     }
 
     /**
@@ -438,8 +511,8 @@ class Formatter
     {
         return sprintf(
             '<a href="%s" class="fa fa-filter" style="text-decoration: none;" title="%s"></a>',
-            get_term_link($term),
-            sprintf('Eins&auml;tze unter Beteiligung von %s anzeigen', $term->name)
+            esc_url(get_term_link($term)),
+            esc_attr(sprintf('Eins&auml;tze unter Beteiligung von %s anzeigen', $term->name))
         );
     }
 

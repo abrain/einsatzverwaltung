@@ -22,16 +22,18 @@ class TypeRegistry
     private $taxonomies = array();
 
     /**
-     * @var TaxonomyCustomFields
+     * @var CustomFieldsRepository
      */
-    private $taxonomyCustomFields;
+    private $customFields;
 
     /**
      * TypeRegistry constructor.
+     *
+     * @param CustomFieldsRepository $customFieldsRepo
      */
-    public function __construct()
+    public function __construct(CustomFieldsRepository $customFieldsRepo)
     {
-        $this->taxonomyCustomFields = new TaxonomyCustomFields();
+        $this->customFields = $customFieldsRepo;
     }
 
     /**
@@ -45,10 +47,10 @@ class TypeRegistry
     {
         $report = new Report();
         $this->registerPostType($report);
-        $this->registerTaxonomy(new IncidentType(), $report->getSlug());
-        $this->registerTaxonomy(new Vehicle(), $report->getSlug());
-        $this->registerTaxonomy(new ExtEinsatzmittel(), $report->getSlug());
-        $this->registerTaxonomy(new Alarmierungsart(), $report->getSlug());
+        $this->registerTaxonomy(new IncidentType(), $report::getSlug());
+        $this->registerTaxonomy(new Vehicle(), $report::getSlug());
+        $this->registerTaxonomy(new ExtEinsatzmittel(), $report::getSlug());
+        $this->registerTaxonomy(new Alarmierungsart(), $report::getSlug());
 
         $unit = new Unit();
         $this->registerPostType($unit);
@@ -65,8 +67,8 @@ class TypeRegistry
      */
     private function registerPostType(CustomPostType $customPostType)
     {
-        $slug = $customPostType->getSlug();
-        if (array_key_exists($slug, $this->postTypes)) {
+        $slug = $customPostType::getSlug();
+        if (post_type_exists($slug)) {
             throw new TypeRegistrationException(
                 sprintf(__('Post type with slug "%s" already exists', 'einsatzverwaltung'), $slug)
             );
@@ -81,7 +83,7 @@ class TypeRegistry
             ));
         }
 
-        $customPostType->registerCustomFields();
+        $customPostType->registerCustomFields($this->customFields);
         $customPostType->registerHooks();
 
         $this->postTypes[$slug] = $postType;
@@ -97,23 +99,23 @@ class TypeRegistry
      */
     private function registerTaxonomy(CustomTaxonomy $customTaxonomy, $postType)
     {
-        $slug = $customTaxonomy->getSlug();
+        $slug = $customTaxonomy::getSlug();
         if (get_taxonomy($slug) !== false) {
             throw new TypeRegistrationException(
                 sprintf(__('Taxonomy with slug "%s" already exists', 'einsatzverwaltung'), $slug)
             );
         }
 
-        $postType = register_taxonomy($slug, $postType, $customTaxonomy->getRegistrationArgs());
-        if (is_wp_error($postType)) {
+        $result = register_taxonomy($slug, $postType, $customTaxonomy->getRegistrationArgs());
+        if (is_wp_error($result)) {
             throw new TypeRegistrationException(sprintf(
-                __('Failed to register post type with slug "%s": %s', 'einsatzverwaltung'),
+                __('Failed to register taxonomy with slug "%s": %s', 'einsatzverwaltung'),
                 $slug,
-                $postType->get_error_message()
+                $result->get_error_message()
             ));
         }
 
-        $customTaxonomy->registerCustomFields($this->taxonomyCustomFields);
+        $customTaxonomy->registerCustomFields($this->customFields);
         $customTaxonomy->registerHooks();
 
         array_push($this->taxonomies, $slug);

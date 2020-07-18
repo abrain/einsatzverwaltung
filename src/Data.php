@@ -6,6 +6,23 @@ use abrain\Einsatzverwaltung\Types\Report;
 use DateTime;
 use WP_Post;
 use wpdb;
+use function add_post_meta;
+use function array_diff;
+use function array_key_exists;
+use function current_user_can;
+use function defined;
+use function delete_post_meta;
+use function error_log;
+use function filter_input;
+use function get_post_meta;
+use function update_post_meta;
+use function wp_verify_nonce;
+use const FILTER_REQUIRE_ARRAY;
+use const FILTER_SANITIZE_NUMBER_INT;
+use const FILTER_SANITIZE_STRING;
+use const FILTER_SANITIZE_URL;
+use const INPUT_GET;
+use const INPUT_POST;
 
 /**
  * Stellt Methoden zur Datenabfrage und Datenmanipulation bereit
@@ -33,63 +50,23 @@ class Data
     public function __construct($options)
     {
         $this->options = $options;
-
-        $this->addHooks();
-    }
-
-    private function addHooks()
-    {
-        add_action('save_post_einsatz', array($this, 'savePostdata'), 10, 2);
-        add_action('private_einsatz', array($this, 'onPublish'), 10, 2);
-        add_action('publish_einsatz', array($this, 'onPublish'), 10, 2);
-        add_action('trash_einsatz', array($this, 'onTrash'), 10, 2);
-        add_action('transition_post_status', array($this, 'onTransitionPostStatus'), 10, 3);
     }
 
     /**
-     * @param $kalenderjahr
+     * Returns the years that contain reports
      *
-     * @return WP_Post[]
-     */
-    public static function getEinsatzberichte($kalenderjahr)
-    {
-        if (empty($kalenderjahr) || strlen($kalenderjahr)!=4 || !is_numeric($kalenderjahr)) {
-            $kalenderjahr = '';
-        }
-
-        return get_posts(array(
-            'nopaging' => true,
-            'orderby' => 'post_date',
-            'order' => 'ASC',
-            'post_type' => 'einsatz',
-            'post_status' => array('publish', 'private'),
-            'year' => $kalenderjahr
-        ));
-    }
-
-    /**
-     * Gibt ein Array mit Jahreszahlen zurück, in denen Einsätze vorliegen
-     *
-     * @return string[]
-     */
-    public static function getJahreMitEinsatz()
-    {
-        /** @var wpdb $wpdb */
-        global $wpdb;
-
-        return $wpdb->get_col($wpdb->prepare(
-            "SELECT DISTINCT YEAR(post_date) AS years FROM {$wpdb->posts} WHERE post_type = %s AND post_status = %s;",
-            array('einsatz', 'publish')
-        ));
-    }
-
-    /**
-     * Returns the years
      * @return int[]
      */
     public function getYearsWithReports()
     {
-        $yearStrings = self::getJahreMitEinsatz();
+        /** @var wpdb $wpdb */
+        global $wpdb;
+
+        $yearStrings = $wpdb->get_col($wpdb->prepare(
+            "SELECT DISTINCT YEAR(post_date) AS years FROM {$wpdb->posts} WHERE post_type = %s AND post_status = %s;",
+            array('einsatz', 'publish')
+        ));
+
         return array_map('intval', $yearStrings);
     }
 
@@ -114,13 +91,13 @@ class Data
         // Fängt Speichervorgänge per QuickEdit ab
         if (defined('DOING_AJAX') && DOING_AJAX) {
             $units = (array)filter_input(INPUT_POST, 'evw_units', FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY);
-            $this->saveUnits($post, $units);
+            $this->savePostRelation('_evw_unit', $post, $units);
             return;
         }
 
         if ($this->isBulkEdit()) {
             $unitsToAdd = (array)filter_input(INPUT_GET, 'evw_units', FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY);
-            $this->saveUnits($post, $unitsToAdd, false);
+            $this->savePostRelation('_evw_unit', $post, $unitsToAdd, false);
             return;
         }
 
@@ -183,7 +160,7 @@ class Data
 
         // Save Units
         $units = (array)filter_input(INPUT_POST, 'evw_units', FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY);
-        $this->saveUnits($post, $units);
+        $this->savePostRelation('_evw_unit', $post, $units);
     }
 
     /**
@@ -195,7 +172,7 @@ class Data
     public function updateSequenceNumbers($yearToUpdate = null)
     {
         if (empty($yearToUpdate)) {
-            $years = self::getJahreMitEinsatz();
+            $years = self::getYearsWithReports();
         }
 
         if (!is_array($yearToUpdate) && is_string($yearToUpdate) && is_numeric($yearToUpdate)) {
@@ -207,13 +184,17 @@ class Data
         }
 
         foreach ($years as $year) {
-            $posts = self::getEinsatzberichte($year);
+            $reportQuery = new ReportQuery();
+            $reportQuery->setOrderAsc(true);
+            $reportQuery->setIncludePrivateReports(true);
+            $reportQuery->setYear($year);
+            $reports = $reportQuery->getReports();
 
             $expectedNumber = 1;
-            foreach ($posts as $post) {
-                $actualNumber = get_post_meta($post->ID, 'einsatz_seqNum', true);
+            foreach ($reports as $report) {
+                $actualNumber = $report->getSequentialNumber();
                 if ($expectedNumber != $actualNumber) {
-                    $this->setSequenceNumber($post->ID, $expectedNumber);
+                    $this->setSequenceNumber($report->getPostId(), $expectedNumber);
                 }
                 $expectedNumber++;
             }
@@ -254,7 +235,7 @@ class Data
      */
     public function onTransitionPostStatus($newStatus, $oldStatus, WP_Post $post)
     {
-        if (get_post_type($post) !== Report::SLUG) {
+        if (get_post_type($post) !== Report::getSlug()) {
             return;
         }
 
@@ -338,24 +319,25 @@ class Data
     }
 
     /**
+     * @param string $relationKey
      * @param WP_Post $post
-     * @param string[] $units
-     * @param bool $removeUnits Whether to remove the association with units not mentioned in $units. Default true.
+     * @param string[] $items
+     * @param bool $removeItems Whether to remove the association with items not mentioned in $items. Default true.
      */
-    private function saveUnits(WP_Post $post, $units, $removeUnits = true)
+    private function savePostRelation($relationKey, WP_Post $post, $items, $removeItems = true)
     {
-        $assignedUnits = get_post_meta($post->ID, '_evw_unit');
-        $unitsToAdd = array_diff($units, $assignedUnits);
+        $assignedItems = get_post_meta($post->ID, $relationKey);
+        $itemsToAdd = array_diff($items, $assignedItems);
 
-        if ($removeUnits === true) {
-            $unitsToDelete = array_diff($assignedUnits, $units);
-            foreach ($unitsToDelete as $unitId) {
-                delete_post_meta($post->ID, '_evw_unit', $unitId);
+        if ($removeItems === true) {
+            $itemsToDelete = array_diff($assignedItems, $items);
+            foreach ($itemsToDelete as $itemId) {
+                delete_post_meta($post->ID, $relationKey, $itemId);
             }
         }
 
-        foreach ($unitsToAdd as $unitId) {
-            add_post_meta($post->ID, '_evw_unit', $unitId);
+        foreach ($itemsToAdd as $itemId) {
+            add_post_meta($post->ID, $relationKey, $itemId);
         }
     }
 
@@ -375,5 +357,45 @@ class Data
         }
 
         return false;
+    }
+
+    public function saveUnitData($postId, WP_Post $post)
+    {
+        // Check if the user is allowed to edit this unit
+        if (!current_user_can('edit_evw_unit', $postId)) {
+            return;
+        }
+
+        // Don't react to autosave
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+            return;
+        }
+
+        // Handle QuickEdit
+        if (defined('DOING_AJAX') && DOING_AJAX) {
+            // No additional work to do at the moment
+            return;
+        }
+
+        // Handle bulk edit
+        if ($this->isBulkEdit()) {
+            // No additional work to do at the moment
+            return;
+        }
+
+        // Check if the save was actually triggered by using the form on the edit page
+        if (!array_key_exists('einsatzverwaltung_nonce', $_POST) ||
+            !wp_verify_nonce($_POST['einsatzverwaltung_nonce'], 'save_evw_unit_details')
+        ) {
+            return;
+        }
+
+        // Save the ID of the info page
+        $pid = filter_input(INPUT_POST, 'unit_pid', FILTER_SANITIZE_NUMBER_INT);
+        update_post_meta($postId, 'unit_pid', $pid);
+
+        // Save the external URL
+        $url = filter_input(INPUT_POST, 'unit_exturl', FILTER_SANITIZE_URL);
+        update_post_meta($postId, 'unit_exturl', $url);
     }
 }

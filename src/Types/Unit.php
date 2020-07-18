@@ -1,13 +1,48 @@
 <?php
 namespace abrain\Einsatzverwaltung\Types;
 
+use abrain\Einsatzverwaltung\CustomFields\PostSelector;
+use abrain\Einsatzverwaltung\CustomFields\UrlInput;
+use abrain\Einsatzverwaltung\CustomFieldsRepository;
+use WP_Post;
+use function get_permalink;
+use function get_post_meta;
+
 /**
  * Description of the custom post type for units
  * @package abrain\Einsatzverwaltung\Types
  */
 class Unit implements CustomPostType
 {
-    const POST_TYPE = 'evw_unit';
+    /**
+     * Retrieve the URL to more info about a given Unit. This can be a permalink to an internal page or an external URL.
+     *
+     * @param WP_Post $unit
+     *
+     * @return string A URL or an empty string
+     */
+    public static function getInfoUrl(WP_Post $unit)
+    {
+        // The external URL takes precedence over an internal page
+        $extUrl = get_post_meta($unit->ID, 'unit_exturl', true);
+        if (!empty($extUrl)) {
+            return $extUrl;
+        }
+
+        // Figure out if an internal page has been assigned
+        $pageid = get_post_meta($unit->ID, 'unit_pid', true);
+        if (empty($pageid)) {
+            return '';
+        }
+
+        // Try to get the permalink of this page
+        $pageUrl = get_permalink($pageid);
+        if ($pageUrl === false) {
+            return '';
+        }
+
+        return $pageUrl;
+    }
 
     /**
      * @return array
@@ -32,7 +67,7 @@ class Unit implements CustomPostType
             'insert_into_item' => __('Insert into unit', 'einsatzverwaltung'),
             'uploaded_to_this_item' => __('Uploaded to this unit', 'einsatzverwaltung'),
             'featured_image' => _x('Featured Image', 'unit', 'einsatzverwaltung'),
-            'set_featured_image' => __('Set featured image', 'unit', 'einsatzverwaltung'),
+            'set_featured_image' => _x('Set featured image', 'unit', 'einsatzverwaltung'),
             'remove_featured_image' => _x('Remove featured image', 'unit', 'einsatzverwaltung'),
             'use_featured_image' => _x('Use as featured image', 'unit', 'einsatzverwaltung'),
             'filter_items_list' => __('Filter units list', 'einsatzverwaltung'),
@@ -47,7 +82,7 @@ class Unit implements CustomPostType
     }
 
     /**
-     * @return array
+     * @inheritDoc
      */
     public function getRegistrationArgs()
     {
@@ -56,32 +91,52 @@ class Unit implements CustomPostType
             'public' => false,
             'supports' => array('title', 'editor', 'thumbnail', 'revisions', 'custom-fields', 'author'),
             'show_ui' => true,
-            'show_in_menu' => 'edit.php?post_type=' . Report::SLUG,
+            'show_in_menu' => 'edit.php?post_type=' . Report::getSlug(),
             'show_in_admin_bar' => false,
             'show_in_rest' => false,
-            'capability_type' => $this->getSlug(),
+            'capability_type' => self::getSlug(),
             'map_meta_cap' => true,
             'menu_icon' => 'dashicons-networking',
+            'delete_with_user' => false,
         );
     }
 
     /**
-     * @return string
+     * @inheritDoc
      */
-    public function getSlug()
+    public function getRewriteSlug()
     {
-        return self::POST_TYPE;
+        return self::getSlug();
     }
 
     /**
-     * @return void
+     * @inheritDoc
      */
-    public function registerCustomFields()
+    public static function getSlug()
     {
+        return 'evw_unit';
     }
 
     /**
-     * @return void
+     * @inheritDoc
+     */
+    public function registerCustomFields(CustomFieldsRepository $customFields)
+    {
+        $customFields->add($this, new PostSelector(
+            'unit_pid',
+            __('Page with further information', 'einsatzverwaltung'),
+            'Seite mit mehr Informationen &uuml;ber die Einheit. Wird in Einsatzberichten mit dieser Einheit verlinkt.',
+            array('page')
+        ));
+        $customFields->add($this, new UrlInput(
+            'unit_exturl',
+            __('External URL', 'einsatzverwaltung'),
+            __('You can specify a URL that points to more information about this unit. If set, this takes precedence over the page selected above.', 'einsatzverwaltung')
+        ));
+    }
+
+    /**
+     * @inheritDoc
      */
     public function registerHooks()
     {

@@ -3,6 +3,9 @@ namespace abrain\Einsatzverwaltung\Export\Formats;
 
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Util\Formatter;
+use WP_Post;
+use WP_Query;
+use WP_Term;
 
 /**
  * Abstraktion für Exportformate
@@ -32,7 +35,7 @@ abstract class AbstractFormat implements Format
      * Gibt das WP_Query-Objekt für den Abruf der zu exportierenden Einsatzberichte
      * zurück.
      *
-     * @return \WP_Query
+     * @return WP_Query
      */
     protected function getQuery()
     {
@@ -56,7 +59,7 @@ abstract class AbstractFormat implements Format
             }
         }
 
-        return new \WP_Query($args);
+        return new WP_Query($args);
     }
 
     /**
@@ -87,10 +90,10 @@ abstract class AbstractFormat implements Format
     }
 
     /**
-     * @param \WP_Post $post
+     * @param WP_Post $post
      * @return array
      */
-    protected function getValuesForReport(\WP_Post $post)
+    protected function getValuesForReport(WP_Post $post)
     {
         $report = new IncidentReport($post);
 
@@ -121,12 +124,18 @@ abstract class AbstractFormat implements Format
     }
 
     /**
-     * @param \WP_Term $object
+     * @param WP_Post|WP_Term $object
      * @return string
      */
     private function getName($object)
     {
-        return $object->name;
+        if ($object instanceof WP_Term) {
+            return $object->name;
+        } elseif ($object instanceof WP_Post) {
+            return get_the_title($object);
+        }
+
+        return '';
     }
 
     /**

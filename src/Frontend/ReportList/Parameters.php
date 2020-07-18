@@ -7,17 +7,15 @@ namespace abrain\Einsatzverwaltung\Frontend\ReportList;
  */
 class Parameters
 {
-    const DEFAULT_COLUMNS = 'number,date,time,title';
-
     /**
-     * @var array
+     * @var Column[]
      */
     private $columns;
 
     /**
      * Array mit Spalten-IDs, die mit einem Link zum Einsatzbericht versehen werden sollen
      *
-     * @var array
+     * @var string[]
      */
     private $columnsLinkingReport;
 
@@ -68,8 +66,14 @@ class Parameters
      */
     public function __construct()
     {
-        $enabledColumns = self::sanitizeColumns(get_option('einsatzvw_list_columns', ''));
-        $this->columns = explode(',', $enabledColumns);
+        $columnRepository = ColumnRepository::getInstance();
+
+        $columnIdentifiers = explode(',', get_option('einsatzvw_list_columns', ''));
+        $this->columns = $columnRepository->getColumnsByIdentifier($columnIdentifiers);
+        if (empty($this->columns)) {
+            $this->columns = $columnRepository->getDefaultColumns();
+        }
+
         $this->columnsLinkingReport = array('title');
         $this->compact = false;
         $this->linkEmptyReports = true;
@@ -80,7 +84,7 @@ class Parameters
     }
 
     /**
-     * @return array
+     * @return Column[]
      */
     public function getColumns()
     {
@@ -96,15 +100,7 @@ class Parameters
     }
 
     /**
-     * @param array $columns
-     */
-    public function setColumns($columns)
-    {
-        $this->columns = self::sanitizeColumnsArray($columns);
-    }
-
-    /**
-     * @return array
+     * @return string[]
      */
     public function getColumnsLinkingReport()
     {
@@ -112,11 +108,11 @@ class Parameters
     }
 
     /**
-     * @param array $columnsLinkingReport
+     * @param string[] $columnsLinkingReport
      */
     public function setColumnsLinkingReport($columnsLinkingReport)
     {
-        $this->columnsLinkingReport = self::sanitizeColumnsArrayNoDefault($columnsLinkingReport);
+        $this->columnsLinkingReport = ColumnRepository::sanitizeColumnsArrayNoDefault($columnsLinkingReport);
     }
 
     /**
@@ -141,67 +137,5 @@ class Parameters
     public function setSplitType($splitType)
     {
         $this->splitType = $splitType;
-    }
-
-    /**
-     * Stellt sicher, dass nur gültige Spalten-Ids gespeichert werden.
-     *
-     * @param string $input Kommaseparierte Spalten-Ids
-     *
-     * @return string Der Eingabestring ohne ungültige Spalten-Ids, bei Problemen werden die Standardspalten
-     * zurückgegeben
-     */
-    public static function sanitizeColumns($input)
-    {
-        if (empty($input)) {
-            return self::DEFAULT_COLUMNS;
-        }
-
-        $inputArray = explode(',', $input);
-        $validColumnIds = self::sanitizeColumnsArray($inputArray);
-
-        return implode(',', $validColumnIds);
-    }
-
-    /**
-     * Bereinigt ein Array von Spalten-Ids, sodass nur gültige Ids darin verbleiben. Verbleiben keine Ids, werden die
-     * Standard-Spalten zurückgegeben
-     *
-     * @param array $inputArray
-     *
-     * @return array
-     */
-    public static function sanitizeColumnsArray($inputArray)
-    {
-        $validColumnIds = self::sanitizeColumnsArrayNoDefault($inputArray);
-
-        if (empty($validColumnIds)) {
-            $validColumnIds = explode(',', self::DEFAULT_COLUMNS);
-        }
-
-        return $validColumnIds;
-    }
-
-    /**
-     * Bereinigt ein Array von Spalten-Ids, sodass nur gültige Ids darin verbleiben
-     *
-     * @param array $inputArray
-     *
-     * @return array
-     */
-    public static function sanitizeColumnsArrayNoDefault($inputArray)
-    {
-        $columns = Renderer::getListColumns();
-        $columnIds = array_keys($columns);
-
-        $validColumnIds = array();
-        foreach ($inputArray as $colId) {
-            $colId = trim($colId);
-            if (in_array($colId, $columnIds)) {
-                $validColumnIds[] = $colId;
-            }
-        }
-
-        return $validColumnIds;
     }
 }

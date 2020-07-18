@@ -3,6 +3,7 @@
 namespace abrain\Einsatzverwaltung\Admin;
 
 use abrain\Einsatzverwaltung\Core;
+use abrain\Einsatzverwaltung\CustomFieldsRepository;
 use abrain\Einsatzverwaltung\Data;
 use abrain\Einsatzverwaltung\Export\Tool as ExportTool;
 use abrain\Einsatzverwaltung\Import\Tool as ImportTool;
@@ -10,6 +11,7 @@ use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\PermalinkController;
 use abrain\Einsatzverwaltung\Settings\MainPage;
 use abrain\Einsatzverwaltung\Types\Report;
+use abrain\Einsatzverwaltung\Types\Unit;
 use abrain\Einsatzverwaltung\Utilities;
 
 /**
@@ -25,8 +27,9 @@ class Initializer
      * @param Options $options
      * @param Utilities $utilities
      * @param PermalinkController $permalinkController
+     * @param CustomFieldsRepository $customFieldsRepo
      */
-    public function __construct(Data $data, Options $options, Utilities $utilities, PermalinkController $permalinkController)
+    public function __construct(Data $data, Options $options, Utilities $utilities, PermalinkController $permalinkController, CustomFieldsRepository $customFieldsRepo)
     {
         $pluginBasename = plugin_basename(einsatzverwaltung_plugin_file());
         add_action('admin_menu', array($this, 'hideTaxonomies'));
@@ -48,7 +51,13 @@ class Initializer
         add_action('add_meta_boxes_einsatz', array($reportEditScreen, 'addMetaBoxes'));
         add_filter('default_hidden_meta_boxes', array($reportEditScreen, 'filterDefaultHiddenMetaboxes'), 10, 2);
 
-        $unitEditScreen = new UnitEditScreen();
+        $unitSlug = Unit::getSlug();
+        $unitListTable = new UnitListTable();
+        add_filter("manage_edit-{$unitSlug}_columns", array($unitListTable, 'filterColumns'), 20);
+        add_action("manage_{$unitSlug}_posts_custom_column", array($unitListTable, 'filterColumnContent'), 20, 2);
+
+        $unitEditScreen = new UnitEditScreen($customFieldsRepo);
+        add_action("add_meta_boxes_$unitSlug", array($unitEditScreen, 'addMetaBoxes'));
         add_filter('default_hidden_meta_boxes', array($unitEditScreen, 'filterDefaultHiddenMetaboxes'), 10, 2);
 
         // Register Settings
@@ -234,7 +243,7 @@ class Initializer
      */
     public function useBlockEditorForReports($useBlockEditor, $postType)
     {
-        if ($postType === Report::SLUG && get_option('einsatz_disable_blockeditor', '0') === '1') {
+        if ($postType === Report::getSlug() && get_option('einsatz_disable_blockeditor', '0') === '1') {
             return false;
         }
 

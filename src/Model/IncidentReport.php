@@ -2,9 +2,13 @@
 
 namespace abrain\Einsatzverwaltung\Model;
 
+use abrain\Einsatzverwaltung\Types\Vehicle;
 use DateTime;
 use WP_Post;
 use WP_Term;
+use function get_post;
+use function get_post_type;
+use function error_log;
 
 /**
  * Datenmodellklasse für Einsatzberichte
@@ -120,33 +124,6 @@ class IncidentReport
         $differenz = $timestamp2 - $timestamp1;
 
         return intval($differenz / 60);
-    }
-
-    /**
-     * Komparator für Fahrzeuge
-     *
-     * @param object $vehicle1
-     * @param object $vehicle2
-     *
-     * @return int
-     */
-    private function compareVehicles($vehicle1, $vehicle2)
-    {
-        if (empty($vehicle1->vehicle_order) && !empty($vehicle2->vehicle_order)) {
-            return 1;
-        }
-
-        if (!empty($vehicle1->vehicle_order) && empty($vehicle2->vehicle_order)) {
-            return -1;
-        }
-
-        if (empty($vehicle1->vehicle_order) && empty($vehicle2->vehicle_order) ||
-            $vehicle1->vehicle_order == $vehicle2->vehicle_order
-        ) {
-            return strcasecmp($vehicle1->name, $vehicle2->name);
-        }
-
-        return ($vehicle1->vehicle_order < $vehicle2->vehicle_order) ? -1 : 1;
     }
 
     /**
@@ -388,20 +365,7 @@ class IncidentReport
             return array();
         }
 
-        // Reihenfolge abfragen
-        foreach ($vehicles as $vehicle) {
-            if (!isset($vehicle->term_id)) {
-                continue;
-            }
-
-            $vehicleOrder = get_term_meta($vehicle->term_id, 'vehicleorder', true);
-            if (!empty($vehicleOrder)) {
-                $vehicle->vehicle_order = $vehicleOrder;
-            }
-        }
-
-        // Fahrzeuge vor Rückgabe sortieren
-        usort($vehicles, array($this, 'compareVehicles'));
+        usort($vehicles, array(Vehicle::class, 'compareVehicles'));
 
         return $vehicles;
     }
@@ -441,7 +405,7 @@ class IncidentReport
      *
      * @return bool
      */
-    private function isDraft()
+    public function isDraft()
     {
         return in_array($this->post->post_status, array('draft', 'pending', 'auto-draft'));
     }

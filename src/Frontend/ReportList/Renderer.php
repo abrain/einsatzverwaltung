@@ -4,7 +4,6 @@ namespace abrain\Einsatzverwaltung\Frontend\ReportList;
 use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Util\Formatter;
-use abrain\Einsatzverwaltung\Utilities;
 use DateTime;
 
 /**
@@ -182,18 +181,10 @@ class Renderer
      */
     private function insertTableHeader(Parameters $parameters)
     {
-        $allColumns = self::getListColumns();
-
         $this->string .= '<tr class="einsatz-header">';
-        foreach ($parameters->getColumns() as $colId) {
-            if (!array_key_exists($colId, $allColumns)) {
-                $this->string .= '<th>&nbsp;</th>';
-                continue;
-            }
-
-            $colInfo = $allColumns[$colId];
-            $style = Utilities::getArrayValueIfKey($colInfo, 'nowrap', false) ? 'white-space: nowrap;' : '';
-            $this->string .= sprintf('<th style="%s">%s</th>', esc_attr($style), esc_html($colInfo['name']));
+        foreach ($parameters->getColumns() as $column) {
+            $style = $column->isNoWrap() ? 'white-space: nowrap;' : '';
+            $this->string .= sprintf('<th style="%s">%s</th>', esc_attr($style), esc_html($column->getName()));
         }
         $this->string .= '</tr>';
 
@@ -222,11 +213,53 @@ class Renderer
     private function insertRow($report, Parameters $parameters)
     {
         $this->string .= '<tr class="report">';
-        foreach ($parameters->getColumns() as $colId) {
-            $this->string .= $this->getCellMarkup($report, $parameters, $colId);
+        $this->string .= $this->getSmallScreenCell($report, $parameters);
+        foreach ($parameters->getColumns() as $column) {
+            $cellMarkup = $this->getCellMarkup($report, $parameters, $column->getIdentifier());
+            $this->string .= sprintf('<td class="einsatz-column-%s">%s</td>', $column->getIdentifier(), $cellMarkup);
         }
         $this->string .= '</tr>';
         $this->rowsSinceLastHeader++;
+    }
+
+    /**
+     * @param IncidentReport $report
+     * @param Parameters $parameters
+     *
+     * @return string HTML markup for the table cell only visible on devices with a small screen (e.g. smartphones)
+     */
+    private function getSmallScreenCell(IncidentReport $report, Parameters $parameters)
+    {
+        $content = '';
+        $annotations = '';
+
+        foreach ($parameters->getColumns() as $column) {
+            $columnValue = $this->getCellMarkup($report, $parameters, $column->getIdentifier());
+
+            // Annotation icons get appended to a different variable
+            if (strpos($column->getIdentifier(), 'annotation') === 0) {
+                $annotations .= $columnValue;
+                continue;
+            }
+
+            $columnContent = sprintf('<strong>%1$s:</strong> %2$s', esc_html($column->getName()), $columnValue);
+
+            $content .= sprintf('<span class="einsatz-%s">%s</span><br>', $column->getIdentifier(), $columnContent);
+        }
+
+        if (!empty($annotations)) {
+            $content = '<div class="annotation-icon-bar">' . $annotations . '</div>' . $content;
+        }
+
+        $linkToReport = $parameters->linkEmptyReports || $report->hasContent();
+        $permalink = $linkToReport ? get_permalink($report->getPostId()) : '';
+
+        return sprintf(
+            '<td class="smallscreen" colspan="%d" data-permalink="%s">%s</td>',
+            esc_attr($parameters->getColumnCount()),
+            $permalink,
+            $content
+        );
     }
 
     /**
@@ -248,7 +281,7 @@ class Renderer
             );
         }
 
-        return sprintf('<td class="einsatz-column-%s">%s</td>', $columnId, $cellContent);
+        return $cellContent;
     }
 
     /**
@@ -431,88 +464,13 @@ class Renderer
     }
 
     /**
-     * Gibt die möglichen Spalten für die Tabelle zurück
-     *
-     * @return array
-     */
-    public static function getListColumns()
-    {
-        return array(
-            'number' => array(
-                'name' => 'Nummer',
-                'nowrap' => true
-            ),
-            'date' => array(
-                'name' => 'Datum',
-                'nowrap' => true
-            ),
-            'time' => array(
-                'name' => 'Zeit',
-                'nowrap' => true
-            ),
-            'datetime' => array(
-                'name' => 'Datum',
-                'longName' => 'Datum + Zeit',
-                'nowrap' => true
-            ),
-            'title' => array(
-                'name' => 'Einsatzmeldung'
-            ),
-            'incidentCommander' => array(
-                'name' => 'Einsatzleiter'
-            ),
-            'location' => array(
-                'name' => 'Einsatzort'
-            ),
-            'workforce' => array(
-                'name' => 'Mannschaftsst&auml;rke',
-                'cssname' => 'Mannschaftsst\0000E4rke',
-            ),
-            'duration' => array(
-                'name' => 'Dauer',
-                'nowrap' => true
-            ),
-            'vehicles' => array(
-                'name' => 'Fahrzeuge'
-            ),
-            'alarmType' => array(
-                'name' => 'Alarmierungsart'
-            ),
-            'additionalForces' => array(
-                'name' => 'Weitere Kr&auml;fte',
-                'cssname' => 'Weitere Kr\0000E4fte',
-            ),
-            'units' => array(
-                'name' => __('Units', 'einsatzverwaltung')
-            ),
-            'incidentType' => array(
-                'name' => 'Einsatzart'
-            ),
-            'seqNum' => array(
-                'name' => 'Lfd.',
-                'longName' => 'Laufende Nummer'
-            ),
-            'annotationImages' => array(
-                'name' => '',
-                'longName' => 'Vermerk &quot;Bilder im Bericht&quot;'
-            ),
-            'annotationSpecial' => array(
-                'name' => '',
-                'longName' => 'Vermerk &quot;Besonderer Einsatz&quot;'
-            )
-        );
-    }
-
-    /**
      * Generiert CSS-Code, der von Einstellungen abhängt oder nicht gut von Hand zu pflegen ist
      *
      * @return string
      */
     public static function getDynamicCss()
     {
-        $reportListSettings = self::$settings; // FIXME Verrenkung, um PHP 5.3.0 als Minimum zu ermöglichen, solange das
-                                               // Ende der Untersützung nicht im Blog angekündigt wurde.
-        if (empty($reportListSettings)) {      // NEEDS_PHP5.5 direkt empty(self::$settings) prüfen
+        if (empty(self::$settings)) {
             self::$settings = new Settings();
         }
 
@@ -527,18 +485,6 @@ class Renderer
                 self::$settings->getZebraColor()
             );
         }
-
-        // Bei der responsiven Ansicht die selben Begriffe voranstellen wie im Tabellenkopf
-        $string .= '@media (max-width: 767px) {';
-        foreach (self::getListColumns() as $colId => $colInfo) {
-            $string .= sprintf(
-                '.%s td.einsatz-column-%s:before {content: "%s:";}',
-                self::TABLECLASS,
-                $colId,
-                (array_key_exists('cssname', $colInfo) ? $colInfo['cssname'] : $colInfo['name'])
-            ).PHP_EOL;
-        }
-        $string .= '}';
 
         return $string;
     }

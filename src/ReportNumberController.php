@@ -2,7 +2,17 @@
 
 namespace abrain\Einsatzverwaltung;
 
-use abrain\Einsatzverwaltung\Model\IncidentReport;
+use function date_create;
+use function date_format;
+use function get_option;
+use function get_post_field;
+use function get_post_type;
+use function in_array;
+use function intval;
+use function is_numeric;
+use function sprintf;
+use function str_pad;
+use function update_post_meta;
 
 /**
  * Takes care of keeping report numbers up-to-date
@@ -13,17 +23,18 @@ class ReportNumberController
     const DEFAULT_SEQNUM_DIGITS = 3;
 
     /**
-     * ReportNumberController constructor.
+     * @var Data
      */
-    public function __construct()
+    private $data;
+
+    /**
+     * ReportNumberController constructor.
+     *
+     * @param Data $data
+     */
+    public function __construct(Data $data)
     {
-        if (self::isAutoIncidentNumbers()) {
-            add_action('updated_postmeta', array($this, 'adjustIncidentNumber'), 10, 4);
-            add_action('added_post_meta', array($this, 'adjustIncidentNumber'), 10, 4);
-        }
-        add_action('updated_option', array($this, 'maybeAutoIncidentNumbersChanged'), 10, 3);
-        add_action('updated_option', array($this, 'maybeIncidentNumberFormatChanged'), 10, 3);
-        add_action('add_option_einsatzverwaltung_incidentnumbers_auto', array($this, 'onOptionAdded'), 10, 2);
+        $this->data = $data;
     }
 
     /**
@@ -34,22 +45,27 @@ class ReportNumberController
      * @param string $metaKey Der Key des postmeta-Eintrags
      * @param string $metaValue Der Wert des postmeta-Eintrags
      */
-    public function adjustIncidentNumber($metaId, $objectId, $metaKey, $metaValue)
+    public function onPostMetaChanged($metaId, $objectId, $metaKey, $metaValue)
     {
-        // Nur Änderungen an der laufenden Nummer sind interessant
-        if ('einsatz_seqNum' != $metaKey) {
+        // Bail, if this is not about reports
+        if (get_post_type($objectId) !== 'einsatz') {
             return;
         }
 
-        // Für den unwahrscheinlichen Fall, dass der Metakey bei anderen Beitragstypen verwendet wird, ist hier Schluss
-        $postType = get_post_type($objectId);
-        if ('einsatz' != $postType) {
-            return;
+        if ($metaKey === 'einsatz_seqNum' && self::isAutoIncidentNumbers()) {
+            $this->adjustIncidentNumber($objectId, $metaValue);
         }
+    }
 
-        $date = date_create(get_post_field('post_date', $objectId));
-        $newIncidentNumber = $this->formatEinsatznummer(date_format($date, 'Y'), $metaValue);
-        update_post_meta($objectId, 'einsatz_incidentNumber', $newIncidentNumber);
+    /**
+     * @param int $postId
+     * @param string $sequenceNumber
+     */
+    private function adjustIncidentNumber($postId, $sequenceNumber)
+    {
+        $date = date_create(get_post_field('post_date', $postId));
+        $newIncidentNumber = $this->formatEinsatznummer(date_format($date, 'Y'), $sequenceNumber);
+        update_post_meta($postId, 'einsatz_incidentNumber', $newIncidentNumber);
     }
 
     /**
@@ -60,7 +76,7 @@ class ReportNumberController
      *
      * @return string Formatierte Einsatznummer
      */
-    public function formatEinsatznummer($jahr, $nummer)
+    private function formatEinsatznummer($jahr, $nummer)
     {
         $stellen = self::sanitizeEinsatznummerStellen(get_option('einsatzvw_einsatznummer_stellen'));
         $lfdvorne = (get_option('einsatzvw_einsatznummer_lfdvorne', false) === '1');
@@ -111,16 +127,19 @@ class ReportNumberController
     /**
      * Generiert für alle Einsatzberichte eine Einsatznummer gemäß dem aktuell konfigurierten Format.
      */
-    public function updateAllIncidentNumbers()
+    private function updateAllIncidentNumbers()
     {
-        $years = Data::getJahreMitEinsatz();
+        $years = $this->data->getYearsWithReports();
         foreach ($years as $year) {
-            $posts = Data::getEinsatzberichte($year);
-            foreach ($posts as $post) {
-                $incidentReport = new IncidentReport($post);
-                $seqNum = $incidentReport->getSequentialNumber();
-                $newIncidentNumber = $this->formatEinsatznummer($year, $seqNum);
-                update_post_meta($post->ID, 'einsatz_incidentNumber', $newIncidentNumber);
+            $reportQuery = new ReportQuery();
+            $reportQuery->setOrderAsc(true);
+            $reportQuery->setIncludePrivateReports(true);
+            $reportQuery->setYear($year);
+            $reports = $reportQuery->getReports();
+
+            foreach ($reports as $report) {
+                $newIncidentNumber = $this->formatEinsatznummer($year, $report->getSequentialNumber());
+                update_post_meta($report->getPostId(), 'einsatz_incidentNumber', $newIncidentNumber);
             }
         }
     }

@@ -2,25 +2,24 @@
 namespace abrain\Einsatzverwaltung;
 
 use abrain\Einsatzverwaltung\Shortcodes\Initializer as ShortcodeInitializer;
+use abrain\Einsatzverwaltung\Types\Unit;
 use abrain\Einsatzverwaltung\Util\Formatter;
-use abrain\Einsatzverwaltung\Widgets\RecentIncidents;
-use abrain\Einsatzverwaltung\Widgets\RecentIncidentsFormatted;
+use function add_action;
 
 /**
  * Grundlegende Funktionen
  */
 class Core
 {
-    const VERSION = '1.6.7';
-    const DB_VERSION = 41;
+    const VERSION = '1.7.0';
+    const DB_VERSION = 50;
 
-   /**
-    * Statische Variable, um die aktuelle (einzige!) Instanz dieser Klasse zu halten
-    * @var Core
-    */
+    /**
+     * Statische Variable, um die aktuelle (einzige!) Instanz dieser Klasse zu halten
+     * @var Core
+     */
     private static $instance = null;
 
-    public static $pluginFile;
     public static $pluginBasename;
     public static $pluginDir;
     public static $pluginUrl;
@@ -31,6 +30,11 @@ class Core
      * @var Data
      */
     private $data;
+
+    /**
+     * @var CustomFieldsRepository
+     */
+    private $customFieldsRepo;
     
     /**
      * @var Options
@@ -63,46 +67,20 @@ class Core
     private $permalinkController;
 
     /**
-     * Constructor
+     * Private Constructor, use ::getInstance() instead.
      */
     private function __construct()
     {
-        $this->utilities = new Utilities();
         $this->options = new Options();
 
-        $this->typeRegistry = new TypeRegistry();
+        $this->customFieldsRepo = new CustomFieldsRepository();
+        $this->typeRegistry = new TypeRegistry($this->customFieldsRepo);
+
         $this->permalinkController = new PermalinkController();
+        $this->formatter = new Formatter($this->options, $this->permalinkController);
 
-        $this->formatter = new Formatter($this->options, $this->permalinkController); // TODO In Singleton umwandeln
-
-        $this->data = new Data($this->options);
-        new Frontend($this->options, $this->formatter);
-        new ShortcodeInitializer($this->data, $this->formatter, $this->permalinkController);
-        new ReportNumberController();
-
-        if (is_admin()) {
-            new Admin\Initializer($this->data, $this->options, $this->utilities, $this->permalinkController);
-        }
-
-        $this->addHooks();
-    }
-
-    private function addHooks()
-    {
-        add_action('admin_notices', array($this, 'onAdminNotices'));
-        add_action('init', array($this, 'onInit'));
-        add_action('plugins_loaded', array($this, 'onPluginsLoaded'));
-        register_activation_hook(self::$pluginFile, array($this, 'onActivation'));
-        register_deactivation_hook(self::$pluginFile, array($this, 'onDeactivation'));
-        add_action('widgets_init', array($this, 'registerWidgets'));
-
-        $userRightsManager = new UserRightsManager();
-        add_filter('user_has_cap', array($userRightsManager, 'userHasCap'), 10, 4);
-
-        add_filter('option_einsatz_permalink', array('abrain\Einsatzverwaltung\PermalinkController', 'sanitizePermalink'));
-        add_action('parse_query', array($this->permalinkController, 'einsatznummerMetaQuery'));
-        add_filter('post_type_link', array($this->permalinkController, 'filterPostTypeLink'), 10, 4);
-        add_filter('request', array($this->permalinkController, 'filterRequest'));
+        $widgetInitializer = new Widgets\Initializer($this->formatter);
+        add_action('widgets_init', array($widgetInitializer, 'registerWidgets'));
     }
 
     /**
@@ -113,7 +91,6 @@ class Core
         add_option('einsatzvw_db_version', self::DB_VERSION);
 
         $this->maybeUpdate();
-        update_option('einsatzvw_version', self::VERSION);
 
         // Posttypen registrieren
         try {
@@ -141,6 +118,42 @@ class Core
      */
     public function onInit()
     {
+        $this->maybeUpdate();
+
+        $this->utilities = new Utilities();
+
+        add_filter('option_einsatz_permalink', array(PermalinkController::class, 'sanitizePermalink'));
+        add_action('parse_query', array($this->permalinkController, 'einsatznummerMetaQuery'));
+        add_filter('post_type_link', array($this->permalinkController, 'filterPostTypeLink'), 10, 4);
+        add_filter('request', array($this->permalinkController, 'filterRequest'));
+
+        $this->data = new Data($this->options);
+        add_action('save_post_einsatz', array($this->data, 'savePostdata'), 10, 2);
+        add_action('private_einsatz', array($this->data, 'onPublish'), 10, 2);
+        add_action('publish_einsatz', array($this->data, 'onPublish'), 10, 2);
+        add_action('trash_einsatz', array($this->data, 'onTrash'), 10, 2);
+        add_action('transition_post_status', array($this->data, 'onTransitionPostStatus'), 10, 3);
+        $unitSlug = Unit::getSlug();
+        add_action("save_post_$unitSlug", array($this->data, 'saveUnitData'), 10, 2);
+
+        new Frontend($this->options, $this->formatter);
+        new ShortcodeInitializer($this->data, $this->formatter, $this->permalinkController);
+
+        $numberController = new ReportNumberController($this->data);
+        add_action('updated_postmeta', array($numberController, 'onPostMetaChanged'), 10, 4);
+        add_action('added_post_meta', array($numberController, 'onPostMetaChanged'), 10, 4);
+        add_action('updated_option', array($numberController, 'maybeAutoIncidentNumbersChanged'), 10, 3);
+        add_action('updated_option', array($numberController, 'maybeIncidentNumberFormatChanged'), 10, 3);
+        add_action('add_option_einsatzverwaltung_incidentnumbers_auto', array($numberController, 'onOptionAdded'), 10, 2);
+
+        if (is_admin()) {
+            add_action('admin_notices', array($this, 'onAdminNotices'));
+            new Admin\Initializer($this->data, $this->options, $this->utilities, $this->permalinkController, $this->customFieldsRepo);
+        }
+
+        $userRightsManager = new UserRightsManager();
+        add_filter('user_has_cap', array($userRightsManager, 'userHasCap'), 10, 4);
+
         try {
             $this->typeRegistry->registerTypes($this->permalinkController);
         } catch (Exceptions\TypeRegistrationException $e) {
@@ -152,12 +165,6 @@ class Core
             flush_rewrite_rules();
             $this->options->setFlushRewriteRules(false);
         }
-    }
-
-    public function onPluginsLoaded()
-    {
-        $this->maybeUpdate();
-        update_option('einsatzvw_version', self::VERSION);
     }
 
     public function onAdminNotices()
@@ -173,12 +180,6 @@ class Core
         }
     }
 
-    public function registerWidgets()
-    {
-        register_widget(new RecentIncidents($this->options, $this->formatter));
-        register_widget(new RecentIncidentsFormatted($this->formatter));
-    }
-
     private function maybeUpdate()
     {
         $currentDbVersion = get_option('einsatzvw_db_version');
@@ -186,19 +187,11 @@ class Core
             return;
         }
 
-        $update = $this->getUpdater();
+        $update = new Update();
         $updateResult = $update->doUpdate($currentDbVersion, self::DB_VERSION);
         if (is_wp_error($updateResult)) {
             error_log("Das Datenbank-Upgrade wurde mit folgendem Fehler beendet: {$updateResult->get_error_message()}");
         }
-    }
-
-    /**
-     * @return Update
-     */
-    public function getUpdater()
-    {
-        return new Update($this->data);
     }
 
     /**

@@ -72,7 +72,7 @@ class ReportListTable
      */
     public function addInlineData(WP_Post $post, WP_Post_Type $post_type_object)
     {
-        if ($post_type_object->name !== Report::SLUG) {
+        if ($post_type_object->name !== Report::getSlug()) {
             return;
         }
 
@@ -83,7 +83,7 @@ class ReportListTable
         $unitIds = join(',', $unitIds);
         printf(
             '<div id="%s" class="post_category">%s</div>',
-            esc_attr(Unit::POST_TYPE . '_' . $post->ID),
+            esc_attr(Unit::getSlug() . '_' . $post->ID),
             esc_html($unitIds)
         );
     }
@@ -174,7 +174,7 @@ class ReportListTable
             return '';
         }
 
-        $url = add_query_arg(array('post_type' => Report::SLUG, $term->taxonomy => $term->slug), 'edit.php');
+        $url = add_query_arg(array('post_type' => Report::getSlug(), $term->taxonomy => $term->slug), 'edit.php');
         $text = sanitize_term_field('name', $term->name, $term->term_id, $term->taxonomy, 'display');
         return sprintf('<a href="%s">%s</a>', esc_url($url), esc_html($text));
     }
@@ -188,7 +188,7 @@ class ReportListTable
      */
     public function quickEditCustomBox($columnName, $postType, $taxonomy)
     {
-        if (!empty($taxonomy) || $postType !== Report::SLUG) {
+        if (!empty($taxonomy) || $postType !== Report::getSlug()) {
             return;
         }
 
@@ -207,7 +207,7 @@ class ReportListTable
      */
     public function bulkEditCustomBox($columnName, $postType)
     {
-        if ($postType !== Report::SLUG) {
+        if ($postType !== Report::getSlug()) {
             return;
         }
 
@@ -231,20 +231,20 @@ class ReportListTable
         );
         if ($columnName === 'einsatzverwaltung_units') {
             $units = get_posts(array(
-                'post_type' => Unit::POST_TYPE,
+                'post_type' => Unit::getSlug(),
                 'numberposts' => -1,
                 'order' => 'ASC',
                 'orderby' => 'name'
             ));
             if (empty($units)) {
-                $postTypeObject = get_post_type_object(Unit::POST_TYPE);
+                $postTypeObject = get_post_type_object(Unit::getSlug());
                 printf("<div>%s</div>", esc_html($postTypeObject->labels->not_found));
                 return;
             }
 
             echo '<ul class="cat-checklist evw_unit-checklist">';
             foreach ($units as $unit) {
-                $identifier = Unit::POST_TYPE . '-' . $unit->ID;
+                $identifier = Unit::getSlug() . '-' . $unit->ID;
                 printf(
                     '<li id="%1$s"><label><input type="checkbox" name="evw_units[]" value="%2$d">%3$s</label></li>',
                     esc_attr($identifier),

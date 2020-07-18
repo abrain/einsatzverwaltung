@@ -9,6 +9,7 @@ use abrain\Einsatzverwaltung\Import\Sources\Csv;
 use abrain\Einsatzverwaltung\Import\Sources\WpEinsatz;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Utilities;
+use WP_Post;
 
 /**
  * Werkzeug für den Import von Einsatzberichten aus verschiedenen Quellen
@@ -218,7 +219,7 @@ class Tool
 
             echo '<fieldset>';
             foreach ($csvAttachments as $csvAttachment) {
-                /** @var \WP_Post $csvAttachment */
+                /** @var WP_Post $csvAttachment */
                 printf(
                     '<label><input type="radio" name="csv_file_id" value="%d">%s</label><br/>',
                     esc_attr($csvAttachment->ID),
@@ -326,7 +327,7 @@ class Tool
 
         // Import starten
         echo '<p>Die Daten werden eingelesen, das kann einen Moment dauern.</p>';
-        $importStatus = new ImportStatus(0);
+        $importStatus = new ImportStatus($this->utilities, 0);
         try {
             $this->helper->import($this->currentSource, $mapping, $importStatus);
         } catch (ImportException $e) {

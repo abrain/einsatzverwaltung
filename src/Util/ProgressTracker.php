@@ -1,7 +1,6 @@
 <?php
 namespace abrain\Einsatzverwaltung\Util;
 
-use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\Utilities;
 
 /**
@@ -27,11 +26,13 @@ class ProgressTracker
 
     /**
      * ProgressTracker constructor.
+     *
+     * @param Utilities $utilities
      * @param int $totalSteps
      */
-    public function __construct($totalSteps = 0)
+    public function __construct(Utilities $utilities, $totalSteps = 0)
     {
-        $this->utilities = Core::getInstance()->utilities;
+        $this->utilities = $utilities;
 
         $this->currentStep = 0;
 

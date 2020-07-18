@@ -12,6 +12,7 @@ use abrain\Einsatzverwaltung\Settings\Pages\Numbers;
 use abrain\Einsatzverwaltung\Settings\Pages\Report;
 use abrain\Einsatzverwaltung\Settings\Pages\ReportList;
 use abrain\Einsatzverwaltung\Settings\Pages\SubPage;
+use WP_Post;
 
 /**
  * Entry point for the plugin settings
@@ -87,7 +88,7 @@ class MainPage
         // Prüfen, ob Rewrite Slug von einer Seite genutzt wird
         $rewriteSlug = sanitize_title(get_option('einsatzvw_rewrite_slug'), 'einsatzberichte');
         $conflictingPage = get_page_by_path($rewriteSlug);
-        if ($conflictingPage instanceof \WP_Post) {
+        if ($conflictingPage instanceof WP_Post) {
             $pageEditLink = '<a href="' . get_edit_post_link($conflictingPage->ID) . '">' . $conflictingPage->post_title . '</a>';
             $message = sprintf('Die Seite %s und das Archiv der Einsatzberichte haben einen identischen Permalink (%s). &Auml;ndere einen der beiden Permalinks, um beide Seiten erreichen zu k&ouml;nnen.', $pageEditLink, $rewriteSlug);
             echo '<div class="error"><p>' . $message . '</p></div>';

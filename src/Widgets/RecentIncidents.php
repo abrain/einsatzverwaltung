@@ -3,7 +3,6 @@ namespace abrain\Einsatzverwaltung\Widgets;
 
 use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
-use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\ReportQuery;
 use abrain\Einsatzverwaltung\Types\Unit;
 use abrain\Einsatzverwaltung\Util\Formatter;
@@ -22,16 +21,11 @@ class RecentIncidents extends AbstractWidget
     private $formatter;
 
     /**
-     * @var Options
-     */
-    private $options;
-
-    /**
      * Register widget with WordPress.
-     * @param Options $options
+     *
      * @param Formatter $formatter
      */
-    public function __construct(Options $options, Formatter $formatter)
+    public function __construct(Formatter $formatter)
     {
         parent::__construct(
             'einsatzverwaltung_widget', // Base ID
@@ -41,7 +35,6 @@ class RecentIncidents extends AbstractWidget
                 'customize_selective_refresh' => true,
             ) // Args
         );
-        $this->options = $options;
         $this->formatter = $formatter;
     }
 
@@ -128,11 +121,15 @@ class RecentIncidents extends AbstractWidget
 
         if ($instance['zeigeDatum']) {
             $timestamp = $report->getTimeOfAlerting()->getTimestamp();
-            $datumsformat = $this->options->getDateFormat();
-            printf('<br><span class="einsatzdatum">%s</span>', date_i18n($datumsformat, $timestamp));
+            printf(
+                '<br><span class="einsatzdatum">%s</span>',
+                esc_html(date_i18n(get_option('date_format', 'd.m.Y'), $timestamp))
+            );
             if ($instance['zeigeZeit']) {
-                $zeitformat = $this->options->getTimeFormat();
-                printf(' | <span class="einsatzzeit">%s Uhr</span>', date_i18n($zeitformat, $timestamp));
+                printf(
+                    ' | <span class="einsatzzeit">%s Uhr</span>',
+                    esc_html(date_i18n(get_option('time_format', 'H:i'), $timestamp))
+                );
             }
         }
 
@@ -216,7 +213,7 @@ class RecentIncidents extends AbstractWidget
         );
 
         $this->echoChecklistBox(
-            get_post_type_object(Unit::POST_TYPE),
+            get_post_type_object(Unit::getSlug()),
             'units',
             __('Only show reports for these units:', 'einsatzverwaltung'),
             $selectedUnits,

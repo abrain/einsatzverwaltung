@@ -1,10 +1,20 @@
 <?php
 namespace abrain\Einsatzverwaltung\Types;
 
+use abrain\Einsatzverwaltung\CustomFields\Checkbox;
 use abrain\Einsatzverwaltung\CustomFields\NumberInput;
 use abrain\Einsatzverwaltung\CustomFields\PostSelector;
-use abrain\Einsatzverwaltung\TaxonomyCustomFields;
+use abrain\Einsatzverwaltung\CustomFields\UrlInput;
+use WP_REST_Response;
 use WP_Term;
+use abrain\Einsatzverwaltung\CustomFieldsRepository;
+use function array_key_exists;
+use function esc_html;
+use function esc_url;
+use function get_term_meta;
+use function get_the_title;
+use function strcasecmp;
+use function url_to_postid;
 
 /**
  * Description of the custom taxonomy 'Vehicle'
@@ -13,9 +23,38 @@ use WP_Term;
 class Vehicle implements CustomTaxonomy
 {
     /**
+     * Comparison function for vehicles
+     *
+     * @param WP_Term $vehicle1
+     * @param WP_Term $vehicle2
+     *
+     * @return int
+     */
+    public static function compareVehicles($vehicle1, $vehicle2)
+    {
+        $order1 = get_term_meta($vehicle1->term_id, 'vehicleorder', true);
+        $order2 = get_term_meta($vehicle2->term_id, 'vehicleorder', true);
+
+        if (empty($order1) && !empty($order2)) {
+            return 1;
+        }
+
+        if (!empty($order1) && empty($order2)) {
+            return -1;
+        }
+
+        // If no order is set on both or if they are equal, sort by name
+        if (empty($order1) && empty($order2) || $order1 == $order2) {
+            return strcasecmp($vehicle1->name, $vehicle2->name);
+        }
+
+        return ($order1 < $order2) ? -1 : 1;
+    }
+
+    /**
      * @return string
      */
-    public function getSlug()
+    public static function getSlug()
     {
         return 'fahrzeug';
     }
@@ -50,6 +89,7 @@ class Vehicle implements CustomTaxonomy
             'public' => true,
             'show_in_nav_menus' => false,
             'show_in_rest' => true,
+            'meta_box_cb' => false,
             'hierarchical' => true,
             'capabilities' => array(
                 'manage_terms' => 'edit_einsatzberichte',
@@ -61,20 +101,40 @@ class Vehicle implements CustomTaxonomy
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getRewriteSlug()
+    {
+        return self::getSlug();
+    }
+
+    /**
      * @inheritdoc
      */
-    public function registerCustomFields(TaxonomyCustomFields $taxonomyCustomFields)
+    public function registerCustomFields(CustomFieldsRepository $customFields)
     {
-        $taxonomyCustomFields->addPostSelector($this->getSlug(), new PostSelector(
+        $customFields->add($this, new PostSelector(
             'fahrzeugpid',
-            'Fahrzeugseite',
+            __('Page with further information', 'einsatzverwaltung'),
             'Seite mit mehr Informationen &uuml;ber das Fahrzeug. Wird in Einsatzberichten mit diesem Fahrzeug verlinkt.',
-            array('einsatz', 'attachment', 'ai1ec_event', 'tribe_events', 'pec-events')
+            array('page')
         ));
-        $taxonomyCustomFields->addNumberInput($this->getSlug(), new NumberInput(
+        $customFields->add($this, new UrlInput(
+            'vehicle_exturl',
+            __('External URL', 'einsatzverwaltung'),
+            __('You can specify a URL that points to more information about this vehicle. If set, this takes precedence over the page selected above.', 'einsatzverwaltung')
+        ));
+        $customFields->add($this, new NumberInput(
             'vehicleorder',
             'Reihenfolge',
-            'Optionale Angabe, mit der die Anzeigereihenfolge der Fahrzeuge beeinflusst werden kann. Fahrzeuge mit der kleineren Zahl werden zuerst angezeigt, anschlie&szlig;end diejenigen ohne Angabe bzw. dem Wert 0 in alphabetischer Reihenfolge.'
+            'Optionale Angabe, mit der die Anzeigereihenfolge der Fahrzeuge beeinflusst werden kann. Fahrzeuge mit der kleineren Zahl werden zuerst angezeigt, anschlie&szlig;end diejenigen ohne Angabe bzw. dem Wert 0. Haben mehrere Fahrzeuge den gleichen Wert, werden sie in alphabetischer Reihenfolge ausgegeben.'
+        ));
+        $customFields->add($this, new Checkbox(
+            'out_of_service',
+            __('Out of service', 'einsatzverwaltung'),
+            __('This vehicle is no longer in service', 'einsatzverwaltung'),
+            'Beim Bearbeiten von Einsatzberichten werden Fahrzeuge, die nicht außer Dienst sind, zuerst aufgelistet.',
+            '0'
         ));
     }
 
@@ -83,8 +143,24 @@ class Vehicle implements CustomTaxonomy
      */
     public function registerHooks()
     {
-        add_action("{$this->getSlug()}_pre_add_form", array($this, 'deprectatedHierarchyNotice'));
+        $taxonomySlug = self::getSlug();
+        add_action("{$taxonomySlug}_pre_add_form", array($this, 'deprectatedHierarchyNotice'));
         add_action('admin_menu', array($this, 'addBadgeToMenu'));
+
+        /**
+         * Prevent the Gutenberg Editor from creating a UI for this taxonomy, so we can use our own
+         * https://github.com/WordPress/gutenberg/issues/6912#issuecomment-428403380
+         */
+        add_filter('rest_prepare_taxonomy', function (WP_REST_Response $response, $taxonomy) {
+            if (self::getSlug() === $taxonomy->name) {
+                $response->data['visibility']['show_ui'] = false;
+            }
+            return $response;
+        }, 10, 2);
+
+        // Manipulate the columns of the term list after the automatically generated ones have been added
+        add_action("manage_edit-{$taxonomySlug}_columns", array($this, 'onCustomColumns'), 20);
+        add_filter("manage_{$taxonomySlug}_custom_column", array($this, 'onTaxonomyColumnContent'), 20, 3);
     }
 
     /**
@@ -106,7 +182,7 @@ class Vehicle implements CustomTaxonomy
         global $submenu;
         $termsWithParentCount = $this->getTermsWithParentCount();
         if ($termsWithParentCount > 0) {
-            $submenuKey = 'edit.php?post_type=' . Report::SLUG;
+            $submenuKey = 'edit.php?post_type=' . Report::getSlug();
             if (array_key_exists($submenuKey, $submenu)) {
                 $vehicleEntry = array_filter($submenu[$submenuKey], function ($entry) {
                     return $entry[2] === 'edit-tags.php?taxonomy=fahrzeug&amp;post_type=einsatz';
@@ -128,10 +204,61 @@ class Vehicle implements CustomTaxonomy
      */
     private function getTermsWithParentCount()
     {
-        $terms = get_terms(array('taxonomy' => $this->getSlug(), 'hide_empty' => false));
+        $terms = get_terms(array('taxonomy' => self::getSlug(), 'hide_empty' => false));
         $childTerms = array_filter($terms, function (WP_Term $term) {
             return $term->parent !== 0;
         });
         return count($childTerms);
+    }
+
+    /**
+     * Filters the columns shown in the WP_List_Table for this taxonomy.
+     *
+     * @param array $columns
+     *
+     * @return array
+     */
+    public function onCustomColumns($columns)
+    {
+        // Remove the column for the external URL. We'll combine it with the vehicle page column.
+        unset($columns['vehicle_exturl']);
+        // Rename the vehicle page column
+        $columns['fahrzeugpid'] = __('Linking', 'einsatzverwaltung');
+        return $columns;
+    }
+
+    /**
+     * Filters the content of the columns of the WP_List_Table for this taxonomy.
+     *
+     * @param string $content Content of the column that has been defined by the previous filters
+     * @param string $columnName Name of the column
+     * @param int $termId Term ID
+     *
+     * @return string
+     */
+    public function onTaxonomyColumnContent($content, $columnName, $termId)
+    {
+        // We only want to change the column of the vehicle page
+        if ($columnName !== 'fahrzeugpid') {
+            return $content;
+        }
+
+        $externalUrl = get_term_meta($termId, 'vehicle_exturl', true);
+        // If no external URL is set, there's nothing to change
+        if (empty($externalUrl)) {
+            return $content;
+        }
+
+        // The external URL takes precedence over the internal vehicle page, so we will return that
+
+        // Check if it is a local link after all so we can display the post title
+        $linkTitle = __('External URL', 'einsatzverwaltung');
+        $postId = url_to_postid($externalUrl);
+        if ($postId !== 0) {
+            $title = get_the_title($postId);
+            $linkTitle = empty($title) ? __('Internal URL', 'einsatzverwaltung') : $title;
+        }
+
+        return sprintf('<a href="%1$s">%2$s</a>', esc_url($externalUrl), esc_html($linkTitle));
     }
 }

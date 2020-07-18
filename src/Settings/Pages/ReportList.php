@@ -2,8 +2,8 @@
 
 namespace abrain\Einsatzverwaltung\Settings\Pages;
 
-use abrain\Einsatzverwaltung\Frontend\ReportList\Parameters as ReportListParameters;
-use abrain\Einsatzverwaltung\Frontend\ReportList\Renderer as ReportListRenderer;
+use abrain\Einsatzverwaltung\Frontend\ReportList\Column;
+use abrain\Einsatzverwaltung\Frontend\ReportList\ColumnRepository;
 use abrain\Einsatzverwaltung\Frontend\ReportList\Settings;
 
 /**
@@ -62,22 +62,34 @@ class ReportList extends SubPage
         );
     }
 
+    /**
+     * @param Column $column
+     */
+    private function echoDraggableColumn(Column $column)
+    {
+        printf(
+            '<li id="%s" class="evw-column"><span>%s</span></li>',
+            esc_attr($column->getIdentifier()),
+            esc_html($column->getNameForSettings())
+        );
+    }
+
     public function echoFieldColumns()
     {
-        $columns = ReportListRenderer::getListColumns();
-        $enabledColumnsString = ReportListParameters::sanitizeColumns(get_option('einsatzvw_list_columns', ''));
-        $enabledColumns = explode(',', $enabledColumnsString);
+        $columnRepository = ColumnRepository::getInstance();
+        $columnIdentifiers = explode(',', get_option('einsatzvw_list_columns', ''));
+        $enabledColumns = $columnRepository->getColumnsByIdentifier($columnIdentifiers);
+        $availableColumns = $columnRepository->getAvailableColumns();
 
         echo '<table id="columns-available"><tr><td style="width: 250px;">';
         echo '<span class="evw-area-title">Verf&uuml;gbare Spalten</span>';
         echo '<p class="description">Spaltennamen in unteres Feld ziehen, um sie auf der Seite anzuzeigen</p>';
         echo '</td><td class="columns"><ul>';
-        foreach ($columns as $colId => $colInfo) {
-            if (in_array($colId, $enabledColumns)) {
+        foreach ($availableColumns as $column) {
+            if (in_array($column, $enabledColumns)) {
                 continue;
             }
-            $name = array_key_exists('longName', $colInfo) ? $colInfo['longName'] : $colInfo['name'];
-            echo '<li id="' . $colId . '" class="evw-column"><span>' . $name . '</span></li>';
+            $this->echoDraggableColumn($column);
         }
         echo '</ul></td></tr></table>';
 
@@ -85,19 +97,13 @@ class ReportList extends SubPage
         echo '<span class="evw-area-title">Aktive Spalten</span>';
         echo '<p class="description">Die Reihenfolge kann ebenfalls durch Ziehen ge&auml;ndert werden</p>';
         echo '</td><td class="columns"><ul>';
-        foreach ($enabledColumns as $colId) {
-            if (!array_key_exists($colId, $columns)) {
-                continue;
-            }
-
-            $colInfo = $columns[$colId];
-            $name = array_key_exists('longName', $colInfo) ? $colInfo['longName'] : $colInfo['name'];
-            echo '<li id="' . $colId . '" class="evw-column"><span>' . $name . '</span></li>';
+        foreach ($enabledColumns as $column) {
+            $this->echoDraggableColumn($column);
         }
         echo '</ul></td></tr></table>';
         printf(
             '<input name="einsatzvw_list_columns" id="einsatzvw_list_columns" type="hidden" value="%s">',
-            esc_attr($enabledColumnsString)
+            esc_attr($columnRepository->getIdentifiers($enabledColumns))
         );
     }
 

@@ -2,7 +2,7 @@
 namespace abrain\Einsatzverwaltung\Types;
 
 use abrain\Einsatzverwaltung\CustomFields\TextInput;
-use abrain\Einsatzverwaltung\TaxonomyCustomFields;
+use abrain\Einsatzverwaltung\CustomFieldsRepository;
 
 /**
  * Description of the custom taxonomy 'Externes Einsatzmittel'
@@ -13,7 +13,7 @@ class ExtEinsatzmittel implements CustomTaxonomy
     /**
      * @return string
      */
-    public function getSlug()
+    public static function getSlug()
     {
         return 'exteinsatzmittel';
     }
@@ -62,11 +62,19 @@ class ExtEinsatzmittel implements CustomTaxonomy
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getRewriteSlug()
+    {
+        return self::getSlug();
+    }
+
+    /**
      * @inheritdoc
      */
-    public function registerCustomFields(TaxonomyCustomFields $taxonomyCustomFields)
+    public function registerCustomFields(CustomFieldsRepository $customFields)
     {
-        $taxonomyCustomFields->addTextInput($this->getSlug(), new TextInput(
+        $customFields->add($this, new TextInput(
             'url',
             'URL',
             'URL zu mehr Informationen &uuml;ber ein externes Einsatzmittel, beispielsweise dessen Webseite.'

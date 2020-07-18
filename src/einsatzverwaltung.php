@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: Incident Reports
+Plugin Name: Einsatzverwaltung
 Plugin URI: https://einsatzverwaltung.abrain.de
 Description: Public incident reports for fire brigades and other rescue services
 Version: 1.7.0

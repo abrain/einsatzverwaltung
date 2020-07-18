@@ -1,11 +1,11 @@
 === Einsatzverwaltung ===
 Contributors: abrain
 Donate link: https://einsatzverwaltung.abrain.de/unterstuetzen/
-Tags: Feuerwehr, Hilfsorganisation, Öffentlichkeitsarbeit
+Tags: Feuerwehr, Hilfsorganisation, fire brigade, rescue services, EMS
 Requires at least: 4.7.0
 Tested up to: 5.4
 Requires PHP: 5.6.0
-Stable tag: 1.6.7
+Stable tag: 1.7.0
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -13,25 +13,13 @@ Public incident reports for fire brigades and other rescue services
 
 == Description ==
 
-Dieses Plugin f&uuml;gt WordPress eine neue Beitragsart "Einsatzbericht" hinzu. Diese Einsatzberichte werden wie gew&ouml;hnliche WordPress-Beitr&auml;ge erstellt, es k&ouml;nnen aber zus&auml;tzliche Informationen wie Alarmzeit, Art des Einsatzes, eingesetzte Fahrzeuge und vieles mehr angegeben werden. Zudem stellt das Plugin verschiedene M&ouml;glichkeiten zur Darstellung der Einsatzberichte zur Verf&uuml;gung.
+This plugin lets you create incident reports to inform the public about your work. Although initially developed for fire brigades, it is also used by emergency medical services, mountain rescue services, water rescue services, and others.
 
-Die prim&auml;re Zielgruppe des Plugins sind Feuerwehren im deutschsprachigen Raum, es ist aber genauso geeignet f&uuml;r Rettungsdienste, die Wasserwacht, das THW und sonstige Hilfsorganisationen, die ihre Eins&auml;tze im Internet pr&auml;sentieren m&ouml;chten.
+You can assign vehicles, units, type of incident, types of alerting, and external resources to each report. There are shortcodes and widgets to list the reports, optionally filtered by unit. The reports have a default layout, but you can also get creative with the templating feature. Reports can be imported and exported, creating and editing reports can be restricted to certain user roles.
 
-__Dieses Plugin steht in keiner Verbindung zu einsatzverwaltung.eu!__
+Significant parts of the plugin are still only available in German. Any help with translating those parts into English would be very welcome.
 
-Funktionen im &Uuml;berblick:
-
-* Einsatzberichte als vollwertige Beitr&auml;ge ver&ouml;ffentlichen
-* Information &uuml;ber Einsatzart, eingesetzte Fahrzeuge, Dauer und vieles mehr
-* Unterscheidung von mehreren Einheiten
-* Shortcodes zum Einbinden von Einsatzlisten und Einsatzzahlen
-* Widget zeigt die aktuellsten Einsatzberichte
-* Import aus wp-einsatz und CSV-Dateien
-* Export als CSV und JSON
-* Newsfeed f&uuml;r Einsatzberichte
-* Pflege der Einsatzberichte kann auf bestimmte Benutzerrollen beschr&auml;nkt werden
-
-= Aknowledgements =
+= Acknowledgements =
 
 Uses Font Awesome by Dave Gandy - http://fontawesome.io
 
@@ -43,27 +31,38 @@ Uses Font Awesome by Dave Gandy - http://fontawesome.io
 
 == Installation ==
 
-The plugin does not require any setup but I recommend to take a look at the settings before you start publishing. Especially those in the Advanced section should not be changed inconsiderately later on.
+The plugin does not require any setup but it is recommended to take a look at the settings before you start publishing. Especially those in the Advanced section should not be changed inconsiderately later on.
 
 == Frequently Asked Questions ==
 
-= Ist das hier das WordPress-Plugin für einsatzverwaltung.eu? =
+= Is this the WordPress plugin for einsatzverwaltung.eu? =
 
-Nein, dieses Plugin hat nichts mit einsatzverwaltung.eu zu tun.
+No, this plugin has no affiliation with einsatzverwaltung.eu.
 
-= Wo finde ich die Anleitung bzw. Dokumentation? =
+= Is there a manual? =
 
-Die Dokumentation gibt es [hier](https://einsatzverwaltung.abrain.de/dokumentation/), wenn etwas fehlt oder missverst&auml;ndlich erkl&auml;rt ist, bitte melden.
+Yes, there is more [documentation](https://einsatzverwaltung.abrain.de/dokumentation/) on our website.
 
 = Where should I send feature requests and bug reports to? =
 
 Ideally, you check the issues on [GitHub](https://github.com/abrain/einsatzverwaltung/issues) if this has been addressed before. If not, feel free to open a new issue. You can also post a new topic on the support forum instead.
 
-= Sind das hier die ganzen FAQ? =
+= Are there more FAQ? =
 
-Nein, mehr gibt es [hier](https://einsatzverwaltung.abrain.de/faq/).
+Yes, you can find them on [our website](https://einsatzverwaltung.abrain.de/faq/).
 
 == Changelog ==
+
+= 1.7.0 =
+* Vehicles: Can be marked as out of service so they are initially hidden when composing reports
+* Vehicles: Custom sort order is respected when composing or editing reports
+* Vehicles: Can now be linked with a page from the same site or an arbitrary URL
+* Units: Can now be linked with a page from the same site or an arbitrary URL
+* Templates: Added placeholder for end date and time of an incident
+* Templates: Placeholder for yearly archive permalink can be used in widget footer
+* Report list: Made the entire row clickable on mobile devices
+* Improved compatibility with Essential Addons for Elementor
+* Requires PHP 5.6 or newer
 
 = 1.6.7 =
 * Fix: Calculation of the duration could fail, if the time zone was specified as offset from UTC

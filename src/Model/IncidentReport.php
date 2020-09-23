@@ -6,6 +6,7 @@ use abrain\Einsatzverwaltung\Types\Vehicle;
 use DateTime;
 use WP_Post;
 use WP_Term;
+use function array_filter;
 use function get_post;
 use function get_post_type;
 use function error_log;
@@ -349,7 +350,10 @@ class IncidentReport
     public function getUnits()
     {
         $unitIds = get_post_meta($this->getPostId(), '_evw_unit');
-        return array_map('get_post', $unitIds);
+        $units = array_map('get_post', $unitIds);
+        return array_filter($units, function ($unit) {
+            return !empty($unit);
+        });
     }
 
     /**

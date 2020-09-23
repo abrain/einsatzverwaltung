@@ -3,6 +3,7 @@ namespace abrain\Einsatzverwaltung;
 
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Types\Report;
+use abrain\Einsatzverwaltung\Types\Unit;
 use DateTime;
 use WP_Post;
 use wpdb;
@@ -15,6 +16,7 @@ use function delete_post_meta;
 use function error_log;
 use function filter_input;
 use function get_post_meta;
+use function get_post_type;
 use function update_post_meta;
 use function wp_verify_nonce;
 use const FILTER_REQUIRE_ARRAY;
@@ -397,5 +399,21 @@ class Data
         // Save the external URL
         $url = filter_input(INPUT_POST, 'unit_exturl', FILTER_SANITIZE_URL);
         update_post_meta($postId, 'unit_exturl', $url);
+    }
+
+    /**
+     * Gets called right before the removal of a Post from the database
+     *
+     * @param int $postId
+     */
+    public function onBeforeDeletePost($postId)
+    {
+        global $wpdb;
+
+        // If a Unit gets deleted, remove the relations in postmeta
+        // NEEDS_WP5.5 Use hook after_delete_post as it passes the post object (allows for check of post type even after deletion).
+        if (get_post_type($postId) === Unit::getSlug()) {
+            $wpdb->delete($wpdb->postmeta, array('meta_key' => '_evw_unit', 'meta_value' => $postId), array('%d'));
+        }
     }
 }

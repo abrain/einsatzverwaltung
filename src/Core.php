@@ -12,7 +12,7 @@ use function add_action;
 class Core
 {
     const VERSION = '1.7.0';
-    const DB_VERSION = 50;
+    const DB_VERSION = 51;
 
     /**
      * Statische Variable, um die aktuelle (einzige!) Instanz dieser Klasse zu halten
@@ -135,6 +135,7 @@ class Core
         add_action('transition_post_status', array($this->data, 'onTransitionPostStatus'), 10, 3);
         $unitSlug = Unit::getSlug();
         add_action("save_post_$unitSlug", array($this->data, 'saveUnitData'), 10, 2);
+        add_action('before_delete_post', array($this->data, 'onBeforeDeletePost'));
 
         new Frontend($this->options, $this->formatter);
         new ShortcodeInitializer($this->data, $this->formatter, $this->permalinkController);

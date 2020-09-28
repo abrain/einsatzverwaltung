@@ -10,6 +10,8 @@ use function array_filter;
 use function get_post;
 use function get_post_type;
 use function error_log;
+use function intval;
+use function is_numeric;
 
 /**
  * Datenmodellklasse für Einsatzberichte
@@ -372,6 +374,19 @@ class IncidentReport
         usort($vehicles, array(Vehicle::class, 'compareVehicles'));
 
         return $vehicles;
+    }
+
+    /**
+     * @return int The weight of the report (i. e. how many reports it represents)
+     */
+    public function getWeight()
+    {
+        $weight = $this->getPostMeta('einsatz_weight');
+        if (empty($weight) || !is_numeric($weight)) {
+            return 1;
+        }
+
+        return intval($weight);
     }
 
     /**

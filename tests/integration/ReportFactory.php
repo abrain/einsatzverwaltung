@@ -18,6 +18,7 @@ class ReportFactory extends WP_UnitTest_Factory_For_Post
         'einsatz_incidentNumber' => '',
         'einsatz_mannschaft' => '',
         'einsatz_special' => 0,
+        'einsatz_weight' => 1,
     );
 
     /**

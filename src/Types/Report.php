@@ -4,6 +4,7 @@ namespace abrain\Einsatzverwaltung\Types;
 use abrain\Einsatzverwaltung\CustomFieldsRepository;
 use abrain\Einsatzverwaltung\Model\ReportAnnotation;
 use abrain\Einsatzverwaltung\ReportAnnotationRepository;
+use function register_meta;
 
 /**
  * Description of the custom post type for the reports
@@ -254,6 +255,16 @@ class Report implements CustomPostType
             'single' => true,
             'sanitize_callback' => array('Utilities', 'sanitizeCheckbox'),
             'show_in_rest' => false
+        ));
+
+        register_meta('post', 'einsatz_weight', array(
+            'object_subtype' => self::getSlug(),
+            'type' => 'integer',
+            'description' => 'Anzahl von Einsätzen, die durch diesen Bericht repräsentiert werden',
+            'single' => true,
+            'default' => '1',
+            'sanitize_callback' => 'absint',
+            'show_in_rest' => true
         ));
     }
 

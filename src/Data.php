@@ -7,6 +7,7 @@ use abrain\Einsatzverwaltung\Types\Unit;
 use DateTime;
 use WP_Post;
 use wpdb;
+use function absint;
 use function add_post_meta;
 use function array_diff;
 use function array_key_exists;
@@ -148,6 +149,11 @@ class Data
             $updateArgs['meta_input'][$metaField] = empty($value) ? '' : $value;
         }
 
+        // Save weight
+        $weight = filter_input(INPUT_POST, 'einsatz_weight', FILTER_SANITIZE_NUMBER_INT);
+        $weight = absint($weight);
+        $updateArgs['meta_input']['einsatz_weight'] = empty($weight) ? '1' : $weight;
+
         // Vermerke speichern (werden explizit deaktiviert, wenn sie nicht gesetzt wurden)
         $annotations = array('einsatz_fehlalarm', 'einsatz_hasimages', 'einsatz_special');
         foreach ($annotations as $annotation) {
@@ -198,7 +204,7 @@ class Data
                 if ($expectedNumber != $actualNumber) {
                     $this->setSequenceNumber($report->getPostId(), $expectedNumber);
                 }
-                $expectedNumber++;
+                $expectedNumber += $report->getWeight();
             }
         }
     }

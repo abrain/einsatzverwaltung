@@ -24,6 +24,7 @@ use function get_terms;
 use function get_the_terms;
 use function in_array;
 use function printf;
+use function sprintf;
 use function str_replace;
 use function usort;
 
@@ -157,10 +158,11 @@ class ReportEditScreen extends EditScreen
         $einsatzort = $report->getLocation();
         $einsatzleiter = $report->getIncidentCommander();
         $mannschaftsstaerke = $report->getWorkforce();
+        $weight = $report->getWeight();
 
         $names = $this->getEinsatzleiterNamen();
         printf('<input type="hidden" id="einsatzleiter_used_values" value="%s" />', esc_attr(implode(',', $names)));
-        echo '<table><tbody>';
+        echo '<div style="display: flex; flex-wrap: nowrap; justify-content: space-between"><table><tbody>';
 
         if (get_option('einsatzverwaltung_incidentnumbers_auto', '0') === '1') {
             $numberText = $report->isDraft() ? __('Will be generated upon publication', 'einsatzverwaltung') : $nummer;
@@ -189,7 +191,7 @@ class ReportEditScreen extends EditScreen
             'JJJJ-MM-TT hh:mm'
         );
 
-        echo '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';
+        echo '</tbody></table><table><tbody>';
 
         $this->echoInputText(
             'Einsatzort',
@@ -210,6 +212,18 @@ class ReportEditScreen extends EditScreen
         );
 
         echo '</tbody></table>';
+
+        echo '<div>';
+        printf('<label for="einsatz_weight">%1$s</label>&nbsp;', 'Anzahl Eins&auml;tze:');
+        printf(
+            '<input type="number" id="einsatz_weight" name="einsatz_weight" value="%1$s" min="1" size="3"/>',
+            esc_attr($weight)
+        );
+        printf(
+            '<p class="description">%1$s</p>',
+            'Bei Großereignissen (z. B. Unwetter) kann ein einzelner Einsatzbericht stellvertretend für mehrere Einsätze stehen. Die Nummerierung wird entsprechend angepasst.'
+        );
+        echo '</div></div>';
     }
 
     /**

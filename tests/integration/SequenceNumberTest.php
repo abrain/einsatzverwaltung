@@ -2,6 +2,8 @@
 namespace abrain\Einsatzverwaltung;
 
 use WP_UnitTestCase;
+use function date;
+use function strtotime;
 
 /**
  * Class SequenceNumberTest
@@ -157,5 +159,18 @@ class SequenceNumberTest extends WP_UnitTestCase
         foreach ($reportIds as $index => $reportId) {
             $this->assertSequenceNumber($index + 1, $reportId);
         }
+    }
+
+    public function testSkipNumbersAccordingToWeight()
+    {
+        $reportIds = array();
+        $reportIds[] = $this->reportFactory->create(array('post_date' => date('Y-m-d H:i:s', strtotime('1 hour ago'))));
+        $reportIds[] = $this->reportFactory->create(array('post_date' => date('Y-m-d H:i:s', strtotime('30 minutes ago')), 'meta_input' => array('einsatz_weight' => 3)));
+        $reportIds[] = $this->reportFactory->create(array('post_date' => date('Y-m-d H:i:s', strtotime('10 minutes ago'))));
+
+        // Make sure the weight has been taken into account
+        $this->assertSequenceNumber(1, $reportIds[0]);
+        $this->assertSequenceNumber(2, $reportIds[1]);
+        $this->assertSequenceNumber(5, $reportIds[2]);
     }
 }

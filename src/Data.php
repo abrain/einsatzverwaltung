@@ -3,9 +3,11 @@ namespace abrain\Einsatzverwaltung;
 
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Types\Report;
+use abrain\Einsatzverwaltung\Types\Unit;
 use DateTime;
 use WP_Post;
 use wpdb;
+use function absint;
 use function add_post_meta;
 use function array_diff;
 use function array_key_exists;
@@ -15,6 +17,7 @@ use function delete_post_meta;
 use function error_log;
 use function filter_input;
 use function get_post_meta;
+use function get_post_type;
 use function update_post_meta;
 use function wp_verify_nonce;
 use const FILTER_REQUIRE_ARRAY;
@@ -146,6 +149,11 @@ class Data
             $updateArgs['meta_input'][$metaField] = empty($value) ? '' : $value;
         }
 
+        // Save weight
+        $weight = filter_input(INPUT_POST, 'einsatz_weight', FILTER_SANITIZE_NUMBER_INT);
+        $weight = absint($weight);
+        $updateArgs['meta_input']['einsatz_weight'] = empty($weight) ? '1' : $weight;
+
         // Vermerke speichern (werden explizit deaktiviert, wenn sie nicht gesetzt wurden)
         $annotations = array('einsatz_fehlalarm', 'einsatz_hasimages', 'einsatz_special');
         foreach ($annotations as $annotation) {
@@ -196,7 +204,7 @@ class Data
                 if ($expectedNumber != $actualNumber) {
                     $this->setSequenceNumber($report->getPostId(), $expectedNumber);
                 }
-                $expectedNumber++;
+                $expectedNumber += $report->getWeight();
             }
         }
     }
@@ -397,5 +405,21 @@ class Data
         // Save the external URL
         $url = filter_input(INPUT_POST, 'unit_exturl', FILTER_SANITIZE_URL);
         update_post_meta($postId, 'unit_exturl', $url);
+    }
+
+    /**
+     * Gets called right before the removal of a Post from the database
+     *
+     * @param int $postId
+     */
+    public function onBeforeDeletePost($postId)
+    {
+        global $wpdb;
+
+        // If a Unit gets deleted, remove the relations in postmeta
+        // NEEDS_WP5.5 Use hook after_delete_post as it passes the post object (allows for check of post type even after deletion).
+        if (get_post_type($postId) === Unit::getSlug()) {
+            $wpdb->delete($wpdb->postmeta, array('meta_key' => '_evw_unit', 'meta_value' => $postId), array('%d'));
+        }
     }
 }

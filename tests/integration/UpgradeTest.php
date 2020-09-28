@@ -3,7 +3,10 @@ namespace abrain\Einsatzverwaltung;
 
 use WP_UnitTestCase;
 use wpdb;
+use function add_post_meta;
+use function array_map;
 use function get_permalink;
+use function get_post_meta;
 use function get_term_meta;
 use function is_wp_error;
 use function update_option;
@@ -450,5 +453,29 @@ class UpgradeTest extends WP_UnitTestCase
         update_option('einsatzvw_version', '1.7.0');
         $this->runUpgrade(41, 50);
         $this->assertFalse(get_option('einsatzvw_version'));
+    }
+
+    public function testUpgrade171RemoveDeletedUnitRelations()
+    {
+        // Associate a report with two units, of which one does not exist
+        $reportId = wp_insert_post(array('post_type' => 'einsatz', 'post_title' => 'Some Report'));
+        $unit1Id = wp_insert_post(array('post_type' => 'evw_unit', 'post_title' => 'Unit 1', 'post_status' => 'publish'));
+        add_post_meta($reportId, '_evw_unit', $unit1Id);
+        add_post_meta($reportId, '_evw_unit', 999999);
+
+        // Also create a post that has _evw_unit postmeta entries, just in case some other plugin does that
+        $postId = wp_insert_post(array('post_type' => 'post', 'post_title' => 'Some Post'));
+        add_post_meta($postId, '_evw_unit', $unit1Id);
+        add_post_meta($postId, '_evw_unit', 999999);
+
+        $this->runUpgrade(50, 51);
+
+        // The report should no longer have a reference to the deleted unit
+        $unitIds = array_map('intval', get_post_meta($reportId, '_evw_unit'));
+        $this->assertEquals(array($unit1Id), $unitIds);
+
+        // The post should still have its postmeta entries as the update must not touch anything except the einsatz CPT
+        $postMeta = array_map('intval', get_post_meta($postId, '_evw_unit'));
+        $this->assertEquals(array($unit1Id, 999999), $postMeta);
     }
 }

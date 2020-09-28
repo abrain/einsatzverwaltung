@@ -3,9 +3,9 @@ Contributors: abrain
 Donate link: https://einsatzverwaltung.abrain.de/unterstuetzen/
 Tags: Feuerwehr, Hilfsorganisation, fire brigade, rescue services, EMS
 Requires at least: 4.7.0
-Tested up to: 5.4
+Tested up to: 5.5
 Requires PHP: 5.6.0
-Stable tag: 1.7.0
+Stable tag: 1.7.1
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -52,6 +52,10 @@ Ideally, you check the issues on [GitHub](https://github.com/abrain/einsatzverwa
 Yes, you can find them on [our website](https://einsatzverwaltung.abrain.de/faq/).
 
 == Changelog ==
+
+= 1.7.1 =
+* Fix: Associations with reports were not removed when a Unit got deleted
+* Adjust numbering automatically, if reports represent more than one incident
 
 = 1.7.0 =
 * Vehicles: Can be marked as out of service so they are initially hidden when composing reports

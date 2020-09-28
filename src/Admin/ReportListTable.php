@@ -9,6 +9,7 @@ use abrain\Einsatzverwaltung\Types\Unit;
 use WP_Post;
 use WP_Post_Type;
 use WP_Term;
+use function sprintf;
 
 /**
  * Bestimmt das Aussehen der Auflistung von Einsatzberichten im Adminbereich
@@ -133,7 +134,12 @@ class ReportListTable
     {
         switch ($columnId) {
             case 'e_nummer':
-                return $report->getNumber();
+                $numberString = $report->getNumber();
+                $weight = $report->getWeight();
+                if ($weight > 1) {
+                    $numberString .= sprintf('<br>(%d Eins&auml;tze)', $weight);
+                }
+                return $numberString;
             case 'e_einsatzende':
                 $timeOfEnding = $report->getTimeOfEnding();
                 if (!empty($timeOfEnding)) {

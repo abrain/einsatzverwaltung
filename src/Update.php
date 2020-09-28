@@ -1,6 +1,8 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
+use abrain\Einsatzverwaltung\Types\Report;
+use abrain\Einsatzverwaltung\Types\Unit;
 use WP_Error;
 use wpdb;
 use function delete_option;
@@ -86,6 +88,10 @@ class Update
 
         if ($currentDbVersion < 50 && $targetDbVersion >= 50) {
             $this->upgrade170();
+        }
+
+        if ($currentDbVersion < 51 && $targetDbVersion >= 51) {
+            $this->upgrade171();
         }
     }
 
@@ -449,6 +455,22 @@ class Update
         delete_option('einsatzvw_version');
 
         update_option('einsatzvw_db_version', 50);
+    }
+
+    private function upgrade171()
+    {
+        global $wpdb;
+
+        /*
+         * Remove associations with nonexistant Units from Reports (and only from Reports)
+         */
+        $query = $wpdb->prepare(
+            "DELETE FROM $wpdb->postmeta WHERE meta_key = %s AND meta_value NOT IN (SELECT ID FROM $wpdb->posts WHERE post_type = %s AND post_status = %s) AND post_id IN (SELECT ID FROM $wpdb->posts WHERE post_type = %s)",
+            '_evw_unit', Unit::getSlug(), 'publish', Report::getSlug()
+        );
+        $wpdb->query($query);
+
+        update_option('einsatzvw_db_version', 51);
     }
 
     /**

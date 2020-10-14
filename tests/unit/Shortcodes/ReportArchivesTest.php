@@ -41,13 +41,13 @@ class ReportArchivesTest extends UnitTestCase
      * Generates the expected markup for a certain year
      *
      * @param int $year
-     * @param bool $strong
+     * @param bool $currentYear
      *
      * @return string
      */
-    private function getAnchor($year, $strong = false)
+    private function getAnchor($year, $currentYear = false)
     {
-        $format = $strong ? '<a href="%s"><strong>%d</strong></a>' : '<a href="%s">%d</a>';
+        $format = $currentYear ? '<a href="%s" aria-current="page"><strong>%d</strong></a>' : '<a href="%s">%d</a>';
         return sprintf($format, self::FAKE_URL, $year);
     }
 

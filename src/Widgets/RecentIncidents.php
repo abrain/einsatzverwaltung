@@ -7,6 +7,7 @@ use abrain\Einsatzverwaltung\ReportQuery;
 use abrain\Einsatzverwaltung\Types\Unit;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use abrain\Einsatzverwaltung\Utilities;
+use function get_queried_object_id;
 
 /**
  * WordPress-Widget für die letzten X Einsätze
@@ -112,9 +113,14 @@ class RecentIncidents extends AbstractWidget
             printf('<div class="annotation-icon-bar">%s</div>', $annotationIconBar->render($report));
         }
 
+        if (get_queried_object_id() === $report->getPostId()) {
+            $format = '<a href="%s" rel="bookmark" aria-current="page" class="einsatzmeldung">%s</a>';
+        } else {
+            $format = '<a href="%s" rel="bookmark" class="einsatzmeldung">%s</a>';
+        }
         $meldung = get_the_title($report->getPostId());
         printf(
-            '<a href="%s" rel="bookmark" class="einsatzmeldung">%s</a>',
+            $format,
             esc_attr(get_permalink($report->getPostId())),
             (empty($meldung) ? "(kein Titel)" : $meldung)
         );

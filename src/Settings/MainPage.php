@@ -104,11 +104,16 @@ class MainPage
             esc_attr__('Secondary menu', 'einsatzverwaltung')
         );
         foreach ($this->subPages as $subPage) {
+            if ($this->isCurrentSubPage($subPage)) {
+                $format = '<a href="?page=%s&tab=%s" class="%s" aria-current="page">%s</a>';
+            } else {
+                $format = '<a href="?page=%s&tab=%s" class="%s">%s</a>';
+            }
             printf(
-                '<a href="?page=%s&tab=%s" class="%s">%s</a>',
+                $format,
                 self::EVW_SETTINGS_SLUG,
                 $subPage->identifier,
-                $currentSubPage === $subPage ? "nav-tab nav-tab-active" : "nav-tab",
+                $this->isCurrentSubPage($subPage) ? "nav-tab nav-tab-active" : "nav-tab",
                 $subPage->title
             );
         }
@@ -141,6 +146,16 @@ class MainPage
         }
 
         return $this->subPages[$tab];
+    }
+
+    /**
+     * @param SubPage $subPage
+     *
+     * @return bool Returns true if the supplied sub page matches the currently displayed sub page
+     */
+    private function isCurrentSubPage(SubPage $subPage)
+    {
+        return $subPage === $this->getCurrentSubPage();
     }
 
     /**

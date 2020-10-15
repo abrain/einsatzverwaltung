@@ -5,7 +5,7 @@ Tags: Feuerwehr, Hilfsorganisation, fire brigade, rescue services, EMS
 Requires at least: 4.7.0
 Tested up to: 5.5
 Requires PHP: 5.6.0
-Stable tag: 1.7.1
+Stable tag: 1.7.2
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -52,6 +52,12 @@ Ideally, you check the issues on [GitHub](https://github.com/abrain/einsatzverwa
 Yes, you can find them on [our website](https://einsatzverwaltung.abrain.de/faq/).
 
 == Changelog ==
+
+= 1.7.2 =
+* Report list and Templates: Show sequential numbers as range if the report represents more than one incident
+* Fix: Shortcode `reportcount` did not take into account if reports represented more than one incident
+* Fix: Incident numbers would not have been correctly updated when changing the format
+* Accessibility: Add aria-current attribute to links to the currently displayed page
 
 = 1.7.1 =
 * Fix: Associations with reports were not removed when a Unit got deleted

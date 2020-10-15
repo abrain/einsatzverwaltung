@@ -5,6 +5,8 @@ use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use DateTime;
+use function intval;
+use function sprintf;
 
 /**
  * Tabellarische Übersicht für Einsatzberichte
@@ -377,6 +379,11 @@ class Renderer
                 break;
             case 'seqNum':
                 $cellContent = $report->getSequentialNumber();
+                if ($report->getWeight() > 1) {
+                    $firstNumber = intval($cellContent);
+                    $lastNumber = $firstNumber + $report->getWeight() - 1;
+                    $cellContent = sprintf('%1$d&nbsp;- %2$d', $firstNumber, $lastNumber);
+                }
                 break;
             case 'annotationImages':
                 $cellContent = AnnotationIconBar::getInstance()->render($report, array('images'));

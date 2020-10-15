@@ -2,7 +2,9 @@
 
 namespace abrain\Einsatzverwaltung\Shortcodes;
 
+use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\ReportQuery;
+use function array_reduce;
 
 /**
  * Shows a number of incident reports for the shortcode [reportcount]
@@ -46,7 +48,10 @@ class ReportCount extends AbstractShortcode
         $reportQuery->setUnits($this->getIntegerList($attributes, 'units'));
 
         $incidentReports = $reportQuery->getReports();
-        return sprintf('%d', count($incidentReports));
+        $reportCount = array_reduce($incidentReports, function ($sum, IncidentReport $report) {
+            return $sum + $report->getWeight();
+        }, 0);
+        return sprintf('%d', $reportCount);
     }
 
     /**

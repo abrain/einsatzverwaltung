@@ -80,11 +80,17 @@ class ReportArchives extends AbstractShortcode
     {
         $anchors = array();
         foreach ($yearsWithReports as $currentYear) {
-            $format = $currentYear === $queriedYear ? '<strong>%d</strong>' : '%d';
-            $text = sprintf($format, $currentYear);
+            if ($currentYear === $queriedYear) {
+                $textFormat = '<strong>%d</strong>';
+                $anchorFormat = '<a href="%s" aria-current="page">%s</a>';
+            } else {
+                $textFormat = '%d';
+                $anchorFormat = '<a href="%s">%s</a>';
+            }
 
+            $text = sprintf($textFormat, $currentYear);
             $anchors[] = sprintf(
-                '<a href="%s">%s</a>',
+                $anchorFormat,
                 esc_url($this->permalinkController->getYearArchiveLink($currentYear)),
                 $text
             );

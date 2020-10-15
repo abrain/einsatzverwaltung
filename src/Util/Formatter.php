@@ -17,6 +17,7 @@ use function esc_url;
 use function get_permalink;
 use function get_term_link;
 use function get_term_meta;
+use function intval;
 use function join;
 use function sanitize_post_field;
 use function sprintf;
@@ -184,6 +185,11 @@ class Formatter
                 break;
             case '%seqNum%':
                 $replace = $incidentReport->getSequentialNumber();
+                if ($incidentReport->getWeight() > 1) {
+                    $firstNumber = intval($replace);
+                    $lastNumber = $firstNumber + $incidentReport->getWeight() - 1;
+                    $replace = sprintf('%1$d&nbsp;- %2$d', $firstNumber, $lastNumber);
+                }
                 break;
             case '%annotations%':
                 $replace = $this->annotationIconBar->render($incidentReport);

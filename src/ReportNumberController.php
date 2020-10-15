@@ -79,7 +79,7 @@ class ReportNumberController
     private function formatEinsatznummer($jahr, $nummer)
     {
         $stellen = self::sanitizeEinsatznummerStellen(get_option('einsatzvw_einsatznummer_stellen'));
-        $lfdvorne = (get_option('einsatzvw_einsatznummer_lfdvorne', false) === '1');
+        $lfdvorne = (get_option('einsatzvw_einsatznummer_lfdvorne', false) == '1');
         $format = $lfdvorne ? '%2$s%1$s' : '%1$s%2$s';
         return sprintf($format, $jahr, str_pad($nummer, $stellen, "0", STR_PAD_LEFT));
     }

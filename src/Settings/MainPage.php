@@ -12,7 +12,19 @@ use abrain\Einsatzverwaltung\Settings\Pages\Numbers;
 use abrain\Einsatzverwaltung\Settings\Pages\Report;
 use abrain\Einsatzverwaltung\Settings\Pages\ReportList;
 use abrain\Einsatzverwaltung\Settings\Pages\SubPage;
+use abrain\Einsatzverwaltung\Types\Report as ReportType;
 use WP_Post;
+use function esc_html;
+use function esc_html__;
+use function esc_url;
+use function get_page_by_path;
+use function get_permalink;
+use function get_post_type_archive_link;
+use function home_url;
+use function parse_url;
+use function str_replace;
+use function strpos;
+use const PHP_URL_PATH;
 
 /**
  * Entry point for the plugin settings
@@ -79,19 +91,24 @@ class MainPage
         if (!current_user_can('manage_options')) {
             wp_die(__('You do not have sufficient permissions to manage options for this site.'));
         }
-        ?>
 
-        <div class="wrap">
-        <h1>Einstellungen &rsaquo; Einsatzverwaltung</h1>
+        echo '<div class="wrap">';
+        echo '<h1>Einstellungen &rsaquo; Einsatzverwaltung</h1>';
 
-        <?php
-        // Prüfen, ob Rewrite Slug von einer Seite genutzt wird
-        $rewriteSlug = sanitize_title(get_option('einsatzvw_rewrite_slug'), 'einsatzberichte');
-        $conflictingPage = get_page_by_path($rewriteSlug);
+        // Check if any page uses the same permalink as the archive
+        $conflictingPage = $this->getConflictingPage();
         if ($conflictingPage instanceof WP_Post) {
-            $pageEditLink = '<a href="' . get_edit_post_link($conflictingPage->ID) . '">' . $conflictingPage->post_title . '</a>';
-            $message = sprintf('Die Seite %s und das Archiv der Einsatzberichte haben einen identischen Permalink (%s). &Auml;ndere einen der beiden Permalinks, um beide Seiten erreichen zu k&ouml;nnen.', $pageEditLink, $rewriteSlug);
-            echo '<div class="error"><p>' . $message . '</p></div>';
+            $pageEditLink = sprintf(
+                '<a href="%1$s">%2$s</a>',
+                esc_url(get_edit_post_link($conflictingPage->ID)),
+                esc_html($conflictingPage->post_title)
+            );
+            $message = sprintf(
+                esc_html__('The page %1$s uses the same permalink as the archive (%2$s). Please change the permalink of the page.', 'einsatzverwaltung'),
+                $pageEditLink,
+                sprintf('<code>%s</code>', esc_html(get_permalink($conflictingPage)))
+            );
+            printf('<div class="error"><p>%s</p></div>', $message);
         }
 
         $currentSubPage = $this->getCurrentSubPage();
@@ -130,6 +147,25 @@ class MainPage
             submit_button();
             echo '</form>';
         }
+    }
+
+    /**
+     * Finds a page that uses the same permalink as the archive
+     *
+     * @return WP_Post|null
+     */
+    private function getConflictingPage()
+    {
+        $reportArchiveUrl = get_post_type_archive_link(ReportType::getSlug());
+
+        $homeUrl = home_url();
+        if (strpos($reportArchiveUrl, $homeUrl) === 0) {
+            $reportArchivePath = str_replace($homeUrl, '', $reportArchiveUrl);
+        } else {
+            $reportArchivePath = parse_url($reportArchiveUrl, PHP_URL_PATH);
+        }
+
+        return get_page_by_path($reportArchivePath);
     }
 
     /**

@@ -4,7 +4,7 @@ Donate link: https://einsatzverwaltung.abrain.de/unterstuetzen/
 Tags: Feuerwehr, Hilfsorganisation, fire brigade, rescue services, EMS
 Requires at least: 5.1.0
 Tested up to: 5.5
-Requires PHP: 5.6.0
+Requires PHP: 7.1.0
 Stable tag: 1.7.2
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html

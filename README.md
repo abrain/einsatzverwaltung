@@ -28,10 +28,8 @@ Der PHP-Code wird gem&auml;&szlig; dem Coding Style Guide [PSR-2](https://www.ph
 Klassen werden automatisch geladen, die Dateien sind nach [PSR-4](https://www.php-fig.org/psr/psr-4/) zu organisieren.
 
 ### Mindestvoraussetzungen
-* PHP: 5.6.0
+* PHP: 7.1
 * WordPress: 5.1
-
-Auch wenn PHP 5.3 vorausgesetzt und derzeit noch als Minimum erhalten wird, werden die automatisierten Tests nur mit den [aktuellen PHP-Versionen](https://secure.php.net/supported-versions.php) durchgef&uuml;hrt.
 
 ### Social Media
 

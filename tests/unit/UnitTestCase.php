@@ -3,13 +3,13 @@ namespace abrain\Einsatzverwaltung;
 
 use Brain\Monkey;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Base class for unit testing, takes care of mocking many WordPress functions
  * @package abrain\Einsatzverwaltung
  */
-class UnitTestCase extends PHPUnit_Framework_TestCase
+class UnitTestCase extends TestCase
 {
     use MockeryPHPUnitIntegration;
 

@@ -13,7 +13,7 @@ branches:
   - /^feature\/[-\w]+$/
 
 php:
-  - '7.2'
+  - '7.4'
 
 env:
   - WP_VERSION=5.1.8 WP_MULTISITE=0
@@ -35,7 +35,6 @@ jobs:
   include:
   - stage: validate
     name: "Basic Checks"
-    php: '7.4'
     before_script: skip
     script: ./vendor/bin/phpunit -c phpunit-checks.xml --no-coverage
   - stage: validate
@@ -45,7 +44,6 @@ jobs:
     script: ./vendor/bin/phpunit -c phpunit.xml --no-coverage
   - stage: validate
     name: 'Latest versions'
-    php: '7.3'
     before_install: skip
     before_script:
       - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
@@ -57,11 +55,9 @@ jobs:
   - stage: test
     name: 'Latest versions, pretty permalinks'
     env: WP_VERSION=latest WP_MULTISITE=0 WP_TESTS_PERMALINK=PRETTY
-    php: '7.3'
   - stage: test
     name: 'Latest versions, PATHINFO permalinks'
     env: WP_VERSION=latest WP_MULTISITE=0 WP_TESTS_PERMALINK=PATHINFO
-    php: '7.3'
   allow_failures:
     - env: WP_VERSION=nightly WP_MULTISITE=0
   fast_finish: true

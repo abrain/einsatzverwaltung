@@ -19,6 +19,12 @@
     "source": "https://github.com/abrain/einsatzverwaltung",
     "docs": "https://einsatzverwaltung.abrain.de/dokumentation/"
   },
+  "scripts": {
+    "test": [
+      "Composer\\Config::disableProcessTimeout",
+      "phpunit"
+    ]
+  },
   "config": {
     "platform": {
       "php": "7.1"

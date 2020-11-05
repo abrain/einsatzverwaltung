@@ -1,27 +1,26 @@
 <phpunit
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/5.7/phpunit.xsd"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/7.5/phpunit.xsd"
     bootstrap="tests/unit/bootstrap.php"
-    backupGlobals="false"
-    beStrictAboutTestsThatDoNotTestAnything="true"
     beStrictAboutCoversAnnotation="true"
+    beStrictAboutTodoAnnotatedTests="true"
     colors="true"
     forceCoversAnnotation="true"
     >
     <testsuites>
         <testsuite name="unit">
-            <directory suffix="Test.php">./tests/unit/</directory>
+            <directory>./tests/unit/</directory>
         </testsuite>
     </testsuites>
 
     <filter>
-        <whitelist processUncoveredFilesFromWhitelist="false">
+        <whitelist>
             <directory suffix=".php">./src</directory>
         </whitelist>
     </filter>
 
     <logging>
-        <log type="coverage-text" target="php://stdout" showUncoveredFiles="false"/>
+        <log type="coverage-text" target="php://stdout"/>
         <log type="coverage-clover" target="build/logs/clover.xml"/>
     </logging>
 </phpunit>

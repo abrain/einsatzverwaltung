@@ -1,33 +1,49 @@
 <?php
 namespace abrain\Einsatzverwaltung\Import\Sources;
 
-use abrain\Einsatzverwaltung\Utilities;
+use abrain\Einsatzverwaltung\Exceptions\ImportCheckException;
+use abrain\Einsatzverwaltung\Exceptions\ImportException;
+use function sprintf;
 
 /**
  * Abstraktion für Importquellen
  */
 abstract class AbstractSource
 {
-    /**
-     * @var Utilities
-     */
-    protected $utilities;
     protected $actionOrder = array();
     protected $args = array();
     protected $autoMatchFields = array();
-    protected $internalFields = array();
-    protected $problematicFields = array();
     protected $cachedFields;
+
+    /**
+     * @var string
+     */
+    protected $description = '';
+
+    /**
+     * @var string
+     */
+    protected $identifier = '';
+
+    protected $internalFields = array();
+
+    /**
+     * @var string
+     */
+    protected $name = '';
+
+    protected $problematicFields = array();
 
     /**
      * AbstractSource constructor.
      *
-     * @param Utilities $utilities
      */
-    abstract public function __construct($utilities);
+    abstract public function __construct();
 
     /**
-     * @return boolean True, wenn Voraussetzungen stimmen, ansonsten false
+     * Checks if the preconditions for importing from this source are met.
+     *
+     * @throws ImportCheckException
      */
     abstract public function checkPreconditions();
 
@@ -37,7 +53,7 @@ abstract class AbstractSource
      *
      * @param array $nextAction Die nächste Action
      */
-    public function echoExtraFormFields($nextAction)
+    public function echoExtraFormFields(array $nextAction)
     {
         if (empty($nextAction)) {
             return;
@@ -61,13 +77,16 @@ abstract class AbstractSource
      *
      * @return string Beschreibung der Importquelle
      */
-    abstract public function getDescription();
+    public function getDescription()
+    {
+        return $this->description;
+    }
 
     /**
-     * @param $action
+     * @param string $action
      * @return string
      */
-    public function getActionAttribute($action)
+    public function getActionAttribute(string $action)
     {
         return $this->getIdentifier() . ':' . $action;
     }
@@ -79,7 +98,7 @@ abstract class AbstractSource
      *
      * @return array|bool Das Array der Action oder false, wenn es keines für $slug gibt
      */
-    public function getAction($slug)
+    public function getAction(string $slug)
     {
         if (empty($slug)) {
             return false;
@@ -114,6 +133,7 @@ abstract class AbstractSource
      * Felder abgefragt.
      *
      * @return array
+     * @throws ImportException
      */
     abstract public function getEntries($fields);
 
@@ -141,15 +161,19 @@ abstract class AbstractSource
      *
      * @return string Eindeutiger Bezeichner der Importquelle
      */
-    abstract public function getIdentifier();
+    public function getIdentifier()
+    {
+        return $this->identifier;
+    }
 
     /**
      * Gibt den Wert für das name-Attribut eines Formularelements zurück
      *
      * @param string $field Bezeichner des Felds
+     *
      * @return string Eindeutiger Name bestehend aus Bezeichnern der Importquelle und des Felds
      */
-    public function getInputName($field)
+    public function getInputName(string $field)
     {
         $fieldId = array_search($field, $this->getFields());
         return $this->getIdentifier() . '-field' . $fieldId;
@@ -160,6 +184,7 @@ abstract class AbstractSource
      * @param array $ownFields Felder der Einsatzverwaltung
      *
      * @return array
+     * @throws ImportException
      */
     public function getMapping($sourceFields, $ownFields)
     {
@@ -172,7 +197,7 @@ abstract class AbstractSource
                     if (array_key_exists($ownField, $ownFields)) {
                         $mapping[$sourceField] = $ownField;
                     } else {
-                        $this->utilities->printWarning("Unbekanntes Feld: $ownField");
+                        throw new ImportException(sprintf(__('Unknown field: %s', 'einsatzverwaltung'), $ownField));
                     }
                 }
             }
@@ -188,7 +213,10 @@ abstract class AbstractSource
      *
      * @return string Name der Importquelle
      */
-    abstract public function getName();
+    public function getName()
+    {
+        return $this->name;
+    }
 
     /**
      * Gibt die nächste Action der Importquelle zurück
@@ -197,7 +225,7 @@ abstract class AbstractSource
      *
      * @return array|bool Ein Array, das die nächste Action beschreibt, oder false, wenn es keine weitere gibt
      */
-    public function getNextAction($currentAction)
+    public function getNextAction(array $currentAction)
     {
         if (empty($this->actionOrder)) {
             return false;

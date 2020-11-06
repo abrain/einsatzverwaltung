@@ -1,17 +1,15 @@
 <?php
 namespace abrain\Einsatzverwaltung\Import\Sources;
 
+use abrain\Einsatzverwaltung\Exceptions\ImportCheckException;
 use abrain\Einsatzverwaltung\Utilities;
+use Exception;
 
 /**
  * Importiert Einsatzberichte aus einer CSV-Datei
  */
 class Csv extends AbstractSource
 {
-    /**
-     * @var Utilities
-     */
-    protected $utilities;
     private $dateFormats = array('d.m.Y', 'd.m.y', 'Y-m-d', 'm/d/Y', 'm/d/y');
     private $timeFormats = array('H:i', 'G:i', 'H:i:s', 'G:i:s');
     private $csvFilePath;
@@ -22,11 +20,12 @@ class Csv extends AbstractSource
     /**
      * Csv constructor.
      *
-     * @param Utilities $utilities
      */
-    public function __construct($utilities)
+    public function __construct()
     {
-        $this->utilities = $utilities;
+        $this->description = 'Importiert Einsatzberichte aus einer CSV-Datei.';
+        $this->identifier = 'evw_csv';
+        $this->name = 'CSV';
 
         $this->actionOrder = array(
             array(
@@ -51,7 +50,7 @@ class Csv extends AbstractSource
     }
 
     /**
-     * @return boolean True, wenn Voraussetzungen stimmen, ansonsten false
+     * @inheritDoc
      */
     public function checkPreconditions()
     {
@@ -64,33 +63,28 @@ class Csv extends AbstractSource
 
         $attachmentId = $this->args['csv_file_id'];
         if (empty($attachmentId)) {
-            $this->utilities->printError('Keine Datei ausgew&auml;hlt');
-            return false;
+            throw new ImportCheckException('Keine Datei ausgew&auml;hlt');
         }
 
         if (!is_numeric($attachmentId)) {
-            $this->utilities->printError('Attachment ID ist keine Zahl');
-            return false;
+            throw new ImportCheckException('Attachment ID ist keine Zahl');
         }
 
         $csvFilePath = get_attached_file($attachmentId);
         if (empty($csvFilePath)) {
-            $this->utilities->printError(sprintf('Konnte Attachment mit ID %d nicht finden', $attachmentId));
-            return false;
+            throw new ImportCheckException(sprintf('Konnte Attachment mit ID %d nicht finden', $attachmentId));
         }
 
         $this->csvFilePath = $csvFilePath;
         if (!file_exists($csvFilePath)) {
-            $this->utilities->printError('Datei existiert nicht');
-            return false;
+            throw new ImportCheckException('Datei existiert nicht');
         }
 
-        $readFile = $this->readFile(0);
-        if (false === $readFile) {
-            return false;
+        try {
+            $this->readFile(0);
+        } catch (Exception $e) {
+            throw new ImportCheckException($e->getMessage());
         }
-
-        return true;
     }
 
     /**
@@ -131,16 +125,6 @@ class Csv extends AbstractSource
         }
 
         return $this->args['import_date_format'];
-    }
-
-    /**
-     * Gibt die Beschreibung der Importquelle zurück
-     *
-     * @return string Beschreibung der Importquelle
-     */
-    public function getDescription()
-    {
-        return 'Importiert Einsatzberichte aus einer CSV-Datei.';
     }
 
     /**
@@ -195,26 +179,6 @@ class Csv extends AbstractSource
     }
 
     /**
-     * Gibt den eindeutigen Bezeichner der Importquelle zurück
-     *
-     * @return string Eindeutiger Bezeichner der Importquelle
-     */
-    public function getIdentifier()
-    {
-        return 'evw_csv';
-    }
-
-    /**
-     * Gibt den Namen der Importquelle zurück
-     *
-     * @return string Name der Importquelle
-     */
-    public function getName()
-    {
-        return 'CSV';
-    }
-
-    /**
      * @return string
      */
     public function getTimeFormat()
@@ -232,6 +196,7 @@ class Csv extends AbstractSource
      * @param array $requestedFields
      *
      * @return array|bool
+     * @throws Exception
      */
     private function readFile($numLines = null, $requestedFields = array())
     {
@@ -245,8 +210,7 @@ class Csv extends AbstractSource
 
         $handle = fopen($this->csvFilePath, 'r');
         if (empty($handle)) {
-            $this->utilities->printError('Konnte Datei nicht öffnen');
-            return false;
+            throw new Exception('Konnte Datei nicht öffnen');
         }
 
         if ($numLines === 0) {

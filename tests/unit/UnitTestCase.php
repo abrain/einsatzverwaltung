@@ -2,6 +2,7 @@
 namespace abrain\Einsatzverwaltung;
 
 use Brain\Monkey;
+use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
 
@@ -24,6 +25,11 @@ class UnitTestCase extends TestCase
         Monkey\Functions\when('_n')->alias(function ($single, $plural, $number) {
             return $number === 1 ? $single : $plural;
         });
+
+        // Fake the global database object
+        global $wpdb;
+        $wpdb = Mockery::mock('\wpdb');
+        $wpdb->prefix = 'wpunit_';
     }
 
     protected function tearDown()

@@ -9,6 +9,7 @@ if (! defined('ABSPATH')) {
 }
 
 require __DIR__ . '/../../vendor/autoload.php';
+require __DIR__ . '/constants.php';
 require __DIR__ . '/UnitTestCase.php';
 
 spl_autoload_register(function ($class) {

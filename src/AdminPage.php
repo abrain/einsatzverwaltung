@@ -28,6 +28,11 @@ abstract class AdminPage
     abstract protected function echoPageContent();
 
     /**
+     * @return string
+     */
+    abstract protected function getMenuSlug();
+
+    /**
      * Prints an error message.
      *
      * @param string $message The message text.
@@ -69,16 +74,14 @@ abstract class AdminPage
 
     /**
      * Registers this page under the Tools menu.
-     *
-     * @param string $menuSlug
      */
-    public function registerAsToolPage(string $menuSlug)
+    public function registerAsToolPage()
     {
         add_management_page(
             $this->pageTitle,
             esc_html($this->pageTitle),
             'manage_options',
-            $menuSlug,
+            $this->getMenuSlug(),
             array($this, 'render')
         );
     }

@@ -17,6 +17,14 @@ class Page extends AdminPage
         parent::__construct('Einsatzberichte importieren');
     }
 
+    /**
+     * @inheritDoc
+     */
+    protected function getMenuSlug()
+    {
+        return 'einsatzvw-tool-import';
+    }
+
     protected function echoPageContent()
     {
         echo '<p>Content</p>';

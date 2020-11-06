@@ -17,12 +17,13 @@ class UnitTestCase extends TestCase
     {
         parent::setUp();
         Monkey\setUp();
-        Monkey\Functions\when('__')->returnArg(1);
-        Monkey\Functions\when('_e')->echoArg(1);
+        Monkey\Functions\stubTranslationFunctions();
+        Monkey\Functions\stubEscapeFunctions();
+
+        // Plurals are not yet covered by Brain Monkey
         Monkey\Functions\when('_n')->alias(function ($single, $plural, $number) {
             return $number === 1 ? $single : $plural;
         });
-        Monkey\Functions\when('esc_url')->returnArg(1);
     }
 
     protected function tearDown()

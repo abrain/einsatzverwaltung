@@ -38,15 +38,7 @@ class Page extends AdminPage
      */
     public function __construct()
     {
-        parent::__construct('Einsatzberichte importieren');
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected function getMenuSlug()
-    {
-        return 'einsatzvw-tool-import';
+        parent::__construct('Einsatzberichte importieren', 'einsatzvw-tool-import');
     }
 
     protected function echoPageContent()

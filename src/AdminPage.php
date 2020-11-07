@@ -15,22 +15,24 @@ abstract class AdminPage
     /**
      * @var string
      */
+    private $menuSlug;
+
+    /**
+     * @var string
+     */
     private $pageTitle;
 
     /**
      * @param string $pageTitle
+     * @param string $menuSlug
      */
-    public function __construct(string $pageTitle)
+    public function __construct(string $pageTitle, string $menuSlug)
     {
         $this->pageTitle = $pageTitle;
+        $this->menuSlug = $menuSlug;
     }
 
     abstract protected function echoPageContent();
-
-    /**
-     * @return string
-     */
-    abstract protected function getMenuSlug();
 
     /**
      * Prints an error message.
@@ -81,7 +83,7 @@ abstract class AdminPage
             $this->pageTitle,
             esc_html($this->pageTitle),
             'manage_options',
-            $this->getMenuSlug(),
+            $this->menuSlug,
             array($this, 'render')
         );
     }

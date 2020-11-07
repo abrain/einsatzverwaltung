@@ -1,12 +1,9 @@
 <?php
 namespace abrain\Einsatzverwaltung\Import;
 
-use abrain\Einsatzverwaltung\Data;
 use abrain\Einsatzverwaltung\Exceptions\ImportException;
 use abrain\Einsatzverwaltung\Exceptions\ImportPreparationException;
 use abrain\Einsatzverwaltung\Import\Sources\AbstractSource;
-use abrain\Einsatzverwaltung\Import\Sources\Csv;
-use abrain\Einsatzverwaltung\Import\Sources\WpEinsatz;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Utilities;
 use WP_Post;
@@ -16,24 +13,12 @@ use WP_Post;
  */
 class Tool
 {
-    const EVW_TOOL_IMPORT_SLUG = 'einsatzvw-tool-import';
-
-    private $sources = array();
-
     /**
      * @var AbstractSource
      */
     private $currentSource;
 
-    /**
-     * @var array
-     */
-    private $currentAction;
 
-    /**
-     * @var array
-     */
-    private $nextAction;
 
     /**
      * @var Helper
@@ -46,67 +31,6 @@ class Tool
     private $utilities;
 
     /**
-     * @var Data
-     */
-    private $data;
-
-    /**
-     * Konstruktor
-     *
-     * @param Utilities $utilities
-     * @param Data $data
-     */
-    public function __construct($utilities, $data)
-    {
-        $this->utilities = $utilities;
-        $this->data = $data;
-
-        $this->loadSources();
-    }
-
-    /**
-     * Fügt das Werkzeug zum Menü hinzu
-     */
-    public function addToolToMenu()
-    {
-        add_management_page(
-            'Einsatzberichte importieren',
-            'Einsatzberichte importieren',
-            'manage_options',
-            self::EVW_TOOL_IMPORT_SLUG,
-            array($this, 'renderToolPage')
-        );
-    }
-
-    /**
-     * @param AbstractSource $source
-     * @param string $action
-     */
-    private function checkNonce($source, $action)
-    {
-        check_admin_referer($this->getNonceAction($source, $action));
-    }
-
-    /**
-     * @param AbstractSource $source
-     * @param string $action
-     * @return string
-     */
-    private function getNonceAction($source, $action)
-    {
-        return $source->getIdentifier() . '_' . $action;
-    }
-
-    private function loadSources()
-    {
-        $wpEinsatz = new WpEinsatz($this->utilities);
-        $this->sources[$wpEinsatz->getIdentifier()] = $wpEinsatz;
-
-        $csv = new Csv($this->utilities);
-        $this->sources[$csv->getIdentifier()] = $csv;
-    }
-
-    /**
      * Generiert den Inhalt der Werkzeugseite
      */
     public function renderToolPage()
@@ -115,48 +39,6 @@ class Tool
         $this->helper->metaFields = IncidentReport::getMetaFields();
         $this->helper->taxonomies = IncidentReport::getTerms();
         $this->helper->postFields = IncidentReport::getPostFields();
-
-        echo '<div class="wrap">';
-        echo '<h1>' . 'Einsatzberichte importieren' . '</h1>';
-
-        $aktion = null;
-        if (array_key_exists('aktion', $_POST)) {
-            list($identifier, $aktion) = explode(':', $_POST['aktion']);
-            if (array_key_exists($identifier, $this->sources)) {
-                $this->currentSource = $this->sources[$identifier];
-            }
-        }
-
-        if (null == $this->currentSource || !($this->currentSource instanceof AbstractSource) || empty($aktion)) {
-            echo '<p>Dieses Werkzeug importiert Einsatzberichte aus verschiedenen Quellen.</p>';
-
-            echo '<ul>';
-            /** @var AbstractSource $source */
-            foreach ($this->sources as $source) {
-                $firstAction = $source->getFirstAction();
-
-                echo '<li>';
-                echo '<h2>' . $source->getName() . '</h2>';
-                echo '<p class="description">' . $source->getDescription() . '</p>';
-                if (false !== $firstAction) {
-                    echo '<form method="post">';
-                    echo '<input type="hidden" name="aktion" value="' . $source->getActionAttribute($firstAction['slug']) . '" />';
-                    wp_nonce_field($this->getNonceAction($source, $firstAction['slug']));
-                    submit_button($firstAction['button_text'], 'secondary', 'submit', false);
-                    echo '</form>';
-                }
-                echo '</li>';
-            }
-            echo '</ul>';
-            return;
-        }
-
-        // Nonce überprüfen
-        $this->checkNonce($this->currentSource, $aktion);
-
-        // Variablen für die Ablaufsteuerung
-        $this->currentAction = $this->currentSource->getAction($aktion);
-        $this->nextAction = $this->currentSource->getNextAction($this->currentAction);
 
         // Einstellungen an die Importquelle übergeben
         if (array_key_exists('args', $this->currentAction) && is_array($this->currentAction['args'])) {
@@ -243,8 +125,6 @@ class Tool
             submit_button($this->nextAction['button_text']);
             echo '</form>';
         }
-
-        echo '</div>';
     }
 
     private function analysisPage()

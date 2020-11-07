@@ -241,6 +241,16 @@ abstract class AbstractSource
     }
 
     /**
+     * @param string $action
+     *
+     * @return string
+     */
+    public function getNonce(string $action)
+    {
+        return sprintf("%s_%s", $this->getIdentifier(), $action);
+    }
+
+    /**
      * @return array
      */
     public function getProblematicFields()

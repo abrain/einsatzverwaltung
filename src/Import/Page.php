@@ -8,7 +8,9 @@ use abrain\Einsatzverwaltung\Import\Sources\WpEinsatz;
 use function __;
 use function array_key_exists;
 use function check_admin_referer;
+use function esc_attr;
 use function esc_html;
+use function esc_html__;
 use function explode;
 use function filter_input;
 use function submit_button;
@@ -55,7 +57,7 @@ class Page extends AdminPage
         }
 
         if (null == $this->currentSource || !($this->currentSource instanceof AbstractSource) || empty($action)) {
-            printf('<p>%s</p>', __('You can import incident reports from the following sources:', 'einsatzverwaltung'));
+            printf('<p>%s</p>', esc_html__('You can import incident reports from the following sources:', 'einsatzverwaltung'));
 
             echo '<ul>';
             foreach ($this->sources as $source) {
@@ -66,7 +68,7 @@ class Page extends AdminPage
                 printf('<p class="description">%s</p>', esc_html($source->getDescription()));
                 if (false !== $firstAction) {
                     echo '<form method="post">';
-                    printf('<input type="hidden" name="action" value="%s"/>', $source->getActionAttribute($firstAction['slug']));
+                    printf('<input type="hidden" name="action" value="%s"/>', esc_attr($source->getActionAttribute($firstAction['slug'])));
                     wp_nonce_field($source->getNonce($firstAction['slug']));
                     submit_button($firstAction['button_text'], 'secondary', 'submit', false);
                     echo '</form>';

@@ -1,4 +1,10 @@
-# Einsatzverwaltung
+# Einsatzverwaltung Altenerding
+
+Dies ist eine modifizierte Version des Einsatzverwaltung-Plugins für die Feuerwehr Altenerding.
+Änderungen:
+- Andere Einsatz-Ansicht inkl. Map-View
+
+
 ## Plugin zur Verwaltung von Feuerwehreins&auml;tzen
 
 ![Wordpress Plugin: Required WP Version](https://img.shields.io/wordpress/plugin/wp-version/einsatzverwaltung.svg)

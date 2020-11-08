@@ -4,6 +4,7 @@ Dies ist eine modifizierte Version des Einsatzverwaltung-Plugins für die Feuerw
 Änderungen:
 - Andere Einsatz-Ansicht inkl. Map-View
 
+# Original Content:
 
 ## Plugin zur Verwaltung von Feuerwehreins&auml;tzen
 

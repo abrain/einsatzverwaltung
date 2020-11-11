@@ -12,6 +12,7 @@ use const ARRAY_A;
  * @covers \abrain\Einsatzverwaltung\Import\Sources\AbstractSource
  * @covers \abrain\Einsatzverwaltung\Import\Sources\WpEinsatz
  * @package abrain\Einsatzverwaltung\Import\Sources
+ * @uses \abrain\Einsatzverwaltung\Import\Step
  */
 class WpEinsatzTest extends UnitTestCase
 {

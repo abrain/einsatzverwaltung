@@ -3,6 +3,7 @@ namespace abrain\Einsatzverwaltung\Import\Sources;
 
 use abrain\Einsatzverwaltung\Exceptions\ImportCheckException;
 use abrain\Einsatzverwaltung\Exceptions\ImportException;
+use abrain\Einsatzverwaltung\Import\Step;
 use function __;
 use function esc_html;
 use function join;
@@ -32,20 +33,8 @@ class WpEinsatz extends AbstractSource
             'Datum' => 'post_date'
         );
 
-        $this->actionOrder = array(
-            array(
-                'slug' => 'analysis',
-                'name' => 'Analyse',
-                'button_text' => 'Datenbank analysieren',
-                'args' => array()
-            ),
-            array(
-                'slug' => 'import',
-                'name' => 'Import',
-                'button_text' => 'Import starten',
-                'args' => array()
-            )
-        );
+        $this->steps[] = new Step('analysis', 'Analyse', 'Datenbank analysieren');
+        $this->steps[] = new Step('import', 'Import', 'Import starten');
     }
 
     /**

@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
  * @covers \abrain\Einsatzverwaltung\Import\Sources\AbstractSource
  * @covers \abrain\Einsatzverwaltung\Import\Sources\Csv
  * @package abrain\Einsatzverwaltung\Import\Sources
+ * @uses \abrain\Einsatzverwaltung\Import\Step
  */
 class CsvTest extends TestCase
 {

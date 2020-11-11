@@ -3,6 +3,8 @@ namespace abrain\Einsatzverwaltung\Import\Sources;
 
 use abrain\Einsatzverwaltung\Exceptions\ImportCheckException;
 use abrain\Einsatzverwaltung\Exceptions\ImportException;
+use abrain\Einsatzverwaltung\Import\Step;
+use function esc_attr;
 use function sprintf;
 
 /**
@@ -10,11 +12,9 @@ use function sprintf;
  */
 abstract class AbstractSource
 {
-    protected $actionOrder = array();
     protected $args = array();
     protected $autoMatchFields = array();
     protected $cachedFields;
-
     /**
      * @var string
      */
@@ -35,6 +35,11 @@ abstract class AbstractSource
     protected $problematicFields = array();
 
     /**
+     * @var Step[]
+     */
+    protected $steps = array();
+
+    /**
      * AbstractSource constructor.
      *
      */
@@ -48,14 +53,16 @@ abstract class AbstractSource
     abstract public function checkPreconditions();
 
     /**
+     * TODO: The source shouldn't echo anything, but return its requirements in a standardized way
+     *
      * Generiert für Argumente, die in der nächsten Action wieder gebraucht werden, Felder, die in das Formular
      * eingebaut werden können, damit diese mitgenommen werden
      *
-     * @param array $nextAction Die nächste Action
+     * @param Step $nextStep
      */
-    public function echoExtraFormFields(array $nextAction)
+    public function echoExtraFormFields(Step $nextStep)
     {
-        if (empty($nextAction)) {
+        if (empty($nextStep)) {
             return;
         }
 
@@ -65,9 +72,9 @@ abstract class AbstractSource
         echo ' /> Einsatzberichte sofort ver&ouml;ffentlichen</label>';
         echo '<p class="description">Das Setzen dieser Option verl&auml;ngert die Importzeit deutlich, Benutzung auf eigene Gefahr. Standardm&auml;&szlig;ig werden die Berichte als Entwurf importiert.</p>';
 
-        foreach ($nextAction['args'] as $arg) {
+        foreach ($nextStep->getArguments() as $arg) {
             if (array_key_exists($arg, $this->args)) {
-                echo '<input type="hidden" name="'.$arg.'" value="' . $this->args[$arg] . '" />';
+                printf('<input type="hidden" name="%s" value="%s" />', esc_attr($arg), esc_attr($this->args[$arg]));
             }
         }
     }
@@ -83,30 +90,31 @@ abstract class AbstractSource
     }
 
     /**
-     * @param string $action
+     * @param Step $step
+     *
      * @return string
      */
-    public function getActionAttribute(string $action)
+    public function getActionAttribute(Step $step)
     {
-        return $this->getIdentifier() . ':' . $action;
+        return sprintf("%s:%s", $this->getIdentifier(), $step->getSlug());
     }
 
     /**
-     * Gibt das Action-Array für $slug zurück
+     * Gets a Step object based on its slug.
      *
-     * @param string $slug Slug der Action
+     * @param string $slug Slug of the step
      *
-     * @return array|bool Das Array der Action oder false, wenn es keines für $slug gibt
+     * @return Step|false The Step object or false if there is no step for this slug
      */
-    public function getAction(string $slug)
+    public function getStep(string $slug)
     {
         if (empty($slug)) {
             return false;
         }
 
-        foreach ($this->actionOrder as $action) {
-            if ($action['slug'] == $slug) {
-                return $action;
+        foreach ($this->steps as $step) {
+            if ($step->getSlug() == $slug) {
+                return $step;
             }
         }
 
@@ -143,17 +151,17 @@ abstract class AbstractSource
     abstract public function getFields();
 
     /**
-     * Gibt die erste Action der Importquelle zurück
+     * Returns the first step of the import source.
      *
-     * @return array|bool Ein Array, das die erste Action beschreibt, oder false, wenn es keine Action gibt
+     * @return Step|false The Step object representing the first step or false if there are no steps defined.
      */
-    public function getFirstAction()
+    public function getFirstStep()
     {
-        if (empty($this->actionOrder)) {
+        if (empty($this->steps)) {
             return false;
         }
 
-        return $this->actionOrder[0];
+        return $this->steps[0];
     }
 
     /**
@@ -221,33 +229,39 @@ abstract class AbstractSource
     /**
      * Gibt die nächste Action der Importquelle zurück
      *
-     * @param array $currentAction Array, das die aktuelle Action beschreibt
+     * @param Step $currentStep Array, das die aktuelle Action beschreibt
      *
-     * @return array|bool Ein Array, das die nächste Action beschreibt, oder false, wenn es keine weitere gibt
+     * @return Step|false Ein Array, das die nächste Action beschreibt, oder false, wenn es keine weitere gibt
      */
-    public function getNextAction(array $currentAction)
+    public function getNextStep(Step $currentStep)
     {
-        if (empty($this->actionOrder)) {
+        if (empty($this->steps)) {
             return false;
         }
 
-        $key = array_search($currentAction, $this->actionOrder);
+        $key = array_search($currentStep, $this->steps);
 
-        if ($key + 1 >= count($this->actionOrder)) {
+        // Make sure the given step was found in the list of steps
+        if ($key === false) {
             return false;
         }
 
-        return $this->actionOrder[$key + 1];
+        // Return false if this was the last step
+        if ($key + 1 >= count($this->steps)) {
+            return false;
+        }
+
+        return $this->steps[$key + 1];
     }
 
     /**
-     * @param string $action
+     * @param Step $step
      *
      * @return string
      */
-    public function getNonce(string $action)
+    public function getNonce(Step $step)
     {
-        return sprintf("%s_%s", $this->getIdentifier(), $action);
+        return sprintf("%s_%s", $this->getIdentifier(), $step->getSlug());
     }
 
     /**

@@ -2,6 +2,7 @@
 namespace abrain\Einsatzverwaltung\Import\Sources;
 
 use abrain\Einsatzverwaltung\Exceptions\ImportCheckException;
+use abrain\Einsatzverwaltung\Import\Step;
 use abrain\Einsatzverwaltung\Utilities;
 use Exception;
 
@@ -27,26 +28,9 @@ class Csv extends AbstractSource
         $this->identifier = 'evw_csv';
         $this->name = 'CSV';
 
-        $this->actionOrder = array(
-            array(
-                'slug' => 'selectcsvfile',
-                'name' => 'Dateiauswahl',
-                'button_text' => 'Datei ausw&auml;hlen',
-                'args' => array()
-            ),
-            array(
-                'slug' => 'analysis',
-                'name' => 'Analyse',
-                'button_text' => 'Datei analysieren',
-                'args' => array('csv_file_id', 'has_headlines', 'delimiter')
-            ),
-            array(
-                'slug' => 'import',
-                'name' => 'Import',
-                'button_text' => 'Import starten',
-                'args' => array('csv_file_id', 'has_headlines', 'delimiter')
-            )
-        );
+        $this->steps[] = new Step('selectcsvfile', 'Dateiauswahl', 'Datei ausw&auml;hlen');
+        $this->steps[] = new Step('analysis', 'Analyse', 'Datei analysieren', ['csv_file_id', 'has_headlines', 'delimiter']);
+        $this->steps[] = new Step('import', 'Import', 'Import starten', ['csv_file_id', 'has_headlines', 'delimiter']);
     }
 
     /**

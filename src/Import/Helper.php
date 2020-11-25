@@ -49,6 +49,10 @@ class Helper
     {
         $this->utilities = $utilities;
         $this->data = $data;
+
+        $this->metaFields = IncidentReport::getMetaFields();
+        $this->taxonomies = IncidentReport::getTerms();
+        $this->postFields = IncidentReport::getPostFields();
     }
 
     /**

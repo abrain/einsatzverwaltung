@@ -5,6 +5,7 @@ use abrain\Einsatzverwaltung\AdminPage;
 use abrain\Einsatzverwaltung\Import\Sources\AbstractSource;
 use abrain\Einsatzverwaltung\Import\Sources\Csv;
 use abrain\Einsatzverwaltung\Import\Sources\WpEinsatz;
+use abrain\Einsatzverwaltung\Utilities;
 use function array_key_exists;
 use function check_admin_referer;
 use function esc_attr;
@@ -12,6 +13,7 @@ use function esc_html;
 use function esc_html__;
 use function explode;
 use function filter_input;
+use function sanitize_text_field;
 use function submit_button;
 use function wp_die;
 use function wp_nonce_field;
@@ -89,6 +91,31 @@ class Page extends AdminPage
         check_admin_referer($this->currentSource->getNonce($currentStep));
 
         $nextStep = $this->currentSource->getNextStep($currentStep);
+
+        // Read the settings that have been passed from the previous step
+        foreach ($currentStep->getArguments() as $argument) {
+            $value = filter_input(INPUT_POST, $argument, FILTER_SANITIZE_STRING);
+            $this->currentSource->putArg($argument, $value);
+        }
+
+        // Pass settings for date and time to the CSV source
+        // TODO move custom logic into the class of the source
+        if ('evw_csv' == $this->currentSource->getIdentifier()) {
+            if (array_key_exists('import_date_format', $_POST)) {
+                $this->currentSource->putArg('import_date_format', sanitize_text_field($_POST['import_date_format']));
+            }
+
+            if (array_key_exists('import_time_format', $_POST)) {
+                $this->currentSource->putArg('import_time_format', sanitize_text_field($_POST['import_time_format']));
+            }
+        }
+
+        // Carry over the setting whether to publish imported reports immediately
+        $publishReports = filter_input(INPUT_POST, 'import_publish_reports', FILTER_SANITIZE_STRING);
+        $this->currentSource->putArg(
+            'import_publish_reports',
+            Utilities::sanitizeCheckbox($publishReports)
+        );
 
         echo '<p>Content</p>';
     }

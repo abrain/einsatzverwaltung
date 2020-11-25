@@ -36,35 +36,6 @@ class Tool
     public function renderToolPage()
     {
         $this->helper = new Helper($this->utilities, $this->data);
-        $this->helper->metaFields = IncidentReport::getMetaFields();
-        $this->helper->taxonomies = IncidentReport::getTerms();
-        $this->helper->postFields = IncidentReport::getPostFields();
-
-        // Einstellungen an die Importquelle übergeben
-        if (array_key_exists('args', $this->currentAction) && is_array($this->currentAction['args'])) {
-            foreach ($this->currentAction['args'] as $arg) {
-                $value = (array_key_exists($arg, $_POST) ? sanitize_text_field($_POST[$arg]) : null);
-                $this->currentSource->putArg($arg, $value);
-            }
-        }
-
-        // Datums- und Zeitformat für CSV-Import übernehmen
-        if ('evw_csv' == $this->currentSource->getIdentifier()) {
-            if (array_key_exists('import_date_format', $_POST)) {
-                $this->currentSource->putArg('import_date_format', sanitize_text_field($_POST['import_date_format']));
-            }
-
-            if (array_key_exists('import_time_format', $_POST)) {
-                $this->currentSource->putArg('import_time_format', sanitize_text_field($_POST['import_time_format']));
-            }
-        }
-
-        // 'Sofort veröffentlichen'-Option übernehmen
-        $publishReports = filter_input(INPUT_POST, 'import_publish_reports', FILTER_SANITIZE_STRING);
-        $this->currentSource->putArg(
-            'import_publish_reports',
-            Utilities::sanitizeCheckbox($publishReports)
-        );
 
         echo "<h2>{$this->currentAction['name']}</h2>";
 

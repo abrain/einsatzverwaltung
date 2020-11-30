@@ -5,11 +5,13 @@ use abrain\Einsatzverwaltung\Exceptions\ImportCheckException;
 use abrain\Einsatzverwaltung\Import\Step;
 use abrain\Einsatzverwaltung\Utilities;
 use Exception;
+use function __;
+use function in_array;
 
 /**
  * Importiert Einsatzberichte aus einer CSV-Datei
  */
-class Csv extends AbstractSource
+class Csv extends FileSource
 {
     private $dateFormats = array('d.m.Y', 'd.m.y', 'Y-m-d', 'm/d/Y', 'm/d/y');
     private $timeFormats = array('H:i', 'G:i', 'H:i:s', 'G:i:s');
@@ -26,11 +28,12 @@ class Csv extends AbstractSource
     {
         $this->description = 'Importiert Einsatzberichte aus einer CSV-Datei.';
         $this->identifier = 'evw_csv';
+        $this->mimeType = 'text/csv';
         $this->name = 'CSV';
 
-        $this->steps[] = new Step('selectcsvfile', 'Dateiauswahl', 'Datei ausw&auml;hlen');
-        $this->steps[] = new Step('analysis', 'Analyse', 'Datei analysieren', ['csv_file_id', 'has_headlines', 'delimiter']);
-        $this->steps[] = new Step('import', 'Import', 'Import starten', ['csv_file_id', 'has_headlines', 'delimiter']);
+        $this->steps[] = new Step(self::STEP_CHOOSEFILE, __('Choose a CSV file', 'einsatzverwaltung'), 'Datei ausw&auml;hlen');
+        $this->steps[] = new Step(self::STEP_ANALYSIS, 'Analyse', 'Datei analysieren', ['file_id', 'has_headlines', 'delimiter']);
+        $this->steps[] = new Step(self::STEP_IMPORT, 'Import', 'Import starten', ['file_id', 'has_headlines', 'delimiter']);
     }
 
     /**
@@ -74,28 +77,40 @@ class Csv extends AbstractSource
     /**
      * @inheritDoc
      */
-    public function echoExtraFormFields($nextAction)
+    public function echoExtraFormFields(string $currentAction, Step $nextStep)
     {
-        echo '<h3>Datums- und Zeitformat</h3>';
-        $dateExample = strtotime('December 31st 5:29 am');
+        if ($currentAction === self::STEP_CHOOSEFILE) {
+            echo '<h3>Aufbau der CSV-Datei</h3>';
+            echo '<input id="has_headlines" name="has_headlines" type="checkbox" value="1" />';
+            echo '<label for="has_headlines">Erste Zeile der Datei enth&auml;lt Spaltenbeschriftung</label>';
+            echo '<p class="description">Setze diesen Haken, wenn die erste Zeile der CSV-Datei keine Daten von Eins&auml;tzen enth&auml;lt, sondern nur die &Uuml;berschriften der jeweiligen Spalten.</p>';
+            echo '<br>Trennzeichen zwischen den Spalten:&nbsp;';
+            echo '<label><input type="radio" name="delimiter" value=";" checked="checked"><code>;</code> Semikolon</label>';
+            echo '&nbsp;<label><input type="radio" name="delimiter" value=","><code>,</code> Komma</label>';
+            echo '<p class="description">Wenn du unsicher bist, kannst du die CSV-Datei mit einem Texteditor &ouml;ffnen und nachsehen.</p>';
+            echo '<p class="description">Als Feldbegrenzerzeichen (umschlie&szlig;t ggf. den Inhalt einer Spalte) wird das Anf&uuml;hrungszeichen <code>&quot;</code> erwartet.</p>';
+        } elseif (in_array($currentAction, [self::STEP_ANALYSIS, self::STEP_IMPORT])) {
+            echo '<h3>Datums- und Zeitformat</h3>';
+            $dateExample = strtotime('December 31st 5:29 am');
 
-        echo '<div class="import-date-formats">';
-        foreach ($this->dateFormats as $dateFormat) {
-            echo '<label><input type="radio" name="import_date_format" value="'.$dateFormat.'"';
-            checked($this->getDateFormat(), $dateFormat);
-            echo ' />' . date($dateFormat, $dateExample) . '</label><br/>';
+            echo '<div class="import-date-formats">';
+            foreach ($this->dateFormats as $dateFormat) {
+                echo '<label><input type="radio" name="import_date_format" value="'.$dateFormat.'"';
+                checked($this->getDateFormat(), $dateFormat);
+                echo ' />' . date($dateFormat, $dateExample) . '</label><br/>';
+            }
+            echo '</div>';
+
+            echo '<div class="import-time-formats">';
+            foreach ($this->timeFormats as $timeFormat) {
+                echo '<label><input type="radio" name="import_time_format" value="'.$timeFormat.'"';
+                checked($this->getTimeFormat(), $timeFormat);
+                echo ' />' . date($timeFormat, $dateExample) . '</label><br/>';
+            }
+            echo '</div>';
         }
-        echo '</div>';
 
-        echo '<div class="import-time-formats">';
-        foreach ($this->timeFormats as $timeFormat) {
-            echo '<label><input type="radio" name="import_time_format" value="'.$timeFormat.'"';
-            checked($this->getTimeFormat(), $timeFormat);
-            echo ' />' . date($timeFormat, $dateExample) . '</label><br/>';
-        }
-        echo '</div>';
-
-        parent::echoExtraFormFields($nextAction);
+        parent::echoExtraFormFields($currentAction, $nextStep);
     }
 
     /**

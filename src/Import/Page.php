@@ -4,8 +4,10 @@ namespace abrain\Einsatzverwaltung\Import;
 use abrain\Einsatzverwaltung\AdminPage;
 use abrain\Einsatzverwaltung\Import\Sources\AbstractSource;
 use abrain\Einsatzverwaltung\Import\Sources\Csv;
+use abrain\Einsatzverwaltung\Import\Sources\FileSource;
 use abrain\Einsatzverwaltung\Import\Sources\WpEinsatz;
 use abrain\Einsatzverwaltung\Utilities;
+use function __;
 use function array_key_exists;
 use function check_admin_referer;
 use function esc_attr;
@@ -13,7 +15,10 @@ use function esc_html;
 use function esc_html__;
 use function explode;
 use function filter_input;
+use function get_posts;
+use function printf;
 use function sanitize_text_field;
+use function sprintf;
 use function submit_button;
 use function wp_die;
 use function wp_nonce_field;
@@ -117,7 +122,73 @@ class Page extends AdminPage
             Utilities::sanitizeCheckbox($publishReports)
         );
 
-        echo '<p>Content</p>';
+        printf("<h2>%s</h2>", esc_html($currentStep->getTitle()));
+
+        switch ($action) {
+            case AbstractSource::STEP_ANALYSIS:
+                echo "Analysiere...";
+                break;
+            case AbstractSource::STEP_CHOOSEFILE:
+                if (!$this->currentSource instanceof FileSource) {
+                    $this->printError('The selected source does not import from a file');
+                    return;
+                }
+                $this->echoFileChooser($this->currentSource, $nextStep);
+                break;
+            case AbstractSource::STEP_IMPORT:
+                echo "Import...";
+                break;
+            default:
+                $this->printError(sprintf('Action %s is unknown', esc_html($action)));
+        }
+    }
+
+    /**
+     * @param FileSource $source
+     * @param Step $nextStep
+     */
+    private function echoFileChooser(FileSource $source, Step $nextStep)
+    {
+        $mimeType = $source->getMimeType();
+        if (empty($mimeType)) {
+            $this->printError('The MIME type must not be empty');
+            return;
+        }
+
+        echo '<p>Bitte werfe einen Blick in die <a href="https://einsatzverwaltung.abrain.de/dokumentation/import-von-einsatzberichten/">Dokumentation</a>, um herauszufinden, welche Anforderungen an die Datei gestellt werden.</p>';
+
+        echo '<h3>In der Mediathek gefundene Dateien</h3>';
+        echo 'Bevor eine Datei f&uuml;r den Import verwendet werden kann, muss sie in die <a href="' . admin_url('upload.php') . '">Mediathek</a> hochgeladen worden sein. Nach erfolgreichem Import kann die Datei gel&ouml;scht werden.';
+        $this->printWarning('Der Inhalt der Mediathek ist &ouml;ffentlich abrufbar. Achte darauf, dass die Importdatei keine sensiblen Daten enth&auml;lt.');
+
+        $attachments = get_posts(array(
+            'post_type' => 'attachment',
+            'post_mime_type' => $mimeType
+        ));
+
+        if (empty($attachments)) {
+            $this->printInfo(sprintf(__('No files of type %s found.', 'einsatzverwaltung'), $mimeType));
+            return;
+        }
+
+        echo '<form method="post">';
+        wp_nonce_field($this->currentSource->getNonce($nextStep));
+
+        echo '<fieldset>';
+        foreach ($attachments as $attachment) {
+            printf(
+                '<label><input type="radio" name="file_id" value="%d">%s</label><br/>',
+                esc_attr($attachment->ID),
+                esc_html($attachment->post_title)
+            );
+        }
+        echo '</fieldset>';
+
+        $source->echoExtraFormFields(AbstractSource::STEP_CHOOSEFILE, $nextStep);
+
+        printf('<input type="hidden" name="aktion" value="%s" />', $this->currentSource->getActionAttribute($nextStep));
+        submit_button($nextStep->getButtonText());
+        echo '</form>';
     }
 
     private function loadSources()

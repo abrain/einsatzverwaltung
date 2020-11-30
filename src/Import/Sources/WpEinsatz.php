@@ -33,8 +33,8 @@ class WpEinsatz extends AbstractSource
             'Datum' => 'post_date'
         );
 
-        $this->steps[] = new Step('analysis', 'Analyse', 'Datenbank analysieren');
-        $this->steps[] = new Step('import', 'Import', 'Import starten');
+        $this->steps[] = new Step(self::STEP_ANALYSIS, 'Analyse', 'Datenbank analysieren');
+        $this->steps[] = new Step(self::STEP_IMPORT, 'Import', 'Import starten');
     }
 
     /**

@@ -5,6 +5,7 @@ use abrain\Einsatzverwaltung\Exceptions\ImportCheckException;
 use abrain\Einsatzverwaltung\Exceptions\ImportException;
 use abrain\Einsatzverwaltung\Import\Step;
 use function esc_attr;
+use function in_array;
 use function sprintf;
 
 /**
@@ -12,6 +13,9 @@ use function sprintf;
  */
 abstract class AbstractSource
 {
+    const STEP_ANALYSIS = 'analysis';
+    const STEP_CHOOSEFILE = 'choosefile';
+    const STEP_IMPORT = 'import';
     protected $args = array();
     protected $autoMatchFields = array();
     protected $cachedFields;
@@ -58,11 +62,12 @@ abstract class AbstractSource
      * Generiert für Argumente, die in der nächsten Action wieder gebraucht werden, Felder, die in das Formular
      * eingebaut werden können, damit diese mitgenommen werden
      *
+     * @param string $currentAction
      * @param Step $nextStep
      */
-    public function echoExtraFormFields(Step $nextStep)
+    public function echoExtraFormFields(string $currentAction, Step $nextStep)
     {
-        if (empty($nextStep)) {
+        if (empty($nextStep) || !in_array($currentAction, [self::STEP_ANALYSIS, self::STEP_IMPORT])) {
             return;
         }
 

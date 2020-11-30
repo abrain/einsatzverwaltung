@@ -56,60 +56,6 @@ class Helper
     }
 
     /**
-     * Gibt ein Auswahlfeld zur Zuordnung der Felder in Einsatzverwaltung aus
-     *
-     * @param array $args {
-     *     @type string $name              Name des Dropdownfelds im Formular
-     *     @type string $selected          Wert der ausgewählten Option
-     *     @type array  $unmatchableFields Felder, die nicht als Importziel auswählbar sein sollen
-     * }
-     */
-    private function dropdownEigeneFelder($args)
-    {
-        $defaults = array(
-            'name' => null,
-            'selected' => '-',
-            'unmatchableFields' => array()
-        );
-        $parsedArgs = wp_parse_args($args, $defaults);
-
-        if (null === $parsedArgs['name'] || empty($parsedArgs['name'])) {
-            _doing_it_wrong(__FUNCTION__, 'Name darf nicht null oder leer sein', '');
-        }
-
-        $fields = IncidentReport::getFields();
-
-        // Felder, die automatisch beschrieben werden, nicht zur Auswahl stellen
-        foreach ($parsedArgs['unmatchableFields'] as $ownField) {
-            unset($fields[$ownField]);
-        }
-
-        // Sortieren und ausgeben
-        uasort($fields, function ($field1, $field2) {
-            return strcmp($field1['label'], $field2['label']);
-        });
-        $string = '<select name="' . $parsedArgs['name'] . '">';
-        /** @noinspection HtmlUnknownAttribute */
-        $string .= sprintf(
-            '<option value="-" %s>%s</option>',
-            selected($parsedArgs['selected'], '-', false),
-            'nicht importieren'
-        );
-        foreach ($fields as $slug => $fieldProperties) {
-            /** @noinspection HtmlUnknownAttribute */
-            $string .= sprintf(
-                '<option value="%s" %s>%s</option>',
-                esc_attr($slug),
-                selected($parsedArgs['selected'], $slug, false),
-                esc_html($fieldProperties['label'])
-            );
-        }
-        $string .= '</select>';
-
-        echo $string;
-    }
-
-    /**
      * @param array $mapping
      * @param array $sourceEntry
      * @param array $insertArgs
@@ -352,75 +298,6 @@ class Helper
             $preparedInsertArgs[] = $insertArgs;
             $yearsAffected[$alarmzeit->format('Y')] = 1;
         }
-    }
-
-    /**
-     * Gibt das Formular für die Zuordnung zwischen zu importieren Feldern und denen von Einsatzverwaltung aus
-     *
-     * @param AbstractSource $source
-     * @param array $args {
-     *     @type array  $mapping           Zuordnung von zu importieren Feldern auf Einsatzverwaltungsfelder
-     *     @type array  $next_action       Array der nächsten Action
-     *     @type string $nonce_action      Wert der Nonce
-     *     @type string $action_value      Wert der action-Variable
-     *     @type string submit_button_text Beschriftung für den Button unter dem Formular
-     * }
-     */
-    public function renderMatchForm($source, $args)
-    {
-        $defaults = array(
-            'mapping' => array(),
-            'next_action' => null,
-            'nonce_action' => '',
-            'action_value' => '',
-            'submit_button_text' => 'Import starten'
-        );
-
-        $parsedArgs = wp_parse_args($args, $defaults);
-        $fields = $source->getFields();
-
-        $unmatchableFields = $source->getUnmatchableFields();
-        if (ReportNumberController::isAutoIncidentNumbers()) {
-            $this->utilities->printInfo('Einsatznummern können nur importiert werden, wenn die automatische Verwaltung deaktiviert ist.');
-
-            $unmatchableFields[] = 'einsatz_incidentNumber';
-        }
-
-        echo '<form method="post">';
-        wp_nonce_field($parsedArgs['nonce_action']);
-        echo '<input type="hidden" name="aktion" value="' . $parsedArgs['action_value'] . '" />';
-        echo '<table class="evw_match_fields"><tr><th>';
-        printf('Feld in %s', $source->getName());
-        echo '</th><th>' . 'Feld in Einsatzverwaltung' . '</th></tr><tbody>';
-        foreach ($fields as $field) {
-            echo '<tr><td><strong>' . $field . '</strong></td><td>';
-            if (array_key_exists($field, $source->getAutoMatchFields())) {
-                echo 'wird automatisch zugeordnet';
-            } elseif (in_array($field, $source->getProblematicFields())) {
-                $this->utilities->printWarning(sprintf('Probleme mit Feld %s, siehe Analyse', $field));
-            } else {
-                $selected = '-';
-                if (!empty($parsedArgs['mapping']) &&
-                    array_key_exists($field, $parsedArgs['mapping']) &&
-                    !empty($parsedArgs['mapping'][$field])
-                ) {
-                    $selected = $parsedArgs['mapping'][$field];
-                }
-
-                $this->dropdownEigeneFelder(array(
-                    'name' => $source->getInputName($field),
-                    'selected' => $selected,
-                    'unmatchableFields' => $unmatchableFields
-                ));
-            }
-            echo '</td></tr>';
-        }
-        echo '</tbody></table>';
-        if (!empty($parsedArgs['next_action'])) {
-            $source->echoExtraFormFields($parsedArgs['next_action']);
-        }
-        submit_button($parsedArgs['submit_button_text']);
-        echo '</form>';
     }
 
     /**

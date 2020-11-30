@@ -48,7 +48,7 @@ class Csv extends FileSource
             $this->delimiter = $delimiter;
         }
 
-        $attachmentId = $this->args['csv_file_id'];
+        $attachmentId = $this->args['file_id'];
         if (empty($attachmentId)) {
             throw new ImportCheckException('Keine Datei ausgew&auml;hlt');
         }

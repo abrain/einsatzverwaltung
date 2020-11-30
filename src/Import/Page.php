@@ -2,13 +2,19 @@
 namespace abrain\Einsatzverwaltung\Import;
 
 use abrain\Einsatzverwaltung\AdminPage;
+use abrain\Einsatzverwaltung\Exceptions\ImportCheckException;
+use abrain\Einsatzverwaltung\Exceptions\ImportException;
 use abrain\Einsatzverwaltung\Import\Sources\AbstractSource;
 use abrain\Einsatzverwaltung\Import\Sources\Csv;
 use abrain\Einsatzverwaltung\Import\Sources\FileSource;
 use abrain\Einsatzverwaltung\Import\Sources\WpEinsatz;
+use abrain\Einsatzverwaltung\Model\IncidentReport;
+use abrain\Einsatzverwaltung\ReportNumberController;
 use abrain\Einsatzverwaltung\Utilities;
 use function __;
+use function _n;
 use function array_key_exists;
+use function array_keys;
 use function check_admin_referer;
 use function esc_attr;
 use function esc_html;
@@ -16,10 +22,15 @@ use function esc_html__;
 use function explode;
 use function filter_input;
 use function get_posts;
+use function implode;
+use function in_array;
 use function printf;
 use function sanitize_text_field;
+use function selected;
 use function sprintf;
+use function strcmp;
 use function submit_button;
+use function uasort;
 use function wp_die;
 use function wp_nonce_field;
 use const FILTER_SANITIZE_STRING;
@@ -31,12 +42,6 @@ use const INPUT_POST;
  */
 class Page extends AdminPage
 {
-
-    /**
-     * @var AbstractSource
-     */
-    private $currentSource;
-
     /**
      * @var AbstractSource[]
      */
@@ -84,40 +89,40 @@ class Page extends AdminPage
         if (!array_key_exists($identifier, $this->sources)) {
             wp_die('Invalid source');
         }
-        $this->currentSource = $this->sources[$identifier];
+        $currentSource = $this->sources[$identifier];
 
         // Set variables for further flow control
-        $currentStep = $this->currentSource->getStep($action);
+        $currentStep = $currentSource->getStep($action);
         if ($currentStep === false) {
             wp_die('Invalid step');
         }
 
         // Check if the request has been sent through the form
-        check_admin_referer($this->currentSource->getNonce($currentStep));
+        check_admin_referer($currentSource->getNonce($currentStep));
 
-        $nextStep = $this->currentSource->getNextStep($currentStep);
+        $nextStep = $currentSource->getNextStep($currentStep);
 
         // Read the settings that have been passed from the previous step
         foreach ($currentStep->getArguments() as $argument) {
             $value = filter_input(INPUT_POST, $argument, FILTER_SANITIZE_STRING);
-            $this->currentSource->putArg($argument, $value);
+            $currentSource->putArg($argument, $value);
         }
 
         // Pass settings for date and time to the CSV source
         // TODO move custom logic into the class of the source
-        if ('evw_csv' == $this->currentSource->getIdentifier()) {
+        if ('evw_csv' == $currentSource->getIdentifier()) {
             if (array_key_exists('import_date_format', $_POST)) {
-                $this->currentSource->putArg('import_date_format', sanitize_text_field($_POST['import_date_format']));
+                $currentSource->putArg('import_date_format', sanitize_text_field($_POST['import_date_format']));
             }
 
             if (array_key_exists('import_time_format', $_POST)) {
-                $this->currentSource->putArg('import_time_format', sanitize_text_field($_POST['import_time_format']));
+                $currentSource->putArg('import_time_format', sanitize_text_field($_POST['import_time_format']));
             }
         }
 
         // Carry over the setting whether to publish imported reports immediately
         $publishReports = filter_input(INPUT_POST, 'import_publish_reports', FILTER_SANITIZE_STRING);
-        $this->currentSource->putArg(
+        $currentSource->putArg(
             'import_publish_reports',
             Utilities::sanitizeCheckbox($publishReports)
         );
@@ -126,14 +131,14 @@ class Page extends AdminPage
 
         switch ($action) {
             case AbstractSource::STEP_ANALYSIS:
-                echo "Analysiere...";
+                $this->echoAnalysis($currentSource, $currentStep, $nextStep);
                 break;
             case AbstractSource::STEP_CHOOSEFILE:
-                if (!$this->currentSource instanceof FileSource) {
+                if (!$currentSource instanceof FileSource) {
                     $this->printError('The selected source does not import from a file');
                     return;
                 }
-                $this->echoFileChooser($this->currentSource, $nextStep);
+                $this->echoFileChooser($currentSource, $nextStep);
                 break;
             case AbstractSource::STEP_IMPORT:
                 echo "Import...";
@@ -141,6 +146,65 @@ class Page extends AdminPage
             default:
                 $this->printError(sprintf('Action %s is unknown', esc_html($action)));
         }
+    }
+
+    /**
+     * @param AbstractSource $source
+     * @param Step $currentStep
+     * @param Step $nextStep
+     */
+    private function echoAnalysis(AbstractSource $source, Step $currentStep, Step $nextStep)
+    {
+        try {
+            $source->checkPreconditions();
+        } catch (ImportCheckException $e) {
+            $this->printError(sprintf('Voraussetzung nicht erf&uuml;llt: %s', $e->getMessage()));
+            return;
+        }
+
+        $fields = $source->getFields();
+        if (empty($fields)) {
+            $this->printError('Es wurden keine Felder gefunden');
+            return;
+        }
+        $numberOfFields = count($fields);
+        $this->printSuccess(sprintf(
+            _n('Found %1$d field: %2$s', 'Found %1$d fields: %2$s', $numberOfFields, 'einsatzverwaltung'),
+            $numberOfFields,
+            esc_html(implode($fields, ', '))
+        ));
+
+        // Check for mandatory fields
+        $mandatoryFieldsOk = true;
+        foreach (array_keys($source->getAutoMatchFields()) as $autoMatchField) {
+            if (!in_array($autoMatchField, $fields)) {
+                $this->printError(
+                    sprintf('Das automatisch zu importierende Feld %s konnte nicht gefunden werden!', $autoMatchField)
+                );
+                $mandatoryFieldsOk = false;
+            }
+        }
+        if (!$mandatoryFieldsOk) {
+            return;
+        }
+
+        // Count the entries
+        try {
+            $entries = $source->getEntries(null);
+        } catch (ImportException $e) {
+            $this->printError(sprintf('Fehler beim Abfragen der Eins&auml;tze: %s', $e->getMessage()));
+            return;
+        }
+
+        if (empty($entries)) {
+            $this->printWarning('Es wurden keine Eins&auml;tze gefunden.');
+            return;
+        }
+        $this->printSuccess(sprintf("Es wurden %s Eins&auml;tze gefunden", count($entries)));
+
+        // Felder matchen
+        echo "<h3>Felder zuordnen</h3>";
+        $this->renderMatchForm($source, $currentStep, $nextStep);
     }
 
     /**
@@ -172,7 +236,7 @@ class Page extends AdminPage
         }
 
         echo '<form method="post">';
-        wp_nonce_field($this->currentSource->getNonce($nextStep));
+        wp_nonce_field($source->getNonce($nextStep));
 
         echo '<fieldset>';
         foreach ($attachments as $attachment) {
@@ -186,7 +250,7 @@ class Page extends AdminPage
 
         $source->echoExtraFormFields(AbstractSource::STEP_CHOOSEFILE, $nextStep);
 
-        printf('<input type="hidden" name="aktion" value="%s" />', $this->currentSource->getActionAttribute($nextStep));
+        printf('<input type="hidden" name="action" value="%s" />', $source->getActionAttribute($nextStep));
         submit_button($nextStep->getButtonText());
         echo '</form>';
     }
@@ -198,5 +262,94 @@ class Page extends AdminPage
 
         $csv = new Csv();
         $this->sources[$csv->getIdentifier()] = $csv;
+    }
+
+    /**
+     * Gibt das Formular für die Zuordnung zwischen zu importieren Feldern und denen von Einsatzverwaltung aus
+     *
+     * @param AbstractSource $source
+     * @param Step $currentStep
+     * @param Step $nextStep
+     * @param array $mapping
+     */
+    private function renderMatchForm(AbstractSource $source, Step $currentStep, Step $nextStep, array $mapping = [])
+    {
+        $fields = $source->getFields();
+
+        // If the incident numbers are managed automatically, don't offer to import them
+        $unmatchableFields = $source->getUnmatchableFields();
+        if (ReportNumberController::isAutoIncidentNumbers()) {
+            $unmatchableFields[] = 'einsatz_incidentNumber';
+        }
+
+        echo '<form method="post">';
+        wp_nonce_field($source->getNonce($nextStep));
+        printf('<input type="hidden" name="action" value="%s" />', esc_attr($source->getActionAttribute($nextStep)));
+        echo '<table class="evw_match_fields"><tr><th>';
+        printf('Feld in %s', $source->getName());
+        echo '</th><th>Feld in Einsatzverwaltung</th></tr><tbody>';
+        foreach ($fields as $field) {
+            printf("<tr><td><b>%s</b></td><td>", esc_html($field));
+            if (array_key_exists($field, $source->getAutoMatchFields())) {
+                echo 'wird automatisch zugeordnet';
+            } elseif (in_array($field, $source->getProblematicFields())) {
+                $this->printWarning(sprintf('Probleme mit Feld %s, siehe Analyse', $field));
+            } else {
+                $selected = '-';
+                if (!empty($mapping) && array_key_exists($field, $mapping) && !empty($mapping[$field])) {
+                    $selected = $mapping[$field];
+                }
+
+                $this->renderOwnFieldsDropdown($source->getInputName($field), $selected, $unmatchableFields);
+            }
+            echo '</td></tr>';
+        }
+        echo '</tbody></table>';
+        if (!empty($nextStep)) {
+            $source->echoExtraFormFields($currentStep->getSlug(), $nextStep);
+        }
+        submit_button($nextStep->getButtonText());
+        echo '</form>';
+    }
+
+    /**
+     * Generates a select tag for selecting the available properties of reports
+     *
+     * @param string $name Name of the select tag
+     * @param string $selected Value of the selected option, defaults to '-' for 'do not import'
+     * @param array $fieldsToSkip Array of own field names that should be skipped during output
+     */
+    private function renderOwnFieldsDropdown(string $name, string $selected = '-', array $fieldsToSkip = [])
+    {
+        $fields = IncidentReport::getFields();
+
+        // Remove fields that should not be presented as an option
+        foreach ($fieldsToSkip as $ownField) {
+            unset($fields[$ownField]);
+        }
+
+        // Sortieren und ausgeben
+        uasort($fields, function ($field1, $field2) {
+            return strcmp($field1['label'], $field2['label']);
+        });
+        $string = sprintf('<select name="%s">', esc_attr($name));
+        /** @noinspection HtmlUnknownAttribute */
+        $string .= sprintf(
+            '<option value="-" %s>%s</option>',
+            selected($selected, '-', false),
+            'nicht importieren'
+        );
+        foreach ($fields as $slug => $fieldProperties) {
+            /** @noinspection HtmlUnknownAttribute */
+            $string .= sprintf(
+                '<option value="%s" %s>%s</option>',
+                esc_attr($slug),
+                selected($selected, $slug, false),
+                esc_html($fieldProperties['label'])
+            );
+        }
+        $string .= '</select>';
+
+        echo $string;
     }
 }

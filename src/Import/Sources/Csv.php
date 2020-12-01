@@ -13,12 +13,12 @@ use function in_array;
  */
 class Csv extends FileSource
 {
-    private $dateFormats = array('d.m.Y', 'd.m.y', 'Y-m-d', 'm/d/Y', 'm/d/y');
-    private $timeFormats = array('H:i', 'G:i', 'H:i:s', 'G:i:s');
     private $csvFilePath;
+    private $dateFormats = array('d.m.Y', 'd.m.y', 'Y-m-d', 'm/d/Y', 'm/d/y');
     private $delimiter = ';';
     private $enclosure = '"';
     private $fileHasHeadlines = false;
+    private $timeFormats = array('H:i', 'G:i', 'H:i:s', 'G:i:s');
 
     /**
      * Csv constructor.
@@ -119,8 +119,7 @@ class Csv extends FileSource
     public function getDateFormat()
     {
         if (!array_key_exists('import_date_format', $this->args)) {
-            $fallbackDateFormat = $this->dateFormats[0];
-            return $fallbackDateFormat;
+            return $this->dateFormats[0];
         }
 
         return $this->args['import_date_format'];
@@ -183,8 +182,7 @@ class Csv extends FileSource
     public function getTimeFormat()
     {
         if (!array_key_exists('import_time_format', $this->args)) {
-            $fallbackTimeFormat = $this->timeFormats[0];
-            return $fallbackTimeFormat;
+            return $this->timeFormats[0];
         }
 
         return $this->args['import_time_format'];

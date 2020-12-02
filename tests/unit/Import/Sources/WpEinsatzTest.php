@@ -58,7 +58,7 @@ class WpEinsatzTest extends UnitTestCase
 
         // Pretend that the table exists and return some bad column names
         $wpdb->expects()->get_var(Mockery::type('string'))->andReturn('wpunit_einsaetze');
-        $wpdb->expects()->get_col("DESCRIBE 'wpunit_einsaetze'", 0)->andReturn(['Datum', 'Örtlichkeit', 'Einsatz#']);
+        $wpdb->expects()->get_col("DESCRIBE `wpunit_einsaetze`", 0)->andReturn(['Datum', 'Örtlichkeit', 'Einsatz#']);
 
         $this->expectException(ImportCheckException::class);
         $source = new WpEinsatz();
@@ -72,7 +72,7 @@ class WpEinsatzTest extends UnitTestCase
 
         // Pretend that the table exists and return some good column names
         $wpdb->expects()->get_var("SHOW TABLES LIKE 'wpunit_einsaetze'")->andReturn('wpunit_einsaetze');
-        $wpdb->expects()->get_col("DESCRIBE 'wpunit_einsaetze'", 0)->andReturn(['Datum', 'Ort', 'Art', 'Einsatztext']);
+        $wpdb->expects()->get_col("DESCRIBE `wpunit_einsaetze`", 0)->andReturn(['Datum', 'Ort', 'Art', 'Einsatztext']);
 
         $source = new WpEinsatz();
         try {
@@ -88,7 +88,7 @@ class WpEinsatzTest extends UnitTestCase
         global $wpdb;
 
         // Return some column names
-        $wpdb->expects()->get_col("DESCRIBE 'wpunit_einsaetze'", 0)->andReturn(['ID', 'Nr_Jahr', 'Nr_Monat', 'Datum', 'Ort']);
+        $wpdb->expects()->get_col("DESCRIBE `wpunit_einsaetze`", 0)->andReturn(['ID', 'Nr_Jahr', 'Nr_Monat', 'Datum', 'Ort']);
 
         $source = new WpEinsatz();
         $this->assertEqualSets(['Datum', 'Ort'], $source->getFields());
@@ -100,7 +100,7 @@ class WpEinsatzTest extends UnitTestCase
         global $wpdb;
 
         // Return some column names
-        $wpdb->expects()->get_col("DESCRIBE 'wpunit_einsaetze'", 0)->andReturn(['ID', 'Nr_Jahr', 'Nr_Monat', 'Datum', 'Ort']);
+        $wpdb->expects()->get_col("DESCRIBE `wpunit_einsaetze`", 0)->andReturn(['ID', 'Nr_Jahr', 'Nr_Monat', 'Datum', 'Ort']);
 
         $source = new WpEinsatz();
         $this->assertEqualSets(['Datum', 'Ort'], $source->getFields());
@@ -120,7 +120,7 @@ class WpEinsatzTest extends UnitTestCase
             ['ID' => 2, 'colA' => 'value4', 'colB' => 'value5', 'colC' => 'value6'],
             ['ID' => 3, 'colA' => 'value7', 'colB' => 'value8', 'colC' => 'value9']
         ];
-        $wpdb->expects()->get_results("SELECT * FROM 'wpunit_einsaetze' ORDER BY Datum", ARRAY_A)->andReturn($entries);
+        $wpdb->expects()->get_results("SELECT * FROM `wpunit_einsaetze` ORDER BY `Datum`", ARRAY_A)->andReturn($entries);
 
         $source = new WpEinsatz();
         try {
@@ -142,7 +142,7 @@ class WpEinsatzTest extends UnitTestCase
             ['ID' => 3, 'colA' => 'value5', 'colC' => 'value6']
         ];
         $wpdb->expects()
-            ->get_results("SELECT ID,colA,colC FROM 'wpunit_einsaetze' ORDER BY Datum", ARRAY_A)
+            ->get_results("SELECT ID,colA,colC FROM `wpunit_einsaetze` ORDER BY `Datum`", ARRAY_A)
             ->andReturn($entries);
 
         $source = new WpEinsatz();

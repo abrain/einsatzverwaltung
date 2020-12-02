@@ -1,7 +1,7 @@
 <?php
 namespace abrain\Einsatzverwaltung\Import\Sources;
 
-use PHPUnit\Framework\TestCase;
+use abrain\Einsatzverwaltung\UnitTestCase;
 
 /**
  * Class CsvTest
@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
  * @package abrain\Einsatzverwaltung\Import\Sources
  * @uses \abrain\Einsatzverwaltung\Import\Step
  */
-class CsvTest extends TestCase
+class CsvTest extends UnitTestCase
 {
     public function testHasAnIdentifier()
     {

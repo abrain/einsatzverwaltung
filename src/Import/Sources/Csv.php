@@ -1,12 +1,18 @@
 <?php
 namespace abrain\Einsatzverwaltung\Import\Sources;
 
+use abrain\Einsatzverwaltung\Exceptions\FileReadException;
 use abrain\Einsatzverwaltung\Exceptions\ImportCheckException;
+use abrain\Einsatzverwaltung\Exceptions\ImportException;
+use abrain\Einsatzverwaltung\Import\CsvReader;
 use abrain\Einsatzverwaltung\Import\Step;
 use abrain\Einsatzverwaltung\Utilities;
-use Exception;
 use function __;
+use function array_map;
+use function array_search;
+use function error_log;
 use function in_array;
+use function print_r;
 
 /**
  * Importiert Einsatzberichte aus einer CSV-Datei
@@ -68,8 +74,9 @@ class Csv extends FileSource
         }
 
         try {
-            $this->readFile(0);
-        } catch (Exception $e) {
+            $csvReader = new CsvReader($csvFilePath, $this->delimiter, $this->enclosure);
+            $csvReader->getLines(1);
+        } catch (FileReadException $e) {
             throw new ImportCheckException($e->getMessage());
         }
     }
@@ -126,16 +133,25 @@ class Csv extends FileSource
     }
 
     /**
-     * Gibt die Einsatzberichte der Importquelle zurück
-     *
-     * @param array $fields Felder der Importquelle, die abgefragt werden sollen. Ist dieser Parameter null, werden alle
-     * Felder abgefragt.
-     *
-     * @return array|bool
+     * @inheritDoc
      */
-    public function getEntries($fields)
+    public function getEntries(array $requestedFields = [])
     {
-        $lines = $this->readFile(null, $fields);
+        $columns = [];
+        if (!empty($requestedFields)) {
+            $fields = $this->getFields();
+            foreach ($requestedFields as $requestedField) {
+                $columns[] = array_search($requestedField, $fields);
+            }
+            error_log('Requested fields: '.print_r($requestedFields, true).', columns: '.print_r($columns, true));
+        }
+
+        $csvReader = new CsvReader($this->csvFilePath, $this->delimiter, $this->enclosure);
+        try {
+            $lines = $csvReader->getLines(0, $columns);
+        } catch (FileReadException $e) {
+            throw new ImportException($e->getMessage());
+        }
 
         if (empty($lines)) {
             return false;
@@ -149,7 +165,7 @@ class Csv extends FileSource
     }
 
     /**
-     * @return array
+     * @inheritDoc
      */
     public function getFields()
     {
@@ -157,23 +173,28 @@ class Csv extends FileSource
             return $this->cachedFields;
         }
 
-        $fields = $this->readFile(1);
+        $csvReader = new CsvReader($this->csvFilePath, $this->delimiter, $this->enclosure);
+        try {
+            $lines = $csvReader->getLines(1);
+            $fields = $lines[0];
+        } catch (FileReadException $e) {
+            throw new ImportException($e->getMessage());
+        }
 
         if (empty($fields)) {
             return array();
         }
 
-        // Gebe nummerierte Spalten zurück, wenn es keine Überschriften gibt
+        // If the first line does not contain the column names, return names like Coulumn 1, Column 2, ...
         if (!$this->fileHasHeadlines) {
             return array_map(function ($number) {
-                return sprintf('Spalte %d', $number);
-            }, range(1, count($fields[0])));
+                return sprintf(__('Column %d', 'einsatzverwaltung'), $number);
+            }, range(1, count($fields)));
         }
 
-        $this->cachedFields = $fields[0];
+        $this->cachedFields = $fields;
 
-        // Gebe die Überschriften der Spalten zurück
-        return $fields[0];
+        return $fields;
     }
 
     /**
@@ -186,63 +207,5 @@ class Csv extends FileSource
         }
 
         return $this->args['import_time_format'];
-    }
-
-    /**
-     * @param int|null $numLines Maximale Anzahl zu lesender Zeilen, oder null um alle Zeilen einzulesen
-     * @param array $requestedFields
-     *
-     * @return array|bool
-     * @throws Exception
-     */
-    private function readFile($numLines = null, $requestedFields = array())
-    {
-        $fieldMap = array();
-        if (!empty($requestedFields)) {
-            $fields = $this->getFields();
-            foreach ($requestedFields as $requestedField) {
-                $fieldMap[$requestedField] = array_search($requestedField, $fields);
-            }
-        }
-
-        $handle = fopen($this->csvFilePath, 'r');
-        if (empty($handle)) {
-            throw new Exception('Konnte Datei nicht öffnen');
-        }
-
-        if ($numLines === 0) {
-            fclose($handle);
-            return array();
-        }
-
-        $lines = array();
-        while (null === $numLines || count($lines) < $numLines) {
-            $line = fgetcsv($handle, 0, $this->delimiter, $this->enclosure);
-
-            // Problem beim Lesen oder Ende der Datei
-            if (empty($line)) {
-                break;
-            }
-
-            // Leere Zeile
-            if (is_array($line) && $line[0] == null) {
-                continue;
-            }
-
-            if (empty($requestedFields)) {
-                $lines[] = $line;
-                continue;
-            }
-
-            $filteredLine = array();
-            foreach ($fieldMap as $fieldName => $index) {
-                // Fehlende Felder in zu kurzen Zeilen werden als leer gewertet
-                $filteredLine[$fieldName] = array_key_exists($index, $line) ? $line[$index] : '';
-            }
-            $lines[] = $filteredLine;
-        }
-
-        fclose($handle);
-        return $lines;
     }
 }

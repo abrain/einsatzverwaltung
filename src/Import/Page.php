@@ -162,7 +162,13 @@ class Page extends AdminPage
             return;
         }
 
-        $fields = $source->getFields();
+        try {
+            $fields = $source->getFields();
+        } catch (ImportException $e) {
+            $this->printError('Fehler beim Abrufen der Felder');
+            return;
+        }
+
         if (empty($fields)) {
             $this->printError('Es wurden keine Felder gefunden');
             return;
@@ -190,7 +196,7 @@ class Page extends AdminPage
 
         // Count the entries
         try {
-            $entries = $source->getEntries(null);
+            $entries = $source->getEntries();
         } catch (ImportException $e) {
             $this->printError(sprintf('Fehler beim Abfragen der Eins&auml;tze: %s', $e->getMessage()));
             return;
@@ -274,7 +280,12 @@ class Page extends AdminPage
      */
     private function renderMatchForm(AbstractSource $source, Step $currentStep, Step $nextStep, array $mapping = [])
     {
-        $fields = $source->getFields();
+        try {
+            $fields = $source->getFields();
+        } catch (ImportException $e) {
+            $this->printError('Fehler beim Abrufen der Felder');
+            return;
+        }
 
         // If the incident numbers are managed automatically, don't offer to import them
         $unmatchableFields = $source->getUnmatchableFields();
@@ -300,7 +311,11 @@ class Page extends AdminPage
                     $selected = $mapping[$field];
                 }
 
-                $this->renderOwnFieldsDropdown($source->getInputName($field), $selected, $unmatchableFields);
+                try {
+                    $this->renderOwnFieldsDropdown($source->getInputName($field), $selected, $unmatchableFields);
+                } catch (ImportException $e) {
+                    echo 'ERROR';
+                }
             }
             echo '</td></tr>';
         }
@@ -328,7 +343,7 @@ class Page extends AdminPage
             unset($fields[$ownField]);
         }
 
-        // Sortieren und ausgeben
+        // Sort fields by name
         uasort($fields, function ($field1, $field2) {
             return strcmp($field1['label'], $field2['label']);
         });

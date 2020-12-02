@@ -178,7 +178,7 @@ class Csv extends FileSource
             $lines = $csvReader->getLines(1);
             $fields = $lines[0];
         } catch (FileReadException $e) {
-            throw new ImportException($e->getMessage());
+            throw new ImportCheckException($e->getMessage());
         }
 
         if (empty($fields)) {

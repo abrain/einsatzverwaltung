@@ -141,7 +141,7 @@ class Page extends AdminPage
                 $this->echoFileChooser($currentSource, $nextStep);
                 break;
             case AbstractSource::STEP_IMPORT:
-                echo "Import...";
+                $this->echoImport($currentSource, $currentStep);
                 break;
             default:
                 $this->printError(sprintf('Action %s is unknown', esc_html($action)));
@@ -164,7 +164,7 @@ class Page extends AdminPage
 
         try {
             $fields = $source->getFields();
-        } catch (ImportException $e) {
+        } catch (ImportCheckException $e) {
             $this->printError('Fehler beim Abrufen der Felder');
             return;
         }
@@ -261,6 +261,41 @@ class Page extends AdminPage
         echo '</form>';
     }
 
+    /**
+     * @param AbstractSource $source
+     * @param Step $currentStep
+     */
+    private function echoImport(AbstractSource $source, Step $currentStep)
+    {
+        try {
+            $source->checkPreconditions();
+        } catch (ImportCheckException $e) {
+            $this->printError(sprintf('Voraussetzung nicht erf&uuml;llt: %s', $e->getMessage()));
+            return;
+        }
+
+        // Get the mapping of the source fields to our internal fields
+        $mappingHelper = new MappingHelper();
+        try {
+            $mapping = $mappingHelper->getMapping($source, IncidentReport::getFields());
+            $mappingHelper->validateMapping($mapping, $source);
+        } catch (ImportCheckException $e) {
+            $this->printError(sprintf("Fehler bei der Zuordnung: %s", $e->getMessage()));
+
+            // Repeat the mapping
+            $this->renderMatchForm($source, $currentStep, $currentStep, empty($mapping) ? [] : $mapping);
+            return;
+        }
+
+        // Start the import
+        echo '<p>Die Daten werden eingelesen, das kann einen Moment dauern.</p>';
+        // TODO do the import
+
+        $this->printSuccess('Der Import ist abgeschlossen');
+        $url = admin_url('edit.php?post_type=einsatz');
+        printf('<a href="%s">Zu den Einsatzberichten</a>', $url);
+    }
+
     private function loadSources()
     {
         $wpEinsatz = new WpEinsatz();
@@ -282,7 +317,7 @@ class Page extends AdminPage
     {
         try {
             $fields = $source->getFields();
-        } catch (ImportException $e) {
+        } catch (ImportCheckException $e) {
             $this->printError('Fehler beim Abrufen der Felder');
             return;
         }
@@ -313,7 +348,7 @@ class Page extends AdminPage
 
                 try {
                     $this->renderOwnFieldsDropdown($source->getInputName($field), $selected, $unmatchableFields);
-                } catch (ImportException $e) {
+                } catch (ImportCheckException $e) {
                     echo 'ERROR';
                 }
             }

@@ -6,7 +6,6 @@ use abrain\Einsatzverwaltung\Exceptions\ImportException;
 use abrain\Einsatzverwaltung\Exceptions\ImportPreparationException;
 use abrain\Einsatzverwaltung\Import\Sources\AbstractSource;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
-use abrain\Einsatzverwaltung\ReportNumberController;
 use abrain\Einsatzverwaltung\Utilities;
 use DateTime;
 
@@ -264,6 +263,7 @@ class Helper
      * @param array $mapping
      * @param array $preparedInsertArgs
      * @param array $yearsAffected
+     * @throws ImportException
      * @throws ImportPreparationException
      */
     public function prepareImport($source, $mapping, &$preparedInsertArgs, &$yearsAffected)
@@ -333,52 +333,5 @@ class Helper
                 $this->data->updateSequenceNumbers(strval($year));
             }
         }
-    }
-
-    /**
-     * Prüft, ob das Mapping stimmig ist und gibt Warnungen oder Fehlermeldungen aus
-     *
-     * @param array $mapping Das zu prüfende Mapping
-     * @param AbstractSource $source
-     *
-     * @return bool True bei bestandener Prüfung, false bei Unstimmigkeiten
-     */
-    public function validateMapping($mapping, $source)
-    {
-        $valid = true;
-
-        // Pflichtfelder prüfen
-        if (!in_array('post_date', $mapping)) {
-            $this->utilities->printError('Pflichtfeld Alarmzeit wurde nicht zugeordnet');
-            $valid = false;
-        }
-
-        $unmatchableFields = $source->getUnmatchableFields();
-        $autoMatchFields = $source->getAutoMatchFields();
-        if (ReportNumberController::isAutoIncidentNumbers()) {
-            $unmatchableFields[] = 'einsatz_incidentNumber';
-        }
-        foreach ($unmatchableFields as $unmatchableField) {
-            if (in_array($unmatchableField, $mapping) && !in_array($unmatchableField, $autoMatchFields)) {
-                $this->utilities->printError(sprintf(
-                    'Feld %s kann nicht f&uuml;r ein zu importierendes Feld als Ziel angegeben werden',
-                    esc_html($unmatchableField)
-                ));
-                $valid = false;
-            }
-        }
-
-        // Mehrfache Zuweisungen prüfen
-        foreach (array_count_values($mapping) as $ownField => $count) {
-            if ($count > 1) {
-                $this->utilities->printError(sprintf(
-                    'Feld %s kann nicht f&uuml;r mehr als ein zu importierendes Feld als Ziel angegeben werden',
-                    IncidentReport::getFieldLabel($ownField)
-                ));
-                $valid = false;
-            }
-        }
-
-        return $valid;
     }
 }

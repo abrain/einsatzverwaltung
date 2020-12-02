@@ -152,7 +152,7 @@ abstract class AbstractSource
 
     /**
      * @return array
-     * @throws ImportException
+     * @throws ImportCheckException
      */
     abstract public function getFields();
 
@@ -186,41 +186,12 @@ abstract class AbstractSource
      * @param string $field Bezeichner des Felds
      *
      * @return string Eindeutiger Name bestehend aus Bezeichnern der Importquelle und des Felds
-     * @throws ImportException
+     * @throws ImportCheckException
      */
     public function getInputName(string $field)
     {
         $fieldId = array_search($field, $this->getFields());
         return $this->getIdentifier() . '-field' . $fieldId;
-    }
-
-    /**
-     * @param array $sourceFields Felder der Importquelle
-     * @param array $ownFields Felder der Einsatzverwaltung
-     *
-     * @return array
-     * @throws ImportException
-     */
-    public function getMapping($sourceFields, $ownFields)
-    {
-        $mapping = array();
-        foreach ($sourceFields as $sourceField) {
-            $index = $this->getInputName($sourceField);
-            if (array_key_exists($index, $_POST)) {
-                $ownField = $_POST[$index];
-                if (!empty($ownField) && is_string($ownField) && $ownField != '-') {
-                    if (array_key_exists($ownField, $ownFields)) {
-                        $mapping[$sourceField] = $ownField;
-                    } else {
-                        throw new ImportException(sprintf(__('Unknown field: %s', 'einsatzverwaltung'), $ownField));
-                    }
-                }
-            }
-        }
-        foreach ($this->autoMatchFields as $sourceFieldAuto => $ownFieldAuto) {
-            $mapping[$sourceFieldAuto] = $ownFieldAuto;
-        }
-        return $mapping;
     }
 
     /**

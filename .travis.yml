@@ -45,6 +45,9 @@ jobs:
   - stage: validate
     name: 'Latest versions'
     before_install: skip
+    install:
+      - pecl install -f xdebug-2.9.8
+      - composer install --prefer-source
     before_script:
       - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
       - chmod +x ./cc-test-reporter

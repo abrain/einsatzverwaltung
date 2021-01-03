@@ -16,12 +16,12 @@ php:
   - '7.3'
 
 env:
+  - WP_VERSION=latest WP_MULTISITE=0
   - WP_VERSION=5.1.8 WP_MULTISITE=0
   - WP_VERSION=5.2.9 WP_MULTISITE=0
   - WP_VERSION=5.3.6 WP_MULTISITE=0
   - WP_VERSION=5.4.4 WP_MULTISITE=0
   - WP_VERSION=5.5.3 WP_MULTISITE=0
-  - WP_VERSION=latest WP_MULTISITE=0
   - WP_VERSION=nightly WP_MULTISITE=0
 
 services:
@@ -49,7 +49,7 @@ jobs:
       - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
       - chmod +x ./cc-test-reporter
       - ./cc-test-reporter before-build
-    script: ./vendor/bin/phpunit -c phpunit.xml
+    script: XDEBUG_MODE=coverage ./vendor/bin/phpunit -c phpunit.xml
     after_script:
       - ./cc-test-reporter after-build --coverage-input-type clover --exit-code $TRAVIS_TEST_RESULT
   - stage: test

@@ -1,8 +1,6 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
-use abrain\Einsatzverwaltung\Types\Report;
-use abrain\Einsatzverwaltung\Types\Unit;
 use WP_Error;
 use wpdb;
 use function delete_option;
@@ -466,7 +464,10 @@ class Update
          */
         $query = $wpdb->prepare(
             "DELETE FROM $wpdb->postmeta WHERE meta_key = %s AND meta_value NOT IN (SELECT ID FROM $wpdb->posts WHERE post_type = %s AND post_status = %s) AND post_id IN (SELECT ID FROM $wpdb->posts WHERE post_type = %s)",
-            '_evw_unit', Unit::getSlug(), 'publish', Report::getSlug()
+            '_evw_unit',
+            'evw_unit',
+            'publish',
+            'einsatz'
         );
         $wpdb->query($query);
 

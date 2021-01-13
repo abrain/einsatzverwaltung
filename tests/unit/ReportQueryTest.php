@@ -9,6 +9,7 @@ use function Brain\Monkey\Functions\expect;
  * @covers \abrain\Einsatzverwaltung\ReportQuery
  * @package abrain\Einsatzverwaltung
  * @uses \abrain\Einsatzverwaltung\Model\IncidentReport
+ * @uses \abrain\Einsatzverwaltung\Types\Unit
  */
 class ReportQueryTest extends UnitTestCase
 {
@@ -94,11 +95,9 @@ class ReportQueryTest extends UnitTestCase
         $reportQuery = new ReportQuery();
         $reportQuery->setUnits(array(146,7544));
         expect('get_posts')->once()->with(Mockery::on(function ($array) {
-            return is_array($array) && array_key_exists('meta_query', $array) && is_array($array['meta_query']) &&
-                (!array_key_exists('relation', $array['meta_query']) || $array['meta_query']['relation'] === 'AND') &&
-                $array['meta_query'][0]['relation'] === 'OR' &&
-                in_array(array('key' => '_evw_unit', 'value' => 146), $array['meta_query'][0]) &&
-                in_array(array('key' => '_evw_unit', 'value' => 7544), $array['meta_query'][0]);
+            return is_array($array) && array_key_exists('tax_query', $array) && is_array($array['tax_query']) &&
+                (!array_key_exists('relation', $array['tax_query']) || $array['tax_query']['relation'] === 'AND') &&
+                in_array(array('taxonomy' => 'evw_unit', 'terms' => [146, 7544]), $array['tax_query']);
         }))->andReturn(array());
         $reportQuery->getReports();
     }

@@ -1,8 +1,9 @@
 <?php
 namespace abrain\Einsatzverwaltung\Widgets;
 
-use WP_Post_Type;
+use WP_Taxonomy;
 use WP_Widget;
+use function get_terms;
 
 /**
  * Class AbstractWidget
@@ -11,33 +12,32 @@ use WP_Widget;
 abstract class AbstractWidget extends WP_Widget
 {
     /**
-     * @param WP_Post_Type $postTypeObject
+     * @param WP_Taxonomy $taxonomyObject
      * @param string $fieldName
      * @param string $label
-     * @param int[] $selectedPostIds
+     * @param int[] $selectedIds
      * @param string $smallText
      */
-    protected function echoChecklistBox(WP_Post_Type $postTypeObject, $fieldName, $label, $selectedPostIds, $smallText)
+    protected function echoChecklistBox(WP_Taxonomy $taxonomyObject, string $fieldName, string $label, array $selectedIds, string $smallText)
     {
         printf('<label>%s</label>', esc_html($label));
-        $posts = get_posts(array(
-            'post_type' => $postTypeObject->name,
-            'numberposts' => -1,
-            'order' => 'ASC',
-            'orderby' => 'name'
+        $terms = get_terms(array(
+            'taxonomy' => $taxonomyObject->name,
+            'hide_empty' => false
         ));
-        if (empty($posts)) {
-            printf('<div class="checkboxlist">%s</div>', esc_html($postTypeObject->labels->not_found));
+
+        if (empty($terms)) {
+            printf('<div class="checkboxlist">%s</div>', esc_html($taxonomyObject->labels->no_terms));
         } else {
             echo '<div class="checkboxlist"><ul>';
-            foreach ($posts as $post) {
-                $selected = in_array($post->ID, $selectedPostIds);
+            foreach ($terms as $term) {
+                $selected = in_array($term->term_id, $selectedIds);
                 printf(
                     '<li><label><input type="checkbox" name="%s[]" value="%d"%s>%s</label></li>',
                     $this->get_field_name($fieldName),
-                    esc_attr($post->ID),
+                    esc_attr($term->term_id),
                     checked($selected, true, false),
-                    esc_html($post->post_title)
+                    esc_html($term->name)
                 );
             }
             printf(

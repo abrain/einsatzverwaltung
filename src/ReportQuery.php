@@ -2,6 +2,7 @@
 namespace abrain\Einsatzverwaltung;
 
 use abrain\Einsatzverwaltung\Model\IncidentReport;
+use abrain\Einsatzverwaltung\Types\Unit;
 
 /**
  * Class ReportQuery
@@ -108,20 +109,12 @@ class ReportQuery
     /**
      * @return array
      */
-    private function getMetaQuery()
+    private function getMetaQuery(): array
     {
         $metaQuery = array();
 
         if ($this->onlySpecialReports) {
             $metaQuery[] = array('key' => 'einsatz_special', 'value' => '1');
-        }
-
-        if (!empty($this->units)) {
-            $unitSubQuery = array('relation' => 'OR');
-            foreach ($this->units as $unit) {
-                $unitSubQuery[] = array('key' => '_evw_unit', 'value' => $unit);
-            }
-            $metaQuery[] = $unitSubQuery;
         }
 
         return $metaQuery;
@@ -167,12 +160,16 @@ class ReportQuery
     /**
      * @return array
      */
-    private function getTaxQuery()
+    private function getTaxQuery(): array
     {
         $taxQuery = array();
 
         if (!empty($this->incidentTypeId)) {
             $taxQuery[] = array('taxonomy' => 'einsatzart', 'terms' => array($this->incidentTypeId));
+        }
+
+        if (!empty($this->units)) {
+            $taxQuery[] = array('taxonomy' => Unit::getSlug(), 'terms' => $this->units);
         }
 
         return $taxQuery;

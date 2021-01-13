@@ -4,33 +4,41 @@ namespace abrain\Einsatzverwaltung\Types;
 use abrain\Einsatzverwaltung\CustomFields\PostSelector;
 use abrain\Einsatzverwaltung\CustomFields\UrlInput;
 use abrain\Einsatzverwaltung\CustomFieldsRepository;
-use WP_Post;
+use WP_Term;
+use function add_action;
+use function add_filter;
+use function esc_html;
+use function esc_url;
 use function get_permalink;
-use function get_post_meta;
+use function get_term;
+use function get_term_meta;
+use function get_the_title;
+use function sprintf;
+use function url_to_postid;
 
 /**
- * Description of the custom post type for units
+ * Description of the custom taxonomy for units
  * @package abrain\Einsatzverwaltung\Types
  */
-class Unit implements CustomPostType
+class Unit implements CustomTaxonomy
 {
     /**
      * Retrieve the URL to more info about a given Unit. This can be a permalink to an internal page or an external URL.
      *
-     * @param WP_Post $unit
+     * @param WP_Term $unit
      *
      * @return string A URL or an empty string
      */
-    public static function getInfoUrl(WP_Post $unit)
+    public static function getInfoUrl(WP_Term $unit): string
     {
         // The external URL takes precedence over an internal page
-        $extUrl = get_post_meta($unit->ID, 'unit_exturl', true);
+        $extUrl = get_term_meta($unit->term_id, 'unit_exturl', true);
         if (!empty($extUrl)) {
             return $extUrl;
         }
 
         // Figure out if an internal page has been assigned
-        $pageid = get_post_meta($unit->ID, 'unit_pid', true);
+        $pageid = get_term_meta($unit->term_id, 'unit_pid', true);
         if (empty($pageid)) {
             return '';
         }
@@ -47,64 +55,56 @@ class Unit implements CustomPostType
     /**
      * @return array
      */
-    private function getLabels()
+    private function getLabels(): array
     {
         return array(
-            'name' => _x('Units', 'post type general name', 'einsatzverwaltung'),
-            'singular_name' => _x('Unit', 'post type singular name', 'einsatzverwaltung'),
-            'menu_name' => __('Units', 'einsatzverwaltung'),
-            'add_new' => _x('Add New', 'Unit', 'einsatzverwaltung'),
-            'add_new_item' => __('Add New Unit', 'einsatzverwaltung'),
-            'edit_item' => __('Edit Unit', 'einsatzverwaltung'),
-            'new_item' => __('New Unit', 'einsatzverwaltung'),
-            'view_item' => __('View Unit', 'einsatzverwaltung'),
-            'view_items' => __('View Units', 'einsatzverwaltung'),
+            'name' => _x('Units', 'taxonomy general name', 'einsatzverwaltung'),
+            'singular_name' => _x('Unit', 'taxonomy singular name', 'einsatzverwaltung'),
             'search_items' => __('Search Units', 'einsatzverwaltung'),
+            'popular_items' => 'H&auml;ufig eingesetzte Einheiten',
+            'all_items' => 'Alle Einheiten',
+            'edit_item' => __('Edit Unit', 'einsatzverwaltung'),
+            'view_item' => __('View Unit', 'einsatzverwaltung'),
+            'update_item' => 'Einheit aktualisieren',
+            'add_new_item' => __('Add New Unit', 'einsatzverwaltung'),
+            'new_item_name' => 'Einheit hinzuf&uuml;gen',
+            'separate_items_with_commas' => 'Separate tags with commas',
+            'add_or_remove_items' => 'Add or remove tags',
+            'choose_from_most_used' => 'Choose from the most used tags',
             'not_found' => __('No units found.', 'einsatzverwaltung'),
-            'not_found_in_trash' => __('No units found in Trash.', 'einsatzverwaltung'),
-            'archives' => __('Unit Archives', 'einsatzverwaltung'),
-            'attributes' => __('Unit Attributes', 'einsatzverwaltung'),
-            'insert_into_item' => __('Insert into unit', 'einsatzverwaltung'),
-            'uploaded_to_this_item' => __('Uploaded to this unit', 'einsatzverwaltung'),
-            'featured_image' => _x('Featured Image', 'unit', 'einsatzverwaltung'),
-            'set_featured_image' => _x('Set featured image', 'unit', 'einsatzverwaltung'),
-            'remove_featured_image' => _x('Remove featured image', 'unit', 'einsatzverwaltung'),
-            'use_featured_image' => _x('Use as featured image', 'unit', 'einsatzverwaltung'),
-            'filter_items_list' => __('Filter units list', 'einsatzverwaltung'),
+            'no_terms' => 'Keine Einheiten',
             'items_list_navigation' => __('Units list navigation', 'einsatzverwaltung'),
             'items_list' => __('Units list', 'einsatzverwaltung'),
-            'item_published' => __('Unit published.', 'einsatzverwaltung'),
-            'item_published_privately' => __('Unit published privately.', 'einsatzverwaltung'),
-            'item_reverted_to_draft' => __('Unit reverted to draft.', 'einsatzverwaltung'),
-            'item_scheduled' => __('Unit scheduled.', 'einsatzverwaltung'),
-            'item_updated' => __('Unit updated.', 'einsatzverwaltung'),
+            'most_used' => 'Most Used',
+            'back_to_items' => '&larr; Zur&uuml;ck zu den Einheiten',
         );
     }
 
     /**
      * @inheritDoc
      */
-    public function getRegistrationArgs()
+    public function getRegistrationArgs(): array
     {
         return array(
             'labels' => $this->getLabels(),
-            'public' => false,
-            'supports' => array('title', 'editor', 'thumbnail', 'revisions', 'custom-fields', 'author'),
-            'show_ui' => true,
-            'show_in_menu' => 'edit.php?post_type=' . Report::getSlug(),
-            'show_in_admin_bar' => false,
-            'show_in_rest' => false,
-            'capability_type' => self::getSlug(),
-            'map_meta_cap' => true,
-            'menu_icon' => 'dashicons-networking',
-            'delete_with_user' => false,
+            'description' => '',
+            'public' => true,
+            'hierarchical' => false,
+            'show_in_rest' => true,
+            'meta_box_cb' => false,
+            'capabilities' => array(
+                'manage_terms' => 'edit_einsatzberichte',
+                'edit_terms' => 'edit_einsatzberichte',
+                'delete_terms' => 'edit_einsatzberichte',
+                'assign_terms' => 'edit_einsatzberichte'
+            )
         );
     }
 
     /**
      * @inheritDoc
      */
-    public function getRewriteSlug()
+    public function getRewriteSlug(): string
     {
         return self::getSlug();
     }
@@ -112,7 +112,7 @@ class Unit implements CustomPostType
     /**
      * @inheritDoc
      */
-    public static function getSlug()
+    public static function getSlug(): string
     {
         return 'evw_unit';
     }
@@ -140,5 +140,69 @@ class Unit implements CustomPostType
      */
     public function registerHooks()
     {
+        $taxonomySlug = self::getSlug();
+
+        // Manipulate the columns of the term list after the automatically generated ones have been added
+        add_action("manage_edit-{$taxonomySlug}_columns", array($this, 'onCustomColumns'), 20);
+        add_filter("manage_{$taxonomySlug}_custom_column", array($this, 'onTaxonomyColumnContent'), 20, 3);
+    }
+
+    /**
+     * Filters the columns shown in the WP_List_Table for this taxonomy.
+     *
+     * @param array $columns
+     *
+     * @return array
+     */
+    public function onCustomColumns(array $columns): array
+    {
+        // Remove the column for the external URL. We'll combine it with the vehicle page column.
+        unset($columns['unit_exturl']);
+        // Rename the unit page column
+        $columns['unit_pid'] = __('Linking', 'einsatzverwaltung');
+
+
+
+        // Remove the columns for the external URL and the info page column, as we cannot override their content.
+        //unset($columns['unit_exturl']);
+        //unset($columns['unit_pid']);
+
+        // Add a separate column in which we can combine the content of the two removed columns above
+        //$columns['unit_linking'] = __('Linking', 'einsatzverwaltung');
+        return $columns;
+    }
+
+    /**
+     * Filters the content of the columns of the WP_List_Table for this taxonomy.
+     *
+     * @param string $content Content of the column that has been defined by the previous filters
+     * @param string $columnName Name of the column
+     * @param int $termId Term ID
+     *
+     * @return string
+     */
+    public function onTaxonomyColumnContent(string $content, string $columnName, int $termId): string
+    {
+        // We only want to change a specific column
+        if ($columnName !== 'unit_pid') {
+            return $content;
+        }
+
+        $unit = get_term($termId);
+        $url = Unit::getInfoUrl($unit);
+        // If no info URL is set, there's nothing to do
+        if (empty($url)) {
+            return $content;
+        }
+
+        // Check if it is a local link after all so we can display the post title
+        $linkTitle = __('External URL', 'einsatzverwaltung');
+        $postId = url_to_postid($url);
+        if ($postId !== 0) {
+            $title = get_the_title($postId);
+            $linkTitle = empty($title) ? __('Internal URL', 'einsatzverwaltung') : $title;
+        }
+
+        return sprintf('<a href="%1$s">%2$s</a>', esc_url($url), esc_html($linkTitle));
     }
 }

@@ -16,15 +16,13 @@ use function array_map;
 use function checked;
 use function esc_attr;
 use function esc_html;
-use function get_post_type_object;
-use function get_posts;
 use function get_taxonomy;
 use function get_term_meta;
 use function get_terms;
 use function get_the_terms;
 use function in_array;
+use function is_wp_error;
 use function printf;
-use function sprintf;
 use function str_replace;
 use function usort;
 
@@ -243,32 +241,29 @@ class ReportEditScreen extends EditScreen
      */
     public function displayMetaBoxUnits(WP_Post $post)
     {
-        $units = get_posts(array(
-            'post_type' => Unit::getSlug(),
-            'numberposts' => -1,
-            'order' => 'ASC',
-            'orderby' => 'name'
+        $units = get_terms(array(
+            'taxonomy' => Unit::getSlug(),
+            'hide_empty' => false
         ));
+
+        if (is_wp_error($units)) {
+            printf("<div>%s</div>", $units->get_error_message());
+            return;
+        }
+
+        $taxonomyObject = get_taxonomy(Unit::getSlug());
         if (empty($units)) {
-            $postTypeObject = get_post_type_object(Unit::getSlug());
-            printf("<div>%s</div>", esc_html($postTypeObject->labels->not_found));
+            printf("<div>%s</div>", esc_html($taxonomyObject->labels->no_terms));
             return;
         }
 
         $report = new IncidentReport($post);
-        $assignedUnits = array_map(function (WP_Post $unit) {
-            return $unit->ID;
+        $assignedUnits = array_map(function (WP_Term $unit) {
+            return $unit->term_id;
         }, $report->getUnits());
+
         echo '<div><ul>';
-        foreach ($units as $unit) {
-            $assigned = in_array($unit->ID, $assignedUnits);
-            printf(
-                '<li><label><input type="checkbox" name="evw_units[]" value="%d"%s>%s</label></li>',
-                esc_attr($unit->ID),
-                checked($assigned, true, false),
-                esc_html($unit->post_title)
-            );
-        }
+        $this->echoTermCheckboxes($units, $taxonomyObject, $assignedUnits);
         echo '</ul></div>';
     }
 

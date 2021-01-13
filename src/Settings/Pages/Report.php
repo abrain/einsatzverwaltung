@@ -236,7 +236,7 @@ class Report extends SubPage
         register_setting(
             'einsatzvw_settings_report',
             'einsatzverwaltung_use_excerpttemplate',
-            array('Utilities', 'sanitizeCheckbox')
+            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_report',

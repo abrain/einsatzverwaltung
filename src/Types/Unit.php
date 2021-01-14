@@ -156,19 +156,12 @@ class Unit implements CustomTaxonomy
      */
     public function onCustomColumns(array $columns): array
     {
-        // Remove the column for the external URL. We'll combine it with the vehicle page column.
+        // Remove the column for the external URL, we'll combine it with the unit page column.
         unset($columns['unit_exturl']);
+
         // Rename the unit page column
         $columns['unit_pid'] = __('Linking', 'einsatzverwaltung');
 
-
-
-        // Remove the columns for the external URL and the info page column, as we cannot override their content.
-        //unset($columns['unit_exturl']);
-        //unset($columns['unit_pid']);
-
-        // Add a separate column in which we can combine the content of the two removed columns above
-        //$columns['unit_linking'] = __('Linking', 'einsatzverwaltung');
         return $columns;
     }
 

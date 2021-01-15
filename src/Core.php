@@ -1,6 +1,7 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
+use abrain\Einsatzverwaltung\Jobs\MigrateUnitsJob;
 use abrain\Einsatzverwaltung\Shortcodes\Initializer as ShortcodeInitializer;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use function add_action;
@@ -11,7 +12,7 @@ use function add_action;
 class Core
 {
     const VERSION = '1.7.2';
-    const DB_VERSION = 51;
+    const DB_VERSION = 60;
 
     /**
      * Statische Variable, um die aktuelle (einzige!) Instanz dieser Klasse zu halten
@@ -157,6 +158,8 @@ class Core
             array_push($this->adminErrorMessages, $e->getMessage());
             return;
         }
+
+        add_action('einsatzverwaltung_migrate_units', array(new MigrateUnitsJob(), 'run'));
 
         if ($this->options->isFlushRewriteRules()) {
             flush_rewrite_rules();

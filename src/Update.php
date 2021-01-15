@@ -3,14 +3,22 @@ namespace abrain\Einsatzverwaltung;
 
 use WP_Error;
 use wpdb;
+use function add_term_meta;
 use function delete_option;
 use function delete_term_meta;
 use function error_log;
 use function get_permalink;
 use function get_post_type;
+use function get_posts;
 use function get_term_meta;
+use function is_wp_error;
+use function register_taxonomy;
+use function time;
+use function unregister_taxonomy;
 use function update_option;
 use function update_term_meta;
+use function wp_insert_term;
+use function wp_schedule_single_event;
 
 /**
  *
@@ -91,6 +99,16 @@ class Update
         if ($currentDbVersion < 51 && $targetDbVersion >= 51) {
             $this->upgrade171();
         }
+
+        // Register taxonomy stub, so that convenience functions work during the update
+        register_taxonomy('evw_unit', 'einsatz');
+
+        if ($currentDbVersion < 60 && $targetDbVersion >= 60) {
+            $this->upgrade180();
+        }
+
+        // Unregister the taxonomy again, so it can be registered properly later
+        unregister_taxonomy('evw_unit');
     }
 
     /**
@@ -472,6 +490,46 @@ class Update
         $wpdb->query($query);
 
         update_option('einsatzvw_db_version', 51);
+    }
+
+    /**
+     * - Transforms the Unit custom post type to a taxonomy
+     *
+     * @since 1.8.0
+     */
+    public function upgrade180()
+    {
+        // Rewrite post_type to evw_legacy_unit
+        global $wpdb;
+        $query = $wpdb->prepare("UPDATE $wpdb->posts SET post_type = %s WHERE post_type = %s", 'evw_legacy_unit', 'evw_unit');
+        $wpdb->query($query);
+
+        $oldUnits = get_posts([
+            'nopaging' => true,
+            'post_type' => 'evw_legacy_unit',
+            'post_status' => ['publish', 'private']
+        ]);
+
+        // If there are no units, there's nothing to do
+        if (empty($oldUnits)) {
+            update_option('einsatzvw_db_version', 60);
+            return;
+        }
+
+        // Recreate units as terms
+        foreach ($oldUnits as $oldUnit) {
+            $newUnit = wp_insert_term($oldUnit->post_title, 'evw_unit');
+            if (is_wp_error($newUnit)) {
+                error_log('Could not create term for Unit: ' . $newUnit->get_error_message());
+                continue;
+            }
+            add_term_meta($newUnit['term_id'], 'old_unit_id', $oldUnit->ID, true);
+        }
+
+        // Schedule the initial run of the data migration job
+        wp_schedule_single_event(time() + 30, 'einsatzverwaltung_migrate_units');
+
+        update_option('einsatzvw_db_version', 60);
     }
 
     /**

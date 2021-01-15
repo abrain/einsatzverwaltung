@@ -11,6 +11,7 @@ use function in_array;
 /**
  * @package abrain\Einsatzverwaltung\Jobs
  * @covers \abrain\Einsatzverwaltung\Jobs\MigrateUnitsJob
+ * @uses \abrain\Einsatzverwaltung\Types\Report
  * @uses \abrain\Einsatzverwaltung\Types\Unit
  */
 class MigrateUnitsJobTest extends UnitTestCase

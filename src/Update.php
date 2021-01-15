@@ -8,6 +8,7 @@ use function delete_option;
 use function delete_term_meta;
 use function error_log;
 use function get_permalink;
+use function get_post_meta;
 use function get_post_type;
 use function get_posts;
 use function get_term_meta;
@@ -523,7 +524,10 @@ class Update
                 error_log('Could not create term for Unit: ' . $newUnit->get_error_message());
                 continue;
             }
-            add_term_meta($newUnit['term_id'], 'old_unit_id', $oldUnit->ID, true);
+            $termId = $newUnit['term_id'];
+            add_term_meta($termId, 'unit_exturl', get_post_meta($oldUnit->ID, 'unit_exturl', true), true);
+            add_term_meta($termId, 'unit_pid', get_post_meta($oldUnit->ID, 'unit_pid', true), true);
+            add_term_meta($termId, 'old_unit_id', $oldUnit->ID, true);
         }
 
         // Schedule the initial run of the data migration job

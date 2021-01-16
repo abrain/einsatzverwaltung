@@ -37,7 +37,7 @@ class MigrateUnitsJob
         }
 
         $reportsWithUnits = get_posts([
-            'numberposts' => 25,
+            'numberposts' => 50,
             'fields' => 'ids',
             'post_type' => Report::getSlug(),
             'post_status' => ['publish', 'private'],

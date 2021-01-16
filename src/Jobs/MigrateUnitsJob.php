@@ -90,6 +90,8 @@ class MigrateUnitsJob
             $newUnits[] = $unitIdMap[intval($assignedUnit)];
         }
         wp_set_post_terms($reportId, $newUnits, Unit::getSlug());
+
+        // Rename postmeta entry, so we know which one is already migrated
         $wpdb->query($wpdb->prepare(
             "UPDATE $wpdb->postmeta SET meta_key = %s WHERE meta_key = %s AND post_id = %d",
             '_evw_legacy_unit',

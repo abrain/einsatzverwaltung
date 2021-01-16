@@ -2,7 +2,6 @@
 namespace abrain\Einsatzverwaltung;
 
 use WP_Error;
-use wpdb;
 use function add_term_meta;
 use function delete_option;
 use function delete_term_meta;
@@ -22,7 +21,7 @@ use function wp_insert_term;
 use function wp_schedule_single_event;
 
 /**
- *
+ * Performs data structure and data migrations after a plugin upgrade
  */
 class Update
 {
@@ -34,7 +33,7 @@ class Update
      *
      * @return void|WP_Error
      */
-    public function doUpdate($currentDbVersion, $targetDbVersion)
+    public function doUpdate(int $currentDbVersion, int $targetDbVersion)
     {
         if (empty($targetDbVersion)) {
             return new WP_Error('', 'Zieldatenbankversion darf nicht leer sein');
@@ -117,7 +116,6 @@ class Update
      */
     private function upgrade054()
     {
-        /** @var wpdb $wpdb */
         global $wpdb;
 
         $allReports = get_posts(array(
@@ -166,7 +164,6 @@ class Update
      */
     private function upgrade090()
     {
-        /** @var wpdb $wpdb */
         global $wpdb;
 
         $wpdb->delete(
@@ -303,7 +300,6 @@ class Update
 
     private function upgrade130()
     {
-        /** @var wpdb $wpdb */
         global $wpdb;
 
         $taxonomies = array(
@@ -362,7 +358,6 @@ class Update
      */
     private function upgrade134()
     {
-        /** @var wpdb $wpdb */
         global $wpdb;
 
         $postIds = $wpdb->get_col("SELECT ID FROM $wpdb->posts WHERE post_type = 'einsatz'");
@@ -384,9 +379,9 @@ class Update
     private function upgrade140()
     {
         add_option('einsatzverwaltung_use_reporttemplate', 'no');
-        add_option('einsatzverwaltung_reporttemplate', '');
+        add_option('einsatzverwaltung_reporttemplate');
         add_option('einsatzverwaltung_use_excerpttemplate', '0');
-        add_option('einsatzverwaltung_excerpttemplate', '');
+        add_option('einsatzverwaltung_excerpttemplate');
 
         delete_option('einsatzvw_excerpt_type');
         delete_option('einsatzvw_excerpt_type_feed');
@@ -541,7 +536,7 @@ class Update
      *
      * @param string $slug Bezeichner für die Notice
      */
-    private function addAdminNotice($slug)
+    private function addAdminNotice(string $slug)
     {
         $notices = get_option('einsatzverwaltung_admin_notices');
 

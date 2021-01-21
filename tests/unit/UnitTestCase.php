@@ -19,6 +19,19 @@ class UnitTestCase extends TestCase
         Monkey\setUp();
         Monkey\Functions\stubTranslationFunctions();
         Monkey\Functions\stubEscapeFunctions();
+
+        Monkey\Functions\when('shortcode_atts')->alias(function ($defaults, $attributes) {
+            $attributes = (array) $attributes;
+            $result = [];
+            foreach ($defaults as $name => $default) {
+                if (array_key_exists($name, $attributes)) {
+                    $result[$name] = $attributes[$name];
+                } else {
+                    $result[$name] = $default;
+                }
+            }
+            return $result;
+        });
     }
 
     protected function tearDown()
@@ -29,10 +42,11 @@ class UnitTestCase extends TestCase
 
     /**
      * Copied from WP_UnitTestCase
+     *
      * @param array $expected
      * @param array $actual
      */
-    protected function assertEqualSets($expected, $actual)
+    protected function assertEqualSets(array $expected, array $actual)
     {
         sort($expected);
         sort($actual);

@@ -20,13 +20,27 @@ class ReportCount extends AbstractShortcode
         'units' => '',
         'year' => ''
     );
+    /**
+     * @var ReportQuery
+     */
+    private $reportQuery;
+
+    /**
+     * ReportCount constructor.
+     *
+     * @param ReportQuery $reportQuery
+     */
+    public function __construct(ReportQuery $reportQuery)
+    {
+        $this->reportQuery = $reportQuery;
+    }
 
     /**
      * @param array|string $attributes Attributes of the shortcode
      *
      * @return string
      */
-    public function render($attributes)
+    public function render($attributes): string
     {
         // See https://core.trac.wordpress.org/ticket/45929
         if ($attributes === '') {
@@ -36,21 +50,21 @@ class ReportCount extends AbstractShortcode
         $attributes = shortcode_atts($this->defaultAttributes, $attributes);
         $year = $this->getYear($attributes['year']);
 
-        $reportQuery = new ReportQuery();
+        $this->reportQuery->resetQueryVars();
         if (is_int($year)) {
-            $reportQuery->setYear(intval($year));
+            $this->reportQuery->setYear(intval($year));
         }
 
         if (array_key_exists('einsatzart', $attributes) && is_numeric($attributes['einsatzart'])) {
-            $reportQuery->setIncidentTypeId(intval($attributes['einsatzart']));
+            $this->reportQuery->setIncidentTypeId(intval($attributes['einsatzart']));
         }
 
         $units = $this->getIntegerList($attributes, 'units');
         if (!empty($units)) {
-            $reportQuery->setUnits($this->translateOldUnitIds($units));
+            $this->reportQuery->setUnits($this->translateOldUnitIds($units));
         }
 
-        $incidentReports = $reportQuery->getReports();
+        $incidentReports = $this->reportQuery->getReports();
         $reportCount = array_reduce($incidentReports, function ($sum, IncidentReport $report) {
             return $sum + $report->getWeight();
         }, 0);
@@ -64,7 +78,7 @@ class ReportCount extends AbstractShortcode
      *
      * @return int|string A numeric year or an empty string in case of an empty or erroneous attribute
      */
-    private function getYear($value)
+    private function getYear(string $value)
     {
         $currentYear = intval(date('Y'));
         if ($value === 'current') {

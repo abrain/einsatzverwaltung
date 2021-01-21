@@ -45,7 +45,10 @@ class ReportCount extends AbstractShortcode
             $reportQuery->setIncidentTypeId(intval($attributes['einsatzart']));
         }
 
-        $reportQuery->setUnits($this->getIntegerList($attributes, 'units'));
+        $units = $this->getIntegerList($attributes, 'units');
+        if (!empty($units)) {
+            $reportQuery->setUnits($this->translateOldUnitIds($units));
+        }
 
         $incidentReports = $reportQuery->getReports();
         $reportCount = array_reduce($incidentReports, function ($sum, IncidentReport $report) {

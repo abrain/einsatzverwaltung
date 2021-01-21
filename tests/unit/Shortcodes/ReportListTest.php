@@ -3,12 +3,14 @@ namespace abrain\Einsatzverwaltung\Shortcodes;
 
 use abrain\Einsatzverwaltung\Frontend\ReportList\SplitType;
 use abrain\Einsatzverwaltung\UnitTestCase;
+use const ARRAY_A;
 
 /**
  * Class ReportListTest
+ * @package abrain\Einsatzverwaltung\Shortcodes
  * @covers \abrain\Einsatzverwaltung\Shortcodes\AbstractShortcode
  * @covers \abrain\Einsatzverwaltung\Shortcodes\ReportList
- * @package abrain\Einsatzverwaltung\Shortcodes
+ * @uses \abrain\Einsatzverwaltung\Types\Unit
  */
 class ReportListTest extends UnitTestCase
 {
@@ -82,12 +84,23 @@ class ReportListTest extends UnitTestCase
 
     public function testGetReports()
     {
+        global $wpdb;
+        $mockBuilder = $this->getMockBuilder('\wpdb');
+        $mockBuilder->setMethods(['prepare', 'get_results']);
+        $wpdb = $mockBuilder->getMock();
+        $wpdb->termmeta = 'tm';
+        $wpdb->term_taxonomy = 'tt';
+        $wpdb->expects($this->once())->method('prepare')->willReturn('query');
+        $wpdb->expects($this->once())->method('get_results')->with('query', ARRAY_A)->willReturn([
+            ['term_id' => 777, 'meta_value' => 433],
+            ['term_id' => 888, 'meta_value' => 560]
+        ]);
         $reportQuery = $this->createMock('\abrain\Einsatzverwaltung\ReportQuery');
         $reportQuery->expects($this->once())->method('setIncidentTypeId')->with($this->equalTo(16));
         $reportQuery->expects($this->once())->method('setLimit')->with($this->equalTo(4));
         $reportQuery->expects($this->once())->method('setOnlySpecialReports')->with($this->isTrue());
         $reportQuery->expects($this->once())->method('setOrderAsc')->with($this->isTrue());
-        $reportQuery->expects($this->once())->method('setUnits')->with($this->equalTo(array(433, 457, 560)));
+        $reportQuery->expects($this->once())->method('setUnits')->with($this->equalTo(array(777, 457, 888)));
         $reportQuery->expects($this->once())->method('setYear')->with($this->equalTo('2017'));
         $this->reportList->configureReportQuery(
             $reportQuery,

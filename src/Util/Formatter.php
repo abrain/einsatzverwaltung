@@ -20,6 +20,7 @@ use function get_term_meta;
 use function intval;
 use function join;
 use function sanitize_post_field;
+use function sanitize_term_field;
 use function sprintf;
 
 /**
@@ -337,25 +338,25 @@ class Formatter
      *
      * @return string
      */
-    public function getUnits(IncidentReport $report, $addLinks = false)
+    public function getUnits(IncidentReport $report, $addLinks = false): string
     {
         $units = $report->getUnits();
 
         if (!$addLinks) {
             // Only return the names
-            $unitNames = array_map(function (WP_Post $unit) {
-                return sanitize_post_field('post_title', $unit->post_title, $unit->ID);
+            $unitNames = array_map(function (WP_Term $unit) {
+                return esc_html($unit->name);
             }, $units);
             return join(', ', $unitNames);
         }
 
         // Return the names, linked to the respective info page if URL has been set
-        $linkedUnitNames = array_map(function (WP_Post $unit) {
-            $name = sanitize_post_field('post_title', $unit->post_title, $unit->ID);
+        $linkedUnitNames = array_map(function (WP_Term $unit) {
+            $name = $unit->name;
 
             $infoUrl = Unit::getInfoUrl($unit);
             if (empty($infoUrl)) {
-                return $name;
+                return esc_html($name);
             }
 
             return sprintf(

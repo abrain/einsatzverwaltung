@@ -6,6 +6,7 @@ use abrain\Einsatzverwaltung\Frontend\ReportList\Parameters as ReportListParamet
 use abrain\Einsatzverwaltung\Frontend\ReportList\Renderer as ReportListRenderer;
 use abrain\Einsatzverwaltung\Frontend\ReportList\SplitType;
 use abrain\Einsatzverwaltung\ReportQuery;
+use function array_map;
 
 /**
  * Renders the list of reports for the shortcode [einsatzliste]
@@ -152,6 +153,9 @@ class ReportList extends AbstractShortcode
             $reportQuery->setIncidentTypeId(intval($attributes['einsatzart']));
         }
 
-        $reportQuery->setUnits($this->getIntegerList($attributes, 'units'));
+        $units = $this->getIntegerList($attributes, 'units');
+        if (!empty($units)) {
+            $reportQuery->setUnits($this->translateOldUnitIds($units));
+        }
     }
 }

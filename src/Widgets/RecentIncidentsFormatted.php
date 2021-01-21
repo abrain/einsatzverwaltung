@@ -4,6 +4,7 @@ namespace abrain\Einsatzverwaltung\Widgets;
 use abrain\Einsatzverwaltung\ReportQuery;
 use abrain\Einsatzverwaltung\Types\Unit;
 use abrain\Einsatzverwaltung\Util\Formatter;
+use function get_taxonomy;
 
 /**
  * Widget für die neuesten Einsätze, das Aussehen wird vom Benutzer per HTML-Templates bestimmt
@@ -260,7 +261,7 @@ class RecentIncidentsFormatted extends AbstractWidget
         echo '</p>';
 
         $this->echoChecklistBox(
-            get_post_type_object(Unit::getSlug()),
+            get_taxonomy(Unit::getSlug()),
             'units',
             __('Only show reports for these units:', 'einsatzverwaltung'),
             $values['units'],

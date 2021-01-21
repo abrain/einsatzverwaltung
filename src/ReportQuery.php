@@ -67,25 +67,28 @@ class ReportQuery
      */
     public function __construct()
     {
-        $this->initQueryVars();
+        $this->resetQueryVars();
     }
 
     /**
      * Setzt die Abfragevariablen auf einen definierten Standardwert
      */
-    private function initQueryVars()
+    public function resetQueryVars()
     {
         $this->excludePostId = array();
+        $this->incidentTypeId = 0;
         $this->includePrivateReports = false;
         $this->limit = -1;
         $this->onlySpecialReports = false;
         $this->orderAsc = true;
+        $this->units = [];
+        $this->year = null;
     }
 
     /**
      * @return array
      */
-    private function getDateQuery()
+    private function getDateQuery(): array
     {
         $dateQuery = array();
 
@@ -123,7 +126,7 @@ class ReportQuery
     /**
      * @return IncidentReport[]
      */
-    public function getReports()
+    public function getReports(): array
     {
         $postStatus = array('publish');
         if ($this->includePrivateReports) {
@@ -178,7 +181,7 @@ class ReportQuery
     /**
      * @param array $postIds
      */
-    public function setExcludePostIds($postIds)
+    public function setExcludePostIds(array $postIds)
     {
         $this->excludePostId = $postIds;
     }
@@ -186,7 +189,7 @@ class ReportQuery
     /**
      * @param int $incidentTypeId
      */
-    public function setIncidentTypeId($incidentTypeId)
+    public function setIncidentTypeId(int $incidentTypeId)
     {
         $this->incidentTypeId = $incidentTypeId;
     }
@@ -194,7 +197,7 @@ class ReportQuery
     /**
      * @param bool $includePrivateReports
      */
-    public function setIncludePrivateReports($includePrivateReports)
+    public function setIncludePrivateReports(bool $includePrivateReports)
     {
         $this->includePrivateReports = $includePrivateReports;
     }
@@ -202,7 +205,7 @@ class ReportQuery
     /**
      * @param int $limit
      */
-    public function setLimit($limit)
+    public function setLimit(int $limit)
     {
         if (is_numeric($limit)) {
             $this->limit = $limit;
@@ -212,7 +215,7 @@ class ReportQuery
     /**
      * @param boolean $onlySpecialReports
      */
-    public function setOnlySpecialReports($onlySpecialReports)
+    public function setOnlySpecialReports(bool $onlySpecialReports)
     {
         $this->onlySpecialReports = $onlySpecialReports;
     }
@@ -220,7 +223,7 @@ class ReportQuery
     /**
      * @param boolean $orderAsc
      */
-    public function setOrderAsc($orderAsc)
+    public function setOrderAsc(bool $orderAsc)
     {
         $this->orderAsc = $orderAsc;
     }
@@ -228,7 +231,7 @@ class ReportQuery
     /**
      * @param int[] $units
      */
-    public function setUnits($units)
+    public function setUnits(array $units)
     {
         $this->units = $units;
     }
@@ -236,7 +239,7 @@ class ReportQuery
     /**
      * @param int $year
      */
-    public function setYear($year)
+    public function setYear(int $year)
     {
         $this->year = $year;
     }

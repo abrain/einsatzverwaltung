@@ -3,14 +3,18 @@ namespace abrain\Einsatzverwaltung;
 
 use WP_Error;
 use function add_term_meta;
+use function array_key_exists;
+use function array_map;
 use function delete_option;
 use function delete_term_meta;
 use function error_log;
+use function get_option;
 use function get_permalink;
 use function get_post_meta;
 use function get_post_type;
 use function get_posts;
 use function get_term_meta;
+use function is_array;
 use function is_wp_error;
 use function register_taxonomy;
 use function time;
@@ -513,6 +517,7 @@ class Update
         }
 
         // Recreate units as terms
+        $map = [];
         foreach ($oldUnits as $oldUnit) {
             $newUnit = wp_insert_term($oldUnit->post_title, 'evw_unit');
             if (is_wp_error($newUnit)) {
@@ -523,10 +528,40 @@ class Update
             add_term_meta($termId, 'unit_exturl', get_post_meta($oldUnit->ID, 'unit_exturl', true), true);
             add_term_meta($termId, 'unit_pid', get_post_meta($oldUnit->ID, 'unit_pid', true), true);
             add_term_meta($termId, 'old_unit_id', $oldUnit->ID, true);
+
+            // Map old to new ID
+            $map[$oldUnit->ID] = $termId;
         }
 
         // Schedule the initial run of the data migration job
         wp_schedule_single_event(time() + 30, 'einsatzverwaltung_migrate_units');
+
+        // Update the Units IDs in the widgets if configured
+        foreach (['einsatzverwaltung_widget', 'recent-incidents-formatted'] as $widgetId) {
+            $optionName = "widget_$widgetId";
+            $widgetConfigs = get_option($optionName);
+            if (empty($widgetConfigs)) {
+                continue;
+            }
+            $updatedConfigs = [];
+            $modified = false;
+            foreach ($widgetConfigs as $key => $config) {
+                if (!is_array($config) || !array_key_exists('units', $config) || empty($config['units'])) {
+                    // Transfer as-is
+                    $updatedConfigs[$key] = $config;
+                    continue;
+                }
+
+                $config['units'] = array_map(function ($unitId) use ($map) {
+                    return array_key_exists($unitId, $map) ? $map[$unitId] : $unitId;
+                }, $config['units']);
+                $updatedConfigs[$key] = $config;
+                $modified = true;
+            }
+            if ($modified) {
+                update_option($optionName, $updatedConfigs);
+            }
+        }
 
         update_option('einsatzvw_db_version', 60);
     }

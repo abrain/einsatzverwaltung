@@ -3,6 +3,8 @@ namespace abrain\Einsatzverwaltung;
 
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Types\Report;
+use abrain\Einsatzverwaltung\Types\Unit;
+use abrain\Einsatzverwaltung\Types\Vehicle;
 use DateTime;
 use WP_Post;
 use wpdb;
@@ -112,7 +114,8 @@ class Data
 
         $updateArgs = array(
             'ID' => $postId,
-            'meta_input' => array()
+            'meta_input' => [],
+            'tax_input' => []
         );
 
         /**
@@ -149,6 +152,14 @@ class Data
         foreach ($annotations as $annotation) {
             $value = filter_input(INPUT_POST, $annotation, FILTER_SANITIZE_STRING);
             $updateArgs['meta_input'][$annotation] = empty($value) ? '0' : $value;
+        }
+
+        // Explicitly set an empty collection for a taxonomy if no values have been selected
+        $taxInput = (array)filter_input(INPUT_POST, 'tax_input', FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY);
+        foreach ([Vehicle::getSlug(), Unit::getSlug()] as $taxonomy) {
+            if (!array_key_exists($taxonomy, $taxInput)) {
+                $updateArgs['tax_input'][$taxonomy] = [];
+            }
         }
 
         // save_post Filter kurzzeitig deaktivieren, damit keine Dauerschleife entsteht

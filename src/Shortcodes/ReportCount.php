@@ -1,5 +1,4 @@
 <?php
-
 namespace abrain\Einsatzverwaltung\Shortcodes;
 
 use abrain\Einsatzverwaltung\Model\IncidentReport;
@@ -36,9 +35,7 @@ class ReportCount extends AbstractShortcode
     }
 
     /**
-     * @param array|string $attributes Attributes of the shortcode
-     *
-     * @return string
+     * @inheritDoc
      */
     public function render($attributes): string
     {

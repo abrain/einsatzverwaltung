@@ -1,5 +1,4 @@
 <?php
-
 namespace abrain\Einsatzverwaltung\Shortcodes;
 
 use abrain\Einsatzverwaltung\Types\Unit;
@@ -15,11 +14,11 @@ use const ARRAY_A;
 abstract class AbstractShortcode
 {
     /**
-     * @param array $atts
+     * @param array|string $attributes
      *
      * @return string
      */
-    abstract public function render($atts);
+    abstract public function render($attributes): string;
 
     /**
      * Extracts a list of integers from a comma-separated string
@@ -29,7 +28,7 @@ abstract class AbstractShortcode
      *
      * @return int[] All the valid numbers from the string. Empty array if key doesn't exist.
      */
-    protected function getIntegerList($attributes, $key)
+    protected function getIntegerList(array $attributes, string $key): array
     {
         if (!array_key_exists($key, $attributes)) {
             return array();

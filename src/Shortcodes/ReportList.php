@@ -1,5 +1,4 @@
 <?php
-
 namespace abrain\Einsatzverwaltung\Shortcodes;
 
 use abrain\Einsatzverwaltung\Frontend\ReportList\Parameters as ReportListParameters;
@@ -46,15 +45,11 @@ class ReportList extends AbstractShortcode
     }
 
     /**
-     * Gibt eine Tabelle mit Einsätzen aus dem gegebenen Jahr zurück
-     *
-     * @param array|string $atts Parameter des Shortcodes
-     *
-     * @return string
+     * @inheritDoc
      */
-    public function render($atts)
+    public function render($attributes): string
     {
-        $attributes = $this->getAttributes($atts);
+        $attributes = $this->getAttributes($attributes);
         $filteredOptions = $this->extractOptions($attributes);
 
         $reportQuery = new ReportQuery();
@@ -72,7 +67,7 @@ class ReportList extends AbstractShortcode
      *
      * @return array
      */
-    private function getAttributes($attributes)
+    private function getAttributes($attributes): array
     {
         // See https://core.trac.wordpress.org/ticket/45929
         if ($attributes === '') {
@@ -94,7 +89,7 @@ class ReportList extends AbstractShortcode
      *
      * @return array
      */
-    public function extractOptions($attributes)
+    public function extractOptions(array $attributes): array
     {
         $rawOptions = array_map('trim', explode(',', $attributes['options']));
         $possibleOptions = array('special', 'noLinkWithoutContent', 'noHeading', 'compact');
@@ -106,7 +101,7 @@ class ReportList extends AbstractShortcode
      * @param array $attributes
      * @param array $filteredOptions
      */
-    public function configureListParameters(ReportListParameters &$parameters, $attributes, $filteredOptions)
+    public function configureListParameters(ReportListParameters &$parameters, array $attributes, array $filteredOptions)
     {
         switch ($attributes['split']) {
             case 'monthly':

@@ -1,5 +1,4 @@
 <?php
-
 namespace abrain\Einsatzverwaltung\Shortcodes;
 
 use abrain\Einsatzverwaltung\Data;
@@ -42,20 +41,16 @@ class ReportArchives extends AbstractShortcode
     }
 
     /**
-     * Gibt Links zu den Archivseiten der Jahre, in denen Einsatzberichte existieren, zurück
-     *
-     * @param array $atts Parameter des Shortcodes
-     *
-     * @return string
+     * @inheritDoc
      */
-    public function render($atts)
+    public function render($attributes): string
     {
         global $year;
         $thisYear = intval(date('Y'));
         $queriedYear = empty($year) ? $thisYear : $year;
         $yearsWithReports = $this->data->getYearsWithReports();
 
-        $attributes = shortcode_atts($this->defaultAttributes, $atts);
+        $attributes = shortcode_atts($this->defaultAttributes, $attributes);
 
         if ($attributes['add_queried_year'] !== 'no' && !in_array($queriedYear, $yearsWithReports)) {
             $yearsWithReports[] = $queriedYear;
@@ -76,7 +71,7 @@ class ReportArchives extends AbstractShortcode
      *
      * @return string[]
      */
-    private function getAnchorsForYears($yearsWithReports, $queriedYear)
+    private function getAnchorsForYears(array $yearsWithReports, int $queriedYear): array
     {
         $anchors = array();
         foreach ($yearsWithReports as $currentYear) {
@@ -99,13 +94,13 @@ class ReportArchives extends AbstractShortcode
     }
 
     /**
-     * @param array $yearsWithReports
+     * @param int[] $yearsWithReports
      * @param string $sort
      * @param string $limit
      *
-     * @return array
+     * @return int[]
      */
-    private function sortAndLimit($yearsWithReports, $sort, $limit)
+    private function sortAndLimit(array $yearsWithReports, string $sort, string $limit): array
     {
         // Always sort in descending order so that the most current year is at index 0
         rsort($yearsWithReports);

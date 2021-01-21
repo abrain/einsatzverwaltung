@@ -4,6 +4,7 @@ namespace abrain\Einsatzverwaltung\Types;
 use abrain\Einsatzverwaltung\CustomFields\PostSelector;
 use abrain\Einsatzverwaltung\CustomFields\UrlInput;
 use abrain\Einsatzverwaltung\CustomFieldsRepository;
+use WP_REST_Response;
 use WP_Term;
 use function add_action;
 use function add_filter;
@@ -145,6 +146,17 @@ class Unit implements CustomTaxonomy
         // Manipulate the columns of the term list after the automatically generated ones have been added
         add_action("manage_edit-{$taxonomySlug}_columns", array($this, 'onCustomColumns'), 20);
         add_filter("manage_{$taxonomySlug}_custom_column", array($this, 'onTaxonomyColumnContent'), 20, 3);
+
+        /**
+         * Prevent the Gutenberg Editor from creating a UI for this taxonomy, so we can use our own
+         * https://github.com/WordPress/gutenberg/issues/6912#issuecomment-428403380
+         */
+        add_filter('rest_prepare_taxonomy', function (WP_REST_Response $response, $taxonomy) use ($taxonomySlug) {
+            if ($taxonomySlug === $taxonomy->name) {
+                $response->data['visibility']['show_ui'] = false;
+            }
+            return $response;
+        }, 10, 2);
     }
 
     /**

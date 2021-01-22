@@ -5,12 +5,15 @@ use abrain\Einsatzverwaltung\Model\IncidentReport;
 use Brain\Monkey\Expectation\Exception\ExpectationArgsRequired;
 use Brain\Monkey\Expectation\Exception\NotAllowedMethod;
 use Mockery;
+use function array_key_exists;
 use function Brain\Monkey\Functions\expect;
+use function in_array;
+use function is_array;
 
 /**
  * Class ReportQueryTest
- * @covers \abrain\Einsatzverwaltung\ReportQuery
  * @package abrain\Einsatzverwaltung
+ * @covers \abrain\Einsatzverwaltung\ReportQuery
  * @uses \abrain\Einsatzverwaltung\Model\IncidentReport
  * @uses \abrain\Einsatzverwaltung\Types\Unit
  */
@@ -183,6 +186,56 @@ class ReportQueryTest extends UnitTestCase
                 (array_key_exists('numberposts', $array) && $array['numberposts'] === 63) ||
                 (array_key_exists('posts_per_page', $array) && $array['posts_per_page'] === 63)
             );
+        }))->andReturn([]);
+        $reportQuery->getReports();
+    }
+
+    /**
+     * @throws ExpectationArgsRequired
+     */
+    public function testOnlyReturnFalseAlarms()
+    {
+        $reportQuery = new ReportQuery();
+        $reportQuery->setOnlyReportStatus([ReportStatus::FALSE_ALARM]);
+        expect('get_posts')->once()->with(Mockery::on(function ($args) {
+            return is_array($args) && array_key_exists('meta_query', $args) && is_array($args['meta_query']) &&
+                (!array_key_exists('relation', $args['meta_query']) || $args['meta_query']['relation'] === 'AND') &&
+                $args['meta_query'][0] === ['key' => 'einsatz_fehlalarm', 'value' => '1'] &&
+                count($args['meta_query']) === 1;
+        }))->andReturn([]);
+        $reportQuery->getReports();
+    }
+
+    /**
+     * @throws ExpectationArgsRequired
+     */
+    public function testOnlyReturnActualAlarms()
+    {
+        $reportQuery = new ReportQuery();
+        $reportQuery->setOnlyReportStatus([ReportStatus::ACTUAL]);
+        expect('get_posts')->once()->with(Mockery::on(function ($args) {
+            return is_array($args) && array_key_exists('meta_query', $args) && is_array($args['meta_query']) &&
+                (!array_key_exists('relation', $args['meta_query']) || $args['meta_query']['relation'] === 'AND') &&
+                in_array(['key' => 'einsatz_fehlalarm', 'value' => '0'], $args['meta_query'][0]) &&
+                in_array(['key' => 'einsatz_fehlalarm', 'compare' => 'NOT EXISTS'], $args['meta_query'][0]) &&
+                $args['meta_query'][0]['relation'] === 'OR';
+        }))->andReturn([]);
+        $reportQuery->getReports();
+    }
+
+    /**
+     * @throws ExpectationArgsRequired
+     */
+    public function testOnlyReturnFalseAndActualAlarms()
+    {
+        $reportQuery = new ReportQuery();
+        $reportQuery->setOnlyReportStatus([ReportStatus::ACTUAL, ReportStatus::FALSE_ALARM]);
+        expect('get_posts')->once()->with(Mockery::on(function ($args) {
+            return is_array($args) && array_key_exists('meta_query', $args) && is_array($args['meta_query']) &&
+                (!array_key_exists('relation', $args['meta_query']) || $args['meta_query']['relation'] === 'AND') &&
+                $args['meta_query'][0]['relation'] === 'OR' &&
+                in_array(['key' => 'einsatz_fehlalarm', 'value' => '1'], $args['meta_query'][0]) &&
+                in_array(['key' => 'einsatz_fehlalarm', 'value' => '0'], $args['meta_query'][0]);
         }))->andReturn([]);
         $reportQuery->getReports();
     }

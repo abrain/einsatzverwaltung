@@ -10,6 +10,7 @@ use DateTime;
 use WP_Post;
 use WP_Term;
 use function array_map;
+use function current_theme_supports;
 use function date;
 use function date_i18n;
 use function esc_html;
@@ -17,10 +18,10 @@ use function esc_url;
 use function get_permalink;
 use function get_term_link;
 use function get_term_meta;
+use function get_the_post_thumbnail;
+use function has_post_thumbnail;
 use function intval;
 use function join;
-use function sanitize_post_field;
-use function sanitize_term_field;
 use function sprintf;
 
 /**
@@ -56,6 +57,7 @@ class Formatter
         '%typesOfAlerting%' => 'Alarmierungsarten',
         '%content%' => 'Berichtstext',
         '%featuredImage%' => 'Beitragsbild',
+        '%featuredImageThumbnail%' => 'Beitragsvorschaubild',
         '%yearArchive%' => 'Link zum Jahresarchiv',
         '%workforce%' => 'Mannschaftsstärke',
         '%units%' => 'Einheiten',
@@ -209,6 +211,9 @@ class Formatter
                 break;
             case '%featuredImage%':
                 $replace = current_theme_supports('post-thumbnails') ? get_the_post_thumbnail($post->ID) : '';
+                break;
+            case '%featuredImageThumbnail%':
+                $replace = has_post_thumbnail($post->ID) ? get_the_post_thumbnail($post->ID, 'thumbnail') : '';
                 break;
             case '%yearArchive%':
                 // Take the year of the report, or the current year if used outside a specific report

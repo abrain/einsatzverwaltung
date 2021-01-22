@@ -3,7 +3,9 @@ namespace abrain\Einsatzverwaltung\Shortcodes;
 
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\ReportQuery;
+use abrain\Einsatzverwaltung\ReportStatus;
 use function array_reduce;
+use function in_array;
 
 /**
  * Shows a number of incident reports for the shortcode [reportcount]
@@ -16,6 +18,7 @@ class ReportCount extends AbstractShortcode
      */
     private $defaultAttributes = array(
         'einsatzart' => '',
+        'status' => '',
         'units' => '',
         'year' => ''
     );
@@ -54,6 +57,18 @@ class ReportCount extends AbstractShortcode
 
         if (array_key_exists('einsatzart', $attributes) && is_numeric($attributes['einsatzart'])) {
             $this->reportQuery->setIncidentTypeId(intval($attributes['einsatzart']));
+        }
+
+        $status = $this->getStringList($attributes, 'status', ['actual', 'falseAlarm']);
+        if (!empty($status)) {
+            $reportStatus = [];
+            if (in_array('actual', $status)) {
+                $reportStatus[] = ReportStatus::ACTUAL;
+            }
+            if (in_array('falseAlarm', $status)) {
+                $reportStatus[] = ReportStatus::FALSE_ALARM;
+            }
+            $this->reportQuery->setOnlyReportStatus($reportStatus);
         }
 
         $units = $this->getIntegerList($attributes, 'units');

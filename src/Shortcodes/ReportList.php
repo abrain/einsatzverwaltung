@@ -5,7 +5,6 @@ use abrain\Einsatzverwaltung\Frontend\ReportList\Parameters as ReportListParamet
 use abrain\Einsatzverwaltung\Frontend\ReportList\Renderer as ReportListRenderer;
 use abrain\Einsatzverwaltung\Frontend\ReportList\SplitType;
 use abrain\Einsatzverwaltung\ReportQuery;
-use function array_map;
 
 /**
  * Renders the list of reports for the shortcode [einsatzliste]
@@ -91,9 +90,11 @@ class ReportList extends AbstractShortcode
      */
     public function extractOptions(array $attributes): array
     {
-        $rawOptions = array_map('trim', explode(',', $attributes['options']));
-        $possibleOptions = array('special', 'noLinkWithoutContent', 'noHeading', 'compact');
-        return array_intersect($possibleOptions, $rawOptions);
+        return $this->getStringList(
+            $attributes,
+            'options',
+            ['special', 'noLinkWithoutContent', 'noHeading', 'compact']
+        );
     }
 
     /**

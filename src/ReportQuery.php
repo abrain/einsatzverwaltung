@@ -3,6 +3,8 @@ namespace abrain\Einsatzverwaltung;
 
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Types\Unit;
+use function count;
+use function in_array;
 
 /**
  * Class ReportQuery
@@ -37,6 +39,11 @@ class ReportQuery
      * @var int
      */
     private $limit;
+
+    /**
+     * @var ReportStatus[]
+     */
+    private $onlyReportStatus;
 
     /**
      * Zeigt an, ob nur als besonders markierte Berichte abgefragt werden sollen
@@ -79,6 +86,7 @@ class ReportQuery
         $this->incidentTypeId = 0;
         $this->includePrivateReports = false;
         $this->limit = -1;
+        $this->onlyReportStatus = [];
         $this->onlySpecialReports = false;
         $this->orderAsc = true;
         $this->units = [];
@@ -114,10 +122,32 @@ class ReportQuery
      */
     private function getMetaQuery(): array
     {
-        $metaQuery = array();
+        $metaQuery = [];
 
         if ($this->onlySpecialReports) {
-            $metaQuery[] = array('key' => 'einsatz_special', 'value' => '1');
+            $metaQuery[] = ['key' => 'einsatz_special', 'value' => '1'];
+        }
+
+        if (!empty($this->onlyReportStatus)) {
+            $conditions = [];
+            if (in_array(ReportStatus::ACTUAL, $this->onlyReportStatus)) {
+                $conditions[] = ['key' => 'einsatz_fehlalarm', 'value' => '0'];
+                $conditions[] = ['key' => 'einsatz_fehlalarm', 'compare' => 'NOT EXISTS'];
+            }
+            if (in_array(ReportStatus::FALSE_ALARM, $this->onlyReportStatus)) {
+                $conditions[] = ['key' => 'einsatz_fehlalarm', 'value' => '1'];
+            }
+
+            if (count($conditions) > 1) {
+                $conditions['relation'] = 'OR';
+                $metaQuery[] = $conditions;
+            } else {
+                $metaQuery[] = $conditions[0];
+            }
+        }
+
+        if (count($metaQuery) > 1) {
+            $metaQuery['relation'] = 'AND';
         }
 
         return $metaQuery;
@@ -210,6 +240,16 @@ class ReportQuery
         if (is_numeric($limit)) {
             $this->limit = $limit;
         }
+    }
+
+    /**
+     * Restrict the query to only contain reports with a certain status
+     *
+     * @param ReportStatus[] $onlyReportStatus
+     */
+    public function setOnlyReportStatus(array $onlyReportStatus): void
+    {
+        $this->onlyReportStatus = $onlyReportStatus;
     }
 
     /**

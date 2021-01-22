@@ -3,10 +3,13 @@ namespace abrain\Einsatzverwaltung\Shortcodes;
 
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\ReportQuery;
+use abrain\Einsatzverwaltung\ReportStatus;
 use abrain\Einsatzverwaltung\UnitTestCase;
 use Mockery;
 use function date;
+use function in_array;
 use function intval;
+use function is_array;
 use const ARRAY_A;
 
 /**
@@ -61,15 +64,18 @@ class ReportCountTest extends UnitTestCase
         $this->assertEquals('8', $reportCount->render([]));
     }
 
-    public function testConfiguresCurrentYear()
+    public function testQueriesActualIncidentsFromCurrentYear()
     {
         $reportQuery = Mockery::mock(ReportQuery::class);
         $reportQuery->expects('resetQueryVars')->once();
+        $reportQuery->expects('setOnlyReportStatus')->once()->with(Mockery::on(function ($array) {
+            return is_array($array) && in_array(ReportStatus::ACTUAL, $array) && count($array) === 1;
+        }));
         $reportQuery->expects('setYear')->once()->with(intval(date('Y')));
         $reportQuery->expects('getReports')->once()->andReturn([]);
 
         $reportCount = new ReportCount($reportQuery);
-        $reportCount->render(['year' => 'current']);
+        $reportCount->render(['year' => 'current', 'status' => 'actual']);
     }
 
     public function testConfiguresGivenYear()
@@ -83,15 +89,18 @@ class ReportCountTest extends UnitTestCase
         $reportCount->render(['year' => '2015']);
     }
 
-    public function testConfiguresNegativeYear()
+    public function testQueriesFalseAlarmsOfLast3Years()
     {
         $reportQuery = Mockery::mock(ReportQuery::class);
         $reportQuery->expects('resetQueryVars')->once();
+        $reportQuery->expects('setOnlyReportStatus')->once()->with(Mockery::on(function ($array) {
+            return is_array($array) && in_array(ReportStatus::FALSE_ALARM, $array) && count($array) === 1;
+        }));
         $reportQuery->expects('setYear')->once()->with(intval(date('Y')) - 3);
         $reportQuery->expects('getReports')->once()->andReturn([]);
 
         $reportCount = new ReportCount($reportQuery);
-        $reportCount->render(['year' => '-3']);
+        $reportCount->render(['year' => '-3', 'status' => 'falseAlarm']);
     }
 
     public function testConfiguresUnits()

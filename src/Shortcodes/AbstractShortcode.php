@@ -2,8 +2,10 @@
 namespace abrain\Einsatzverwaltung\Shortcodes;
 
 use abrain\Einsatzverwaltung\Types\Unit;
+use function array_intersect;
 use function array_key_exists;
 use function array_map;
+use function explode;
 use const ARRAY_A;
 
 /**
@@ -39,6 +41,23 @@ abstract class AbstractShortcode
         $integers = array_filter($integers, 'is_numeric');
 
         return array_map('intval', $integers);
+    }
+
+    /**
+     * @param array $attributes
+     * @param string $key
+     * @param string[] $allowedValues
+     *
+     * @return string[]
+     */
+    protected function getStringList(array $attributes, string $key, array $allowedValues): array
+    {
+        if (!array_key_exists($key, $attributes)) {
+            return [];
+        }
+
+        $givenValues = array_map('trim', explode(',', $attributes[$key]));
+        return array_intersect($allowedValues, $givenValues);
     }
 
     /**

@@ -44,6 +44,8 @@ abstract class AbstractShortcode
     }
 
     /**
+     * Extracts a list of allowed strings from a comma-separated string.
+     *
      * @param array $attributes
      * @param string $key
      * @param string[] $allowedValues

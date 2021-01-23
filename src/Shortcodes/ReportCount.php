@@ -4,8 +4,10 @@ namespace abrain\Einsatzverwaltung\Shortcodes;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\ReportQuery;
 use abrain\Einsatzverwaltung\ReportStatus;
+use function array_key_exists;
 use function array_reduce;
 use function in_array;
+use function is_numeric;
 
 /**
  * Shows a number of incident reports for the shortcode [reportcount]
@@ -17,8 +19,8 @@ class ReportCount extends AbstractShortcode
      * @var array
      */
     private $defaultAttributes = array(
-        'einsatzart' => '',
         'status' => '',
+        'types' => '',
         'units' => '',
         'year' => ''
     );
@@ -42,12 +44,7 @@ class ReportCount extends AbstractShortcode
      */
     public function render($attributes): string
     {
-        // See https://core.trac.wordpress.org/ticket/45929
-        if ($attributes === '') {
-            $attributes = array();
-        }
-
-        $attributes = shortcode_atts($this->defaultAttributes, $attributes);
+        $attributes = $this->getAttributes($attributes);
         $year = $this->getYear($attributes['year']);
 
         $this->reportQuery->resetQueryVars();
@@ -55,8 +52,9 @@ class ReportCount extends AbstractShortcode
             $this->reportQuery->setYear(intval($year));
         }
 
-        if (array_key_exists('einsatzart', $attributes) && is_numeric($attributes['einsatzart'])) {
-            $this->reportQuery->setIncidentTypeId(intval($attributes['einsatzart']));
+        $incidentTypeIds = $this->getIntegerList($attributes['types']);
+        if (!empty($incidentTypeIds)) {
+            $this->reportQuery->setIncidentTypeIds($incidentTypeIds);
         }
 
         $status = $this->getStringList($attributes['status'], ['actual', 'falseAlarm']);
@@ -81,6 +79,27 @@ class ReportCount extends AbstractShortcode
             return $sum + $report->getWeight();
         }, 0);
         return sprintf('%d', $reportCount);
+    }
+
+    /**
+     * @param array|string $attributes
+     *
+     * @return array
+     */
+    private function getAttributes($attributes): array
+    {
+        // See https://core.trac.wordpress.org/ticket/45929
+        if ($attributes === '') {
+            $attributes = [];
+        }
+
+        // Ensure backwards compatibility
+        if (array_key_exists('einsatzart', $attributes) && !array_key_exists('types', $attributes) &&
+            is_numeric($attributes['einsatzart'])) {
+            $attributes['types'] = $attributes['einsatzart'];
+        }
+
+        return shortcode_atts($this->defaultAttributes, $attributes);
     }
 
     /**

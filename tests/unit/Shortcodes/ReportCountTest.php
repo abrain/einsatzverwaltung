@@ -125,11 +125,22 @@ class ReportCountTest extends UnitTestCase
         $reportCount->render(['units' => '152,2351,13254']);
     }
 
-    public function testConfiguresIncidentType()
+    public function testConfiguresIncidentTypes()
     {
         $reportQuery = Mockery::mock(ReportQuery::class);
         $reportQuery->expects('resetQueryVars')->once();
-        $reportQuery->expects('setIncidentTypeId')->once()->with(5122);
+        $reportQuery->expects('setIncidentTypeIds')->once()->with([23556, 198341]);
+        $reportQuery->expects('getReports')->once()->andReturn([]);
+
+        $reportCount = new ReportCount($reportQuery);
+        $reportCount->render(['types' => '23556,198341']);
+    }
+
+    public function testRespectsLegacyOptions()
+    {
+        $reportQuery = Mockery::mock(ReportQuery::class);
+        $reportQuery->expects('resetQueryVars')->once();
+        $reportQuery->expects('setIncidentTypeIds')->once()->with([5122]);
         $reportQuery->expects('getReports')->once()->andReturn([]);
 
         $reportCount = new ReportCount($reportQuery);

@@ -196,7 +196,7 @@ class ReportListTest extends UnitTestCase
         $this->assertEquals(false, $parameters->showHeading);
     }
 
-    public function testFilterByIncidentTypeAndSplitMonthly()
+    public function testFilterByIncidentTypesAndSplitMonthly()
     {
         $reportQuery = Mockery::mock(ReportQuery::class);
         $reportListRenderer = Mockery::mock(Renderer::class);
@@ -204,7 +204,7 @@ class ReportListTest extends UnitTestCase
         $reportList = new ReportList($reportQuery, $reportListRenderer, $parameters);
 
         $reportQuery->expects('resetQueryVars')->once();
-        $reportQuery->expects('setIncidentTypeId')->once()->with(684513);
+        $reportQuery->expects('setIncidentTypeIds')->once()->with([684513, 12867]);
         $reportQuery->expects('setOnlySpecialReports')->once()->with(false);
         $reportQuery->expects('setOrderAsc')->once()->with(false);
         $reportQuery->expects('setYear')->once()->with(date('Y'));
@@ -215,7 +215,7 @@ class ReportListTest extends UnitTestCase
 
         $reportListRenderer->expects('getList')->once()->andReturn('');
 
-        $reportList->render(['einsatzart' => '684513', 'split' => 'monthly']);
+        $reportList->render(['types' => '684513,12867', 'split' => 'monthly']);
         $this->assertEquals(false, $parameters->compact);
         $this->assertEquals(true, $parameters->linkEmptyReports);
         $this->assertEquals(true, $parameters->showHeading);
@@ -255,6 +255,7 @@ class ReportListTest extends UnitTestCase
         $reportList = new ReportList($reportQuery, $reportListRenderer, $parameters);
 
         $reportQuery->expects('resetQueryVars')->once();
+        $reportQuery->expects('setIncidentTypeIds')->once()->with([46851]);
         $reportQuery->expects('setOnlySpecialReports')->once()->with(false);
         $reportQuery->expects('setOrderAsc')->once()->with(false);
         $reportQuery->expects('setYear')->once()->with(date('Y'));
@@ -265,7 +266,7 @@ class ReportListTest extends UnitTestCase
 
         $reportListRenderer->expects('getList')->once()->andReturn('');
 
-        $reportList->render(['monatetrennen' => 'ja']);
+        $reportList->render(['monatetrennen' => 'ja', 'einsatzart' => '46851']);
         $this->assertEquals(false, $parameters->compact);
         $this->assertEquals(true, $parameters->linkEmptyReports);
         $this->assertEquals(true, $parameters->showHeading);

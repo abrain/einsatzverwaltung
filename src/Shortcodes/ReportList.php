@@ -64,8 +64,7 @@ class ReportList extends AbstractShortcode
     {
         $attributes = $this->getAttributes($attributes);
         $options = $this->getStringList(
-            $attributes,
-            'options',
+            $attributes['options'],
             ['special', 'noLinkWithoutContent', 'noHeading', 'compact']
         );
 
@@ -150,7 +149,7 @@ class ReportList extends AbstractShortcode
             $this->reportQuery->setIncidentTypeId(intval($attributes['einsatzart']));
         }
 
-        $units = $this->getIntegerList($attributes, 'units');
+        $units = $this->getIntegerList($attributes['units']);
         if (!empty($units)) {
             $this->reportQuery->setUnits($this->translateOldUnitIds($units));
         }

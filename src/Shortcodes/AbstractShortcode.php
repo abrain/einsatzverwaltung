@@ -25,18 +25,13 @@ abstract class AbstractShortcode
     /**
      * Extracts a list of integers from a comma-separated string
      *
-     * @param array $attributes Attributes array
-     * @param string $key Array key to access the string to extract from
+     * @param string $value
      *
      * @return int[] All the valid numbers from the string. Empty array if key doesn't exist.
      */
-    protected function getIntegerList(array $attributes, string $key): array
+    protected function getIntegerList(string $value): array
     {
-        if (!array_key_exists($key, $attributes)) {
-            return array();
-        }
-
-        $integers = explode(',', $attributes[$key]);
+        $integers = explode(',', $value);
         $integers = array_map('trim', $integers);
         $integers = array_filter($integers, 'is_numeric');
 
@@ -46,19 +41,14 @@ abstract class AbstractShortcode
     /**
      * Extracts a list of allowed strings from a comma-separated string.
      *
-     * @param array $attributes
-     * @param string $key
+     * @param string $value
      * @param string[] $allowedValues
      *
      * @return string[]
      */
-    protected function getStringList(array $attributes, string $key, array $allowedValues): array
+    protected function getStringList(string $value, array $allowedValues): array
     {
-        if (!array_key_exists($key, $attributes)) {
-            return [];
-        }
-
-        $givenValues = array_map('trim', explode(',', $attributes[$key]));
+        $givenValues = array_map('trim', explode(',', $value));
         return array_intersect($allowedValues, $givenValues);
     }
 

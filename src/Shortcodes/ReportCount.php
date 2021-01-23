@@ -59,7 +59,7 @@ class ReportCount extends AbstractShortcode
             $this->reportQuery->setIncidentTypeId(intval($attributes['einsatzart']));
         }
 
-        $status = $this->getStringList($attributes, 'status', ['actual', 'falseAlarm']);
+        $status = $this->getStringList($attributes['status'], ['actual', 'falseAlarm']);
         if (!empty($status)) {
             $reportStatus = [];
             if (in_array('actual', $status)) {
@@ -71,7 +71,7 @@ class ReportCount extends AbstractShortcode
             $this->reportQuery->setOnlyReportStatus($reportStatus);
         }
 
-        $units = $this->getIntegerList($attributes, 'units');
+        $units = $this->getIntegerList($attributes['units']);
         if (!empty($units)) {
             $this->reportQuery->setUnits($this->translateOldUnitIds($units));
         }

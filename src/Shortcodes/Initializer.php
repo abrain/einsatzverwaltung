@@ -2,6 +2,7 @@
 namespace abrain\Einsatzverwaltung\Shortcodes;
 
 use abrain\Einsatzverwaltung\Data;
+use abrain\Einsatzverwaltung\Frontend\ReportList\Parameters;
 use abrain\Einsatzverwaltung\Frontend\ReportList\Renderer as ReportListRenderer;
 use abrain\Einsatzverwaltung\PermalinkController;
 use abrain\Einsatzverwaltung\ReportQuery;
@@ -19,10 +20,10 @@ class Initializer
      * @param Formatter $formatter
      * @param PermalinkController $permalinkController
      */
-    public function __construct($data, $formatter, $permalinkController)
+    public function __construct(Data $data, Formatter $formatter, PermalinkController $permalinkController)
     {
         $reportListRenderer = new ReportListRenderer($formatter);
-        $reportList = new ReportList($reportListRenderer);
+        $reportList = new ReportList(new ReportQuery(), $reportListRenderer, new Parameters());
         add_shortcode('einsatzliste', array($reportList, 'render'));
 
         $reportArchives = new ReportArchives($data, $permalinkController);

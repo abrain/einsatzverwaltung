@@ -198,7 +198,7 @@ class ReportQueryTest extends WP_UnitTestCase
     public function testFilterIncidentTypeChild()
     {
         $query = new ReportQuery();
-        $query->setIncidentTypeId($this->incidentType1aId);
+        $query->setIncidentTypeIds([$this->incidentType1aId]);
         $reports = $query->getReports();
         $this->assertCount(2, $reports);
         foreach ($reports as $report) {
@@ -211,7 +211,7 @@ class ReportQueryTest extends WP_UnitTestCase
     public function testFilterIncidentTypeParent()
     {
         $query = new ReportQuery();
-        $query->setIncidentTypeId($this->incidentType1Id);
+        $query->setIncidentTypeIds([$this->incidentType1Id]);
         $reports = $query->getReports();
         $this->assertCount(3, $reports);
         foreach ($reports as $report) {

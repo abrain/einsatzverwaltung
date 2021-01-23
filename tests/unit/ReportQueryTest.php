@@ -133,10 +133,10 @@ class ReportQueryTest extends UnitTestCase
     /**
      * @throws ExpectationArgsRequired
      */
-    public function testSetIncidentTypeId()
+    public function testSetIncidentTypeIds()
     {
         $reportQuery = new ReportQuery();
-        $reportQuery->setIncidentTypeId(951);
+        $reportQuery->setIncidentTypeIds([951]);
         expect('get_posts')->once()->with(Mockery::on(function ($array) {
             return is_array($array) && array_key_exists('tax_query', $array) && is_array($array['tax_query']) &&
                 (!array_key_exists('relation', $array['tax_query']) || $array['tax_query']['relation'] === 'AND') &&

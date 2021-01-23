@@ -5,7 +5,9 @@ use abrain\Einsatzverwaltung\Frontend\ReportList\Parameters;
 use abrain\Einsatzverwaltung\Frontend\ReportList\Renderer;
 use abrain\Einsatzverwaltung\Frontend\ReportList\SplitType;
 use abrain\Einsatzverwaltung\ReportQuery;
+use function array_key_exists;
 use function array_map;
+use function is_numeric;
 
 /**
  * Renders the list of reports for the shortcode [einsatzliste]
@@ -51,7 +53,7 @@ class ReportList extends AbstractShortcode
             'split' => 'no',
             'link' => 'title',
             'limit' => -1,
-            'einsatzart' => '',
+            'types' => '',
             'units' => '',
             'options' => ''
         ];
@@ -94,6 +96,10 @@ class ReportList extends AbstractShortcode
             $attributes['monatetrennen'] == 'ja'
         ) {
             $attributes['split'] = 'monthly';
+        }
+        if (array_key_exists('einsatzart', $attributes) && !array_key_exists('types', $attributes) &&
+            is_numeric($attributes['einsatzart'])) {
+            $attributes['types'] = $attributes['einsatzart'];
         }
 
         return shortcode_atts($this->defaultAttributes, $attributes);
@@ -145,8 +151,9 @@ class ReportList extends AbstractShortcode
             $this->reportQuery->setYear(intval($attributes['jahr']));
         }
 
-        if (is_numeric($attributes['einsatzart'])) {
-            $this->reportQuery->setIncidentTypeId(intval($attributes['einsatzart']));
+        $incidentTypeIds = $this->getIntegerList($attributes['types']);
+        if (!empty($incidentTypeIds)) {
+            $this->reportQuery->setIncidentTypeIds($incidentTypeIds);
         }
 
         $units = $this->getIntegerList($attributes['units']);

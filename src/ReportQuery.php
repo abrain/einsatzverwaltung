@@ -20,11 +20,11 @@ class ReportQuery
     private $excludePostId;
 
     /**
-     * Die Term-ID der Einsatzart, nach der gefiltert werden soll
+     * The term IDs of the einsatzart taxonomy to filter for
      *
-     * @var int
+     * @var int[]
      */
-    private $incidentTypeId = 0;
+    private $incidentTypeIds;
 
     /**
      * Zeigt an, ob als privat markierte Berichte mit abgefragt werden sollen
@@ -83,7 +83,7 @@ class ReportQuery
     public function resetQueryVars()
     {
         $this->excludePostId = array();
-        $this->incidentTypeId = 0;
+        $this->incidentTypeIds = [];
         $this->includePrivateReports = false;
         $this->limit = -1;
         $this->onlyReportStatus = [];
@@ -197,8 +197,8 @@ class ReportQuery
     {
         $taxQuery = array();
 
-        if (!empty($this->incidentTypeId)) {
-            $taxQuery[] = array('taxonomy' => 'einsatzart', 'terms' => array($this->incidentTypeId));
+        if (!empty($this->incidentTypeIds)) {
+            $taxQuery[] = array('taxonomy' => 'einsatzart', 'terms' => $this->incidentTypeIds);
         }
 
         if (!empty($this->units)) {
@@ -217,11 +217,11 @@ class ReportQuery
     }
 
     /**
-     * @param int $incidentTypeId
+     * @param int[] $incidentTypeIds
      */
-    public function setIncidentTypeId(int $incidentTypeId)
+    public function setIncidentTypeIds(array $incidentTypeIds)
     {
-        $this->incidentTypeId = $incidentTypeId;
+        $this->incidentTypeIds = $incidentTypeIds;
     }
 
     /**

@@ -12,17 +12,17 @@ interface CustomType
     /**
      * @return string
      */
-    public static function getSlug();
+    public static function getSlug(): string;
 
     /**
      * @return array
      */
-    public function getRegistrationArgs();
+    public function getRegistrationArgs(): array;
 
     /**
      * @return string
      */
-    public function getRewriteSlug();
+    public function getRewriteSlug(): string;
 
     /**
      * @param CustomFieldsRepository $customFields

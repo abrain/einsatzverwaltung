@@ -30,7 +30,7 @@ class Vehicle implements CustomTaxonomy
      *
      * @return int
      */
-    public static function compareVehicles($vehicle1, $vehicle2)
+    public static function compareVehicles(WP_Term $vehicle1, WP_Term $vehicle2): int
     {
         $order1 = get_term_meta($vehicle1->term_id, 'vehicleorder', true);
         $order2 = get_term_meta($vehicle2->term_id, 'vehicleorder', true);
@@ -54,7 +54,7 @@ class Vehicle implements CustomTaxonomy
     /**
      * @return string
      */
-    public static function getSlug()
+    public static function getSlug(): string
     {
         return 'fahrzeug';
     }
@@ -62,7 +62,7 @@ class Vehicle implements CustomTaxonomy
     /**
      * @return array
      */
-    public function getRegistrationArgs()
+    public function getRegistrationArgs(): array
     {
         return array(
             'label' => 'Fahrzeuge',
@@ -103,7 +103,7 @@ class Vehicle implements CustomTaxonomy
     /**
      * @inheritDoc
      */
-    public function getRewriteSlug()
+    public function getRewriteSlug(): string
     {
         return self::getSlug();
     }
@@ -202,7 +202,7 @@ class Vehicle implements CustomTaxonomy
     /**
      * @return int Returns the number of terms in this taxonomy that have a parent term.
      */
-    private function getTermsWithParentCount()
+    private function getTermsWithParentCount(): int
     {
         $terms = get_terms(array('taxonomy' => self::getSlug(), 'hide_empty' => false));
         $childTerms = array_filter($terms, function (WP_Term $term) {
@@ -218,7 +218,7 @@ class Vehicle implements CustomTaxonomy
      *
      * @return array
      */
-    public function onCustomColumns($columns)
+    public function onCustomColumns(array $columns): array
     {
         // Remove the column for the external URL. We'll combine it with the vehicle page column.
         unset($columns['vehicle_exturl']);
@@ -236,7 +236,7 @@ class Vehicle implements CustomTaxonomy
      *
      * @return string
      */
-    public function onTaxonomyColumnContent($content, $columnName, $termId)
+    public function onTaxonomyColumnContent(string $content, string $columnName, int $termId): string
     {
         // We only want to change the column of the vehicle page
         if ($columnName !== 'fahrzeugpid') {

@@ -13,7 +13,7 @@ class ExtEinsatzmittel implements CustomTaxonomy
     /**
      * @return string
      */
-    public static function getSlug()
+    public static function getSlug(): string
     {
         return 'exteinsatzmittel';
     }
@@ -21,7 +21,7 @@ class ExtEinsatzmittel implements CustomTaxonomy
     /**
      * @return array
      */
-    public function getRegistrationArgs()
+    public function getRegistrationArgs(): array
     {
         return array(
             'label' => 'Externe Einsatzmittel',
@@ -64,7 +64,7 @@ class ExtEinsatzmittel implements CustomTaxonomy
     /**
      * @inheritDoc
      */
-    public function getRewriteSlug()
+    public function getRewriteSlug(): string
     {
         return self::getSlug();
     }

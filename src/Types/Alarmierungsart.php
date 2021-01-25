@@ -12,7 +12,7 @@ class Alarmierungsart implements CustomTaxonomy
     /**
      * @return string
      */
-    public static function getSlug()
+    public static function getSlug(): string
     {
         return 'alarmierungsart';
     }
@@ -20,7 +20,7 @@ class Alarmierungsart implements CustomTaxonomy
     /**
      * @return array
      */
-    public function getRegistrationArgs()
+    public function getRegistrationArgs(): array
     {
         return array(
             'label' => 'Alarmierungsart',
@@ -60,7 +60,7 @@ class Alarmierungsart implements CustomTaxonomy
     /**
      * @inheritDoc
      */
-    public function getRewriteSlug()
+    public function getRewriteSlug(): string
     {
         return self::getSlug();
     }

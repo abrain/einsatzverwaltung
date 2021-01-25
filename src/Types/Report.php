@@ -17,7 +17,7 @@ class Report implements CustomPostType
     /**
      * @return array
      */
-    private function getLabels()
+    private function getLabels(): array
     {
         return array(
             'name' => 'Einsatzberichte',
@@ -51,7 +51,7 @@ class Report implements CustomPostType
     /**
      * @return array
      */
-    private function getCapabilities()
+    private function getCapabilities(): array
     {
         return array(
             'edit_post' => 'edit_einsatzbericht',
@@ -74,7 +74,7 @@ class Report implements CustomPostType
     /**
      * @inheritdoc
      */
-    public function getRegistrationArgs()
+    public function getRegistrationArgs(): array
     {
         return array(
             'labels' => $this->getLabels(),
@@ -103,7 +103,7 @@ class Report implements CustomPostType
     /**
      * @inheritDoc
      */
-    public function getRewriteSlug()
+    public function getRewriteSlug(): string
     {
         $rewriteSlug = get_option('einsatzvw_rewrite_slug', self::DEFAULT_REWRITE_SLUG);
         return sanitize_title($rewriteSlug, self::DEFAULT_REWRITE_SLUG);
@@ -112,7 +112,7 @@ class Report implements CustomPostType
     /**
      * @inheritdoc
      */
-    public static function getSlug()
+    public static function getSlug(): string
     {
         return 'einsatz';
     }
@@ -120,7 +120,7 @@ class Report implements CustomPostType
     /**
      * @return array The core features that this post type supports
      */
-    private function getSupportedFeatures()
+    private function getSupportedFeatures(): array
     {
         $features = array('title', 'editor', 'thumbnail', 'publicize', 'author', 'revisions', 'custom-fields');
 
@@ -134,7 +134,7 @@ class Report implements CustomPostType
     /**
      * @return array The taxonomies that are linked to this post type
      */
-    private function getTaxonomies()
+    private function getTaxonomies(): array
     {
         $taxonomies = array('category');
 
@@ -270,9 +270,10 @@ class Report implements CustomPostType
 
     /**
      * @param string $value
+     *
      * @return string
      */
-    public function sanitizeTimeOfEnding($value)
+    public function sanitizeTimeOfEnding(string $value): string
     {
         $sanitizedValue = sanitize_text_field($value);
         if (!empty($sanitizedValue)) {

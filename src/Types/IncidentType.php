@@ -14,7 +14,7 @@ class IncidentType implements CustomTaxonomy
     /**
      * @return string
      */
-    public static function getSlug()
+    public static function getSlug(): string
     {
         return 'einsatzart';
     }
@@ -22,7 +22,7 @@ class IncidentType implements CustomTaxonomy
     /**
      * @return array
      */
-    public function getRegistrationArgs()
+    public function getRegistrationArgs(): array
     {
         return array(
             'label' => 'Einsatzarten',
@@ -66,7 +66,7 @@ class IncidentType implements CustomTaxonomy
     /**
      * @inheritDoc
      */
-    public function getRewriteSlug()
+    public function getRewriteSlug(): string
     {
         return self::getSlug();
     }

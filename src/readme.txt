@@ -27,7 +27,6 @@ Uses Font Awesome by Dave Gandy - http://fontawesome.io
 
 * Twitter: [@einsatzvw](https://twitter.com/einsatzvw)
 * Mastodon: [@einsatzverwaltung](https://chaos.social/@einsatzverwaltung)
-* Facebook: [Einsatzverwaltung](https://www.facebook.com/einsatzverwaltung/)
 
 == Installation ==
 

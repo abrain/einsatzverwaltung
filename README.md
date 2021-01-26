@@ -35,4 +35,3 @@ Klassen werden automatisch geladen, die Dateien sind nach [PSR-4](https://www.ph
 
 * Twitter: [@einsatzvw](https://twitter.com/einsatzvw)
 * Mastodon: [@einsatzverwaltung](https://chaos.social/@einsatzverwaltung)
-* Facebook: [Einsatzverwaltung](https://www.facebook.com/einsatzverwaltung/)

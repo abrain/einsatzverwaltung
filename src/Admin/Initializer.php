@@ -11,6 +11,7 @@ use abrain\Einsatzverwaltung\PermalinkController;
 use abrain\Einsatzverwaltung\Settings\MainPage;
 use abrain\Einsatzverwaltung\Types\Report;
 use abrain\Einsatzverwaltung\Utilities;
+use function add_filter;
 
 /**
  * Bootstraps and registers all the things we can do in WordPress' admin area
@@ -46,6 +47,7 @@ class Initializer
         $reportEditScreen = new ReportEditScreen();
         add_action('add_meta_boxes_einsatz', array($reportEditScreen, 'addMetaBoxes'));
         add_filter('default_hidden_meta_boxes', array($reportEditScreen, 'filterDefaultHiddenMetaboxes'), 10, 2);
+        add_filter('wp_dropdown_cats', array($reportEditScreen, 'filterIncidentCategoryDropdown'), 10, 2);
 
         // Register Settings
         $mainPage = new MainPage($options, $permalinkController);

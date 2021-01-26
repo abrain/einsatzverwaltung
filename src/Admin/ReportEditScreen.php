@@ -2,6 +2,7 @@
 namespace abrain\Einsatzverwaltung\Admin;
 
 use abrain\Einsatzverwaltung\Model\IncidentReport;
+use abrain\Einsatzverwaltung\Types\IncidentType;
 use abrain\Einsatzverwaltung\Types\Report;
 use abrain\Einsatzverwaltung\Types\Unit;
 use abrain\Einsatzverwaltung\Types\Vehicle;
@@ -12,9 +13,11 @@ use wpdb;
 use function add_meta_box;
 use function array_filter;
 use function array_intersect;
+use function array_key_exists;
 use function array_map;
 use function checked;
 use function esc_attr;
+use function esc_attr__;
 use function esc_html;
 use function get_taxonomy;
 use function get_term_meta;
@@ -22,9 +25,15 @@ use function get_terms;
 use function get_the_terms;
 use function in_array;
 use function is_wp_error;
+use function join;
+use function preg_grep;
+use function preg_match;
+use function preg_match_all;
 use function printf;
+use function sprintf;
 use function str_replace;
 use function usort;
+use const PREG_GREP_INVERT;
 
 /**
  * Customizations for the edit screen for the IncidentReport custom post type.
@@ -334,7 +343,7 @@ class ReportEditScreen extends EditScreen
      *
      * @param string $selected Slug der ausgewählten Einsatzart
      */
-    public static function dropdownEinsatzart($selected)
+    public static function dropdownEinsatzart(string $selected)
     {
         wp_dropdown_categories(array(
             'show_option_all'    => '',
@@ -350,6 +359,59 @@ class ReportEditScreen extends EditScreen
             'taxonomy'           => 'einsatzart',
             'hide_if_empty'      => false
         ));
+    }
+
+    /**
+     * Modifies the output of wp_dropdown_categories() for the taxonomy einsatzart to put entries marked as outdated at
+     * the end of the list.
+     *
+     * @param string $output
+     * @param array $parsedArgs
+     *
+     * @return string
+     */
+    public function filterIncidentCategoryDropdown(string $output, array $parsedArgs): string
+    {
+        if (!array_key_exists('taxonomy', $parsedArgs) || $parsedArgs['taxonomy'] !== IncidentType::getSlug()) {
+            return $output;
+        }
+
+        $outdatedTermsIds = get_terms([
+            'taxonomy' => IncidentType::getSlug(),
+            'hide_empty' => false,
+            'fields' => 'ids',
+            'meta_query' => [
+                ['key' => 'outdated', 'value' => '1']
+            ]
+        ]);
+        if (empty($outdatedTermsIds)) {
+            // If no categories are marked as outdated, don't alter the output
+            return $output;
+        }
+
+        // Separeate the select opening tag and the options
+        if (preg_match('/^(<select [^>]+>)(.*?)<\/select>$/ms', $output, $matches) !== 1) {
+            return $output;
+        }
+
+        // Extract the option tags
+        if (empty(preg_match_all('/<option [^>]+>[^<]+<\/option>/', $matches[2], $options))) {
+            return $output;
+        }
+
+        // Separate the current from the outdated options
+        $pattern = sprintf('/value="(%s)"/', join('|', $outdatedTermsIds));
+        $currentOptions = preg_grep($pattern, $options[0], PREG_GREP_INVERT);
+        $outdatedOptions = preg_grep($pattern, $options[0]);
+
+        // Begin the new output with opening the select tag
+        $newOutput = $matches[1];
+        $newOutput .= join("\n", $currentOptions);
+        $newOutput .= sprintf('<optgroup label="%s">', esc_attr__('Outdated', 'einsatzverwaltung'));
+        $newOutput .= join("\n", $outdatedOptions);
+        $newOutput .= '</optgroup></select>';
+
+        return $newOutput;
     }
 
     /**

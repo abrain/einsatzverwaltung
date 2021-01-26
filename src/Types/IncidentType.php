@@ -1,9 +1,11 @@
 <?php
 namespace abrain\Einsatzverwaltung\Types;
 
+use abrain\Einsatzverwaltung\CustomFields\Checkbox;
 use abrain\Einsatzverwaltung\CustomFields\ColorPicker;
 use abrain\Einsatzverwaltung\CustomFieldsRepository;
 use WP_REST_Response;
+use function __;
 
 /**
  * Description of the custom taxonomy 'Type of incident'
@@ -80,6 +82,13 @@ class IncidentType implements CustomTaxonomy
             'typecolor',
             'Farbe',
             'Ordne dieser Einsatzart eine Farbe zu. Einsatzarten ohne Farbe erben diese gegebenenfalls von übergeordneten Einsatzarten.'
+        ));
+        $customFields->add($this, new Checkbox(
+            'outdated',
+            __('Outdated', 'einsatzverwaltung'),
+            __('This Incident Category is no longer used', 'einsatzverwaltung'),
+            __('Outdated categories can still be assigned to reports, they just get moved to the end of the list. Existing reports will not be changed.', 'einsatzverwaltung'),
+            '0'
         ));
     }
 

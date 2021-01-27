@@ -75,7 +75,7 @@ class MainPage
     public function addToSettingsMenu()
     {
         add_options_page(
-            'Einstellungen',
+            __('Settings', 'einsatzverwaltung'),
             'Einsatzverwaltung',
             'manage_options',
             self::EVW_SETTINGS_SLUG,
@@ -131,7 +131,7 @@ class MainPage
                 self::EVW_SETTINGS_SLUG,
                 $subPage->identifier,
                 $this->isCurrentSubPage($subPage) ? "nav-tab nav-tab-active" : "nav-tab",
-                $subPage->title
+                esc_html($subPage->title)
             );
         }
         echo '</nav>';

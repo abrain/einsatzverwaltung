@@ -12,6 +12,7 @@ use abrain\Einsatzverwaltung\Settings\MainPage;
 use abrain\Einsatzverwaltung\Types\Report;
 use abrain\Einsatzverwaltung\Utilities;
 use function add_filter;
+use function esc_html__;
 
 /**
  * Bootstraps and registers all the things we can do in WordPress' admin area
@@ -144,7 +145,7 @@ class Initializer
         if (post_type_exists($postType)) {
             $postCounts = wp_count_posts($postType);
             $text = sprintf(
-                _n('%d Report', '%d Reports', intval($postCounts->publish), 'einsatzverwaltung'),
+                _n('%d Incident Report', '%d Incident Reports', intval($postCounts->publish), 'einsatzverwaltung'),
                 number_format_i18n($postCounts->publish)
             );
             $postTypeObject = get_post_type_object($postType);
@@ -174,10 +175,10 @@ class Initializer
     public function pluginMetaLinks($links, $file)
     {
         if (Core::$pluginBasename === $file) {
-            $links[] = '<a href="https://einsatzverwaltung.abrain.de/feed/">Newsfeed</a>';
             $links[] = sprintf(
-                '<a href="%s">Support &amp; Links</a>',
-                admin_url('options-general.php?page=' . MainPage::EVW_SETTINGS_SLUG . '&tab=about')
+                '<a href="%1$s">%2$s</a>',
+                admin_url('options-general.php?page=' . MainPage::EVW_SETTINGS_SLUG . '&tab=about'),
+                esc_html__('Support & Links', 'einsatzverwaltung')
             );
         }
 
@@ -194,7 +195,9 @@ class Initializer
     public function addActionLinks($links)
     {
         $settingsPage = 'options-general.php?page=' . MainPage::EVW_SETTINGS_SLUG;
-        $actionLinks = array('<a href="' . admin_url($settingsPage) . '">Einstellungen</a>');
+        $actionLinks = [
+            sprintf('<a href="%s">%s</a>', admin_url($settingsPage), esc_html__('Settings', 'einsatzverwaltung'))
+        ];
         return array_merge($links, $actionLinks);
     }
 

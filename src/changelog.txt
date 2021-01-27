@@ -1,3 +1,39 @@
+= 1.6.7 =
+* Fix: Calculation of the duration could fail, if the time zone was specified as offset from UTC
+
+= 1.6.6 =
+* Fix: The duration was calculated incorrectly, when a switch to/from Daylight Saving Time happened during the incident
+
+= 1.6.5 =
+* Fix: Publishing reports privately would overwrite the time of alerting with the current time
+
+= 1.6.4 =
+* Fix incompatibility with themes based on Gantry 5 framework
+
+= 1.6.3 =
+* Units can be assigned to reports in Quick Edit and Bulk Edit mode
+
+= 1.6.2 =
+* Classic singular view of reports now also shows units
+* Vehicles: Hide events of Pro Event Calendar from selector for vehicle page
+* Settings: Placeholder text for empty reports can be set
+* Resolved compatibility issue with NextGEN Gallery
+
+= 1.6.1 =
+* Fixed user privileges for editing units
+
+= 1.6.0 =
+* Added support for multiple units
+* Added a shortcode to display the number of reports
+* Templates: Added placeholder for units
+* Templates: Added placeholder for type of incident incl. its hierarchy
+* Templates: Added support for shortcodes
+* Templates: Whitelisted more HTML tags
+* Report list: Added option for quarterly subheadings
+* Report list: Added parameter to limit to certain units
+* Report list: Added parameter to limit to certain types of incident
+* Improved accessibility of the navigation tabs on the Settings page
+
 = 1.5.1 =
 * URLs für PATHINFO-Permalinks (beginnen mit /index.php/) repariert
 * Block-Editor kann für Einsatzberichte deaktiviert werden

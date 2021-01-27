@@ -7,6 +7,7 @@ use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Types\Report;
 use WP_Term;
 use function array_map;
+use function esc_html;
 use function sprintf;
 
 /**
@@ -29,27 +30,27 @@ class ReportListTable
     {
         $this->customColumns = array(
             'title' => array(
-                'label' => 'Einsatzbericht',
+                'label' => __('Title', 'einsatzverwaltung'),
                 'quickedit' => false
             ),
             'e_nummer' => array(
-                'label' => 'Nummer',
+                'label' => __('Incident number', 'einsatzverwaltung'),
                 'quickedit' => false
             ),
             'einsatzverwaltung_annotations' => array(
-                'label' => 'Vermerke',
+                'label' => __('Annotations', 'einsatzverwaltung'),
                 'quickedit' => false
             ),
             'e_alarmzeit' => array(
-                'label' => 'Alarmzeit',
+                'label' => __('Alarm time', 'einsatzverwaltung'),
                 'quickedit' => false
             ),
             'e_einsatzende' => array(
-                'label' => 'Einsatzende',
+                'label' => __('End time', 'einsatzverwaltung'),
                 'quickedit' => false
             ),
             'e_art' => array(
-                'label' => 'Art',
+                'label' => __('Incident Category', 'einsatzverwaltung'),
                 'quickedit' => false
             ),
             'einsatzverwaltung_units' => array(
@@ -57,7 +58,7 @@ class ReportListTable
                 'quickedit' => false
             ),
             'e_fzg' => array(
-                'label' => 'Fahrzeuge',
+                'label' => __('Vehicles', 'einsatzverwaltung'),
                 'quickedit' => false
             )
         );
@@ -111,7 +112,7 @@ class ReportListTable
                 $numberString = $report->getNumber();
                 $weight = $report->getWeight();
                 if ($weight > 1) {
-                    $numberString .= sprintf('<br>(%d Eins&auml;tze)', $weight);
+                    $numberString .= '<br>' . esc_html(sprintf(__('(%d incidents)', 'einsatzverwaltung'), $weight));
                 }
                 return $numberString;
             case 'e_einsatzende':

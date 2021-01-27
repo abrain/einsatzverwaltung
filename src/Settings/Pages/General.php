@@ -15,7 +15,7 @@ class General extends SubPage
 {
     public function __construct()
     {
-        parent::__construct('general', 'Allgemein');
+        parent::__construct('general', __('General', 'einsatzverwaltung'));
 
         add_filter('pre_update_option_einsatzvw_category', array($this, 'maybeCategoryChanged'), 10, 2);
         add_filter('pre_update_option_einsatzvw_loop_only_special', array($this, 'maybeCategorySpecialChanged'), 10, 2);
@@ -32,7 +32,7 @@ class General extends SubPage
         );
         add_settings_field(
             'einsatzvw_settings_listannotations',
-            'Vermerke',
+            __('Annotations', 'einsatzverwaltung'),
             array($this, 'echoFieldAnnotations'),
             $this->settingsApiPage,
             'einsatzvw_settings_general'

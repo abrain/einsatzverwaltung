@@ -13,7 +13,7 @@ class About extends SubPage
 {
     public function __construct()
     {
-        parent::__construct('about', '&Uuml;ber');
+        parent::__construct('about', __('About', 'einsatzverwaltung'));
     }
 
     public function addSettingsFields()

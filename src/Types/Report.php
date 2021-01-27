@@ -20,31 +20,35 @@ class Report implements CustomPostType
     private function getLabels(): array
     {
         return array(
-            'name' => 'Einsatzberichte',
-            'singular_name' => 'Einsatzbericht',
-            'menu_name' => 'Einsatzberichte',
-            'add_new' => 'Erstellen',
-            'add_new_item' => 'Neuer Einsatzbericht',
-            'edit' => 'Bearbeiten',
-            'edit_item' => 'Einsatzbericht bearbeiten',
-            'new_item' => 'Neuer Einsatzbericht',
-            'view' => 'Ansehen',
-            'view_item' => 'Einsatzbericht ansehen',
-            'search_items' => 'Einsatzberichte suchen',
-            'not_found' => 'Keine Einsatzberichte gefunden',
-            'not_found_in_trash' => 'Keine Einsatzberichte im Papierkorb gefunden',
-            'filter_items_list' => 'Liste der Einsatzberichte filtern',
-            'items_list_navigation' => 'Navigation der Liste der Einsatzberichte',
-            'items_list' => 'Liste der Einsatzberichte',
-            'insert_into_item' => 'In den Einsatzbericht einf&uuml;gen',
-            'uploaded_to_this_item' => 'Zu diesem Einsatzbericht hochgeladen',
-            'view_items' => 'Einsatzberichte ansehen',
-            //'attributes' => 'Attribute', // In WP 4.7 eingeführtes Label, für Einsatzberichte derzeit nicht relevant
-            'item_published' => 'Einsatzbericht veröffentlicht.',
-            'item_published_privately' => 'Einsatzbericht privat veröffentlicht.',
-            'item_reverted_to_draft' => 'Einsatzbericht auf Entwurf zurückgesetzt.',
-            'item_scheduled' => 'Einsatzbericht geplant.',
-            'item_updated' => 'Einsatzbericht aktualisiert.',
+            'name' => _x('Incident Reports', 'post type general name', 'einsatzverwaltung'),
+            'singular_name' => _x('Incident Report', 'post type singular name', 'einsatzverwaltung'),
+            'add_new' => _x('Add New', 'incident report', 'einsatzverwaltung'),
+            'add_new_item' => __('Add New Incident Report', 'einsatzverwaltung'),
+            'edit_item' => __('Edit Incident Report', 'einsatzverwaltung'),
+            'new_item' => __('New Incident Report', 'einsatzverwaltung'),
+            'view_item' => __('View Incident Report', 'einsatzverwaltung'),
+            'view_items' => __('View Incident Reports', 'einsatzverwaltung'),
+            'search_items' => __('Search Incident Reports', 'einsatzverwaltung'),
+            'not_found' => __('No Incident Reports found.', 'einsatzverwaltung'),
+            'not_found_in_trash' => __('No Incident Reports found in Trash.', 'einsatzverwaltung'),
+            'all_items' => __('All Incident Reports', 'einsatzverwaltung'),
+            'archives' => __('Incident Report Archives', 'einsatzverwaltung'),
+            'attributes' => __('Incident Report Attributes', 'einsatzverwaltung'),
+            'insert_into_item' => __('Insert into Incident Report', 'einsatzverwaltung'),
+            'uploaded_to_this_item' => __('Uploaded to this Incident Report', 'einsatzverwaltung'),
+            'featured_image' => _x('Featured image', 'Incident Report', 'einsatzverwaltung'),
+            'set_featured_image' => _x('Set featured image', 'incident report', 'einsatzverwaltung'),
+            'remove_featured_image' => _x('Remove featured image', 'incident report', 'einsatzverwaltung'),
+            'use_featured_image' => _x('Use as featured image', 'incident report', 'einsatzverwaltung'),
+            'menu_name' => _x('Incident Reports', 'menu name', 'einsatzverwaltung'),
+            'filter_items_list' => __('Filter Incident Reports list', 'einsatzverwaltung'),
+            'items_list_navigation' => __('Incident Reports list navigation', 'einsatzverwaltung'),
+            'items_list' => __('Incident Reports list', 'einsatzverwaltung'),
+            'item_published' => __('Incident Report published.', 'einsatzverwaltung'),
+            'item_published_privately' => __('Incident Report published privately.', 'einsatzverwaltung'),
+            'item_reverted_to_draft' => __('Incident Report reverted to draft.', 'einsatzverwaltung'),
+            'item_scheduled' => __('Incident Report scheduled.', 'einsatzverwaltung'),
+            'item_updated' => __('Incident Report updated.', 'einsatzverwaltung'),
         );
     }
 
@@ -159,11 +163,11 @@ class Report implements CustomPostType
         $annotationRepository = ReportAnnotationRepository::getInstance();
         $annotationRepository->addAnnotation(new ReportAnnotation(
             'images',
-            'Bilder im Bericht',
+            __('Report contains pictures', 'einsatzverwaltung'),
             'einsatz_hasimages',
             'camera',
-            'Einsatzbericht enthält Bilder',
-            'Einsatzbericht enthält keine Bilder'
+            __('Report contains pictures', 'einsatzverwaltung'),
+            __('Report does not contain pictures', 'einsatzverwaltung')
         ));
         $annotationRepository->addAnnotation(new ReportAnnotation(
             'special',
@@ -175,10 +179,10 @@ class Report implements CustomPostType
         ));
         $annotationRepository->addAnnotation(new ReportAnnotation(
             'falseAlarm',
-            'Fehlalarm',
+            __('False alarm', 'einsatzverwaltung'),
             'einsatz_fehlalarm',
             '',
-            'Fehlalarm',
+            __('False alarm', 'einsatzverwaltung'),
             'Kein Fehlalarm'
         ));
     }

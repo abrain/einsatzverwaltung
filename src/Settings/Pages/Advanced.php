@@ -1,8 +1,8 @@
 <?php
-
 namespace abrain\Einsatzverwaltung\Settings\Pages;
 
 use abrain\Einsatzverwaltung\PermalinkController;
+use abrain\Einsatzverwaltung\Utilities;
 use WP_Post;
 
 /**
@@ -233,22 +233,22 @@ class Advanced extends SubPage
         register_setting(
             'einsatzvw_settings_advanced',
             'einsatz_permalink',
-            array('\abrain\Einsatzverwaltung\PermalinkController', 'sanitizePermalink')
+            array(PermalinkController::class, 'sanitizePermalink')
         );
         register_setting(
             'einsatzvw_settings_advanced',
             'einsatz_support_excerpt',
-            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            array(Utilities::class, 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_advanced',
             'einsatz_support_posttag',
-            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            array(Utilities::class, 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_advanced',
             'einsatz_disable_blockeditor',
-            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            array(Utilities::class, 'sanitizeCheckbox')
         );
     }
 }

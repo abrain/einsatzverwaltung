@@ -1,5 +1,4 @@
 <?php
-
 namespace abrain\Einsatzverwaltung\Settings\Pages;
 
 use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
@@ -187,7 +186,7 @@ class General extends SubPage
         register_setting(
             'einsatzvw_settings_general',
             'einsatzvw_show_einsatzberichte_mainloop',
-            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            array(Utilities::class, 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_general',
@@ -197,7 +196,7 @@ class General extends SubPage
         register_setting(
             'einsatzvw_settings_general',
             'einsatzvw_loop_only_special',
-            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            array(Utilities::class, 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_general',

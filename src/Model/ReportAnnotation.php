@@ -107,13 +107,13 @@ class ReportAnnotation
     }
 
     /**
-     * @param IncidentReport $report
+     * @param int $postId
      *
      * @return bool
      */
-    public function getStateForReport($report)
+    public function getStateForReport(int $postId): bool
     {
-        $get_post_meta = get_post_meta($report->getPostId(), $this->metaKey, true);
+        $get_post_meta = get_post_meta($postId, $this->metaKey, true);
         return 1 == $get_post_meta;
     }
 }

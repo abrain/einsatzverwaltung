@@ -111,7 +111,7 @@ class RecentIncidents extends AbstractWidget
     {
         if (true === ($instance['showAnnotations'])) {
             $annotationIconBar = AnnotationIconBar::getInstance();
-            printf('<div class="annotation-icon-bar">%s</div>', $annotationIconBar->render($report));
+            printf('<div class="annotation-icon-bar">%s</div>', $annotationIconBar->render($report->getPostId()));
         }
 
         if (get_queried_object_id() === $report->getPostId()) {

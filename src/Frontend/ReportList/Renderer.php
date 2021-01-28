@@ -388,10 +388,10 @@ class Renderer
                 }
                 break;
             case 'annotationImages':
-                $cellContent = AnnotationIconBar::getInstance()->render($report, array('images'));
+                $cellContent = AnnotationIconBar::getInstance()->render($report->getPostId(), array('images'));
                 break;
             case 'annotationSpecial':
-                $cellContent = AnnotationIconBar::getInstance()->render($report, array('special'));
+                $cellContent = AnnotationIconBar::getInstance()->render($report->getPostId(), array('special'));
                 break;
             default:
                 $cellContent = '';

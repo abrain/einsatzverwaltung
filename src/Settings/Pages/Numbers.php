@@ -1,8 +1,8 @@
 <?php
-
 namespace abrain\Einsatzverwaltung\Settings\Pages;
 
 use abrain\Einsatzverwaltung\ReportNumberController;
+use abrain\Einsatzverwaltung\Utilities;
 
 /**
  * Numbers settings page
@@ -76,17 +76,17 @@ class Numbers extends SubPage
         register_setting(
             'einsatzvw_settings_numbers',
             'einsatzverwaltung_incidentnumbers_auto',
-            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            array(Utilities::class, 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_numbers',
             'einsatzvw_einsatznummer_stellen',
-            array('\abrain\Einsatzverwaltung\ReportNumberController', 'sanitizeEinsatznummerStellen')
+            array(ReportNumberController::class, 'sanitizeEinsatznummerStellen')
         );
         register_setting(
             'einsatzvw_settings_numbers',
             'einsatzvw_einsatznummer_lfdvorne',
-            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            array(Utilities::class, 'sanitizeCheckbox')
         );
     }
 }

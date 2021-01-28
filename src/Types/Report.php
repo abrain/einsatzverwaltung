@@ -4,6 +4,7 @@ namespace abrain\Einsatzverwaltung\Types;
 use abrain\Einsatzverwaltung\CustomFieldsRepository;
 use abrain\Einsatzverwaltung\Model\ReportAnnotation;
 use abrain\Einsatzverwaltung\ReportAnnotationRepository;
+use abrain\Einsatzverwaltung\Utilities;
 use function register_meta;
 
 /**
@@ -221,7 +222,7 @@ class Report implements CustomPostType
             'type' => 'boolean',
             'description' => 'Vermerk, ob es sich um einen Fehlalarm handelte.',
             'single' => true,
-            'sanitize_callback' => array('Utilities', 'sanitizeCheckbox'),
+            'sanitize_callback' => array(Utilities::class, 'sanitizeCheckbox'),
             'show_in_rest' => false
         ));
 
@@ -230,7 +231,7 @@ class Report implements CustomPostType
             'type' => 'boolean',
             'description' => 'Vermerk, ob der Einsatzbericht Bilder enthält.',
             'single' => true,
-            'sanitize_callback' => array('Utilities', 'sanitizeCheckbox'),
+            'sanitize_callback' => array(Utilities::class, 'sanitizeCheckbox'),
             'show_in_rest' => false
         ));
 
@@ -257,7 +258,7 @@ class Report implements CustomPostType
             'type' => 'boolean',
             'description' => 'Vermerk, ob es sich um einen besonderen Einsatzbericht handelt.',
             'single' => true,
-            'sanitize_callback' => array('Utilities', 'sanitizeCheckbox'),
+            'sanitize_callback' => array(Utilities::class, 'sanitizeCheckbox'),
             'show_in_rest' => false
         ));
 

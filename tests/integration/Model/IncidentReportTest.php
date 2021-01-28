@@ -4,6 +4,10 @@ namespace abrain\Einsatzverwaltung\Model;
 use abrain\Einsatzverwaltung\ReportFactory;
 use WP_UnitTestCase;
 
+/**
+ * Class IncidentReportTest
+ * @package abrain\Einsatzverwaltung\Model
+ */
 class IncidentReportTest extends WP_UnitTestCase
 {
     public function testGetDuration()

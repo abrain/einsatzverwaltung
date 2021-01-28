@@ -215,7 +215,7 @@ class ReportListTest extends UnitTestCase
 
         $reportListRenderer->expects('getList')->once()->andReturn('');
 
-        $reportList->render(['types' => '684513,12867', 'split' => 'monthly']);
+        $reportList->render(['icategories' => '684513,12867', 'split' => 'monthly']);
         $this->assertEquals(false, $parameters->compact);
         $this->assertEquals(true, $parameters->linkEmptyReports);
         $this->assertEquals(true, $parameters->showHeading);

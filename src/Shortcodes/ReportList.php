@@ -53,7 +53,7 @@ class ReportList extends AbstractShortcode
             'split' => 'no',
             'link' => 'title',
             'limit' => -1,
-            'types' => '',
+            'icategories' => '',
             'units' => '',
             'options' => ''
         ];
@@ -97,9 +97,9 @@ class ReportList extends AbstractShortcode
         ) {
             $attributes['split'] = 'monthly';
         }
-        if (array_key_exists('einsatzart', $attributes) && !array_key_exists('types', $attributes) &&
+        if (array_key_exists('einsatzart', $attributes) && !array_key_exists('icategories', $attributes) &&
             is_numeric($attributes['einsatzart'])) {
-            $attributes['types'] = $attributes['einsatzart'];
+            $attributes['icategories'] = $attributes['einsatzart'];
         }
 
         return shortcode_atts($this->defaultAttributes, $attributes);
@@ -151,9 +151,9 @@ class ReportList extends AbstractShortcode
             $this->reportQuery->setYear(intval($attributes['jahr']));
         }
 
-        $incidentTypeIds = $this->getIntegerList($attributes['types']);
-        if (!empty($incidentTypeIds)) {
-            $this->reportQuery->setIncidentTypeIds($incidentTypeIds);
+        $incidentCategoryIds = $this->getIntegerList($attributes['icategories']);
+        if (!empty($incidentCategoryIds)) {
+            $this->reportQuery->setIncidentTypeIds($incidentCategoryIds);
         }
 
         $units = $this->getIntegerList($attributes['units']);

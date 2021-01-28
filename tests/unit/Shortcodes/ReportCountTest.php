@@ -133,7 +133,7 @@ class ReportCountTest extends UnitTestCase
         $reportQuery->expects('getReports')->once()->andReturn([]);
 
         $reportCount = new ReportCount($reportQuery);
-        $reportCount->render(['types' => '23556,198341']);
+        $reportCount->render(['icategories' => '23556,198341']);
     }
 
     public function testRespectsLegacyOptions()

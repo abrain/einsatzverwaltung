@@ -1,11 +1,11 @@
 === Einsatzverwaltung ===
 Contributors: abrain
 Donate link: https://einsatzverwaltung.abrain.de/unterstuetzen/
-Tags: Feuerwehr, Hilfsorganisation, fire brigade, rescue services, EMS
+Tags: Feuerwehr, fire department, EMS
 Requires at least: 5.1.0
 Tested up to: 5.6
 Requires PHP: 7.1.0
-Stable tag: 1.7.2
+Stable tag: 1.8.0
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -52,6 +52,16 @@ Yes, you can find them on [our website](https://einsatzverwaltung.abrain.de/faq/
 
 == Changelog ==
 
+= 1.8.0 =
+* Fix: Not all vehicles could be removed from an existing Incident Report
+* Shortcode `reportcount` can be filtered by status (actual or false alarm)
+* Templates: Added placeholder for featured image thumbnail
+* Shortcodes `einsatzliste` and `reportcount` can be filtered by multiple Incident Categories
+* Incident Categories can be marked as outdated
+* Units were converted to a taxonomy
+* Requires PHP 7.1 or newer
+* Requires WordPress 5.1 or newer
+
 = 1.7.2 =
 * Report list and Templates: Show sequential numbers as range if the report represents more than one incident
 * Fix: Shortcode `reportcount` did not take into account if reports represented more than one incident
@@ -72,42 +82,6 @@ Yes, you can find them on [our website](https://einsatzverwaltung.abrain.de/faq/
 * Report list: Made the entire row clickable on mobile devices
 * Improved compatibility with Essential Addons for Elementor
 * Requires PHP 5.6 or newer
-
-= 1.6.7 =
-* Fix: Calculation of the duration could fail, if the time zone was specified as offset from UTC
-
-= 1.6.6 =
-* Fix: The duration was calculated incorrectly, when a switch to/from Daylight Saving Time happened during the incident
-
-= 1.6.5 =
-* Fix: Publishing reports privately would overwrite the time of alerting with the current time
-
-= 1.6.4 =
-* Fix incompatibility with themes based on Gantry 5 framework
-
-= 1.6.3 =
-* Units can be assigned to reports in Quick Edit and Bulk Edit mode
-
-= 1.6.2 =
-* Classic singular view of reports now also shows units
-* Vehicles: Hide events of Pro Event Calendar from selector for vehicle page
-* Settings: Placeholder text for empty reports can be set
-* Resolved compatibility issue with NextGEN Gallery
-
-= 1.6.1 =
-* Fixed user privileges for editing units
-
-= 1.6.0 =
-* Added support for multiple units
-* Added a shortcode to display the number of reports
-* Templates: Added placeholder for units
-* Templates: Added placeholder for type of incident incl. its hierarchy
-* Templates: Added support for shortcodes
-* Templates: Whitelisted more HTML tags
-* Report list: Added option for quarterly subheadings
-* Report list: Added parameter to limit to certain units
-* Report list: Added parameter to limit to certain types of incident
-* Improved accessibility of the navigation tabs on the Settings page
 
 == Upgrade Notice ==
 

@@ -20,7 +20,7 @@ class ReportCount extends AbstractShortcode
      */
     private $defaultAttributes = array(
         'status' => '',
-        'types' => '',
+        'icategories' => '',
         'units' => '',
         'year' => ''
     );
@@ -52,9 +52,9 @@ class ReportCount extends AbstractShortcode
             $this->reportQuery->setYear(intval($year));
         }
 
-        $incidentTypeIds = $this->getIntegerList($attributes['types']);
-        if (!empty($incidentTypeIds)) {
-            $this->reportQuery->setIncidentTypeIds($incidentTypeIds);
+        $incidentCategoryIds = $this->getIntegerList($attributes['icategories']);
+        if (!empty($incidentCategoryIds)) {
+            $this->reportQuery->setIncidentTypeIds($incidentCategoryIds);
         }
 
         $status = $this->getStringList($attributes['status'], ['actual', 'falseAlarm']);
@@ -94,9 +94,9 @@ class ReportCount extends AbstractShortcode
         }
 
         // Ensure backwards compatibility
-        if (array_key_exists('einsatzart', $attributes) && !array_key_exists('types', $attributes) &&
+        if (array_key_exists('einsatzart', $attributes) && !array_key_exists('icategories', $attributes) &&
             is_numeric($attributes['einsatzart'])) {
-            $attributes['types'] = $attributes['einsatzart'];
+            $attributes['icategories'] = $attributes['einsatzart'];
         }
 
         return shortcode_atts($this->defaultAttributes, $attributes);

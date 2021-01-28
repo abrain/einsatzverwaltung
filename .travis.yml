@@ -55,6 +55,8 @@ jobs:
   - stage: test
     name: 'Latest versions, PATHINFO permalinks'
     env: WP_VERSION=latest WP_MULTISITE=0 WP_TESTS_PERMALINK=PATHINFO
+  - stage: test
+    php: '8.0'
   allow_failures:
     - env: WP_VERSION=nightly WP_MULTISITE=0
   fast_finish: true

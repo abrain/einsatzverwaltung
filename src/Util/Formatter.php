@@ -195,7 +195,7 @@ class Formatter
                 }
                 break;
             case '%annotations%':
-                $replace = $this->annotationIconBar->render($incidentReport);
+                $replace = $this->annotationIconBar->render($incidentReport->getPostId());
                 break;
             case '%vehicles%':
                 $replace = $this->getVehicles($incidentReport, ($context === 'post'), ($context === 'post'));

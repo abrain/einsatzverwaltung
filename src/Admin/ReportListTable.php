@@ -136,7 +136,7 @@ class ReportListTable
                 $vehicleLinks = array_map(array($this, 'getTermFilterLink'), $vehicles);
                 return join(', ', $vehicleLinks);
             case 'einsatzverwaltung_annotations':
-                return AnnotationIconBar::getInstance()->render($report);
+                return AnnotationIconBar::getInstance()->render($report->getPostId());
             case 'einsatzverwaltung_units':
                 $units = $report->getUnits();
                 $unitLinks = array_map(array($this, 'getTermFilterLink'), $units);

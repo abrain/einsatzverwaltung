@@ -26,7 +26,7 @@ class Report extends SubPage
 
     public function __construct()
     {
-        parent::__construct('report', 'Einsatzberichte');
+        parent::__construct('report', __('Incident Reports', 'einsatzverwaltung'));
     }
 
     public function addSettingsFields()
@@ -118,7 +118,7 @@ class Report extends SubPage
         echo '<fieldset>';
         $this->echoSettingsCheckbox(
             'einsatzvw_show_einsatzart_archive',
-            'Einsatzart'
+            __('Incident Category', 'einsatzverwaltung')
         );
         echo '<br>';
         $this->echoSettingsCheckbox(
@@ -128,7 +128,7 @@ class Report extends SubPage
         echo '<br>';
         $this->echoSettingsCheckbox(
             'einsatzvw_show_fahrzeug_archive',
-            'Fahrzeuge'
+            __('Vehicles', 'einsatzverwaltung')
         );
         echo '<p class="description">F&uuml;r alle hier aktivierten Arten von Einsatzdetails werden im Kopfbereich des Einsatzberichts f&uuml;r alle auftretenden Werte Links zu einer gefilterten Einsatz&uuml;bersicht angezeigt. Beispielsweise kann man damit alle Eins&auml;tze unter Beteiligung einer bestimmten externen Einsatzkraft auflisten lassen.</p>';
         echo '</fieldset>';
@@ -236,7 +236,7 @@ class Report extends SubPage
         register_setting(
             'einsatzvw_settings_report',
             'einsatzverwaltung_use_excerpttemplate',
-            array('Utilities', 'sanitizeCheckbox')
+            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_report',

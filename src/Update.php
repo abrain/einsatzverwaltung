@@ -1,21 +1,31 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
-use abrain\Einsatzverwaltung\Types\Report;
-use abrain\Einsatzverwaltung\Types\Unit;
 use WP_Error;
-use wpdb;
+use function add_term_meta;
+use function array_key_exists;
+use function array_map;
 use function delete_option;
 use function delete_term_meta;
 use function error_log;
+use function get_option;
 use function get_permalink;
+use function get_post_meta;
 use function get_post_type;
+use function get_posts;
 use function get_term_meta;
+use function is_array;
+use function is_wp_error;
+use function register_taxonomy;
+use function time;
+use function unregister_taxonomy;
 use function update_option;
 use function update_term_meta;
+use function wp_insert_term;
+use function wp_schedule_single_event;
 
 /**
- *
+ * Performs data structure and data migrations after a plugin upgrade
  */
 class Update
 {
@@ -27,7 +37,7 @@ class Update
      *
      * @return void|WP_Error
      */
-    public function doUpdate($currentDbVersion, $targetDbVersion)
+    public function doUpdate(int $currentDbVersion, int $targetDbVersion)
     {
         if (empty($targetDbVersion)) {
             return new WP_Error('', 'Zieldatenbankversion darf nicht leer sein');
@@ -93,6 +103,16 @@ class Update
         if ($currentDbVersion < 51 && $targetDbVersion >= 51) {
             $this->upgrade171();
         }
+
+        // Register taxonomy stub, so that convenience functions work during the update
+        register_taxonomy('evw_unit', 'einsatz');
+
+        if ($currentDbVersion < 60 && $targetDbVersion >= 60) {
+            $this->upgrade180();
+        }
+
+        // Unregister the taxonomy again, so it can be registered properly later
+        unregister_taxonomy('evw_unit');
     }
 
     /**
@@ -100,7 +120,6 @@ class Update
      */
     private function upgrade054()
     {
-        /** @var wpdb $wpdb */
         global $wpdb;
 
         $allReports = get_posts(array(
@@ -149,7 +168,6 @@ class Update
      */
     private function upgrade090()
     {
-        /** @var wpdb $wpdb */
         global $wpdb;
 
         $wpdb->delete(
@@ -286,7 +304,6 @@ class Update
 
     private function upgrade130()
     {
-        /** @var wpdb $wpdb */
         global $wpdb;
 
         $taxonomies = array(
@@ -345,7 +362,6 @@ class Update
      */
     private function upgrade134()
     {
-        /** @var wpdb $wpdb */
         global $wpdb;
 
         $postIds = $wpdb->get_col("SELECT ID FROM $wpdb->posts WHERE post_type = 'einsatz'");
@@ -367,9 +383,9 @@ class Update
     private function upgrade140()
     {
         add_option('einsatzverwaltung_use_reporttemplate', 'no');
-        add_option('einsatzverwaltung_reporttemplate', '');
+        add_option('einsatzverwaltung_reporttemplate');
         add_option('einsatzverwaltung_use_excerpttemplate', '0');
-        add_option('einsatzverwaltung_excerpttemplate', '');
+        add_option('einsatzverwaltung_excerpttemplate');
 
         delete_option('einsatzvw_excerpt_type');
         delete_option('einsatzvw_excerpt_type_feed');
@@ -466,7 +482,10 @@ class Update
          */
         $query = $wpdb->prepare(
             "DELETE FROM $wpdb->postmeta WHERE meta_key = %s AND meta_value NOT IN (SELECT ID FROM $wpdb->posts WHERE post_type = %s AND post_status = %s) AND post_id IN (SELECT ID FROM $wpdb->posts WHERE post_type = %s)",
-            '_evw_unit', Unit::getSlug(), 'publish', Report::getSlug()
+            '_evw_unit',
+            'evw_unit',
+            'publish',
+            'einsatz'
         );
         $wpdb->query($query);
 
@@ -474,11 +493,85 @@ class Update
     }
 
     /**
+     * - Transforms the Unit custom post type to a taxonomy
+     *
+     * @since 1.8.0
+     */
+    public function upgrade180()
+    {
+        // Rewrite post_type to evw_legacy_unit
+        global $wpdb;
+        $query = $wpdb->prepare("UPDATE $wpdb->posts SET post_type = %s WHERE post_type = %s", 'evw_legacy_unit', 'evw_unit');
+        $wpdb->query($query);
+
+        $oldUnits = get_posts([
+            'nopaging' => true,
+            'post_type' => 'evw_legacy_unit',
+            'post_status' => ['publish', 'private']
+        ]);
+
+        // If there are no units, there's nothing to do
+        if (empty($oldUnits)) {
+            update_option('einsatzvw_db_version', 60);
+            return;
+        }
+
+        // Recreate units as terms
+        $map = [];
+        foreach ($oldUnits as $oldUnit) {
+            $newUnit = wp_insert_term($oldUnit->post_title, 'evw_unit');
+            if (is_wp_error($newUnit)) {
+                error_log('Could not create term for Unit: ' . $newUnit->get_error_message());
+                continue;
+            }
+            $termId = $newUnit['term_id'];
+            add_term_meta($termId, 'unit_exturl', get_post_meta($oldUnit->ID, 'unit_exturl', true), true);
+            add_term_meta($termId, 'unit_pid', get_post_meta($oldUnit->ID, 'unit_pid', true), true);
+            add_term_meta($termId, 'old_unit_id', $oldUnit->ID, true);
+
+            // Map old to new ID
+            $map[$oldUnit->ID] = $termId;
+        }
+
+        // Schedule the initial run of the data migration job
+        wp_schedule_single_event(time() + 30, 'einsatzverwaltung_migrate_units');
+
+        // Update the Units IDs in the widgets if configured
+        foreach (['einsatzverwaltung_widget', 'recent-incidents-formatted'] as $widgetId) {
+            $optionName = "widget_$widgetId";
+            $widgetConfigs = get_option($optionName);
+            if (empty($widgetConfigs)) {
+                continue;
+            }
+            $updatedConfigs = [];
+            $modified = false;
+            foreach ($widgetConfigs as $key => $config) {
+                if (!is_array($config) || !array_key_exists('units', $config) || empty($config['units'])) {
+                    // Transfer as-is
+                    $updatedConfigs[$key] = $config;
+                    continue;
+                }
+
+                $config['units'] = array_map(function ($unitId) use ($map) {
+                    return array_key_exists($unitId, $map) ? $map[$unitId] : $unitId;
+                }, $config['units']);
+                $updatedConfigs[$key] = $config;
+                $modified = true;
+            }
+            if ($modified) {
+                update_option($optionName, $updatedConfigs);
+            }
+        }
+
+        update_option('einsatzvw_db_version', 60);
+    }
+
+    /**
      * Fügt einen Bezeichner für eine Admin Notice der Liste der noch anzuzeigenden Notices hinzu
      *
      * @param string $slug Bezeichner für die Notice
      */
-    private function addAdminNotice($slug)
+    private function addAdminNotice(string $slug)
     {
         $notices = get_option('einsatzverwaltung_admin_notices');
 

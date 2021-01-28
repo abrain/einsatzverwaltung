@@ -74,6 +74,14 @@ class Parameters
             $this->columns = $columnRepository->getDefaultColumns();
         }
 
+        $this->reset();
+    }
+
+    /**
+     * Reset the parameters to default values
+     */
+    public function reset()
+    {
         $this->columnsLinkingReport = array('title');
         $this->compact = false;
         $this->linkEmptyReports = true;
@@ -86,7 +94,7 @@ class Parameters
     /**
      * @return Column[]
      */
-    public function getColumns()
+    public function getColumns(): array
     {
         return $this->columns;
     }
@@ -94,7 +102,7 @@ class Parameters
     /**
      * @return int
      */
-    public function getColumnCount()
+    public function getColumnCount(): int
     {
         return count($this->columns);
     }
@@ -102,7 +110,7 @@ class Parameters
     /**
      * @return string[]
      */
-    public function getColumnsLinkingReport()
+    public function getColumnsLinkingReport(): array
     {
         return $this->columnsLinkingReport;
     }
@@ -110,7 +118,7 @@ class Parameters
     /**
      * @param string[] $columnsLinkingReport
      */
-    public function setColumnsLinkingReport($columnsLinkingReport)
+    public function setColumnsLinkingReport(array $columnsLinkingReport)
     {
         $this->columnsLinkingReport = ColumnRepository::sanitizeColumnsArrayNoDefault($columnsLinkingReport);
     }
@@ -118,7 +126,7 @@ class Parameters
     /**
      * @return bool
      */
-    public function isSplitMonths()
+    public function isSplitMonths(): bool
     {
         return $this->splitType === SplitType::MONTHLY && !$this->compact;
     }
@@ -126,7 +134,7 @@ class Parameters
     /**
      * @return bool
      */
-    public function isSplitQuarterly()
+    public function isSplitQuarterly(): bool
     {
         return $this->splitType === SplitType::QUARTERLY && !$this->compact;
     }
@@ -134,7 +142,7 @@ class Parameters
     /**
      * @param int $splitType
      */
-    public function setSplitType($splitType)
+    public function setSplitType(int $splitType)
     {
         $this->splitType = $splitType;
     }

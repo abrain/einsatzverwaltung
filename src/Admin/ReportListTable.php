@@ -5,10 +5,9 @@ namespace abrain\Einsatzverwaltung\Admin;
 use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Types\Report;
-use abrain\Einsatzverwaltung\Types\Unit;
-use WP_Post;
-use WP_Post_Type;
 use WP_Term;
+use function array_map;
+use function esc_html;
 use function sprintf;
 
 /**
@@ -31,61 +30,37 @@ class ReportListTable
     {
         $this->customColumns = array(
             'title' => array(
-                'label' => 'Einsatzbericht',
+                'label' => __('Title', 'einsatzverwaltung'),
                 'quickedit' => false
             ),
             'e_nummer' => array(
-                'label' => 'Nummer',
+                'label' => __('Incident number', 'einsatzverwaltung'),
                 'quickedit' => false
             ),
             'einsatzverwaltung_annotations' => array(
-                'label' => 'Vermerke',
+                'label' => __('Annotations', 'einsatzverwaltung'),
                 'quickedit' => false
             ),
             'e_alarmzeit' => array(
-                'label' => 'Alarmzeit',
+                'label' => __('Alarm time', 'einsatzverwaltung'),
                 'quickedit' => false
             ),
             'e_einsatzende' => array(
-                'label' => 'Einsatzende',
+                'label' => __('End time', 'einsatzverwaltung'),
                 'quickedit' => false
             ),
             'e_art' => array(
-                'label' => 'Art',
+                'label' => __('Incident Category', 'einsatzverwaltung'),
                 'quickedit' => false
             ),
             'einsatzverwaltung_units' => array(
                 'label' => __('Units', 'einsatzverwaltung'),
-                'quickedit' => true
+                'quickedit' => false
             ),
             'e_fzg' => array(
-                'label' => 'Fahrzeuge',
+                'label' => __('Vehicles', 'einsatzverwaltung'),
                 'quickedit' => false
             )
-        );
-    }
-
-    /**
-     * Echo the values of custom columns for a post, to be used for Quick Edit mode.
-     *
-     * @param WP_Post $post
-     * @param WP_Post_Type $post_type_object
-     */
-    public function addInlineData(WP_Post $post, WP_Post_Type $post_type_object)
-    {
-        if ($post_type_object->name !== Report::getSlug()) {
-            return;
-        }
-
-        $report = new IncidentReport($post);
-        $unitIds = array_map(function (WP_Post $unit) {
-            return $unit->ID;
-        }, $report->getUnits());
-        $unitIds = join(',', $unitIds);
-        printf(
-            '<div id="%s" class="post_category">%s</div>',
-            esc_attr(Unit::getSlug() . '_' . $post->ID),
-            esc_html($unitIds)
         );
     }
 
@@ -137,7 +112,7 @@ class ReportListTable
                 $numberString = $report->getNumber();
                 $weight = $report->getWeight();
                 if ($weight > 1) {
-                    $numberString .= sprintf('<br>(%d Eins&auml;tze)', $weight);
+                    $numberString .= '<br>' . esc_html(sprintf(__('(%d incidents)', 'einsatzverwaltung'), $weight));
                 }
                 return $numberString;
             case 'e_einsatzende':
@@ -163,8 +138,9 @@ class ReportListTable
             case 'einsatzverwaltung_annotations':
                 return AnnotationIconBar::getInstance()->render($report);
             case 'einsatzverwaltung_units':
-                $unitNames = array_map('get_the_title', $report->getUnits());
-                return join(', ', $unitNames);
+                $units = $report->getUnits();
+                $unitLinks = array_map(array($this, 'getTermFilterLink'), $units);
+                return join(', ', $unitLinks);
         }
 
         return '';
@@ -235,31 +211,6 @@ class ReportListTable
             '<span class="title inline-edit-categories-label">%s</span>',
             esc_html($this->getColumnLabel($columnName))
         );
-        if ($columnName === 'einsatzverwaltung_units') {
-            $units = get_posts(array(
-                'post_type' => Unit::getSlug(),
-                'numberposts' => -1,
-                'order' => 'ASC',
-                'orderby' => 'name'
-            ));
-            if (empty($units)) {
-                $postTypeObject = get_post_type_object(Unit::getSlug());
-                printf("<div>%s</div>", esc_html($postTypeObject->labels->not_found));
-                return;
-            }
-
-            echo '<ul class="cat-checklist evw_unit-checklist">';
-            foreach ($units as $unit) {
-                $identifier = Unit::getSlug() . '-' . $unit->ID;
-                printf(
-                    '<li id="%1$s"><label><input type="checkbox" name="evw_units[]" value="%2$d">%3$s</label></li>',
-                    esc_attr($identifier),
-                    esc_attr($unit->ID),
-                    esc_html($unit->post_title)
-                );
-            }
-            echo '</ul>';
-        }
     }
 
     /**

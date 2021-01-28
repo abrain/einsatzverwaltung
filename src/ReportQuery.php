@@ -2,6 +2,9 @@
 namespace abrain\Einsatzverwaltung;
 
 use abrain\Einsatzverwaltung\Model\IncidentReport;
+use abrain\Einsatzverwaltung\Types\Unit;
+use function count;
+use function in_array;
 
 /**
  * Class ReportQuery
@@ -17,11 +20,11 @@ class ReportQuery
     private $excludePostId;
 
     /**
-     * Die Term-ID der Einsatzart, nach der gefiltert werden soll
+     * The term IDs of the einsatzart taxonomy to filter for
      *
-     * @var int
+     * @var int[]
      */
-    private $incidentTypeId = 0;
+    private $incidentTypeIds;
 
     /**
      * Zeigt an, ob als privat markierte Berichte mit abgefragt werden sollen
@@ -36,6 +39,11 @@ class ReportQuery
      * @var int
      */
     private $limit;
+
+    /**
+     * @var ReportStatus[]
+     */
+    private $onlyReportStatus;
 
     /**
      * Zeigt an, ob nur als besonders markierte Berichte abgefragt werden sollen
@@ -66,25 +74,29 @@ class ReportQuery
      */
     public function __construct()
     {
-        $this->initQueryVars();
+        $this->resetQueryVars();
     }
 
     /**
      * Setzt die Abfragevariablen auf einen definierten Standardwert
      */
-    private function initQueryVars()
+    public function resetQueryVars()
     {
         $this->excludePostId = array();
+        $this->incidentTypeIds = [];
         $this->includePrivateReports = false;
         $this->limit = -1;
+        $this->onlyReportStatus = [];
         $this->onlySpecialReports = false;
         $this->orderAsc = true;
+        $this->units = [];
+        $this->year = null;
     }
 
     /**
      * @return array
      */
-    private function getDateQuery()
+    private function getDateQuery(): array
     {
         $dateQuery = array();
 
@@ -108,20 +120,34 @@ class ReportQuery
     /**
      * @return array
      */
-    private function getMetaQuery()
+    private function getMetaQuery(): array
     {
-        $metaQuery = array();
+        $metaQuery = [];
 
         if ($this->onlySpecialReports) {
-            $metaQuery[] = array('key' => 'einsatz_special', 'value' => '1');
+            $metaQuery[] = ['key' => 'einsatz_special', 'value' => '1'];
         }
 
-        if (!empty($this->units)) {
-            $unitSubQuery = array('relation' => 'OR');
-            foreach ($this->units as $unit) {
-                $unitSubQuery[] = array('key' => '_evw_unit', 'value' => $unit);
+        if (!empty($this->onlyReportStatus)) {
+            $conditions = [];
+            if (in_array(ReportStatus::ACTUAL, $this->onlyReportStatus)) {
+                $conditions[] = ['key' => 'einsatz_fehlalarm', 'value' => '0'];
+                $conditions[] = ['key' => 'einsatz_fehlalarm', 'compare' => 'NOT EXISTS'];
             }
-            $metaQuery[] = $unitSubQuery;
+            if (in_array(ReportStatus::FALSE_ALARM, $this->onlyReportStatus)) {
+                $conditions[] = ['key' => 'einsatz_fehlalarm', 'value' => '1'];
+            }
+
+            if (count($conditions) > 1) {
+                $conditions['relation'] = 'OR';
+                $metaQuery[] = $conditions;
+            } else {
+                $metaQuery[] = $conditions[0];
+            }
+        }
+
+        if (count($metaQuery) > 1) {
+            $metaQuery['relation'] = 'AND';
         }
 
         return $metaQuery;
@@ -130,7 +156,7 @@ class ReportQuery
     /**
      * @return IncidentReport[]
      */
-    public function getReports()
+    public function getReports(): array
     {
         $postStatus = array('publish');
         if ($this->includePrivateReports) {
@@ -167,12 +193,16 @@ class ReportQuery
     /**
      * @return array
      */
-    private function getTaxQuery()
+    private function getTaxQuery(): array
     {
         $taxQuery = array();
 
-        if (!empty($this->incidentTypeId)) {
-            $taxQuery[] = array('taxonomy' => 'einsatzart', 'terms' => array($this->incidentTypeId));
+        if (!empty($this->incidentTypeIds)) {
+            $taxQuery[] = array('taxonomy' => 'einsatzart', 'terms' => $this->incidentTypeIds);
+        }
+
+        if (!empty($this->units)) {
+            $taxQuery[] = array('taxonomy' => Unit::getSlug(), 'terms' => $this->units);
         }
 
         return $taxQuery;
@@ -181,23 +211,23 @@ class ReportQuery
     /**
      * @param array $postIds
      */
-    public function setExcludePostIds($postIds)
+    public function setExcludePostIds(array $postIds)
     {
         $this->excludePostId = $postIds;
     }
 
     /**
-     * @param int $incidentTypeId
+     * @param int[] $incidentTypeIds
      */
-    public function setIncidentTypeId($incidentTypeId)
+    public function setIncidentTypeIds(array $incidentTypeIds)
     {
-        $this->incidentTypeId = $incidentTypeId;
+        $this->incidentTypeIds = $incidentTypeIds;
     }
 
     /**
      * @param bool $includePrivateReports
      */
-    public function setIncludePrivateReports($includePrivateReports)
+    public function setIncludePrivateReports(bool $includePrivateReports)
     {
         $this->includePrivateReports = $includePrivateReports;
     }
@@ -205,7 +235,7 @@ class ReportQuery
     /**
      * @param int $limit
      */
-    public function setLimit($limit)
+    public function setLimit(int $limit)
     {
         if (is_numeric($limit)) {
             $this->limit = $limit;
@@ -213,9 +243,19 @@ class ReportQuery
     }
 
     /**
+     * Restrict the query to only contain reports with a certain status
+     *
+     * @param ReportStatus[] $onlyReportStatus
+     */
+    public function setOnlyReportStatus(array $onlyReportStatus): void
+    {
+        $this->onlyReportStatus = $onlyReportStatus;
+    }
+
+    /**
      * @param boolean $onlySpecialReports
      */
-    public function setOnlySpecialReports($onlySpecialReports)
+    public function setOnlySpecialReports(bool $onlySpecialReports)
     {
         $this->onlySpecialReports = $onlySpecialReports;
     }
@@ -223,7 +263,7 @@ class ReportQuery
     /**
      * @param boolean $orderAsc
      */
-    public function setOrderAsc($orderAsc)
+    public function setOrderAsc(bool $orderAsc)
     {
         $this->orderAsc = $orderAsc;
     }
@@ -231,7 +271,7 @@ class ReportQuery
     /**
      * @param int[] $units
      */
-    public function setUnits($units)
+    public function setUnits(array $units)
     {
         $this->units = $units;
     }
@@ -239,7 +279,7 @@ class ReportQuery
     /**
      * @param int $year
      */
-    public function setYear($year)
+    public function setYear(int $year)
     {
         $this->year = $year;
     }

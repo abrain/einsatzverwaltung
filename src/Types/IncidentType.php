@@ -1,9 +1,11 @@
 <?php
 namespace abrain\Einsatzverwaltung\Types;
 
+use abrain\Einsatzverwaltung\CustomFields\Checkbox;
 use abrain\Einsatzverwaltung\CustomFields\ColorPicker;
 use abrain\Einsatzverwaltung\CustomFieldsRepository;
 use WP_REST_Response;
+use function __;
 
 /**
  * Description of the custom taxonomy 'Type of incident'
@@ -14,7 +16,7 @@ class IncidentType implements CustomTaxonomy
     /**
      * @return string
      */
-    public static function getSlug()
+    public static function getSlug(): string
     {
         return 'einsatzart';
     }
@@ -22,32 +24,29 @@ class IncidentType implements CustomTaxonomy
     /**
      * @return array
      */
-    public function getRegistrationArgs()
+    public function getRegistrationArgs(): array
     {
         return array(
-            'label' => 'Einsatzarten',
             'labels' => array(
-                'name' => 'Einsatzarten',
-                'singular_name' => 'Einsatzart',
-                'menu_name' => 'Einsatzarten',
-                'search_items' => 'Einsatzarten suchen',
-                'popular_items' => 'H&auml;ufige Einsatzarten',
-                'all_items' => 'Alle Einsatzarten',
-                'parent_item' => '&Uuml;bergeordnete Einsatzart',
-                'parent_item_colon' => '&Uuml;bergeordnete Einsatzart:',
-                'edit_item' => 'Einsatzart bearbeiten',
-                'view_item' => 'Einsatzart ansehen',
-                'update_item' => 'Einsatzart aktualisieren',
-                'add_new_item' => 'Neue Einsatzart',
-                'new_item_name' => 'Einsatzart hinzuf&uuml;gen',
-                'separate_items_with_commas' => 'Einsatzarten mit Kommas trennen',
-                'add_or_remove_items' => 'Einsatzarten hinzuf&uuml;gen oder entfernen',
-                'choose_from_most_used' => 'Aus h&auml;ufigen Einsatzarten w&auml;hlen',
-                'not_found' => 'Keine Einsatzarten gefunden.',
-                'no_terms' => 'Keine Einsatzarten',
-                'items_list_navigation' => 'Navigation der Liste der Einsatzarten',
-                'items_list' => 'Liste der Einsatzarten',
-                'back_to_items' => '&larr; Zur&uuml;ck zu den Einsatzarten',
+                'name' => _x('Incident Categories', 'taxonomy general name', 'einsatzverwaltung'),
+                'singular_name' => _x('Incident Category', 'taxonomy singular name', 'einsatzverwaltung'),
+                'menu_name' => _x('Incident Categories', 'menu name', 'einsatzverwaltung'),
+                'search_items' => __('Search Incident Categories', 'einsatzverwaltung'),
+                'all_items' => __('All Incident Categories', 'einsatzverwaltung'),
+                'parent_item' => __('Parent Incident Category', 'einsatzverwaltung'),
+                'parent_item_colon' => __('Parent Incident Category:', 'einsatzverwaltung'),
+                'edit_item' => __('Edit Incident Category', 'einsatzverwaltung'),
+                'view_item' => __('View Incident Category', 'einsatzverwaltung'),
+                'update_item' => __('Update Incident Category', 'einsatzverwaltung'),
+                'add_new_item' => __('Add New Incident Category', 'einsatzverwaltung'),
+                'new_item_name' => __('New Incident Category Name', 'einsatzverwaltung'),
+                'not_found' => __('No Incident Categories found.', 'einsatzverwaltung'),
+                'no_terms' => __('No Incident Categories', 'einsatzverwaltung'),
+                'items_list_navigation' => __('Incident Categories list navigation', 'einsatzverwaltung'),
+                'items_list' => __('Incident Categories list', 'einsatzverwaltung'),
+                /* translators: Tab heading when selecting from the most used terms. */
+                'most_used' => _x('Most Used', 'incident categories', 'einsatzverwaltung'),
+                'back_to_items' => __('&larr; Go to Incident Categories', 'einsatzverwaltung'),
             ),
             'public' => true,
             'show_in_nav_menus' => false,
@@ -66,7 +65,7 @@ class IncidentType implements CustomTaxonomy
     /**
      * @inheritDoc
      */
-    public function getRewriteSlug()
+    public function getRewriteSlug(): string
     {
         return self::getSlug();
     }
@@ -78,8 +77,15 @@ class IncidentType implements CustomTaxonomy
     {
         $customFields->add($this, new ColorPicker(
             'typecolor',
-            'Farbe',
+            __('Color', 'einsatzverwaltung'),
             'Ordne dieser Einsatzart eine Farbe zu. Einsatzarten ohne Farbe erben diese gegebenenfalls von übergeordneten Einsatzarten.'
+        ));
+        $customFields->add($this, new Checkbox(
+            'outdated',
+            __('Outdated', 'einsatzverwaltung'),
+            __('This Incident Category is no longer used', 'einsatzverwaltung'),
+            __('Outdated categories can still be assigned to reports, they just get moved to the end of the list. Existing reports will not be changed.', 'einsatzverwaltung'),
+            '0'
         ));
     }
 

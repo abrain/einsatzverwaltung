@@ -1,11 +1,13 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
+use PHPUnit\Framework\TestCase;
+
 /**
  * Prüft bestimmte Dateien auf grundlegende Fehler
  * @package abrain\Einsatzverwaltung
  */
-class FileCheck extends \PHPUnit_Framework_TestCase
+class FileCheck extends TestCase
 {
     /**
      * Prüft, ob die in der README als Minimum angegebene PHP-Version mit den tatsächlichen Anforderungen übereinstimmt.

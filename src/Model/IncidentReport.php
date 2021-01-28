@@ -2,11 +2,11 @@
 
 namespace abrain\Einsatzverwaltung\Model;
 
+use abrain\Einsatzverwaltung\Types\Unit;
 use abrain\Einsatzverwaltung\Types\Vehicle;
 use DateTime;
 use WP_Post;
 use WP_Term;
-use function array_filter;
 use function get_post;
 use function get_post_type;
 use function error_log;
@@ -347,15 +347,11 @@ class IncidentReport
     }
 
     /**
-     * @return WP_Post[]
+     * @return WP_Term[]
      */
-    public function getUnits()
+    public function getUnits(): array
     {
-        $unitIds = get_post_meta($this->getPostId(), '_evw_unit');
-        $units = array_map('get_post', $unitIds);
-        return array_filter($units, function ($unit) {
-            return !empty($unit);
-        });
+        return $this->getTheTerms(Unit::getSlug());
     }
 
     /**

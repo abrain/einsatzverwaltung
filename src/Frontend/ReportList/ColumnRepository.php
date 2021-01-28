@@ -29,20 +29,20 @@ class ColumnRepository
      */
     private function __construct()
     {
-        $this->addColumn(new Column('number', 'Nummer', '', true));
-        $this->addColumn(new Column('date', 'Datum', '', true));
-        $this->addColumn(new Column('time', 'Zeit', '', true));
-        $this->addColumn(new Column('datetime', 'Datum', 'Datum + Zeit', true));
+        $this->addColumn(new Column('number', __('Number', 'einsatzverwaltung'), __('Incident number', 'einsatzverwaltung'), true));
+        $this->addColumn(new Column('date', __('Date', 'einsatzverwaltung'), '', true));
+        $this->addColumn(new Column('time', __('Time', 'einsatzverwaltung'), '', true));
+        $this->addColumn(new Column('datetime', __('Date', 'einsatzverwaltung'), __('Date and time', 'einsatzverwaltung'), true));
         $this->addColumn(new Column('title', 'Einsatzmeldung'));
         $this->addColumn(new Column('incidentCommander', 'Einsatzleiter'));
-        $this->addColumn(new Column('location', 'Einsatzort'));
+        $this->addColumn(new Column('location', __('Location', 'einsatzverwaltung')));
         $this->addColumn(new Column('workforce', 'Mannschaftsst&auml;rke'));
-        $this->addColumn(new Column('duration', 'Dauer', '', true));
-        $this->addColumn(new Column('vehicles', 'Fahrzeuge'));
+        $this->addColumn(new Column('duration', __('Duration', 'einsatzverwaltung'), '', true));
+        $this->addColumn(new Column('vehicles', __('Vehicles', 'einsatzverwaltung')));
         $this->addColumn(new Column('alarmType', 'Alarmierungsart'));
         $this->addColumn(new Column('additionalForces', 'Weitere Kr&auml;fte'));
         $this->addColumn(new Column('units', __('Units', 'einsatzverwaltung')));
-        $this->addColumn(new Column('incidentType', 'Einsatzart'));
+        $this->addColumn(new Column('incidentType', __('Incident Category', 'einsatzverwaltung')));
         $this->addColumn(new Column('seqNum', 'Lfd.', 'Laufende Nummer'));
         $this->addColumn(new Column('annotationImages', '', 'Vermerk &quot;Bilder im Bericht&quot;'));
         $this->addColumn(new Column('annotationSpecial', '', 'Vermerk &quot;Besonderer Einsatz&quot;'));

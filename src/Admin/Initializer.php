@@ -3,7 +3,6 @@
 namespace abrain\Einsatzverwaltung\Admin;
 
 use abrain\Einsatzverwaltung\Core;
-use abrain\Einsatzverwaltung\CustomFieldsRepository;
 use abrain\Einsatzverwaltung\Data;
 use abrain\Einsatzverwaltung\Export\Tool as ExportTool;
 use abrain\Einsatzverwaltung\Import\Tool as ImportTool;
@@ -11,8 +10,9 @@ use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\PermalinkController;
 use abrain\Einsatzverwaltung\Settings\MainPage;
 use abrain\Einsatzverwaltung\Types\Report;
-use abrain\Einsatzverwaltung\Types\Unit;
 use abrain\Einsatzverwaltung\Utilities;
+use function add_filter;
+use function esc_html__;
 
 /**
  * Bootstraps and registers all the things we can do in WordPress' admin area
@@ -27,9 +27,8 @@ class Initializer
      * @param Options $options
      * @param Utilities $utilities
      * @param PermalinkController $permalinkController
-     * @param CustomFieldsRepository $customFieldsRepo
      */
-    public function __construct(Data $data, Options $options, Utilities $utilities, PermalinkController $permalinkController, CustomFieldsRepository $customFieldsRepo)
+    public function __construct(Data $data, Options $options, Utilities $utilities, PermalinkController $permalinkController)
     {
         $pluginBasename = plugin_basename(einsatzverwaltung_plugin_file());
         add_action('admin_menu', array($this, 'hideTaxonomies'));
@@ -45,20 +44,11 @@ class Initializer
         add_action('manage_einsatz_posts_custom_column', array($reportListTable, 'filterColumnContentEinsatz'), 10, 2);
         add_action('quick_edit_custom_box', array($reportListTable, 'quickEditCustomBox'), 10, 3);
         add_action('bulk_edit_custom_box', array($reportListTable, 'bulkEditCustomBox'), 10, 2);
-        add_action('add_inline_data', array($reportListTable, 'addInlineData'), 10, 2);
 
         $reportEditScreen = new ReportEditScreen();
         add_action('add_meta_boxes_einsatz', array($reportEditScreen, 'addMetaBoxes'));
         add_filter('default_hidden_meta_boxes', array($reportEditScreen, 'filterDefaultHiddenMetaboxes'), 10, 2);
-
-        $unitSlug = Unit::getSlug();
-        $unitListTable = new UnitListTable();
-        add_filter("manage_edit-{$unitSlug}_columns", array($unitListTable, 'filterColumns'), 20);
-        add_action("manage_{$unitSlug}_posts_custom_column", array($unitListTable, 'filterColumnContent'), 20, 2);
-
-        $unitEditScreen = new UnitEditScreen($customFieldsRepo);
-        add_action("add_meta_boxes_$unitSlug", array($unitEditScreen, 'addMetaBoxes'));
-        add_filter('default_hidden_meta_boxes', array($unitEditScreen, 'filterDefaultHiddenMetaboxes'), 10, 2);
+        add_filter('wp_dropdown_cats', array($reportEditScreen, 'filterIncidentCategoryDropdown'), 10, 2);
 
         // Register Settings
         $mainPage = new MainPage($options, $permalinkController);
@@ -155,7 +145,7 @@ class Initializer
         if (post_type_exists($postType)) {
             $postCounts = wp_count_posts($postType);
             $text = sprintf(
-                _n('%d Report', '%d Reports', intval($postCounts->publish), 'einsatzverwaltung'),
+                _n('%d Incident Report', '%d Incident Reports', intval($postCounts->publish), 'einsatzverwaltung'),
                 number_format_i18n($postCounts->publish)
             );
             $postTypeObject = get_post_type_object($postType);
@@ -185,10 +175,10 @@ class Initializer
     public function pluginMetaLinks($links, $file)
     {
         if (Core::$pluginBasename === $file) {
-            $links[] = '<a href="https://einsatzverwaltung.abrain.de/feed/">Newsfeed</a>';
             $links[] = sprintf(
-                '<a href="%s">Support &amp; Links</a>',
-                admin_url('options-general.php?page=' . MainPage::EVW_SETTINGS_SLUG . '&tab=about')
+                '<a href="%1$s">%2$s</a>',
+                admin_url('options-general.php?page=' . MainPage::EVW_SETTINGS_SLUG . '&tab=about'),
+                esc_html__('Support & Links', 'einsatzverwaltung')
             );
         }
 
@@ -205,7 +195,9 @@ class Initializer
     public function addActionLinks($links)
     {
         $settingsPage = 'options-general.php?page=' . MainPage::EVW_SETTINGS_SLUG;
-        $actionLinks = array('<a href="' . admin_url($settingsPage) . '">Einstellungen</a>');
+        $actionLinks = [
+            sprintf('<a href="%s">%s</a>', admin_url($settingsPage), esc_html__('Settings', 'einsatzverwaltung'))
+        ];
         return array_merge($links, $actionLinks);
     }
 

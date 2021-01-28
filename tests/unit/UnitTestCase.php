@@ -3,13 +3,13 @@ namespace abrain\Einsatzverwaltung;
 
 use Brain\Monkey;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Base class for unit testing, takes care of mocking many WordPress functions
  * @package abrain\Einsatzverwaltung
  */
-class UnitTestCase extends PHPUnit_Framework_TestCase
+class UnitTestCase extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
@@ -17,12 +17,21 @@ class UnitTestCase extends PHPUnit_Framework_TestCase
     {
         parent::setUp();
         Monkey\setUp();
-        Monkey\Functions\when('__')->returnArg(1);
-        Monkey\Functions\when('_e')->echoArg(1);
-        Monkey\Functions\when('_n')->alias(function ($single, $plural, $number) {
-            return $number === 1 ? $single : $plural;
+        Monkey\Functions\stubTranslationFunctions();
+        Monkey\Functions\stubEscapeFunctions();
+
+        Monkey\Functions\when('shortcode_atts')->alias(function ($defaults, $attributes) {
+            $attributes = (array) $attributes;
+            $result = [];
+            foreach ($defaults as $name => $default) {
+                if (array_key_exists($name, $attributes)) {
+                    $result[$name] = $attributes[$name];
+                } else {
+                    $result[$name] = $default;
+                }
+            }
+            return $result;
         });
-        Monkey\Functions\when('esc_url')->returnArg(1);
     }
 
     protected function tearDown()
@@ -33,10 +42,11 @@ class UnitTestCase extends PHPUnit_Framework_TestCase
 
     /**
      * Copied from WP_UnitTestCase
+     *
      * @param array $expected
      * @param array $actual
      */
-    protected function assertEqualSets($expected, $actual)
+    protected function assertEqualSets(array $expected, array $actual)
     {
         sort($expected);
         sort($actual);

@@ -5,6 +5,7 @@ use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use DateTime;
+use function esc_html__;
 use function intval;
 use function sprintf;
 
@@ -86,7 +87,7 @@ class Renderer
         if (empty($reports)) {
             $this->string = sprintf(
                 '<span>%s</span>',
-                esc_html('F&uuml;r den gew&auml;hlten Zeitraum stehen keine Einsatzberichte zur Verf&uuml;gung')
+                esc_html__('There are no incident reports for the chosen period.', 'einsatzverwaltung')
             );
             return;
         }
@@ -167,7 +168,8 @@ class Renderer
     private function beginTable($year, Parameters $parameters)
     {
         if ($parameters->showHeading && $year !== false) {
-            $this->string .= '<h2>Eins&auml;tze '.$year.'</h2>';
+            // translators: 1: a year
+            $this->string .= '<h2>' . esc_html(sprintf(__('Incidents %1$d', 'einsatzverwaltung'), $year)) . '</h2>';
         }
         $this->string .= '<table class="' . self::TABLECLASS . '"><tbody>';
         $this->rowsSinceLastHeader = 0;

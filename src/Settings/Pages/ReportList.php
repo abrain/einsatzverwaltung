@@ -20,7 +20,7 @@ class ReportList extends SubPage
 
     public function __construct()
     {
-        parent::__construct('list', 'Einsatzliste');
+        parent::__construct('list', __('Report list', 'einsatzverwaltung'));
 
         $this->reportListSettings = new Settings();
     }

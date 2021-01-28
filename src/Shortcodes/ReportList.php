@@ -1,11 +1,13 @@
 <?php
-
 namespace abrain\Einsatzverwaltung\Shortcodes;
 
-use abrain\Einsatzverwaltung\Frontend\ReportList\Parameters as ReportListParameters;
-use abrain\Einsatzverwaltung\Frontend\ReportList\Renderer as ReportListRenderer;
+use abrain\Einsatzverwaltung\Frontend\ReportList\Parameters;
+use abrain\Einsatzverwaltung\Frontend\ReportList\Renderer;
 use abrain\Einsatzverwaltung\Frontend\ReportList\SplitType;
 use abrain\Einsatzverwaltung\ReportQuery;
+use function array_key_exists;
+use function array_map;
+use function is_numeric;
 
 /**
  * Renders the list of reports for the shortcode [einsatzliste]
@@ -18,52 +20,63 @@ class ReportList extends AbstractShortcode
     private $defaultAttributes;
 
     /**
-     * @var ReportListRenderer
+     * @var Renderer
      */
     private $reportList;
 
     /**
+     * @var ReportQuery
+     */
+    private $reportQuery;
+
+    /**
+     * @var Parameters
+     */
+    private $parameters;
+
+    /**
      * ReportList constructor.
      *
-     * @param ReportListRenderer $reportList
+     * @param ReportQuery $reportQuery
+     * @param Renderer $reportList
+     * @param Parameters $parameters
      */
-    public function __construct(ReportListRenderer $reportList)
+    public function __construct(ReportQuery $reportQuery, Renderer $reportList, Parameters $parameters)
     {
+        $this->reportQuery = $reportQuery;
         $this->reportList = $reportList;
+        $this->parameters = $parameters;
 
-        // Shortcodeparameter auslesen
-        $this->defaultAttributes = array(
+        $this->defaultAttributes = [
             'jahr' => date('Y'),
             'sort' => 'ab',
             'split' => 'no',
             'link' => 'title',
             'limit' => -1,
-            'einsatzart' => 0,
+            'icategories' => '',
             'units' => '',
             'options' => ''
-        );
+        ];
     }
 
     /**
-     * Gibt eine Tabelle mit Einsätzen aus dem gegebenen Jahr zurück
-     *
-     * @param array|string $atts Parameter des Shortcodes
-     *
-     * @return string
+     * @inheritDoc
      */
-    public function render($atts)
+    public function render($attributes): string
     {
-        $attributes = $this->getAttributes($atts);
-        $filteredOptions = $this->extractOptions($attributes);
+        $attributes = $this->getAttributes($attributes);
+        $options = $this->getStringList(
+            $attributes['options'],
+            ['special', 'noLinkWithoutContent', 'noHeading', 'compact']
+        );
 
-        $reportQuery = new ReportQuery();
-        $this->configureReportQuery($reportQuery, $attributes, $filteredOptions);
-        $reports = $reportQuery->getReports();
+        $this->reportQuery->resetQueryVars();
+        $this->configureReportQuery($attributes, $options);
+        $reports = $this->reportQuery->getReports();
 
-        $parameters = new ReportListParameters();
-        $this->configureListParameters($parameters, $attributes, $filteredOptions);
+        $this->configureListParameters($attributes, $options);
 
-        return $this->reportList->getList($reports, $parameters);
+        return $this->reportList->getList($reports, $this->parameters);
     }
 
     /**
@@ -71,7 +84,7 @@ class ReportList extends AbstractShortcode
      *
      * @return array
      */
-    private function getAttributes($attributes)
+    private function getAttributes($attributes): array
     {
         // See https://core.trac.wordpress.org/ticket/45929
         if ($attributes === '') {
@@ -84,74 +97,68 @@ class ReportList extends AbstractShortcode
         ) {
             $attributes['split'] = 'monthly';
         }
+        if (array_key_exists('einsatzart', $attributes) && !array_key_exists('icategories', $attributes) &&
+            is_numeric($attributes['einsatzart'])) {
+            $attributes['icategories'] = $attributes['einsatzart'];
+        }
 
         return shortcode_atts($this->defaultAttributes, $attributes);
     }
 
     /**
      * @param array $attributes
-     *
-     * @return array
-     */
-    public function extractOptions($attributes)
-    {
-        $rawOptions = array_map('trim', explode(',', $attributes['options']));
-        $possibleOptions = array('special', 'noLinkWithoutContent', 'noHeading', 'compact');
-        return array_intersect($possibleOptions, $rawOptions);
-    }
-
-    /**
-     * @param ReportListParameters $parameters
-     * @param array $attributes
      * @param array $filteredOptions
      */
-    public function configureListParameters(ReportListParameters &$parameters, $attributes, $filteredOptions)
+    private function configureListParameters(array $attributes, array $filteredOptions)
     {
         switch ($attributes['split']) {
             case 'monthly':
-                $parameters->setSplitType(SplitType::MONTHLY);
+                $this->parameters->setSplitType(SplitType::MONTHLY);
                 break;
             case 'quarterly':
-                $parameters->setSplitType(SplitType::QUARTERLY);
+                $this->parameters->setSplitType(SplitType::QUARTERLY);
                 break;
             default:
-                $parameters->setSplitType(SplitType::NONE);
+                $this->parameters->setSplitType(SplitType::NONE);
         }
 
-        $columnsWithLink = explode(',', $attributes['link']);
+        $columnsWithLink = array_map('trim', explode(',', $attributes['link']));
         if (in_array('none', $columnsWithLink)) {
             $columnsWithLink = array();
         }
-        $parameters->setColumnsLinkingReport($columnsWithLink);
+        $this->parameters->setColumnsLinkingReport($columnsWithLink);
 
-        $parameters->linkEmptyReports = (!in_array('noLinkWithoutContent', $filteredOptions));
-        $parameters->showHeading = (!in_array('noHeading', $filteredOptions));
-        $parameters->compact = in_array('compact', $filteredOptions);
+        $this->parameters->linkEmptyReports = (!in_array('noLinkWithoutContent', $filteredOptions));
+        $this->parameters->showHeading = (!in_array('noHeading', $filteredOptions));
+        $this->parameters->compact = in_array('compact', $filteredOptions);
     }
 
     /**
-     * @param ReportQuery $reportQuery
      * @param array $attributes
      * @param array $filteredOptions
      */
-    public function configureReportQuery(ReportQuery &$reportQuery, array $attributes, array $filteredOptions)
+    private function configureReportQuery(array $attributes, array $filteredOptions)
     {
         $limit = $attributes['limit'];
         if (is_numeric($limit) && $limit > 0) {
-            $reportQuery->setLimit(intval($limit));
+            $this->reportQuery->setLimit(intval($limit));
         }
 
-        $reportQuery->setOnlySpecialReports(in_array('special', $filteredOptions));
-        $reportQuery->setOrderAsc($attributes['sort'] == 'auf');
+        $this->reportQuery->setOnlySpecialReports(in_array('special', $filteredOptions));
+        $this->reportQuery->setOrderAsc($attributes['sort'] == 'auf');
 
         if (is_numeric($attributes['jahr'])) {
-            $reportQuery->setYear(intval($attributes['jahr']));
+            $this->reportQuery->setYear(intval($attributes['jahr']));
         }
 
-        if (array_key_exists('einsatzart', $attributes) && is_numeric($attributes['einsatzart'])) {
-            $reportQuery->setIncidentTypeId(intval($attributes['einsatzart']));
+        $incidentCategoryIds = $this->getIntegerList($attributes['icategories']);
+        if (!empty($incidentCategoryIds)) {
+            $this->reportQuery->setIncidentTypeIds($incidentCategoryIds);
         }
 
-        $reportQuery->setUnits($this->getIntegerList($attributes, 'units'));
+        $units = $this->getIntegerList($attributes['units']);
+        if (!empty($units)) {
+            $this->reportQuery->setUnits($this->translateOldUnitIds($units));
+        }
     }
 }

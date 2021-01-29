@@ -177,7 +177,7 @@ class Page extends AdminPage
         $this->printSuccess(sprintf(
             _n('Found %1$d field: %2$s', 'Found %1$d fields: %2$s', $numberOfFields, 'einsatzverwaltung'),
             $numberOfFields,
-            esc_html(implode($fields, ', '))
+            esc_html(implode(', ', $fields))
         ));
 
         // Check for mandatory fields

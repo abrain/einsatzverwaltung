@@ -13,22 +13,6 @@ use function Brain\Monkey\Functions\when;
  */
 class PermalinkControllerTest extends UnitTestCase
 {
-    /*public function testGetRewriteBase()
-    {
-        $controller = new PermalinkController();
-        $report = $this->createMock(Report::class);
-        $report->method('getRewriteSlug')->willReturn('customrewriteslug');
-        $controller->addRewriteRules($report);
-
-        if (getenv('WP_TESTS_PERMALINK') === 'PRETTY') {
-            $this->assertEquals('customrewriteslug', $controller->getRewriteBase());
-        } elseif (getenv('WP_TESTS_PERMALINK') === 'PATHINFO') {
-            $this->assertEquals('index.php/customrewriteslug', $controller->getRewriteBase());
-        } else {
-            $this->assertEquals('', $controller->getRewriteBase());
-        }
-    }*/
-
     /**
      * @covers \abrain\Einsatzverwaltung\PermalinkController::getPermalink
      * @covers \abrain\Einsatzverwaltung\PermalinkController::getRewriteBase

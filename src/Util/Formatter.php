@@ -10,6 +10,7 @@ use DateTime;
 use WP_Post;
 use WP_Term;
 use function array_map;
+use function current_theme_supports;
 use function date;
 use function date_i18n;
 use function esc_html;
@@ -17,9 +18,10 @@ use function esc_url;
 use function get_permalink;
 use function get_term_link;
 use function get_term_meta;
+use function get_the_post_thumbnail;
+use function has_post_thumbnail;
 use function intval;
 use function join;
-use function sanitize_post_field;
 use function sprintf;
 
 /**
@@ -55,6 +57,7 @@ class Formatter
         '%typesOfAlerting%' => 'Alarmierungsarten',
         '%content%' => 'Berichtstext',
         '%featuredImage%' => 'Beitragsbild',
+        '%featuredImageThumbnail%' => 'Beitragsvorschaubild',
         '%yearArchive%' => 'Link zum Jahresarchiv',
         '%workforce%' => 'Mannschaftsstärke',
         '%units%' => 'Einheiten',
@@ -192,7 +195,7 @@ class Formatter
                 }
                 break;
             case '%annotations%':
-                $replace = $this->annotationIconBar->render($incidentReport);
+                $replace = $this->annotationIconBar->render($incidentReport->getPostId());
                 break;
             case '%vehicles%':
                 $replace = $this->getVehicles($incidentReport, ($context === 'post'), ($context === 'post'));
@@ -208,6 +211,9 @@ class Formatter
                 break;
             case '%featuredImage%':
                 $replace = current_theme_supports('post-thumbnails') ? get_the_post_thumbnail($post->ID) : '';
+                break;
+            case '%featuredImageThumbnail%':
+                $replace = has_post_thumbnail($post->ID) ? get_the_post_thumbnail($post->ID, 'thumbnail') : '';
                 break;
             case '%yearArchive%':
                 // Take the year of the report, or the current year if used outside a specific report
@@ -337,25 +343,25 @@ class Formatter
      *
      * @return string
      */
-    public function getUnits(IncidentReport $report, $addLinks = false)
+    public function getUnits(IncidentReport $report, $addLinks = false): string
     {
         $units = $report->getUnits();
 
         if (!$addLinks) {
             // Only return the names
-            $unitNames = array_map(function (WP_Post $unit) {
-                return sanitize_post_field('post_title', $unit->post_title, $unit->ID);
+            $unitNames = array_map(function (WP_Term $unit) {
+                return esc_html($unit->name);
             }, $units);
             return join(', ', $unitNames);
         }
 
         // Return the names, linked to the respective info page if URL has been set
-        $linkedUnitNames = array_map(function (WP_Post $unit) {
-            $name = sanitize_post_field('post_title', $unit->post_title, $unit->ID);
+        $linkedUnitNames = array_map(function (WP_Term $unit) {
+            $name = $unit->name;
 
             $infoUrl = Unit::getInfoUrl($unit);
             if (empty($infoUrl)) {
-                return $name;
+                return esc_html($name);
             }
 
             return sprintf(

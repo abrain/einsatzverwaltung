@@ -1,8 +1,8 @@
 <?php
-
 namespace abrain\Einsatzverwaltung\Settings\Pages;
 
 use abrain\Einsatzverwaltung\PermalinkController;
+use abrain\Einsatzverwaltung\Utilities;
 use WP_Post;
 
 /**
@@ -97,7 +97,7 @@ class Advanced extends SubPage
         );
         add_settings_section(
             'einsatzvw_settings_advreport',
-            'Einsatzberichte',
+            __('Incident Reports', 'einsatzverwaltung'),
             null,
             $this->settingsApiPage
         );
@@ -140,7 +140,7 @@ class Advanced extends SubPage
         echo '<fieldset>';
         $this->echoSettingsCheckbox(
             'einsatz_support_excerpt',
-            'Auszug'
+            __('Excerpt', 'einsatzverwaltung')
         );
         echo '<br>';
         $this->echoSettingsCheckbox(
@@ -154,8 +154,10 @@ class Advanced extends SubPage
     public function echoFieldGutenberg()
     {
         echo '<fieldset>';
-        $this->echoSettingsCheckbox('einsatz_disable_blockeditor', 'Block-Editor f&uuml;r Einsatzberichte deaktivieren');
-        echo '<p class="description">Diese Einstellung betrifft nur WordPress 5.0 und neuer.</p>';
+        $this->echoSettingsCheckbox(
+            'einsatz_disable_blockeditor',
+            __('Disable block editor for Incident Reports', 'einsatzverwaltung')
+        );
         echo '</fieldset>';
     }
 
@@ -231,22 +233,22 @@ class Advanced extends SubPage
         register_setting(
             'einsatzvw_settings_advanced',
             'einsatz_permalink',
-            array('\abrain\Einsatzverwaltung\PermalinkController', 'sanitizePermalink')
+            array(PermalinkController::class, 'sanitizePermalink')
         );
         register_setting(
             'einsatzvw_settings_advanced',
             'einsatz_support_excerpt',
-            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            array(Utilities::class, 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_advanced',
             'einsatz_support_posttag',
-            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            array(Utilities::class, 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_advanced',
             'einsatz_disable_blockeditor',
-            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            array(Utilities::class, 'sanitizeCheckbox')
         );
     }
 }

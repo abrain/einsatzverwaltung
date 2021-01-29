@@ -3,6 +3,9 @@ namespace abrain\Einsatzverwaltung\CustomFields;
 
 use WP_Post;
 use WP_Query;
+use function __;
+use function esc_html__;
+use function sprintf;
 
 /**
  * Represents an additional dropdown of a taxonomy for selecting posts
@@ -65,7 +68,7 @@ class PostSelector extends CustomField
         ));
 
         $string = sprintf('<select name="%s" id="%s">', $parsedArgs['name'], $parsedArgs['id']);
-        $string .= '<option value="">- keine -</option>';
+        $string .= sprintf('<option value="">%s</option>', esc_html__('- none -', 'einsatzverwaltung'));
         if ($wpQuery->have_posts()) {
             $oldPtype = null;
             while ($wpQuery->have_posts()) {
@@ -87,7 +90,7 @@ class PostSelector extends CustomField
                 $string .= sprintf(
                     '<option value="%s"' . selected($postId, $parsedArgs['selected'], false) . '>%s</option>',
                     $postId,
-                    (empty($postTitle) ? '(Kein Titel)' : $postTitle)
+                    (empty($postTitle) ? sprintf('ID %d', $postId) : $postTitle)
                 );
                 $oldPtype = $postType;
             }
@@ -140,9 +143,10 @@ class PostSelector extends CustomField
 
         $title = get_the_title($postId);
         return sprintf(
-            '<a href="%1$s" title="&quot;%2$s&quot; ansehen" target="_blank">%3$s</a>',
+            '<a href="%1$s" title="%2$s" target="_blank">%3$s</a>',
             get_permalink($postId),
-            esc_attr($title),
+            // translators: 1: Title of a page
+            esc_attr(sprintf(__('View "%1$s"', 'einsatzverwaltung'), $title)),
             esc_html($title)
         );
     }

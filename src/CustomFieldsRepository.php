@@ -257,6 +257,7 @@ class CustomFieldsRepository
 
         /** @var CustomField $field */
         foreach ($this->taxonomyFields[$taxonomy] as $field) {
+            // TODO choose filter based on type of CustomField
             $value = filter_input(INPUT_POST, $field->key, FILTER_SANITIZE_STRING);
 
             update_term_meta($termId, $field->key, empty($value) ? $field->defaultValue : $value);

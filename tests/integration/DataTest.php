@@ -14,8 +14,7 @@ class DataTest extends WP_UnitTestCase
      */
     public function testGetYearsWithReports()
     {
-        $options = $this->createMock('abrain\Einsatzverwaltung\Options');
-        $data = new Data($options);
+        $data = new Data(new Options());
         $this->assertEquals(array(), $data->getYearsWithReports());
 
         $reportFactory = new ReportFactory();

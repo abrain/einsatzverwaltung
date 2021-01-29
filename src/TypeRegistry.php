@@ -51,9 +51,7 @@ class TypeRegistry
         $this->registerTaxonomy(new Vehicle(), $report::getSlug());
         $this->registerTaxonomy(new ExtEinsatzmittel(), $report::getSlug());
         $this->registerTaxonomy(new Alarmierungsart(), $report::getSlug());
-
-        $unit = new Unit();
-        $this->registerPostType($unit);
+        $this->registerTaxonomy(new Unit(), $report::getSlug());
 
         $permalinkController->addRewriteRules($report);
     }

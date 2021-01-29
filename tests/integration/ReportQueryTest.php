@@ -3,7 +3,12 @@ namespace abrain\Einsatzverwaltung;
 
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Types\Unit;
+use WP_Term;
 use WP_UnitTestCase;
+use function array_map;
+use function is_wp_error;
+use function wp_insert_term;
+use function wp_set_object_terms;
 
 class ReportQueryTest extends WP_UnitTestCase
 {
@@ -37,7 +42,12 @@ class ReportQueryTest extends WP_UnitTestCase
         $this->incidentType1aId = $childTerm['term_id'];
 
         // Units anlegen
-        $this->unitIds = $this->factory->post->create_many(2, array('post_type' => Unit::getSlug()));
+        $unit1 = wp_insert_term('Unit 1', Unit::getSlug());
+        $unit2 = wp_insert_term('Unit 2', Unit::getSlug());
+        if (is_wp_error($unit1) || is_wp_error($unit2)) {
+            self::fail('Could not create units');
+        }
+        $this->unitIds = [$unit1['term_id'], $unit2['term_id']];
 
         $currentYear = date('Y');
         $this->postIds = $this->factory->post->create_many(10, array('post_type' => 'einsatz'));
@@ -68,11 +78,10 @@ class ReportQueryTest extends WP_UnitTestCase
         wp_set_object_terms($this->postIds[8], array($this->incidentType1aId), 'einsatzart');
 
         // Units zuweisen
-        add_post_meta($this->postIds[2], '_evw_unit', $this->unitIds[0]);
-        add_post_meta($this->postIds[4], '_evw_unit', $this->unitIds[1]);
-        add_post_meta($this->postIds[5], '_evw_unit', $this->unitIds[0]);
-        add_post_meta($this->postIds[6], '_evw_unit', $this->unitIds[0]);
-        add_post_meta($this->postIds[6], '_evw_unit', $this->unitIds[1]);
+        wp_set_object_terms($this->postIds[2], array($this->unitIds[0]), Unit::getSlug());
+        wp_set_object_terms($this->postIds[4], array($this->unitIds[1]), Unit::getSlug());
+        wp_set_object_terms($this->postIds[5], array($this->unitIds[0]), Unit::getSlug());
+        wp_set_object_terms($this->postIds[6], array($this->unitIds[0], $this->unitIds[1]), Unit::getSlug());
     }
 
     public function testGetAllPublishedReports()
@@ -109,7 +118,6 @@ class ReportQueryTest extends WP_UnitTestCase
         $query = new ReportQuery();
         $reports = $query->getReports();
         $lastTimestamp = 0;
-        /** @var IncidentReport $report */
         foreach ($reports as $report) {
             $timeOfAlerting = $report->getTimeOfAlerting();
             $timestamp = $timeOfAlerting->getTimestamp();
@@ -124,7 +132,6 @@ class ReportQueryTest extends WP_UnitTestCase
         $query->setOrderAsc(false);
         $reports = $query->getReports();
         $lastTimestamp = PHP_INT_MAX;
-        /** @var IncidentReport $report */
         foreach ($reports as $report) {
             $timeOfAlerting = $report->getTimeOfAlerting();
             $timestamp = $timeOfAlerting->getTimestamp();
@@ -191,10 +198,9 @@ class ReportQueryTest extends WP_UnitTestCase
     public function testFilterIncidentTypeChild()
     {
         $query = new ReportQuery();
-        $query->setIncidentTypeId($this->incidentType1aId);
+        $query->setIncidentTypeIds([$this->incidentType1aId]);
         $reports = $query->getReports();
         $this->assertCount(2, $reports);
-        /** @var IncidentReport $report */
         foreach ($reports as $report) {
             $typeOfIncident = $report->getTypeOfIncident();
             $this->assertNotNull($typeOfIncident);
@@ -205,10 +211,9 @@ class ReportQueryTest extends WP_UnitTestCase
     public function testFilterIncidentTypeParent()
     {
         $query = new ReportQuery();
-        $query->setIncidentTypeId($this->incidentType1Id);
+        $query->setIncidentTypeIds([$this->incidentType1Id]);
         $reports = $query->getReports();
         $this->assertCount(3, $reports);
-        /** @var IncidentReport $report */
         foreach ($reports as $report) {
             $typeOfIncident = $report->getTypeOfIncident();
             $this->assertNotNull($typeOfIncident);
@@ -221,40 +226,56 @@ class ReportQueryTest extends WP_UnitTestCase
 
     public function testFilterUnits()
     {
+        // Filter for Unit 1
         $query = new ReportQuery();
         $query->setUnits(array($this->unitIds[0]));
         $reports = $query->getReports();
-        $this->assertCount(3, $reports);
-        /** @var IncidentReport $report */
+        $this->assertEqualSets(
+            [$this->postIds[2], $this->postIds[5], $this->postIds[6]],
+            array_map(function (IncidentReport $report) {
+                return $report->getPostId();
+            }, $reports)
+        );
         foreach ($reports as $report) {
             $units = $report->getUnits();
-            $unitIds = array_map(function ($unit) {
-                return $unit->ID;
+            $unitIds = array_map(function (WP_Term $unit) {
+                return $unit->term_id;
             }, $units);
             $this->assertContains($this->unitIds[0], $unitIds);
         }
 
+        // Filter for Unit 2
         $query->setUnits(array($this->unitIds[1]));
         $reports = $query->getReports();
+        $this->assertEqualSets(
+            [$this->postIds[4], $this->postIds[6]],
+            array_map(function (IncidentReport $report) {
+                return $report->getPostId();
+            }, $reports)
+        );
         $this->assertCount(2, $reports);
-        /** @var IncidentReport $report */
         foreach ($reports as $report) {
             $units = $report->getUnits();
-            $unitIds = array_map(function ($unit) {
-                return $unit->ID;
+            $unitIds = array_map(function (WP_Term $unit) {
+                return $unit->term_id;
             }, $units);
             $this->assertContains($this->unitIds[1], $unitIds);
         }
 
+        // Filter for either Unit 1 or Unit 2
         $query->setUnits($this->unitIds);
         $reports = $query->getReports();
-        $this->assertCount(4, $reports);
-        /** @var IncidentReport $report */
+        $this->assertEqualSets(
+            [$this->postIds[2], $this->postIds[4], $this->postIds[5], $this->postIds[6]],
+            array_map(function (IncidentReport $report) {
+                return $report->getPostId();
+            }, $reports)
+        );
         foreach ($reports as $report) {
             $units = $report->getUnits();
             $this->assertNotEmpty($units);
-            $unitIds = array_map(function ($unit) {
-                return $unit->ID;
+            $unitIds = array_map(function (WP_Term $unit) {
+                return $unit->term_id;
             }, $units);
 
             // Make sure at least one of the requested unit IDs is assigned to the returned report

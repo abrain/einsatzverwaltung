@@ -8,6 +8,7 @@ use abrain\Einsatzverwaltung\Types\Unit;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use abrain\Einsatzverwaltung\Utilities;
 use function get_queried_object_id;
+use function get_taxonomy;
 
 /**
  * WordPress-Widget für die letzten X Einsätze
@@ -110,7 +111,7 @@ class RecentIncidents extends AbstractWidget
     {
         if (true === ($instance['showAnnotations'])) {
             $annotationIconBar = AnnotationIconBar::getInstance();
-            printf('<div class="annotation-icon-bar">%s</div>', $annotationIconBar->render($report));
+            printf('<div class="annotation-icon-bar">%s</div>', $annotationIconBar->render($report->getPostId()));
         }
 
         if (get_queried_object_id() === $report->getPostId()) {
@@ -219,7 +220,7 @@ class RecentIncidents extends AbstractWidget
         );
 
         $this->echoChecklistBox(
-            get_post_type_object(Unit::getSlug()),
+            get_taxonomy(Unit::getSlug()),
             'units',
             __('Only show reports for these units:', 'einsatzverwaltung'),
             $selectedUnits,

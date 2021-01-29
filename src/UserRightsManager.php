@@ -22,25 +22,12 @@ class UserRightsManager
         'delete_others_einsatzberichte'
     );
 
-    private $capabilitiesUnit = array(
-        'edit_evw_units',
-        'edit_private_evw_units',
-        'edit_published_evw_units',
-        'edit_others_evw_units',
-        'publish_evw_units',
-        'read_private_evw_units',
-        'delete_evw_units',
-        'delete_private_evw_units',
-        'delete_published_evw_units',
-        'delete_others_evw_units'
-    );
-
     /**
      * @param string $roleSlug
      *
      * @return bool
      */
-    private function isRoleAllowedToEdit($roleSlug)
+    private function isRoleAllowedToEdit(string $roleSlug): bool
     {
         if ($roleSlug === 'administrator') {
             return true;
@@ -60,10 +47,9 @@ class UserRightsManager
      *
      * @return array Die gefilterten oder erweiterten Nutzerrechte
      */
-    public function userHasCap($allcaps, $caps, $args, $user)
+    public function userHasCap(array $allcaps, array $caps, array $args, WP_User $user): array
     {
-        $allCapabilities = array_merge(self::$capabilities, $this->capabilitiesUnit);
-        $requestedCaps = array_intersect($allCapabilities, $caps);
+        $requestedCaps = array_intersect(self::$capabilities, $caps);
 
         // Wenn es nicht um Berechtigungen aus der Einsatzverwaltung geht, können wir uns den Rest sparen
         if (count($requestedCaps) == 0) {

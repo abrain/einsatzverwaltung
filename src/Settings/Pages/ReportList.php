@@ -1,10 +1,11 @@
 <?php
-
 namespace abrain\Einsatzverwaltung\Settings\Pages;
 
 use abrain\Einsatzverwaltung\Frontend\ReportList\Column;
 use abrain\Einsatzverwaltung\Frontend\ReportList\ColumnRepository;
+use abrain\Einsatzverwaltung\Frontend\ReportList\Parameters;
 use abrain\Einsatzverwaltung\Frontend\ReportList\Settings;
+use abrain\Einsatzverwaltung\Utilities;
 
 /**
  * ReportList settings page
@@ -20,7 +21,7 @@ class ReportList extends SubPage
 
     public function __construct()
     {
-        parent::__construct('list', 'Einsatzliste');
+        parent::__construct('list', __('Report list', 'einsatzverwaltung'));
 
         $this->reportListSettings = new Settings();
     }
@@ -154,27 +155,27 @@ class ReportList extends SubPage
         register_setting(
             'einsatzvw_settings_list',
             'einsatzvw_list_columns',
-            array('\abrain\Einsatzverwaltung\Frontend\ReportList\Parameters', 'sanitizeColumns')
+            [Parameters::class , 'sanitizeColumns']
         );
         register_setting(
             'einsatzvw_settings_list',
             'einsatzvw_list_art_hierarchy',
-            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            [Utilities::class, 'sanitizeCheckbox']
         );
         register_setting(
             'einsatzvw_settings_list',
             'einsatzvw_list_fahrzeuge_link',
-            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            [Utilities::class, 'sanitizeCheckbox']
         );
         register_setting(
             'einsatzvw_settings_list',
             'einsatzvw_list_ext_link',
-            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            [Utilities::class, 'sanitizeCheckbox']
         );
         register_setting(
             'einsatzvw_settings_list',
             'einsatzvw_list_zebra',
-            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            [Utilities::class, 'sanitizeCheckbox']
         );
         register_setting(
             'einsatzvw_settings_list',
@@ -184,7 +185,7 @@ class ReportList extends SubPage
         register_setting(
             'einsatzvw_settings_list',
             'einsatzvw_list_zebra_nth',
-            array($this->reportListSettings, 'sanitizeZebraNthChildArg')
+            [$this->reportListSettings, 'sanitizeZebraNthChildArg']
         );
     }
 }

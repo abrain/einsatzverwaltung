@@ -41,6 +41,7 @@
     "brain/monkey": "^2.3",
     "friendsofphp/php-cs-fixer": "^2.15",
     "php-cs-fixer/phpunit-constraint-isidenticalstring": "^1.1",
-    "php-cs-fixer/phpunit-constraint-xmlmatchesxsd": "^1.1"
+    "php-cs-fixer/phpunit-constraint-xmlmatchesxsd": "^1.1",
+    "sebastian/comparator": "^3.0"
   }
 }

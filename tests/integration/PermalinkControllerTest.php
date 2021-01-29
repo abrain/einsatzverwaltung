@@ -24,45 +24,6 @@ class PermalinkControllerTest extends WP_UnitTestCase
         $this->assertEquals("prefix/$report->post_name/suffix", $controller->buildSelector($report, 'prefix/%postname%/suffix'));
     }
 
-    public function testGetPermalink()
-    {
-        $controller = new PermalinkController();
-        $report = $this->createMock('abrain\Einsatzverwaltung\Types\Report');
-        $report->method('getRewriteSlug')->willReturn('customrewriteslug');
-        $controller->addRewriteRules($report);
-
-        if (getenv('WP_TESTS_PERMALINK') === 'PRETTY') {
-            $this->assertEquals(
-                'http://example.org/customrewriteslug/some-unique-selector/',
-                $controller->getPermalink('some-unique-selector')
-            );
-        } elseif (getenv('WP_TESTS_PERMALINK') === 'PATHINFO') {
-            $this->assertEquals(
-                'http://example.org/index.php/customrewriteslug/some-unique-selector/',
-                $controller->getPermalink('some-unique-selector')
-            );
-        }
-    }
-
-    /**
-     * @group unittests
-     */
-    public function testGetRewriteBase()
-    {
-        $controller = new PermalinkController();
-        $report = $this->createMock('abrain\Einsatzverwaltung\Types\Report');
-        $report->method('getRewriteSlug')->willReturn('customrewriteslug');
-        $controller->addRewriteRules($report);
-
-        if (getenv('WP_TESTS_PERMALINK') === 'PRETTY') {
-            $this->assertEquals('customrewriteslug', $controller->getRewriteBase());
-        } elseif (getenv('WP_TESTS_PERMALINK') === 'PATHINFO') {
-            $this->assertEquals('index.php/customrewriteslug', $controller->getRewriteBase());
-        } else {
-            $this->assertEquals('', $controller->getRewriteBase());
-        }
-    }
-
     /**
      * @dataProvider queryVarTests
      * @param string $input
@@ -153,23 +114,5 @@ class PermalinkControllerTest extends WP_UnitTestCase
             'name' => 'some-name'
         );
         $this->assertEquals($queryVarsWrongFormat, $controller->modifyQueryVars($queryVarsWrongFormat, 'wontmatch'));
-    }
-
-    public function testSanitizePermalink()
-    {
-        $this->assertEquals('%postname%', PermalinkController::sanitizePermalink('%postname%'));
-        $this->assertEquals('%post_id%-%postname_nosuffix%', PermalinkController::sanitizePermalink('%post_id%-%postname_nosuffix%'));
-        $this->assertEquals('%postname_nosuffix%-%post_id%', PermalinkController::sanitizePermalink('%postname_nosuffix%-%post_id%'));
-        $this->assertEquals('%post_id%-%postname%', PermalinkController::sanitizePermalink('%post_id%-%postname%'));
-
-        // invalid permalinks should return the default permalink
-        $this->assertEquals('%postname%', PermalinkController::sanitizePermalink('%post_id%_%postname_nosuffix%'));
-        $this->assertEquals('%postname%', PermalinkController::sanitizePermalink('%post_id%/%postname_nosuffix%'));
-        $this->assertEquals('%postname%', PermalinkController::sanitizePermalink('%post_id%--%postname_nosuffix%'));
-        $this->assertEquals('%postname%', PermalinkController::sanitizePermalink(''));
-        $this->assertEquals('%postname%', PermalinkController::sanitizePermalink('something'));
-
-        // permalinks that do not contain a unique identifier should return the default permalink
-        $this->assertEquals('%postname%', PermalinkController::sanitizePermalink('%postname_nosuffix%'));
     }
 }

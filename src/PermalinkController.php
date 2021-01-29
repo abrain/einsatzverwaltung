@@ -143,7 +143,7 @@ class PermalinkController
     /**
      * @return string
      */
-    public function getRewriteBase()
+    private function getRewriteBase(): string
     {
         global $wp_rewrite;
         return ltrim($wp_rewrite->front, '/') . $this->reportRewriteSlug;

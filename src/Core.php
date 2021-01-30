@@ -197,7 +197,7 @@ class Core
     /**
      * @return Data
      */
-    public function getData()
+    public function getData(): Data
     {
         return $this->data;
     }
@@ -208,7 +208,7 @@ class Core
      *
      * @return   Core
      */
-    public static function getInstance()
+    public static function getInstance(): ?Core
     {
         if (null === self::$instance) {
             self::$instance = new Core();

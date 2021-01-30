@@ -95,7 +95,7 @@ class TypeRegistry
      *
      * @throws TypeRegistrationException
      */
-    private function registerTaxonomy(CustomTaxonomy $customTaxonomy, $postType)
+    private function registerTaxonomy(CustomTaxonomy $customTaxonomy, string $postType)
     {
         $slug = $customTaxonomy::getSlug();
         if (get_taxonomy($slug) !== false) {

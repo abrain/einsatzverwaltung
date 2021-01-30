@@ -205,7 +205,7 @@ class IncidentReport
      *
      * @return string
      */
-    public function getNumber()
+    public function getNumber(): string
     {
         return $this->getPostMeta('einsatz_incidentNumber');
     }
@@ -223,7 +223,7 @@ class IncidentReport
      *
      * @return string
      */
-    private function getPostMeta($key)
+    private function getPostMeta($key): string
     {
         if (empty($this->post)) {
             return '';
@@ -241,9 +241,9 @@ class IncidentReport
     /**
      * Gibt die laufende Nummer des Einsatzberichts bezogen auf das Kalenderjahr zurück
      *
-     * @return mixed
+     * @return string
      */
-    public function getSequentialNumber()
+    public function getSequentialNumber(): string
     {
         return $this->getPostMeta('einsatz_seqNum');
     }
@@ -290,7 +290,7 @@ class IncidentReport
      *
      * @return string
      */
-    public function getTimeOfEnding()
+    public function getTimeOfEnding(): string
     {
         return $this->getPostMeta('einsatz_einsatzende');
     }
@@ -298,9 +298,9 @@ class IncidentReport
     /**
      * Gibt das Term-Objekt der Alarmierungsart zurück
      *
-     * @return array
+     * @return WP_Term[]
      */
-    public function getTypesOfAlerting()
+    public function getTypesOfAlerting(): array
     {
         return $this->getTheTerms('alarmierungsart');
     }
@@ -313,7 +313,7 @@ class IncidentReport
      *
      * @return WP_Term[] Die Terms oder ein leeres Array
      */
-    private function getTheTerms($taxonomy)
+    private function getTheTerms(string $taxonomy): array
     {
         if (empty($this->post)) {
             return array();
@@ -334,7 +334,7 @@ class IncidentReport
      *
      * @return WP_Term
      */
-    public function getTypeOfIncident()
+    public function getTypeOfIncident(): ?WP_Term
     {
         $terms = $this->getTheTerms('einsatzart');
 
@@ -359,7 +359,7 @@ class IncidentReport
      *
      * @return WP_Term[]
      */
-    public function getVehicles()
+    public function getVehicles(): array
     {
         $vehicles = $this->getTheTerms('fahrzeug');
 
@@ -375,7 +375,7 @@ class IncidentReport
     /**
      * @return int The weight of the report (i. e. how many reports it represents)
      */
-    public function getWeight()
+    public function getWeight(): int
     {
         $weight = $this->getPostMeta('einsatz_weight');
         if (empty($weight) || !is_numeric($weight)) {
@@ -390,7 +390,7 @@ class IncidentReport
      *
      * @return string
      */
-    public function getWorkforce()
+    public function getWorkforce(): string
     {
         return $this->getPostMeta('einsatz_mannschaft');
     }
@@ -400,7 +400,7 @@ class IncidentReport
      *
      * @return bool
      */
-    public function hasContent()
+    public function hasContent(): bool
     {
         return !empty($this->post->post_content);
     }
@@ -410,7 +410,7 @@ class IncidentReport
      *
      * @return bool
      */
-    public function hasImages()
+    public function hasImages(): bool
     {
         return ($this->getPostMeta('einsatz_hasimages') == 1);
     }
@@ -420,7 +420,7 @@ class IncidentReport
      *
      * @return bool
      */
-    public function isDraft()
+    public function isDraft(): bool
     {
         return in_array($this->post->post_status, array('draft', 'pending', 'auto-draft'));
     }
@@ -430,7 +430,7 @@ class IncidentReport
      *
      * @return bool
      */
-    public function isFalseAlarm()
+    public function isFalseAlarm(): bool
     {
         return ($this->getPostMeta('einsatz_fehlalarm') == 1);
     }
@@ -440,7 +440,7 @@ class IncidentReport
      *
      * @return bool
      */
-    public function isSpecial()
+    public function isSpecial(): bool
     {
         return ($this->getPostMeta('einsatz_special') == 1);
     }
@@ -450,7 +450,7 @@ class IncidentReport
      *
      * @return bool
      */
-    private function isFuture()
+    private function isFuture(): bool
     {
         return $this->post->post_status === 'future';
     }
@@ -460,7 +460,7 @@ class IncidentReport
      *
      * @param int $category Die ID der Kategorie
      */
-    public function addToCategory($category)
+    public function addToCategory(int $category)
     {
         wp_set_post_categories($this->getPostId(), $category, true);
     }

@@ -25,7 +25,7 @@ abstract class AbstractFormat implements Format
     /**
      * @inheritDoc
      */
-    public function setFilters($startDate, $endDate)
+    public function setFilters(string $startDate, string $endDate)
     {
         $this->startDate = $startDate;
         $this->endDate = $endDate;
@@ -127,7 +127,7 @@ abstract class AbstractFormat implements Format
      * @param WP_Post|WP_Term $object
      * @return string
      */
-    private function getName($object)
+    private function getName($object): string
     {
         if ($object instanceof WP_Term) {
             return $object->name;
@@ -140,13 +140,15 @@ abstract class AbstractFormat implements Format
 
     /**
      * @param array $array
+     *
      * @return mixed
      */
-    abstract protected function getArrayRepresentation($array);
+    abstract protected function getArrayRepresentation(array $array);
 
     /**
      * @param bool $bool
+     *
      * @return mixed
      */
-    abstract protected function getBooleanRepresentation($bool);
+    abstract protected function getBooleanRepresentation(bool $bool);
 }

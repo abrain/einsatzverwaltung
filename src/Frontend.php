@@ -28,7 +28,7 @@ class Frontend
      * @param Options $options
      * @param Formatter $formatter
      */
-    public function __construct($options, $formatter)
+    public function __construct(Options $options, Formatter $formatter)
     {
         $this->formatter = $formatter;
         $this->options = $options;
@@ -81,7 +81,7 @@ class Frontend
      *
      * @return string Auflistung der Einsatzdetails
      */
-    public function getEinsatzberichtHeader($post, $mayContainLinks = true, $showArchiveLinks = true)
+    public function getEinsatzberichtHeader(WP_Post $post, bool $mayContainLinks = true, bool $showArchiveLinks = true): string
     {
         if (get_post_type($post) == "einsatz") {
             $report = new IncidentReport($post);
@@ -139,7 +139,7 @@ class Frontend
      *
      * @return string Formatiertes Einsatzdetail
      */
-    private function getDetailString($title, $value, $newline = true)
+    private function getDetailString(string $title, string $value, bool $newline = true): string
     {
         if ($this->options->isHideEmptyDetails() && (!isset($value) || $value === '')) {
             return '';
@@ -156,7 +156,7 @@ class Frontend
      *
      * @return string Mit Einsatzdetails angereicherter Beitragstext
      */
-    public function renderContent($content)
+    public function renderContent(string $content): string
     {
         global $post;
 
@@ -198,7 +198,7 @@ class Frontend
      *
      * @return bool
      */
-    private function useReportTemplate()
+    private function useReportTemplate(): bool
     {
         $useTemplate = get_option('einsatzverwaltung_use_reporttemplate', 'no');
 
@@ -229,7 +229,7 @@ class Frontend
      * @return string Der Beitragstext mit einer vorangestellten Überschrift. Wenn der Beitragstext leer ist, wird ein
      * Ersatztext zurückgegeben
      */
-    private function prepareContent($content)
+    private function prepareContent(string $content): string
     {
         $replacementText = get_option('einsatzverwaltung_report_contentifempty', '');
         if (!empty($replacementText)) {
@@ -249,7 +249,7 @@ class Frontend
      *
      * @return string Der Auszug
      */
-    public function filterEinsatzExcerpt($excerpt)
+    public function filterEinsatzExcerpt(string $excerpt): string
     {
         global $post;
         if (get_post_type() !== 'einsatz') {
@@ -275,7 +275,7 @@ class Frontend
      *
      * @param WP_Query $query
      */
-    public function addReportsToQuery($query)
+    public function addReportsToQuery(WP_Query $query)
     {
         // Nur, wenn Filter erlaubt sind, soll weitergemacht werden
         if (!empty($query->query_vars['suppress_filters'])) {

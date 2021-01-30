@@ -65,9 +65,19 @@ class IncidentReport
      */
     public static function getFields()
     {
-        return array_merge(self::getMetaFields(), self::getTerms(), self::getPostFields());
+        return array_merge(self::getMetaFields(), self::getTerms(), self::getPostFields(), self::getImageFields());
     }
-
+    /**
+     * Gibt ein Array für die Felder mit den Bilder für den Import zurück
+     * @return array
+     */
+    public static function getImageFields() 
+    {
+        return array(
+            'gallery' => array(
+                'label' => 'Einsatzbilder'
+            ),
+    }    
     /**
      * Gibt die slugs und Namen der Metafelder zurück
      *

@@ -426,17 +426,7 @@ class Helper
         }
         return null;
     }
-    
-    /**
-     * Fügt Bilder einem Beitrag hinzu
-     *
-     */
-    public function addImages($postId, $imgIdsArr) {
-        foreach ($imgIdsArr as $imgId) {
-            /* Füge Bild/Anhang zu Post hinzu */
-        }
-    }
-    
+  
     /**
      * Stellt sicher, dass boolsche Werte durch 0 und 1 dargestellt werden
      * @param string $value

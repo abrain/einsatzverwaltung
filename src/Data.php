@@ -58,7 +58,6 @@ class Data
      */
     public function getYearsWithReports(): array
     {
-        /** @var wpdb $wpdb */
         global $wpdb;
 
         $yearStrings = $wpdb->get_col($wpdb->prepare(

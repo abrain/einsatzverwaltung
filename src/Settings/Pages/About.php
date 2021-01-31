@@ -18,12 +18,10 @@ class About extends SubPage
 
     public function addSettingsFields()
     {
-        return;
     }
 
     public function addSettingsSections()
     {
-        return;
     }
 
     /**
@@ -71,6 +69,5 @@ class About extends SubPage
 
     public function registerSettings()
     {
-        return;
     }
 }

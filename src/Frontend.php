@@ -177,7 +177,7 @@ class Frontend
                 $content = sprintf('<p>%s</p>', esc_html($replacementText));
             }
             
-            $templateWithData = $this->formatter->formatIncidentData($template, array(), $post, 'post');
+            $templateWithData = $this->formatter->formatIncidentData($template, array(), $post);
             $templateWithContent = str_replace('%content%', $content, $templateWithData);
             return stripslashes(wp_filter_post_kses(addslashes($templateWithContent)));
         }
@@ -187,7 +187,7 @@ class Frontend
         }
 
         // Fallback auf das klassische Layout
-        $header = $this->getEinsatzberichtHeader($post, true, true);
+        $header = $this->getEinsatzberichtHeader($post);
         $content = $this->prepareContent($content);
 
         return $header . '<hr>' . $content;

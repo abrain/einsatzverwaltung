@@ -167,7 +167,7 @@ class Formatter
                 $replace = $incidentReport->getIncidentCommander();
                 break;
             case '%incidentType%':
-                $replace = $this->getTypeOfIncidentString($incidentReport, $context, false);
+                $replace = $this->getTypeOfIncidentString($incidentReport, $context);
                 break;
             case '%incidentTypeHierarchical%':
                 $replace = $this->getTypeOfIncidentString($incidentReport, $context, true);

@@ -21,7 +21,7 @@ class ReportListTable
      *
      * @var array
      */
-    private $customColumns = array();
+    private $customColumns;
 
     /**
      * ReportListTable constructor.
@@ -96,7 +96,7 @@ class ReportListTable
     {
         $report = new IncidentReport($postId);
         $content = $this->getColumnContent($column, $report);
-        echo (empty($content) ? '-' : $content);
+        echo empty($content) ? '-' : $content;
     }
 
     /**

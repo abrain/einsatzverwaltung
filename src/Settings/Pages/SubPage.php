@@ -54,7 +54,6 @@ abstract class SubPage
      */
     public function beforeContent()
     {
-        return;
     }
 
     /**
@@ -179,7 +178,6 @@ abstract class SubPage
      */
     public function echoStaticContent()
     {
-        return;
     }
 
     /**

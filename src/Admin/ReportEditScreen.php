@@ -490,7 +490,6 @@ class ReportEditScreen extends EditScreen
      */
     public function getEinsatzleiterNamen(): array
     {
-        /** @var wpdb $wpdb */
         global $wpdb;
 
         $names = array();

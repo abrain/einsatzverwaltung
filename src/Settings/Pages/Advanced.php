@@ -191,7 +191,6 @@ class Advanced extends SubPage
     public function echoStaticContent()
     {
         echo '<p>Die erweiterten Einstellungen k&ouml;nnen weitreichende Konsequenzen haben und sollten entsprechend nicht leichtfertig ge&auml;ndert werden.</p>';
-        return;
     }
 
     /**

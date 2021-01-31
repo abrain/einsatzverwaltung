@@ -482,9 +482,11 @@ class Helper
                     'post_type'	=> 'einsatz',
                     'posts_per_page' => 1,
                     'meta_query' => array(
-                        'key' => 'einsatz_incidentNumber',
-                        'value' => $insertArgs['meta_input']['einsatz_incidentNumber'],
-                        'compare' => '=',
+                        array(
+                            'key' => 'einsatz_incidentNumber',
+                            'value' => $insertArgs['meta_input']['einsatz_incidentNumber'],
+                            'compare' => '=',
+                       )
                     )
                 );
                 // Suche nach Einsatz mit Einsatznummer

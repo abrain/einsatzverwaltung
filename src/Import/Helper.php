@@ -476,9 +476,29 @@ class Helper
             $this->mapEntryToInsertArgs($mapping, $sourceEntry, $insertArgs);
             $alarmzeit = DateTime::createFromFormat($dateTimeFormat, $insertArgs['post_date']);
             $this->prepareArgsForInsertPost($insertArgs, $dateTimeFormat, $postStatus, $alarmzeit);
+            // Prüfen ob Eintrag schon existiert => kostet Performance bietet aber konsistente Daten!
+            if (array_key_exists('einsatz_incidentNumber', $insertArgs['meta_input']) && ! empty($insertArgs['meta_input']['einsatz_incidentNumber'])) {
+                $args = array(
+                    'post_type'	=> 'einsatz',
+                    'posts_per_page' => 1,
+                    'meta_query' => array(
+                        'key' => 'einsatz_incidentNumber',
+                        'value' => $insertArgs['meta_input']['einsatz_incidentNumber'],
+                        'compare' => '=',
+                    )
+                );
+                // Suche nach Einsatz mit Einsatznummer
+                $posts = query_posts( $args );
+               
+                $post_exists = (count($posts) > 0);
+            } else {
+                $post_exists = false;
+            }
             
-            $preparedInsertArgs[] = $insertArgs;
-            $yearsAffected[$alarmzeit->format('Y')] = 1;
+            if (! $post_exists) {
+                $preparedInsertArgs[] = $insertArgs;
+                $yearsAffected[$alarmzeit->format('Y')] = 1;
+            }
         }
     }
     

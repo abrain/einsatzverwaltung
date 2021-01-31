@@ -7,11 +7,6 @@ use abrain\Einsatzverwaltung\Types\Vehicle;
 use DateTime;
 use WP_Post;
 use WP_Term;
-use function get_post;
-use function get_post_type;
-use function error_log;
-use function intval;
-use function is_numeric;
 
 /**
  * Datenmodellklasse für Einsatzberichte
@@ -71,13 +66,14 @@ class IncidentReport
      * Gibt ein Array für die Felder mit den Bilder für den Import zurück
      * @return array
      */
-    public static function getImageFields() 
+    public static function getImageFields()
     {
         return array(
             'gallery' => array(
-                'label' => 'Einsatzbilder'
+                'label' => 'Einsatzbilder',
             ),
-    }    
+        );
+    }
     /**
      * Gibt die slugs und Namen der Metafelder zurück
      *
@@ -87,25 +83,25 @@ class IncidentReport
     {
         return array(
             'einsatz_einsatzort' => array(
-                'label' => 'Einsatzort'
+                'label' => 'Einsatzort',
             ),
             'einsatz_einsatzleiter' => array(
-                'label' => 'Einsatzleiter'
+                'label' => 'Einsatzleiter',
             ),
             'einsatz_einsatzende' => array(
-                'label' => 'Einsatzende'
+                'label' => 'Einsatzende',
             ),
             'einsatz_fehlalarm' => array(
-                'label' => 'Fehlalarm'
+                'label' => 'Fehlalarm',
             ),
             'einsatz_mannschaft' => array(
-                'label' => 'Mannschaftsstärke'
+                'label' => 'Mannschaftsstärke',
             ),
             'einsatz_special' => array(
-                'label' => 'Besonderer Einsatz'
+                'label' => 'Besonderer Einsatz',
             ),
             'einsatz_incidentNumber' => array(
-                'label' => 'Einsatznummer'
+                'label' => 'Einsatznummer',
             ),
         );
     }
@@ -148,17 +144,17 @@ class IncidentReport
     {
         return array(
             'alarmierungsart' => array(
-                'label' => 'Alarmierungsart'
+                'label' => 'Alarmierungsart',
             ),
             'einsatzart' => array(
-                'label' => 'Einsatzart'
+                'label' => 'Einsatzart',
             ),
             'fahrzeug' => array(
-                'label' => 'Fahrzeuge'
+                'label' => 'Fahrzeuge',
             ),
             'exteinsatzmittel' => array(
-                'label' => 'Externe Einsatzmittel'
-            )
+                'label' => 'Externe Einsatzmittel',
+            ),
         );
     }
 
@@ -171,14 +167,14 @@ class IncidentReport
     {
         return array(
             'post_date' => array(
-                'label' => 'Alarmzeit'
+                'label' => 'Alarmzeit',
             ),
             'post_content' => array(
-                'label' => 'Berichtstext'
+                'label' => 'Berichtstext',
             ),
             'post_title' => array(
-                'label' => 'Berichtstitel'
-            )
+                'label' => 'Berichtstitel',
+            ),
         );
     }
 

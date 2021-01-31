@@ -115,6 +115,7 @@ class Tool
         $this->helper->metaFields = IncidentReport::getMetaFields();
         $this->helper->taxonomies = IncidentReport::getTerms();
         $this->helper->postFields = IncidentReport::getPostFields();
+        $this->helper->imageFields = IncidentReport::getImageFields();
 
         echo '<div class="wrap">';
         echo '<h1>' . 'Einsatzberichte importieren' . '</h1>';

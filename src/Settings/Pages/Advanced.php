@@ -191,7 +191,6 @@ class Advanced extends SubPage
     public function echoStaticContent()
     {
         echo '<p>Die erweiterten Einstellungen k&ouml;nnen weitreichende Konsequenzen haben und sollten entsprechend nicht leichtfertig ge&auml;ndert werden.</p>';
-        return;
     }
 
     /**
@@ -200,7 +199,7 @@ class Advanced extends SubPage
      *
      * @return string
      */
-    private function getSampleUrl(WP_Post $post, $permalinkStructure)
+    private function getSampleUrl(WP_Post $post, $permalinkStructure): string
     {
         $selector = $this->permalinkController->buildSelector($post, $permalinkStructure);
         return $this->permalinkController->getPermalink($selector);
@@ -214,7 +213,7 @@ class Advanced extends SubPage
      * @param string $oldValue Der alte Wert
      * @return string Der zu speichernde Wert
      */
-    public function maybeRewriteSlugChanged($newValue, $oldValue)
+    public function maybeRewriteSlugChanged($newValue, $oldValue): string
     {
         if ($newValue != $oldValue) {
             self::$options->setFlushRewriteRules(true);

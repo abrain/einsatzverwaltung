@@ -163,7 +163,7 @@ class RecentIncidents extends AbstractWidget
     /**
      * @inheritDoc
      */
-    public function update($newInstance, $oldInstance)
+    public function update($newInstance, $oldInstance): array
     {
         $instance = array();
         $instance['title'] = strip_tags($newInstance['title']);
@@ -190,7 +190,7 @@ class RecentIncidents extends AbstractWidget
     /**
      * @inheritDoc
      */
-    public function form($instance)
+    public function form($instance): string
     {
         $title = Utilities::getArrayValueIfKey($instance, 'title', 'Letzte Eins&auml;tze');
         $anzahl = Utilities::getArrayValueIfKey($instance, 'anzahl', 3);

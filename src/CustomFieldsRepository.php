@@ -76,7 +76,7 @@ class CustomFieldsRepository
      *
      * @return CustomField[]
      */
-    public function getFieldsForType($slug)
+    public function getFieldsForType($slug): array
     {
         if ($this->hasPostType($slug)) {
             return $this->postTypeFields[$slug];
@@ -94,7 +94,7 @@ class CustomFieldsRepository
      *
      * @return bool
      */
-    private function hasPostType($postType)
+    private function hasPostType($postType): bool
     {
         return array_key_exists($postType, $this->postTypeFields) && is_array($this->postTypeFields[$postType]);
     }
@@ -106,7 +106,7 @@ class CustomFieldsRepository
      *
      * @return bool
      */
-    private function hasTaxonomy($taxonomy)
+    private function hasTaxonomy($taxonomy): bool
     {
         return array_key_exists($taxonomy, $this->taxonomyFields) && is_array($this->taxonomyFields[$taxonomy]);
     }
@@ -148,7 +148,7 @@ class CustomFieldsRepository
      * @param array $columns
      * @return array
      */
-    public function onCustomColumns($columns)
+    public function onCustomColumns($columns): array
     {
         $screen = get_current_screen();
 
@@ -220,7 +220,7 @@ class CustomFieldsRepository
      *
      * @return string Inhalt der Spalte
      */
-    public function onTaxonomyColumnContent($string, $columnName, $termId)
+    public function onTaxonomyColumnContent($string, $columnName, $termId): string
     {
         $term = get_term($termId);
         if (empty($term) || is_wp_error($term)) {

@@ -54,7 +54,6 @@ abstract class SubPage
      */
     public function beforeContent()
     {
-        return;
     }
 
     /**
@@ -179,7 +178,6 @@ abstract class SubPage
      */
     public function echoStaticContent()
     {
-        return;
     }
 
     /**
@@ -188,7 +186,7 @@ abstract class SubPage
      *
      * @return bool
      */
-    public function hasForm()
+    public function hasForm(): bool
     {
         return true;
     }

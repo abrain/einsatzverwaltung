@@ -46,7 +46,7 @@ class Data
      *
      * @param Options $options
      */
-    public function __construct($options)
+    public function __construct(Options $options)
     {
         $this->options = $options;
     }
@@ -56,9 +56,8 @@ class Data
      *
      * @return int[]
      */
-    public function getYearsWithReports()
+    public function getYearsWithReports(): array
     {
-        /** @var wpdb $wpdb */
         global $wpdb;
 
         $yearStrings = $wpdb->get_col($wpdb->prepare(
@@ -75,7 +74,7 @@ class Data
      * @param int $postId ID des Posts
      * @param WP_Post $post Das Post-Objekt
      */
-    public function savePostdata($postId, $post)
+    public function savePostdata(int $postId, WP_Post $post)
     {
         // Schreibrechte prüfen
         if (!current_user_can('edit_einsatzbericht', $postId)) {
@@ -212,7 +211,7 @@ class Data
      * @param int $postId Die ID des Einsatzberichts
      * @param WP_Post $post Das Post-Objekt des Einsatzberichts
      */
-    public function onPublish($postId, $post)
+    public function onPublish(int $postId, WP_Post $post)
     {
         $report = new IncidentReport($post);
 
@@ -238,7 +237,7 @@ class Data
      * @param string $oldStatus
      * @param WP_Post $post
      */
-    public function onTransitionPostStatus($newStatus, $oldStatus, WP_Post $post)
+    public function onTransitionPostStatus(string $newStatus, string $oldStatus, WP_Post $post)
     {
         if (get_post_type($post) !== Report::getSlug()) {
             return;
@@ -282,7 +281,7 @@ class Data
      * @param int $postId Die ID des Einsatzberichts
      * @param WP_Post $post Das Post-Objekt des Einsatzberichts
      */
-    public function onTrash($postId, $post)
+    public function onTrash(int $postId, WP_Post $post)
     {
         // Laufende Nummern aktualisieren
         if (true === $this->assignSequenceNumbers) {
@@ -314,7 +313,7 @@ class Data
      * @param int $postId ID des Einsatzberichts
      * @param string $seqNum Zu setzende laufende Nummer
      */
-    public function setSequenceNumber($postId, $seqNum)
+    public function setSequenceNumber(int $postId, string $seqNum)
     {
         if (empty($postId) || empty($seqNum)) {
             return;
@@ -326,7 +325,7 @@ class Data
     /**
      * @return bool
      */
-    private function isBulkEdit()
+    private function isBulkEdit(): bool
     {
         if (isset($_REQUEST['filter_action']) && ! empty($_REQUEST['filter_action'])) {
             return false;

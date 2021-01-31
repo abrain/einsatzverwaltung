@@ -27,7 +27,7 @@ class Options
      *
      * @return mixed
      */
-    public function getOption($key)
+    public function getOption(string $key)
     {
         if (array_key_exists($key, $this->defaults)) {
             return get_option($key, $this->defaults[$key]);
@@ -46,7 +46,7 @@ class Options
      *
      * @return bool
      */
-    public function getBoolOption($key)
+    public function getBoolOption(string $key): bool
     {
         $option = $this->getOption($key);
         return $this->toBoolean($option);
@@ -59,7 +59,7 @@ class Options
      *
      * @return int Die ID der Kategorie oder -1, wenn nicht gesetzt
      */
-    public function getEinsatzberichteCategory()
+    public function getEinsatzberichteCategory(): int
     {
         $categoryId = $this->getOption('einsatzvw_category');
         return (false === $categoryId ? -1 : intval($categoryId));
@@ -70,7 +70,7 @@ class Options
      *
      * @return bool
      */
-    public function isFlushRewriteRules()
+    public function isFlushRewriteRules(): bool
     {
         return $this->getBoolOption('einsatzvw_flush_rewrite_rules');
     }
@@ -80,7 +80,7 @@ class Options
      *
      * @return bool
      */
-    public function isHideEmptyDetails()
+    public function isHideEmptyDetails(): bool
     {
         $option = $this->getOption('einsatzvw_einsatz_hideemptydetails');
         return $this->toBoolean($option);
@@ -92,7 +92,7 @@ class Options
      *
      * @return bool
      */
-    public function isOnlySpecialInLoop()
+    public function isOnlySpecialInLoop(): bool
     {
         return $this->getBoolOption('einsatzvw_loop_only_special');
     }
@@ -101,7 +101,7 @@ class Options
     /**
      * @return bool
      */
-    public function isOpenExtEinsatzmittelNewWindow()
+    public function isOpenExtEinsatzmittelNewWindow(): bool
     {
         $option = $this->getOption('einsatzvw_open_ext_in_new');
         return $this->toBoolean($option);
@@ -110,7 +110,7 @@ class Options
     /**
      * @return bool
      */
-    public function isShowEinsatzartArchive()
+    public function isShowEinsatzartArchive(): bool
     {
         $option = $this->getOption('einsatzvw_show_einsatzart_archive');
         return $this->toBoolean($option);
@@ -119,7 +119,7 @@ class Options
     /**
      * @return bool
      */
-    public function isShowReportsInLoop()
+    public function isShowReportsInLoop(): bool
     {
         $option = $this->getOption('einsatzvw_show_einsatzberichte_mainloop');
         return $this->toBoolean($option);
@@ -128,7 +128,7 @@ class Options
     /**
      * @return bool
      */
-    public function isShowExtEinsatzmittelArchive()
+    public function isShowExtEinsatzmittelArchive(): bool
     {
         $option = $this->getOption('einsatzvw_show_exteinsatzmittel_archive');
         return $this->toBoolean($option);
@@ -137,18 +137,19 @@ class Options
     /**
      * @return bool
      */
-    public function isShowFahrzeugArchive()
+    public function isShowFahrzeugArchive(): bool
     {
         $option = $this->getOption('einsatzvw_show_fahrzeug_archive');
         return $this->toBoolean($option);
     }
 
     /**
+     * @param bool $value
+     *
      * @since 1.0.0
      *
-     * @param bool $value
      */
-    public function setFlushRewriteRules($value)
+    public function setFlushRewriteRules(bool $value)
     {
         update_option('einsatzvw_flush_rewrite_rules', $value ? 1 : 0);
     }
@@ -158,7 +159,7 @@ class Options
      *
      * @return bool
      */
-    private function toBoolean($value)
+    private function toBoolean($value): bool
     {
         return in_array($value, array(1, true, '1', 'yes', 'on'), true);
     }

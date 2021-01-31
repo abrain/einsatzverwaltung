@@ -19,7 +19,7 @@ class Loader
      *
      * @param string $class The fully-qualified name of the class to load
      */
-    public static function load($class)
+    public static function load(string $class)
     {
         // Do not load classes from other namespaces
         if (strpos($class, 'abrain\\Einsatzverwaltung') === false) {

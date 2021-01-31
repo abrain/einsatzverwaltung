@@ -26,9 +26,7 @@ class FormatterTest extends UnitTestCase
         $this->assertEquals('1 h 1 min', Formatter::getDurationString(61, true));
         $this->assertEquals('2 h 2 min', Formatter::getDurationString(122, true));
 
-        $this->assertEquals('', Formatter::getDurationString('asdf', true));
-        $this->assertEquals('', Formatter::getDurationString('asdf', false));
         $this->assertEquals('', Formatter::getDurationString(-1));
-        $this->assertEquals('9 minutes', Formatter::getDurationString('9', false));
+        $this->assertEquals('9 minutes', Formatter::getDurationString('9'));
     }
 }

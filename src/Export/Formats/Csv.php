@@ -32,7 +32,7 @@ class Csv extends AbstractFormat
     /**
      * @inheritDoc
      */
-    public function getTitle()
+    public function getTitle(): string
     {
         return 'CSV';
     }
@@ -91,7 +91,7 @@ class Csv extends AbstractFormat
     /**
      * @inheritDoc
      */
-    public function getFilename()
+    public function getFilename(): string
     {
         return 'Einsatzberichte.csv';
     }
@@ -125,18 +125,20 @@ class Csv extends AbstractFormat
 
     /**
      * @param bool $bool
+     *
      * @return mixed
      */
-    protected function getBooleanRepresentation($bool)
+    protected function getBooleanRepresentation(bool $bool): string
     {
         return ($bool === true ? 'Ja' : 'Nein');
     }
 
     /**
      * @param array $array
+     *
      * @return mixed
      */
-    protected function getArrayRepresentation($array)
+    protected function getArrayRepresentation(array $array)
     {
         return join(',', $array);
     }

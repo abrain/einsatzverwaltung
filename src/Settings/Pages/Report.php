@@ -250,7 +250,7 @@ class Report extends SubPage
      * @param string $input
      * @return string
      */
-    public function sanitizeReportTemplateUsage($input)
+    public function sanitizeReportTemplateUsage($input): string
     {
         if (!in_array($input, array_keys($this->useReportTemplateOptions))) {
             return 'no';
@@ -263,7 +263,7 @@ class Report extends SubPage
      * @param string $input
      * @return string
      */
-    public function sanitizeTemplate($input)
+    public function sanitizeTemplate($input): string
     {
         return stripslashes(wp_filter_post_kses(addslashes($input)));
     }

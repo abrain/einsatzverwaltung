@@ -143,7 +143,7 @@ class Renderer
      *
      * @return string HTML-Code der Liste
      */
-    public function getList($reports, Parameters $parameters)
+    public function getList($reports, Parameters $parameters): string
     {
         $this->string = '';
         $this->constructList($reports, $parameters);
@@ -232,7 +232,7 @@ class Renderer
      *
      * @return string HTML markup for the table cell only visible on devices with a small screen (e.g. smartphones)
      */
-    private function getSmallScreenCell(IncidentReport $report, Parameters $parameters)
+    private function getSmallScreenCell(IncidentReport $report, Parameters $parameters): string
     {
         $content = '';
         $annotations = '';
@@ -273,7 +273,7 @@ class Renderer
      *
      * @return string
      */
-    private function getCellMarkup(IncidentReport $report, Parameters $parameters, $columnId)
+    private function getCellMarkup(IncidentReport $report, Parameters $parameters, $columnId): string
     {
         $cellContent = $this->getCellContent($report, $columnId, $parameters);
 
@@ -297,7 +297,7 @@ class Renderer
      *
      * @return bool
      */
-    private function isCellLinkToReport(IncidentReport $report, $columnId, Parameters $parameters)
+    private function isCellLinkToReport(IncidentReport $report, $columnId, Parameters $parameters): bool
     {
         $linkToReport = $parameters->linkEmptyReports || $report->hasContent();
         $columnsLinkingReport = $parameters->getColumnsLinkingReport();
@@ -325,7 +325,7 @@ class Renderer
      *
      * @return string
      */
-    private function getCellContent($report, $colId, Parameters $parameters)
+    private function getCellContent($report, $colId, Parameters $parameters): string
     {
         if (empty($report)) {
             return '&nbsp;';
@@ -477,7 +477,7 @@ class Renderer
      *
      * @return string
      */
-    public static function getDynamicCss()
+    public static function getDynamicCss(): string
     {
         if (empty(self::$settings)) {
             self::$settings = new Settings();

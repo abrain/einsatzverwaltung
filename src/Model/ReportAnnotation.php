@@ -69,7 +69,7 @@ class ReportAnnotation
     /**
      * @return string
      */
-    public function getIcon()
+    public function getIcon(): string
     {
         return $this->icon;
     }
@@ -77,7 +77,7 @@ class ReportAnnotation
     /**
      * @return string
      */
-    public function getIdentifier()
+    public function getIdentifier(): string
     {
         return $this->identifier;
     }
@@ -85,7 +85,7 @@ class ReportAnnotation
     /**
      * @return string
      */
-    public function getLabelWhenActive()
+    public function getLabelWhenActive(): string
     {
         return $this->labelWhenActive;
     }
@@ -93,7 +93,7 @@ class ReportAnnotation
     /**
      * @return string
      */
-    public function getLabelWhenInactive()
+    public function getLabelWhenInactive(): string
     {
         return $this->labelWhenInactive;
     }
@@ -101,7 +101,7 @@ class ReportAnnotation
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }

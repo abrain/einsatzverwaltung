@@ -18,12 +18,10 @@ class About extends SubPage
 
     public function addSettingsFields()
     {
-        return;
     }
 
     public function addSettingsSections()
     {
-        return;
     }
 
     /**
@@ -64,13 +62,12 @@ class About extends SubPage
     /**
      * @inheritDoc
      */
-    public function hasForm()
+    public function hasForm(): bool
     {
         return false;
     }
 
     public function registerSettings()
     {
-        return;
     }
 }

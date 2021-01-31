@@ -64,7 +64,7 @@ class About extends SubPage
     /**
      * @inheritDoc
      */
-    public function hasForm()
+    public function hasForm(): bool
     {
         return false;
     }

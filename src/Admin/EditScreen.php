@@ -21,7 +21,7 @@ abstract class EditScreen
      *
      * @return string[]
      */
-    public function filterDefaultHiddenMetaboxes($hidden, WP_Screen $screen)
+    public function filterDefaultHiddenMetaboxes($hidden, WP_Screen $screen): array
     {
         if ($screen->post_type !== $this->customTypeSlug) {
             return $hidden;

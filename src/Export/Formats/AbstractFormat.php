@@ -37,7 +37,7 @@ abstract class AbstractFormat implements Format
      *
      * @return WP_Query
      */
-    protected function getQuery()
+    protected function getQuery(): WP_Query
     {
         // Wähle nur veröffentlichte Einsatzberichte aus
         $args = array(
@@ -67,7 +67,7 @@ abstract class AbstractFormat implements Format
      *
      * @return array
      */
-    protected function getColumnNames()
+    protected function getColumnNames(): array
     {
         return array(
             'Einsatznummer',
@@ -93,7 +93,7 @@ abstract class AbstractFormat implements Format
      * @param WP_Post $post
      * @return array
      */
-    protected function getValuesForReport(WP_Post $post)
+    protected function getValuesForReport(WP_Post $post): array
     {
         $report = new IncidentReport($post);
 

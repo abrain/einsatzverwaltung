@@ -188,7 +188,7 @@ abstract class SubPage
      *
      * @return bool
      */
-    public function hasForm()
+    public function hasForm(): bool
     {
         return true;
     }

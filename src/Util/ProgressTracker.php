@@ -82,7 +82,7 @@ class ProgressTracker
     /**
      * @return int
      */
-    public function getPercentage()
+    public function getPercentage(): int
     {
         if ($this->totalSteps === 0) {
             return 0;

@@ -17,7 +17,7 @@ class Json extends AbstractFormat
     /**
      * @inheritDoc
      */
-    public function getTitle()
+    public function getTitle(): string
     {
         return 'JSON';
     }

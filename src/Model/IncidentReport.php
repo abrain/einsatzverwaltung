@@ -53,7 +53,7 @@ class IncidentReport
      *
      * @return string Die Beschriftung oder $field, wenn es das Feld nicht gibt
      */
-    public static function getFieldLabel($field)
+    public static function getFieldLabel($field): string
     {
         $fields = self::getFields();
         return (array_key_exists($field, $fields) ? $fields[$field]['label'] : $field);
@@ -63,7 +63,7 @@ class IncidentReport
      * Gibt ein Array aller Felder und deren Namen zurück,
      * Hauptverwendungszweck ist das Mapping beim Import
      */
-    public static function getFields()
+    public static function getFields(): array
     {
         return array_merge(self::getMetaFields(), self::getTerms(), self::getPostFields());
     }
@@ -73,7 +73,7 @@ class IncidentReport
      *
      * @return array
      */
-    public static function getMetaFields()
+    public static function getMetaFields(): array
     {
         return array(
             'einsatz_einsatzort' => array(
@@ -134,7 +134,7 @@ class IncidentReport
      *
      * @return array
      */
-    public static function getTerms()
+    public static function getTerms(): array
     {
         return array(
             'alarmierungsart' => array(
@@ -157,7 +157,7 @@ class IncidentReport
      *
      * @return array
      */
-    public static function getPostFields()
+    public static function getPostFields(): array
     {
         return array(
             'post_date' => array(
@@ -175,7 +175,7 @@ class IncidentReport
     /**
      * @return array
      */
-    public function getAdditionalForces()
+    public function getAdditionalForces(): array
     {
         return $this->getTheTerms('exteinsatzmittel');
     }
@@ -185,7 +185,7 @@ class IncidentReport
      *
      * @return string
      */
-    public function getIncidentCommander()
+    public function getIncidentCommander(): string
     {
         return $this->getPostMeta('einsatz_einsatzleiter');
     }
@@ -195,7 +195,7 @@ class IncidentReport
      *
      * @return string
      */
-    public function getLocation()
+    public function getLocation(): string
     {
         return $this->getPostMeta('einsatz_einsatzort');
     }

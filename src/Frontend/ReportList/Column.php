@@ -54,7 +54,7 @@ class Column
     /**
      * @return string
      */
-    public function getIdentifier()
+    public function getIdentifier(): string
     {
         return $this->identifier;
     }
@@ -62,7 +62,7 @@ class Column
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -70,7 +70,7 @@ class Column
     /**
      * @return string
      */
-    public function getNameForSettings()
+    public function getNameForSettings(): string
     {
         if (empty($this->longName)) {
             return $this->name;
@@ -82,7 +82,7 @@ class Column
     /**
      * @return bool
      */
-    public function isNoWrap()
+    public function isNoWrap(): bool
     {
         return $this->noWrap;
     }

@@ -21,7 +21,7 @@ class ColorPicker extends CustomField
     /**
      * @inheritdoc
      */
-    public function getAddTermInput()
+    public function getAddTermInput(): string
     {
         return sprintf(
             '<input id="tag-%1$s" type="text" value="" name="%1$s" class="einsatzverwaltung-color-picker" />',
@@ -32,7 +32,7 @@ class ColorPicker extends CustomField
     /**
      * @inheritdoc
      */
-    public function getEditTermInput($tag)
+    public function getEditTermInput($tag): string
     {
         return sprintf(
             '<input name="%1$s" id="%1$s" type="text" value="%2$s" class="einsatzverwaltung-color-picker" />',
@@ -44,7 +44,7 @@ class ColorPicker extends CustomField
     /**
      * @inheritdoc
      */
-    public function getColumnContent($termId)
+    public function getColumnContent($termId): string
     {
         $value = $this->getValue($termId);
         if (empty($value)) {
@@ -60,7 +60,7 @@ class ColorPicker extends CustomField
     /**
      * @inheritDoc
      */
-    public function getEditPostInput(WP_Post $post)
+    public function getEditPostInput(WP_Post $post): string
     {
         return sprintf(
             '<input name="%1$s" id="%1$s" type="text" value="%2$s" class="einsatzverwaltung-color-picker" />',

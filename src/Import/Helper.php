@@ -1,4 +1,7 @@
 <?php
+/**
+ * Helper Klasse für den Import von Einsatzberichten
+ */
 namespace abrain\Einsatzverwaltung\Import;
 
 use abrain\Einsatzverwaltung\Data;
@@ -16,38 +19,32 @@ use DateTime;
 class Helper
 {
 
-    /**
-     *
+    /*
      * @var Utilities
      */
-    private $utilities;
+    private $_utilities;
 
-    /**
-     *
+    /*
      * @var Data
      */
-    private $data;
+    private $_data;
 
-    /**
-     *
+    /*
      * @var array
      */
     public $metaFields;
 
-    /**
-     *
+    /*
      * @var array
      */
     public $postFields;
 
-    /**
-     *
+    /*
      * @var array
      */
     public $imageFields;
 
-    /**
-     *
+    /*
      * @var array
      */
     public $taxonomies;
@@ -56,25 +53,28 @@ class Helper
      * Helper constructor.
      *
      * @param Utilities $utilities
-     * @param Data $data
+     * @param Data      $data
      */
     public function __construct(Utilities $utilities, Data $data)
     {
-        $this->utilities = $utilities;
-        $this->data = $data;
+        $this->_utilities = $utilities;
+        $this->_data = $data;
     }
 
     /**
      * Gibt ein Auswahlfeld zur Zuordnung der Felder in Einsatzverwaltung aus
      *
-     * @param array $args
-     *            {
+     * @param array $args Argumenten-Array
+     * {
      *     @type string $name              Name des Dropdownfelds im Formular
      *     @type string $selected          Wert der ausgewählten Option
-     *     @type array  $unmatchableFields Felder, die nicht als Importziel auswählbar sein sollen
+     *     @type array  $unmatchableFields Felder, die nicht als Importziel
+     *                                     auswählbar sein sollen
      * }
+     *
+     * @return null
      */
-    private function dropdownEigeneFelder($args)
+    private function _dropdownEigeneFelder($args)
     {
         $defaults = array(
             'name' => null,
@@ -95,15 +95,27 @@ class Helper
         }
 
         // Sortieren und ausgeben
-        uasort($fields, function ($field1, $field2) {
-            return strcmp($field1['label'], $field2['label']);
-        });
+        uasort(
+            $fields,
+            function ($field1, $field2) {
+                return strcmp($field1['label'], $field2['label']);
+            }
+        );
         $string = '<select name="' . $parsedArgs['name'] . '">';
         /* @noinspection HtmlUnknownAttribute */
-        $string .= sprintf('<option value="-" %s>%s</option>', selected($parsedArgs['selected'], '-', false), 'nicht importieren');
+        $string .= sprintf(
+            '<option value="-" %s>%s</option>',
+            selected($parsedArgs['selected'], '-', false),
+            'nicht importieren'
+        );
         foreach ($fields as $slug => $fieldProperties) {
             /* @noinspection HtmlUnknownAttribute */
-            $string .= sprintf('<option value="%s" %s>%s</option>', esc_attr($slug), selected($parsedArgs['selected'], $slug, false), esc_html($fieldProperties['label']));
+            $string .= sprintf(
+                '<option value="%s" %s>%s</option>',
+                esc_attr($slug),
+                selected($parsedArgs['selected'], $slug, false),
+                esc_html($fieldProperties['label'])
+            );
         }
         $string .= '</select>';
 
@@ -111,17 +123,21 @@ class Helper
     }
 
     /**
+     * MapEntryToInsertArgs
      *
      * @param array $mapping
      * @param array $sourceEntry
      * @param array $insertArgs
+     *
+     * @return null
+     *
      * @throws ImportPreparationException
      */
     public function mapEntryToInsertArgs($mapping, $sourceEntry, &$insertArgs)
     {
         foreach ($mapping as $sourceField => $ownField) {
             if (empty($ownField) || !is_string($ownField)) {
-                $this->utilities->printError("Feld '$ownField' ung&uuml;ltig");
+                $this->_utilities->printError("Feld '$ownField' ung&uuml;ltig");
                 continue;
             }
 
@@ -136,7 +152,9 @@ class Helper
                     continue;
                 }
 
-                $insertArgs['tax_input'][$ownField] = $this->getTaxInputString($ownField, $sourceValue);
+                $insertArgs['tax_input'][$ownField] = $this->getTaxInputString(
+                    $ownField, $sourceValue
+                );
             } elseif (array_key_exists($ownField, $this->postFields)) {
                 // Wert gehört direkt zum Post
                 $insertArgs[$ownField] = $sourceValue;
@@ -144,20 +162,26 @@ class Helper
                 // Wert gehört in ein Metafeld
                 $insertArgs['image'][$ownField] = $sourceValue;
             } elseif ($ownField == '-') {
-                $this->utilities->printWarning("Feld '$sourceField' nicht zugeordnet");
+                $this->_utilities->printWarning(
+                    "Feld '$sourceField' nicht zugeordnet"
+                );
             } else {
-                $this->utilities->printError("Feld '$ownField' unbekannt");
+                $this->_utilities->printError("Feld '$ownField' unbekannt");
             }
         }
     }
 
     /**
-     * Bereitet eine kommaseparierte Auflistung von Terms einer bestimmten Taxonomie so, dass sie beim Anlegen eines
-     * Einsatzberichts für die gegebene Taxonomie als tax_input verwendet werden kann.
+     * Bereitet eine kommaseparierte Auflistung von Terms einer
+     * bestimmten Taxonomie so, dass sie beim Anlegen eines
+     * Einsatzberichts für die gegebene Taxonomie
+     * als tax_input verwendet werden kann.
      *
      * @param string $taxonomy
      * @param string $terms
+     *
      * @return string
+     *
      * @throws ImportPreparationException
      */
     public function getTaxInputString($taxonomy, $terms)
@@ -167,7 +191,7 @@ class Helper
             return $terms;
         }
 
-        // Bei hierarchischen Taxonomien muss die ID statt des Namens verwendet werden
+        // Bei hierarchischen Taxonomien muss ID anstelle Namen verwendet werden
         $termIds = array();
 
         $termNames = explode(',', $terms);
@@ -184,13 +208,17 @@ class Helper
      *
      * @param string $termName
      * @param string $taxonomy
+     *
      * @return int
+     *
      * @throws ImportPreparationException
      */
     public function getTermId($termName, $taxonomy)
     {
         if (is_taxonomy_hierarchical($taxonomy) === false) {
-            throw new ImportPreparationException("Die Taxonomie $taxonomy ist nicht hierarchisch!");
+            throw new ImportPreparationException(
+                "Die Taxonomie $taxonomy ist nicht hierarchisch!"
+            );
         }
 
         $termName = trim($termName);
@@ -205,7 +233,13 @@ class Helper
         $newterm = wp_insert_term($termName, $taxonomy);
 
         if (is_wp_error($newterm)) {
-            throw new ImportPreparationException(sprintf("Konnte %s '%s' nicht anlegen: %s", $this->taxonomies[$taxonomy]['label'], $termName, $newterm->get_error_message()));
+            throw new ImportPreparationException(
+                sprintf(
+                    "Konnte %s '%s' nicht anlegen: %s",
+                    $this->taxonomies[$taxonomy]['label'],
+                    $termName, $newterm->get_error_message()
+                )
+            );
         }
 
         // Anlegen erfolgreich, zurückgegebene ID verwenden
@@ -215,10 +249,13 @@ class Helper
     /**
      * Importiert Einsätze aus der wp-einsatz-Tabelle
      *
-     * @param AbstractSource $source
-     * @param array $mapping
-     *            Zuordnung zwischen zu importieren Feldern und denen der Einsatzverwaltung
-     * @param ImportStatus $importStatus
+     * @param AbstractSource $source       Quelle
+     * @param array          $mapping      Zuordnung zwischen zu importieren
+     *                                     Feldern und denen der Einsatzverwaltung
+     * @param ImportStatus   $importStatus Status
+     *
+     * @return null
+     *
      * @throws ImportException
      * @throws ImportPreparationException
      */
@@ -234,43 +271,79 @@ class Helper
         $importStatus->displayMessage('Daten eingelesen, starte den Import...');
 
         // Den tatsächlichen Import starten
-        $this->runImport($preparedInsertArgs, $source, $yearsAffected, $importStatus);
+        $this->runImport(
+            $preparedInsertArgs, $source, $yearsAffected, $importStatus
+        );
     }
 
     /**
+     * PrepareArgsForInsertPost
      *
-     * @param array $insertArgs
-     * @param string $dateTimeFormat
-     * @param string $postStatus
+     * @param array    $insertArgs
+     * @param string   $dateTimeFormat
+     * @param string   $postStatus
      * @param DateTime $alarmzeit
+     *
+     * @return null
+     *
      * @throws ImportPreparationException
      */
-    public function prepareArgsForInsertPost(&$insertArgs, $dateTimeFormat, $postStatus, $alarmzeit)
-    {
+    public function prepareArgsForInsertPost(
+        &$insertArgs,
+        $dateTimeFormat,
+        $postStatus,
+        $alarmzeit
+    ) {
         // Datum des Einsatzes prüfen
         if (false === $alarmzeit) {
-            throw new ImportPreparationException(sprintf('Die Alarmzeit %s konnte mit dem angegebenen Format %s nicht eingelesen werden', esc_html($insertArgs['post_date']), esc_html($dateTimeFormat)));
+            throw new ImportPreparationException(
+                sprintf(
+                    'Die Alarmzeit %s konnte mit dem angegebenen Format %s nicht eingelesen werden',
+                    esc_html($insertArgs['post_date']),
+                    esc_html($dateTimeFormat)
+                )
+            );
         }
 
-        // Solange der Einsatzbericht ein Entwurf ist, soll kein Datum gesetzt werden (vgl. wp_update_post()).
+        /*
+         * Solange der Einsatzbericht ein Entwurf ist,
+         * soll kein Datum gesetzt werden (vgl. wp_update_post()).
+         */
         if ($postStatus === 'draft') {
             // Wird bis zur Veröffentlichung in Postmeta zwischengespeichert.
-            $insertArgs['meta_input']['_einsatz_timeofalerting'] = date_format($alarmzeit, 'Y-m-d H:i:s');
+            $insertArgs['meta_input']['_einsatz_timeofalerting'] = date_format(
+                $alarmzeit, 'Y-m-d H:i:s'
+            );
             unset($insertArgs['post_date']);
             unset($insertArgs['post_date_gmt']);
         } else {
             $insertArgs['post_date'] = $alarmzeit->format('Y-m-d H:i:s');
-            $insertArgs['post_date_gmt'] = get_gmt_from_date($insertArgs['post_date']);
+            $insertArgs['post_date_gmt'] = get_gmt_from_date(
+                $insertArgs['post_date']
+            );
         }
 
         // Einsatzende korrekt formatieren
-        if (array_key_exists('einsatz_einsatzende', $insertArgs['meta_input']) && !empty($insertArgs['meta_input']['einsatz_einsatzende'])) {
-            $endDate = DateTime::createFromFormat($dateTimeFormat, $insertArgs['meta_input']['einsatz_einsatzende']);
+        if (array_key_exists('einsatz_einsatzende', $insertArgs['meta_input'])
+            && !empty($insertArgs['meta_input']['einsatz_einsatzende'])
+        ) {
+            $endDate = DateTime::createFromFormat(
+                $dateTimeFormat,
+                $insertArgs['meta_input']['einsatz_einsatzende']
+            );
             if (false === $endDate) {
-                throw new ImportPreparationException(sprintf('Das Einsatzende %s konnte mit dem angegebenen Format %s nicht eingelesen werden', esc_html($insertArgs['meta_input']['einsatz_einsatzende']), esc_html($dateTimeFormat)));
+                throw new ImportPreparationException(
+                    sprintf(
+                        'Das Einsatzende %s konnte mit dem angegebenen Format %s nicht eingelesen werden',
+                        esc_html($insertArgs['meta_input']['einsatz_einsatzende']),
+                        esc_html($dateTimeFormat)
+                    )
+                );
             }
 
-            $insertArgs['meta_input']['einsatz_einsatzende'] = $endDate->format('Y-m-d H:i');
+            $insertArgs['meta_input']['einsatz_einsatzende'] = $endDate->format(
+                'Y-m-d H:i'
+            );
         }
 
         $insertArgs['post_type'] = 'einsatz';
@@ -292,22 +365,31 @@ class Helper
             'einsatz_hasimages',
         );
         foreach ($boolAnnotations as $metaKey) {
-            $insertArgs['meta_input'][$metaKey] = $this->sanitizeBooleanValues(@$insertArgs['meta_input'][$metaKey]);
+            $insertArgs['meta_input'][$metaKey] = $this->sanitizeBooleanValues(
+                @$insertArgs['meta_input'][$metaKey]
+            );
         }
 
         // Bilder als Anhänge erstellen oder in Anhängen suchen
-        if (array_key_exists('gallery', $insertArgs['image']) && !empty($insertArgs['image']['gallery'])) {
-            $images = $this->parseImageArrayFromString($insertArgs['image']['gallery']);
+        if (array_key_exists('gallery', $insertArgs['image'])
+            && !empty($insertArgs['image']['gallery'])
+        ) {
+            $images = $this->parseImageArrayFromString(
+                $insertArgs['image']['gallery']
+            );
             if (is_array($images) && count($images) > 0) {
-                // Create Gallery Shortcode
+                // Hier kann alternativ auch ein  Gallery Shortcode erzeugt werden
                 // $shortcode = ws_sprintf('[gallery ids="%"]',$images);
-                $shortcode = '[gallery columns="3" link="file"]';
-                // Add Shortcode to post content
-                $insertArgs['post_content'] .= $shortcode;
+                // oder für die angehängten Bilder:
+                // $shortcode = '[gallery columns="3" link="file"]';
+                // Shortcode zu post content hinzufügen
+                // $insertArgs['post_content'] .= $shortcode;
+                // => IMO Besser: In Template erledigen...
+                // Setze Bilder-Flag
                 $insertArgs['meta_input']['einsatz_hasimages'] = 1;
+                // Attachment IDs Zwischenspeichern
                 $insertArgs['image']['_gallery'] = $images;
             }
-            // Keep gallery field to attach images later to post (?) will not be with post in DB
         }
     }
 
@@ -315,7 +397,8 @@ class Helper
      * Versucht Bilder aus String parsen und in Attachment zu wandeln
      * gibt im Erfolgsfall Array aus Attachment IDs zurück
      *
-     * @param string $imgArrString
+     * @param string $imgArrString Kommaseparierter String aus Bildpfaden
+     *
      * @return array
      */
     public function parseImageArrayFromString($imgArrString)
@@ -328,7 +411,12 @@ class Helper
                 if ($attachment_id) {
                     $imgIds[] = $attachment_id;
                 } else {
-                    throw new ImportPreparationException(sprintf('Das Bild "%s" konnte nicht eingelesen werden, Datei wurde nicht gefunden oder ist nicht lesbar (Berechtigung?).', esc_html(trim($img))));
+                    throw new ImportPreparationException(
+                        sprintf(
+                            'Das Bild "%s" konnte nicht eingelesen werden, Datei wurde nicht gefunden oder ist nicht lesbar (Berechtigung?).',
+                            esc_html(trim($img))
+                        )
+                    );
                 }
 
             }
@@ -343,22 +431,26 @@ class Helper
      * Wenn gefunden, gebe ID zurück.
      * Wenn nicht, lege Attachment neu an.
      *
-     * @param string $url
-     *            Pfad zum Bild (ex: /wp-content/uploads/2013/05/test-image.jpg)
+     * @param string $url Pfad zum Bild (ex: /wp-content/uploads/2013/05/image.jpg)
      *
      * @return int $attachment Gibt attachment ID zurück
      */
     public function getAttachmentIdByUrl($url)
     {
         // TODO: Absoluten Pfad entfernen (Security?!)
-
         /*
-         * Suche in DB nach attachment GUID mit einem Teiltreffer (rechter Pfadanteil)
+         * Suche in DB nach attachment GUID mit
+         * einem Teiltreffer (rechter Pfadanteil)
          * Example: uploads/2013/05/test-image.jpg
          */
         global $wpdb;
 
-        $attachment = $wpdb->get_col($wpdb->prepare("SELECT ID FROM {$wpdb->prefix}posts WHERE post_type='attachment' AND guid RLIKE %s LIMIT 1;", $url));
+        $attachment = $wpdb->get_col(
+            $wpdb->prepare(
+                "SELECT ID FROM {$wpdb->prefix}posts WHERE post_type='attachment' AND guid RLIKE %s LIMIT 1;",
+                $url
+            )
+        );
 
         if (count($attachment) > 0) {
             // Treffer in Datenbank zurückgeben
@@ -371,8 +463,9 @@ class Helper
     /**
      * Fügt Anhang (Bild) anhand einer URI in Mediathek
      *
-     * @param $url Pfad
-     *            zu Bild, relativ unter WP_CONTENT_DIR => /wp-content/uploads/...
+     * @param string $url Pfad zu Bild,
+     *                    relativ unter WP_CONTENT_DIR => /wp-content/uploads/...
+     *
      * @return int|WP_Error AttachmentId oder WP_Error
      */
     public function addAttachment($url)
@@ -424,7 +517,8 @@ class Helper
     /**
      * Stellt sicher, dass boolsche Werte durch 0 und 1 dargestellt werden
      *
-     * @param string $value
+     * @param string $value boolscher Wert, kann null oder leer sein
+     *
      * @return string
      */
     public function sanitizeBooleanValues($value)
@@ -433,25 +527,34 @@ class Helper
             return '0';
         }
 
-        return (in_array(strtolower($value), array(
-            '1',
-            'ja',
-        )) ? '1' : '0');
+        return (
+            in_array(strtolower($value), array('1', 'ja')) ? '1' : '0'
+        );
     }
 
     /**
+     * PrepareImport
      *
      * @param AbstractSource $source
-     * @param array $mapping
-     * @param array $preparedInsertArgs
-     * @param array $yearsAffected
+     * @param array          $mapping
+     * @param array          $preparedInsertArgs
+     * @param array          $yearsAffected
+     *
+     * @return null
+     *
      * @throws ImportPreparationException
      */
-    public function prepareImport($source, $mapping, &$preparedInsertArgs, &$yearsAffected)
-    {
+    public function prepareImport(
+        $source,
+        $mapping,
+        &$preparedInsertArgs,
+        &$yearsAffected
+    ) {
         $sourceEntries = $source->getEntries(array_keys($mapping));
         if (empty($sourceEntries)) {
-            throw new ImportPreparationException('Die Importquelle lieferte keine Ergebnisse. Entweder sind dort keine Eins&auml;tze gespeichert oder es gab ein Problem bei der Abfrage.');
+            throw new ImportPreparationException(
+                'Die Importquelle lieferte keine Ergebnisse. Entweder sind dort keine Eins&auml;tze gespeichert oder es gab ein Problem bei der Abfrage.'
+            );
         }
 
         $dateFormat = $source->getDateFormat();
@@ -473,10 +576,24 @@ class Helper
             $insertArgs['meta_input'] = array();
 
             $this->mapEntryToInsertArgs($mapping, $sourceEntry, $insertArgs);
-            $alarmzeit = DateTime::createFromFormat($dateTimeFormat, $insertArgs['post_date']);
-            $this->prepareArgsForInsertPost($insertArgs, $dateTimeFormat, $postStatus, $alarmzeit);
-            // Prüfen ob Eintrag schon existiert => kostet Performance bietet aber konsistente Daten!
-            if (array_key_exists('einsatz_incidentNumber', $insertArgs['meta_input']) && !empty($insertArgs['meta_input']['einsatz_incidentNumber'])) {
+            $alarmzeit = DateTime::createFromFormat(
+                $dateTimeFormat, $insertArgs['post_date']
+            );
+            $this->prepareArgsForInsertPost(
+                $insertArgs,
+                $dateTimeFormat,
+                $postStatus,
+                $alarmzeit
+            );
+            /*
+             * Prüfen ob Eintrag schon existiert
+             * => kostet Performance bietet aber konsistente Daten!
+             */
+            if (array_key_exists(
+                'einsatz_incidentNumber', $insertArgs['meta_input']
+            )
+                && !empty($insertArgs['meta_input']['einsatz_incidentNumber'])
+            ) {
                 $args = array(
                     'post_type' => 'einsatz',
                     'posts_per_page' => 1,
@@ -504,22 +621,30 @@ class Helper
     }
 
     /**
-     * Gibt das Formular für die Zuordnung zwischen zu importieren Feldern und denen von Einsatzverwaltung aus
+     * Gibt das Formular für die Zuordnung zwischen zu
+     * importieren Feldern und denen von Einsatzverwaltung aus
      *
      * @param AbstractSource $source
-     * @param array $args
-     *            {
-     *     @type array  $mapping           Zuordnung von zu importieren Feldern auf Einsatzverwaltungsfelder
+     * @param array          $args
+     * {
+     *     @type array  $mapping           Zuordnung von zu importieren 
+     *                                     Feldern auf Einsatzverwaltungsfelder
      *     @type array  $next_action       Array der nächsten Action
      *     @type string $nonce_action      Wert der Nonce
      *     @type string $action_value      Wert der action-Variable
-     *     @type string submit_button_text Beschriftung für den Button unter dem Formular
+     *     @type string submit_button_text Beschriftung für den Button 
+     *                                     unter dem Formular
      * }
+     *
+     * @return null
      */
     public function renderMatchForm($source, $args)
     {
         /* Erkannte Feldnamen in CSV (Feldname = Label) */
-        $mapping_fields = array_combine(array_column(IncidentReport::getFields(), 'label'), array_keys(IncidentReport::getFields()));
+        $mapping_fields = array_combine(
+            array_column(IncidentReport::getFields(), 'label'),
+            array_keys(IncidentReport::getFields())
+        );
 
         /* Temporär: benutze eigenes Zusatzmapping, kann ggf. raus */
         $mapping_add = array(
@@ -542,9 +667,14 @@ class Helper
         /* Ergänge um eigenes temporäres Mapping (siehe oben), kann ggf. raus */
         $mapping_fields = array_merge(
             // Auch Feld-Schlüssel suchen
-            array_combine(array_keys(IncidentReport::getFields()), array_keys(IncidentReport::getFields())),
+            array_combine(
+                array_keys(IncidentReport::getFields()),
+                array_keys(IncidentReport::getFields())
+            ),
             // Feld-Label
-            $mapping_fields, $mapping_add);
+            $mapping_fields,
+            $mapping_add
+        );
 
         $defaults = array(
             'mapping' => $mapping_fields,
@@ -559,8 +689,9 @@ class Helper
 
         $unmatchableFields = $source->getUnmatchableFields();
         if (ReportNumberController::isAutoIncidentNumbers()) {
-            $this->utilities->printInfo('Einsatznummern können nur importiert werden, wenn die automatische Verwaltung deaktiviert ist.');
-
+            $this->_utilities->printInfo(
+                'Einsatznummern können nur importiert werden, wenn die automatische Verwaltung deaktiviert ist.'
+            );
             $unmatchableFields[] = 'einsatz_incidentNumber';
         }
 
@@ -575,18 +706,28 @@ class Helper
             if (array_key_exists($field, $source->getAutoMatchFields())) {
                 echo 'wird automatisch zugeordnet';
             } elseif (in_array($field, $source->getProblematicFields())) {
-                $this->utilities->printWarning(sprintf('Probleme mit Feld %s, siehe Analyse', $field));
+                $this->_utilities->printWarning(
+                    sprintf('Probleme mit Feld %s, siehe Analyse', $field)
+                );
             } else {
                 $selected = '-';
-                if (!empty($parsedArgs['mapping']) && array_key_exists(strtolower($field), array_change_key_case($parsedArgs['mapping'], CASE_LOWER)) && !empty($parsedArgs['mapping'][$field])) {
+                if (!empty($parsedArgs['mapping'])
+                    && array_key_exists(
+                        strtolower($field),
+                        array_change_key_case($parsedArgs['mapping'], CASE_LOWER)
+                    )
+                    && !empty($parsedArgs['mapping'][$field])
+                ) {
                     $selected = $parsedArgs['mapping'][$field];
                 }
 
-                $this->dropdownEigeneFelder(array(
-                    'name' => $source->getInputName($field),
-                    'selected' => $selected,
-                    'unmatchableFields' => $unmatchableFields,
-                ));
+                $this->_dropdownEigeneFelder(
+                    array(
+                        'name' => $source->getInputName($field),
+                        'selected' => $selected,
+                        'unmatchableFields' => $unmatchableFields,
+                    )
+                );
             }
             echo '</td></tr>';
         }
@@ -599,36 +740,56 @@ class Helper
     }
 
     /**
+     * RunImport
      *
-     * @param array $preparedInsertArgs
+     * @param array          $preparedInsertArgs
      * @param AbstractSource $source
-     * @param array $yearsAffected
-     * @param ImportStatus $importStatus
+     * @param array          $yearsAffected
+     * @param ImportStatus   $importStatus
+     *
+     * @return null
+     *
      * @throws ImportException
      */
-    public function runImport($preparedInsertArgs, $source, $yearsAffected, $importStatus)
-    {
-        // Für die Dauer des Imports sollen die laufenden Nummern nicht aktuell gehalten werden, da dies die Performance
-        // stark beeinträchtigt
+    public function runImport(
+        $preparedInsertArgs,
+        $source,
+        $yearsAffected,
+        $importStatus
+    ) {
+        /* 
+        * Für die Dauer des Imports sollen die laufenden Nummern 
+        * nicht aktuell gehalten werden, da dies die Performance
+        * stark beeinträchtigt
+        */
         if ($source->isPublishReports()) {
-            $this->data->pauseAutoSequenceNumbers();
+            $this->_data->pauseAutoSequenceNumbers();
         }
 
         foreach ($preparedInsertArgs as $insertArgs) {
             // Neuen Beitrag anlegen
             $postId = wp_insert_post($insertArgs, true);
             if (is_wp_error($postId)) {
-                throw new ImportException('Konnte Einsatz nicht importieren: ' . $postId->get_error_message());
+                throw new ImportException(
+                    'Konnte Einsatz nicht importieren: ' . 
+                    $postId->get_error_message()
+                );
             }
             // Update attached images
-            if (array_key_exists('image', $insertArgs) && array_key_exists('_gallery', $insertArgs['image']) && is_array($insertArgs['image']['_gallery']) && count($insertArgs['image']['_gallery']) > 0) {
+            if (array_key_exists('image', $insertArgs)
+                && array_key_exists('_gallery', $insertArgs['image'])
+                && is_array($insertArgs['image']['_gallery'])
+                && count($insertArgs['image']['_gallery']) > 0
+            ) {
                 foreach ($insertArgs['image']['_gallery'] as $imgId) {
                     if (is_numeric($imgId) && $imgId > 0) {
                         // Attach attachmentID to Post
-                        wp_update_post(array(
-                            'ID' => $imgId,
-                            'post_parent' => $postId,
-                        ));
+                        wp_update_post(
+                            array(
+                                'ID' => $imgId,
+                                'post_parent' => $postId,
+                            )
+                        );
                     }
                 }
                 // Erstes Bild als Thumbnail setzen
@@ -638,11 +799,19 @@ class Helper
         }
 
         if ($source->isPublishReports()) {
-            // Die automatische Aktualisierung der laufenden Nummern wird wieder aufgenommen
-            $this->data->resumeAutoSequenceNumbers();
+            /* 
+            * Die automatische Aktualisierung der laufenden Nummern 
+            * wird wieder aufgenommen
+            */
+            $this->_data->resumeAutoSequenceNumbers();
             foreach (array_keys($yearsAffected) as $year) {
-                $importStatus->displayMessage(sprintf('Aktualisiere laufende Nummern für das Jahr %d...', $year));
-                $this->data->updateSequenceNumbers(strval($year));
+                $importStatus->displayMessage(
+                    sprintf(
+                        'Aktualisiere laufende Nummern für das Jahr %d...',
+                        $year
+                    )
+                );
+                $this->_data->updateSequenceNumbers(strval($year));
             }
         }
     }
@@ -650,9 +819,8 @@ class Helper
     /**
      * Prüft, ob das Mapping stimmig ist und gibt Warnungen oder Fehlermeldungen aus
      *
-     * @param array $mapping
-     *            Das zu prüfende Mapping
-     * @param AbstractSource $source
+     * @param array          $mapping Das zu prüfende Mapping
+     * @param AbstractSource $source  Quelle
      *
      * @return bool True bei bestandener Prüfung, false bei Unstimmigkeiten
      */
@@ -662,7 +830,9 @@ class Helper
 
         // Pflichtfelder prüfen
         if (!in_array('post_date', $mapping)) {
-            $this->utilities->printError('Pflichtfeld Alarmzeit wurde nicht zugeordnet');
+            $this->_utilities->printError(
+                'Pflichtfeld Alarmzeit wurde nicht zugeordnet'
+            );
             $valid = false;
         }
 
@@ -672,8 +842,15 @@ class Helper
             $unmatchableFields[] = 'einsatz_incidentNumber';
         }
         foreach ($unmatchableFields as $unmatchableField) {
-            if (in_array($unmatchableField, $mapping) && !in_array($unmatchableField, $autoMatchFields)) {
-                $this->utilities->printError(sprintf('Feld %s kann nicht f&uuml;r ein zu importierendes Feld als Ziel angegeben werden', esc_html($unmatchableField)));
+            if (in_array($unmatchableField, $mapping) 
+                && !in_array($unmatchableField, $autoMatchFields)
+            ) {
+                $this->utilities->printError(
+                    sprintf(
+                        'Feld %s kann nicht f&uuml;r ein zu importierendes Feld als Ziel angegeben werden',
+                        esc_html($unmatchableField)
+                    )
+                );
                 $valid = false;
             }
         }
@@ -681,7 +858,12 @@ class Helper
         // Mehrfache Zuweisungen prüfen
         foreach (array_count_values($mapping) as $ownField => $count) {
             if ($count > 1) {
-                $this->utilities->printError(sprintf('Feld %s kann nicht f&uuml;r mehr als ein zu importierendes Feld als Ziel angegeben werden', IncidentReport::getFieldLabel($ownField)));
+                $this->_utilities->printError(
+                    sprintf(
+                        'Feld %s kann nicht f&uuml;r mehr als ein zu importierendes Feld als Ziel angegeben werden',
+                        IncidentReport::getFieldLabel($ownField)
+                    )
+                );
                 $valid = false;
             }
         }

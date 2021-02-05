@@ -3,16 +3,19 @@ type: docker
 name: unit-tests
 
 steps:
+  - name: install
+    image: composer
+    commands:
+      - composer install
   - name: test
     image: php:7
     environment:
       CC_TEST_REPORTER_ID:
         from_secret: cc_test_reporter_id
     commands:
-      - apt-get update && apt-get install -y zlib1g-dev libicu-dev g++ composer
+      - apt-get update && apt-get install -y zlib1g-dev libicu-dev g++
       - docker-php-ext-configure intl
       - docker-php-ext-install intl
-      - composer install
       - ./vendor/bin/phpunit -c phpunit-checks.xml --no-coverage
       - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
       - chmod +x ./cc-test-reporter

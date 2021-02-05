@@ -21,7 +21,8 @@
   },
   "config": {
     "platform": {
-      "php": "7.1.27"
+      "php": "7.1.27",
+      "ext-intl": "1"
     }
   },
   "require": {

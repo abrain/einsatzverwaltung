@@ -38,7 +38,7 @@ class AnnotationIconBar
      *
      * @return AnnotationIconBar
      */
-    public static function getInstance()
+    public static function getInstance(): AnnotationIconBar
     {
         if (null === self::$instance) {
             self::$instance = new AnnotationIconBar();
@@ -104,7 +104,7 @@ class AnnotationIconBar
      *
      * @return string
      */
-    private function getAnnotationIcon($icon, $titles, $state)
+    private function getAnnotationIcon($icon, $titles, $state): string
     {
         return sprintf(
             '<i class="%s" aria-hidden="true" title="%s" style="%s"></i>',
@@ -117,7 +117,7 @@ class AnnotationIconBar
     /**
      * @return string
      */
-    private function getAnnotationColorOff()
+    private function getAnnotationColorOff(): string
     {
         if (is_admin()) {
             return self::DEFAULT_COLOR_OFF;

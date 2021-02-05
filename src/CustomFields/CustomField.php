@@ -34,7 +34,7 @@ abstract class CustomField
     /**
      * @return string The markup for the form field shown when adding a new term.
      */
-    public function getAddTermMarkup()
+    public function getAddTermMarkup(): string
     {
         return sprintf(
             '<div class="form-field"><label for="tag-%1$s">%2$s</label>%4$s<p>%3$s</p></div>',
@@ -49,7 +49,7 @@ abstract class CustomField
      * @param WP_Term $tag Current taxonomy term object.
      * @return string The markup for the form field shown when editing an existing term.
      */
-    public function getEditTermMarkup($tag)
+    public function getEditTermMarkup($tag): string
     {
         return sprintf(
             '<tr class="form-field"><th scope="row"><label for="%1$s">%2$s</label></th><td>%4$s<p class="description">%3$s</p></td></tr>',
@@ -80,23 +80,23 @@ abstract class CustomField
     /**
      * @return string The markup for the input shown when adding a new term.
      */
-    abstract public function getAddTermInput();
+    abstract public function getAddTermInput(): string;
 
     /**
      * @param int $termId
      * @return string
      */
-    abstract public function getColumnContent($termId);
+    abstract public function getColumnContent($termId): string;
 
     /**
      * @param WP_Post $post Currently edited post object
      * @return string HTML markup for the input
      */
-    abstract public function getEditPostInput(WP_Post $post);
+    abstract public function getEditPostInput(WP_Post $post): string;
 
     /**
      * @param WP_Term $tag Current taxonomy term object.
      * @return string The markup for the input shown when editing an existing term.
      */
-    abstract public function getEditTermInput($tag);
+    abstract public function getEditTermInput($tag): string;
 }

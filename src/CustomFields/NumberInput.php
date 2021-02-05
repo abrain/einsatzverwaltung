@@ -21,7 +21,7 @@ class NumberInput extends CustomField
     /**
      * @inheritdoc
      */
-    public function getAddTermInput()
+    public function getAddTermInput(): string
     {
         return sprintf(
             '<input id="tag-%1$s" type="number" min="0" value="%2$d" name="%1$s">',
@@ -33,7 +33,7 @@ class NumberInput extends CustomField
     /**
      * @inheritdoc
      */
-    public function getEditTermInput($tag)
+    public function getEditTermInput($tag): string
     {
         return sprintf(
             '<input id="tag-%1$s" type="number" min="0" value="%2$d" name="%1$s">',
@@ -45,7 +45,7 @@ class NumberInput extends CustomField
     /**
      * @inheritdoc
      */
-    public function getColumnContent($termId)
+    public function getColumnContent($termId): string
     {
         return esc_html($this->getValue($termId));
     }
@@ -53,7 +53,7 @@ class NumberInput extends CustomField
     /**
      * @inheritDoc
      */
-    public function getEditPostInput(WP_Post $post)
+    public function getEditPostInput(WP_Post $post): string
     {
         return sprintf(
             '<input id="%1$s" type="number" min="0" value="%2$d" name="%1$s">',

@@ -23,7 +23,7 @@ class UrlInput extends CustomField
     /**
      * @inheritDoc
      */
-    public function getAddTermInput()
+    public function getAddTermInput(): string
     {
         return sprintf(
             '<input id="tag-%1$s" type="url" value="%2$s" name="%1$s">',
@@ -35,7 +35,7 @@ class UrlInput extends CustomField
     /**
      * @inheritDoc
      */
-    public function getColumnContent($termId)
+    public function getColumnContent($termId): string
     {
         $url = $this->getValue($termId);
         if (empty($url)) {
@@ -52,7 +52,7 @@ class UrlInput extends CustomField
     /**
      * @inheritDoc
      */
-    public function getEditPostInput(WP_Post $post)
+    public function getEditPostInput(WP_Post $post): string
     {
         return sprintf(
             '<input id="%1$s" type="url" value="%2$s" name="%1$s">',
@@ -64,7 +64,7 @@ class UrlInput extends CustomField
     /**
      * @inheritDoc
      */
-    public function getEditTermInput($tag)
+    public function getEditTermInput($tag): string
     {
         return sprintf(
             '<input id="tag-%1$s" type="url" value="%2$s" name="%1$s">',

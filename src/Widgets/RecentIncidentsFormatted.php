@@ -209,7 +209,7 @@ class RecentIncidentsFormatted extends AbstractWidget
      *
      * @return array Die zu speichernden Einstellungen oder false um das Speichern abzubrechen
      */
-    public function update($newInstance, $oldInstance)
+    public function update($newInstance, $oldInstance): array
     {
         $instance = array();
         $instance['title'] = strip_tags($newInstance['title']);
@@ -236,7 +236,7 @@ class RecentIncidentsFormatted extends AbstractWidget
      *
      * @return string HTML-Code für das Formular
      */
-    public function form($instance)
+    public function form($instance): string
     {
         $values = wp_parse_args($instance, $this->defaults);
 

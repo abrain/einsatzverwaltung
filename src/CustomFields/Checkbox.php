@@ -29,7 +29,7 @@ class Checkbox extends CustomField
     /**
      * @inheritDoc
      */
-    public function getAddTermInput()
+    public function getAddTermInput(): string
     {
         return sprintf(
             '<input id="tag-%1$s" type="checkbox" value="1" name="%1$s" %2$s />',
@@ -41,7 +41,7 @@ class Checkbox extends CustomField
     /**
      * @inheritDoc
      */
-    public function getAddTermMarkup()
+    public function getAddTermMarkup(): string
     {
         return sprintf(
             '<div class="form-field"><span class="fakelabel">%2$s</span>%4$s<label for="tag-%1$s" class="checkboxlabel">%3$s</label><p>%5$s</p></div>',
@@ -56,7 +56,7 @@ class Checkbox extends CustomField
     /**
      * @inheritDoc
      */
-    public function getColumnContent($termId)
+    public function getColumnContent($termId): string
     {
         $value = $this->getValue($termId);
         return ($value === '1' ? __('Yes', 'einsatzverwaltung') : __('No', 'einsatzverwaltung'));
@@ -65,7 +65,7 @@ class Checkbox extends CustomField
     /**
      * @inheritDoc
      */
-    public function getEditPostInput(WP_Post $post)
+    public function getEditPostInput(WP_Post $post): string
     {
         return sprintf(
             '<input name="%1$s" id="%1$s" type="checkbox" value="1" %2$s />',
@@ -77,7 +77,7 @@ class Checkbox extends CustomField
     /**
      * @inheritDoc
      */
-    public function getEditTermInput($tag)
+    public function getEditTermInput($tag): string
     {
         return sprintf(
             '<input name="%1$s" id="%1$s" type="checkbox" value="1" %2$s />',
@@ -89,7 +89,7 @@ class Checkbox extends CustomField
     /**
      * @inheritDoc
      */
-    public function getEditTermMarkup($tag)
+    public function getEditTermMarkup($tag): string
     {
         return sprintf(
             '<tr class="form-field"><th scope="row">%2$s</th><td>%3$s<label for="%1$s">%4$s</label><p class="description">%5$s</p></td></tr>',

@@ -59,7 +59,7 @@ class ColumnRepository
     /**
      * @return Column[]
      */
-    public function getAvailableColumns()
+    public function getAvailableColumns(): array
     {
         return $this->columns;
     }
@@ -69,7 +69,7 @@ class ColumnRepository
      *
      * @return Column|null
      */
-    public function getColumn($identifier)
+    public function getColumn($identifier): ?Column
     {
         if (!$this->hasColumn($identifier)) {
             return null;
@@ -83,7 +83,7 @@ class ColumnRepository
      *
      * @return Column[]
      */
-    public function getColumnsByIdentifier($identifiers)
+    public function getColumnsByIdentifier($identifiers): array
     {
         $columns = array();
         foreach ($identifiers as $identifier) {
@@ -97,7 +97,7 @@ class ColumnRepository
     /**
      * @return Column[]
      */
-    public function getDefaultColumns()
+    public function getDefaultColumns(): array
     {
         return $this->getColumnsByIdentifier(explode(',', self::DEFAULT_COLUMNS));
     }
@@ -107,7 +107,7 @@ class ColumnRepository
      *
      * @return string
      */
-    public function getIdentifiers($columns)
+    public function getIdentifiers($columns): string
     {
         $columnIds = array_map(function (Column $column) {
             return $column->getIdentifier();
@@ -119,7 +119,7 @@ class ColumnRepository
     /**
      * @return ColumnRepository
      */
-    public static function getInstance()
+    public static function getInstance(): ColumnRepository
     {
         if (empty(self::$instance)) {
             self::$instance = new self();
@@ -133,7 +133,7 @@ class ColumnRepository
      *
      * @return bool
      */
-    public function hasColumn($identifier)
+    public function hasColumn($identifier): bool
     {
         return array_key_exists($identifier, $this->columns);
     }
@@ -146,7 +146,7 @@ class ColumnRepository
      * @return string Der Eingabestring ohne ungültige Spalten-Ids, bei Problemen werden die Standardspalten
      * zurückgegeben
      */
-    public static function sanitizeColumns($input)
+    public static function sanitizeColumns($input): string
     {
         if (empty($input)) {
             return self::DEFAULT_COLUMNS;
@@ -166,7 +166,7 @@ class ColumnRepository
      *
      * @return string[]
      */
-    public static function sanitizeColumnsArray($inputArray)
+    public static function sanitizeColumnsArray($inputArray): array
     {
         $validColumnIds = self::sanitizeColumnsArrayNoDefault($inputArray);
 
@@ -184,7 +184,7 @@ class ColumnRepository
      *
      * @return string[]
      */
-    public static function sanitizeColumnsArrayNoDefault($inputArray)
+    public static function sanitizeColumnsArrayNoDefault($inputArray): array
     {
         $columnRepository = self::getInstance();
 

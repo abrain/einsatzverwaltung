@@ -17,7 +17,7 @@ class Settings
      *
      * @return string
      */
-    public function getZebraColor()
+    public function getZebraColor(): string
     {
         $option = get_option('einsatzvw_list_zebracolor', self::DEFAULT_ZEBRACOLOR);
         $sanitized = sanitize_hex_color($option);
@@ -33,7 +33,7 @@ class Settings
      *
      * @return string
      */
-    public function getZebraNthChildArg()
+    public function getZebraNthChildArg(): string
     {
         $option = get_option('einsatzvw_list_zebra_nth', self::DEFAULT_NTHCHILD);
         return $this->sanitizeZebraNthChildArg($option);
@@ -44,7 +44,7 @@ class Settings
      *
      * @return boolean
      */
-    public function isZebraTable()
+    public function isZebraTable(): bool
     {
         return (get_option('einsatzvw_list_zebra', '1') !== '0');
     }
@@ -56,7 +56,7 @@ class Settings
      *
      * @return string
      */
-    public function sanitizeZebraNthChildArg($input)
+    public function sanitizeZebraNthChildArg($input): string
     {
         if (!in_array($input, array('odd', 'even'))) {
             return self::DEFAULT_NTHCHILD;

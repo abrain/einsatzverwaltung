@@ -28,7 +28,7 @@ class MappingHelper
      * @return array
      * @throws ImportCheckException
      */
-    public function getMapping(AbstractSource $source, array $ownFields)
+    public function getMapping(AbstractSource $source, array $ownFields): array
     {
         $mapping = [];
 

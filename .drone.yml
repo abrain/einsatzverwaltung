@@ -31,8 +31,7 @@ steps:
       - chmod +x ./cc-test-reporter
       - ./cc-test-reporter before-build
       - XDEBUG_MODE=coverage ./vendor/bin/phpunit -c phpunit.xml
-      - ./bin/determine-cc-branch.sh
-      - ./cc-test-reporter after-build --debug --coverage-input-type clover --exit-code $?
+      - ./bin/report-code-coverage.sh
   - name: slack
     image: plugins/slack
     settings:

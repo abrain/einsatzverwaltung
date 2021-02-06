@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 if [ "$DRONE_BUILD_EVENT" == "pull_request" ]; then
     case "$DRONE_SOURCE_BRANCH" in

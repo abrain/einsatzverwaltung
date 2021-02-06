@@ -3,6 +3,14 @@ type: docker
 name: unit-tests
 
 steps:
+  - name: check-pr-branch-name
+    image: alpine
+    commands:
+      - ./bin/check-branch-name.sh
+    when:
+      event:
+        include:
+          - pull_request
   - name: install
     image: composer
     commands:

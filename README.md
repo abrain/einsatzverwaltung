@@ -19,7 +19,9 @@ Uses Font Awesome by Dave Gandy - http://fontawesome.io
 ### Hinweise f&uuml;r Entwickler
 Dieses Projekt arbeitet mit [git-flow](http://nvie.com/posts/a-successful-git-branching-model/).
 Die Entwicklung findet im Branch [develop](https://github.com/abrain/einsatzverwaltung/tree/develop) statt, im Branch [master](https://github.com/abrain/einsatzverwaltung/tree/master) befindet sich immer der Stand der zuletzt ver&ouml;ffentlichten Version.
-Pull Requests werden nur im Branch `develop` angenommen.
+
+Pull Requests können nur gegen `develop` gestellt werden.
+Die Änderungen im Fork müssen auf einem eigenen Branch (also nicht `develop`) vorgenommen werden, da sonst die Code Coverage nicht korrekt bestimmt wird.
 
 Das Plugin an sich liegt im Ordner `src`, alles andere dient der Unterst&uuml;tzung bei der Entwicklung.
 Code aus einem anderen Branch als `master` sollte nicht f&uuml;r Produktivsysteme verwendet werden.

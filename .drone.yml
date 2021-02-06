@@ -23,7 +23,7 @@ steps:
       - chmod +x ./cc-test-reporter
       - ./cc-test-reporter before-build
       - XDEBUG_MODE=coverage ./vendor/bin/phpunit -c phpunit.xml
-      - ./cc-test-reporter after-build --coverage-input-type clover --exit-code $?
+      - ./cc-test-reporter after-build --debug --coverage-input-type clover --exit-code $?
   - name: slack
     image: plugins/slack
     settings:
@@ -35,3 +35,8 @@ steps:
       event:
         exclude:
           - pull_request
+
+trigger:
+  branch:
+    exclude:
+      - feature/*

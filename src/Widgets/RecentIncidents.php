@@ -7,8 +7,12 @@ use abrain\Einsatzverwaltung\ReportQuery;
 use abrain\Einsatzverwaltung\Types\Unit;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use abrain\Einsatzverwaltung\Utilities;
+use function array_merge;
+use function checked;
+use function esc_html;
 use function get_queried_object_id;
 use function get_taxonomy;
+use function printf;
 
 /**
  * WordPress-Widget für die letzten X Einsätze
@@ -23,6 +27,11 @@ class RecentIncidents extends AbstractWidget
     private $formatter;
 
     /**
+     * @var array
+     */
+    private $defaults;
+
+    /**
      * Register widget with WordPress.
      *
      * @param Formatter $formatter
@@ -30,25 +39,19 @@ class RecentIncidents extends AbstractWidget
     public function __construct(Formatter $formatter)
     {
         parent::__construct(
-            'einsatzverwaltung_widget', // Base ID
-            'Letzte Eins&auml;tze', // Name
-            array(
+            'einsatzverwaltung_widget',
+            'Letzte Eins&auml;tze',
+            [
                 'description' => 'Zeigt die neuesten Eins&auml;tze an.',
                 'customize_selective_refresh' => true,
-            ) // Args
+            ]
         );
         $this->formatter = $formatter;
-    }
 
-    /**
-     * @inheritDoc
-     */
-    public function widget($args, $instance)
-    {
-        $defaults = array(
+        $this->defaults = [
             'title' => 'Letzte Eins&auml;tze',
             'anzahl' => 3,
-            'units' => array(),
+            'units' => [],
             'zeigeDatum' => false,
             'zeigeZeit' => false,
             'zeigeFeedlink' => false,
@@ -56,14 +59,20 @@ class RecentIncidents extends AbstractWidget
             'zeigeArt' => false,
             'zeigeArtHierarchie' => false,
             'showAnnotations' => false
-        );
-        $instance = wp_parse_args($instance, $defaults);
+        ];
+    }
 
-        $title = apply_filters('widget_title', $instance['title']);
+    /**
+     * @inheritDoc
+     */
+    public function widget($args, $instance)
+    {
+        $instance = array_merge($this->defaults, $instance);
+        $title = empty($instance['title']) ? $this->defaults['title'] : $instance['title'];
 
         echo $args['before_widget'];
         echo $args['before_title'];
-        echo esc_html($title);
+        echo esc_html(apply_filters('widget_title', $title));
         echo $args['after_title'];
 
         $this->echoReports($instance);
@@ -81,7 +90,7 @@ class RecentIncidents extends AbstractWidget
     /**
      * @param array $instance
      */
-    private function echoReports($instance)
+    private function echoReports(array $instance)
     {
         $reportQuery = new ReportQuery();
         $reportQuery->setOrderAsc(false);
@@ -192,23 +201,14 @@ class RecentIncidents extends AbstractWidget
      */
     public function form($instance): string
     {
-        $title = Utilities::getArrayValueIfKey($instance, 'title', 'Letzte Eins&auml;tze');
-        $anzahl = Utilities::getArrayValueIfKey($instance, 'anzahl', 3);
-        $selectedUnits = Utilities::getArrayValueIfKey($instance, 'units', array());
-        $zeigeDatum = Utilities::getArrayValueIfKey($instance, 'zeigeDatum', false);
-        $zeigeZeit = Utilities::getArrayValueIfKey($instance, 'zeigeZeit', false);
-        $zeigeFeedlink = Utilities::getArrayValueIfKey($instance, 'zeigeFeedlink', false);
-        $zeigeOrt = Utilities::getArrayValueIfKey($instance, 'zeigeOrt', false);
-        $zeigeArt = Utilities::getArrayValueIfKey($instance, 'zeigeArt', false);
-        $zeigeArtHierarchie = Utilities::getArrayValueIfKey($instance, 'zeigeArtHierarchie', false);
-        $showAnnotations = Utilities::getArrayValueIfKey($instance, 'showAnnotations', false);
+        $instance = array_merge($this->defaults, $instance);
 
         printf(
             '<p><label for="%1$s">%2$s</label><input class="widefat" id="%1$s" name="%3$s" type="text" value="%4$s" /></p>',
             $this->get_field_id('title'),
             'Titel:',
             $this->get_field_name('title'),
-            esc_attr($title)
+            esc_attr($instance['title'])
         );
 
         printf(
@@ -216,72 +216,40 @@ class RecentIncidents extends AbstractWidget
             $this->get_field_id('anzahl'),
             'Anzahl der Einsatzberichte, die angezeigt werden:',
             $this->get_field_name('anzahl'),
-            esc_attr($anzahl)
+            esc_attr($instance['anzahl'])
         );
 
         $this->echoChecklistBox(
             get_taxonomy(Unit::getSlug()),
             'units',
             __('Only show reports for these units:', 'einsatzverwaltung'),
-            $selectedUnits,
+            $instance['units'],
             __('Select no unit to show all reports', 'einsatzverwaltung')
         );
 
-        printf(
-            '<p><input id="%1$s" name="%2$s" type="checkbox" %3$s />&nbsp;<label for="%1$s">%4$s</label></p>',
-            esc_attr($this->get_field_id('zeigeFeedlink')),
-            esc_attr($this->get_field_name('zeigeFeedlink')),
-            checked($zeigeFeedlink, 'on', false),
-            'Link zum Feed anzeigen'
-        );
+        echo '<p>';
+        $this->echoCheckbox($instance, 'zeigeFeedlink', 'Link zum Feed anzeigen');
+        echo '</p>';
 
         echo '<p><strong>Einsatzdaten:</strong></p>';
 
-        printf(
-            '<p><input id="%1$s" name="%2$s" type="checkbox" %3$s />&nbsp;<label for="%1$s">%4$s</label></p>',
-            esc_attr($this->get_field_id('zeigeDatum')),
-            esc_attr($this->get_field_name('zeigeDatum')),
-            checked($zeigeDatum, 'on', false),
-            'Datum anzeigen'
-        );
-
-        printf(
-            '<p style="text-indent:1em;"><input id="%1$s" name="%2$s" type="checkbox" %3$s />&nbsp;<label for="%1$s">%4$s</label></p>',
-            esc_attr($this->get_field_id('zeigeZeit')),
-            esc_attr($this->get_field_name('zeigeZeit')),
-            checked($zeigeZeit, 'on', false),
-            'Zeit anzeigen (nur in Kombination mit Datum)'
-        );
-
-        printf(
-            '<p><input id="%1$s" name="%2$s" type="checkbox" %3$s />&nbsp;<label for="%1$s">%4$s</label></p>',
-            esc_attr($this->get_field_id('zeigeArt')),
-            esc_attr($this->get_field_name('zeigeArt')),
-            checked($zeigeArt, 'on', false),
-            'Einsatzart anzeigen'
-        );
-
-        printf(
-            '<p><input id="%1$s" name="%2$s" type="checkbox" %3$s />&nbsp;<label for="%1$s">%4$s</label></p>',
-            esc_attr($this->get_field_id('zeigeArtHierarchie')),
-            esc_attr($this->get_field_name('zeigeArtHierarchie')),
-            checked($zeigeArtHierarchie, 'on', false),
-            'Hierarchie der Einsatzart anzeigen'
-        );
-
-        printf(
-            '<p><input id="%1$s" name="%2$s" type="checkbox" %3$s />&nbsp;<label for="%1$s">%4$s</label></p>',
-            esc_attr($this->get_field_id('zeigeOrt')),
-            esc_attr($this->get_field_name('zeigeOrt')),
-            checked($zeigeOrt, 'on', false),
-            'Ort anzeigen'
-        );
+        echo '<p>';
+        $this->echoCheckbox($instance, 'zeigeDatum', 'Datum anzeigen');
+        echo '</p><p style="text-indent:1em;">';
+        $this->echoCheckbox($instance, 'zeigeZeit', 'Zeit anzeigen (nur in Kombination mit Datum)');
+        echo '</p><p>';
+        $this->echoCheckbox($instance, 'zeigeArt', 'Einsatzart anzeigen');
+        echo '</p><p style="text-indent:1em;">';
+        $this->echoCheckbox($instance, 'zeigeArtHierarchie', 'Hierarchie der Einsatzart anzeigen');
+        echo '</p><p>';
+        $this->echoCheckbox($instance, 'zeigeOrt', 'Ort anzeigen');
+        echo '</p>';
 
         printf(
             '<p><input id="%1$s" name="%2$s" type="checkbox" value="1" %3$s />&nbsp;<label for="%1$s">%4$s</label></p>',
             esc_attr($this->get_field_id('showAnnotations')),
             esc_attr($this->get_field_name('showAnnotations')),
-            checked($showAnnotations, '1', false),
+            checked($instance['showAnnotations'], '1', false),
             'Vermerke anzeigen'
         );
 

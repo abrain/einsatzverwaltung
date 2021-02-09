@@ -10,6 +10,7 @@ use abrain\Einsatzverwaltung\Utilities;
 use function array_merge;
 use function checked;
 use function esc_html;
+use function esc_html__;
 use function get_queried_object_id;
 use function get_taxonomy;
 use function printf;
@@ -40,16 +41,16 @@ class RecentIncidents extends AbstractWidget
     {
         parent::__construct(
             'einsatzverwaltung_widget',
-            'Letzte Eins&auml;tze',
+            __('Recent Incident Reports', 'einsatzverwaltung'),
             [
-                'description' => 'Zeigt die neuesten Eins&auml;tze an.',
+                'description' => __('The the most recent Incident Reports.', 'einsatzverwaltung'),
                 'customize_selective_refresh' => true,
             ]
         );
         $this->formatter = $formatter;
 
         $this->defaults = [
-            'title' => 'Letzte Eins&auml;tze',
+            'title' => '',
             'anzahl' => 3,
             'units' => [],
             'zeigeDatum' => false,
@@ -68,7 +69,7 @@ class RecentIncidents extends AbstractWidget
     public function widget($args, $instance)
     {
         $instance = array_merge($this->defaults, $instance);
-        $title = empty($instance['title']) ? $this->defaults['title'] : $instance['title'];
+        $title = empty($instance['title']) ? __('Recent incidents', 'einsatzverwaltung') : $instance['title'];
 
         echo $args['before_widget'];
         echo $args['before_title'];
@@ -81,7 +82,7 @@ class RecentIncidents extends AbstractWidget
             printf(
                 '<p class="einsatzfeed"><span class="fa fa-rss"></span>&nbsp;<a href="%s">%s</a></p>',
                 get_post_type_archive_feed_link('einsatz'),
-                'Einsatzberichte (Feed)'
+                esc_html__('Incident Reports feed', 'einsatzverwaltung')
             );
         }
         echo $args['after_widget'];
@@ -99,7 +100,7 @@ class RecentIncidents extends AbstractWidget
         $reports = $reportQuery->getReports();
 
         if (empty($reports)) {
-            echo '<p>Keine Eins&auml;tze</p>';
+            echo sprintf("<p>%s</p>", esc_html__('No reports', 'einsatzverwaltung'));
             return;
         }
 
@@ -143,7 +144,7 @@ class RecentIncidents extends AbstractWidget
             );
             if ($instance['zeigeZeit']) {
                 printf(
-                    ' | <span class="einsatzzeit">%s Uhr</span>',
+                    ' | <span class="einsatzzeit">%s</span>',
                     esc_html(date_i18n(get_option('time_format', 'H:i'), $timestamp))
                 );
             }
@@ -164,7 +165,11 @@ class RecentIncidents extends AbstractWidget
         if ($instance['zeigeOrt']) {
             $location = $report->getLocation();
             if (!empty($location)) {
-                printf('<br><span class="einsatzort">Ort:&nbsp;%s</span>', $location);
+                $locationFormat = sprintf(
+                    '<br><span class="einsatzort">%s</span>',
+                    esc_html__('Location: %s', 'einsatzverwaltung')
+                );
+                printf($locationFormat, esc_html($location));
             }
         }
     }
@@ -206,7 +211,7 @@ class RecentIncidents extends AbstractWidget
         printf(
             '<p><label for="%1$s">%2$s</label><input class="widefat" id="%1$s" name="%3$s" type="text" value="%4$s" /></p>',
             $this->get_field_id('title'),
-            'Titel:',
+            esc_html__('Title:', 'einsatzverwaltung'),
             $this->get_field_name('title'),
             esc_attr($instance['title'])
         );
@@ -214,7 +219,7 @@ class RecentIncidents extends AbstractWidget
         printf(
             '<p><label for="%1$s">%2$s</label>&nbsp;<input class="tiny-text" id="%1$s" name="%3$s" type="number" min="1" value="%4$s" size="3" /></p>',
             $this->get_field_id('anzahl'),
-            'Anzahl der Einsatzberichte, die angezeigt werden:',
+            esc_html__('Number of reports to show:', 'einsatzverwaltung'),
             $this->get_field_name('anzahl'),
             esc_attr($instance['anzahl'])
         );
@@ -228,21 +233,21 @@ class RecentIncidents extends AbstractWidget
         );
 
         echo '<p>';
-        $this->echoCheckbox($instance, 'zeigeFeedlink', 'Link zum Feed anzeigen');
+        $this->echoCheckbox($instance, 'zeigeFeedlink', __('Show link to RSS feed', 'einsatzverwaltung'));
         echo '</p>';
 
-        echo '<p><strong>Einsatzdaten:</strong></p>';
+        echo sprintf("<p><strong>%s</strong></p>", __('Incident details', 'einsatzverwaltung'));
 
         echo '<p>';
-        $this->echoCheckbox($instance, 'zeigeDatum', 'Datum anzeigen');
+        $this->echoCheckbox($instance, 'zeigeDatum', __('Show date', 'einsatzverwaltung'));
         echo '</p><p style="text-indent:1em;">';
-        $this->echoCheckbox($instance, 'zeigeZeit', 'Zeit anzeigen (nur in Kombination mit Datum)');
+        $this->echoCheckbox($instance, 'zeigeZeit', __('Show time', 'einsatzverwaltung'));
         echo '</p><p>';
-        $this->echoCheckbox($instance, 'zeigeArt', 'Einsatzart anzeigen');
+        $this->echoCheckbox($instance, 'zeigeArt', __('Show Incident Category', 'einsatzverwaltung'));
         echo '</p><p style="text-indent:1em;">';
-        $this->echoCheckbox($instance, 'zeigeArtHierarchie', 'Hierarchie der Einsatzart anzeigen');
+        $this->echoCheckbox($instance, 'zeigeArtHierarchie', __('Show parent Incident Categories', 'einsatzverwaltung'));
         echo '</p><p>';
-        $this->echoCheckbox($instance, 'zeigeOrt', 'Ort anzeigen');
+        $this->echoCheckbox($instance, 'zeigeOrt', __('Show location', 'einsatzverwaltung'));
         echo '</p>';
 
         printf(
@@ -250,7 +255,7 @@ class RecentIncidents extends AbstractWidget
             esc_attr($this->get_field_id('showAnnotations')),
             esc_attr($this->get_field_name('showAnnotations')),
             checked($instance['showAnnotations'], '1', false),
-            'Vermerke anzeigen'
+            esc_html__('Show annotations', 'einsatzverwaltung')
         );
 
         return '';

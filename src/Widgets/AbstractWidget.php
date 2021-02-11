@@ -12,6 +12,22 @@ use function get_terms;
 abstract class AbstractWidget extends WP_Widget
 {
     /**
+     * @param array $instance
+     * @param string $fieldName
+     * @param string $label
+     */
+    protected function echoCheckbox(array $instance, string $fieldName, string $label)
+    {
+        printf(
+            '<input id="%1$s" name="%2$s" type="checkbox" %3$s />&nbsp;<label for="%1$s">%4$s</label>',
+            esc_attr($this->get_field_id($fieldName)),
+            esc_attr($this->get_field_name($fieldName)),
+            checked($instance[$fieldName], 'on', false),
+            esc_html($label)
+        );
+    }
+
+    /**
      * @param WP_Taxonomy $taxonomyObject
      * @param string $fieldName
      * @param string $label

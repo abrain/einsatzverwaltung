@@ -95,12 +95,12 @@ class Formatter
     /**
      * @param string $pattern
      * @param array $allowedTags
-     * @param null $post
+     * @param WP_Post|null $post
      * @param string $context
      *
      * @return mixed
      */
-    public function formatIncidentData(string $pattern, $allowedTags = array(), $post = null, $context = 'post'): string
+    public function formatIncidentData(string $pattern, $allowedTags = array(), ?WP_Post $post = null, $context = 'post'): string
     {
         if (empty($allowedTags)) {
             $allowedTags = array_keys($this->availableTags);

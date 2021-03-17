@@ -274,6 +274,9 @@ class ReportEditScreen extends EditScreen
             return;
         }
 
+        // Sort the units according to the custom order numbers
+        usort($units, array(Unit::class, 'compare'));
+
         $report = new IncidentReport($post);
         $assignedUnits = array_map(function (WP_Term $unit) {
             return $unit->term_id;

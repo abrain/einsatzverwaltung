@@ -3,9 +3,12 @@ namespace abrain\Einsatzverwaltung;
 
 use abrain\Einsatzverwaltung\Frontend\ReportList\Renderer as ReportListRenderer;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
+use abrain\Einsatzverwaltung\Types\Unit;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use WP_Post;
 use WP_Query;
+use function get_terms;
+use function is_numeric;
 
 /**
  * Generiert alle Inhalte für das Frontend, mit Ausnahme der Shortcodes und des Widgets
@@ -102,10 +105,6 @@ class Frontend
             $einsatzleiter = $report->getIncidentCommander();
             $mannschaft = $report->getWorkforce();
 
-            $vehicles = $this->formatter->getVehicles($report, $mayContainLinks, $showArchiveLinks);
-            $units = $this->formatter->getUnits($report);
-            $additionalForces = $this->formatter->getAdditionalForces($report, $mayContainLinks, $showArchiveLinks);
-
             $timeOfAlerting = $report->getTimeOfAlerting();
             $datumsformat = get_option('date_format', 'd.m.Y');
             $zeitformat = get_option('time_format', 'H:i');
@@ -120,8 +119,23 @@ class Frontend
             $headerstring .= $this->getDetailString('Einsatzort:', $einsatzort);
             $headerstring .= $this->getDetailString('Einsatzleiter:', $einsatzleiter);
             $headerstring .= $this->getDetailString('Mannschaftsst&auml;rke:', $mannschaft);
-            $headerstring .= $this->getDetailString('Fahrzeuge:', $vehicles);
-            $headerstring .= $this->getDetailString('Einheiten:', $units);
+
+            // If at least one unit has been assigned to any report, show the vehicles grouped by unit
+            $unitCount = get_terms(['taxonomy' => Unit::getSlug(), 'fields' => 'count']);
+            if (is_numeric($unitCount) && $unitCount > 0) {
+                $headerstring .= $this->getDetailString(
+                    'Fahrzeuge:',
+                    $this->formatter->getVehiclesByUnitString($report->getVehiclesByUnit()),
+                    false
+                );
+            } else {
+                $headerstring .= $this->getDetailString(
+                    'Fahrzeuge:',
+                    $this->formatter->getVehicleString($report->getVehicles(), $mayContainLinks, $showArchiveLinks)
+                );
+            }
+
+            $additionalForces = $this->formatter->getAdditionalForces($report, $mayContainLinks, $showArchiveLinks);
             $headerstring .= $this->getDetailString('Weitere Kr&auml;fte:', $additionalForces);
 
             return "<p>$headerstring</p>";

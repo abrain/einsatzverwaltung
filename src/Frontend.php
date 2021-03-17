@@ -3,6 +3,7 @@ namespace abrain\Einsatzverwaltung;
 
 use abrain\Einsatzverwaltung\Frontend\ReportList\Renderer as ReportListRenderer;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
+use abrain\Einsatzverwaltung\Types\Report;
 use abrain\Einsatzverwaltung\Types\Unit;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use WP_Post;
@@ -86,61 +87,54 @@ class Frontend
      */
     public function getEinsatzberichtHeader(WP_Post $post, bool $mayContainLinks = true, bool $showArchiveLinks = true): string
     {
-        if (get_post_type($post) == "einsatz") {
-            $report = new IncidentReport($post);
-
-            $typesOfAlerting = $this->formatter->getTypesOfAlerting($report);
-
-            $duration = $report->getDuration();
-            $durationString = ($duration === false ? '' : $this->formatter->getDurationString($duration));
-
-            $showEinsatzartArchiveLink = $showArchiveLinks && $this->options->isShowEinsatzartArchive();
-            $art = $this->formatter->getTypeOfIncident($report, $mayContainLinks, $showEinsatzartArchiveLink);
-
-            if ($report->isFalseAlarm()) {
-                $art = (empty($art) ? 'Fehlalarm' : $art.' (Fehlalarm)');
-            }
-
-            $einsatzort = $report->getLocation();
-            $einsatzleiter = $report->getIncidentCommander();
-            $mannschaft = $report->getWorkforce();
-
-            $timeOfAlerting = $report->getTimeOfAlerting();
-            $datumsformat = get_option('date_format', 'd.m.Y');
-            $zeitformat = get_option('time_format', 'H:i');
-            $einsatz_datum = ($timeOfAlerting ? date_i18n($datumsformat, $timeOfAlerting->getTimestamp()) : '-');
-            $einsatz_zeit = ($timeOfAlerting ? date_i18n($zeitformat, $timeOfAlerting->getTimestamp()).' Uhr' : '-');
-
-            $headerstring = "<strong>Datum:</strong> ".$einsatz_datum."&nbsp;<br>";
-            $headerstring .= "<strong>Alarmzeit:</strong> ".$einsatz_zeit."&nbsp;<br>";
-            $headerstring .= $this->getDetailString('Alarmierungsart:', $typesOfAlerting);
-            $headerstring .= $this->getDetailString('Dauer:', $durationString);
-            $headerstring .= $this->getDetailString('Art:', $art);
-            $headerstring .= $this->getDetailString('Einsatzort:', $einsatzort);
-            $headerstring .= $this->getDetailString('Einsatzleiter:', $einsatzleiter);
-            $headerstring .= $this->getDetailString('Mannschaftsst&auml;rke:', $mannschaft);
-
-            // If at least one unit has been assigned to any report, show the vehicles grouped by unit
-            $unitCount = get_terms(['taxonomy' => Unit::getSlug(), 'fields' => 'count']);
-            if (is_numeric($unitCount) && $unitCount > 0) {
-                $headerstring .= $this->getDetailString(
-                    'Fahrzeuge:',
-                    $this->formatter->getVehiclesByUnitString($report->getVehiclesByUnit()),
-                    false
-                );
-            } else {
-                $headerstring .= $this->getDetailString(
-                    'Fahrzeuge:',
-                    $this->formatter->getVehicleString($report->getVehicles(), $mayContainLinks, $showArchiveLinks)
-                );
-            }
-
-            $additionalForces = $this->formatter->getAdditionalForces($report, $mayContainLinks, $showArchiveLinks);
-            $headerstring .= $this->getDetailString('Weitere Kr&auml;fte:', $additionalForces);
-
-            return "<p>$headerstring</p>";
+        if (get_post_type($post) !== Report::getSlug()) {
+            return '';
         }
-        return "";
+
+        $report = new IncidentReport($post);
+
+        $duration = $report->getDuration();
+        $durationString = ($duration === false ? '' : $this->formatter->getDurationString($duration));
+
+        $showTypeArchiveLink = $showArchiveLinks && $this->options->isShowEinsatzartArchive();
+        $art = $this->formatter->getTypeOfIncident($report, $mayContainLinks, $showTypeArchiveLink);
+
+        if ($report->isFalseAlarm()) {
+            $art = (empty($art) ? 'Fehlalarm' : $art . ' (Fehlalarm)');
+        }
+
+        $timeOfAlerting = $report->getTimeOfAlerting();
+        $einsatz_datum = ($timeOfAlerting ? date_i18n(get_option('date_format'), $timeOfAlerting->getTimestamp()) : '-');
+        $einsatz_zeit = ($timeOfAlerting ? date_i18n(get_option('time_format'), $timeOfAlerting->getTimestamp()) . ' Uhr' : '-');
+
+        $headerstring = "<strong>Datum:</strong> " . $einsatz_datum . "&nbsp;<br>";
+        $headerstring .= "<strong>Alarmzeit:</strong> " . $einsatz_zeit . "&nbsp;<br>";
+        $headerstring .= $this->getDetailString('Alarmierungsart:', $this->formatter->getTypesOfAlerting($report));
+        $headerstring .= $this->getDetailString('Dauer:', $durationString);
+        $headerstring .= $this->getDetailString('Art:', $art);
+        $headerstring .= $this->getDetailString('Einsatzort:', $report->getLocation());
+        $headerstring .= $this->getDetailString('Einsatzleiter:', $report->getIncidentCommander());
+        $headerstring .= $this->getDetailString('Mannschaftsst&auml;rke:', $report->getWorkforce());
+
+        // If at least one unit has been assigned to any report, show the vehicles grouped by unit
+        $unitCount = get_terms(['taxonomy' => Unit::getSlug(), 'fields' => 'count']);
+        if (is_numeric($unitCount) && $unitCount > 0) {
+            $headerstring .= $this->getDetailString(
+                'Fahrzeuge:',
+                $this->formatter->getVehiclesByUnitString($report->getVehiclesByUnit()),
+                false
+            );
+        } else {
+            $headerstring .= $this->getDetailString(
+                'Fahrzeuge:',
+                $this->formatter->getVehicleString($report->getVehicles(), $mayContainLinks, $showArchiveLinks)
+            );
+        }
+
+        $additionalForces = $this->formatter->getAdditionalForces($report, $mayContainLinks, $showArchiveLinks);
+        $headerstring .= $this->getDetailString('Weitere Kr&auml;fte:', $additionalForces);
+
+        return "<p>$headerstring</p>";
     }
 
 

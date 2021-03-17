@@ -434,7 +434,7 @@ class Formatter
 
             $unit = get_term($unitId, Unit::getSlug());
             $string .= sprintf(
-                '<li><strong>%s</strong>: %s</li>',
+                '<li><strong>%s:</strong> %s</li>',
                 $this->getUnitNameWithLink($unit),
                 $this->getVehicleString($vehicles, true, true)
             );

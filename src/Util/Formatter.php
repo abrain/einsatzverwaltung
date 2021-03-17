@@ -16,6 +16,7 @@ use function date_i18n;
 use function esc_html;
 use function esc_url;
 use function get_permalink;
+use function get_term;
 use function get_term_link;
 use function get_term_meta;
 use function get_the_post_thumbnail;
@@ -199,7 +200,7 @@ class Formatter
                 $replace = $this->annotationIconBar->render($incidentReport->getPostId());
                 break;
             case '%vehicles%':
-                $replace = $this->getVehicles($incidentReport, ($context === 'post'), ($context === 'post'));
+                $replace = $this->getVehicleString($incidentReport->getVehicles(), ($context === 'post'), ($context === 'post'));
                 break;
             case '%additionalForces%':
                 $replace = $this->getAdditionalForces($incidentReport, ($context === 'post'), ($context === 'post'));
@@ -348,49 +349,52 @@ class Formatter
     {
         $units = $report->getUnits();
 
-        if (!$addLinks) {
-            // Only return the names
-            $unitNames = array_map(function (WP_Term $unit) {
-                return esc_html($unit->name);
-            }, $units);
-            return join(', ', $unitNames);
+        if ($addLinks) {
+            $linkedUnitNames = array_map([$this, 'getUnitNameWithLink'], $units);
+            return join(', ', $linkedUnitNames);
         }
 
-        // Return the names, linked to the respective info page if URL has been set
-        $linkedUnitNames = array_map(function (WP_Term $unit) {
-            $name = $unit->name;
-
-            $infoUrl = Unit::getInfoUrl($unit);
-            if (empty($infoUrl)) {
-                return esc_html($name);
-            }
-
-            return sprintf(
-                '<a href="%s" title="Mehr Informationen zu %s">%s</a>',
-                esc_url($infoUrl),
-                esc_attr($name),
-                esc_html($name)
-            );
+        // Only return the names
+        $unitNames = array_map(function (WP_Term $unit) {
+            return esc_html($unit->name);
         }, $units);
 
-        return join(', ', $linkedUnitNames);
+        return join(', ', $unitNames);
     }
 
     /**
-     * @param IncidentReport $report
+     * Returns the name of a Unit, linked to the respective info page if URL has been set.
+     *
+     * @param WP_Term $unit
+     *
+     * @return string
+     */
+    private function getUnitNameWithLink(WP_Term $unit): string
+    {
+        $name = $unit->name;
+
+        $infoUrl = Unit::getInfoUrl($unit);
+        if (empty($infoUrl)) {
+            return esc_html($name);
+        }
+
+        return sprintf(
+            '<a href="%s" title="Mehr Informationen zu %s">%s</a>',
+            esc_url($infoUrl),
+            esc_attr($name),
+            esc_html($name)
+        );
+    }
+
+    /**
+     * @param WP_Term[] $vehicles
      * @param bool $makeLinks Fahrzeugname als Link zur Fahrzeugseite angeben, wenn diese eingetragen wurde
      * @param bool $showArchiveLinks Generiere zusätzlichen Link zur Archivseite des Fahrzeugs
      *
      * @return string
      */
-    public function getVehicles(IncidentReport $report, bool $makeLinks, bool $showArchiveLinks): string
+    public function getVehicleString(array $vehicles, bool $makeLinks, bool $showArchiveLinks): string
     {
-        if (empty($report)) {
-            return '';
-        }
-
-        $vehicles = $report->getVehicles();
-
         if (empty($vehicles)) {
             return '';
         }
@@ -410,6 +414,33 @@ class Formatter
             $names[] = $name;
         }
         return join(", ", $names);
+    }
+
+    public function getVehiclesByUnitString(array $vehiclesByUnitId): string
+    {
+        if (empty($vehiclesByUnitId)) {
+            return '';
+        }
+
+        $string = '<ul>';
+        foreach ($vehiclesByUnitId as $unitId => $vehicles) {
+            if ($unitId === -1) {
+                $string .= sprintf(
+                    '<li>%s</li>',
+                    $this->getVehicleString($vehicles, true, true)
+                );
+                continue;
+            }
+
+            $unit = get_term($unitId, Unit::getSlug());
+            $string .= sprintf(
+                '<li><strong>%s</strong>: %s</li>',
+                $this->getUnitNameWithLink($unit),
+                $this->getVehicleString($vehicles, true, true)
+            );
+        }
+        $string .= '</ul>';
+        return $string;
     }
 
     /**

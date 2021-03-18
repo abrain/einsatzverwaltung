@@ -123,7 +123,7 @@ class ReportEditScreen extends EditScreen
      *
      * @param WP_Post $post Das Post-Objekt des aktuell bearbeiteten Einsatzberichts
      */
-    public function displayMetaBoxAnnotations($post)
+    public function displayMetaBoxAnnotations(WP_Post $post)
     {
         $report = new IncidentReport($post);
 
@@ -153,7 +153,7 @@ class ReportEditScreen extends EditScreen
      *
      * @param WP_Post $post Das Post-Objekt des aktuell bearbeiteten Einsatzberichts
      */
-    public function displayMetaBoxEinsatzdetails($post)
+    public function displayMetaBoxEinsatzdetails(WP_Post $post)
     {
         // Use nonce for verification
         wp_nonce_field('save_einsatz_details', 'einsatzverwaltung_nonce');
@@ -246,7 +246,7 @@ class ReportEditScreen extends EditScreen
      *
      * @param WP_Post $post Post-Object
      */
-    public static function displayMetaBoxEinsatzart($post)
+    public static function displayMetaBoxEinsatzart(WP_Post $post)
     {
         $report = new IncidentReport($post);
         $typeOfIncident = $report->getTypeOfIncident();
@@ -434,7 +434,7 @@ class ReportEditScreen extends EditScreen
      * @param string $placeholder Platzhalter
      * @param int $size Größe des Eingabefelds
      */
-    private function echoInputText($label, $name, $value, $placeholder = '', $size = 20)
+    private function echoInputText(string $label, string $name, string $value, $placeholder = '', $size = 20)
     {
         printf('<tr><td><label for="%1$s">%2$s</label></td>', esc_attr($name), esc_html($label));
         printf(
@@ -453,7 +453,7 @@ class ReportEditScreen extends EditScreen
      * @param string $name Feld-ID
      * @param bool $state Zustandswert
      */
-    private function echoInputCheckbox($label, $name, $state)
+    private function echoInputCheckbox(string $label, string $name, bool $state)
     {
         printf(
             '<input type="checkbox" id="%1$s" name="%1$s" value="1" %2$s/><label for="%1$s">%3$s</label>',
@@ -468,7 +468,7 @@ class ReportEditScreen extends EditScreen
      * @param WP_Taxonomy $taxonomy
      * @param int[] $assignedIds
      */
-    private function echoTermCheckboxes($terms, $taxonomy, $assignedIds)
+    private function echoTermCheckboxes(array $terms, WP_Taxonomy $taxonomy, array $assignedIds)
     {
         $format = '<li><label><input type="checkbox" name="tax_input[%1$s][]" value="%2$s" %3$s>%4$s</label></li>';
         if ($taxonomy->hierarchical) {

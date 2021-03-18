@@ -7,8 +7,8 @@ jQuery(document).ready(function() {
     jQuery('#einsatzverwaltung_alarmzeit').after('&nbsp;<span class="einsatzverwaltung_hint" id="einsatzverwaltung_alarmzeit_hint"></span>');
     jQuery('#einsatz_einsatzende').after('&nbsp;<span class="einsatzverwaltung_hint" id="einsatz_einsatzende_hint"></span>');
 
-    einsatzverwaltung_register_and_execute('keyup', 'einsatzverwaltung_alarmzeit', datumsregex, hinweistext, false);
-    einsatzverwaltung_register_and_execute('keyup', 'einsatz_einsatzende', datumsregex, hinweistext, true);
+    einsatzverwaltung_register_and_execute('blur', 'einsatzverwaltung_alarmzeit', datumsregex, hinweistext, false);
+    einsatzverwaltung_register_and_execute('blur', 'einsatz_einsatzende', datumsregex, hinweistext, true);
 
     var used_values = jQuery("#einsatzleiter_used_values");
     if (used_values.val() !== undefined) {

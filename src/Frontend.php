@@ -8,8 +8,11 @@ use abrain\Einsatzverwaltung\Types\Unit;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use WP_Post;
 use WP_Query;
+use function date_i18n;
 use function get_terms;
 use function is_numeric;
+use function sprintf;
+use function wp_kses;
 
 /**
  * Generiert alle Inhalte für das Frontend, mit Ausnahme der Shortcodes und des Widgets
@@ -104,35 +107,38 @@ class Frontend
         }
 
         $timeOfAlerting = $report->getTimeOfAlerting();
-        $einsatz_datum = ($timeOfAlerting ? date_i18n(get_option('date_format'), $timeOfAlerting->getTimestamp()) : '-');
-        $einsatz_zeit = ($timeOfAlerting ? date_i18n(get_option('time_format'), $timeOfAlerting->getTimestamp()) . ' Uhr' : '-');
+        $dateAndTime = empty($timeOfAlerting) ? '-' : sprintf(
+            /* translators: 1: Date, 2: Time. */
+            __('%1$s at %2$s', 'einsatzverwaltung'),
+            date_i18n(get_option('date_format'), $timeOfAlerting->getTimestamp()),
+            date_i18n(get_option('time_format'), $timeOfAlerting->getTimestamp())
+        );
+        $headerstring = $this->getDetailString(__('Date', 'einsatzverwaltung'), $dateAndTime);
 
-        $headerstring = "<strong>Datum:</strong> " . $einsatz_datum . "&nbsp;<br>";
-        $headerstring .= "<strong>Alarmzeit:</strong> " . $einsatz_zeit . "&nbsp;<br>";
-        $headerstring .= $this->getDetailString('Alarmierungsart:', $this->formatter->getTypesOfAlerting($report));
-        $headerstring .= $this->getDetailString('Dauer:', $durationString);
-        $headerstring .= $this->getDetailString('Art:', $art);
-        $headerstring .= $this->getDetailString('Einsatzort:', $report->getLocation());
-        $headerstring .= $this->getDetailString('Einsatzleiter:', $report->getIncidentCommander());
-        $headerstring .= $this->getDetailString('Mannschaftsst&auml;rke:', $report->getWorkforce());
+        $headerstring .= $this->getDetailString('Alarmierungsart', $this->formatter->getTypesOfAlerting($report));
+        $headerstring .= $this->getDetailString(__('Duration', 'einsatzverwaltung'), $durationString);
+        $headerstring .= $this->getDetailString(__('Incident Category', 'einsatzverwaltung'), $art);
+        $headerstring .= $this->getDetailString(__('Location', 'einsatzverwaltung'), $report->getLocation());
+        $headerstring .= $this->getDetailString('Einsatzleiter', $report->getIncidentCommander());
+        $headerstring .= $this->getDetailString('Mannschaftsst&auml;rke', $report->getWorkforce());
 
         // If at least one unit has been assigned to any report, show the vehicles grouped by unit
         $unitCount = get_terms(['taxonomy' => Unit::getSlug(), 'fields' => 'count']);
         if (is_numeric($unitCount) && $unitCount > 0) {
             $headerstring .= $this->getDetailString(
-                'Fahrzeuge:',
+                __('Vehicles', 'einsatzverwaltung'),
                 $this->formatter->getVehiclesByUnitString($report->getVehiclesByUnit()),
                 false
             );
         } else {
             $headerstring .= $this->getDetailString(
-                'Fahrzeuge:',
+                __('Vehicles', 'einsatzverwaltung'),
                 $this->formatter->getVehicleString($report->getVehicles(), $mayContainLinks, $showArchiveLinks)
             );
         }
 
         $additionalForces = $this->formatter->getAdditionalForces($report, $mayContainLinks, $showArchiveLinks);
-        $headerstring .= $this->getDetailString('Weitere Kr&auml;fte:', $additionalForces);
+        $headerstring .= $this->getDetailString('Weitere Kr&auml;fte', $additionalForces);
 
         return "<p>$headerstring</p>";
     }
@@ -153,7 +159,14 @@ class Frontend
             return '';
         }
 
-        return '<strong>'.$title.'</strong> '.$value.($newline ? '&nbsp;<br>' : '&nbsp;');
+        /* translators: Single incident detail, 1: Label, 2: Value */
+        $format = __('<b>%1$s:</b> %2$s', 'einsatzverwaltung');
+        $filteredFormat = wp_kses($format, ['b' => []]);
+        if ($newline) {
+            $filteredFormat .= '<br>';
+        }
+
+        return sprintf($filteredFormat, $title, $value);
     }
 
 

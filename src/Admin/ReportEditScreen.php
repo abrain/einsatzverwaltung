@@ -193,14 +193,14 @@ class ReportEditScreen extends EditScreen
             __('Alarm time', 'einsatzverwaltung'),
             'einsatzverwaltung_alarmzeit',
             esc_attr($alarmzeit->format('Y-m-d H:i')),
-            'JJJJ-MM-TT hh:mm'
+            'YYYY-MM-TT hh:mm'
         );
 
         $this->echoInputText(
             __('End time', 'einsatzverwaltung'),
             'einsatz_einsatzende',
             esc_attr($einsatzende),
-            'JJJJ-MM-TT hh:mm'
+            'YYYY-MM-TT hh:mm'
         );
 
         echo '</tbody></table><table><tbody>';

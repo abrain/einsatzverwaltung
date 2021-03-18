@@ -170,7 +170,7 @@ class ReportEditScreen extends EditScreen
 
         $names = $this->getEinsatzleiterNamen();
         printf('<input type="hidden" id="einsatzleiter_used_values" value="%s" />', esc_attr(implode(',', $names)));
-        echo '<div style="display: flex; flex-wrap: nowrap; justify-content: space-between"><table><tbody>';
+        echo '<div style="display: flex; flex-wrap: wrap; justify-content: space-between"><table><tbody>';
 
         if (get_option('einsatzverwaltung_incidentnumbers_auto', '0') === '1') {
             $numberText = $report->isDraft() ? __('Will be generated upon publication', 'einsatzverwaltung') : $nummer;

@@ -123,15 +123,6 @@ li.dropzone {
     display: unset;
 }
 
-#fahrzeugdiv summary {
-    margin-bottom: 0.5em;
-}
-
-#einsatzverwaltung_meta_box .incidentnumber {
-    line-height: 2;
-    min-height: 30px;
-}
-
 /* Hides the selector for the parent term when creating a term for the fahrzeug taxonomy, hierarchy will be removed */
 body.edit-tags-php.post-type-einsatz.taxonomy-fahrzeug .form-wrap div.form-field.term-parent-wrap {
     display: none;

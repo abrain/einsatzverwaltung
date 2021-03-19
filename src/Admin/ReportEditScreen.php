@@ -7,7 +7,6 @@ use abrain\Einsatzverwaltung\Types\Report;
 use abrain\Einsatzverwaltung\Types\Unit;
 use abrain\Einsatzverwaltung\Types\Vehicle;
 use WP_Post;
-use WP_Taxonomy;
 use WP_Term;
 use wpdb;
 use function add_meta_box;
@@ -15,7 +14,6 @@ use function array_filter;
 use function array_intersect;
 use function array_key_exists;
 use function array_map;
-use function checked;
 use function esc_attr;
 use function esc_attr__;
 use function esc_html;
@@ -23,8 +21,6 @@ use function esc_html__;
 use function get_taxonomy;
 use function get_term_meta;
 use function get_terms;
-use function get_the_terms;
-use function in_array;
 use function is_wp_error;
 use function join;
 use function preg_grep;
@@ -32,8 +28,8 @@ use function preg_match;
 use function preg_match_all;
 use function printf;
 use function sprintf;
-use function str_replace;
 use function usort;
+use function wp_dropdown_categories;
 use const PREG_GREP_INVERT;
 
 /**
@@ -83,7 +79,7 @@ class ReportEditScreen extends EditScreen
         add_meta_box(
             'einsatzartdiv',
             __('Incident Category', 'einsatzverwaltung'),
-            array('abrain\Einsatzverwaltung\Admin\ReportEditScreen', 'displayMetaBoxEinsatzart'),
+            array($this, 'displayMetaBoxEinsatzart'),
             'einsatz',
             'side',
             'default',
@@ -246,11 +242,24 @@ class ReportEditScreen extends EditScreen
      *
      * @param WP_Post $post Post-Object
      */
-    public static function displayMetaBoxEinsatzart(WP_Post $post)
+    public function displayMetaBoxEinsatzart(WP_Post $post)
     {
         $report = new IncidentReport($post);
         $typeOfIncident = $report->getTypeOfIncident();
-        self::dropdownEinsatzart($typeOfIncident ? $typeOfIncident->term_id : 0);
+        wp_dropdown_categories(array(
+            'show_option_all'    => '',
+            'show_option_none'   => _x('- none -', 'incident category dropdown', 'einsatzverwaltung'),
+            'orderby'            => 'NAME',
+            'order'              => 'ASC',
+            'show_count'         => false,
+            'hide_empty'         => false,
+            'echo'               => true,
+            'selected'           => $typeOfIncident ? $typeOfIncident->term_id : 0,
+            'hierarchical'       => true,
+            'name'               => 'tax_input[einsatzart]',
+            'taxonomy'           => 'einsatzart',
+            'hide_if_empty'      => false
+        ));
     }
 
     /**
@@ -350,29 +359,6 @@ class ReportEditScreen extends EditScreen
     }
 
     /**
-     * Zeigt Dropdown mit Hierarchie für die Einsatzart
-     *
-     * @param string $selected Slug der ausgewählten Einsatzart
-     */
-    public static function dropdownEinsatzart(string $selected)
-    {
-        wp_dropdown_categories(array(
-            'show_option_all'    => '',
-            'show_option_none'   => _x('- none -', 'incident category dropdown', 'einsatzverwaltung'),
-            'orderby'            => 'NAME',
-            'order'              => 'ASC',
-            'show_count'         => false,
-            'hide_empty'         => false,
-            'echo'               => true,
-            'selected'           => $selected,
-            'hierarchical'       => true,
-            'name'               => 'tax_input[einsatzart]',
-            'taxonomy'           => 'einsatzart',
-            'hide_if_empty'      => false
-        ));
-    }
-
-    /**
      * Modifies the output of wp_dropdown_categories() for the taxonomy einsatzart to put entries marked as outdated at
      * the end of the list.
      *
@@ -423,67 +409,6 @@ class ReportEditScreen extends EditScreen
         $newOutput .= '</optgroup></select>';
 
         return $newOutput;
-    }
-
-    /**
-     * Gibt ein Eingabefeld für die Metabox aus
-     *
-     * @param string $label Beschriftung
-     * @param string $name Feld-ID
-     * @param string $value Feldwert
-     * @param string $placeholder Platzhalter
-     * @param int $size Größe des Eingabefelds
-     */
-    private function echoInputText(string $label, string $name, string $value, $placeholder = '', $size = 20)
-    {
-        printf('<tr><td><label for="%1$s">%2$s</label></td>', esc_attr($name), esc_html($label));
-        printf(
-            '<td><input type="text" id="%1$s" name="%1$s" value="%2$s" size="%3$s" placeholder="%4$s" /></td></tr>',
-            esc_attr($name),
-            esc_attr($value),
-            esc_attr($size),
-            esc_attr($placeholder)
-        );
-    }
-
-    /**
-     * Gibt eine Checkbox für die Metabox aus
-     *
-     * @param string $label Beschriftung
-     * @param string $name Feld-ID
-     * @param bool $state Zustandswert
-     */
-    private function echoInputCheckbox(string $label, string $name, bool $state)
-    {
-        printf(
-            '<input type="checkbox" id="%1$s" name="%1$s" value="1" %2$s/><label for="%1$s">%3$s</label>',
-            esc_attr($name),
-            checked($state, '1', false),
-            $label
-        );
-    }
-
-    /**
-     * @param WP_Term[] $terms
-     * @param WP_Taxonomy $taxonomy
-     * @param int[] $assignedIds
-     */
-    private function echoTermCheckboxes(array $terms, WP_Taxonomy $taxonomy, array $assignedIds)
-    {
-        $format = '<li><label><input type="checkbox" name="tax_input[%1$s][]" value="%2$s" %3$s>%4$s</label></li>';
-        if ($taxonomy->hierarchical) {
-            $format = str_replace('%2$s', '%2$d', $format);
-        }
-        foreach ($terms as $term) {
-            $assigned = in_array($term->term_id, $assignedIds);
-            printf(
-                $format,
-                $taxonomy->name,
-                ($taxonomy->hierarchical ? esc_attr($term->term_id) : esc_attr($term->name)),
-                checked($assigned, true, false),
-                esc_html($term->name)
-            );
-        }
     }
 
     /**

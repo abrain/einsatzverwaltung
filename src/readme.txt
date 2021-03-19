@@ -5,7 +5,7 @@ Tags: Feuerwehr, Hilfsorganisation, fire brigade, rescue services, EMS
 Requires at least: 5.1.0
 Tested up to: 5.5
 Requires PHP: 7.1.0
-Stable tag: 1.7.2
+Stable tag: 1.7.3.AE
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -52,6 +52,9 @@ Ideally, you check the issues on [GitHub](https://github.com/abrain/einsatzverwa
 Yes, you can find them on [our website](https://einsatzverwaltung.abrain.de/faq/).
 
 == Changelog ==
+= 1.7.3.AE =
+* Modifications for FF Altenerding
+* Display of Emergency including Map
 
 = 1.7.2 =
 * Report list and Templates: Show sequential numbers as range if the report represents more than one incident

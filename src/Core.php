@@ -1,4 +1,5 @@
 <?php
+
 namespace abrain\Einsatzverwaltung;
 
 use abrain\Einsatzverwaltung\Shortcodes\Initializer as ShortcodeInitializer;
@@ -11,7 +12,7 @@ use function add_action;
  */
 class Core
 {
-    const VERSION = '1.7.2';
+    const VERSION = '1.7.3.AE';
     const DB_VERSION = 51;
 
     /**
@@ -35,12 +36,12 @@ class Core
      * @var CustomFieldsRepository
      */
     private $customFieldsRepo;
-    
+
     /**
      * @var Options
      */
     public $options;
-    
+
     /**
      * @var Utilities
      */
@@ -173,7 +174,7 @@ class Core
         if (empty($this->adminErrorMessages)) {
             return;
         }
-        
+
         $pluginData = get_plugin_data(einsatzverwaltung_plugin_file());
         foreach ($this->adminErrorMessages as $errorMessage) {
             $message = sprintf('Plugin %s: %s', $pluginData['Name'], $errorMessage);

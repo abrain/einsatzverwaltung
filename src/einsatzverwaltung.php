@@ -1,13 +1,13 @@
 <?php
 /*
-Plugin Name: Einsatzverwaltung
+Plugin Name: Einsatzverwaltung Altenerding
 Plugin URI: https://einsatzverwaltung.abrain.de
-Description: Public incident reports for fire brigades and other rescue services
-Version: 1.7.2
-Author: Andreas Brain
+Description: Public incident reports for fire brigades and other rescue services. Modified for FF Altenerding
+Version: 1.7.3.AE
+Author: Andreas Brain, Benjamin Pabst
 Author URI: https://www.abrain.de
 License: GPLv2
-Text Domain: einsatzverwaltung
+Text Domain: einsatzverwaltung_ae
 */
 
 if (!defined('ABSPATH')) {

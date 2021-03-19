@@ -1,4 +1,5 @@
 <?php
+
 namespace abrain\Einsatzverwaltung;
 
 use abrain\Einsatzverwaltung\Frontend\ReportList\Renderer as ReportListRenderer;
@@ -38,11 +39,9 @@ class Frontend
     private function addHooks()
     {
         add_action('wp_enqueue_scripts', array($this, 'enqueueStyleAndScripts'));
-        if (!(
-            is_array($_REQUEST) &&
+        if (!(is_array($_REQUEST) &&
             array_key_exists('plugin', $_REQUEST) && $_REQUEST['plugin'] == 'all-in-one-event-calendar' &&
-            array_key_exists('action', $_REQUEST) && $_REQUEST['action'] == 'export_events'
-        )) {
+            array_key_exists('action', $_REQUEST) && $_REQUEST['action'] == 'export_events')) {
             add_filter('the_content', array($this, 'renderContent'), 9);
         }
         add_filter('the_excerpt', array($this, 'filterEinsatzExcerpt'));
@@ -95,7 +94,7 @@ class Frontend
             $art = $this->formatter->getTypeOfIncident($report, $mayContainLinks, $showEinsatzartArchiveLink);
 
             if ($report->isFalseAlarm()) {
-                $art = (empty($art) ? 'Fehlalarm' : $art.' (Fehlalarm)');
+                $art = (empty($art) ? 'Fehlalarm' : $art . ' (Fehlalarm)');
             }
 
             $einsatzort = $report->getLocation();
@@ -110,23 +109,44 @@ class Frontend
             $datumsformat = get_option('date_format', 'd.m.Y');
             $zeitformat = get_option('time_format', 'H:i');
             $einsatz_datum = ($timeOfAlerting ? date_i18n($datumsformat, $timeOfAlerting->getTimestamp()) : '-');
-            $einsatz_zeit = ($timeOfAlerting ? date_i18n($zeitformat, $timeOfAlerting->getTimestamp()).' Uhr' : '-');
+            $einsatz_zeit = ($timeOfAlerting ? date_i18n($zeitformat, $timeOfAlerting->getTimestamp()) . ' Uhr' : '-');
 
-            $headerstring = "<strong>Datum:</strong> ".$einsatz_datum."&nbsp;<br>";
-            $headerstring .= "<strong>Alarmzeit:</strong> ".$einsatz_zeit."&nbsp;<br>";
-            $headerstring .= $this->getDetailString('Alarmierungsart:', $typesOfAlerting);
-            $headerstring .= $this->getDetailString('Dauer:', $durationString);
-            $headerstring .= $this->getDetailString('Art:', $art);
-            $headerstring .= $this->getDetailString('Einsatzort:', $einsatzort);
-            $headerstring .= $this->getDetailString('Einsatzleiter:', $einsatzleiter);
-            $headerstring .= $this->getDetailString('Mannschaftsst&auml;rke:', $mannschaft);
-            $headerstring .= $this->getDetailString('Fahrzeuge:', $vehicles);
-            $headerstring .= $this->getDetailString('Einheiten:', $units);
-            $headerstring .= $this->getDetailString('Weitere Kr&auml;fte:', $additionalForces);
+            $emergencyHeader = '<table id="emergency_info_table" cellspacing="0" cellpadding="0">';
 
-            return "<p>$headerstring</p>";
+            $emergencyHeader .= $this->addDetailRow("Datum:", $einsatz_datum);
+            $emergencyHeader .= $this->addDetailRow("Alarmzeit:", $einsatz_zeit);
+            $emergencyHeader .= $this->addDetailRow("Alarmierungsart:", $typesOfAlerting);
+            $emergencyHeader .= $this->addDetailRow("Dauer:", $durationString);
+            $emergencyHeader .= $this->addDetailRow("Art:", $art);
+
+            $emergencyHeader .= $this->addDetailRow("Einsatzort:", $einsatzort);
+            $emergencyHeader .= $this->addDetailRow("Einsatzleiter:", $einsatzleiter);
+            $emergencyHeader .= $this->addDetailRow("Mannschaftsst&auml;rke:", $mannschaft);
+            $emergencyHeader .= $this->addDetailRow("Fahrzeuge:", $vehicles);
+            $emergencyHeader .= $this->addDetailRow("Alarmierte Einheiten:", $units);
+            $emergencyHeader .= $this->addDetailRow("Weitere Kr&auml;fte:", $additionalForces);
+            $emergencyHeader .= "</table>";
+
+            $API_KEY = get_option("einsatzvw_settings_api_google_maps");
+            // Location Frame
+            if (isset($einsatzort) && $einsatzort !== '') {
+                $emergencyHeader .= "<h2>Einsatzort</h2>";
+                $emergencyHeader .= "<iframe width=\"700\" height=\"450\" style='max-height: 450px; max-width: 700px; width:700px; height:450px' frameborder=\"0\" src=\"https://www.google.com/maps/embed/v1/place?key=$API_KEY&q=$einsatzort\" ></iframe>";
+            }
+
+
+            return "<p>$emergencyHeader</p>";
         }
         return "";
+    }
+
+    private function addDetailRow($title, $value)
+    {
+        if ($this->options->isHideEmptyDetails() && (!isset($value) || $value === '')) {
+            return '';
+        }
+
+        return '<tr><td><b>' . $title . '</b></td><td>' . $value . '</td></tr>';
     }
 
 
@@ -145,7 +165,7 @@ class Frontend
             return '';
         }
 
-        return '<strong>'.$title.'</strong> '.$value.($newline ? '&nbsp;<br>' : '&nbsp;');
+        return '<strong>' . $title . '</strong> ' . $value . ($newline ? '&nbsp;<br>' : '&nbsp;');
     }
 
 
@@ -176,7 +196,7 @@ class Frontend
             if (empty($content) && !empty($replacementText)) {
                 $content = sprintf('<p>%s</p>', esc_html($replacementText));
             }
-            
+
             $templateWithData = $this->formatter->formatIncidentData($template, array(), $post, 'post');
             $templateWithContent = str_replace('%content%', $content, $templateWithData);
             return stripslashes(wp_filter_post_kses(addslashes($templateWithContent)));
@@ -300,7 +320,7 @@ class Frontend
             } else {
                 $postTypes = array('post');
             }
-            
+
             // Einsatzberichte nur zusammen mit Beiträgen abfragen
             if (!in_array('post', $postTypes)) {
                 return;

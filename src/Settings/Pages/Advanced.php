@@ -68,6 +68,13 @@ class Advanced extends SubPage
             $this->settingsApiPage,
             'einsatzvw_settings_advreport'
         );
+        add_settings_field(
+            'einsatzvw_settings_api_google_maps',
+            'Google Maps API-Token',
+            array($this, 'echoFieldGoogleMapsAPI'),
+            $this->settingsApiPage,
+            'einsatzvw_settings_api'
+        );
     }
 
     public function addSettingsSections()
@@ -101,6 +108,12 @@ class Advanced extends SubPage
             null,
             $this->settingsApiPage
         );
+        add_settings_section(
+            'einsatzvw_settings_api',
+            'API-Token',
+            null,
+            $this->settingsApiPage
+        );
     }
 
     /**
@@ -117,6 +130,20 @@ class Advanced extends SubPage
         foreach (array_keys($this->permalinkOptions) as $permalinkStructure) {
             $this->permalinkOptions[$permalinkStructure]['code'] = $this->getSampleUrl($fakePost, $permalinkStructure);
         }
+    }
+
+    public function echoFieldGoogleMapsAPI()
+    {
+        echo '<fieldset>';
+        $this->echoSettingsInput(
+            'einsatzvw_settings_api_google_maps',
+            sanitize_title(get_option('einsatzvw_settings_api_google_maps'), '')
+        );
+        echo '<p class="description">';
+        printf(
+            'Google API-Token zur Nutzung für z.B. Google Maps Embed API.'
+        );
+        echo '</p></fieldset>';
     }
 
     public function echoFieldBase()
@@ -247,6 +274,11 @@ class Advanced extends SubPage
             'einsatzvw_settings_advanced',
             'einsatz_disable_blockeditor',
             array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+        );
+        register_setting(
+            'einsatzvw_settings_advanced',
+            'einsatzvw_settings_api_google_maps',
+            array('sanitizeCheckbox')
         );
     }
 }

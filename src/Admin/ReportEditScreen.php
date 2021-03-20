@@ -6,7 +6,9 @@ use abrain\Einsatzverwaltung\Types\IncidentType;
 use abrain\Einsatzverwaltung\Types\Report;
 use abrain\Einsatzverwaltung\Types\Unit;
 use abrain\Einsatzverwaltung\Types\Vehicle;
+use abrain\Einsatzverwaltung\Utilities;
 use WP_Post;
+use WP_Taxonomy;
 use WP_Term;
 use wpdb;
 use function add_meta_box;
@@ -14,13 +16,16 @@ use function array_filter;
 use function array_intersect;
 use function array_key_exists;
 use function array_map;
+use function checked;
 use function esc_attr;
 use function esc_attr__;
 use function esc_html;
 use function esc_html__;
 use function get_taxonomy;
+use function get_term;
 use function get_term_meta;
 use function get_terms;
+use function in_array;
 use function is_wp_error;
 use function join;
 use function preg_grep;
@@ -80,18 +85,6 @@ class ReportEditScreen extends EditScreen
             'einsatzartdiv',
             __('Incident Category', 'einsatzverwaltung'),
             array($this, 'displayMetaBoxEinsatzart'),
-            'einsatz',
-            'side',
-            'default',
-            array(
-                '__block_editor_compatible_meta_box' => true,
-                '__back_compat_meta_box' => false
-            )
-        );
-        add_meta_box(
-            'einsatzverwaltung_units',
-            __('Units', 'einsatzverwaltung'),
-            array($this, 'displayMetaBoxUnits'),
             'einsatz',
             'side',
             'default',
@@ -263,48 +256,14 @@ class ReportEditScreen extends EditScreen
     }
 
     /**
-     * @param WP_Post $post
-     */
-    public function displayMetaBoxUnits(WP_Post $post)
-    {
-        $units = get_terms(array(
-            'taxonomy' => Unit::getSlug(),
-            'hide_empty' => false
-        ));
-
-        if (is_wp_error($units)) {
-            printf("<div>%s</div>", $units->get_error_message());
-            return;
-        }
-
-        $taxonomyObject = get_taxonomy(Unit::getSlug());
-        if (empty($units)) {
-            printf("<div>%s</div>", esc_html($taxonomyObject->labels->no_terms));
-            return;
-        }
-
-        // Sort the units according to the custom order numbers
-        usort($units, array(Unit::class, 'compare'));
-
-        $report = new IncidentReport($post);
-        $assignedUnits = array_map(function (WP_Term $unit) {
-            return $unit->term_id;
-        }, $report->getUnits());
-
-        echo '<div><ul>';
-        $this->echoTermCheckboxes($units, $taxonomyObject, $assignedUnits);
-        echo '</ul></div>';
-    }
-
-    /**
      * A custom meta box for selecting the vehicles
      *
      * @param WP_Post $post
      */
     public function displayMetaBoxVehicles(WP_Post $post)
     {
-        $taxonomyObject = get_taxonomy(Vehicle::getSlug());
-        if (empty($taxonomyObject)) {
+        $vehicleTaxonomy = get_taxonomy(Vehicle::getSlug());
+        if (empty($vehicleTaxonomy)) {
             return;
         }
 
@@ -313,7 +272,7 @@ class ReportEditScreen extends EditScreen
             'hide_empty' => false
         ));
         if (empty($allVehicles)) {
-            printf("<div>%s</div>", esc_html($taxonomyObject->labels->no_terms));
+            printf("<div>%s</div>", esc_html($vehicleTaxonomy->labels->no_terms));
             return;
         }
 
@@ -325,25 +284,31 @@ class ReportEditScreen extends EditScreen
             return get_term_meta($vehicle->term_id, 'out_of_service', true) !== '1';
         });
 
-        // Sort the vehicles according to the custom order numbers
-        usort($inServiceVehicles, array(Vehicle::class, 'compareVehicles'));
-        usort($outOfServiceVehicles, array(Vehicle::class, 'compareVehicles'));
-
         // Determine vehicles assigned to the current report
-        $terms = get_the_terms($post, Vehicle::getSlug());
-        if (is_wp_error($terms) || $terms === false) {
-            $terms = array();
+        $assignedVehicleIds = get_terms([
+            'taxonomy' => Vehicle::getSlug(),
+            'object_ids' => $post->ID,
+            'fields' => 'ids'
+        ]);
+        if (is_wp_error($assignedVehicleIds)) {
+            $assignedVehicleIds = [];
         }
-        $assignedVehicleIds = array_map(function (WP_Term $vehicle) {
-            return $vehicle->term_id;
-        }, $terms);
 
-        // Output the checkboxes
-        echo '<div><ul>';
-        $this->echoTermCheckboxes($inServiceVehicles, $taxonomyObject, $assignedVehicleIds);
+        echo '<div>';
+        if (Unit::isActivelyUsed()) {
+            $this->echoVehiclesByUnit($post, $vehicleTaxonomy, $inServiceVehicles, $assignedVehicleIds);
+        } else {
+            // Sort the vehicles according to the custom order numbers
+            usort($inServiceVehicles, array(Vehicle::class, 'compareVehicles'));
+
+            echo '<ul>';
+            $this->echoTermCheckboxes($inServiceVehicles, $vehicleTaxonomy, $assignedVehicleIds);
+            echo '</ul>';
+        }
 
         if (!empty($outOfServiceVehicles)) {
             echo '<hr>';
+            usort($outOfServiceVehicles, array(Vehicle::class, 'compareVehicles'));
 
             // Automatically expand the details tag, if vehicles in there are assigned to the current report
             $outOfServiceIds = array_map(function (WP_Term $vehicle) {
@@ -352,10 +317,55 @@ class ReportEditScreen extends EditScreen
             echo empty(array_intersect($assignedVehicleIds, $outOfServiceIds)) ? '<details>' : '<details open="open">';
 
             echo sprintf("<summary>%s</summary>", esc_html__('Out of service', 'einsatzverwaltung'));
-            $this->echoTermCheckboxes($outOfServiceVehicles, $taxonomyObject, $assignedVehicleIds);
+            echo '<ul>';
+            $this->echoTermCheckboxes($outOfServiceVehicles, $vehicleTaxonomy, $assignedVehicleIds);
+            echo '</ul>';
             echo '</details>';
         }
-        echo '</ul></div>';
+        echo '</div>';
+    }
+
+    /**
+     * Echoes the checkboxes for vehicles and units, grouped by unit.
+     *
+     * @param WP_Post $post
+     * @param WP_Taxonomy $vehicleTaxonomy
+     * @param array $vehicles
+     * @param array $assignedVehicleIds
+     */
+    private function echoVehiclesByUnit(WP_Post $post, WP_Taxonomy $vehicleTaxonomy, array $vehicles, array $assignedVehicleIds)
+    {
+        $unitTaxObj = get_taxonomy(Unit::getSlug());
+        if (empty($unitTaxObj)) {
+            return;
+        }
+
+        $assignedUnitIds = get_terms([
+            'taxonomy' => Unit::getSlug(),
+            'object_ids' => $post->ID,
+            'fields' => 'ids'
+        ]);
+        if (is_wp_error($assignedVehicleIds)) {
+            $assignedVehicleIds = [];
+        }
+
+        foreach (Utilities::groupVehiclesByUnit($vehicles) as $unitId => $unitVehicles) {
+            if ($unitId === -1) {
+                printf('<p><b>%s</b></p>', esc_html__('Without Unit', 'einsatzverwaltung'));
+            } else {
+                $unit = get_term($unitId, Unit::getSlug());
+                printf(
+                    '<label><input type="checkbox" name="tax_input[%1$s][]" value="%2$s" %3$s><b>%4$s</b></label>',
+                    $unitTaxObj->name,
+                    esc_attr($unit->name),
+                    checked(in_array($unit->term_id, $assignedUnitIds), true, false),
+                    esc_html($unit->name)
+                );
+            }
+            echo '<ul style="margin-left: 1.5em;">';
+            $this->echoTermCheckboxes($unitVehicles, $vehicleTaxonomy, $assignedVehicleIds);
+            echo '</ul>';
+        }
     }
 
     /**

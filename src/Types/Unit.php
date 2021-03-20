@@ -14,7 +14,9 @@ use function esc_url;
 use function get_permalink;
 use function get_term;
 use function get_term_meta;
+use function get_terms;
 use function get_the_title;
+use function is_numeric;
 use function sprintf;
 use function strcasecmp;
 use function url_to_postid;
@@ -147,6 +149,12 @@ class Unit implements CustomTaxonomy
     public static function getSlug(): string
     {
         return 'evw_unit';
+    }
+
+    public static function isActivelyUsed(): bool
+    {
+        $unitCount = get_terms(['taxonomy' => self::getSlug(), 'fields' => 'count']);
+        return is_numeric($unitCount) && $unitCount > 0;
     }
 
     /**

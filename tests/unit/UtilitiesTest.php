@@ -1,6 +1,8 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
+use Brain\Monkey\Expectation\Exception\ExpectationArgsRequired;
+use Mockery;
 use function Brain\Monkey\Functions\expect;
 
 /**
@@ -26,7 +28,7 @@ class UtilitiesTest extends UnitTestCase
     /**
      * @return array
      */
-    public function dataForGetArrayValue()
+    public function dataForGetArrayValue(): array
     {
         return array(
             array(array(), 'key', 'defaultValue', 'defaultValue'),
@@ -34,6 +36,57 @@ class UtilitiesTest extends UnitTestCase
             array(array('stringkey' => false, 3 => 'null'), 3, 'defaultValue', 'null'),
             array(array('stringkey' => false, 3 => 'null'), 'stringkey', 'defaultValue', false)
         );
+    }
+
+    /**
+     * @uses \abrain\Einsatzverwaltung\Types\Unit::compare()
+     * @uses \abrain\Einsatzverwaltung\Types\Vehicle::compareVehicles()
+     * @throws ExpectationArgsRequired
+     */
+    public function testGroupVehiclesByUnit()
+    {
+        $vehicle1 = Mockery::mock('\WP_Term');
+        $vehicle1->term_id = 124;
+        $vehicle1->name = 'A';
+        expect('get_term_meta')->once()->with(124, 'vehicle_unit', true)->andReturn(53);
+        expect('get_term_meta')->once()->with(124, 'vehicleorder', true)->andReturn(3);
+
+        $vehicle2 = Mockery::mock('\WP_Term');
+        $vehicle2->term_id = 6232;
+        $vehicle2->name = 'B';
+        expect('get_term_meta')->once()->with(6232, 'vehicle_unit', true)->andReturn(-1);
+
+        $vehicle3 = Mockery::mock('\WP_Term');
+        $vehicle3->term_id = 7632;
+        $vehicle3->name = 'C';
+        expect('get_term_meta')->once()->with(7632, 'vehicle_unit', true)->andReturn(53);
+        expect('get_term_meta')->once()->with(7632, 'vehicleorder', true)->andReturn(2);
+
+        $vehicle4 = Mockery::mock('\WP_Term');
+        $vehicle4->term_id = 523;
+        $vehicle4->name = 'D';
+        expect('get_term_meta')->once()->with(523, 'vehicle_unit', true)->andReturn(991);
+
+        $vehicle5 = Mockery::mock('\WP_Term');
+        $vehicle5->term_id = 1928;
+        $vehicle5->name = 'E';
+        expect('get_term_meta')->once()->with(1928, 'vehicle_unit', true)->andReturn(false);
+
+        $unit1 = Mockery::mock('\WP_Term');
+        $unit1->term_id = 991;
+        expect('get_term')->once()->with(991)->andReturn($unit1);
+        expect('get_term_meta')->once()->with(991, 'unit_order', true)->andReturn(2);
+
+        $unit2 = Mockery::mock('\WP_Term');
+        $unit2->term_id = 53;
+        expect('get_term')->once()->with(53)->andReturn($unit2);
+        expect('get_term_meta')->once()->with(53, 'unit_order', true)->andReturn(1);
+
+        self::assertEquals([
+            53 => [$vehicle3, $vehicle1],
+            991 => [$vehicle4],
+            -1 => [$vehicle2, $vehicle5]
+        ], Utilities::groupVehiclesByUnit([$vehicle1, $vehicle2, $vehicle3, $vehicle4, $vehicle5]));
     }
 
     public function testPrintError()
@@ -64,6 +117,9 @@ class UtilitiesTest extends UnitTestCase
         $utilities->printWarning('Some random string');
     }
 
+    /**
+     * @throws ExpectationArgsRequired
+     */
     public function testRemovePostFromCategory()
     {
         $postId = 24;
@@ -74,6 +130,7 @@ class UtilitiesTest extends UnitTestCase
 
     /**
      * If we want to remove a category that is not even set, nothing should be changed.
+     * @throws ExpectationArgsRequired
      */
     public function testRemovePostFromCategoryBail()
     {

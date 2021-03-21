@@ -52,6 +52,17 @@ Yes, you can find them on [our website](https://einsatzverwaltung.abrain.de/faq/
 
 == Changelog ==
 
+= 1.9.0 =
+* Vehicles can be associated with a unit
+* Incident numbers can have a separator between the year the and sequential number
+* Classic singular view of reports shows vehicles grouped by unit, if units are used
+* Templates: Added placeholder for vehicles grouped by unit
+* Units: Display order can be customized
+* Editor: Vehicles appear grouped by unit
+* Editor: Meta box for incident details is now mobile friendly
+* Editor: Notice about wrong date format only appears after leaving the field
+* Internationalized more labels
+
 = 1.8.0 =
 * Fix: Not all vehicles could be removed from an existing Incident Report
 * Shortcode `reportcount` can be filtered by status (actual or false alarm)

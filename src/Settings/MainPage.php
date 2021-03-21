@@ -93,7 +93,7 @@ class MainPage
         }
 
         echo '<div class="wrap">';
-        echo '<h1>Einstellungen &rsaquo; Einsatzverwaltung</h1>';
+        echo sprintf('<h1>%s &rsaquo; Einsatzverwaltung</h1>', __('Settings', 'einsatzverwaltung'));
 
         // Check if any page uses the same permalink as the archive
         $conflictingPage = $this->getConflictingPage();

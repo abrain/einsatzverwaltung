@@ -54,6 +54,7 @@ class Formatter
         '%seqNum%' => 'Laufende Nummer',
         '%annotations%' => 'Vermerke',
         '%vehicles%' => 'Fahrzeuge',
+        '%vehiclesByUnit%' => 'Fahrzeuge, gruppiert nach Einheiten',
         '%additionalForces%' => 'Weitere Kr&auml;fte',
         '%typesOfAlerting%' => 'Alarmierungsarten',
         '%content%' => 'Berichtstext',
@@ -201,6 +202,9 @@ class Formatter
                 break;
             case '%vehicles%':
                 $replace = $this->getVehicleString($incidentReport->getVehicles(), ($context === 'post'), ($context === 'post'));
+                break;
+            case '%vehiclesByUnit%':
+                $replace = $this->getVehiclesByUnitString($incidentReport->getVehiclesByUnit());
                 break;
             case '%additionalForces%':
                 $replace = $this->getAdditionalForces($incidentReport, ($context === 'post'), ($context === 'post'));

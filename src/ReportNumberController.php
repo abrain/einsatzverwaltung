@@ -87,7 +87,7 @@ class ReportNumberController
             case 'slash':
                 $separator = '/';
                 break;
-            case 'dash':
+            case 'hyphen':
                 $separator = '-';
                 break;
             default:
@@ -151,7 +151,7 @@ class ReportNumberController
      */
     public static function sanitizeSeparator(string $input): string
     {
-        if (in_array($input, ['none', 'slash', 'dash'])) {
+        if (in_array($input, ['none', 'slash', 'hyphen'])) {
             return $input;
         }
 

@@ -30,7 +30,7 @@ class ReportNumberControllerTest extends UnitTestCase
         $fallback = ReportNumberController::DEFAULT_SEPARATOR;
         self::assertEquals('none', ReportNumberController::sanitizeSeparator('none'));
         self::assertEquals('slash', ReportNumberController::sanitizeSeparator('slash'));
-        self::assertEquals('dash', ReportNumberController::sanitizeSeparator('dash'));
+        self::assertEquals('hyphen', ReportNumberController::sanitizeSeparator('hyphen'));
         self::assertEquals($fallback, ReportNumberController::sanitizeSeparator(''));
         self::assertEquals($fallback, ReportNumberController::sanitizeSeparator('something'));
     }
@@ -95,7 +95,7 @@ class ReportNumberControllerTest extends UnitTestCase
 
         expect('get_option')->once()->with('einsatzvw_einsatznummer_stellen')->andReturn('2');
         expect('get_option')->once()->with('einsatzvw_einsatznummer_lfdvorne', false)->andReturn('0');
-        expect('get_option')->once()->with('einsatzvw_numbers_separator', 'none')->andReturn('dash');
+        expect('get_option')->once()->with('einsatzvw_numbers_separator', 'none')->andReturn('hyphen');
         self::assertEquals('2019-623', $controller->formatEinsatznummer('2019', 623));
     }
 }

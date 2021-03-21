@@ -5,7 +5,7 @@ Tags: Feuerwehr, fire department, EMS
 Requires at least: 5.1.0
 Tested up to: 5.7
 Requires PHP: 7.1.0
-Stable tag: 1.8.0
+Stable tag: 1.9.0
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -52,6 +52,17 @@ Yes, you can find them on [our website](https://einsatzverwaltung.abrain.de/faq/
 
 == Changelog ==
 
+= 1.9.0 =
+* Vehicles can be associated with a unit
+* Incident numbers can have a separator between the year the and sequential number
+* Classic singular view of reports shows vehicles grouped by unit, if units are used
+* Templates: Added placeholder for vehicles grouped by unit
+* Units: Display order can be customized
+* Editor: Vehicles appear grouped by unit
+* Editor: Meta box for incident details is now mobile friendly
+* Editor: Notice about wrong date format only appears after leaving the field
+* Internationalized more labels
+
 = 1.8.0 =
 * Fix: Not all vehicles could be removed from an existing Incident Report
 * Shortcode `reportcount` can be filtered by status (actual or false alarm)
@@ -61,27 +72,6 @@ Yes, you can find them on [our website](https://einsatzverwaltung.abrain.de/faq/
 * Units were converted to a taxonomy
 * Requires PHP 7.1 or newer
 * Requires WordPress 5.1 or newer
-
-= 1.7.2 =
-* Report list and Templates: Show sequential numbers as range if the report represents more than one incident
-* Fix: Shortcode `reportcount` did not take into account if reports represented more than one incident
-* Fix: Incident numbers would not have been correctly updated when changing the format
-* Accessibility: Add aria-current attribute to links to the currently displayed page
-
-= 1.7.1 =
-* Fix: Associations with reports were not removed when a Unit got deleted
-* Adjust numbering automatically, if reports represent more than one incident
-
-= 1.7.0 =
-* Vehicles: Can be marked as out of service so they are initially hidden when composing reports
-* Vehicles: Custom sort order is respected when composing or editing reports
-* Vehicles: Can now be linked with a page from the same site or an arbitrary URL
-* Units: Can now be linked with a page from the same site or an arbitrary URL
-* Templates: Added placeholder for end date and time of an incident
-* Templates: Placeholder for yearly archive permalink can be used in widget footer
-* Report list: Made the entire row clickable on mobile devices
-* Improved compatibility with Essential Addons for Elementor
-* Requires PHP 5.6 or newer
 
 == Upgrade Notice ==
 

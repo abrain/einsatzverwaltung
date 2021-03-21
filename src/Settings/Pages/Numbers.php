@@ -106,7 +106,7 @@ class Numbers extends SubPage
         $this->echoRadioButtons('einsatzvw_numbers_separator', [
             'none' => ['label' => _x('None', 'number separator selection', 'einsatzverwaltung')],
             'slash' => ['label' => __('Slash', 'einsatzverwaltung'), 'code' => '/'],
-            'dash' => ['label' => __('Dash', 'einsatzverwaltung'), 'code' => '-'],
+            'hyphen' => ['label' => __('Hyphen', 'einsatzverwaltung'), 'code' => '-'],
         ], ReportNumberController::DEFAULT_SEPARATOR);
         echo '</fieldset>';
         printf(

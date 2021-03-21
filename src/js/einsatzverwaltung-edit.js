@@ -2,7 +2,7 @@ const { __ } = wp.i18n;
 
 jQuery(document).ready(function() {
     var datumsregex = /^(19|20)\d{2}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01]) ([01][0-9]|2[0-3]):([0-5][0-9])$/;
-    const hinweistext = __('Please use the following format: YYYY-MM-TT hh:mm', 'einsatzverwaltung');
+    const hinweistext = __('Please use the following format: YYYY-MM-DD hh:mm', 'einsatzverwaltung');
 
     jQuery('#einsatzverwaltung_alarmzeit').after('&nbsp;<span class="einsatzverwaltung_hint" id="einsatzverwaltung_alarmzeit_hint"></span>');
     jQuery('#einsatz_einsatzende').after('&nbsp;<span class="einsatzverwaltung_hint" id="einsatz_einsatzende_hint"></span>');

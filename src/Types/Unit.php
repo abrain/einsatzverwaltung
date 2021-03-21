@@ -1,6 +1,7 @@
 <?php
 namespace abrain\Einsatzverwaltung\Types;
 
+use abrain\Einsatzverwaltung\CustomFields\NumberInput;
 use abrain\Einsatzverwaltung\CustomFields\PostSelector;
 use abrain\Einsatzverwaltung\CustomFields\UrlInput;
 use abrain\Einsatzverwaltung\CustomFieldsRepository;
@@ -13,8 +14,11 @@ use function esc_url;
 use function get_permalink;
 use function get_term;
 use function get_term_meta;
+use function get_terms;
 use function get_the_title;
+use function is_numeric;
 use function sprintf;
+use function strcasecmp;
 use function url_to_postid;
 
 /**
@@ -23,6 +27,35 @@ use function url_to_postid;
  */
 class Unit implements CustomTaxonomy
 {
+    /**
+     * Comparison function for unis
+     *
+     * @param WP_Term $unit1
+     * @param WP_Term $unit2
+     *
+     * @return int
+     */
+    public static function compare(WP_Term $unit1, WP_Term $unit2): int
+    {
+        $order1 = get_term_meta($unit1->term_id, 'unit_order', true);
+        $order2 = get_term_meta($unit2->term_id, 'unit_order', true);
+
+        if (empty($order1) && !empty($order2)) {
+            return 1;
+        }
+
+        if (!empty($order1) && empty($order2)) {
+            return -1;
+        }
+
+        // If no order is set on both or if they are equal, sort by name
+        if (empty($order1) && empty($order2) || $order1 == $order2) {
+            return strcasecmp($unit1->name, $unit2->name);
+        }
+
+        return ($order1 < $order2) ? -1 : 1;
+    }
+
     /**
      * Retrieve the URL to more info about a given Unit. This can be a permalink to an internal page or an external URL.
      *
@@ -118,6 +151,12 @@ class Unit implements CustomTaxonomy
         return 'evw_unit';
     }
 
+    public static function isActivelyUsed(): bool
+    {
+        $unitCount = get_terms(['taxonomy' => self::getSlug(), 'fields' => 'count']);
+        return is_numeric($unitCount) && $unitCount > 0;
+    }
+
     /**
      * @inheritDoc
      */
@@ -133,6 +172,11 @@ class Unit implements CustomTaxonomy
             'unit_exturl',
             __('External URL', 'einsatzverwaltung'),
             __('You can specify a URL that points to more information about this unit. If set, this takes precedence over the page selected above.', 'einsatzverwaltung')
+        ));
+        $customFields->add($this, new NumberInput(
+            'unit_order',
+            'Reihenfolge',
+            'Optionale Angabe, mit der die Anzeigereihenfolge der Einheiten beeinflusst werden kann. Einheiten mit der kleineren Zahl werden zuerst angezeigt, anschlie&szlig;end diejenigen ohne Angabe bzw. dem Wert 0. Haben mehrere Einheiten den gleichen Wert, werden sie in alphabetischer Reihenfolge ausgegeben.'
         ));
     }
 

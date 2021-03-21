@@ -21,6 +21,7 @@ use function update_post_meta;
 class ReportNumberController
 {
     const DEFAULT_SEQNUM_DIGITS = 3;
+    const DEFAULT_SEPARATOR = 'none';
 
     /**
      * @var Data
@@ -76,12 +77,29 @@ class ReportNumberController
      *
      * @return string Formatierte Einsatznummer
      */
-    private function formatEinsatznummer(string $jahr, int $nummer): string
+    public function formatEinsatznummer(string $jahr, int $nummer): string
     {
-        $stellen = self::sanitizeEinsatznummerStellen(get_option('einsatzvw_einsatznummer_stellen'));
-        $lfdvorne = (get_option('einsatzvw_einsatznummer_lfdvorne', false) == '1');
-        $format = $lfdvorne ? '%2$s%1$s' : '%1$s%2$s';
-        return sprintf($format, $jahr, str_pad($nummer, $stellen, "0", STR_PAD_LEFT));
+        $stellen = self::sanitizeNumberOfDigits(get_option('einsatzvw_einsatznummer_stellen'));
+        $sequentialFirst = (get_option('einsatzvw_einsatznummer_lfdvorne', false) == '1');
+
+        // Determine the separator
+        switch (self::sanitizeSeparator(get_option('einsatzvw_numbers_separator', self::DEFAULT_SEPARATOR))) {
+            case 'slash':
+                $separator = '/';
+                break;
+            case 'hyphen':
+                $separator = '-';
+                break;
+            default:
+                $separator = '';
+        }
+
+        return sprintf(
+            $sequentialFirst ? '%2$s%3$s%1$s' : '%1$s%3$s%2$s',
+            $jahr,
+            str_pad($nummer, $stellen, "0", STR_PAD_LEFT),
+            $separator
+        );
     }
 
     /**
@@ -110,7 +128,7 @@ class ReportNumberController
      *
      * @return int
      */
-    public static function sanitizeEinsatznummerStellen($input): int
+    public static function sanitizeNumberOfDigits($input): int
     {
         if (!is_numeric($input)) {
             return self::DEFAULT_SEQNUM_DIGITS;
@@ -122,6 +140,22 @@ class ReportNumberController
         }
 
         return $val;
+    }
+
+    /**
+     * Sanitizes the option value for the separator between year and sequential number.
+     *
+     * @param string $input
+     *
+     * @return string
+     */
+    public static function sanitizeSeparator(string $input): string
+    {
+        if (in_array($input, ['none', 'slash', 'hyphen'])) {
+            return $input;
+        }
+
+        return self::DEFAULT_SEPARATOR;
     }
 
     /**
@@ -181,7 +215,12 @@ class ReportNumberController
     public function maybeIncidentNumberFormatChanged(string $option, $oldValue, $newValue)
     {
         // Wir sind nur an bestimmten Optionen interessiert
-        if (!in_array($option, array('einsatzvw_einsatznummer_stellen', 'einsatzvw_einsatznummer_lfdvorne'))) {
+        $formatOptions = array(
+            'einsatzvw_einsatznummer_stellen',
+            'einsatzvw_einsatznummer_lfdvorne',
+            'einsatzvw_numbers_separator'
+        );
+        if (!in_array($option, $formatOptions)) {
             return;
         }
 

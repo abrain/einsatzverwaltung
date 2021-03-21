@@ -93,9 +93,10 @@ class Initializer
             wp_enqueue_script(
                 'einsatzverwaltung-edit-script',
                 Core::$scriptUrl . 'einsatzverwaltung-edit.js',
-                array('jquery', 'jquery-ui-autocomplete'),
+                array('jquery', 'jquery-ui-autocomplete', 'wp-i18n'),
                 Core::VERSION
             );
+            wp_set_script_translations('einsatzverwaltung-edit-script', 'einsatzverwaltung');
             wp_enqueue_style(
                 'einsatzverwaltung-edit',
                 Core::$styleUrl . 'style-edit.css',

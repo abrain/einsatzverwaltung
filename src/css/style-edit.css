@@ -1,3 +1,18 @@
 .einsatzverwaltung_hint {
     color: #FF8800;
 }
+
+#fahrzeugdiv summary {
+    margin-bottom: 0.5em;
+}
+
+#einsatzverwaltung_meta_box .incidentnumber {
+    line-height: 2;
+    min-height: 30px;
+}
+
+@media (max-width: 400px) {
+    #einsatz_einsatzort, #einsatz_einsatzleiter, #einsatz_mannschaft {
+        max-width: 12em;
+    }
+}

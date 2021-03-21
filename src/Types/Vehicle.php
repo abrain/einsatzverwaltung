@@ -4,6 +4,7 @@ namespace abrain\Einsatzverwaltung\Types;
 use abrain\Einsatzverwaltung\CustomFields\Checkbox;
 use abrain\Einsatzverwaltung\CustomFields\NumberInput;
 use abrain\Einsatzverwaltung\CustomFields\PostSelector;
+use abrain\Einsatzverwaltung\CustomFields\UnitSelector;
 use abrain\Einsatzverwaltung\CustomFields\UrlInput;
 use WP_REST_Response;
 use WP_Term;
@@ -113,6 +114,11 @@ class Vehicle implements CustomTaxonomy
      */
     public function registerCustomFields(CustomFieldsRepository $customFields)
     {
+        $customFields->add($this, new UnitSelector(
+            'vehicle_unit',
+            _x('Unit', 'taxonomy singular name', 'einsatzverwaltung'),
+            'Falls du auf dieser Seite mehrere Einheiten (Abteilungen o.ä.) unterscheidest, kannst du hier das Fahrzeug einer davon zuordnen.'
+        ));
         $customFields->add($this, new PostSelector(
             'fahrzeugpid',
             __('Page with further information', 'einsatzverwaltung'),

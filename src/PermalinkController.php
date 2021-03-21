@@ -67,7 +67,7 @@ class PermalinkController
      *
      * @return string
      */
-    public function buildSelector(WP_Post $post, $structure)
+    public function buildSelector(WP_Post $post, string $structure): string
     {
         $tagReplacements = array(
             $post->post_name,
@@ -80,7 +80,7 @@ class PermalinkController
     /**
      * @param WP_Query $query
      */
-    public function einsatznummerMetaQuery($query)
+    public function einsatznummerMetaQuery(WP_Query $query)
     {
         $enr = $query->get('einsatznummer');
         if (!empty($enr)) {
@@ -98,7 +98,7 @@ class PermalinkController
      *
      * @return string
      */
-    public function filterPostTypeLink($postLink, WP_Post $post, $leavename, $sample)
+    public function filterPostTypeLink(string $postLink, WP_Post $post, bool $leavename, bool $sample): string
     {
         global $wp_rewrite;
 
@@ -126,9 +126,9 @@ class PermalinkController
      *
      * @param array $queryvars
      *
-     * @return mixed
+     * @return array
      */
-    public function filterRequest($queryvars)
+    public function filterRequest(array $queryvars): array
     {
         global $wp_rewrite;
 
@@ -143,7 +143,7 @@ class PermalinkController
     /**
      * @return string
      */
-    public function getRewriteBase()
+    private function getRewriteBase(): string
     {
         global $wp_rewrite;
         return ltrim($wp_rewrite->front, '/') . $this->reportRewriteSlug;
@@ -156,7 +156,7 @@ class PermalinkController
      *
      * @return string
      */
-    public function getSelectorRegEx($permalink)
+    public function getSelectorRegEx(string $permalink): string
     {
         $regex = str_replace($this->rewriteTags, $this->rewriteTagRegEx, $permalink);
         return '/^' . str_replace('/', '\/', $regex) . '$/';
@@ -167,7 +167,7 @@ class PermalinkController
      *
      * @return string
      */
-    public function getPermalink($selector)
+    public function getPermalink(string $selector): string
     {
         $path = sprintf('%s/%s', $this->getRewriteBase(), $selector);
         return home_url(user_trailingslashit($path));
@@ -180,7 +180,7 @@ class PermalinkController
      *
      * @return string
      */
-    public function getYearArchiveLink($year)
+    public function getYearArchiveLink(string $year): string
     {
         global $wp_rewrite;
         $link = get_post_type_archive_link(Report::getSlug());
@@ -196,7 +196,7 @@ class PermalinkController
      *
      * @return array
      */
-    public function modifyQueryVars($queryVars, $reportPermalink)
+    public function modifyQueryVars(array $queryVars, string $reportPermalink): array
     {
         // Do nothing, if the request is not about reports
         if (!array_key_exists('einsatz', $queryVars)) {
@@ -235,7 +235,7 @@ class PermalinkController
      *
      * @return string
      */
-    public static function sanitizePermalink($permalink)
+    public static function sanitizePermalink(string $permalink): string
     {
         preg_match('/^(%[a-z_]+%)(-(%[a-z_]+%))*$/', $permalink, $matches);
         if (empty($matches)) {

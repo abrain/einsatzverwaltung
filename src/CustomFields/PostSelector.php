@@ -44,7 +44,7 @@ class PostSelector extends CustomField
      * }
      * @return string HTML-Code für Auswahlfeld
      */
-    public function dropdownPosts($args)
+    public function dropdownPosts($args): string
     {
         $defaults = array(
             'echo' => true,
@@ -108,7 +108,7 @@ class PostSelector extends CustomField
     /**
      * @inheritdoc
      */
-    public function getAddTermInput()
+    public function getAddTermInput(): string
     {
         return $this->dropdownPosts(array(
             'echo' => false,
@@ -120,7 +120,7 @@ class PostSelector extends CustomField
     /**
      * @inheritdoc
      */
-    public function getEditTermInput($tag)
+    public function getEditTermInput($tag): string
     {
         return $this->dropdownPosts(array(
             'echo' => false,
@@ -133,7 +133,7 @@ class PostSelector extends CustomField
     /**
      * @inheritdoc
      */
-    public function getColumnContent($termId)
+    public function getColumnContent($termId): string
     {
         $postId = $this->getValue($termId);
 
@@ -154,7 +154,7 @@ class PostSelector extends CustomField
     /**
      * @inheritDoc
      */
-    public function getEditPostInput(WP_Post $post)
+    public function getEditPostInput(WP_Post $post): string
     {
         return $this->dropdownPosts(array(
             'echo' => false,

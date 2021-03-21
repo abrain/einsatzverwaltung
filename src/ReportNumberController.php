@@ -21,6 +21,7 @@ use function update_post_meta;
 class ReportNumberController
 {
     const DEFAULT_SEQNUM_DIGITS = 3;
+    const DEFAULT_SEPARATOR = 'none';
 
     /**
      * @var Data
@@ -45,7 +46,7 @@ class ReportNumberController
      * @param string $metaKey Der Key des postmeta-Eintrags
      * @param string $metaValue Der Wert des postmeta-Eintrags
      */
-    public function onPostMetaChanged($metaId, $objectId, $metaKey, $metaValue)
+    public function onPostMetaChanged(int $metaId, int $objectId, string $metaKey, string $metaValue)
     {
         // Bail, if this is not about reports
         if (get_post_type($objectId) !== 'einsatz') {
@@ -53,15 +54,15 @@ class ReportNumberController
         }
 
         if ($metaKey === 'einsatz_seqNum' && self::isAutoIncidentNumbers()) {
-            $this->adjustIncidentNumber($objectId, $metaValue);
+            $this->adjustIncidentNumber($objectId, (int)$metaValue);
         }
     }
 
     /**
      * @param int $postId
-     * @param string $sequenceNumber
+     * @param int $sequenceNumber
      */
-    private function adjustIncidentNumber($postId, $sequenceNumber)
+    private function adjustIncidentNumber(int $postId, int $sequenceNumber)
     {
         $date = date_create(get_post_field('post_date', $postId));
         $newIncidentNumber = $this->formatEinsatznummer(date_format($date, 'Y'), $sequenceNumber);
@@ -76,18 +77,35 @@ class ReportNumberController
      *
      * @return string Formatierte Einsatznummer
      */
-    private function formatEinsatznummer($jahr, $nummer)
+    public function formatEinsatznummer(string $jahr, int $nummer): string
     {
-        $stellen = self::sanitizeEinsatznummerStellen(get_option('einsatzvw_einsatznummer_stellen'));
-        $lfdvorne = (get_option('einsatzvw_einsatznummer_lfdvorne', false) == '1');
-        $format = $lfdvorne ? '%2$s%1$s' : '%1$s%2$s';
-        return sprintf($format, $jahr, str_pad($nummer, $stellen, "0", STR_PAD_LEFT));
+        $stellen = self::sanitizeNumberOfDigits(get_option('einsatzvw_einsatznummer_stellen'));
+        $sequentialFirst = (get_option('einsatzvw_einsatznummer_lfdvorne', false) == '1');
+
+        // Determine the separator
+        switch (self::sanitizeSeparator(get_option('einsatzvw_numbers_separator', self::DEFAULT_SEPARATOR))) {
+            case 'slash':
+                $separator = '/';
+                break;
+            case 'hyphen':
+                $separator = '-';
+                break;
+            default:
+                $separator = '';
+        }
+
+        return sprintf(
+            $sequentialFirst ? '%2$s%3$s%1$s' : '%1$s%3$s%2$s',
+            $jahr,
+            str_pad($nummer, $stellen, "0", STR_PAD_LEFT),
+            $separator
+        );
     }
 
     /**
      * @return bool
      */
-    public static function isAutoIncidentNumbers()
+    public static function isAutoIncidentNumbers(): bool
     {
         return (get_option('einsatzverwaltung_incidentnumbers_auto', '0') === '1');
     }
@@ -96,7 +114,7 @@ class ReportNumberController
      * @param string $option Name of the added option
      * @param mixed $value Value of the added option
      */
-    public function onOptionAdded($option, $value)
+    public function onOptionAdded(string $option, $value)
     {
         if ($option === 'einsatzverwaltung_incidentnumbers_auto') {
             $this->maybeAutoIncidentNumbersChanged($option, '', $value);
@@ -110,7 +128,7 @@ class ReportNumberController
      *
      * @return int
      */
-    public static function sanitizeEinsatznummerStellen($input)
+    public static function sanitizeNumberOfDigits($input): int
     {
         if (!is_numeric($input)) {
             return self::DEFAULT_SEQNUM_DIGITS;
@@ -122,6 +140,22 @@ class ReportNumberController
         }
 
         return $val;
+    }
+
+    /**
+     * Sanitizes the option value for the separator between year and sequential number.
+     *
+     * @param string $input
+     *
+     * @return string
+     */
+    public static function sanitizeSeparator(string $input): string
+    {
+        if (in_array($input, ['none', 'slash', 'hyphen'])) {
+            return $input;
+        }
+
+        return self::DEFAULT_SEPARATOR;
     }
 
     /**
@@ -138,7 +172,7 @@ class ReportNumberController
             $reports = $reportQuery->getReports();
 
             foreach ($reports as $report) {
-                $newIncidentNumber = $this->formatEinsatznummer($year, $report->getSequentialNumber());
+                $newIncidentNumber = $this->formatEinsatznummer($year, (int)$report->getSequentialNumber());
                 update_post_meta($report->getPostId(), 'einsatz_incidentNumber', $newIncidentNumber);
             }
         }
@@ -149,10 +183,10 @@ class ReportNumberController
      * aktualisiert werden müssen
      *
      * @param string $option Name der Option
-     * @param string $oldValue Der alte Wert
-     * @param string $newValue Der neue Wert
+     * @param mixed $oldValue Der alte Wert
+     * @param mixed $newValue Der neue Wert
      */
-    public function maybeAutoIncidentNumbersChanged($option, $oldValue, $newValue)
+    public function maybeAutoIncidentNumbersChanged(string $option, $oldValue, $newValue)
     {
         // Wir sind nur an einer bestimmten Option interessiert
         if ('einsatzverwaltung_incidentnumbers_auto' != $option) {
@@ -175,13 +209,18 @@ class ReportNumberController
      * müssen
      *
      * @param string $option Name der Option
-     * @param string $oldValue Der alte Wert
-     * @param string $newValue Der neue Wert
+     * @param mixed $oldValue Der alte Wert
+     * @param mixed $newValue Der neue Wert
      */
-    public function maybeIncidentNumberFormatChanged($option, $oldValue, $newValue)
+    public function maybeIncidentNumberFormatChanged(string $option, $oldValue, $newValue)
     {
         // Wir sind nur an bestimmten Optionen interessiert
-        if (!in_array($option, array('einsatzvw_einsatznummer_stellen', 'einsatzvw_einsatznummer_lfdvorne'))) {
+        $formatOptions = array(
+            'einsatzvw_einsatznummer_stellen',
+            'einsatzvw_einsatznummer_lfdvorne',
+            'einsatzvw_numbers_separator'
+        );
+        if (!in_array($option, $formatOptions)) {
             return;
         }
 

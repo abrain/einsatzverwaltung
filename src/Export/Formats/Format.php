@@ -11,7 +11,7 @@ interface Format
      *
      * @return  string
      */
-    public function getTitle();
+    public function getTitle(): string;
 
     /**
      * Gibt die Optionen im HTML-Format für dieses Exportformat aus.
@@ -25,11 +25,12 @@ interface Format
      * Die Inhalte im Array müssen überprüft werden, da es sich um Eingaben vom
      * Benutzer handelt.
      *
-     * @param   string  $startDate  Jahr und Monat im Format YYYY-MM oder 0
-     * @param   string  $endDate    Jahr und Monat im Format YYYY-MM oder 0
+     * @param string $startDate Jahr und Monat im Format YYYY-MM oder 0
+     * @param string $endDate Jahr und Monat im Format YYYY-MM oder 0
+     *
      * @return  void
      */
-    public function setFilters($startDate, $endDate);
+    public function setFilters(string $startDate, string $endDate);
     
     /**
      * Erwartet ein Array mit Optionen zum Konfigurieren des Exportformats.
@@ -46,7 +47,7 @@ interface Format
      *
      * @return  string
      */
-    public function getFilename();
+    public function getFilename(): string;
     
     /**
      * Gibt den Inhalt der Datei, die beim Export erstellt wird, aus.

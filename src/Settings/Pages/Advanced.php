@@ -1,9 +1,11 @@
 <?php
-
 namespace abrain\Einsatzverwaltung\Settings\Pages;
 
 use abrain\Einsatzverwaltung\PermalinkController;
+use abrain\Einsatzverwaltung\Utilities;
 use WP_Post;
+use function esc_html;
+use function esc_html__;
 
 /**
  * Settings page for advanced stuff
@@ -12,14 +14,11 @@ use WP_Post;
  */
 class Advanced extends SubPage
 {
-    private $permalinkOptions = array(
-        PermalinkController::DEFAULT_REPORT_PERMALINK => array(
-            'label' => 'Beitragstitel mit angeh&auml;ngtem Z&auml;hler (Standard)'
-        ),
-        '%post_id%-%postname_nosuffix%' => array(
-            'label' => 'Beitragsnummer und Beitragstitel ohne angeh&auml;ngten Z&auml;hler'
-        )
-    );
+    /**
+     * @var array[]
+     */
+    private $permalinkOptions;
+
     /**
      * @var PermalinkController
      */
@@ -35,6 +34,15 @@ class Advanced extends SubPage
         parent::__construct('advanced', __('Advanced', 'einsatzverwaltung'));
         $this->permalinkController = $permalinkController;
 
+        $this->permalinkOptions = [
+            PermalinkController::DEFAULT_REPORT_PERMALINK => [
+                'label' => __('Title with counter', 'einsatzverwaltung')
+            ],
+            '%post_id%-%postname_nosuffix%' => [
+                'label' => __('ID + title without counter', 'einsatzverwaltung')
+            ]
+        ];
+
         add_filter('pre_update_option_einsatzvw_rewrite_slug', array($this, 'maybeRewriteSlugChanged'), 10, 2);
     }
 
@@ -42,28 +50,28 @@ class Advanced extends SubPage
     {
         add_settings_field(
             'einsatzvw_permalinks_base',
-            'Basis',
+            __('Base', 'einsatzverwaltung'),
             array($this, 'echoFieldBase'),
             $this->settingsApiPage,
             'einsatzvw_settings_permalinks'
         );
         add_settings_field(
             'einsatzvw_permalinks_struct',
-            'URL-Struktur f&uuml;r Einsatzberichte',
+            __('URL structure for reports', 'einsatzverwaltung'),
             array($this, 'echoFieldUrlStructure'),
             $this->settingsApiPage,
             'einsatzvw_settings_permalinks'
         );
         add_settings_field(
             'einsatzvw_advreport_corefeatures',
-            'Beitragsfunktionen',
+            __('Post features', 'einsatzverwaltung'),
             array($this, 'echoFieldCoreFeatures'),
             $this->settingsApiPage,
             'einsatzvw_settings_advreport'
         );
         add_settings_field(
             'einsatzvw_advreport_gutenberg',
-            'Gutenberg',
+            __('Block editor', 'einsatzverwaltung'),
             array($this, 'echoFieldGutenberg'),
             $this->settingsApiPage,
             'einsatzvw_settings_advreport'
@@ -91,7 +99,10 @@ class Advanced extends SubPage
                     );
                     echo '</p>';
                 }
-                echo '<p>Eine &Auml;nderung der Permalinkstruktur hat zur Folge, dass bisherige Links auf Einsatzberichte nicht mehr funktionieren. Dem solltest du als Seitenbetreiber mit Weiterleitungen entgegenwirken.</p>';
+                printf(
+                    "<p>%s</p>",
+                    esc_html__('Changing the permalink structure breaks existing links to reports and archives. In case you are setting up the plugin for the first time, this is not a problem. If you have been using the plugin for some time, you should redirect the broken URLs to the working ones.', 'einsatzverwaltung')
+                );
             },
             $this->settingsApiPage
         );
@@ -128,9 +139,18 @@ class Advanced extends SubPage
         );
         echo '<p class="description">';
         printf(
-            'Basis f&uuml;r Links zu Einsatzberichten, zum %s und zum %s.',
-            sprintf('<a href="%s">%s</a>', get_post_type_archive_link('einsatz'), 'Archiv'),
-            sprintf('<a href="%s">%s</a>', get_post_type_archive_feed_link('einsatz'), 'Feed')
+            /* translators: 1: archive, 2: feed */
+            __('Base for links to single reports, the %s, and the %s.', 'einsatzverwaltung'),
+            sprintf(
+                '<a href="%s">%s</a>',
+                get_post_type_archive_link(\abrain\Einsatzverwaltung\Types\Report::getSlug()),
+                esc_html__('archive', 'einsatzverwaltung')
+            ),
+            sprintf(
+                '<a href="%s">%s</a>',
+                get_post_type_archive_feed_link(\abrain\Einsatzverwaltung\Types\Report::getSlug()),
+                esc_html__('feed', 'einsatzverwaltung')
+            )
         );
         echo '</p></fieldset>';
     }
@@ -147,7 +167,10 @@ class Advanced extends SubPage
             'einsatz_support_posttag',
             __('Tags', 'einsatzverwaltung')
         );
-        echo '<p class="description">Diese Funktionen, die du von Beitr&auml;gen kennst, k&ouml;nnen auch f&uuml;r Einsatzberichte aktiviert werden.</p>';
+        printf(
+            '<p class="description">%s</p>',
+            __('You can activate these features of Posts also for Incident Reports.', 'einsatzverwaltung')
+        );
         echo '</fieldset>';
     }
 
@@ -178,20 +201,11 @@ class Advanced extends SubPage
         );
         printf(
             __('By default, WordPress uses the post name to build the URL. To ensure uniqueness across posts, the post name can have a number appended if there are other posts with the same title (e.g. %1$s, %2$s, %3$s, ...).', 'einsatzverwaltung'),
-            $sampleSlug,
-            "$sampleSlug-2",
-            "$sampleSlug-3"
+            esc_html($sampleSlug),
+            esc_html("$sampleSlug-2"),
+            esc_html("$sampleSlug-3")
         );
         echo '</p></fieldset>';
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function echoStaticContent()
-    {
-        echo '<p>Die erweiterten Einstellungen k&ouml;nnen weitreichende Konsequenzen haben und sollten entsprechend nicht leichtfertig ge&auml;ndert werden.</p>';
-        return;
     }
 
     /**
@@ -200,7 +214,7 @@ class Advanced extends SubPage
      *
      * @return string
      */
-    private function getSampleUrl(WP_Post $post, $permalinkStructure)
+    private function getSampleUrl(WP_Post $post, $permalinkStructure): string
     {
         $selector = $this->permalinkController->buildSelector($post, $permalinkStructure);
         return $this->permalinkController->getPermalink($selector);
@@ -214,7 +228,7 @@ class Advanced extends SubPage
      * @param string $oldValue Der alte Wert
      * @return string Der zu speichernde Wert
      */
-    public function maybeRewriteSlugChanged($newValue, $oldValue)
+    public function maybeRewriteSlugChanged($newValue, $oldValue): string
     {
         if ($newValue != $oldValue) {
             self::$options->setFlushRewriteRules(true);
@@ -233,22 +247,22 @@ class Advanced extends SubPage
         register_setting(
             'einsatzvw_settings_advanced',
             'einsatz_permalink',
-            array('\abrain\Einsatzverwaltung\PermalinkController', 'sanitizePermalink')
+            array(PermalinkController::class, 'sanitizePermalink')
         );
         register_setting(
             'einsatzvw_settings_advanced',
             'einsatz_support_excerpt',
-            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            array(Utilities::class, 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_advanced',
             'einsatz_support_posttag',
-            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            array(Utilities::class, 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_advanced',
             'einsatz_disable_blockeditor',
-            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            array(Utilities::class, 'sanitizeCheckbox')
         );
     }
 }

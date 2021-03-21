@@ -1,7 +1,6 @@
 <?php
 namespace abrain\Einsatzverwaltung\Frontend;
 
-use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Model\ReportAnnotation;
 use abrain\Einsatzverwaltung\ReportAnnotationRepository;
 
@@ -39,7 +38,7 @@ class AnnotationIconBar
      *
      * @return AnnotationIconBar
      */
-    public static function getInstance()
+    public static function getInstance(): AnnotationIconBar
     {
         if (null === self::$instance) {
             self::$instance = new AnnotationIconBar();
@@ -51,13 +50,13 @@ class AnnotationIconBar
      * Generiert HTML-Code, der die Vermerke eines Einsatzberichts je nach Zustand des Vermerks als helle oder dunkle
      * Icons anzeigt
      *
-     * @param IncidentReport $report Der Einsatzbericht, dessen Vermerke angezeigt werden sollen
+     * @param int $postId
      * @param array $annotationIds Liste von Bezeichnern von Vermerken, die in dieser Reihenfolge gerendert werden
      * sollen. Bei einer leeren Liste werden alle bekannten Vermerke ausgegeben.
      *
      * @return string Der generierte HTML-Code
      */
-    public function render($report, $annotationIds = array())
+    public function render(int $postId, $annotationIds = array()): string
     {
         $annotationRepository = ReportAnnotationRepository::getInstance();
         $string = '';
@@ -92,7 +91,7 @@ class AnnotationIconBar
             $string .= $this->getAnnotationIcon(
                 $icon,
                 array($annotation->getLabelWhenInactive(), $annotation->getLabelWhenActive()),
-                $annotation->getStateForReport($report)
+                $annotation->getStateForReport($postId)
             );
         }
         return $string;
@@ -105,7 +104,7 @@ class AnnotationIconBar
      *
      * @return string
      */
-    private function getAnnotationIcon($icon, $titles, $state)
+    private function getAnnotationIcon($icon, $titles, $state): string
     {
         return sprintf(
             '<i class="%s" aria-hidden="true" title="%s" style="%s"></i>',
@@ -118,7 +117,7 @@ class AnnotationIconBar
     /**
      * @return string
      */
-    private function getAnnotationColorOff()
+    private function getAnnotationColorOff(): string
     {
         if (is_admin()) {
             return self::DEFAULT_COLOR_OFF;

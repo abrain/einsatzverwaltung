@@ -1,6 +1,7 @@
 <?php
-
 namespace abrain\Einsatzverwaltung\Settings\Pages;
+
+use abrain\Einsatzverwaltung\Utilities;
 
 /**
  * Capabilities settings page
@@ -78,7 +79,7 @@ class Capabilities extends SubPage
                 register_setting(
                     'einsatzvw_settings_capabilities',
                     'einsatzvw_cap_roles_' . $roleSlug,
-                    array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+                    array(Utilities::class, 'sanitizeCheckbox')
                 );
             }
         }

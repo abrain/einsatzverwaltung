@@ -93,9 +93,10 @@ class Initializer
             wp_enqueue_script(
                 'einsatzverwaltung-edit-script',
                 Core::$scriptUrl . 'einsatzverwaltung-edit.js',
-                array('jquery', 'jquery-ui-autocomplete'),
+                array('jquery', 'jquery-ui-autocomplete', 'wp-i18n'),
                 Core::VERSION
             );
+            wp_set_script_translations('einsatzverwaltung-edit-script', 'einsatzverwaltung');
             wp_enqueue_style(
                 'einsatzverwaltung-edit',
                 Core::$styleUrl . 'style-edit.css',
@@ -139,7 +140,7 @@ class Initializer
      *
      * @return array
      */
-    public function addReportsToDashboard($items)
+    public function addReportsToDashboard($items): array
     {
         $postType = 'einsatz';
         if (post_type_exists($postType)) {
@@ -172,7 +173,7 @@ class Initializer
      * @param string $file Name der Plugindatei
      * @return array Vervollständigte Liste mit Links
      */
-    public function pluginMetaLinks($links, $file)
+    public function pluginMetaLinks($links, $file): array
     {
         if (Core::$pluginBasename === $file) {
             $links[] = sprintf(
@@ -192,7 +193,7 @@ class Initializer
      *
      * @return array
      */
-    public function addActionLinks($links)
+    public function addActionLinks($links): array
     {
         $settingsPage = 'options-general.php?page=' . MainPage::EVW_SETTINGS_SLUG;
         $actionLinks = [
@@ -233,7 +234,7 @@ class Initializer
      *
      * @return bool
      */
-    public function useBlockEditorForReports($useBlockEditor, $postType)
+    public function useBlockEditorForReports($useBlockEditor, $postType): bool
     {
         if ($postType === Report::getSlug() && get_option('einsatz_disable_blockeditor', '0') === '1') {
             return false;

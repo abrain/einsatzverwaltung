@@ -1,6 +1,7 @@
 <?php
-
 namespace abrain\Einsatzverwaltung\Settings\Pages;
+
+use abrain\Einsatzverwaltung\Utilities;
 
 /**
  * Report settings page
@@ -196,27 +197,27 @@ class Report extends SubPage
         register_setting(
             'einsatzvw_settings_report',
             'einsatzvw_einsatz_hideemptydetails',
-            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            array(Utilities::class, 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_report',
             'einsatzvw_show_exteinsatzmittel_archive',
-            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            array(Utilities::class, 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_report',
             'einsatzvw_show_einsatzart_archive',
-            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            array(Utilities::class, 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_report',
             'einsatzvw_show_fahrzeug_archive',
-            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            array(Utilities::class, 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_report',
             'einsatzvw_open_ext_in_new',
-            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            array(Utilities::class, 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_report',
@@ -236,7 +237,7 @@ class Report extends SubPage
         register_setting(
             'einsatzvw_settings_report',
             'einsatzverwaltung_use_excerpttemplate',
-            array('\abrain\Einsatzverwaltung\Utilities', 'sanitizeCheckbox')
+            array(Utilities::class, 'sanitizeCheckbox')
         );
         register_setting(
             'einsatzvw_settings_report',
@@ -249,7 +250,7 @@ class Report extends SubPage
      * @param string $input
      * @return string
      */
-    public function sanitizeReportTemplateUsage($input)
+    public function sanitizeReportTemplateUsage($input): string
     {
         if (!in_array($input, array_keys($this->useReportTemplateOptions))) {
             return 'no';
@@ -262,7 +263,7 @@ class Report extends SubPage
      * @param string $input
      * @return string
      */
-    public function sanitizeTemplate($input)
+    public function sanitizeTemplate($input): string
     {
         return stripslashes(wp_filter_post_kses(addslashes($input)));
     }

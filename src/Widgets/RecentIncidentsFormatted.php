@@ -4,6 +4,8 @@ namespace abrain\Einsatzverwaltung\Widgets;
 use abrain\Einsatzverwaltung\ReportQuery;
 use abrain\Einsatzverwaltung\Types\Unit;
 use abrain\Einsatzverwaltung\Util\Formatter;
+use function esc_html__;
+use function esc_html_e;
 use function get_taxonomy;
 
 /**
@@ -140,8 +142,8 @@ class RecentIncidentsFormatted extends AbstractWidget
     );
     private $allowedTagsPattern = array('%title%', '%date%', '%time%', '%endTime%', '%location%', '%duration%',
         '%incidentCommander%', '%incidentType%', '%incidentTypeHierarchical%', '%incidentTypeColor%', '%url%',
-        '%number%', '%seqNum%', '%annotations%', '%vehicles%', '%units%', '%additionalForces%', '%typesOfAlerting%',
-        '%featuredImage%', '%featuredImageThumbnail%', '%workforce%');
+        '%number%', '%seqNum%', '%annotations%', '%vehicles%', '%vehiclesByUnit%', '%units%', '%additionalForces%',
+        '%typesOfAlerting%', '%featuredImage%', '%featuredImageThumbnail%', '%workforce%');
     private $allowedTagsAfter = array('%feedUrl%', '%yearArchive%');
 
     /**
@@ -152,9 +154,9 @@ class RecentIncidentsFormatted extends AbstractWidget
     {
         parent::__construct(
             'recent-incidents-formatted',
-            'Letzte Eins&auml;tze (eigenes Format)',
+            __('Recent Incident Reports (Templates)', 'einsatzverwaltung'),
             array(
-                'description' => 'Zeigt die neuesten Eins&auml;tze an. Das Aussehen kann vollst&auml;ndig mit eigenem HTML bestimmt werden.',
+                'description' => __('The the most recent Incident Reports. Layout can be customized with HTML and placeholders.', 'einsatzverwaltung'),
                 'customize_selective_refresh' => true,
             )
         );
@@ -170,17 +172,14 @@ class RecentIncidentsFormatted extends AbstractWidget
     public function widget($args, $instance)
     {
         $settings = wp_parse_args($instance, $this->defaults);
-
-        if (empty($settings['title'])) {
-            $settings['title'] = 'Letzte Eins&auml;tze';
-        }
+        $title = empty($settings['title']) ? __('Recent incidents', 'einsatzverwaltung') : $settings['title'];
 
         if (empty($settings['numIncidents'])) {
             $settings['numIncidents'] = $this->defaults['numIncidents'];
         }
 
         echo $args['before_widget'];
-        echo $args['before_title'] . apply_filters('widget_title', $settings['title']) . $args['after_title'];
+        echo $args['before_title'] . apply_filters('widget_title', $title) . $args['after_title'];
 
         $reportQuery = new ReportQuery();
         $reportQuery->setOrderAsc(false);
@@ -209,7 +208,7 @@ class RecentIncidentsFormatted extends AbstractWidget
      *
      * @return array Die zu speichernden Einstellungen oder false um das Speichern abzubrechen
      */
-    public function update($newInstance, $oldInstance)
+    public function update($newInstance, $oldInstance): array
     {
         $instance = array();
         $instance['title'] = strip_tags($newInstance['title']);
@@ -236,7 +235,7 @@ class RecentIncidentsFormatted extends AbstractWidget
      *
      * @return string HTML-Code für das Formular
      */
-    public function form($instance)
+    public function form($instance): string
     {
         $values = wp_parse_args($instance, $this->defaults);
 
@@ -244,7 +243,7 @@ class RecentIncidentsFormatted extends AbstractWidget
         printf(
             '<label for="%1$s">%2$s</label><input class="widefat" id="%1$s" name="%3$s" type="text" value="%4$s" />',
             $this->get_field_id('title'),
-            'Titel:',
+            esc_html__('Title:', 'einsatzverwaltung'),
             $this->get_field_name('title'),
             esc_attr($values['title'])
         );
@@ -254,7 +253,7 @@ class RecentIncidentsFormatted extends AbstractWidget
         printf(
             '<label for="%1$s">%2$s</label>&nbsp;<input id="%1$s" name="%3$s" type="text" value="%4$s" size="3" />',
             $this->get_field_id('numIncidents'),
-            'Anzahl der Einsatzberichte, die angezeigt werden:',
+            esc_html__('Number of reports to show:', 'einsatzverwaltung'),
             $this->get_field_name('numIncidents'),
             esc_attr($values['numIncidents'])
         );
@@ -272,7 +271,7 @@ class RecentIncidentsFormatted extends AbstractWidget
         printf(
             '<label for="%1$s">%2$s</label><textarea class="widefat" id="%1$s" name="%3$s">%4$s</textarea>',
             $this->get_field_id('beforeContent'),
-            'HTML-Code vor den Einsatzberichten:',
+            esc_html__('HTML code before the reports:', 'einsatzverwaltung'),
             $this->get_field_name('beforeContent'),
             esc_textarea($values['beforeContent'])
         );
@@ -282,7 +281,7 @@ class RecentIncidentsFormatted extends AbstractWidget
         printf(
             '<label for="%1$s">%2$s</label><textarea class="widefat" id="%1$s" name="%3$s">%4$s</textarea>',
             $this->get_field_id('pattern'),
-            'HTML-Template pro Einsatzbericht:',
+            esc_html__('HTML template per report:', 'einsatzverwaltung'),
             $this->get_field_name('pattern'),
             esc_textarea($values['pattern'])
         );
@@ -293,7 +292,7 @@ class RecentIncidentsFormatted extends AbstractWidget
         printf(
             '<label for="%1$s">%2$s</label><textarea class="widefat" id="%1$s" name="%3$s">%4$s</textarea>',
             $this->get_field_id('afterContent'),
-            'HTML-Code nach den Einsatzberichten:',
+            esc_html__('HTML code after the reports:', 'einsatzverwaltung'),
             $this->get_field_name('afterContent'),
             esc_textarea($values['afterContent'])
         );
@@ -309,7 +308,7 @@ class RecentIncidentsFormatted extends AbstractWidget
     private function printTagReplacementInfo($allowedTags)
     {
         echo '<br><small>';
-        _e('The following tags will be replaced:', 'einsatzverwaltung');
+        esc_html_e('The following tags will be replaced:', 'einsatzverwaltung');
         foreach ($allowedTags as $tag) {
             printf('<br><strong>%s</strong> (%s)', esc_html($tag), esc_html($this->formatter->getLabelForTag($tag)));
         }

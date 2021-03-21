@@ -12,7 +12,7 @@ class Excel extends Csv
     /**
      * @inheritDoc
      */
-    public function getTitle()
+    public function getTitle(): string
     {
         return 'CSV für Microsoft Excel';
     }

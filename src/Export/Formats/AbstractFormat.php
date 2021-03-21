@@ -25,7 +25,7 @@ abstract class AbstractFormat implements Format
     /**
      * @inheritDoc
      */
-    public function setFilters($startDate, $endDate)
+    public function setFilters(string $startDate, string $endDate)
     {
         $this->startDate = $startDate;
         $this->endDate = $endDate;
@@ -37,7 +37,7 @@ abstract class AbstractFormat implements Format
      *
      * @return WP_Query
      */
-    protected function getQuery()
+    protected function getQuery(): WP_Query
     {
         // Wähle nur veröffentlichte Einsatzberichte aus
         $args = array(
@@ -67,7 +67,7 @@ abstract class AbstractFormat implements Format
      *
      * @return array
      */
-    protected function getColumnNames()
+    protected function getColumnNames(): array
     {
         return array(
             'Einsatznummer',
@@ -93,7 +93,7 @@ abstract class AbstractFormat implements Format
      * @param WP_Post $post
      * @return array
      */
-    protected function getValuesForReport(WP_Post $post)
+    protected function getValuesForReport(WP_Post $post): array
     {
         $report = new IncidentReport($post);
 
@@ -127,7 +127,7 @@ abstract class AbstractFormat implements Format
      * @param WP_Post|WP_Term $object
      * @return string
      */
-    private function getName($object)
+    private function getName($object): string
     {
         if ($object instanceof WP_Term) {
             return $object->name;
@@ -140,13 +140,15 @@ abstract class AbstractFormat implements Format
 
     /**
      * @param array $array
+     *
      * @return mixed
      */
-    abstract protected function getArrayRepresentation($array);
+    abstract protected function getArrayRepresentation(array $array);
 
     /**
      * @param bool $bool
+     *
      * @return mixed
      */
-    abstract protected function getBooleanRepresentation($bool);
+    abstract protected function getBooleanRepresentation(bool $bool);
 }

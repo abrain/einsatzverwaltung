@@ -17,7 +17,7 @@ class Json extends AbstractFormat
     /**
      * @inheritDoc
      */
-    public function getTitle()
+    public function getTitle(): string
     {
         return 'JSON';
     }
@@ -40,7 +40,7 @@ class Json extends AbstractFormat
     /**
      * @inheritDoc
      */
-    public function getFilename()
+    public function getFilename(): string
     {
         return 'Einsatzberichte.json';
     }
@@ -107,18 +107,20 @@ class Json extends AbstractFormat
 
     /**
      * @param bool $bool
+     *
      * @return mixed
      */
-    protected function getBooleanRepresentation($bool)
+    protected function getBooleanRepresentation(bool $bool): bool
     {
         return $bool;
     }
 
     /**
      * @param array $array
+     *
      * @return mixed
      */
-    protected function getArrayRepresentation($array)
+    protected function getArrayRepresentation(array $array): array
     {
         return $array;
     }

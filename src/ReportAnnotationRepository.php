@@ -35,7 +35,7 @@ class ReportAnnotationRepository
      *
      * @return ReportAnnotationRepository
      */
-    public static function getInstance()
+    public static function getInstance(): ReportAnnotationRepository
     {
         if (null === self::$instance) {
             self::$instance = new ReportAnnotationRepository();
@@ -55,7 +55,7 @@ class ReportAnnotationRepository
     /**
      * @return ReportAnnotation[]
      */
-    public function getAnnotations()
+    public function getAnnotations(): array
     {
         return $this->annotations;
     }
@@ -63,7 +63,7 @@ class ReportAnnotationRepository
     /**
      * @return string[]
      */
-    public function getAnnotationIdentifiers()
+    public function getAnnotationIdentifiers(): array
     {
         return array_keys($this->annotations);
     }

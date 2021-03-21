@@ -137,7 +137,8 @@ class Tool
             <ul id="<?php echo $formatKey; ?>-options" class="export-options export-filters" style="display: none;">
                 <?php $format->renderOptions(); ?>
             </ul>
-        <?php } ?>
+            <?php
+        } ?>
     </fieldset>
 
         <?php submit_button('Export-Datei herunterladen'); ?>

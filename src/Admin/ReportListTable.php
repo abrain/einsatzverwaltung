@@ -21,7 +21,7 @@ class ReportListTable
      *
      * @var array
      */
-    private $customColumns = array();
+    private $customColumns;
 
     /**
      * ReportListTable constructor.
@@ -72,7 +72,7 @@ class ReportListTable
      *
      * @return array
      */
-    public function filterColumnsEinsatz($columns)
+    public function filterColumnsEinsatz($columns): array
     {
         unset($columns['author']);
         unset($columns['date']);
@@ -96,7 +96,7 @@ class ReportListTable
     {
         $report = new IncidentReport($postId);
         $content = $this->getColumnContent($column, $report);
-        echo (empty($content) ? '-' : $content);
+        echo empty($content) ? '-' : $content;
     }
 
     /**
@@ -105,7 +105,7 @@ class ReportListTable
      *
      * @return string
      */
-    public function getColumnContent($columnId, IncidentReport $report)
+    public function getColumnContent($columnId, IncidentReport $report): string
     {
         switch ($columnId) {
             case 'e_nummer':
@@ -136,7 +136,7 @@ class ReportListTable
                 $vehicleLinks = array_map(array($this, 'getTermFilterLink'), $vehicles);
                 return join(', ', $vehicleLinks);
             case 'einsatzverwaltung_annotations':
-                return AnnotationIconBar::getInstance()->render($report);
+                return AnnotationIconBar::getInstance()->render($report->getPostId());
             case 'einsatzverwaltung_units':
                 $units = $report->getUnits();
                 $unitLinks = array_map(array($this, 'getTermFilterLink'), $units);
@@ -150,7 +150,7 @@ class ReportListTable
      * @param WP_Term|null $term
      * @return string An HTML anchor to filter this list table for occurrences of a certain term
      */
-    private function getTermFilterLink(WP_Term $term = null)
+    private function getTermFilterLink(WP_Term $term = null): string
     {
         if (empty($term)) {
             return '';
@@ -220,7 +220,7 @@ class ReportListTable
      *
      * @return bool
      */
-    private function columnHasCustomBox($columnName)
+    private function columnHasCustomBox($columnName): bool
     {
         return array_key_exists($columnName, $this->customColumns) && $this->customColumns[$columnName]['quickedit'];
     }
@@ -232,7 +232,7 @@ class ReportListTable
      *
      * @return string
      */
-    private function getColumnLabel($columnName)
+    private function getColumnLabel($columnName): string
     {
         if (!array_key_exists($columnName, $this->customColumns)) {
             return '';

@@ -1,0 +1,50 @@
+kind: pipeline
+type: docker
+name: unit-tests
+
+steps:
+  - name: check-pr-branch-name
+    image: alpine
+    commands:
+      - ./bin/check-branch-name.sh
+    when:
+      event:
+        include:
+          - pull_request
+  - name: install
+    image: composer
+    commands:
+      - composer install --ignore-platform-reqs
+  - name: test
+    image: php:7
+    environment:
+      CC_TEST_REPORTER_ID:
+        from_secret: cc_test_reporter_id
+    commands:
+      - apt-get update && apt-get install -y zlib1g-dev libicu-dev g++ git
+      - docker-php-ext-configure intl
+      - docker-php-ext-install intl
+      - ./vendor/bin/phpunit -c phpunit-checks.xml --no-coverage
+      - pecl install xdebug
+      - docker-php-ext-enable xdebug
+      - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+      - chmod +x ./cc-test-reporter
+      - ./cc-test-reporter before-build
+      - XDEBUG_MODE=coverage ./vendor/bin/phpunit -c phpunit.xml
+      - ./bin/report-code-coverage.sh
+  - name: slack
+    image: plugins/slack
+    settings:
+      webhook:
+        from_secret: slack_hook
+    when:
+      status:
+        - failure
+      event:
+        exclude:
+          - pull_request
+
+trigger:
+  branch:
+    exclude:
+      - feature/*

@@ -4,14 +4,20 @@ namespace abrain\Einsatzverwaltung\Model;
 
 use abrain\Einsatzverwaltung\Types\Unit;
 use abrain\Einsatzverwaltung\Types\Vehicle;
+use abrain\Einsatzverwaltung\Utilities;
 use DateTime;
 use WP_Post;
 use WP_Term;
+use function array_key_exists;
+use function array_keys;
 use function get_post;
 use function get_post_type;
 use function error_log;
+use function get_the_terms;
 use function intval;
 use function is_numeric;
+use function is_wp_error;
+use function usort;
 
 /**
  * Datenmodellklasse für Einsatzberichte
@@ -53,7 +59,7 @@ class IncidentReport
      *
      * @return string Die Beschriftung oder $field, wenn es das Feld nicht gibt
      */
-    public static function getFieldLabel($field)
+    public static function getFieldLabel($field): string
     {
         $fields = self::getFields();
         return (array_key_exists($field, $fields) ? $fields[$field]['label'] : $field);
@@ -63,7 +69,7 @@ class IncidentReport
      * Gibt ein Array aller Felder und deren Namen zurück,
      * Hauptverwendungszweck ist das Mapping beim Import
      */
-    public static function getFields()
+    public static function getFields(): array
     {
         return array_merge(self::getMetaFields(), self::getTerms(), self::getPostFields());
     }
@@ -73,7 +79,7 @@ class IncidentReport
      *
      * @return array
      */
-    public static function getMetaFields()
+    public static function getMetaFields(): array
     {
         return array(
             'einsatz_einsatzort' => array(
@@ -134,7 +140,7 @@ class IncidentReport
      *
      * @return array
      */
-    public static function getTerms()
+    public static function getTerms(): array
     {
         return array(
             'alarmierungsart' => array(
@@ -157,7 +163,7 @@ class IncidentReport
      *
      * @return array
      */
-    public static function getPostFields()
+    public static function getPostFields(): array
     {
         return array(
             'post_date' => array(
@@ -175,7 +181,7 @@ class IncidentReport
     /**
      * @return array
      */
-    public function getAdditionalForces()
+    public function getAdditionalForces(): array
     {
         return $this->getTheTerms('exteinsatzmittel');
     }
@@ -185,7 +191,7 @@ class IncidentReport
      *
      * @return string
      */
-    public function getIncidentCommander()
+    public function getIncidentCommander(): string
     {
         return $this->getPostMeta('einsatz_einsatzleiter');
     }
@@ -195,7 +201,7 @@ class IncidentReport
      *
      * @return string
      */
-    public function getLocation()
+    public function getLocation(): string
     {
         return $this->getPostMeta('einsatz_einsatzort');
     }
@@ -205,7 +211,7 @@ class IncidentReport
      *
      * @return string
      */
-    public function getNumber()
+    public function getNumber(): string
     {
         return $this->getPostMeta('einsatz_incidentNumber');
     }
@@ -223,7 +229,7 @@ class IncidentReport
      *
      * @return string
      */
-    private function getPostMeta($key)
+    private function getPostMeta($key): string
     {
         if (empty($this->post)) {
             return '';
@@ -241,9 +247,9 @@ class IncidentReport
     /**
      * Gibt die laufende Nummer des Einsatzberichts bezogen auf das Kalenderjahr zurück
      *
-     * @return mixed
+     * @return string
      */
-    public function getSequentialNumber()
+    public function getSequentialNumber(): string
     {
         return $this->getPostMeta('einsatz_seqNum');
     }
@@ -290,7 +296,7 @@ class IncidentReport
      *
      * @return string
      */
-    public function getTimeOfEnding()
+    public function getTimeOfEnding(): string
     {
         return $this->getPostMeta('einsatz_einsatzende');
     }
@@ -298,9 +304,9 @@ class IncidentReport
     /**
      * Gibt das Term-Objekt der Alarmierungsart zurück
      *
-     * @return array
+     * @return WP_Term[]
      */
-    public function getTypesOfAlerting()
+    public function getTypesOfAlerting(): array
     {
         return $this->getTheTerms('alarmierungsart');
     }
@@ -313,7 +319,7 @@ class IncidentReport
      *
      * @return WP_Term[] Die Terms oder ein leeres Array
      */
-    private function getTheTerms($taxonomy)
+    private function getTheTerms(string $taxonomy): array
     {
         if (empty($this->post)) {
             return array();
@@ -334,7 +340,7 @@ class IncidentReport
      *
      * @return WP_Term
      */
-    public function getTypeOfIncident()
+    public function getTypeOfIncident(): ?WP_Term
     {
         $terms = $this->getTheTerms('einsatzart');
 
@@ -351,7 +357,9 @@ class IncidentReport
      */
     public function getUnits(): array
     {
-        return $this->getTheTerms(Unit::getSlug());
+        $units = $this->getTheTerms(Unit::getSlug());
+        usort($units, array(Unit::class, 'compare'));
+        return $units;
     }
 
     /**
@@ -359,9 +367,9 @@ class IncidentReport
      *
      * @return WP_Term[]
      */
-    public function getVehicles()
+    public function getVehicles(): array
     {
-        $vehicles = $this->getTheTerms('fahrzeug');
+        $vehicles = $this->getTheTerms(Vehicle::getSlug());
 
         if (empty($vehicles)) {
             return array();
@@ -372,10 +380,20 @@ class IncidentReport
         return $vehicles;
     }
 
+    public function getVehiclesByUnit(): array
+    {
+        $vehicles = $this->getTheTerms(Vehicle::getSlug());
+        if (empty($vehicles)) {
+            return [];
+        }
+
+        return Utilities::groupVehiclesByUnit($vehicles);
+    }
+
     /**
      * @return int The weight of the report (i. e. how many reports it represents)
      */
-    public function getWeight()
+    public function getWeight(): int
     {
         $weight = $this->getPostMeta('einsatz_weight');
         if (empty($weight) || !is_numeric($weight)) {
@@ -390,7 +408,7 @@ class IncidentReport
      *
      * @return string
      */
-    public function getWorkforce()
+    public function getWorkforce(): string
     {
         return $this->getPostMeta('einsatz_mannschaft');
     }
@@ -400,7 +418,7 @@ class IncidentReport
      *
      * @return bool
      */
-    public function hasContent()
+    public function hasContent(): bool
     {
         return !empty($this->post->post_content);
     }
@@ -410,7 +428,7 @@ class IncidentReport
      *
      * @return bool
      */
-    public function hasImages()
+    public function hasImages(): bool
     {
         return ($this->getPostMeta('einsatz_hasimages') == 1);
     }
@@ -420,7 +438,7 @@ class IncidentReport
      *
      * @return bool
      */
-    public function isDraft()
+    public function isDraft(): bool
     {
         return in_array($this->post->post_status, array('draft', 'pending', 'auto-draft'));
     }
@@ -430,7 +448,7 @@ class IncidentReport
      *
      * @return bool
      */
-    public function isFalseAlarm()
+    public function isFalseAlarm(): bool
     {
         return ($this->getPostMeta('einsatz_fehlalarm') == 1);
     }
@@ -440,7 +458,7 @@ class IncidentReport
      *
      * @return bool
      */
-    public function isSpecial()
+    public function isSpecial(): bool
     {
         return ($this->getPostMeta('einsatz_special') == 1);
     }
@@ -450,7 +468,7 @@ class IncidentReport
      *
      * @return bool
      */
-    private function isFuture()
+    private function isFuture(): bool
     {
         return $this->post->post_status === 'future';
     }
@@ -460,7 +478,7 @@ class IncidentReport
      *
      * @param int $category Die ID der Kategorie
      */
-    public function addToCategory($category)
+    public function addToCategory(int $category)
     {
         wp_set_post_categories($this->getPostId(), $category, true);
     }

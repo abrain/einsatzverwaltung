@@ -4,6 +4,8 @@ namespace abrain\Einsatzverwaltung\Settings\Pages;
 
 use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\Settings\MainPage;
+use function esc_html;
+use function sprintf;
 
 /**
  * Base class for a sub page of the plugin settings
@@ -54,7 +56,6 @@ abstract class SubPage
      */
     public function beforeContent()
     {
-        return;
     }
 
     /**
@@ -105,7 +106,11 @@ abstract class SubPage
     {
         $currentValue = get_option($name, $defaultValue);
         foreach ($options as $value => $option) {
-            $label = esc_html($option['label']);
+            if ($value === $defaultValue) {
+                $label = esc_html(sprintf(__('%s (default)', 'einsatzverwaltung'), $option['label']));
+            } else {
+                $label = esc_html($option['label']);
+            }
             if (array_key_exists('code', $option) && !empty($option['code'])) {
                 $label .= sprintf('<code>%s</code>', esc_html($option['code']));
             }
@@ -179,7 +184,6 @@ abstract class SubPage
      */
     public function echoStaticContent()
     {
-        return;
     }
 
     /**
@@ -188,7 +192,7 @@ abstract class SubPage
      *
      * @return bool
      */
-    public function hasForm()
+    public function hasForm(): bool
     {
         return true;
     }

@@ -44,9 +44,9 @@ class ReportNumberController
      * @param int $metaId ID des postmeta-Eintrags
      * @param int $objectId Post-ID
      * @param string $metaKey Der Key des postmeta-Eintrags
-     * @param string $metaValue Der Wert des postmeta-Eintrags
+     * @param mixed $metaValue Der Wert des postmeta-Eintrags
      */
-    public function onPostMetaChanged(int $metaId, int $objectId, string $metaKey, string $metaValue)
+    public function onPostMetaChanged(int $metaId, int $objectId, string $metaKey, $metaValue)
     {
         // Bail, if this is not about reports
         if (get_post_type($objectId) !== 'einsatz') {

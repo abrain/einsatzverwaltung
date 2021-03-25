@@ -295,7 +295,7 @@ class ReportEditScreen extends EditScreen
         }
 
         echo '<div>';
-        if (Unit::isActivelyUsed()) {
+        if (Unit::hasTerms()) {
             $this->echoVehiclesByUnit($post, $vehicleTaxonomy, $inServiceVehicles, $assignedVehicleIds);
         } else {
             // Sort the vehicles according to the custom order numbers

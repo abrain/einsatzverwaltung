@@ -4,11 +4,12 @@ namespace abrain\Einsatzverwaltung;
 use abrain\Einsatzverwaltung\Types\Unit;
 use abrain\Einsatzverwaltung\Types\Vehicle;
 use WP_Term;
-use function array_filter;
+use function array_fill_keys;
 use function array_key_exists;
 use function array_keys;
 use function array_map;
 use function get_term_meta;
+use function get_terms;
 use function usort;
 
 /**
@@ -35,43 +36,39 @@ class Utilities
      *
      * @param WP_Term[] $vehicles
      *
-     * @return array
+     * @return array Array keyed by unit ID with arrays of vehicles as values. The keys and the vehicles arrays are
+     * sorted by the user defined order. Units without vehicles are included and have an empty array as value, vehicles
+     * without units are put into the array of key -1, which always comes last.
      */
     public static function groupVehiclesByUnit(array $vehicles): array
     {
-        $grouped = [];
+        // Get and sort the units
+        $units = get_terms(['taxonomy' => Unit::getSlug(), 'hide_empty' => false]);
+        usort($units, array(Unit::class, 'compare'));
+
+        // Initialize the array with empty lists per unit ID
+        $vehiclesByUnit = array_fill_keys(array_map(function ($unit) {
+            return $unit->term_id;
+        }, $units), []);
+
+        // Add vehicles to their respective unit list
         foreach ($vehicles as $vehicle) {
             $unitId = get_term_meta($vehicle->term_id, 'vehicle_unit', true);
             if (empty($unitId)) {
                 $unitId = -1;
             }
-            if (!array_key_exists($unitId, $grouped)) {
-                $grouped[$unitId] = [];
+            if (!array_key_exists($unitId, $vehiclesByUnit)) {
+                $vehiclesByUnit[$unitId] = [];
             }
-            $grouped[$unitId][] = $vehicle;
-        }
-
-        // Sort the units
-        $unitIds = array_keys($grouped);
-        /** @var WP_Term[] $units */
-        $units = array_map('get_term', array_filter($unitIds, function ($unitId) {
-            return $unitId > 0;
-        }));
-        usort($units, array(Unit::class, 'compare'));
-        $groupedAndSorted = [];
-        foreach ($units as $unit) {
-            $groupedAndSorted[$unit->term_id] = $grouped[$unit->term_id];
-        }
-        if (array_key_exists(-1, $grouped)) {
-            $groupedAndSorted[-1] = $grouped[-1];
+            $vehiclesByUnit[$unitId][] = $vehicle;
         }
 
         // Sort the vehicles per unit
-        foreach ($unitIds as $unitId) {
-            usort($groupedAndSorted[$unitId], array(Vehicle::class, 'compareVehicles'));
+        foreach (array_keys($vehiclesByUnit) as $unitId) {
+            usort($vehiclesByUnit[$unitId], array(Vehicle::class, 'compareVehicles'));
         }
 
-        return $groupedAndSorted;
+        return $vehiclesByUnit;
     }
 
     /**

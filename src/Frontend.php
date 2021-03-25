@@ -122,7 +122,7 @@ class Frontend
         $headerstring .= $this->getDetailString('Einsatzleiter', $report->getIncidentCommander());
         $headerstring .= $this->getDetailString('Mannschaftsst&auml;rke', $report->getWorkforce());
 
-        // If at least one unit has been assigned to any report, show the vehicles grouped by unit
+        // If both units and vehicles have been assigned to any report in the past, show the vehicles grouped by unit
         if (Unit::isActivelyUsed() && Vehicle::isActivelyUsed()) {
             $headerstring .= $this->getDetailString(
                 __('Units and Vehicles', 'einsatzverwaltung'),

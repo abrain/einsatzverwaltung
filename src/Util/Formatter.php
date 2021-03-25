@@ -437,11 +437,18 @@ class Formatter
             }
 
             $unit = get_term($unitId, Unit::getSlug());
-            $string .= sprintf(
-                '<li><strong>%s:</strong> %s</li>',
-                $this->getUnitNameWithLink($unit),
-                $this->getVehicleString($vehicles, true, true)
-            );
+            if (empty($vehicles)) {
+                $string .= sprintf(
+                    '<li><b>%s</b></li>',
+                    $this->getUnitNameWithLink($unit)
+                );
+            } else {
+                $string .= sprintf(
+                    '<li><b>%s:</b> %s</li>',
+                    $this->getUnitNameWithLink($unit),
+                    $this->getVehicleString($vehicles, true, true)
+                );
+            }
         }
         $string .= '</ul>';
         return $string;

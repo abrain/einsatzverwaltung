@@ -5,7 +5,7 @@ Tags: Feuerwehr, fire department, EMS
 Requires at least: 5.1.0
 Tested up to: 5.7
 Requires PHP: 7.1.0
-Stable tag: 1.9.1
+Stable tag: 1.9.2
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -51,6 +51,9 @@ Ideally, you check the issues on [GitHub](https://github.com/abrain/einsatzverwa
 Yes, you can find them on [our website](https://einsatzverwaltung.abrain.de/faq/).
 
 == Changelog ==
+
+= 1.9.2 =
+* Fix: Units without vehicles could not be selected in the editor
 
 = 1.9.1 =
 * Fix: Too narrow PHP type check prevented creation of other post types

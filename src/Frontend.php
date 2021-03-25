@@ -5,10 +5,12 @@ use abrain\Einsatzverwaltung\Frontend\ReportList\Renderer as ReportListRenderer;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Types\Report;
 use abrain\Einsatzverwaltung\Types\Unit;
+use abrain\Einsatzverwaltung\Types\Vehicle;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use WP_Post;
 use WP_Query;
 use function date_i18n;
+use function in_array;
 use function sprintf;
 use function wp_kses;
 
@@ -121,9 +123,9 @@ class Frontend
         $headerstring .= $this->getDetailString('Mannschaftsst&auml;rke', $report->getWorkforce());
 
         // If at least one unit has been assigned to any report, show the vehicles grouped by unit
-        if (Unit::isActivelyUsed()) {
+        if (Unit::isActivelyUsed() && Vehicle::isActivelyUsed()) {
             $headerstring .= $this->getDetailString(
-                __('Vehicles', 'einsatzverwaltung'),
+                __('Units and Vehicles', 'einsatzverwaltung'),
                 $this->formatter->getVehiclesByUnitString($report->getVehiclesByUnit()),
                 false
             );
@@ -131,6 +133,10 @@ class Frontend
             $headerstring .= $this->getDetailString(
                 __('Vehicles', 'einsatzverwaltung'),
                 $this->formatter->getVehicleString($report->getVehicles(), $mayContainLinks, $showArchiveLinks)
+            );
+            $headerstring .= $this->getDetailString(
+                __('Units', 'einsatzverwaltung'),
+                $this->formatter->getUnits($report, $mayContainLinks)
             );
         }
 

@@ -13,7 +13,9 @@ use function array_key_exists;
 use function esc_html;
 use function esc_url;
 use function get_term_meta;
+use function get_terms;
 use function get_the_title;
+use function is_numeric;
 use function strcasecmp;
 use function url_to_postid;
 
@@ -107,6 +109,12 @@ class Vehicle implements CustomTaxonomy
     public function getRewriteSlug(): string
     {
         return self::getSlug();
+    }
+
+    public static function isActivelyUsed(): bool
+    {
+        $vehicleCount = get_terms(['taxonomy' => self::getSlug(), 'fields' => 'count']);
+        return is_numeric($vehicleCount) && $vehicleCount > 0;
     }
 
     /**

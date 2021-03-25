@@ -95,7 +95,7 @@ class ReportEditScreen extends EditScreen
         );
         add_meta_box(
             'fahrzeugdiv',
-            __('Vehicles', 'einsatzverwaltung'),
+            __('Units and Vehicles', 'einsatzverwaltung'),
             array($this, 'displayMetaBoxVehicles'),
             $this->customTypeSlug,
             'side',
@@ -362,6 +362,12 @@ class ReportEditScreen extends EditScreen
                     esc_html($unit->name)
                 );
             }
+
+            if (empty($unitVehicles)) {
+                echo '<br>';
+                continue;
+            }
+
             echo '<ul style="margin-left: 1.5em;">';
             $this->echoTermCheckboxes($unitVehicles, $vehicleTaxonomy, $assignedVehicleIds);
             echo '</ul>';

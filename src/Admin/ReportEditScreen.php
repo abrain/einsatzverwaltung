@@ -295,7 +295,7 @@ class ReportEditScreen extends EditScreen
         }
 
         echo '<div>';
-        if (Unit::isActivelyUsed()) {
+        if (Unit::hasTerms()) {
             $this->echoVehiclesByUnit($post, $vehicleTaxonomy, $inServiceVehicles, $assignedVehicleIds);
         } else {
             // Sort the vehicles according to the custom order numbers
@@ -351,7 +351,7 @@ class ReportEditScreen extends EditScreen
 
         foreach (Utilities::groupVehiclesByUnit($vehicles) as $unitId => $unitVehicles) {
             if ($unitId === -1) {
-                printf('<p><b>%s</b></p>', esc_html__('Without Unit', 'einsatzverwaltung'));
+                printf('<p style="margin-top: 13px;"><b>%s</b></p>', esc_html__('Without Unit', 'einsatzverwaltung'));
             } else {
                 $unit = get_term($unitId, Unit::getSlug());
                 printf(

@@ -11,7 +11,7 @@ use function add_action;
  */
 class Core
 {
-    const VERSION = '1.9.2';
+    const VERSION = '1.9.3';
     const DB_VERSION = 60;
 
     /**

@@ -9,7 +9,9 @@ use abrain\Einsatzverwaltung\Types\Vehicle;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use WP_Post;
 use WP_Query;
+use function add_filter;
 use function date_i18n;
+use function get_post_type;
 use function in_array;
 use function sprintf;
 use function wp_kses;
@@ -182,10 +184,10 @@ class Frontend
      */
     public function renderContent(string $content): string
     {
-        global $post;
+        $post = get_post();
 
-        // Wenn Beiträge durch ein Passwort geschützt sind, werden auch keine Einsatzdetails preisgegeben
-        if (post_password_required()) {
+        // Bail, if the post object is empty, not a report, or the content is password protected
+        if (empty($post) || get_post_type($post) !== Report::getSlug() || post_password_required($post)) {
             return $content;
         }
 

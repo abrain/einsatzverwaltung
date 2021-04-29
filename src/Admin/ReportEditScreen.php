@@ -267,12 +267,15 @@ class ReportEditScreen extends EditScreen
             return;
         }
 
+        // Determine if units should be shown
+        $showUnits = Unit::hasTerms();
+
         $allVehicles = get_terms(array(
             'taxonomy' => Vehicle::getSlug(),
             'hide_empty' => false
         ));
-        if (empty($allVehicles)) {
-            printf("<div>%s</div>", esc_html($vehicleTaxonomy->labels->no_terms));
+        if (empty($allVehicles) && !$showUnits) {
+            printf("<div>%s</div>", esc_html__('No units and no vehicles', 'einsatzverwaltung'));
             return;
         }
 
@@ -295,7 +298,7 @@ class ReportEditScreen extends EditScreen
         }
 
         echo '<div>';
-        if (Unit::hasTerms()) {
+        if ($showUnits) {
             $this->echoVehiclesByUnit($post, $vehicleTaxonomy, $inServiceVehicles, $assignedVehicleIds);
         } else {
             // Sort the vehicles according to the custom order numbers

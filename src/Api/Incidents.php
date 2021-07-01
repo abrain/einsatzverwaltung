@@ -1,0 +1,110 @@
+<?php
+namespace abrain\Einsatzverwaltung\Api;
+
+use abrain\Einsatzverwaltung\Types\Report;
+use DateTime;
+use DateTimeZone;
+use WP_REST_Controller;
+use WP_REST_Request;
+use WP_REST_Response;
+use WP_REST_Server;
+use function current_user_can;
+use function esc_html__;
+use function get_date_from_gmt;
+use function is_wp_error;
+use function wp_insert_post;
+use const DATE_RFC3339;
+
+/**
+ * API Controller for receiving incident data from third-party systems
+ * @package abrain\Einsatzverwaltung\Api
+ */
+class Incidents extends WP_REST_Controller
+{
+    /**
+     * @inheritDoc
+     */
+    public function register_routes()
+    {
+        $namespace = 'einsatzverwaltung/v1';
+        register_rest_route($namespace, '/incidents', array(
+            array(
+                'methods'             => WP_REST_Server::CREATABLE,
+                'callback'            => array($this, 'create_item'),
+                'permission_callback' => array($this, 'create_item_permissions_check'),
+                'args'                => array(
+                    'reason' => array(
+                        'description' => esc_html__('', 'einsatzverwaltung'), // TODO
+                        'type' => 'string',
+                        'validate_callback' => function($param, $request, $key) {
+                            return !empty($param);
+                        },
+                        'sanitize_callback' => function($param, $request, $key) {
+                            return wp_strip_all_tags($param);
+                        },
+                        'required' => true,
+                    ),
+                    'date_start' => array(
+                        'description' => esc_html__('', 'einsatzverwaltung'), // TODO
+                        'type' => 'string',
+                        'format' => 'date-time',
+                        'validate_callback' => array($this, 'validate_date_time'),
+                        'required' => true,
+                    ),
+                ),
+            ),
+        ));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function create_item($request)
+    {
+        $params = $request->get_params();
+
+        // Calculate the UTC post date
+        $start_date_time = DateTime::createFromFormat(DATE_RFC3339, $params['date_start']);
+        $start_date_time->setTimezone(new DateTimeZone('UTC'));
+        $post_date_gmt = $start_date_time->format('Y-m-d H:i:s');
+
+        $post = wp_insert_post(array(
+            'post_type' => Report::getSlug(),
+            'post_title' => $params['reason'],
+            'post_date' => get_date_from_gmt($post_date_gmt),
+            'post_date_gmt' => $post_date_gmt,
+        ), true);
+
+        if (is_wp_error($post)) {
+            return $post;
+        }
+
+        // Return the ID of the created post
+        $response = new WP_REST_Response(array('id' => $post));
+        $response->set_status(201);
+        return $response;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function create_item_permissions_check($request)
+    {
+        return current_user_can('edit_einsatzberichte');
+    }
+
+    /**
+     * Validates if the passed parameter value is a date conforming to RFC 3339.
+     *
+     * @param mixed $value
+     * @param WP_REST_Request $request
+     * @param string $key
+     *
+     * @return bool
+     */
+    public function validate_date_time($value, $request, $key): bool
+    {
+        $dateTime = DateTime::createFromFormat(DATE_RFC3339, $value);
+        return $dateTime !== false;
+    }
+}

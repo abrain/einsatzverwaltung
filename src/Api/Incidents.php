@@ -12,8 +12,10 @@ use function array_key_exists;
 use function current_user_can;
 use function esc_html__;
 use function get_date_from_gmt;
+use function is_string;
 use function is_wp_error;
 use function wp_insert_post;
+use function wp_strip_all_tags;
 use const DATE_RFC3339;
 
 /**
@@ -59,6 +61,15 @@ class Incidents extends WP_REST_Controller
                         'validate_callback' => array($this, 'validate_date_time'),
                         'required' => false,
                     ),
+                    'content' => array(
+                        'description' => esc_html__('The content of the report. No HTML allowed, but line breaks are preserved.', 'einsatzverwaltung'),
+                        'type' => 'string',
+                        'validate_callback' => function($param, $request, $key) {
+                            return is_string($param);
+                        },
+                        'sanitize_callback' => 'sanitize_textarea_field',
+                        'required' => false,
+                    ),
                 ),
             ),
         ));
@@ -83,6 +94,11 @@ class Incidents extends WP_REST_Controller
             'post_date_gmt' => $post_date_gmt,
             'meta_input' => array()
         );
+
+        // Process optional parameter content
+        if (array_key_exists('content', $params) && !empty($params['content'])) {
+            $args['post_content'] = $params['content'];
+        }
 
         // Process optional parameter date_end
         if (array_key_exists('date_end', $params)) {

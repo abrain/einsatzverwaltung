@@ -90,10 +90,17 @@ class Incidents extends WP_REST_Controller
         $args = array(
             'post_type' => Report::getSlug(),
             'post_title' => $params['reason'],
-            'post_date' => get_date_from_gmt($post_date_gmt),
-            'post_date_gmt' => $post_date_gmt,
             'meta_input' => array()
         );
+
+        if (array_key_exists('publish', $params) && $params['publish'] === true) {
+            $args['post_status'] = 'publish';
+            $args['post_date'] = get_date_from_gmt($post_date_gmt);
+            $args['post_date_gmt'] = $post_date_gmt;
+        } else {
+            $args['post_status'] = 'draft';
+            $args['meta_input']['_einsatz_timeofalerting'] = get_date_from_gmt($post_date_gmt);
+        }
 
         // Process optional parameter content
         if (array_key_exists('content', $params) && !empty($params['content'])) {

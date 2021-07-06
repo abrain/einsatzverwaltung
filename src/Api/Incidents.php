@@ -8,6 +8,7 @@ use WP_REST_Controller;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
+use function array_key_exists;
 use function current_user_can;
 use function esc_html__;
 use function get_date_from_gmt;
@@ -51,6 +52,13 @@ class Incidents extends WP_REST_Controller
                         'validate_callback' => array($this, 'validate_date_time'),
                         'required' => true,
                     ),
+                    'date_end' => array(
+                        'description' => esc_html__('', 'einsatzverwaltung'), // TODO
+                        'type' => 'string',
+                        'format' => 'date-time',
+                        'validate_callback' => array($this, 'validate_date_time'),
+                        'required' => false,
+                    ),
                 ),
             ),
         ));
@@ -68,12 +76,23 @@ class Incidents extends WP_REST_Controller
         $start_date_time->setTimezone(new DateTimeZone('UTC'));
         $post_date_gmt = $start_date_time->format('Y-m-d H:i:s');
 
-        $post = wp_insert_post(array(
+        $args = array(
             'post_type' => Report::getSlug(),
             'post_title' => $params['reason'],
             'post_date' => get_date_from_gmt($post_date_gmt),
             'post_date_gmt' => $post_date_gmt,
-        ), true);
+            'meta_input' => array()
+        );
+
+        // Process optional parameter date_end
+        if (array_key_exists('date_end', $params)) {
+            $end_date_time = DateTime::createFromFormat(DATE_RFC3339, $params['date_end']);
+            $end_date_time->setTimezone(new DateTimeZone('UTC'));
+            $args['meta_input']['einsatz_einsatzende'] = get_date_from_gmt($end_date_time->format('Y-m-d H:i:s'));
+        }
+
+        // Add post to database
+        $post = wp_insert_post($args, true);
 
         if (is_wp_error($post)) {
             return $post;

@@ -12,6 +12,7 @@ use function array_key_exists;
 use function current_user_can;
 use function esc_html__;
 use function get_date_from_gmt;
+use function is_bool;
 use function is_string;
 use function is_wp_error;
 use function wp_insert_post;
@@ -68,6 +69,15 @@ class Incidents extends WP_REST_Controller
                             return is_string($param);
                         },
                         'sanitize_callback' => 'sanitize_textarea_field',
+                        'required' => false,
+                    ),
+                    'publish' => array(
+                        'description' => esc_html__('If the report should be published immediately.', 'einsatzverwaltung'),
+                        'type' => 'boolean',
+                        'default' => false,
+                        'validate_callback' => function($param, $request, $key) {
+                            return is_bool($param);
+                        },
                         'required' => false,
                     ),
                 ),

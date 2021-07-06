@@ -71,6 +71,15 @@ class Incidents extends WP_REST_Controller
                         'sanitize_callback' => 'sanitize_textarea_field',
                         'required' => false,
                     ),
+                    'location' => array(
+                        'description' => esc_html__('The location of the incident.', 'einsatzverwaltung'),
+                        'type' => 'string',
+                        'validate_callback' => function($param, $request, $key) {
+                            return is_string($param);
+                        },
+                        'sanitize_callback' => 'sanitize_text_field',
+                        'required' => false,
+                    ),
                     'publish' => array(
                         'description' => esc_html__('If the report should be published immediately.', 'einsatzverwaltung'),
                         'type' => 'boolean',
@@ -122,6 +131,11 @@ class Incidents extends WP_REST_Controller
             $end_date_time = DateTime::createFromFormat(DATE_RFC3339, $params['date_end']);
             $end_date_time->setTimezone(new DateTimeZone('UTC'));
             $args['meta_input']['einsatz_einsatzende'] = get_date_from_gmt($end_date_time->format('Y-m-d H:i:s'));
+        }
+
+        // Process optional parameter location
+        if (array_key_exists('location', $params) && !empty($params['location'])) {
+            $args['meta_input']['einsatz_einsatzort'] = $params['location'];
         }
 
         // Add post to database

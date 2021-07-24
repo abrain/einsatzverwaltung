@@ -4,9 +4,15 @@ namespace abrain\Einsatzverwaltung\Widgets;
 use abrain\Einsatzverwaltung\ReportQuery;
 use abrain\Einsatzverwaltung\Types\Unit;
 use abrain\Einsatzverwaltung\Util\Formatter;
+use function apply_filters;
+use function current_theme_supports;
+use function esc_html;
 use function esc_html__;
 use function esc_html_e;
 use function get_taxonomy;
+use function printf;
+use function strip_tags;
+use function trim;
 
 /**
  * Widget für die neuesten Einsätze, das Aussehen wird vom Benutzer per HTML-Templates bestimmt
@@ -147,6 +153,11 @@ class RecentIncidentsFormatted extends AbstractWidget
     private $allowedTagsAfter = array('%feedUrl%', '%yearArchive%');
 
     /**
+     * @var string
+     */
+    private $defaultTitle;
+
+    /**
      * Konstruktor, generiert und registriert das Widget
      * @param Formatter $formatter
      */
@@ -161,6 +172,7 @@ class RecentIncidentsFormatted extends AbstractWidget
             )
         );
         $this->formatter = $formatter;
+        $this->defaultTitle = __('Recent incidents', 'einsatzverwaltung');
     }
 
     /**
@@ -172,20 +184,29 @@ class RecentIncidentsFormatted extends AbstractWidget
     public function widget($args, $instance)
     {
         $settings = wp_parse_args($instance, $this->defaults);
-        $title = empty($settings['title']) ? __('Recent incidents', 'einsatzverwaltung') : $settings['title'];
+        $title = empty($settings['title']) ? $this->defaultTitle : $settings['title'];
+        $filteredTitle = apply_filters('widget_title', $title);
 
         if (empty($settings['numIncidents'])) {
             $settings['numIncidents'] = $this->defaults['numIncidents'];
         }
 
         echo $args['before_widget'];
-        echo $args['before_title'] . apply_filters('widget_title', $title) . $args['after_title'];
+        echo $args['before_title'] . esc_html($filteredTitle) . $args['after_title'];
 
         $reportQuery = new ReportQuery();
         $reportQuery->setOrderAsc(false);
         $reportQuery->setLimit($settings['numIncidents']);
         $reportQuery->setUnits($settings['units']);
         $reports = $reportQuery->getReports();
+
+        // Add a nav element for accessibility, if the widget contains links
+        $wrapInNav = current_theme_supports('html5', 'navigation-widgets') && strpos($settings['pattern'], '%url%') !== false;
+        if ($wrapInNav) {
+            $filteredTitle = trim(strip_tags($filteredTitle));
+            $ariaLabel = !empty($filteredTitle) ? $filteredTitle : $this->defaultTitle;
+            printf('<nav role="navigation" aria-label="%s">', esc_attr($ariaLabel));
+        }
 
         $widgetContent = $settings['beforeContent'];
         foreach ($reports as $report) {
@@ -198,6 +219,10 @@ class RecentIncidentsFormatted extends AbstractWidget
 
         echo wp_kses($widgetContent, $this->allowedHtmlTags);
         echo $args['after_widget'];
+
+        if ($wrapInNav) {
+            echo '</nav>';
+        }
     }
 
     /**

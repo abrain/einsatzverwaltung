@@ -24,7 +24,6 @@ class WpEinsatz extends AbstractSource
     {
         $this->utilities = $utilities;
 
-        /** @var wpdb $wpdb */
         global $wpdb;
         $this->tablename = $wpdb->prefix . 'einsaetze';
 

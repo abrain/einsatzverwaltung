@@ -249,7 +249,7 @@ class Data
     }
 
     /**
-     * Set the publish date of the report to the time of alerting
+     * Set the publishing date of the report to the time of alerting
      *
      * @param WP_Post $post
      */

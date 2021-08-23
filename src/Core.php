@@ -5,13 +5,15 @@ use abrain\Einsatzverwaltung\Jobs\MigrateUnitsJob;
 use abrain\Einsatzverwaltung\Shortcodes\Initializer as ShortcodeInitializer;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use function add_action;
+use function error_log;
+use function get_option;
 
 /**
  * Grundlegende Funktionen
  */
 class Core
 {
-    const VERSION = '1.9.4';
+    const VERSION = '1.9.5';
     const DB_VERSION = 60;
 
     /**
@@ -142,7 +144,7 @@ class Core
         add_action('added_post_meta', array($numberController, 'onPostMetaChanged'), 10, 4);
         add_action('updated_option', array($numberController, 'maybeAutoIncidentNumbersChanged'), 10, 3);
         add_action('updated_option', array($numberController, 'maybeIncidentNumberFormatChanged'), 10, 3);
-        add_action('add_option_einsatzverwaltung_incidentnumbers_auto', array($numberController, 'onOptionAdded'), 10, 2);
+        add_action('added_option', array($numberController, 'onOptionAdded'), 10, 2);
 
         if (is_admin()) {
             add_action('admin_notices', array($this, 'onAdminNotices'));
@@ -165,6 +167,8 @@ class Core
             flush_rewrite_rules();
             $this->options->setFlushRewriteRules(false);
         }
+
+        $numberController->maybeReformatIncidentNumbers();
     }
 
     public function onAdminNotices()

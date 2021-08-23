@@ -403,7 +403,7 @@ class IncidentReport
     }
 
     /**
-     * @return int The weight of the report (i. e. how many reports it represents)
+     * @return int The weight of the report (i.e. how many reports it represents)
      */
     public function getWeight(): int
     {

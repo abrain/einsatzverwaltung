@@ -1,11 +1,11 @@
 function setUpMobileView()
 {
-    var tables = document.getElementsByClassName('einsatzverwaltung-reportlist');
-    for (var tablecounter = 0; tablecounter < tables.length; tablecounter++) {
-        var table = tables.item(tablecounter);
-        var cells = table.getElementsByClassName('smallscreen');
-        for (var cellcounter = 0; cellcounter < cells.length; cellcounter++) {
-            var cell = cells.item(cellcounter);
+    const tables = document.getElementsByClassName('einsatzverwaltung-reportlist');
+    for (let tablecounter = 0; tablecounter < tables.length; tablecounter++) {
+        const table = tables.item(tablecounter);
+        const cells = table.getElementsByClassName('smallscreen');
+        for (let cellcounter = 0; cellcounter < cells.length; cellcounter++) {
+            const cell = cells.item(cellcounter);
             cell.onclick = function (event) {
                 // Let links do what they do
                 if (event.target.tagName === 'A') {

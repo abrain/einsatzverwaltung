@@ -127,7 +127,7 @@ class Tool
             }
         }
 
-        if (null == $this->currentSource || !($this->currentSource instanceof AbstractSource) || empty($aktion)) {
+        if (!($this->currentSource instanceof AbstractSource) || empty($aktion)) {
             echo '<p>Dieses Werkzeug importiert Einsatzberichte aus verschiedenen Quellen.</p>';
 
             echo '<ul>';

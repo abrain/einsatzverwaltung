@@ -54,7 +54,7 @@ Yes, you can find them on [our website](https://einsatzverwaltung.abrain.de/faq/
 
 = 1.9.5 =
 * Fix: In some cases incident numbers were not regenerated after changing the format
-* Accessibility: Properly label the widgets if the theme supports the navigation-widget feature
+* Accessibility: Improve navigation of the widgets if the theme supports the navigation-widgets feature
 
 = 1.9.4 =
 * Fix: Editor would not show checkboxes for units if no vehicles existed

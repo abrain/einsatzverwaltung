@@ -48,3 +48,29 @@ trigger:
   branch:
     exclude:
       - feature/*
+
+---
+kind: pipeline
+type: docker
+name: release
+
+steps:
+  - name: check version tags
+    image: alpine
+    commands:
+      - ./bin/check-version-tags.sh
+  - name: slack
+    image: plugins/slack
+    settings:
+      webhook:
+        from_secret: slack_hook
+    when:
+      status:
+        - failure
+
+depends_on:
+  - unit-tests
+
+trigger:
+  event:
+    - tag

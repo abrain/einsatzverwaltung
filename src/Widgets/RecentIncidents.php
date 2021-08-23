@@ -7,13 +7,17 @@ use abrain\Einsatzverwaltung\ReportQuery;
 use abrain\Einsatzverwaltung\Types\Unit;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use abrain\Einsatzverwaltung\Utilities;
+use function apply_filters;
 use function array_merge;
 use function checked;
+use function current_theme_supports;
 use function esc_html;
 use function esc_html__;
 use function get_queried_object_id;
 use function get_taxonomy;
 use function printf;
+use function strip_tags;
+use function trim;
 
 /**
  * WordPress-Widget für die letzten X Einsätze
@@ -31,6 +35,11 @@ class RecentIncidents extends AbstractWidget
      * @var array
      */
     private $defaults;
+
+    /**
+     * @var string
+     */
+    private $defaultTitle;
 
     /**
      * Register widget with WordPress.
@@ -61,6 +70,7 @@ class RecentIncidents extends AbstractWidget
             'zeigeArtHierarchie' => false,
             'showAnnotations' => false
         ];
+        $this->defaultTitle = __('Recent incidents', 'einsatzverwaltung');
     }
 
     /**
@@ -69,14 +79,13 @@ class RecentIncidents extends AbstractWidget
     public function widget($args, $instance)
     {
         $instance = array_merge($this->defaults, $instance);
-        $title = empty($instance['title']) ? __('Recent incidents', 'einsatzverwaltung') : $instance['title'];
+        $title = empty($instance['title']) ? $this->defaultTitle : $instance['title'];
+        $filteredTitle = apply_filters('widget_title', $title);
 
         echo $args['before_widget'];
-        echo $args['before_title'];
-        echo esc_html(apply_filters('widget_title', $title));
-        echo $args['after_title'];
+        echo $args['before_title'] . esc_html($filteredTitle) . $args['after_title'];
 
-        $this->echoReports($instance);
+        $this->echoReports($instance, $filteredTitle);
 
         if ($instance['zeigeFeedlink']) {
             printf(
@@ -90,8 +99,9 @@ class RecentIncidents extends AbstractWidget
 
     /**
      * @param array $instance
+     * @param string $title
      */
-    private function echoReports(array $instance)
+    private function echoReports(array $instance, string $title)
     {
         $reportQuery = new ReportQuery();
         $reportQuery->setOrderAsc(false);
@@ -104,6 +114,13 @@ class RecentIncidents extends AbstractWidget
             return;
         }
 
+        // Add a nav element for accessibility
+        if (current_theme_supports('html5', 'navigation-widgets')) {
+            $title = trim(strip_tags($title));
+            $ariaLabel = !empty($title) ? $title : $this->defaultTitle;
+            printf('<nav role="navigation" aria-label="%s">', esc_attr($ariaLabel));
+        }
+
         echo '<ul class="einsatzberichte">';
         foreach ($reports as $report) {
             echo '<li class="einsatzbericht">';
@@ -111,6 +128,10 @@ class RecentIncidents extends AbstractWidget
             echo "</li>";
         }
         echo '</ul>';
+
+        if (current_theme_supports('html5', 'navigation-widgets')) {
+            echo '</nav>';
+        }
     }
 
     /**

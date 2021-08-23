@@ -69,7 +69,7 @@ class Helper
         );
         $parsedArgs = wp_parse_args($args, $defaults);
 
-        if (null === $parsedArgs['name'] || empty($parsedArgs['name'])) {
+        if (empty($parsedArgs['name'])) {
             _doing_it_wrong(__FUNCTION__, 'Name darf nicht null oder leer sein', '');
         }
 

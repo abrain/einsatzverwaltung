@@ -8,9 +8,6 @@
       <option name="BLANK_LINES_BEFORE_RETURN_STATEMENT" value="1" />
       <option name="KEEP_RPAREN_AND_LBRACE_ON_ONE_LINE" value="true" />
     </PHPCodeStyleSettings>
-    <XML>
-      <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true" />
-    </XML>
     <codeStyleSettings language="PHP">
       <option name="BLANK_LINES_AFTER_PACKAGE" value="1" />
       <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />

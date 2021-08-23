@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -eo pipefail
+
 # The root directory of the project is one up
 cd "$(dirname "$0")/.."
 
@@ -11,4 +13,4 @@ else
     export GIT_BRANCH="$DRONE_COMMIT_BRANCH"
 fi
 
-./cc-test-reporter after-build --debug --coverage-input-type clover
+./cc-test-reporter after-build --coverage-input-type clover

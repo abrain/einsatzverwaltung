@@ -12,6 +12,7 @@ use function intval;
 use function is_numeric;
 use function sprintf;
 use function str_pad;
+use function update_option;
 use function update_post_meta;
 
 /**
@@ -111,13 +112,27 @@ class ReportNumberController
     }
 
     /**
+     * If one of the format-defining options is added for the first time, behave as if the option got changed. The
+     * default value is passed as the previous value.
+     *
      * @param string $option Name of the added option
      * @param mixed $value Value of the added option
      */
     public function onOptionAdded(string $option, $value)
     {
-        if ($option === 'einsatzverwaltung_incidentnumbers_auto') {
-            $this->maybeAutoIncidentNumbersChanged($option, '', $value);
+        switch ($option) {
+            case 'einsatzverwaltung_incidentnumbers_auto':
+                $this->maybeAutoIncidentNumbersChanged($option, '0', $value);
+                break;
+            case 'einsatzvw_einsatznummer_stellen':
+                $this->maybeIncidentNumberFormatChanged($option, self::DEFAULT_SEQNUM_DIGITS, $value);
+                break;
+            case 'einsatzvw_einsatznummer_lfdvorne':
+                $this->maybeIncidentNumberFormatChanged($option, '0', $value);
+                break;
+            case 'einsatzvw_numbers_separator':
+                $this->maybeIncidentNumberFormatChanged($option, self::DEFAULT_SEPARATOR, $value);
+                break;
         }
     }
 
@@ -200,7 +215,7 @@ class ReportNumberController
 
         // Die automatische Verwaltung wurde aktiviert
         if ($newValue == 1) {
-            $this->updateAllIncidentNumbers();
+            update_option('einsatzverwaltung_reformat_numbers', '1');
         }
     }
 
@@ -214,7 +229,7 @@ class ReportNumberController
      */
     public function maybeIncidentNumberFormatChanged(string $option, $oldValue, $newValue)
     {
-        // Wir sind nur an bestimmten Optionen interessiert
+        // Make sure this is about one of the format options
         $formatOptions = array(
             'einsatzvw_einsatznummer_stellen',
             'einsatzvw_einsatznummer_lfdvorne',
@@ -234,6 +249,14 @@ class ReportNumberController
             return;
         }
 
-        $this->updateAllIncidentNumbers();
+        update_option('einsatzverwaltung_reformat_numbers', '1');
+    }
+
+    public function maybeReformatIncidentNumbers()
+    {
+        if (get_option('einsatzverwaltung_reformat_numbers', '0') === '1') {
+            $this->updateAllIncidentNumbers();
+            update_option('einsatzverwaltung_reformat_numbers', '0');
+        }
     }
 }

@@ -136,7 +136,7 @@ class Csv extends AbstractFormat
     /**
      * @param array $array
      *
-     * @return mixed
+     * @return string
      */
     protected function getArrayRepresentation(array $array)
     {

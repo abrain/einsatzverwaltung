@@ -2,6 +2,7 @@
 namespace abrain\Einsatzverwaltung;
 
 use function add_action;
+use function count;
 use function get_plugin_data;
 use function plugin_basename;
 use function plugin_dir_path;

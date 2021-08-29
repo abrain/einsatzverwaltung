@@ -11,6 +11,7 @@ if (! defined('ABSPATH')) {
 require __DIR__ . '/../../vendor/autoload.php';
 require __DIR__ . '/constants.php';
 require __DIR__ . '/UnitTestCase.php';
+require __DIR__ . '/Stubs/WP_REST_Server_Stub.php';
 
 spl_autoload_register(function ($class) {
     // Do not load classes from other namespaces

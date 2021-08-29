@@ -4,6 +4,7 @@ namespace abrain\Einsatzverwaltung;
 use Brain\Monkey;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
+use function Brain\Monkey\Functions\when;
 
 /**
  * Base class for unit testing, takes care of mocking many WordPress functions
@@ -32,6 +33,9 @@ class UnitTestCase extends TestCase
             }
             return $result;
         });
+
+        when('sanitize_textarea_field')->returnArg();
+        when('sanitize_text_field')->returnArg();
     }
 
     protected function tearDown()

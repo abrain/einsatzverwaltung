@@ -12,6 +12,6 @@ class Initializer
      */
     public function onRestApiInit()
     {
-        (new Incidents())->register_routes();
+        (new Reports())->register_routes();
     }
 }

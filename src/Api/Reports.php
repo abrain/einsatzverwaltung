@@ -23,7 +23,7 @@ use const DATE_RFC3339;
  * API Controller for receiving incident data from third-party systems
  * @package abrain\Einsatzverwaltung\Api
  */
-class Incidents extends WP_REST_Controller
+class Reports extends WP_REST_Controller
 {
     /**
      * @inheritDoc
@@ -31,7 +31,7 @@ class Incidents extends WP_REST_Controller
     public function register_routes()
     {
         $namespace = 'einsatzverwaltung/v1';
-        register_rest_route($namespace, '/incidents', array(
+        register_rest_route($namespace, '/reports', array(
             array(
                 'methods'             => WP_REST_Server::CREATABLE,
                 'callback'            => array($this, 'create_item'),

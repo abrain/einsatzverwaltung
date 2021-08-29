@@ -5,7 +5,7 @@ Tags: Feuerwehr, fire department, EMS
 Requires at least: 5.1.0
 Tested up to: 5.8
 Requires PHP: 7.1.0
-Stable tag: 1.9.5
+Stable tag: 1.9.6
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -51,6 +51,9 @@ Ideally, you check the issues on [GitHub](https://github.com/abrain/einsatzverwa
 Yes, you can find them on [our website](https://einsatzverwaltung.abrain.de/faq/).
 
 == Changelog ==
+
+= 1.9.6 =
+* Fix: Compatibility issue with PHP 7.4 and newer during import
 
 = 1.9.5 =
 * Fix: In some cases incident numbers were not regenerated after changing the format

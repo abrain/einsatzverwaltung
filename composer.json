@@ -36,6 +36,8 @@
     "friendsofphp/php-cs-fixer": "^2.18",
     "php-cs-fixer/phpunit-constraint-isidenticalstring": "^1.2",
     "php-cs-fixer/phpunit-constraint-xmlmatchesxsd": "^1.2",
-    "sebastian/comparator": "^3.0"
+    "sebastian/comparator": "^3.0",
+    "phpcompatibility/php-compatibility": "^9.3",
+    "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1"
   }
 }

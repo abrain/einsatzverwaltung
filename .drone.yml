@@ -15,6 +15,10 @@ steps:
     image: composer
     commands:
       - composer install --ignore-platform-reqs
+  - name: check-php-compatibility
+    image: php:7
+    commands:
+      - ./vendor/bin/phpcs -p --ignore="\.min\.css" src/ --standard=PHPCompatibility
   - name: test
     image: php:7
     environment:

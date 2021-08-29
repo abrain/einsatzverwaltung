@@ -40,10 +40,10 @@ class Reports extends WP_REST_Controller
                     'reason' => array(
                         'description' => esc_html__('', 'einsatzverwaltung'), // TODO
                         'type' => 'string',
-                        'validate_callback' => function($param, $request, $key) {
+                        'validate_callback' => function ($param, $request, $key) {
                             return !empty($param);
                         },
-                        'sanitize_callback' => function($param, $request, $key) {
+                        'sanitize_callback' => function ($param, $request, $key) {
                             return wp_strip_all_tags($param);
                         },
                         'required' => true,
@@ -65,7 +65,7 @@ class Reports extends WP_REST_Controller
                     'content' => array(
                         'description' => esc_html__('The content of the report. No HTML allowed, but line breaks are preserved.', 'einsatzverwaltung'),
                         'type' => 'string',
-                        'validate_callback' => function($param, $request, $key) {
+                        'validate_callback' => function ($param, $request, $key) {
                             return is_string($param);
                         },
                         'sanitize_callback' => 'sanitize_textarea_field',
@@ -74,7 +74,7 @@ class Reports extends WP_REST_Controller
                     'location' => array(
                         'description' => esc_html__('The location of the incident.', 'einsatzverwaltung'),
                         'type' => 'string',
-                        'validate_callback' => function($param, $request, $key) {
+                        'validate_callback' => function ($param, $request, $key) {
                             return is_string($param);
                         },
                         'sanitize_callback' => 'sanitize_text_field',
@@ -84,7 +84,7 @@ class Reports extends WP_REST_Controller
                         'description' => esc_html__('If the report should be published immediately.', 'einsatzverwaltung'),
                         'type' => 'boolean',
                         'default' => false,
-                        'validate_callback' => function($param, $request, $key) {
+                        'validate_callback' => function ($param, $request, $key) {
                             return is_bool($param);
                         },
                         'required' => false,

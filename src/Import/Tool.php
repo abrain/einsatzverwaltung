@@ -258,7 +258,7 @@ class Tool
             $this->utilities->printError('Es wurden keine Felder gefunden');
             return;
         }
-        $this->utilities->printSuccess('Es wurden ' . count($felder) . ' Feld(er) gefunden: ' . implode($felder, ', '));
+        $this->utilities->printSuccess('Es wurden ' . count($felder) . ' Feld(er) gefunden: ' . implode(', ', $felder));
 
         // Auf Pflichtfelder prüfen
         $mandatoryFieldsOk = true;

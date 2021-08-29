@@ -84,7 +84,7 @@ class WpEinsatz extends AbstractSource
     public function getEntries($fields)
     {
         global $wpdb; /** @var wpdb $wpdb */
-        $queryFields = (null === $fields ? '*' : implode(array_merge(array('ID'), $fields), ','));
+        $queryFields = (null === $fields ? '*' : implode(',', array_merge(array('ID'), $fields)));
         $query = sprintf('SELECT %s FROM %s ORDER BY Datum', $queryFields, $this->tablename);
         $entries = $wpdb->get_results($query, ARRAY_A);
 

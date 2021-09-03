@@ -21,6 +21,11 @@ class ReportInsertObject
     /**
      * @var string
      */
+    private $keyword;
+
+    /**
+     * @var string
+     */
     private $location;
 
     /**
@@ -45,6 +50,7 @@ class ReportInsertObject
         }
         $this->startDateTime = $startDate;
         $this->content = '';
+        $this->keyword = '';
         $this->location = '';
     }
 
@@ -62,6 +68,14 @@ class ReportInsertObject
     public function getEndDateTime(): ?DateTimeImmutable
     {
         return $this->endDateTime;
+    }
+
+    /**
+     * @return string
+     */
+    public function getKeyword(): string
+    {
+        return $this->keyword;
     }
 
     /**
@@ -102,6 +116,14 @@ class ReportInsertObject
     public function setEndDateTime(DateTimeImmutable $endDateTime): void
     {
         $this->endDateTime = $endDateTime;
+    }
+
+    /**
+     * @param string $keyword
+     */
+    public function setKeyword(string $keyword): void
+    {
+        $this->keyword = $keyword;
     }
 
     /**

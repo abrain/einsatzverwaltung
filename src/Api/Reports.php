@@ -68,6 +68,13 @@ class Reports extends WP_REST_Controller
                         'sanitize_callback' => 'sanitize_textarea_field',
                         'required' => false,
                     ),
+                    'keyword' => array(
+                        'description' => esc_html__('', 'einsatzverwaltung'), // TODO
+                        'type' => 'string',
+                        'validate_callback' => array($this, 'validateIsString'),
+                        'sanitize_callback' => 'sanitize_text_field',
+                        'required' => false
+                    ),
                     'location' => array(
                         'description' => esc_html__('The location of the incident.', 'einsatzverwaltung'),
                         'type' => 'string',
@@ -108,6 +115,11 @@ class Reports extends WP_REST_Controller
         if (array_key_exists('date_end', $params)) {
             $end_date_time = DateTimeImmutable::createFromFormat(DATE_RFC3339, $params['date_end']);
             $importObject->setEndDateTime($end_date_time);
+        }
+
+        // Process optional parameter keyword
+        if (array_key_exists('keyword', $params) && !empty($params['keyword'])) {
+            $importObject->setKeyword($params['keyword']);
         }
 
         // Process optional parameter location

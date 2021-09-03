@@ -153,6 +153,7 @@ class ReportsTest extends UnitTestCase
             'date_start' => '2021-08-29T21:47:59+0200',
             'date_end' => '2021-08-29T22:41:16+0200',
             'content' => 'This is the content',
+            'keyword' => 'key-word',
             'location' => 'It happened here',
             'publish' => true
         ]);
@@ -166,6 +167,7 @@ class ReportsTest extends UnitTestCase
         $importObject->expects('setEndDateTime')->once()->with(Mockery::on(function ($arg) {
             return $arg instanceof DateTimeImmutable && $arg->getTimestamp() === 1630269676;
         }));
+        $importObject->expects('setKeyword')->once()->with('key-word');
         $importObject->expects('setLocation')->once()->with('It happened here');
 
         $reportInserter = Mockery::mock('overload:abrain\Einsatzverwaltung\DataAccess\ReportInserter');

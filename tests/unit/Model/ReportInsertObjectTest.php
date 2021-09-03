@@ -16,6 +16,7 @@ class ReportInsertObjectTest extends UnitTestCase
         $importObject = new ReportInsertObject($startDate, 'Some title');
         $this->assertEquals('', $importObject->getContent());
         $this->assertEquals(null, $importObject->getEndDateTime());
+        $this->assertEquals('', $importObject->getKeyword());
         $this->assertEquals('', $importObject->getLocation());
         $this->assertEquals($startDate, $importObject->getStartDateTime());
         $this->assertEquals('Some title', $importObject->getTitle());
@@ -36,6 +37,15 @@ class ReportInsertObjectTest extends UnitTestCase
         $this->assertEquals('This is the content', $importObject->getContent());
     }
 
+    public function testSetKeyword()
+    {
+        $importObject = new ReportInsertObject(new DateTimeImmutable(), '');
+        $this->assertEquals('', $importObject->getKeyword());
+
+        $importObject->setKeyword('A keyword');
+        $this->assertEquals('A keyword', $importObject->getKeyword());
+    }
+
     public function testSetLocation()
     {
         $importObject = new ReportInsertObject(new DateTimeImmutable(), '');
@@ -54,6 +64,4 @@ class ReportInsertObjectTest extends UnitTestCase
         $importObject->setEndDateTime($endTime);
         $this->assertEquals($endTime, $importObject->getEndDateTime());
     }
-
-
 }

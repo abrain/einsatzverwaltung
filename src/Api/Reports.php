@@ -1,7 +1,8 @@
 <?php
 namespace abrain\Einsatzverwaltung\Api;
 
-use abrain\Einsatzverwaltung\Model\ReportImportObject;
+use abrain\Einsatzverwaltung\DataAccess\ReportInserter;
+use abrain\Einsatzverwaltung\Model\ReportInsertObject;
 use DateTime;
 use DateTimeImmutable;
 use WP_REST_Controller;
@@ -14,7 +15,6 @@ use function esc_html__;
 use function is_bool;
 use function is_string;
 use function is_wp_error;
-use function wp_insert_post;
 use function wp_strip_all_tags;
 use const DATE_RFC3339;
 
@@ -103,7 +103,7 @@ class Reports extends WP_REST_Controller
         // Calculate the UTC post date
         $start_date_time = DateTimeImmutable::createFromFormat(DATE_RFC3339, $params['date_start']);
 
-        $importObject = new ReportImportObject($start_date_time, $params['reason']);
+        $importObject = new ReportInsertObject($start_date_time, $params['reason']);
 
         // Process optional parameter content
         if (array_key_exists('content', $params) && !empty($params['content'])) {
@@ -113,7 +113,7 @@ class Reports extends WP_REST_Controller
         // Process optional parameter date_end
         if (array_key_exists('date_end', $params)) {
             $end_date_time = DateTimeImmutable::createFromFormat(DATE_RFC3339, $params['date_end']);
-            $importObject->setEndTime($end_date_time);
+            $importObject->setEndDateTime($end_date_time);
         }
 
         // Process optional parameter location
@@ -123,7 +123,8 @@ class Reports extends WP_REST_Controller
 
         // Add post to database
         $publishReport = array_key_exists('publish', $params) && $params['publish'] === true;
-        $post = wp_insert_post($importObject->getInsertArgs($publishReport), true);
+        $reportInserter = new ReportInserter($publishReport);
+        $post = $reportInserter->insertReport($importObject);
 
         if (is_wp_error($post)) {
             return $post;

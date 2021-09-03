@@ -1,7 +1,9 @@
 <?php
 namespace abrain\Einsatzverwaltung\Api;
 
+use abrain\Einsatzverwaltung\Model\ReportInsertObject;
 use abrain\Einsatzverwaltung\UnitTestCase;
+use Brain\Monkey\Expectation\Exception\ExpectationArgsRequired;
 use DateTimeImmutable;
 use Mockery;
 use function array_key_exists;
@@ -62,6 +64,9 @@ class ReportsTest extends UnitTestCase
         (new Reports())->register_routes();
     }
 
+    /**
+     * @throws ExpectationArgsRequired
+     */
     public function testCreatePermissionCheckPass()
     {
         $request = Mockery::mock('WP_REST_Request');
@@ -69,6 +74,9 @@ class ReportsTest extends UnitTestCase
         $this->assertTrue((new Reports())->create_item_permissions_check($request));
     }
 
+    /**
+     * @throws ExpectationArgsRequired
+     */
     public function testCreatePermissionCheckFail()
     {
         $request = Mockery::mock('WP_REST_Request');
@@ -84,6 +92,9 @@ class ReportsTest extends UnitTestCase
         $this->assertTrue($reports->validate_date_time('2021-08-29T21:35:27+0200', $request, 'some_key'));
     }
 
+    /**
+     * @throws ExpectationArgsRequired
+     */
     public function testCreateItemMinimalData()
     {
         $request = Mockery::mock('WP_REST_Request');
@@ -92,19 +103,17 @@ class ReportsTest extends UnitTestCase
             'date_start' => '2021-08-29T21:47:59+0200'
         ]);
 
-        $fakeArgs = [
-            'some' => 'fake',
-            'post' => 'args'
-        ];
-
         // Create an overload mock, as the object gets created inside the tested function
-        $importObject = Mockery::mock('overload:abrain\Einsatzverwaltung\Model\ReportImportObject');
+        $importObject = Mockery::mock('overload:abrain\Einsatzverwaltung\Model\ReportInsertObject');
         $importObject->expects('__construct')->once()->with(Mockery::on(function ($arg) {
             return $arg instanceof DateTimeImmutable && $arg->getTimestamp() === 1630266479;
         }), 'A reason');
-        $importObject->expects('getInsertArgs')->once()->with(false)->andReturn($fakeArgs);
 
-        expect('wp_insert_post')->once()->with($fakeArgs, true)->andReturn(614);
+        $reportInserter = Mockery::mock('overload:abrain\Einsatzverwaltung\DataAccess\ReportInserter');
+        $reportInserter->expects('__construct')->once()->with(false);
+        $reportInserter->expects('insertReport')->once()->with(Mockery::on(function ($arg) {
+            return $arg instanceof ReportInsertObject;
+        }))->andReturn(614);
 
         // Create an overload mock, as the object gets created inside the tested function
         $response = Mockery::mock('overload:WP_REST_Response');
@@ -116,6 +125,9 @@ class ReportsTest extends UnitTestCase
         $this->assertInstanceOf('WP_REST_Response', $restResponse);
     }
 
+    /**
+     * @throws ExpectationArgsRequired
+     */
     public function testCreateItemComplete()
     {
         $request = Mockery::mock('WP_REST_Request');
@@ -128,34 +140,35 @@ class ReportsTest extends UnitTestCase
             'publish' => true
         ]);
 
-        $fakeArgs = [
-            'some' => 'fake',
-            'post' => 'args'
-        ];
-
         // Create an overload mock, as the object gets created inside the tested function
-        $importObject = Mockery::mock('overload:abrain\Einsatzverwaltung\Model\ReportImportObject');
+        $importObject = Mockery::mock('overload:abrain\Einsatzverwaltung\Model\ReportInsertObject');
         $importObject->expects('__construct')->once()->with(Mockery::on(function ($arg) {
             return $arg instanceof DateTimeImmutable && $arg->getTimestamp() === 1630266479;
         }), 'A reason');
         $importObject->expects('setContent')->once()->with('This is the content');
-        $importObject->expects('setEndTime')->once()->with(Mockery::on(function ($arg) {
+        $importObject->expects('setEndDateTime')->once()->with(Mockery::on(function ($arg) {
             return $arg instanceof DateTimeImmutable && $arg->getTimestamp() === 1630269676;
         }));
         $importObject->expects('setLocation')->once()->with('It happened here');
-        $importObject->expects('getInsertArgs')->once()->with(true)->andReturn($fakeArgs);
 
-        expect('wp_insert_post')->once()->with($fakeArgs, true)->andReturn(614);
+        $reportInserter = Mockery::mock('overload:abrain\Einsatzverwaltung\DataAccess\ReportInserter');
+        $reportInserter->expects('__construct')->once()->with(true);
+        $reportInserter->expects('insertReport')->once()->with(Mockery::on(function ($arg) {
+            return $arg instanceof ReportInsertObject;
+        }))->andReturn(532);
 
         // Create an overload mock, as the object gets created inside the tested function
         $response = Mockery::mock('overload:WP_REST_Response');
-        $response->expects('__construct')->once()->with(['id' => 614]);
+        $response->expects('__construct')->once()->with(['id' => 532]);
         $response->expects('set_status')->once()->with(201);
 
         $reportsApi = new Reports();
         $reportsApi->create_item($request);
     }
 
+    /**
+     * @throws ExpectationArgsRequired
+     */
     public function testCreateItemError()
     {
         $request = Mockery::mock('WP_REST_Request');
@@ -165,19 +178,19 @@ class ReportsTest extends UnitTestCase
         ]);
 
         $wpError = Mockery::mock('WP_Error');
-        $fakeArgs = [
-            'some' => 'fake',
-            'post' => 'args'
-        ];
 
         // Create an overload mock, as the object gets created inside the tested function
-        $importObject = Mockery::mock('overload:abrain\Einsatzverwaltung\Model\ReportImportObject');
+        $importObject = Mockery::mock('overload:abrain\Einsatzverwaltung\Model\ReportInsertObject');
         $importObject->expects('__construct')->once()->with(Mockery::on(function ($arg) {
             return $arg instanceof DateTimeImmutable && $arg->getTimestamp() === 1630266479;
         }), 'A reason');
-        $importObject->expects('getInsertArgs')->once()->with(false)->andReturn($fakeArgs);
 
-        expect('wp_insert_post')->once()->with($fakeArgs, true)->andReturn($wpError);
+        $reportInserter = Mockery::mock('overload:abrain\Einsatzverwaltung\DataAccess\ReportInserter');
+        $reportInserter->expects('__construct')->once()->with(false);
+        $reportInserter->expects('insertReport')->once()->with(Mockery::on(function ($arg) {
+            return $arg instanceof ReportInsertObject;
+        }))->andReturn($wpError);
+
 
         // Create an overload mock, as the object gets created inside the tested function
         $response = Mockery::mock('overload:WP_REST_Response');

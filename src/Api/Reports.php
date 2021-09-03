@@ -15,6 +15,8 @@ use function esc_html__;
 use function is_bool;
 use function is_string;
 use function is_wp_error;
+use function strlen;
+use function trim;
 use function wp_strip_all_tags;
 use const DATE_RFC3339;
 
@@ -39,9 +41,7 @@ class Reports extends WP_REST_Controller
                     'reason' => array(
                         'description' => esc_html__('', 'einsatzverwaltung'), // TODO
                         'type' => 'string',
-                        'validate_callback' => function ($param, $request, $key) {
-                            return !empty($param);
-                        },
+                        'validate_callback' => array($this, 'validateStringNotEmpty'),
                         'sanitize_callback' => function ($param, $request, $key) {
                             return wp_strip_all_tags($param);
                         },
@@ -51,31 +51,27 @@ class Reports extends WP_REST_Controller
                         'description' => esc_html__('', 'einsatzverwaltung'), // TODO
                         'type' => 'string',
                         'format' => 'date-time',
-                        'validate_callback' => array($this, 'validate_date_time'),
+                        'validate_callback' => array($this, 'validateDateTime'),
                         'required' => true,
                     ),
                     'date_end' => array(
                         'description' => esc_html__('', 'einsatzverwaltung'), // TODO
                         'type' => 'string',
                         'format' => 'date-time',
-                        'validate_callback' => array($this, 'validate_date_time'),
+                        'validate_callback' => array($this, 'validateDateTime'),
                         'required' => false,
                     ),
                     'content' => array(
                         'description' => esc_html__('The content of the report. No HTML allowed, but line breaks are preserved.', 'einsatzverwaltung'),
                         'type' => 'string',
-                        'validate_callback' => function ($param, $request, $key) {
-                            return is_string($param);
-                        },
+                        'validate_callback' => array($this, 'validateIsString'),
                         'sanitize_callback' => 'sanitize_textarea_field',
                         'required' => false,
                     ),
                     'location' => array(
                         'description' => esc_html__('The location of the incident.', 'einsatzverwaltung'),
                         'type' => 'string',
-                        'validate_callback' => function ($param, $request, $key) {
-                            return is_string($param);
-                        },
+                        'validate_callback' => array($this, 'validateIsString'),
                         'sanitize_callback' => 'sanitize_text_field',
                         'required' => false,
                     ),
@@ -100,9 +96,7 @@ class Reports extends WP_REST_Controller
     {
         $params = $request->get_params();
 
-        // Calculate the UTC post date
         $start_date_time = DateTimeImmutable::createFromFormat(DATE_RFC3339, $params['date_start']);
-
         $importObject = new ReportInsertObject($start_date_time, $params['reason']);
 
         // Process optional parameter content
@@ -152,10 +146,47 @@ class Reports extends WP_REST_Controller
      * @param string $key
      *
      * @return bool
+     *
+     * @noinspection PhpUnusedParameterInspection
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function validate_date_time($value, $request, $key): bool
+    public function validateDateTime($value, WP_REST_Request $request, string $key): bool
     {
         $dateTime = DateTime::createFromFormat(DATE_RFC3339, $value);
         return $dateTime !== false;
+    }
+
+    /**
+     * Validates if the passed parameter value is a string
+     *
+     * @param mixed $value
+     * @param WP_REST_Request $request
+     * @param string $key
+     *
+     * @return bool
+     *
+     * @noinspection PhpUnusedParameterInspection
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    public function validateIsString($value, WP_REST_Request $request, string $key): bool
+    {
+        return is_string($value);
+    }
+
+    /**
+     * Validates if the passed parameter value is a string and contains non-whitespace characters
+     *
+     * @param mixed $value
+     * @param WP_REST_Request $request
+     * @param string $key
+     *
+     * @return bool
+     *
+     * @noinspection PhpUnusedParameterInspection
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    public function validateStringNotEmpty($value, WP_REST_Request $request, string $key): bool
+    {
+        return is_string($value) && strlen(trim($value)) > 0;
     }
 }

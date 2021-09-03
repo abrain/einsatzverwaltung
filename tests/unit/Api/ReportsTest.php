@@ -8,8 +8,6 @@ use DateTimeImmutable;
 use Mockery;
 use function array_key_exists;
 use function Brain\Monkey\Functions\expect;
-use function is_array;
-use function is_callable;
 
 /**
  * @covers \abrain\Einsatzverwaltung\Api\Reports
@@ -25,43 +23,37 @@ class ReportsTest extends UnitTestCase
         Mockery::namedMock('WP_REST_Server', 'abrain\Einsatzverwaltung\Stubs\WP_REST_Server_Stub');
     }
 
+    /**
+     * @throws ExpectationArgsRequired
+     */
     public function testRegisterRoutes()
     {
-        expect('register_rest_route')
-            ->once()
-            ->with(Mockery::type('string'), Mockery::type('string'), Mockery::on(function ($arg) {
-                if (!is_array($arg)) {
-                    return false;
-                }
-
-                foreach ($arg as $routeOptions) {
-                    if (!is_array($routeOptions)) {
-                        return false;
-                    }
-
-                    foreach ($routeOptions['args'] as $routeOptionsArgs) {
-                        // Check for essential properties
-                        if (!array_key_exists('description', $routeOptionsArgs) ||
-                            !array_key_exists('type', $routeOptionsArgs) ||
-                            !array_key_exists('validate_callback', $routeOptionsArgs) ||
-                            !is_callable($routeOptionsArgs['validate_callback']) ||
-                            !array_key_exists('required', $routeOptionsArgs)
-                        ) {
-                            return false;
-                        }
-
-                        // If there is a sanitize_callback, it has to be a callable
-                        if (array_key_exists('sanitize_callback', $routeOptionsArgs) &&
-                            !is_callable($routeOptionsArgs['sanitize_callback'])
-                        ) {
-                            return false;
-                        }
-                    }
-                }
-
-                return true;
-            }));
+        expect('register_rest_route')->once()->with(
+            Mockery::type('string'),
+            Mockery::type('string'),
+            Mockery::capture($routeArgs)
+        );
         (new Reports())->register_routes();
+
+        $this->assertIsArray($routeArgs);
+
+        foreach ($routeArgs as $routeOptions) {
+            $this->assertIsArray($routeOptions);
+
+            foreach ($routeOptions['args'] as $argName => $routeOptionsArgs) {
+                // Check for essential properties
+                $this->assertArrayHasKey('description', $routeOptionsArgs, "Argument $argName has no description");
+                $this->assertArrayHasKey('type', $routeOptionsArgs, "Argument $argName has no type");
+                $this->assertArrayHasKey('validate_callback', $routeOptionsArgs, "Argument $argName has no validate_callback");
+                $this->assertIsCallable($routeOptionsArgs['validate_callback'], "Validate callback for $argName is not callable");
+                $this->assertArrayHasKey('required', $routeOptionsArgs, "Argument $argName has no required flag");
+
+                // If there is a sanitize_callback, it has to be a callable
+                if (array_key_exists('sanitize_callback', $routeOptionsArgs)) {
+                    $this->assertIsCallable($routeOptionsArgs['sanitize_callback'], "Sanitize callback for $argName is not callable");
+                }
+            }
+        }
     }
 
     /**
@@ -88,8 +80,33 @@ class ReportsTest extends UnitTestCase
     {
         $request = Mockery::mock('WP_REST_Request');
         $reports = new Reports();
-        $this->assertFalse($reports->validate_date_time('2021-08-29 21:35:27', $request, 'some_key'));
-        $this->assertTrue($reports->validate_date_time('2021-08-29T21:35:27+0200', $request, 'some_key'));
+        $this->assertFalse($reports->validateDateTime('2021-08-29 21:35:27', $request, 'some_key'));
+        $this->assertTrue($reports->validateDateTime('2021-08-29T21:35:27+0200', $request, 'some_key'));
+    }
+
+    public function testValidateStringNotEmpty()
+    {
+        $request = Mockery::mock('WP_REST_Request');
+        $reports = new Reports();
+        $this->assertFalse($reports->validateStringNotEmpty(0, $request, 'some_key'));
+        $this->assertFalse($reports->validateStringNotEmpty(null, $request, 'some_key'));
+        $this->assertFalse($reports->validateStringNotEmpty([], $request, 'some_key'));
+        $this->assertFalse($reports->validateStringNotEmpty('', $request, 'some_key'));
+        $this->assertFalse($reports->validateStringNotEmpty(' ', $request, 'some_key'));
+        $this->assertTrue($reports->validateStringNotEmpty('0', $request, 'some_key'));
+        $this->assertTrue($reports->validateStringNotEmpty('yo', $request, 'some_key'));
+    }
+
+    public function testValidateIsString()
+    {
+        $request = Mockery::mock('WP_REST_Request');
+        $reports = new Reports();
+        $this->assertFalse($reports->validateIsString(9, $request, 'some_key'));
+        $this->assertFalse($reports->validateIsString(null, $request, 'some_key'));
+        $this->assertFalse($reports->validateIsString([''], $request, 'some_key'));
+        $this->assertTrue($reports->validateIsString('', $request, 'some_key'));
+        $this->assertTrue($reports->validateIsString('9', $request, 'some_key'));
+        $this->assertTrue($reports->validateIsString('yo', $request, 'some_key'));
     }
 
     /**

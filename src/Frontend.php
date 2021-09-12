@@ -204,8 +204,7 @@ class Frontend
             }
             
             $templateWithData = $this->formatter->formatIncidentData($template, array(), $post);
-            $templateWithContent = str_replace('%content%', $content, $templateWithData);
-            return stripslashes(wp_filter_post_kses(addslashes($templateWithContent)));
+            return str_replace('%content%', $content, $templateWithData);
         }
 
         if (!is_singular('einsatz')) {

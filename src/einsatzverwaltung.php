@@ -8,6 +8,8 @@ Author: Andreas Brain
 Author URI: https://www.abrain.de
 License: GPLv2
 Text Domain: einsatzverwaltung
+Requires at least: 5.1.0
+Requires PHP: 7.1.0
 */
 
 if (!defined('ABSPATH')) {

@@ -13,7 +13,7 @@ use function get_option;
  */
 class Core
 {
-    const VERSION = '1.9.6';
+    const VERSION = '1.9.7';
     const DB_VERSION = 60;
 
     /**

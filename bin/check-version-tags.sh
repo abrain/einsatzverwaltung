@@ -7,7 +7,7 @@ if [ "$DRONE_BUILD_EVENT" != "tag" ]; then
   exit 1
 fi
 
-TAG_VERSION=$(echo "$DRONE_TAG" | grep --only-matching -E -e "(\d+\.\d+\.\d+)(-(alpha|beta|rc)\.\d+)?$")
+TAG_VERSION=$(echo "$DRONE_TAG" | grep -o -E -e "(\d+\.\d+\.\d+)(-(alpha|beta|rc)\.\d+)?$")
 echo "Tag version is: $TAG_VERSION"
 if [ -z "$TAG_VERSION" ]; then
     echo "Tag version is invalid"
@@ -20,7 +20,7 @@ if [ -n "$PRERELEASE" ]; then
 fi
 
 # The root directory of the project is one up
-# cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/.."
 
 PLUGIN_VERSION=$(grep "^Version:" src/einsatzverwaltung.php | cut -d " " -f2)
 if [ "$PLUGIN_VERSION" != "$TAG_VERSION" ]; then

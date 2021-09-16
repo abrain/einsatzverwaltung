@@ -10,8 +10,10 @@ use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
 use function array_key_exists;
+use function array_map;
 use function current_user_can;
 use function esc_html__;
+use function explode;
 use function is_bool;
 use function is_string;
 use function is_wp_error;
@@ -91,6 +93,13 @@ class Reports extends WP_REST_Controller
                         },
                         'required' => false,
                     ),
+                    'resources' => array(
+                        'description' => esc_html__('The resources dispatched to this incident.', 'einsatzverwaltung'),
+                        'type' => 'string',
+                        'validate_callback' => array($this, 'validateIsString'),
+                        'sanitize_callback' => 'sanitize_text_field',
+                        'required' => false,
+                    ),
                 ),
             ),
         ));
@@ -125,6 +134,12 @@ class Reports extends WP_REST_Controller
         // Process optional parameter location
         if (array_key_exists('location', $params) && !empty($params['location'])) {
             $importObject->setLocation($params['location']);
+        }
+
+        // Process optional parameter resources
+        if (array_key_exists('resources', $params) && !empty($params['resources'])) {
+            $resources = explode(',', $params['resources']);
+            $importObject->setResources(array_map('trim', $resources));
         }
 
         // Add post to database

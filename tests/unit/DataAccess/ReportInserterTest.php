@@ -9,8 +9,10 @@ use function Brain\Monkey\Functions\expect;
 
 /**
  * @covers \abrain\Einsatzverwaltung\DataAccess\ReportInserter
+ * @uses \abrain\Einsatzverwaltung\Types\ExtEinsatzmittel
  * @uses \abrain\Einsatzverwaltung\Types\IncidentType
  * @uses \abrain\Einsatzverwaltung\Types\Report
+ * @uses \abrain\Einsatzverwaltung\Types\Vehicle
  */
 class ReportInserterTest extends UnitTestCase
 {
@@ -24,6 +26,7 @@ class ReportInserterTest extends UnitTestCase
         $importObject->expects('getEndDateTime')->once()->andReturnNull();
         $importObject->expects('getKeyword')->once()->andReturn('');
         $importObject->expects('getLocation')->once()->andReturn('');
+        $importObject->expects('getResources')->once()->andReturn([]);
         $importObject->expects('getStartDateTime')->once()->andReturn(new DateTimeImmutable('2021-08-29T17:51:15+0200'));
         $importObject->expects('getTitle')->once()->andReturn('Some title');
 
@@ -53,12 +56,26 @@ class ReportInserterTest extends UnitTestCase
         $importObject->expects('getContent')->once()->andReturn('Some random post content');
         $importObject->expects('getKeyword')->once()->andReturn('The keyword');
         $importObject->expects('getLocation')->once()->andReturn('The location');
+        $importObject->expects('getResources')->once()->andReturn(['a resource', 'Resource 2', 'unknown']);
         $importObject->expects('getEndDateTime')->once()->andReturn(new DateTimeImmutable('2021-08-29T21:34:42+0200'));
 
         // Incident Type exists already
         $term = Mockery::mock('\WP_Term');
         $term->term_id = 5123;
         expect('get_term_by')->once()->with('name', 'The keyword', 'einsatzart')->andReturn($term);
+
+        // Resource look-up, vehicles first
+        $resource1 = Mockery::mock('\WP_Term');
+        $resource1->term_id = 9023;
+        $resource1->taxonomy = 'fahrzeug';
+        $resource2 = Mockery::mock('\WP_Term');
+        $resource2->term_id = 822;
+        $resource2->taxonomy = 'exteinsatzmittel';
+        expect('get_term_by')->once()->with('name', 'a resource', 'fahrzeug')->andReturn($resource1);
+        expect('get_term_by')->once()->with('name', 'Resource 2', 'fahrzeug')->andReturn(false);
+        expect('get_term_by')->once()->with('name', 'Resource 2', 'exteinsatzmittel')->andReturn($resource2);
+        expect('get_term_by')->once()->with('name', 'unknown', 'fahrzeug')->andReturn(false);
+        expect('get_term_by')->once()->with('name', 'unknown', 'exteinsatzmittel')->andReturn(false);
 
         expect('wp_insert_post')->once()->with(Mockery::capture($insertArgs), true)->andReturn(91234);
 
@@ -76,7 +93,9 @@ class ReportInserterTest extends UnitTestCase
                 'einsatz_einsatzende' => '2021-08-29 21:34:42'
             ],
             'tax_input' => [
-                'einsatzart' => [5123]
+                'einsatzart' => [5123],
+                'exteinsatzmittel' => [822],
+                'fahrzeug' => [9023]
             ]
         ], $insertArgs);
     }
@@ -91,6 +110,7 @@ class ReportInserterTest extends UnitTestCase
         $importObject->expects('getEndDateTime')->once()->andReturnNull();
         $importObject->expects('getKeyword')->once()->andReturn('The keyword');
         $importObject->expects('getLocation')->once()->andReturn('');
+        $importObject->expects('getResources')->once()->andReturn([]);
         $importObject->expects('getStartDateTime')->once()->andReturn(new DateTimeImmutable('2021-08-29T17:51:15+0200'));
         $importObject->expects('getTitle')->once()->andReturn('Some title');
 

@@ -2,8 +2,10 @@
 namespace abrain\Einsatzverwaltung\DataAccess;
 
 use abrain\Einsatzverwaltung\Model\ReportInsertObject;
+use abrain\Einsatzverwaltung\Types\ExtEinsatzmittel;
 use abrain\Einsatzverwaltung\Types\IncidentType;
 use abrain\Einsatzverwaltung\Types\Report;
+use abrain\Einsatzverwaltung\Types\Vehicle;
 use DateTimeImmutable;
 use DateTimeZone;
 use WP_Error;
@@ -84,6 +86,21 @@ class ReportInserter
             $args['meta_input']['einsatz_einsatzort'] = $location;
         }
 
+        $resources = $reportImportObject->getResources();
+        if (!empty($resources)) {
+            $args['tax_input'][ExtEinsatzmittel::getSlug()] = [];
+            $args['tax_input'][Vehicle::getSlug()] = [];
+
+            foreach ($resources as $resource) {
+                $resourceTerm = $this->getOrCreateResourceTerm($resource);
+                if (is_wp_error($resourceTerm)) {
+                    return $resourceTerm;
+                } elseif ($resourceTerm instanceof WP_Term) {
+                    $args['tax_input'][$resourceTerm->taxonomy][] = $resourceTerm->term_id;
+                }
+            }
+        }
+
         return $args;
     }
 
@@ -105,6 +122,28 @@ class ReportInserter
         // The term does not yet exist, create it
         $newTerm = wp_insert_term($keyword, IncidentType::getSlug());
         return is_wp_error($newTerm) ? $newTerm : intval($newTerm['term_id']);
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return false|WP_Error|WP_Term
+     */
+    private function getOrCreateResourceTerm(string $name)
+    {
+        $vehicle = get_term_by('name', $name, Vehicle::getSlug());
+        if ($vehicle !== false) {
+            return $vehicle;
+        }
+
+        $extResource = get_term_by('name', $name, ExtEinsatzmittel::getSlug());
+        if ($extResource !== false) {
+            return $extResource;
+        }
+
+        // TODO create unknown resources if desired
+
+        return false;
     }
 
     /**

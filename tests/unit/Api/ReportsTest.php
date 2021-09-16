@@ -155,7 +155,8 @@ class ReportsTest extends UnitTestCase
             'content' => 'This is the content',
             'keyword' => 'key-word',
             'location' => 'It happened here',
-            'publish' => true
+            'publish' => true,
+            'resources' => 'resource 1, another resource,and number three'
         ]);
 
         // Create an overload mock, as the object gets created inside the tested function
@@ -169,6 +170,7 @@ class ReportsTest extends UnitTestCase
         }));
         $importObject->expects('setKeyword')->once()->with('key-word');
         $importObject->expects('setLocation')->once()->with('It happened here');
+        $importObject->expects('setResources')->once()->with(['resource 1', 'another resource', 'and number three']);
 
         $reportInserter = Mockery::mock('overload:abrain\Einsatzverwaltung\DataAccess\ReportInserter');
         $reportInserter->expects('__construct')->once()->with(true);

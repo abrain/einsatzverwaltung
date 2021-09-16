@@ -29,6 +29,11 @@ class ReportInsertObject
     private $location;
 
     /**
+     * @var string[]
+     */
+    private $resources;
+
+    /**
      * @var DateTimeImmutable
      */
     private $startDateTime;
@@ -52,6 +57,7 @@ class ReportInsertObject
         $this->content = '';
         $this->keyword = '';
         $this->location = '';
+        $this->resources = [];
     }
 
     /**
@@ -84,6 +90,14 @@ class ReportInsertObject
     public function getLocation(): string
     {
         return $this->location;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getResources(): array
+    {
+        return $this->resources;
     }
 
     /**
@@ -132,5 +146,13 @@ class ReportInsertObject
     public function setLocation(string $location): void
     {
         $this->location = $location;
+    }
+
+    /**
+     * @param string[] $resources
+     */
+    public function setResources(array $resources): void
+    {
+        $this->resources = $resources;
     }
 }

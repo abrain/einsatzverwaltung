@@ -9,10 +9,10 @@ use WP_REST_Controller;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
+use function __;
 use function array_key_exists;
 use function array_map;
 use function current_user_can;
-use function esc_html__;
 use function explode;
 use function is_bool;
 use function is_string;
@@ -41,7 +41,7 @@ class Reports extends WP_REST_Controller
                 'permission_callback' => array($this, 'create_item_permissions_check'),
                 'args'                => array(
                     'reason' => array(
-                        'description' => esc_html__('', 'einsatzverwaltung'), // TODO
+                        'description' => __('Very short description of the incident, will be used in the title', 'einsatzverwaltung'),
                         'type' => 'string',
                         'validate_callback' => array($this, 'validateStringNotEmpty'),
                         'sanitize_callback' => function ($param, $request, $key) {
@@ -50,42 +50,42 @@ class Reports extends WP_REST_Controller
                         'required' => true,
                     ),
                     'date_start' => array(
-                        'description' => esc_html__('', 'einsatzverwaltung'), // TODO
+                        'description' => __('The start date and time of the incident, RFC 3339 format.', 'einsatzverwaltung'),
                         'type' => 'string',
                         'format' => 'date-time',
                         'validate_callback' => array($this, 'validateDateTime'),
                         'required' => true,
                     ),
                     'date_end' => array(
-                        'description' => esc_html__('', 'einsatzverwaltung'), // TODO
+                        'description' => __('The end date and time of the incident, RFC 3339 format.', 'einsatzverwaltung'),
                         'type' => 'string',
                         'format' => 'date-time',
                         'validate_callback' => array($this, 'validateDateTime'),
                         'required' => false,
                     ),
                     'content' => array(
-                        'description' => esc_html__('The content of the report. No HTML allowed, but line breaks are preserved.', 'einsatzverwaltung'),
+                        'description' => __('The content of the report. No HTML allowed, but line breaks are preserved.', 'einsatzverwaltung'),
                         'type' => 'string',
                         'validate_callback' => array($this, 'validateIsString'),
                         'sanitize_callback' => 'sanitize_textarea_field',
                         'required' => false,
                     ),
                     'keyword' => array(
-                        'description' => esc_html__('', 'einsatzverwaltung'), // TODO
+                        'description' => __('Identifier used to categorize incidents.', 'einsatzverwaltung'),
                         'type' => 'string',
                         'validate_callback' => array($this, 'validateIsString'),
                         'sanitize_callback' => 'sanitize_text_field',
                         'required' => false
                     ),
                     'location' => array(
-                        'description' => esc_html__('The location of the incident.', 'einsatzverwaltung'),
+                        'description' => __('The location of the incident.', 'einsatzverwaltung'),
                         'type' => 'string',
                         'validate_callback' => array($this, 'validateIsString'),
                         'sanitize_callback' => 'sanitize_text_field',
                         'required' => false,
                     ),
                     'publish' => array(
-                        'description' => esc_html__('If the report should be published immediately.', 'einsatzverwaltung'),
+                        'description' => __('If the report should be published immediately.', 'einsatzverwaltung'),
                         'type' => 'boolean',
                         'default' => false,
                         'validate_callback' => function ($param, $request, $key) {
@@ -94,7 +94,7 @@ class Reports extends WP_REST_Controller
                         'required' => false,
                     ),
                     'resources' => array(
-                        'description' => esc_html__('The resources dispatched to this incident.', 'einsatzverwaltung'),
+                        'description' => __('The resources dispatched to this incident as a comma-separated list.', 'einsatzverwaltung'),
                         'type' => 'string',
                         'validate_callback' => array($this, 'validateIsString'),
                         'sanitize_callback' => 'sanitize_text_field',

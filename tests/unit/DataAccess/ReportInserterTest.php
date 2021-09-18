@@ -116,7 +116,11 @@ class ReportInserterTest extends UnitTestCase
 
         // Incident Type does not exist and has to be created
         expect('get_term_by')->once()->with('name', 'The keyword', 'einsatzart')->andReturn(false);
+        expect('get_terms')->once()->with(Mockery::type('array'))->andReturn([]);
         expect('wp_insert_term')->once()->with('The keyword', 'einsatzart')->andReturn(['term_id' => 9384]);
+        $term = Mockery::mock('\WP_Term');
+        $term->term_id = 9384;
+        expect('get_term')->once()->with(9384, 'einsatzart')->andReturn($term);
 
         expect('wp_insert_post')->once()->with(Mockery::capture($insertArgs), true)->andReturn(9114);
 
@@ -149,10 +153,50 @@ class ReportInserterTest extends UnitTestCase
 
         // Incident Type does not exist and creating it causes an error
         expect('get_term_by')->once()->with('name', 'A keyword', 'einsatzart')->andReturn(false);
+        expect('get_terms')->once()->with(Mockery::type('array'))->andReturn([]);
         $wpError = Mockery::mock('\WP_Error');
         expect('wp_insert_term')->once()->with('A keyword', 'einsatzart')->andReturn($wpError);
 
         $reportInserter = new ReportInserter();
         $this->assertEquals($wpError, $reportInserter->insertReport($importObject));
+    }
+
+    /**
+     * @throws ExpectationArgsRequired
+     */
+    public function testFindIncidentCategoryByAlias()
+    {
+        $importObject = Mockery::mock('abrain\Einsatzverwaltung\Model\ReportInsertObject');
+        $importObject->expects('getContent')->once()->andReturn('');
+        $importObject->expects('getEndDateTime')->once()->andReturnNull();
+        $importObject->expects('getKeyword')->once()->andReturn('Alternative keyword');
+        $importObject->expects('getLocation')->once()->andReturn('');
+        $importObject->expects('getResources')->once()->andReturn([]);
+        $importObject->expects('getStartDateTime')->once()->andReturn(new DateTimeImmutable());
+        $importObject->expects('getTitle')->once()->andReturn('');
+
+        // Incident Type does not exist and has to be created
+        expect('get_term_by')->once()->with('name', 'Alternative keyword', 'einsatzart')->andReturn(false);
+        $term1 = Mockery::mock('\WP_Term');
+        $term1->term_id = 8451;
+        $term2 = Mockery::mock('\WP_Term');
+        $term2->term_id = 4561;
+        expect('get_terms')->once()->with(Mockery::capture($getTermsArgs))->andReturn([$term1, $term2]);
+
+        expect('wp_insert_post')->once()->with(Mockery::capture($insertArgs), true)->andReturn(9114);
+
+        $reportInserter = new ReportInserter();
+        $this->assertEquals(9114, $reportInserter->insertReport($importObject));
+        $this->assertEqualSets([
+            'taxonomy' => 'einsatzart',
+            'hide_empty' => false,
+            'meta_query' => [
+                [
+                    'key' => 'altname',
+                    'value' => 'Alternative keyword'
+                ]
+            ]
+        ], $getTermsArgs);
+        $this->assertEquals([8451], $insertArgs['tax_input']['einsatzart']);
     }
 }

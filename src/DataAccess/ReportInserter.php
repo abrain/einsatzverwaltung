@@ -11,7 +11,9 @@ use DateTimeZone;
 use WP_Error;
 use WP_Term;
 use function get_date_from_gmt;
+use function get_term;
 use function get_term_by;
+use function get_terms;
 use function is_wp_error;
 use function wp_insert_post;
 use function wp_insert_term;
@@ -74,11 +76,11 @@ class ReportInserter
 
         $keyword = $reportImportObject->getKeyword();
         if (!empty($keyword)) {
-            $termId = $this->getOrCreateIncidentTypeTerm($keyword);
-            if (is_wp_error($termId)) {
-                return $termId;
+            $incidentTypeTerm = $this->getOrCreateIncidentTypeTerm($keyword);
+            if (is_wp_error($incidentTypeTerm)) {
+                return $incidentTypeTerm;
             }
-            $args['tax_input'][IncidentType::getSlug()] = [$termId];
+            $args['tax_input'][IncidentType::getSlug()] = [$incidentTypeTerm->term_id];
         }
 
         $location = $reportImportObject->getLocation();
@@ -107,21 +109,31 @@ class ReportInserter
     /**
      * @param string $keyword
      *
-     * @return int|WP_Error
+     * @return WP_Error|WP_Term
      */
     private function getOrCreateIncidentTypeTerm(string $keyword)
     {
-        $term = get_term_by('name', $keyword, IncidentType::getSlug());
+        $taxonomy = IncidentType::getSlug();
+        $term = get_term_by('name', $keyword, $taxonomy);
 
-        if ($term instanceof WP_Term) {
-            return $term->term_id;
-        } elseif (is_wp_error($term)) {
+        if ($term !== false) {
             return $term;
         }
 
+        $termsByAlias = get_terms([
+            'taxonomy' => $taxonomy,
+            'hide_empty' => false,
+            'meta_query' => [
+                ['key' => 'altname', 'value' => $keyword]
+            ]
+        ]);
+        if (!empty($termsByAlias)) {
+            return $termsByAlias[0];
+        }
+
         // The term does not yet exist, create it
-        $newTerm = wp_insert_term($keyword, IncidentType::getSlug());
-        return is_wp_error($newTerm) ? $newTerm : intval($newTerm['term_id']);
+        $newTerm = wp_insert_term($keyword, $taxonomy);
+        return is_wp_error($newTerm) ? $newTerm : get_term($newTerm['term_id'], $taxonomy);
     }
 
     /**

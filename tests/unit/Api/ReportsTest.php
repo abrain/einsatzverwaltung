@@ -59,20 +59,34 @@ class ReportsTest extends UnitTestCase
     /**
      * @throws ExpectationArgsRequired
      */
-    public function testCreatePermissionCheckPass()
+    public function testUserCanEditReports()
     {
         $request = Mockery::mock('WP_REST_Request');
-        expect('current_user_can')->once()->with(Mockery::type('string'))->andReturn(true);
+        $request->expects('get_params')->once()->andReturn(['publish' => false]);
+        expect('current_user_can')->once()->with('edit_einsatzberichte')->andReturn(true);
         $this->assertTrue((new Reports())->create_item_permissions_check($request));
     }
 
     /**
      * @throws ExpectationArgsRequired
      */
-    public function testCreatePermissionCheckFail()
+    public function testUserCannotEditReports()
     {
         $request = Mockery::mock('WP_REST_Request');
-        expect('current_user_can')->once()->with(Mockery::type('string'))->andReturn(false);
+        $request->expects('get_params')->once()->andReturn(['publish' => false]);
+        expect('current_user_can')->once()->with('edit_einsatzberichte')->andReturn(false);
+        $this->assertFalse((new Reports())->create_item_permissions_check($request));
+    }
+
+    /**
+     * @throws ExpectationArgsRequired
+     */
+    public function testUserCannotPublishReports()
+    {
+        $request = Mockery::mock('WP_REST_Request');
+        $request->expects('get_params')->once()->andReturn(['publish' => true]);
+        expect('current_user_can')->once()->with('edit_einsatzberichte')->andReturn(true);
+        expect('current_user_can')->once()->with('publish_einsatzberichte')->andReturn(false);
         $this->assertFalse((new Reports())->create_item_permissions_check($request));
     }
 

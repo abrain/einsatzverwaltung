@@ -162,7 +162,9 @@ class Reports extends WP_REST_Controller
      */
     public function create_item_permissions_check($request)
     {
-        return current_user_can('edit_einsatzberichte');
+        $params = $request->get_params();
+        $publishReport = array_key_exists('publish', $params) && $params['publish'] === true;
+        return current_user_can('edit_einsatzberichte') && (!$publishReport || current_user_can('publish_einsatzberichte'));
     }
 
     /**

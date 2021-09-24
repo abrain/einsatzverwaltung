@@ -56,7 +56,7 @@ class ReportInserterTest extends UnitTestCase
         $importObject->expects('getContent')->once()->andReturn('Some random post content');
         $importObject->expects('getKeyword')->once()->andReturn('The keyword');
         $importObject->expects('getLocation')->once()->andReturn('The location');
-        $importObject->expects('getResources')->once()->andReturn(['a resource', 'Resource 2', 'unknown']);
+        $importObject->expects('getResources')->once()->andReturn(['resource', 'Resource 2', 'unknown', 'abc', 'def']);
         $importObject->expects('getEndDateTime')->once()->andReturn(new DateTimeImmutable('2021-08-29T21:34:42+0200'));
 
         // Incident Type exists already
@@ -64,23 +64,46 @@ class ReportInserterTest extends UnitTestCase
         $term->term_id = 5123;
         expect('get_term_by')->once()->with('name', 'The keyword', 'einsatzart')->andReturn($term);
 
-        // Resource look-up, vehicles first
+        // Resource look-up, first by name then by alias
         $resource1 = Mockery::mock('\WP_Term');
+        $resource1->name = 'Resource 2';
         $resource1->term_id = 9023;
         $resource1->taxonomy = 'fahrzeug';
         $resource2 = Mockery::mock('\WP_Term');
+        $resource2->name = 'resource';
         $resource2->term_id = 822;
         $resource2->taxonomy = 'exteinsatzmittel';
-        expect('get_term_by')->once()->with('name', 'a resource', 'fahrzeug')->andReturn($resource1);
-        expect('get_term_by')->once()->with('name', 'Resource 2', 'fahrzeug')->andReturn(false);
-        expect('get_term_by')->once()->with('name', 'Resource 2', 'exteinsatzmittel')->andReturn($resource2);
-        expect('get_term_by')->once()->with('name', 'unknown', 'fahrzeug')->andReturn(false);
-        expect('get_term_by')->once()->with('name', 'unknown', 'exteinsatzmittel')->andReturn(false);
+        $resource3 = Mockery::mock('\WP_Term');
+        $resource3->term_id = 374;
+        $resource3->taxonomy = 'fahrzeug';
+        $resource4 = Mockery::mock('\WP_Term');
+        $resource4->term_id = 2983;
+        $resource4->taxonomy = 'exteinsatzmittel';
+        expect('get_terms')->once()->with(Mockery::capture($byNameArgs))->andReturn([$resource1, $resource2]);
+        expect('get_terms')->once()->with(Mockery::capture($byAliasArgs))->andReturn([$resource3, $resource4]);
 
         expect('wp_insert_post')->once()->with(Mockery::capture($insertArgs), true)->andReturn(91234);
 
         $reportInserter = new ReportInserter(true);
         $this->assertEquals(91234, $reportInserter->insertReport($importObject));
+
+        // Check that get_terms was called with the right args to search by name
+        $this->assertEqualSets([
+            'name' => ['resource', 'Resource 2', 'unknown', 'abc', 'def'],
+            'hide_empty' => false,
+            'taxonomy' => ['fahrzeug', 'exteinsatzmittel']
+        ], $byNameArgs);
+
+        // Check that get_terms was called with the right args to search by alias
+        $this->assertEqualSets([
+            'hide_empty' => false,
+            'taxonomy' => ['fahrzeug', 'exteinsatzmittel'],
+            'meta_query' => [
+                ['key' => 'altname', 'compare' => 'IN', 'value' => ['unknown', 'abc', 'def']]
+            ]
+        ], $byAliasArgs);
+
+        // Check that wp_insert_post was called with the right args
         $this->assertEqualSets([
             'post_type' => 'einsatz',
             'post_status' => 'publish',
@@ -94,8 +117,8 @@ class ReportInserterTest extends UnitTestCase
             ],
             'tax_input' => [
                 'einsatzart' => [5123],
-                'exteinsatzmittel' => [822],
-                'fahrzeug' => [9023]
+                'exteinsatzmittel' => [822, 2983],
+                'fahrzeug' => [9023, 374]
             ]
         ], $insertArgs);
     }
@@ -175,7 +198,7 @@ class ReportInserterTest extends UnitTestCase
         $importObject->expects('getStartDateTime')->once()->andReturn(new DateTimeImmutable());
         $importObject->expects('getTitle')->once()->andReturn('');
 
-        // Incident Type does not exist and has to be created
+        // Incident Type is not found by name, search by alias
         expect('get_term_by')->once()->with('name', 'Alternative keyword', 'einsatzart')->andReturn(false);
         $term1 = Mockery::mock('\WP_Term');
         $term1->term_id = 8451;

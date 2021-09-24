@@ -10,6 +10,10 @@ use DateTimeImmutable;
 use DateTimeZone;
 use WP_Error;
 use WP_Term;
+use function array_diff;
+use function array_map;
+use function array_merge;
+use function array_values;
 use function get_date_from_gmt;
 use function get_term;
 use function get_term_by;
@@ -93,13 +97,12 @@ class ReportInserter
             $args['tax_input'][ExtEinsatzmittel::getSlug()] = [];
             $args['tax_input'][Vehicle::getSlug()] = [];
 
-            foreach ($resources as $resource) {
-                $resourceTerm = $this->getOrCreateResourceTerm($resource);
-                if (is_wp_error($resourceTerm)) {
-                    return $resourceTerm;
-                } elseif ($resourceTerm instanceof WP_Term) {
-                    $args['tax_input'][$resourceTerm->taxonomy][] = $resourceTerm->term_id;
-                }
+            $resourceTerms = $this->getResourceTerms($resources);
+            if (is_wp_error($resourceTerms)) {
+                return $resourceTerms;
+            }
+            foreach ($resourceTerms as $resourceTerm) {
+                $args['tax_input'][$resourceTerm->taxonomy][] = $resourceTerm->term_id;
             }
         }
 
@@ -137,25 +140,44 @@ class ReportInserter
     }
 
     /**
-     * @param string $name
+     * @param string[] $names
      *
-     * @return false|WP_Error|WP_Term
+     * @return WP_Error|WP_Term[]
      */
-    private function getOrCreateResourceTerm(string $name)
+    private function getResourceTerms(array $names)
     {
-        $vehicle = get_term_by('name', $name, Vehicle::getSlug());
-        if ($vehicle !== false) {
-            return $vehicle;
+        $resourcesByName = get_terms([
+            'name' => $names,
+            'taxonomy' => [Vehicle::getSlug(), ExtEinsatzmittel::getSlug()],
+            'hide_empty' => false
+        ]);
+
+        if (is_wp_error($resourcesByName)) {
+            return $resourcesByName;
         }
 
-        $extResource = get_term_by('name', $name, ExtEinsatzmittel::getSlug());
-        if ($extResource !== false) {
-            return $extResource;
+        // Determine which resources have been found by name and continue with the rest
+        $resourceNames = array_map(function ($resource) {
+            return $resource->name;
+        }, $resourcesByName);
+        $remainingNames = array_values(array_diff($names, $resourceNames));
+
+        if (empty($remainingNames)) {
+            return $resourcesByName;
         }
 
-        // TODO create unknown resources if desired
+        $resourcesByAlias = get_terms([
+            'taxonomy' => [Vehicle::getSlug(), ExtEinsatzmittel::getSlug()],
+            'hide_empty' => false,
+            'meta_query' => [
+                ['key' => 'altname', 'compare' => 'IN', 'value' => $remainingNames]
+            ]
+        ]);
+        if (is_wp_error($resourcesByAlias)) {
+            return $resourcesByAlias;
+        }
 
-        return false;
+        return array_merge($resourcesByName, $resourcesByAlias);
     }
 
     /**

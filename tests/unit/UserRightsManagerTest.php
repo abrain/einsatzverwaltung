@@ -3,6 +3,7 @@ namespace abrain\Einsatzverwaltung;
 
 use Brain\Monkey\Expectation\Exception\ExpectationArgsRequired;
 use Mockery;
+use function Brain\Monkey\Filters\expectAdded;
 use function Brain\Monkey\Functions\expect;
 
 /**
@@ -12,6 +13,13 @@ use function Brain\Monkey\Functions\expect;
  */
 class UserRightsManagerTest extends UnitTestCase
 {
+    public function testAddHooks()
+    {
+        expectAdded('user_has_cap');
+        $userRightsManager = new UserRightsManager();
+        $userRightsManager->addHooks();
+    }
+
     public function testOtherCapsAreLeftAlone()
     {
         $userRightsManager = new UserRightsManager();
@@ -71,5 +79,12 @@ class UserRightsManagerTest extends UnitTestCase
         $expectedCaps = array('granted_cap' => 1, 'read' => 1, 'edit_einsatzberichte' => 1);
         $userHasCap = $userRightsManager->userHasCap($allcaps, array('edit_einsatzberichte'), array(), $user);
         $this->assertEquals($expectedCaps, $userHasCap);
+    }
+
+    public function testUpdateRoles()
+    {
+        expect('remove_role')->atLeast()->once()->with(Mockery::type('string'));
+        expect('add_role')->atLeast()->once()->with(Mockery::type('string'), Mockery::type('string'), Mockery::type('array'));
+        (new UserRightsManager())->updateRoles();
     }
 }

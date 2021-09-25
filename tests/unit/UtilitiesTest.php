@@ -4,6 +4,7 @@ namespace abrain\Einsatzverwaltung;
 use Brain\Monkey\Expectation\Exception\ExpectationArgsRequired;
 use Mockery;
 use function Brain\Monkey\Functions\expect;
+use function is_array;
 
 /**
  * Class UtilitiesTest
@@ -40,6 +41,7 @@ class UtilitiesTest extends UnitTestCase
 
     /**
      * @uses \abrain\Einsatzverwaltung\Types\Unit::compare()
+     * @uses \abrain\Einsatzverwaltung\Types\Unit::getSlug()
      * @uses \abrain\Einsatzverwaltung\Types\Vehicle::compareVehicles()
      * @throws ExpectationArgsRequired
      */
@@ -74,17 +76,25 @@ class UtilitiesTest extends UnitTestCase
 
         $unit1 = Mockery::mock('\WP_Term');
         $unit1->term_id = 991;
-        expect('get_term')->once()->with(991)->andReturn($unit1);
-        expect('get_term_meta')->once()->with(991, 'unit_order', true)->andReturn(2);
 
         $unit2 = Mockery::mock('\WP_Term');
         $unit2->term_id = 53;
-        expect('get_term')->once()->with(53)->andReturn($unit2);
-        expect('get_term_meta')->once()->with(53, 'unit_order', true)->andReturn(1);
+
+        $unit3 = Mockery::mock('\WP_Term');
+        $unit3->term_id = 6263;
+
+        expect('get_terms')->once()->with(Mockery::on(function ($args) {
+            return is_array($args) && $args['taxonomy'] === 'evw_unit' && $args['hide_empty'] === false;
+        }))->andReturn([$unit1, $unit2, $unit3]);
+
+        expect('get_term_meta')->atLeast()->once()->with(991, 'unit_order', true)->andReturn(2);
+        expect('get_term_meta')->atLeast()->once()->with(53, 'unit_order', true)->andReturn(1);
+        expect('get_term_meta')->atLeast()->once()->with(6263, 'unit_order', true)->andReturn(4);
 
         self::assertEquals([
             53 => [$vehicle3, $vehicle1],
             991 => [$vehicle4],
+            6263 => [],
             -1 => [$vehicle2, $vehicle5]
         ], Utilities::groupVehiclesByUnit([$vehicle1, $vehicle2, $vehicle3, $vehicle4, $vehicle5]));
     }

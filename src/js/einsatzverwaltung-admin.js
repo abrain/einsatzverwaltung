@@ -1,6 +1,6 @@
-jQuery(document).ready(function() {
-    // Color picker initialisieren
-    if ( jQuery.isFunction( jQuery.fn.wpColorPicker ) ) {
-        jQuery( 'input.einsatzverwaltung-color-picker' ).wpColorPicker();
+jQuery(function () {
+    // Initialize color pickers
+    if (typeof jQuery.fn.wpColorPicker === 'function') {
+        jQuery('input.einsatzverwaltung-color-picker').wpColorPicker();
     }
 });

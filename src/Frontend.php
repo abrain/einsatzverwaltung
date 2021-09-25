@@ -5,10 +5,14 @@ use abrain\Einsatzverwaltung\Frontend\ReportList\Renderer as ReportListRenderer;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Types\Report;
 use abrain\Einsatzverwaltung\Types\Unit;
+use abrain\Einsatzverwaltung\Types\Vehicle;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use WP_Post;
 use WP_Query;
+use function add_filter;
 use function date_i18n;
+use function get_post_type;
+use function in_array;
 use function sprintf;
 use function wp_kses;
 
@@ -120,10 +124,10 @@ class Frontend
         $headerstring .= $this->getDetailString('Einsatzleiter', $report->getIncidentCommander());
         $headerstring .= $this->getDetailString('Mannschaftsst&auml;rke', $report->getWorkforce());
 
-        // If at least one unit has been assigned to any report, show the vehicles grouped by unit
-        if (Unit::isActivelyUsed()) {
+        // If both units and vehicles have been assigned to any report in the past, show the vehicles grouped by unit
+        if (Unit::isActivelyUsed() && Vehicle::isActivelyUsed()) {
             $headerstring .= $this->getDetailString(
-                __('Vehicles', 'einsatzverwaltung'),
+                __('Units and Vehicles', 'einsatzverwaltung'),
                 $this->formatter->getVehiclesByUnitString($report->getVehiclesByUnit()),
                 false
             );
@@ -131,6 +135,10 @@ class Frontend
             $headerstring .= $this->getDetailString(
                 __('Vehicles', 'einsatzverwaltung'),
                 $this->formatter->getVehicleString($report->getVehicles(), $mayContainLinks, $showArchiveLinks)
+            );
+            $headerstring .= $this->getDetailString(
+                __('Units', 'einsatzverwaltung'),
+                $this->formatter->getUnits($report, $mayContainLinks)
             );
         }
 
@@ -176,10 +184,10 @@ class Frontend
      */
     public function renderContent(string $content): string
     {
-        global $post;
+        $post = get_post();
 
-        // Wenn Beiträge durch ein Passwort geschützt sind, werden auch keine Einsatzdetails preisgegeben
-        if (post_password_required()) {
+        // Bail, if the post object is empty, not a report, or the content is password protected
+        if (empty($post) || get_post_type($post) !== Report::getSlug() || post_password_required($post)) {
             return $content;
         }
 
@@ -196,8 +204,7 @@ class Frontend
             }
             
             $templateWithData = $this->formatter->formatIncidentData($template, array(), $post);
-            $templateWithContent = str_replace('%content%', $content, $templateWithData);
-            return stripslashes(wp_filter_post_kses(addslashes($templateWithContent)));
+            return str_replace('%content%', $content, $templateWithData);
         }
 
         if (!is_singular('einsatz')) {

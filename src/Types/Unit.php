@@ -151,6 +151,12 @@ class Unit implements CustomTaxonomy
         return 'evw_unit';
     }
 
+    public static function hasTerms(): bool
+    {
+        $unitCount = get_terms(['taxonomy' => self::getSlug(), 'fields' => 'count', 'hide_empty' => false]);
+        return is_numeric($unitCount) && $unitCount > 0;
+    }
+
     public static function isActivelyUsed(): bool
     {
         $unitCount = get_terms(['taxonomy' => self::getSlug(), 'fields' => 'count']);

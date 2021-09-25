@@ -95,7 +95,7 @@ class ReportEditScreen extends EditScreen
         );
         add_meta_box(
             'fahrzeugdiv',
-            __('Vehicles', 'einsatzverwaltung'),
+            __('Units and Vehicles', 'einsatzverwaltung'),
             array($this, 'displayMetaBoxVehicles'),
             $this->customTypeSlug,
             'side',
@@ -267,12 +267,15 @@ class ReportEditScreen extends EditScreen
             return;
         }
 
+        // Determine if units should be shown
+        $showUnits = Unit::hasTerms();
+
         $allVehicles = get_terms(array(
             'taxonomy' => Vehicle::getSlug(),
             'hide_empty' => false
         ));
-        if (empty($allVehicles)) {
-            printf("<div>%s</div>", esc_html($vehicleTaxonomy->labels->no_terms));
+        if (empty($allVehicles) && !$showUnits) {
+            printf("<div>%s</div>", esc_html__('No units and no vehicles', 'einsatzverwaltung'));
             return;
         }
 
@@ -295,7 +298,7 @@ class ReportEditScreen extends EditScreen
         }
 
         echo '<div>';
-        if (Unit::isActivelyUsed()) {
+        if ($showUnits) {
             $this->echoVehiclesByUnit($post, $vehicleTaxonomy, $inServiceVehicles, $assignedVehicleIds);
         } else {
             // Sort the vehicles according to the custom order numbers
@@ -351,7 +354,7 @@ class ReportEditScreen extends EditScreen
 
         foreach (Utilities::groupVehiclesByUnit($vehicles) as $unitId => $unitVehicles) {
             if ($unitId === -1) {
-                printf('<p><b>%s</b></p>', esc_html__('Without Unit', 'einsatzverwaltung'));
+                printf('<p style="margin-top: 13px;"><b>%s</b></p>', esc_html__('Without Unit', 'einsatzverwaltung'));
             } else {
                 $unit = get_term($unitId, Unit::getSlug());
                 printf(
@@ -362,6 +365,12 @@ class ReportEditScreen extends EditScreen
                     esc_html($unit->name)
                 );
             }
+
+            if (empty($unitVehicles)) {
+                echo '<br>';
+                continue;
+            }
+
             echo '<ul style="margin-left: 1.5em;">';
             $this->echoTermCheckboxes($unitVehicles, $vehicleTaxonomy, $assignedVehicleIds);
             echo '</ul>';

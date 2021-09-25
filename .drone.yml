@@ -15,16 +15,17 @@ steps:
     image: composer
     commands:
       - composer install --ignore-platform-reqs
+  - name: check-php-compatibility
+    image: php:7
+    commands:
+      - ./vendor/bin/phpcs -p --ignore="\.min\.css" src/ --standard=PHPCompatibility
   - name: test
     image: php:7
     environment:
       CC_TEST_REPORTER_ID:
         from_secret: cc_test_reporter_id
     commands:
-      - apt-get update && apt-get install -y zlib1g-dev libicu-dev g++ git
-      - docker-php-ext-configure intl
-      - docker-php-ext-install intl
-      - ./vendor/bin/phpunit -c phpunit-checks.xml --no-coverage
+      - apt-get update && apt-get install -y git
       - pecl install xdebug
       - docker-php-ext-enable xdebug
       - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
@@ -48,3 +49,29 @@ trigger:
   branch:
     exclude:
       - feature/*
+
+---
+kind: pipeline
+type: docker
+name: release
+
+steps:
+  - name: check version tags
+    image: alpine
+    commands:
+      - ./bin/check-version-tags.sh
+  - name: slack
+    image: plugins/slack
+    settings:
+      webhook:
+        from_secret: slack_hook
+    when:
+      status:
+        - failure
+
+depends_on:
+  - unit-tests
+
+trigger:
+  event:
+    - tag

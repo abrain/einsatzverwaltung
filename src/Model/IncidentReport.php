@@ -8,16 +8,20 @@ use abrain\Einsatzverwaltung\Utilities;
 use DateTime;
 use WP_Post;
 use WP_Term;
+use function array_filter;
 use function array_key_exists;
 use function array_keys;
+use function array_map;
 use function get_post;
 use function get_post_type;
 use function error_log;
 use function get_the_terms;
+use function in_array;
 use function intval;
 use function is_numeric;
 use function is_wp_error;
 use function usort;
+use const ARRAY_FILTER_USE_BOTH;
 
 /**
  * Datenmodellklasse für Einsatzberichte
@@ -383,15 +387,23 @@ class IncidentReport
     public function getVehiclesByUnit(): array
     {
         $vehicles = $this->getTheTerms(Vehicle::getSlug());
-        if (empty($vehicles)) {
-            return [];
-        }
+        $vehiclesByUnitId = Utilities::groupVehiclesByUnit($vehicles);
 
-        return Utilities::groupVehiclesByUnit($vehicles);
+        // Keep units that are assigned to the report, or have vehicles that are assigned
+        $assignedUnitIds = array_map(function ($unit) {
+            return $unit->term_id;
+        }, $this->getUnits());
+        return array_filter(
+            $vehiclesByUnitId,
+            function ($vehicles, $unitId) use ($assignedUnitIds) {
+                return !empty($vehicles) || in_array($unitId, $assignedUnitIds);
+            },
+            ARRAY_FILTER_USE_BOTH
+        );
     }
 
     /**
-     * @return int The weight of the report (i. e. how many reports it represents)
+     * @return int The weight of the report (i.e. how many reports it represents)
      */
     public function getWeight(): int
     {

@@ -1,7 +1,7 @@
 {
   "name": "abrain/einsatzverwaltung",
   "description": "Wordpress-Plugin zur Verwaltung und Darstellung von Einsatzberichten der Feuerwehr und anderer Hilfsorganisationen",
-  "homepage": "https://einsatzverwaltung.abrain.de",
+  "homepage": "https://einsatzverwaltung.org",
   "type": "wordpress-plugin",
   "license": "GPL-2.0-or-later",
   "authors": [
@@ -13,11 +13,11 @@
     }
   ],
   "support": {
-    "email": "kontakt@abrain.de",
+    "email": "support@einsatzverwaltung.org",
     "issues": "https://github.com/abrain/einsatzverwaltung/issues",
     "forum": "https://wordpress.org/support/plugin/einsatzverwaltung",
     "source": "https://github.com/abrain/einsatzverwaltung",
-    "docs": "https://einsatzverwaltung.abrain.de/dokumentation/"
+    "docs": "https://einsatzverwaltung.org/dokumentation/"
   },
   "config": {
     "platform": {

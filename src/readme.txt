@@ -1,6 +1,6 @@
 === Einsatzverwaltung ===
 Contributors: abrain
-Donate link: https://einsatzverwaltung.abrain.de/unterstuetzen/
+Donate link: https://einsatzverwaltung.org/unterstuetzen/
 Tags: Feuerwehr, fire department, EMS
 Requires at least: 5.1.0
 Tested up to: 5.8
@@ -40,7 +40,7 @@ No, this plugin has no affiliation with einsatzverwaltung.eu.
 
 = Is there a manual? =
 
-Yes, there is more [documentation](https://einsatzverwaltung.abrain.de/dokumentation/) on our website.
+Yes, there is more [documentation](https://einsatzverwaltung.org/dokumentation/) on our website.
 
 = Where should I send feature requests and bug reports to? =
 
@@ -48,7 +48,7 @@ Ideally, you check the issues on [GitHub](https://github.com/abrain/einsatzverwa
 
 = Are there more FAQ? =
 
-Yes, you can find them on [our website](https://einsatzverwaltung.abrain.de/faq/).
+Yes, you can find them on [our website](https://einsatzverwaltung.org/faq/).
 
 == Changelog ==
 

@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Einsatzverwaltung
-Plugin URI: https://einsatzverwaltung.abrain.de
+Plugin URI: https://einsatzverwaltung.org
 Description: Public incident reports for fire brigades and other rescue services
 Version: 1.9.7
 Author: Andreas Brain

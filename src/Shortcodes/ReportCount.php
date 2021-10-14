@@ -16,15 +16,6 @@ use function is_numeric;
 class ReportCount extends AbstractShortcode
 {
     /**
-     * @var array
-     */
-    private $defaultAttributes = array(
-        'status' => '',
-        'icategories' => '',
-        'units' => '',
-        'year' => ''
-    );
-    /**
      * @var ReportQuery
      */
     private $reportQuery;
@@ -36,6 +27,13 @@ class ReportCount extends AbstractShortcode
      */
     public function __construct(ReportQuery $reportQuery)
     {
+        parent::__construct([
+            'status' => '',
+            'icategories' => '',
+            'units' => '',
+            'year' => ''
+        ]);
+
         $this->reportQuery = $reportQuery;
     }
 
@@ -82,24 +80,17 @@ class ReportCount extends AbstractShortcode
     }
 
     /**
-     * @param array|string $attributes
-     *
-     * @return array
+     * @inheritDoc
      */
-    private function getAttributes($attributes): array
+    protected function fixOutdatedAttributes(array $attributes): array
     {
-        // See https://core.trac.wordpress.org/ticket/45929
-        if ($attributes === '') {
-            $attributes = [];
-        }
-
-        // Ensure backwards compatibility
+        // 'einsatzart' has been renamed to 'icategories'
         if (array_key_exists('einsatzart', $attributes) && !array_key_exists('icategories', $attributes) &&
             is_numeric($attributes['einsatzart'])) {
             $attributes['icategories'] = $attributes['einsatzart'];
         }
 
-        return shortcode_atts($this->defaultAttributes, $attributes);
+        return $attributes;
     }
 
     /**

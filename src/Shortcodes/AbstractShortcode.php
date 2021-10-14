@@ -6,6 +6,8 @@ use function array_intersect;
 use function array_key_exists;
 use function array_map;
 use function explode;
+use function is_string;
+use function shortcode_atts;
 use const ARRAY_A;
 
 /**
@@ -16,11 +18,58 @@ use const ARRAY_A;
 abstract class AbstractShortcode
 {
     /**
+     * The default attributes for the shortcode. Will be used to filter unknown attributes and provide default values
+     * for missing attributes.
+     *
+     * @var array
+     */
+    private $defaultAttributes;
+
+    /**
+     * @param array $defaultAttributes
+     */
+    public function __construct(array $defaultAttributes)
+    {
+        $this->defaultAttributes = $defaultAttributes;
+    }
+
+    /**
      * @param array|string $attributes
      *
      * @return string
      */
     abstract public function render($attributes): string;
+
+    /**
+     * Can be overridden to rewrite the attributes before matching them against the default attributes.
+     *
+     * @param array $attributes
+     *
+     * @return array
+     */
+    protected function fixOutdatedAttributes(array $attributes): array
+    {
+        return $attributes;
+    }
+
+    /**
+     * Filters the provided attributes based on the default attributes of the shortcode. Subclasses can rewrite the
+     * attributes in `fixOutdatedAttributes()` before they get filtered.
+     *
+     * @param array|string $attributes
+     *
+     * @return array
+     */
+    protected function getAttributes($attributes): array
+    {
+        // See https://core.trac.wordpress.org/ticket/45929
+        $attributesArray = is_string($attributes) ? [] : $attributes;
+
+        // Ensure backwards compatibility
+        $attributesArray = $this->fixOutdatedAttributes($attributesArray);
+
+        return shortcode_atts($this->defaultAttributes, $attributesArray);
+    }
 
     /**
      * Extracts a list of integers from a comma-separated string

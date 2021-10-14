@@ -146,4 +146,15 @@ class ReportCountTest extends UnitTestCase
         $reportCount = new ReportCount($reportQuery);
         $reportCount->render(['einsatzart' => '5122']);
     }
+
+    public function testConfiguresAlertingMethods()
+    {
+        $reportQuery = Mockery::mock(ReportQuery::class);
+        $reportQuery->expects('resetQueryVars')->once();
+        $reportQuery->expects('setAlertingMethodIds')->once()->with([253, 831]);
+        $reportQuery->expects('getReports')->once()->andReturn([]);
+
+        $reportCount = new ReportCount($reportQuery);
+        $reportCount->render(['alertingmethods' => '253,831']);
+    }
 }

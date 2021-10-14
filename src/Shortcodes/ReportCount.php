@@ -30,6 +30,7 @@ class ReportCount extends AbstractShortcode
         parent::__construct([
             'status' => '',
             'icategories' => '',
+            'alertingmethods' => '',
             'units' => '',
             'year' => ''
         ]);
@@ -48,6 +49,11 @@ class ReportCount extends AbstractShortcode
         $this->reportQuery->resetQueryVars();
         if (is_int($year)) {
             $this->reportQuery->setYear(intval($year));
+        }
+
+        $alertingMethodIds = $this->getIntegerList($attributes['alertingmethods']);
+        if (!empty($alertingMethodIds)) {
+            $this->reportQuery->setAlertingMethodIds($alertingMethodIds);
         }
 
         $incidentCategoryIds = $this->getIntegerList($attributes['icategories']);

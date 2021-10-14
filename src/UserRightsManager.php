@@ -2,6 +2,10 @@
 namespace abrain\Einsatzverwaltung;
 
 use WP_User;
+use function add_filter;
+use function add_role;
+use function array_fill_keys;
+use function remove_role;
 
 /**
  * Class UserRightsManager
@@ -9,6 +13,8 @@ use WP_User;
  */
 class UserRightsManager
 {
+    const ROLE_UPDATE_OPTION = 'einsatzverwaltung_update_roles';
+
     public static $capabilities = array(
         'edit_einsatzberichte',
         'edit_private_einsatzberichte',
@@ -21,6 +27,11 @@ class UserRightsManager
         'delete_published_einsatzberichte',
         'delete_others_einsatzberichte'
     );
+
+    public function addHooks()
+    {
+        add_filter('user_has_cap', array($this, 'userHasCap'), 10, 4);
+    }
 
     /**
      * @param string $roleSlug
@@ -65,5 +76,25 @@ class UserRightsManager
         }
 
         return $allcaps;
+    }
+
+    /**
+     * Updates the capabilities of the user roles. If the roles already exist, they have to be removed first.
+     */
+    public function updateRoles()
+    {
+        remove_role('einsatzverwaltung_reportapi_draft');
+        add_role(
+            'einsatzverwaltung_reportapi_draft',
+            __('Incident Reports API (drafts)', 'einsatzverwaltung'),
+            ['edit_einsatzberichte' => true]
+        );
+
+        remove_role('einsatzverwaltung_reportapi_publish');
+        add_role(
+            'einsatzverwaltung_reportapi_publish',
+            __('Incident Reports API', 'einsatzverwaltung'),
+            array_fill_keys(['edit_einsatzberichte', 'publish_einsatzberichte'], true)
+        );
     }
 }

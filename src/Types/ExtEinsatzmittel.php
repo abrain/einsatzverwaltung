@@ -1,6 +1,7 @@
 <?php
 namespace abrain\Einsatzverwaltung\Types;
 
+use abrain\Einsatzverwaltung\CustomFields\StringList;
 use abrain\Einsatzverwaltung\CustomFields\TextInput;
 use abrain\Einsatzverwaltung\CustomFieldsRepository;
 
@@ -78,6 +79,11 @@ class ExtEinsatzmittel implements CustomTaxonomy
             'url',
             'URL',
             'URL zu mehr Informationen &uuml;ber ein externes Einsatzmittel, beispielsweise dessen Webseite.'
+        ));
+        $customFields->add($this, new StringList(
+            'altname',
+            __('Alternative identifiers', 'einsatzverwaltung'),
+            __('A list of identifiers that are synonymous with this resource. They will be used to find exisiting resources when reports are created via the API. One identifier per line.', 'einsatzverwaltung')
         ));
     }
 

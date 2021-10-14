@@ -2,6 +2,7 @@
 namespace abrain\Einsatzverwaltung\Types;
 
 use abrain\Einsatzverwaltung\CustomFieldsRepository;
+use abrain\Einsatzverwaltung\DataAccess\ReportActions;
 use abrain\Einsatzverwaltung\Model\ReportAnnotation;
 use abrain\Einsatzverwaltung\ReportAnnotationRepository;
 use abrain\Einsatzverwaltung\Utilities;
@@ -299,5 +300,6 @@ class Report implements CustomPostType
      */
     public function registerHooks()
     {
+        (new ReportActions())->addHooks();
     }
 }

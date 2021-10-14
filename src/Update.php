@@ -113,6 +113,10 @@ class Update
 
         // Unregister the taxonomy again, so it can be registered properly later
         unregister_taxonomy('evw_unit');
+
+        if ($currentDbVersion < 70 && $targetDbVersion >= 70) {
+            $this->upgrade1100();
+        }
     }
 
     /**
@@ -564,6 +568,19 @@ class Update
         }
 
         update_option('einsatzvw_db_version', 60);
+    }
+
+    /**
+     * - Adds new user roles
+     *
+     * @since 1.10.0
+     */
+    public function upgrade1100()
+    {
+        // Set option that the user roles should be updated on the next init hook
+        update_option('einsatzverwaltung_update_roles', '1');
+
+        update_option('einsatzvw_db_version', 70);
     }
 
     /**

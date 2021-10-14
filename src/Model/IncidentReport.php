@@ -148,7 +148,7 @@ class IncidentReport
     {
         return array(
             'alarmierungsart' => array(
-                'label' => 'Alarmierungsart'
+                'label' => __('Alerting Method', 'einsatzverwaltung')
             ),
             'einsatzart' => array(
                 'label' => 'Einsatzart'

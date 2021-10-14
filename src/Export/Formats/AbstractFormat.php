@@ -72,7 +72,7 @@ abstract class AbstractFormat implements Format
         return array(
             'Einsatznummer',
             'Lfd.',
-            'Alarmierungsarten',
+            __('Alerting Methods', 'einsatzverwaltung'),
             'Alarmzeit',
             'Einsatzende',
             'Dauer (Minuten)',

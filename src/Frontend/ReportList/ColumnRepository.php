@@ -39,7 +39,7 @@ class ColumnRepository
         $this->addColumn(new Column('workforce', 'Mannschaftsst&auml;rke'));
         $this->addColumn(new Column('duration', __('Duration', 'einsatzverwaltung'), '', true));
         $this->addColumn(new Column('vehicles', __('Vehicles', 'einsatzverwaltung')));
-        $this->addColumn(new Column('alarmType', 'Alarmierungsart'));
+        $this->addColumn(new Column('alarmType', __('Alerting method', 'einsatzverwaltung')));
         $this->addColumn(new Column('additionalForces', 'Weitere Kr&auml;fte'));
         $this->addColumn(new Column('units', __('Units', 'einsatzverwaltung')));
         $this->addColumn(new Column('incidentType', __('Incident Category', 'einsatzverwaltung')));

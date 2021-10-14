@@ -9,6 +9,7 @@ use function explode;
 use function is_string;
 use function shortcode_atts;
 use const ARRAY_A;
+use const CASE_LOWER;
 
 /**
  * Base class for Shortcode renderers that provides common functions
@@ -64,6 +65,9 @@ abstract class AbstractShortcode
     {
         // See https://core.trac.wordpress.org/ticket/45929
         $attributesArray = is_string($attributes) ? [] : $attributes;
+
+        // Ignore capitalization of attribute keys
+        $attributesArray = array_change_key_case($attributesArray, CASE_LOWER);
 
         // Ensure backwards compatibility
         $attributesArray = $this->fixOutdatedAttributes($attributesArray);

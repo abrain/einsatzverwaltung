@@ -7,6 +7,7 @@ use abrain\Einsatzverwaltung\Util\Formatter;
 use function add_action;
 use function error_log;
 use function get_option;
+use function update_option;
 
 /**
  * Grundlegende Funktionen
@@ -14,7 +15,7 @@ use function get_option;
 class Core
 {
     const VERSION = '1.9.7';
-    const DB_VERSION = 60;
+    const DB_VERSION = 70;
 
     /**
      * Statische Variable, um die aktuelle (einzige!) Instanz dieser Klasse zu halten
@@ -94,6 +95,9 @@ class Core
 
         $this->maybeUpdate();
 
+        // Add user roles
+        (new UserRightsManager())->updateRoles();
+
         // Posttypen registrieren
         try {
             $this->typeRegistry->registerTypes($this->permalinkController);
@@ -152,7 +156,11 @@ class Core
         }
 
         $userRightsManager = new UserRightsManager();
-        add_filter('user_has_cap', array($userRightsManager, 'userHasCap'), 10, 4);
+        $userRightsManager->addHooks();
+        if (get_option(UserRightsManager::ROLE_UPDATE_OPTION, '0') === '1') {
+            $userRightsManager->updateRoles();
+            update_option(UserRightsManager::ROLE_UPDATE_OPTION, '0');
+        }
 
         try {
             $this->typeRegistry->registerTypes($this->permalinkController);

@@ -1,6 +1,7 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
+use function add_action;
 use function count;
 use function get_plugin_data;
 use function plugin_basename;
@@ -68,3 +69,8 @@ $core = Core::getInstance();
 add_action('init', array($core, 'onInit'));
 register_activation_hook($pluginFile, array($core, 'onActivation'));
 register_deactivation_hook($pluginFile, array($core, 'onDeactivation'));
+
+// Register REST API routes
+add_action('rest_api_init', function () {
+    (new Api\Initializer())->onRestApiInit();
+});

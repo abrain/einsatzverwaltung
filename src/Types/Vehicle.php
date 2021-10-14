@@ -4,6 +4,7 @@ namespace abrain\Einsatzverwaltung\Types;
 use abrain\Einsatzverwaltung\CustomFields\Checkbox;
 use abrain\Einsatzverwaltung\CustomFields\NumberInput;
 use abrain\Einsatzverwaltung\CustomFields\PostSelector;
+use abrain\Einsatzverwaltung\CustomFields\StringList;
 use abrain\Einsatzverwaltung\CustomFields\UnitSelector;
 use abrain\Einsatzverwaltung\CustomFields\UrlInput;
 use WP_REST_Response;
@@ -149,6 +150,11 @@ class Vehicle implements CustomTaxonomy
             __('This vehicle is no longer in service', 'einsatzverwaltung'),
             'Beim Bearbeiten von Einsatzberichten werden Fahrzeuge, die nicht außer Dienst sind, zuerst aufgelistet.',
             '0'
+        ));
+        $customFields->add($this, new StringList(
+            'altname',
+            __('Alternative identifiers', 'einsatzverwaltung'),
+            __('A list of identifiers that are synonymous with this vehicle. They will be used to find exisiting vehicles when reports are created via the API. One identifier per line.', 'einsatzverwaltung')
         ));
     }
 

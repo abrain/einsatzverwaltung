@@ -150,4 +150,14 @@ class UpdateTest extends UnitTestCase
 
         (new Update())->upgrade180();
     }
+
+    /**
+     * @throws ExpectationArgsRequired
+     */
+    public function testUpgrade1100ScheduleRoleUpdate()
+    {
+        expect('update_option')->once()->with('einsatzverwaltung_update_roles', '1');
+        expect('update_option')->once()->with('einsatzvw_db_version', 70);
+        (new Update())->upgrade1100();
+    }
 }

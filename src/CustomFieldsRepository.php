@@ -8,6 +8,14 @@ use abrain\Einsatzverwaltung\Types\CustomType;
 use abrain\Einsatzverwaltung\Types\Report;
 use WP_Term;
 use function add_action;
+use function add_term_meta;
+use function array_diff;
+use function array_filter;
+use function array_map;
+use function array_unique;
+use function delete_term_meta;
+use function explode;
+use function get_term_meta;
 
 /**
  * Keeps track of the custom fields of our custom types
@@ -260,7 +268,21 @@ class CustomFieldsRepository
             // TODO choose filter based on type of CustomField
             $value = filter_input(INPUT_POST, $field->key, FILTER_SANITIZE_STRING);
 
-            update_term_meta($termId, $field->key, empty($value) ? $field->defaultValue : $value);
+            if ($field->isMultiValue()) {
+                $existingValues = get_term_meta($termId, $field->key);
+                $desiredValues = array_unique(array_filter(array_map('trim', explode("\n", $value))));
+
+                $valuesToAdd = array_diff($desiredValues, $existingValues);
+                $valuesToRemove = array_diff($existingValues, $desiredValues);
+                foreach ($valuesToAdd as $valueToAdd) {
+                    add_term_meta($termId, $field->key, $valueToAdd);
+                }
+                foreach ($valuesToRemove as $valueToRemove) {
+                    delete_term_meta($termId, $field->key, $valueToRemove);
+                }
+            } else {
+                update_term_meta($termId, $field->key, empty($value) ? $field->defaultValue : $value);
+            }
         }
     }
 }

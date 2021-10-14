@@ -15,7 +15,7 @@ use function is_array;
  * @package abrain\Einsatzverwaltung
  * @covers \abrain\Einsatzverwaltung\ReportQuery
  * @uses \abrain\Einsatzverwaltung\Model\IncidentReport
- * @uses \abrain\Einsatzverwaltung\Types\Alarmierungsart
+ * @uses \abrain\Einsatzverwaltung\Types\AlertingMethod
  * @uses \abrain\Einsatzverwaltung\Types\Unit
  */
 class ReportQueryTest extends UnitTestCase

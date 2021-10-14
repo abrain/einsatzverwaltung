@@ -4,10 +4,10 @@ namespace abrain\Einsatzverwaltung\Types;
 use abrain\Einsatzverwaltung\CustomFieldsRepository;
 
 /**
- * Description of the custom taxonomy 'Alarmierungsart'
+ * Description of the custom taxonomy 'Alerting Methods'
  * @package abrain\Einsatzverwaltung\Types
  */
-class Alarmierungsart implements CustomTaxonomy
+class AlertingMethod implements CustomTaxonomy
 {
     /**
      * @return string

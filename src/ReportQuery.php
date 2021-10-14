@@ -2,7 +2,7 @@
 namespace abrain\Einsatzverwaltung;
 
 use abrain\Einsatzverwaltung\Model\IncidentReport;
-use abrain\Einsatzverwaltung\Types\Alarmierungsart;
+use abrain\Einsatzverwaltung\Types\AlertingMethod;
 use abrain\Einsatzverwaltung\Types\Unit;
 use function count;
 use function in_array;
@@ -204,7 +204,7 @@ class ReportQuery
         $taxQuery = array();
 
         if (!empty($this->alertingMethodIds)) {
-            $taxQuery[] = array('taxonomy' => Alarmierungsart::getSlug(), 'terms' => $this->alertingMethodIds);
+            $taxQuery[] = array('taxonomy' => AlertingMethod::getSlug(), 'terms' => $this->alertingMethodIds);
         }
 
         if (!empty($this->incidentTypeIds)) {

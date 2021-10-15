@@ -154,7 +154,19 @@ class Update
     {
         update_option('einsatzvw_cap_roles_administrator', 1);
         $roleObject = get_role('administrator');
-        foreach (UserRightsManager::$capabilities as $cap) {
+        $capabilities = array(
+            'edit_einsatzberichte',
+            'edit_private_einsatzberichte',
+            'edit_published_einsatzberichte',
+            'edit_others_einsatzberichte',
+            'publish_einsatzberichte',
+            'read_private_einsatzberichte',
+            'delete_einsatzberichte',
+            'delete_private_einsatzberichte',
+            'delete_published_einsatzberichte',
+            'delete_others_einsatzberichte'
+        );
+        foreach ($capabilities as $cap) {
             $roleObject->add_cap($cap);
         }
 
@@ -206,9 +218,21 @@ class Update
         }
         $roles = get_editable_roles();
         if (!empty($roles)) {
+            $capabilities = array(
+                'edit_einsatzberichte',
+                'edit_private_einsatzberichte',
+                'edit_published_einsatzberichte',
+                'edit_others_einsatzberichte',
+                'publish_einsatzberichte',
+                'read_private_einsatzberichte',
+                'delete_einsatzberichte',
+                'delete_private_einsatzberichte',
+                'delete_published_einsatzberichte',
+                'delete_others_einsatzberichte'
+            );
             foreach (array_keys($roles) as $roleSlug) {
                 $roleObject = get_role($roleSlug);
-                foreach (UserRightsManager::$capabilities as $cap) {
+                foreach ($capabilities as $cap) {
                     $roleObject->remove_cap($cap);
                 }
             }

@@ -15,7 +15,7 @@ class UserRightsManager
 {
     const ROLE_UPDATE_OPTION = 'einsatzverwaltung_update_roles';
 
-    public static $capabilities = array(
+    private static $capabilities = array(
         'edit_einsatzberichte',
         'edit_private_einsatzberichte',
         'edit_published_einsatzberichte',

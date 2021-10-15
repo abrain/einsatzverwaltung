@@ -41,7 +41,13 @@ class CustomFieldsRepository
     {
         $this->postTypeFields = array();
         $this->taxonomyFields = array();
+    }
 
+    /**
+     * Register the actions and filters, that this class expects.
+     */
+    public function addHooks()
+    {
         add_action('edited_term', array($this, 'saveTerm'), 10, 3);
         add_action('created_term', array($this, 'saveTerm'), 10, 3);
     }

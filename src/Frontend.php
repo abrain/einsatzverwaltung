@@ -41,10 +41,9 @@ class Frontend
     {
         $this->formatter = $formatter;
         $this->options = $options;
-        $this->addHooks();
     }
 
-    private function addHooks()
+    public function addHooks()
     {
         add_action('wp_enqueue_scripts', array($this, 'enqueueStyleAndScripts'));
         if (!(

@@ -57,6 +57,18 @@ class Data
     }
 
     /**
+     * Register the actions and filters, that this class expects.
+     */
+    public function addHooks()
+    {
+        add_action('save_post_einsatz', array($this, 'savePostdata'), 10, 2);
+        add_action('private_einsatz', array($this, 'onPublish'), 10, 2);
+        add_action('publish_einsatz', array($this, 'onPublish'), 10, 2);
+        add_action('trash_einsatz', array($this, 'onTrash'), 10, 2);
+        add_action('transition_post_status', array($this, 'onTransitionPostStatus'), 10, 3);
+    }
+
+    /**
      * Returns the years that contain reports
      *
      * @return int[]

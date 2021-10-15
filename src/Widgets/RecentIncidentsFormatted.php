@@ -232,6 +232,8 @@ class RecentIncidentsFormatted extends AbstractWidget
      * @param array $oldInstance Die bisherigen Einstellungen
      *
      * @return array Die zu speichernden Einstellungen oder false um das Speichern abzubrechen
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter) Inherited signature
      */
     public function update($newInstance, $oldInstance): array
     {

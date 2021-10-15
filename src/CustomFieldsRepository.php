@@ -227,6 +227,9 @@ class CustomFieldsRepository
      * @param int $termId Term ID
      *
      * @return string Inhalt der Spalte
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter) A WordPress hook with fixed signature
+     * @noinspection PhpUnusedParameterInspection
      */
     public function onTaxonomyColumnContent($string, $columnName, $termId): string
     {
@@ -256,6 +259,9 @@ class CustomFieldsRepository
      * @param int $termId Term ID
      * @param int $ttId Term taxonomy ID
      * @param string $taxonomy Taxonomy slug
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter) A WordPress hook with fixed signature
+     * @noinspection PhpUnusedParameterInspection
      */
     public function saveTerm($termId, $ttId, $taxonomy)
     {

@@ -57,6 +57,9 @@ class UserRightsManager
      * @param WP_User $user The user object.
      *
      * @return array Die gefilterten oder erweiterten Nutzerrechte
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter) A WordPress hook with fixed signature
+     * @noinspection PhpUnusedParameterInspection
      */
     public function userHasCap(array $allcaps, array $caps, array $args, WP_User $user): array
     {

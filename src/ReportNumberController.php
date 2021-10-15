@@ -46,6 +46,9 @@ class ReportNumberController
      * @param int $objectId Post-ID
      * @param string $metaKey Der Key des postmeta-Eintrags
      * @param mixed $metaValue Der Wert des postmeta-Eintrags
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter) A WordPress hook with fixed signature
+     * @noinspection PhpUnusedParameterInspection
      */
     public function onPostMetaChanged(int $metaId, int $objectId, string $metaKey, $metaValue)
     {

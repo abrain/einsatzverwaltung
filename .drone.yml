@@ -1,6 +1,14 @@
 kind: pipeline
 type: docker
-name: unit-tests
+name: compliance
+
+trigger:
+  event:
+    - push
+    - pull_request
+  branch:
+    - develop
+    - master
 
 steps:
   - name: check-pr-branch-name
@@ -19,6 +27,28 @@ steps:
     image: php:7
     commands:
       - ./vendor/bin/phpcs -p --ignore="\.min\.css" src/ --standard=PHPCompatibility
+
+---
+kind: pipeline
+type: docker
+name: unit-tests
+
+trigger:
+  event:
+    - push
+    - pull_request
+  branch:
+    - develop
+    - master
+
+depends_on:
+  - compliance
+
+steps:
+  - name: install
+    image: composer
+    commands:
+      - composer install --ignore-platform-reqs
   - name: test
     image: php:7
     environment:
@@ -44,11 +74,6 @@ steps:
       event:
         exclude:
           - pull_request
-
-trigger:
-  branch:
-    exclude:
-      - feature/*
 
 ---
 kind: pipeline

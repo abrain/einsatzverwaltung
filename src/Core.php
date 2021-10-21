@@ -148,7 +148,6 @@ class Core
         }
 
         $userRightsManager = new UserRightsManager();
-        $userRightsManager->addHooks();
         if (get_option(UserRightsManager::ROLE_UPDATE_OPTION, '0') === '1') {
             $userRightsManager->updateRoles();
             update_option(UserRightsManager::ROLE_UPDATE_OPTION, '0');

@@ -2,7 +2,6 @@
 namespace abrain\Einsatzverwaltung;
 
 use WP_UnitTestCase;
-use function update_option;
 use function user_can;
 
 /**
@@ -26,7 +25,7 @@ class CapabilitiesTest extends WP_UnitTestCase
 
     public function testUserWithoutRoleHasNoCaps()
     {
-        $user = $this->factory->user->create_and_get();
+        $user = self::factory()->user->create_and_get();
 
         foreach ($this->capabilities as $capability) {
             $this->assertFalse(user_can($user, $capability));
@@ -35,7 +34,7 @@ class CapabilitiesTest extends WP_UnitTestCase
 
     public function testAdministratorsCanDoAnything()
     {
-        $user = $this->factory->user->create_and_get();
+        $user = self::factory()->user->create_and_get();
         $user->add_role('administrator');
 
         foreach ($this->capabilities as $capability) {
@@ -45,7 +44,7 @@ class CapabilitiesTest extends WP_UnitTestCase
 
     public function testDefaultEditorHasNoCaps()
     {
-        $user = $this->factory->user->create_and_get();
+        $user = self::factory()->user->create_and_get();
         $user->add_role('editor');
 
         foreach ($this->capabilities as $capability) {
@@ -53,14 +52,83 @@ class CapabilitiesTest extends WP_UnitTestCase
         }
     }
 
-    public function testEditorCanDoAnythingWhenEnabled()
+    public function testReportEditorCanDoAnything()
     {
-        $user = $this->factory->user->create_and_get();
-        $user->add_role('editor');
-        update_option('einsatzvw_cap_roles_editor', '1');
+        $user = self::factory()->user->create_and_get();
+        $user->add_role('einsatzverwaltung_reports_editor');
 
         foreach ($this->capabilities as $capability) {
             $this->assertTrue(user_can($user, $capability));
         }
+    }
+
+    public function testReportAuthorCanEditAndPublish()
+    {
+        $user = self::factory()->user->create_and_get();
+        $user->add_role('einsatzverwaltung_reports_author');
+
+        $reportFactory = new ReportFactory();
+        $report = $reportFactory->create_and_get(['post_author' => $user->ID, 'post_status' => 'draft']);
+
+        $this->assertTrue(user_can($user, 'edit_einsatzbericht', $report->ID));
+        $this->assertTrue(user_can($user, 'publish_einsatzberichte'));
+    }
+
+    public function testReportAuthorCannotEditOthers()
+    {
+        $otherUser = self::factory()->user->create_and_get();
+        $user = self::factory()->user->create_and_get();
+        $user->add_role('einsatzverwaltung_reports_author');
+
+        $reportFactory = new ReportFactory();
+        $report = $reportFactory->create_and_get(['post_author' => $otherUser->ID, 'post_status' => 'draft']);
+
+        $this->assertFalse(user_can($user, 'edit_einsatzbericht', $report->ID));
+    }
+
+    public function testReportAuthorCanEditPublished()
+    {
+        $user = self::factory()->user->create_and_get();
+        $user->add_role('einsatzverwaltung_reports_author');
+
+        $reportFactory = new ReportFactory();
+        $report = $reportFactory->create_and_get(['post_author' => $user->ID, 'post_status' => 'publish']);
+
+        $this->assertTrue(user_can($user, 'edit_einsatzbericht', $report->ID));
+    }
+
+    public function testReportContributorCannotPublish()
+    {
+        $user = self::factory()->user->create_and_get();
+        $user->add_role('einsatzverwaltung_reports_contributor');
+
+        $reportFactory = new ReportFactory();
+        $report = $reportFactory->create_and_get(['post_author' => $user->ID, 'post_status' => 'draft']);
+
+        $this->assertTrue(user_can($user, 'edit_einsatzbericht', $report->ID));
+        $this->assertFalse(user_can($user, 'publish_einsatzberichte'));
+    }
+
+    public function testReportContributorCannotEditOthers()
+    {
+        $otherUser = self::factory()->user->create_and_get();
+        $user = self::factory()->user->create_and_get();
+        $user->add_role('einsatzverwaltung_reports_contributor');
+
+        $reportFactory = new ReportFactory();
+        $report = $reportFactory->create_and_get(['post_author' => $otherUser->ID, 'post_status' => 'draft']);
+
+        $this->assertFalse(user_can($user, 'edit_einsatzbericht', $report->ID));
+    }
+
+    public function testReportContributorCannotEditPublished()
+    {
+        $user = self::factory()->user->create_and_get();
+        $user->add_role('einsatzverwaltung_reports_contributor');
+
+        $reportFactory = new ReportFactory();
+        $report = $reportFactory->create_and_get(['post_author' => $user->ID, 'post_status' => 'publish']);
+
+        $this->assertFalse(user_can($user, 'edit_einsatzbericht', $report->ID));
     }
 }

@@ -27,5 +27,5 @@ function einsatzverwaltung_clearMedia(selector)
     const input = document.getElementById(selector);
     input.value = '';
     const previewImg = document.getElementById('img-' + selector);
-    previewImg.src = '';
+    previewImg.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 }

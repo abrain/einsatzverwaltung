@@ -5,6 +5,7 @@ use WP_UnitTestCase;
 use wpdb;
 use function add_post_meta;
 use function array_map;
+use function delete_option;
 use function get_permalink;
 use function get_post_meta;
 use function get_term_meta;
@@ -117,9 +118,6 @@ class UpgradeTest extends WP_UnitTestCase
 
         update_option('einsatzvw_cap_roles_administrator', 0);
         $roleObject = get_role('administrator');
-        foreach ($capabilities as $cap) {
-            self::assertFalse($roleObject->has_cap($cap));
-        }
 
         $this->runUpgrade(1, 2);
 
@@ -153,7 +151,7 @@ class UpgradeTest extends WP_UnitTestCase
 
     public function testUpgrade100()
     {
-        self::assertFalse(get_option('einsatzvw_rewrite_slug'));
+        delete_option('einsatzvw_rewrite_slug');
         $this->runUpgrade(4, 5);
         self::assertEquals('einsaetze', get_option('einsatzvw_rewrite_slug'));
     }
@@ -400,6 +398,7 @@ class UpgradeTest extends WP_UnitTestCase
 
     public function testUpgrade162()
     {
+        delete_option('einsatzverwaltung_report_contentifempty');
         update_option('einsatzverwaltung_use_reporttemplate', 'no');
         $this->runUpgrade(40, 41);
         $this->assertNotEmpty(get_option('einsatzverwaltung_report_contentifempty'));
@@ -407,6 +406,7 @@ class UpgradeTest extends WP_UnitTestCase
 
     public function testUpgrade162WithTemplate()
     {
+        delete_option('einsatzverwaltung_report_contentifempty');
         update_option('einsatzverwaltung_use_reporttemplate', 'singular');
         $this->runUpgrade(40, 41);
         $this->assertTrue('' === get_option('einsatzverwaltung_report_contentifempty'));

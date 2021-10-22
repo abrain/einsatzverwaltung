@@ -3,8 +3,8 @@ namespace abrain\Einsatzverwaltung;
 
 use Brain\Monkey\Expectation\Exception\ExpectationArgsRequired;
 use Mockery;
-use function Brain\Monkey\Filters\expectAdded;
 use function Brain\Monkey\Functions\expect;
+use function update_option;
 
 /**
  * Class UserRightsManagerTest
@@ -13,76 +13,60 @@ use function Brain\Monkey\Functions\expect;
  */
 class UserRightsManagerTest extends UnitTestCase
 {
-    public function testAddHooks()
+    public function testRolesAreUpdatedIfFlagIsSet()
     {
-        expectAdded('user_has_cap');
-        $userRightsManager = new UserRightsManager();
-        $userRightsManager->addHooks();
+        expect('get_option')->once()->with(UserRightsManager::ROLE_UPDATE_OPTION, '0')->andReturn('1');
+        expect('update_option')->once()->with(UserRightsManager::ROLE_UPDATE_OPTION, '0');
+
+        expect('get_role')->once()->with('administrator')->andReturn(false);
+
+        expect('remove_role')->atLeast()->once();
+        expect('add_role')->atLeast()->once();
+        (new UserRightsManager())->maybeUpdateRoles();
     }
 
-    public function testOtherCapsAreLeftAlone()
+    public function testRoleUpdatesAreSkippedIfFlagIsNotSet()
     {
-        $userRightsManager = new UserRightsManager();
-        $user = Mockery::mock('\WP_User');
-        $allcaps = array('granted_cap' => 1, 'read' => 1);
-        $this->assertEquals($allcaps, $userRightsManager->userHasCap($allcaps, array('foreign_cap'), array(), $user));
-    }
+        expect('get_option')->once()->with(UserRightsManager::ROLE_UPDATE_OPTION, '0')->andReturn('0');
 
-    /**
-     * @throws ExpectationArgsRequired
-     */
-    public function testUserWithRoleIsAllowedToEditReports()
-    {
-        $userRightsManager = new UserRightsManager();
-        $user = Mockery::mock('\WP_User');
-        $user->roles = array('somerole');
+        expect('get_role')->never();
+        expect('remove_role')->never();
+        expect('add_role')->never();
 
-        // Pretend that this role is allowed to edit
-        expect('get_option')->once()->with('einsatzvw_cap_roles_somerole', '0')->andReturn('1');
-
-        $allcaps = array('granted_cap' => 1, 'read' => 1);
-        $expectedCaps = array('granted_cap' => 1, 'read' => 1, 'edit_einsatzberichte' => 1);
-        $userHasCap = $userRightsManager->userHasCap($allcaps, array('edit_einsatzberichte'), array(), $user);
-        $this->assertEquals($expectedCaps, $userHasCap);
+        (new UserRightsManager())->maybeUpdateRoles();
     }
 
     /**
      * @throws ExpectationArgsRequired
      */
-    public function testUserWithoutRoleIsNotAllowedToEditReports()
-    {
-        $userRightsManager = new UserRightsManager();
-        $user = Mockery::mock('\WP_User');
-        $user->roles = array('somerole');
-
-        // Pretend that this role is not allowed to edit
-        expect('get_option')->once()->with('einsatzvw_cap_roles_somerole', '0')->andReturn('0');
-
-        $allcaps = array('granted_cap' => 1, 'read' => 1);
-        $userHasCap = $userRightsManager->userHasCap($allcaps, array('edit_einsatzberichte'), array(), $user);
-        $this->assertEquals($allcaps, $userHasCap);
-    }
-
-    /**
-     * @throws ExpectationArgsRequired
-     */
-    public function testAdministratorIsAlwaysAllowedToEdit()
-    {
-        $userRightsManager = new UserRightsManager();
-        $user = Mockery::mock('\WP_User');
-        $user->roles = array('somerole', 'administrator');
-
-        // Pretend that this role is not allowed to edit
-        expect('get_option')->once()->with('einsatzvw_cap_roles_somerole', '0')->andReturn('0');
-
-        $allcaps = array('granted_cap' => 1, 'read' => 1);
-        $expectedCaps = array('granted_cap' => 1, 'read' => 1, 'edit_einsatzberichte' => 1);
-        $userHasCap = $userRightsManager->userHasCap($allcaps, array('edit_einsatzberichte'), array(), $user);
-        $this->assertEquals($expectedCaps, $userHasCap);
-    }
-
     public function testUpdateRoles()
     {
+        $adminRole = Mockery::mock('\WP_Role');
+        $adminRole->expects('add_cap')->once()->with('edit_einsatzberichte');
+        $adminRole->expects('add_cap')->once()->with('edit_private_einsatzberichte');
+        $adminRole->expects('add_cap')->once()->with('edit_published_einsatzberichte');
+        $adminRole->expects('add_cap')->once()->with('edit_others_einsatzberichte');
+        $adminRole->expects('add_cap')->once()->with('publish_einsatzberichte');
+        $adminRole->expects('add_cap')->once()->with('read_private_einsatzberichte');
+        $adminRole->expects('add_cap')->once()->with('delete_einsatzberichte');
+        $adminRole->expects('add_cap')->once()->with('delete_private_einsatzberichte');
+        $adminRole->expects('add_cap')->once()->with('delete_published_einsatzberichte');
+        $adminRole->expects('add_cap')->once()->with('delete_others_einsatzberichte');
+
+        expect('get_role')->once()->with('administrator')->andReturn($adminRole);
+
+        expect('remove_role')->atLeast()->once()->with(Mockery::type('string'));
+        expect('add_role')->atLeast()->once()->with(Mockery::type('string'), Mockery::type('string'), Mockery::type('array'));
+        (new UserRightsManager())->updateRoles();
+    }
+
+    /**
+     * @throws ExpectationArgsRequired
+     */
+    public function testRoleUpdateToleratesMissingAdminRole()
+    {
+        expect('get_role')->once()->with('administrator')->andReturn(false);
+
         expect('remove_role')->atLeast()->once()->with(Mockery::type('string'));
         expect('add_role')->atLeast()->once()->with(Mockery::type('string'), Mockery::type('string'), Mockery::type('array'));
         (new UserRightsManager())->updateRoles();

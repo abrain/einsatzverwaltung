@@ -6,6 +6,7 @@ use function array_fill_keys;
 use function array_merge;
 use function get_role;
 use function remove_role;
+use function update_option;
 
 /**
  * Class UserRightsManager
@@ -55,6 +56,19 @@ class UserRightsManager
         'edit_einsatzberichte',
         'delete_einsatzberichte'
     ];
+
+    /**
+     * Updates the user roles if the flag for a user role update is set.
+     */
+    public function maybeUpdateRoles()
+    {
+        if (get_option(self::ROLE_UPDATE_OPTION, '0') === '1') {
+            // Reset the flag right away, so no other process tries to update the roles as well
+            update_option(self::ROLE_UPDATE_OPTION, '0');
+
+            $this->updateRoles();
+        }
+    }
 
     /**
      * Updates the capabilities of the user roles. If the roles already exist, they have to be removed first.

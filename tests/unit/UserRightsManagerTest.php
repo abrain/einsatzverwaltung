@@ -4,6 +4,7 @@ namespace abrain\Einsatzverwaltung;
 use Brain\Monkey\Expectation\Exception\ExpectationArgsRequired;
 use Mockery;
 use function Brain\Monkey\Functions\expect;
+use function update_option;
 
 /**
  * Class UserRightsManagerTest
@@ -12,6 +13,29 @@ use function Brain\Monkey\Functions\expect;
  */
 class UserRightsManagerTest extends UnitTestCase
 {
+    public function testRolesAreUpdatedIfFlagIsSet()
+    {
+        expect('get_option')->once()->with(UserRightsManager::ROLE_UPDATE_OPTION, '0')->andReturn('1');
+        expect('update_option')->once()->with(UserRightsManager::ROLE_UPDATE_OPTION, '0');
+
+        expect('get_role')->once()->with('administrator')->andReturn(false);
+
+        expect('remove_role')->atLeast()->once();
+        expect('add_role')->atLeast()->once();
+        (new UserRightsManager())->maybeUpdateRoles();
+    }
+
+    public function testRoleUpdatesAreSkippedIfFlagIsNotSet()
+    {
+        expect('get_option')->once()->with(UserRightsManager::ROLE_UPDATE_OPTION, '0')->andReturn('0');
+
+        expect('get_role')->never();
+        expect('remove_role')->never();
+        expect('add_role')->never();
+
+        (new UserRightsManager())->maybeUpdateRoles();
+    }
+
     /**
      * @throws ExpectationArgsRequired
      */

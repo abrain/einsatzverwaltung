@@ -3,6 +3,7 @@ namespace abrain\Einsatzverwaltung;
 
 use abrain\Einsatzverwaltung\Frontend\ReportList\Renderer as ReportListRenderer;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
+use abrain\Einsatzverwaltung\Types\IncidentType;
 use abrain\Einsatzverwaltung\Types\Report;
 use abrain\Einsatzverwaltung\Types\Unit;
 use abrain\Einsatzverwaltung\Types\Vehicle;
@@ -12,7 +13,10 @@ use WP_Query;
 use function add_filter;
 use function date_i18n;
 use function get_post_type;
+use function get_term_meta;
+use function get_the_terms;
 use function in_array;
+use function is_wp_error;
 use function sprintf;
 use function wp_kses;
 
@@ -57,6 +61,7 @@ class Frontend
         add_filter('the_excerpt_rss', array($this, 'filterEinsatzExcerpt'));
         add_filter('the_excerpt_embed', array($this, 'filterEinsatzExcerpt'));
         add_action('pre_get_posts', array($this, 'addReportsToQuery'));
+        add_filter('default_post_metadata', array($this, 'filterDefaultThumbnail'), 10, 3);
     }
 
     /**
@@ -353,5 +358,33 @@ class Frontend
                 $query->set('meta_query', $metaQuery);
             }
         }
+    }
+
+    /**
+     * Filters the default value of the thumbnail ID for incident reports. Is used to provide a fallback thumbnail,
+     * which is defined per incident type.
+     *
+     * @param mixed $value The default value to filter, probably null.
+     * @param int $postId ID of the object metadata is for.
+     * @param string $metaKey Metadata key.
+     *
+     * @return mixed
+     */
+    public function filterDefaultThumbnail($value, int $postId, string $metaKey)
+    {
+        // Only continue if this is about the thumbnail of an incident report
+        if ($metaKey !== '_thumbnail_id' || get_post_type($postId) !== Report::getSlug()) {
+            return $value;
+        }
+
+        // Check if an incident type has been assigned
+        $terms = get_the_terms($postId, IncidentType::getSlug());
+        if (empty($terms) || is_wp_error($terms)) {
+            return $value;
+        }
+
+        // Use the fallback thumbnail of the incident type, if set
+        $fallbackThumbId = get_term_meta($terms[0]->term_id, 'default_featured_image', true);
+        return empty($fallbackThumbId) ? $value : $fallbackThumbId;
     }
 }

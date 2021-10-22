@@ -334,11 +334,12 @@ class RecentIncidentsFormatted extends AbstractWidget
      */
     private function printTagReplacementInfo($allowedTags)
     {
-        echo '<br><small>';
+        echo '<small><details><summary>';
         esc_html_e('The following tags will be replaced:', 'einsatzverwaltung');
+        echo '</summary><ul>';
         foreach ($allowedTags as $tag) {
-            printf('<br><strong>%s</strong> (%s)', esc_html($tag), esc_html($this->formatter->getLabelForTag($tag)));
+            printf('<li><strong>%s</strong> (%s)</li>', esc_html($tag), esc_html($this->formatter->getLabelForTag($tag)));
         }
-        echo '</small>';
+        echo '</ul></details></small>';
     }
 }

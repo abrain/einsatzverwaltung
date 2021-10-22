@@ -6,7 +6,6 @@ use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\PermalinkController;
 use abrain\Einsatzverwaltung\Settings\Pages\About;
 use abrain\Einsatzverwaltung\Settings\Pages\Advanced;
-use abrain\Einsatzverwaltung\Settings\Pages\Capabilities;
 use abrain\Einsatzverwaltung\Settings\Pages\General;
 use abrain\Einsatzverwaltung\Settings\Pages\Numbers;
 use abrain\Einsatzverwaltung\Settings\Pages\Report;
@@ -55,7 +54,6 @@ class MainPage
         $this->addSubPage(new Numbers());
         $this->addSubPage(new Report());
         $this->addSubPage(new ReportList());
-        $this->addSubPage(new Capabilities());
         $this->addSubPage(new Advanced($permalinkController));
         $this->addSubPage(new About());
     }

@@ -8,8 +8,10 @@ use abrain\Einsatzverwaltung\CustomFields\StringList;
 use abrain\Einsatzverwaltung\CustomFields\UnitSelector;
 use abrain\Einsatzverwaltung\CustomFields\UrlInput;
 use WP_REST_Response;
+use WP_Screen;
 use WP_Term;
 use abrain\Einsatzverwaltung\CustomFieldsRepository;
+use function add_filter;
 use function array_key_exists;
 use function esc_html;
 use function esc_url;
@@ -181,6 +183,13 @@ class Vehicle implements CustomTaxonomy
         // Manipulate the columns of the term list after the automatically generated ones have been added
         add_action("manage_edit-{$taxonomySlug}_columns", array($this, 'onCustomColumns'), 20);
         add_filter("manage_{$taxonomySlug}_custom_column", array($this, 'onTaxonomyColumnContent'), 20, 3);
+
+        add_filter('default_hidden_columns', function (array $hiddenColumns, WP_Screen $screen) {
+            if ($screen->taxonomy === self::getSlug()) {
+                $hiddenColumns[] = 'altname';
+            }
+            return $hiddenColumns;
+        }, 10, 2);
     }
 
     /**

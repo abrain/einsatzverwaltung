@@ -4,6 +4,8 @@ namespace abrain\Einsatzverwaltung\Types;
 use abrain\Einsatzverwaltung\CustomFields\StringList;
 use abrain\Einsatzverwaltung\CustomFields\TextInput;
 use abrain\Einsatzverwaltung\CustomFieldsRepository;
+use WP_Screen;
+use function add_filter;
 
 /**
  * Description of the custom taxonomy 'Externes Einsatzmittel'
@@ -92,5 +94,11 @@ class ExtEinsatzmittel implements CustomTaxonomy
      */
     public function registerHooks()
     {
+        add_filter('default_hidden_columns', function (array $hiddenColumns, WP_Screen $screen) {
+            if ($screen->taxonomy === self::getSlug()) {
+                $hiddenColumns[] = 'altname';
+            }
+            return $hiddenColumns;
+        }, 10, 2);
     }
 }

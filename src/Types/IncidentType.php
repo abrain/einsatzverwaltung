@@ -135,6 +135,7 @@ class IncidentType implements CustomTaxonomy
 
         add_filter('default_hidden_columns', function (array $hiddenColumns, WP_Screen $screen) {
             if ($screen->taxonomy === self::getSlug()) {
+                $hiddenColumns[] = 'altname';
                 $hiddenColumns[] = 'default_featured_image';
             }
             return $hiddenColumns;

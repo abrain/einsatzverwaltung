@@ -50,6 +50,11 @@ class About extends SubPage
             </code>
         </p>
 
+        <h2>Spenden</h2>
+        <p>Unterst&uuml;tze die Weiterentwicklung des Plugins mit einer Spende.</p>
+        <a class="button" href="https://www.paypal.com/donate?hosted_button_id=U7LCWUZ8E54JG" target="_blank">Spende via PayPal</a>
+        <a class="button" href="https://einsatzverwaltung.org/unterstuetzen/" target="_blank">Weitere Optionen</a>
+
         <h2>Social Media</h2>
         <ul>
             <li>Twitter: <a href="https://twitter.com/einsatzvw" title="Einsatzverwaltung auf Twitter">@einsatzvw</a></li>

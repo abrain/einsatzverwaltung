@@ -3,6 +3,7 @@ namespace abrain\Einsatzverwaltung;
 
 use WP_Error;
 use WP_User;
+use function add_option;
 use function add_term_meta;
 use function array_key_exists;
 use function array_keys;
@@ -120,7 +121,7 @@ class Update
         // Unregister the taxonomy again, so it can be registered properly later
         unregister_taxonomy('evw_unit');
 
-        if ($currentDbVersion < 70 && $targetDbVersion >= 70) {
+        if ($currentDbVersion < 71 && $targetDbVersion >= 71) {
             $this->upgrade1100();
         }
     }
@@ -601,6 +602,7 @@ class Update
     }
 
     /**
+     * - Adds missing default value for incicent report category setting
      * - Adds new user roles
      * - Adds role with full permission to users which had those rights before
      *
@@ -608,6 +610,8 @@ class Update
      */
     public function upgrade1100()
     {
+        add_option('einsatzvw_category', '-1');
+
         // Get roles and check if they were allowed to edit reports before
         if (!function_exists('get_editable_roles')) {
             require_once(ABSPATH . 'wp-admin/includes/user.php');
@@ -633,7 +637,7 @@ class Update
         // Set option that the user roles should be updated on the next init hook
         update_option(UserRightsManager::ROLE_UPDATE_OPTION, '1');
 
-        update_option('einsatzvw_db_version', 70);
+        update_option('einsatzvw_db_version', 71);
     }
 
     /**

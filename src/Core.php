@@ -5,9 +5,9 @@ use abrain\Einsatzverwaltung\Jobs\MigrateUnitsJob;
 use abrain\Einsatzverwaltung\Shortcodes\Initializer as ShortcodeInitializer;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use function add_action;
+use function add_option;
 use function error_log;
 use function get_option;
-use function update_option;
 
 /**
  * Grundlegende Funktionen
@@ -15,7 +15,7 @@ use function update_option;
 class Core
 {
     const VERSION = '1.9.7';
-    const DB_VERSION = 70;
+    const DB_VERSION = 71;
 
     /**
      * Statische Variable, um die aktuelle (einzige!) Instanz dieser Klasse zu halten
@@ -92,6 +92,9 @@ class Core
     public function onActivation()
     {
         add_option('einsatzvw_db_version', self::DB_VERSION);
+
+        // Add default values for some options explicitly
+        add_option('einsatzvw_category', '-1');
 
         $this->maybeUpdate();
 

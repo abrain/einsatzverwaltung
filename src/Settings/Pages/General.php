@@ -114,7 +114,7 @@ class General extends SubPage
         $reports = $reportQuery->getReports();
 
         // Wenn zuvor eine Kategorie gesetzt war, müssen die Einsatzberichte aus dieser entfernt werden
-        if ($oldValue != -1) {
+        if (!empty($oldValue) && $oldValue != -1) {
             foreach ($reports as $report) {
                 Utilities::removePostFromCategory($report->getPostId(), $oldValue);
             }

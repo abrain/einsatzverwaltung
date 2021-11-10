@@ -37,6 +37,7 @@
     "php-cs-fixer/phpunit-constraint-xmlmatchesxsd": "^1.2",
     "sebastian/comparator": "^3.0",
     "phpcompatibility/php-compatibility": "^9.3",
-    "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1"
+    "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
+    "yoast/phpunit-polyfills": "^1.0"
   }
 }

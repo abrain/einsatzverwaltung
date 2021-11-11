@@ -86,16 +86,6 @@ Yes, you can find them on [our website](https://einsatzverwaltung.org/faq/).
 * Editor: Notice about wrong date format only appears after leaving the field
 * Internationalized more labels
 
-= 1.8.0 =
-* Fix: Not all vehicles could be removed from an existing Incident Report
-* Shortcode `reportcount` can be filtered by status (actual or false alarm)
-* Templates: Added placeholder for featured image thumbnail
-* Shortcodes `einsatzliste` and `reportcount` can be filtered by multiple Incident Categories
-* Incident Categories can be marked as outdated
-* Units were converted to a taxonomy
-* Requires PHP 7.1 or newer
-* Requires WordPress 5.1 or newer
-
 == Upgrade Notice ==
 
 = 1.9.7 =

@@ -52,6 +52,14 @@ Yes, you can find them on [our website](https://einsatzverwaltung.org/faq/).
 
 == Changelog ==
 
+= 1.10.0 =
+* New API endpoint for third-party systems to create incident reports
+* Roles for user permissions
+* Shortcode `reportcount` can be filtered by Alerting Method
+* Fallback featured image for reports based on Incident Category
+* Autocomplete for incident location
+* Fix: Changing the category setting for incident reports caused an error on fresh installations
+
 = 1.9.7 =
 * Fix: Compatibility issue with Elementor
 
@@ -87,6 +95,9 @@ Yes, you can find them on [our website](https://einsatzverwaltung.org/faq/).
 * Internationalized more labels
 
 == Upgrade Notice ==
+
+= 1.10.0 =
+New API endpoint, roles, and more
 
 = 1.9.7 =
 Maintenance Release

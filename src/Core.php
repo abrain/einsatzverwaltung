@@ -1,6 +1,7 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
+use abrain\Einsatzverwaltung\Api\Ajax;
 use abrain\Einsatzverwaltung\Jobs\MigrateUnitsJob;
 use abrain\Einsatzverwaltung\Shortcodes\Initializer as ShortcodeInitializer;
 use abrain\Einsatzverwaltung\Util\Formatter;
@@ -148,6 +149,7 @@ class Core
         if (is_admin()) {
             add_action('admin_notices', array($this, 'onAdminNotices'));
             new Admin\Initializer($this->data, $this->options, $this->utilities, $this->permalinkController);
+            (new Ajax())->addHooks();
         }
 
         $userRightsManager = new UserRightsManager();

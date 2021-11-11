@@ -97,6 +97,11 @@ class Initializer
                 array('jquery', 'jquery-ui-autocomplete', 'wp-i18n'),
                 Core::VERSION
             );
+            wp_localize_script(
+                'einsatzverwaltung-edit-script',
+                'einsatzverwaltung_ajax_object',
+                array('ajax_url' => admin_url('admin-ajax.php'), 'nonce' => wp_create_nonce('einsatzverwaltung_used_values'))
+            );
             wp_set_script_translations('einsatzverwaltung-edit-script', 'einsatzverwaltung');
             wp_enqueue_style(
                 'einsatzverwaltung-edit',

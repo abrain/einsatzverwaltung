@@ -17,6 +17,20 @@ jQuery(function () {
             source: einsatzleiter_namen
         });
     }
+
+    // Set up autocomplete for incident location input
+    jQuery.post(einsatzverwaltung_ajax_object.ajax_url, {
+        _ajax_nonce: einsatzverwaltung_ajax_object.nonce,
+        action: 'einsatzverwaltung_used_locations',
+    }, function (response) {
+        if (response.success && response.data) {
+            jQuery("#einsatz_einsatzort").autocomplete({
+                source: response.data || []
+            });
+        }
+    }, 'json').fail(function () {
+        console.error('Could not query used locations');
+    });
 });
 
 function einsatzverwaltung_checkField(id, regex, msg, allowEmpty)

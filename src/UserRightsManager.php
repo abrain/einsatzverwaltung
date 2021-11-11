@@ -94,14 +94,14 @@ class UserRightsManager
         add_role(
             'einsatzverwaltung_reports_author',
             _x('Incident Reports Author', 'User role', 'einsatzverwaltung'),
-            array_merge(['read' => true], array_fill_keys(self::$authorCaps, true))
+            array_merge(['read' => true, 'upload_files' => true], array_fill_keys(self::$authorCaps, true))
         );
 
         remove_role('einsatzverwaltung_reports_editor');
         add_role(
             'einsatzverwaltung_reports_editor',
             _x('Incident Reports Editor', 'User role', 'einsatzverwaltung'),
-            array_merge(['read' => true], array_fill_keys(self::$capabilities, true))
+            array_merge(['read' => true, 'upload_files' => true], array_fill_keys(self::$capabilities, true))
         );
 
         remove_role('einsatzverwaltung_reportapi_draft');

@@ -9,11 +9,11 @@ Stable tag: 1.9.7
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Public incident reports for fire brigades and other rescue services
+Public incident reports for fire departments and other rescue services
 
 == Description ==
 
-This plugin lets you create incident reports to inform the public about your work. Although initially developed for fire brigades, it is also used by emergency medical services, mountain rescue services, water rescue services, and others.
+This plugin lets you create incident reports to inform the public about your work. Although initially developed for fire departments, it is also used by emergency medical services, mountain rescue services, water rescue services, and others.
 
 You can assign vehicles, units, type of incident, types of alerting, and external resources to each report. There are shortcodes and widgets to list the reports, optionally filtered by unit. The reports have a default layout, but you can also get creative with the templating feature. Reports can be imported and exported, creating and editing reports can be restricted to certain user roles.
 

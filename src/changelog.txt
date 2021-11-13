@@ -1,3 +1,13 @@
+= 1.8.0 =
+* Fix: Not all vehicles could be removed from an existing Incident Report
+* Shortcode `reportcount` can be filtered by status (actual or false alarm)
+* Templates: Added placeholder for featured image thumbnail
+* Shortcodes `einsatzliste` and `reportcount` can be filtered by multiple Incident Categories
+* Incident Categories can be marked as outdated
+* Units were converted to a taxonomy
+* Requires PHP 7.1 or newer
+* Requires WordPress 5.1 or newer
+
 = 1.7.2 =
 * Report list and Templates: Show sequential numbers as range if the report represents more than one incident
 * Fix: Shortcode `reportcount` did not take into account if reports represented more than one incident

@@ -2,6 +2,7 @@
 
 namespace abrain\Einsatzverwaltung\Model;
 
+use abrain\Einsatzverwaltung\Types\AlertingMethod;
 use abrain\Einsatzverwaltung\Types\Unit;
 use abrain\Einsatzverwaltung\Types\Vehicle;
 use abrain\Einsatzverwaltung\Utilities;
@@ -148,7 +149,7 @@ class IncidentReport
     {
         return array(
             'alarmierungsart' => array(
-                'label' => 'Alarmierungsart'
+                'label' => __('Alerting Method', 'einsatzverwaltung')
             ),
             'einsatzart' => array(
                 'label' => 'Einsatzart'
@@ -306,13 +307,13 @@ class IncidentReport
     }
 
     /**
-     * Gibt das Term-Objekt der Alarmierungsart zurück
+     * Returns the terms for the alerting methods
      *
      * @return WP_Term[]
      */
     public function getTypesOfAlerting(): array
     {
-        return $this->getTheTerms('alarmierungsart');
+        return $this->getTheTerms(AlertingMethod::getSlug());
     }
 
     /**

@@ -263,7 +263,7 @@ class Formatter
     }
 
     /**
-     * Gibt die Alarmierungsarten als kommaseparierten String zurück
+     * Returns the alerting methods as comma-separated string
      *
      * @param IncidentReport $report
      *

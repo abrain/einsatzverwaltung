@@ -9,7 +9,9 @@ use DateTime;
 use WP_Post;
 use wpdb;
 use function absint;
+use function add_action;
 use function array_key_exists;
+use function array_map;
 use function current_user_can;
 use function defined;
 use function delete_post_meta;
@@ -17,7 +19,10 @@ use function error_log;
 use function filter_input;
 use function get_post_meta;
 use function get_post_type;
+use function is_wp_error;
+use function remove_action;
 use function update_post_meta;
+use function wp_update_post;
 use function wp_verify_nonce;
 use const FILTER_SANITIZE_NUMBER_INT;
 use const FILTER_SANITIZE_STRING;
@@ -49,6 +54,18 @@ class Data
     public function __construct(Options $options)
     {
         $this->options = $options;
+    }
+
+    /**
+     * Register the actions and filters, that this class expects.
+     */
+    public function addHooks()
+    {
+        add_action('save_post_einsatz', array($this, 'savePostdata'), 10, 2);
+        add_action('private_einsatz', array($this, 'onPublish'), 10, 2);
+        add_action('publish_einsatz', array($this, 'onPublish'), 10, 2);
+        add_action('trash_einsatz', array($this, 'onTrash'), 10, 2);
+        add_action('transition_post_status', array($this, 'onTransitionPostStatus'), 10, 3);
     }
 
     /**

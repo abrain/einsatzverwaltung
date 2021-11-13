@@ -10,9 +10,8 @@ require_once $_tests_dir . '/includes/functions.php';
 tests_add_filter('muplugins_loaded', function () {
     require dirname(dirname(__FILE__)) . '/../src/einsatzverwaltung.php';
 
-    // DB-Version setzen, damit der Upgrade-Prozess nicht unnötig anläuft
-    // Wird normal bei der Aktivierung des Plugins gemacht, aber diese Action wird bei den Tests nicht aufgerufen
-    add_option('einsatzvw_db_version', \abrain\Einsatzverwaltung\Core::DB_VERSION);
+    // Simulate the activation of the plugin
+    do_action('activate_src/einsatzverwaltung.php');
 
     // Zeitzone setzen
     update_option('timezone_string', 'Europe/Berlin');

@@ -2,7 +2,7 @@
 namespace abrain\Einsatzverwaltung;
 
 use abrain\Einsatzverwaltung\Exceptions\TypeRegistrationException;
-use abrain\Einsatzverwaltung\Types\Alarmierungsart;
+use abrain\Einsatzverwaltung\Types\AlertingMethod;
 use abrain\Einsatzverwaltung\Types\CustomPostType;
 use abrain\Einsatzverwaltung\Types\CustomTaxonomy;
 use abrain\Einsatzverwaltung\Types\ExtEinsatzmittel;
@@ -50,7 +50,7 @@ class TypeRegistry
         $this->registerTaxonomy(new IncidentType(), $report::getSlug());
         $this->registerTaxonomy(new Vehicle(), $report::getSlug());
         $this->registerTaxonomy(new ExtEinsatzmittel(), $report::getSlug());
-        $this->registerTaxonomy(new Alarmierungsart(), $report::getSlug());
+        $this->registerTaxonomy(new AlertingMethod(), $report::getSlug());
         $this->registerTaxonomy(new Unit(), $report::getSlug());
 
         $permalinkController->addRewriteRules($report);

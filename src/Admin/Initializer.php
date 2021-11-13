@@ -13,6 +13,7 @@ use abrain\Einsatzverwaltung\Types\Report;
 use abrain\Einsatzverwaltung\Utilities;
 use function add_filter;
 use function esc_html__;
+use function sprintf;
 
 /**
  * Bootstraps and registers all the things we can do in WordPress' admin area
@@ -96,6 +97,11 @@ class Initializer
                 array('jquery', 'jquery-ui-autocomplete', 'wp-i18n'),
                 Core::VERSION
             );
+            wp_localize_script(
+                'einsatzverwaltung-edit-script',
+                'einsatzverwaltung_ajax_object',
+                array('ajax_url' => admin_url('admin-ajax.php'), 'nonce' => wp_create_nonce('einsatzverwaltung_used_values'))
+            );
             wp_set_script_translations('einsatzverwaltung-edit-script', 'einsatzverwaltung');
             wp_enqueue_style(
                 'einsatzverwaltung-edit',
@@ -176,6 +182,11 @@ class Initializer
     public function pluginMetaLinks($links, $file): array
     {
         if (Core::$pluginBasename === $file) {
+            $links[] = sprintf(
+                '<a href="%1$s" target="_blank">%2$s</a>',
+                'https://www.paypal.com/donate?hosted_button_id=U7LCWUZ8E54JG',
+                esc_html__('Donate', 'einsatzverwaltung')
+            );
             $links[] = sprintf(
                 '<a href="%1$s">%2$s</a>',
                 admin_url('options-general.php?page=' . MainPage::EVW_SETTINGS_SLUG . '&tab=about'),

@@ -1,10 +1,12 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
+use abrain\Einsatzverwaltung\Api\Ajax;
 use abrain\Einsatzverwaltung\Jobs\MigrateUnitsJob;
 use abrain\Einsatzverwaltung\Shortcodes\Initializer as ShortcodeInitializer;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use function add_action;
+use function add_option;
 use function error_log;
 use function get_option;
 
@@ -13,8 +15,8 @@ use function get_option;
  */
 class Core
 {
-    const VERSION = '1.9.7';
-    const DB_VERSION = 60;
+    const VERSION = '1.10.0';
+    const DB_VERSION = 71;
 
     /**
      * Statische Variable, um die aktuelle (einzige!) Instanz dieser Klasse zu halten
@@ -92,7 +94,13 @@ class Core
     {
         add_option('einsatzvw_db_version', self::DB_VERSION);
 
+        // Add default values for some options explicitly
+        add_option('einsatzvw_category', '-1');
+
         $this->maybeUpdate();
+
+        // Add user roles
+        (new UserRightsManager())->updateRoles();
 
         // Posttypen registrieren
         try {
@@ -124,35 +132,28 @@ class Core
 
         $this->utilities = new Utilities();
 
-        add_filter('option_einsatz_permalink', array(PermalinkController::class, 'sanitizePermalink'));
-        add_action('parse_query', array($this->permalinkController, 'einsatznummerMetaQuery'));
-        add_filter('post_type_link', array($this->permalinkController, 'filterPostTypeLink'), 10, 4);
-        add_filter('request', array($this->permalinkController, 'filterRequest'));
+        $this->customFieldsRepo->addHooks();
+        $this->permalinkController->addHooks();
 
         $this->data = new Data($this->options);
-        add_action('save_post_einsatz', array($this->data, 'savePostdata'), 10, 2);
-        add_action('private_einsatz', array($this->data, 'onPublish'), 10, 2);
-        add_action('publish_einsatz', array($this->data, 'onPublish'), 10, 2);
-        add_action('trash_einsatz', array($this->data, 'onTrash'), 10, 2);
-        add_action('transition_post_status', array($this->data, 'onTransitionPostStatus'), 10, 3);
+        $this->data->addHooks();
 
-        new Frontend($this->options, $this->formatter);
+        $frontend = new Frontend($this->options, $this->formatter);
+        $frontend->addHooks();
+
         new ShortcodeInitializer($this->data, $this->formatter, $this->permalinkController);
 
         $numberController = new ReportNumberController($this->data);
-        add_action('updated_postmeta', array($numberController, 'onPostMetaChanged'), 10, 4);
-        add_action('added_post_meta', array($numberController, 'onPostMetaChanged'), 10, 4);
-        add_action('updated_option', array($numberController, 'maybeAutoIncidentNumbersChanged'), 10, 3);
-        add_action('updated_option', array($numberController, 'maybeIncidentNumberFormatChanged'), 10, 3);
-        add_action('added_option', array($numberController, 'onOptionAdded'), 10, 2);
+        $numberController->addHooks();
 
         if (is_admin()) {
             add_action('admin_notices', array($this, 'onAdminNotices'));
             new Admin\Initializer($this->data, $this->options, $this->utilities, $this->permalinkController);
+            (new Ajax())->addHooks();
         }
 
         $userRightsManager = new UserRightsManager();
-        add_filter('user_has_cap', array($userRightsManager, 'userHasCap'), 10, 4);
+        $userRightsManager->maybeUpdateRoles();
 
         try {
             $this->typeRegistry->registerTypes($this->permalinkController);

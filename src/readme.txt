@@ -1,6 +1,6 @@
 === Einsatzverwaltung ===
 Contributors: abrain
-Donate link: https://einsatzverwaltung.abrain.de/unterstuetzen/
+Donate link: https://einsatzverwaltung.org/unterstuetzen/
 Tags: Feuerwehr, fire department, EMS
 Requires at least: 5.1.0
 Tested up to: 5.8
@@ -9,11 +9,11 @@ Stable tag: 1.9.7
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Public incident reports for fire brigades and other rescue services
+Public incident reports for fire departments and other rescue services
 
 == Description ==
 
-This plugin lets you create incident reports to inform the public about your work. Although initially developed for fire brigades, it is also used by emergency medical services, mountain rescue services, water rescue services, and others.
+This plugin lets you create incident reports to inform the public about your work. Although initially developed for fire departments, it is also used by emergency medical services, mountain rescue services, water rescue services, and others.
 
 You can assign vehicles, units, type of incident, types of alerting, and external resources to each report. There are shortcodes and widgets to list the reports, optionally filtered by unit. The reports have a default layout, but you can also get creative with the templating feature. Reports can be imported and exported, creating and editing reports can be restricted to certain user roles.
 
@@ -40,7 +40,7 @@ No, this plugin has no affiliation with einsatzverwaltung.eu.
 
 = Is there a manual? =
 
-Yes, there is more [documentation](https://einsatzverwaltung.abrain.de/dokumentation/) on our website.
+Yes, there is more [documentation](https://einsatzverwaltung.org/dokumentation/) on our website.
 
 = Where should I send feature requests and bug reports to? =
 
@@ -48,9 +48,17 @@ Ideally, you check the issues on [GitHub](https://github.com/abrain/einsatzverwa
 
 = Are there more FAQ? =
 
-Yes, you can find them on [our website](https://einsatzverwaltung.abrain.de/faq/).
+Yes, you can find them on [our website](https://einsatzverwaltung.org/faq/).
 
 == Changelog ==
+
+= 1.10.0 =
+* New API endpoint for third-party systems to create incident reports
+* Roles for user permissions
+* Shortcode `reportcount` can be filtered by Alerting Method
+* Fallback featured image for reports based on Incident Category
+* Autocomplete for incident location
+* Fix: Changing the category setting for incident reports caused an error on fresh installations
 
 = 1.9.7 =
 * Fix: Compatibility issue with Elementor
@@ -60,7 +68,7 @@ Yes, you can find them on [our website](https://einsatzverwaltung.abrain.de/faq/
 
 = 1.9.5 =
 * Fix: In some cases incident numbers were not regenerated after changing the format
-* Accessibility: Properly label the widgets if the theme supports the navigation-widget feature
+* Accessibility: Improve navigation of the widgets if the theme supports the navigation-widgets feature
 
 = 1.9.4 =
 * Fix: Editor would not show checkboxes for units if no vehicles existed
@@ -86,17 +94,10 @@ Yes, you can find them on [our website](https://einsatzverwaltung.abrain.de/faq/
 * Editor: Notice about wrong date format only appears after leaving the field
 * Internationalized more labels
 
-= 1.8.0 =
-* Fix: Not all vehicles could be removed from an existing Incident Report
-* Shortcode `reportcount` can be filtered by status (actual or false alarm)
-* Templates: Added placeholder for featured image thumbnail
-* Shortcodes `einsatzliste` and `reportcount` can be filtered by multiple Incident Categories
-* Incident Categories can be marked as outdated
-* Units were converted to a taxonomy
-* Requires PHP 7.1 or newer
-* Requires WordPress 5.1 or newer
-
 == Upgrade Notice ==
+
+= 1.10.0 =
+New API endpoint, roles, and more
 
 = 1.9.7 =
 Maintenance Release

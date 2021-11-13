@@ -1,11 +1,16 @@
 <?php
 namespace abrain\Einsatzverwaltung\Types;
 
+use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\CustomFields\Checkbox;
 use abrain\Einsatzverwaltung\CustomFields\ColorPicker;
+use abrain\Einsatzverwaltung\CustomFields\MediaSelector;
+use abrain\Einsatzverwaltung\CustomFields\StringList;
 use abrain\Einsatzverwaltung\CustomFieldsRepository;
 use WP_REST_Response;
+use WP_Screen;
 use function __;
+use function add_filter;
 
 /**
  * Description of the custom taxonomy 'Type of incident'
@@ -80,12 +85,22 @@ class IncidentType implements CustomTaxonomy
             __('Color', 'einsatzverwaltung'),
             'Ordne dieser Einsatzart eine Farbe zu. Einsatzarten ohne Farbe erben diese gegebenenfalls von übergeordneten Einsatzarten.'
         ));
+        $customFields->add($this, new MediaSelector(
+            'default_featured_image',
+            __('Default featured image', 'einsatzverwaltung'),
+            __('If a report in this Incident Category has no featured image, this image is shown instead.', 'einsatzverwaltung')
+        ));
         $customFields->add($this, new Checkbox(
             'outdated',
             __('Outdated', 'einsatzverwaltung'),
             __('This Incident Category is no longer used', 'einsatzverwaltung'),
             __('Outdated categories can still be assigned to reports, they just get moved to the end of the list. Existing reports will not be changed.', 'einsatzverwaltung'),
             '0'
+        ));
+        $customFields->add($this, new StringList(
+            'altname',
+            __('Alternative identifiers', 'einsatzverwaltung'),
+            __('A list of identifiers that are synonymous with this Incident Category. They will be used to find exisiting incident categories when reports are created via the API. One identifier per line.', 'einsatzverwaltung')
         ));
     }
 
@@ -103,6 +118,27 @@ class IncidentType implements CustomTaxonomy
                 $response->data['visibility']['show_ui'] = false;
             }
             return $response;
+        }, 10, 2);
+
+        add_action('admin_enqueue_scripts', function () {
+            $screen = get_current_screen();
+            if ($screen === false) {
+                return;
+            }
+
+            // Enqueue the scripts to handle media upload and selection
+            if ($screen->taxonomy === self::getSlug() && in_array($screen->base, array('edit-tags', 'term'))) {
+                wp_enqueue_media();
+                wp_enqueue_script('einsatzverwaltung-media-selector', Core::$scriptUrl . 'media-selector.js');
+            }
+        });
+
+        add_filter('default_hidden_columns', function (array $hiddenColumns, WP_Screen $screen) {
+            if ($screen->taxonomy === self::getSlug()) {
+                $hiddenColumns[] = 'altname';
+                $hiddenColumns[] = 'default_featured_image';
+            }
+            return $hiddenColumns;
         }, 10, 2);
     }
 }

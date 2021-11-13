@@ -15,6 +15,7 @@ use function is_array;
  * @package abrain\Einsatzverwaltung
  * @covers \abrain\Einsatzverwaltung\ReportQuery
  * @uses \abrain\Einsatzverwaltung\Model\IncidentReport
+ * @uses \abrain\Einsatzverwaltung\Types\AlertingMethod
  * @uses \abrain\Einsatzverwaltung\Types\Unit
  */
 class ReportQueryTest extends UnitTestCase
@@ -238,5 +239,20 @@ class ReportQueryTest extends UnitTestCase
                 in_array(['key' => 'einsatz_fehlalarm', 'value' => '0'], $args['meta_query'][0]);
         }))->andReturn([]);
         $reportQuery->getReports();
+    }
+
+    /**
+     * @throws ExpectationArgsRequired
+     */
+    public function testSetAlertingMethodIds()
+    {
+        $reportQuery = new ReportQuery();
+        $reportQuery->setAlertingMethodIds([16822, 872]);
+        expect('get_posts')->once()->with(Mockery::capture($postArgs))->andReturn([]);
+        $reportQuery->getReports();
+
+        $this->assertArrayHasKey('tax_query', $postArgs);
+        $this->assertTrue(!array_key_exists('relation', $postArgs['tax_query']) || $postArgs['tax_query']['relation'] === 'AND');
+        $this->assertTrue(in_array(['taxonomy' => 'alarmierungsart', 'terms' => [16822, 872]], $postArgs['tax_query']));
     }
 }

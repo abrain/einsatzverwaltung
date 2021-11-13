@@ -2,8 +2,13 @@
 namespace abrain\Einsatzverwaltung;
 
 use Brain\Monkey;
+use DateTime;
+use DateTimeZone;
+use Exception;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
+use function Brain\Monkey\Functions\when;
+use function gmdate;
 
 /**
  * Base class for unit testing, takes care of mocking many WordPress functions
@@ -32,6 +37,19 @@ class UnitTestCase extends TestCase
             }
             return $result;
         });
+
+        when('get_date_from_gmt')->alias(function ($string, $format = 'Y-m-d H:i:s') {
+            try {
+                $datetime = new DateTime($string, new DateTimeZone('UTC'));
+            } catch (Exception $exception) {
+                return gmdate($format, 0);
+            }
+
+            return $datetime->setTimezone(new DateTimeZone('Europe/Berlin'))->format($format);
+        });
+
+        when('sanitize_textarea_field')->returnArg();
+        when('sanitize_text_field')->returnArg();
     }
 
     protected function tearDown()

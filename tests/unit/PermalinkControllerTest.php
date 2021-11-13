@@ -4,19 +4,30 @@ namespace abrain\Einsatzverwaltung;
 use abrain\Einsatzverwaltung\Types\Report;
 use Brain\Monkey\Expectation\Exception\ExpectationArgsRequired;
 use Mockery;
+use function Brain\Monkey\Actions\expectAdded as expectAddedAction;
+use function Brain\Monkey\Filters\expectAdded as expectAddedFilter;
 use function Brain\Monkey\Functions\expect;
 use function Brain\Monkey\Functions\when;
 
 /**
  * Class PermalinkControllerTest
  * @package abrain\Einsatzverwaltung
+ *
+ * @covers \abrain\Einsatzverwaltung\PermalinkController
  */
 class PermalinkControllerTest extends UnitTestCase
 {
+    public function testAddHooks()
+    {
+        expectAddedAction('parse_query');
+        expectAddedFilter('option_einsatz_permalink');
+        expectAddedFilter('post_type_link');
+        expectAddedFilter('request');
+        $permalinkController = new PermalinkController();
+        $permalinkController->addHooks();
+    }
+
     /**
-     * @covers \abrain\Einsatzverwaltung\PermalinkController::getPermalink
-     * @covers \abrain\Einsatzverwaltung\PermalinkController::getRewriteBase
-     * @uses \abrain\Einsatzverwaltung\PermalinkController::addRewriteRules
      * @throws ExpectationArgsRequired
      */
     public function testGetPrettyPermalink()
@@ -39,9 +50,6 @@ class PermalinkControllerTest extends UnitTestCase
     }
 
     /**
-     * @covers \abrain\Einsatzverwaltung\PermalinkController::getPermalink
-     * @covers \abrain\Einsatzverwaltung\PermalinkController::getRewriteBase
-     * @uses \abrain\Einsatzverwaltung\PermalinkController::addRewriteRules
      * @throws ExpectationArgsRequired
      */
     public function testGetPathinfoPermalink()
@@ -63,9 +71,6 @@ class PermalinkControllerTest extends UnitTestCase
         $this->assertEquals('url4613', $controller->getPermalink('random-selector'));
     }
 
-    /**
-     * @covers \abrain\Einsatzverwaltung\PermalinkController::sanitizePermalink
-     */
     public function testSanitizePermalink()
     {
         $this->assertEquals('%postname%', PermalinkController::sanitizePermalink('%postname%'));

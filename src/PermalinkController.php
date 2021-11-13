@@ -4,6 +4,8 @@ namespace abrain\Einsatzverwaltung;
 use abrain\Einsatzverwaltung\Types\Report;
 use WP_Post;
 use WP_Query;
+use function add_action;
+use function add_filter;
 
 /**
  * Manages rewrite rules
@@ -34,6 +36,17 @@ class PermalinkController
         '(?<id>[0-9]+)',
         '([A-Za-z0-9_-]+)'
     );
+
+    /**
+     * Register the actions and filters, that this class expects.
+     */
+    public function addHooks()
+    {
+        add_filter('option_einsatz_permalink', array(self::class, 'sanitizePermalink'));
+        add_action('parse_query', array($this, 'einsatznummerMetaQuery'));
+        add_filter('post_type_link', array($this, 'filterPostTypeLink'), 10, 4);
+        add_filter('request', array($this, 'filterRequest'));
+    }
 
     /**
      * @param Report $report

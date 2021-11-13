@@ -2,6 +2,7 @@
 
 namespace abrain\Einsatzverwaltung;
 
+use function add_action;
 use function date_create;
 use function date_format;
 use function get_option;
@@ -40,12 +41,27 @@ class ReportNumberController
     }
 
     /**
+     * Register the actions and filters, that this class expects.
+     */
+    public function addHooks()
+    {
+        add_action('updated_postmeta', array($this, 'onPostMetaChanged'), 10, 4);
+        add_action('added_post_meta', array($this, 'onPostMetaChanged'), 10, 4);
+        add_action('updated_option', array($this, 'maybeAutoIncidentNumbersChanged'), 10, 3);
+        add_action('updated_option', array($this, 'maybeIncidentNumberFormatChanged'), 10, 3);
+        add_action('added_option', array($this, 'onOptionAdded'), 10, 2);
+    }
+
+    /**
      * Sobald die laufende Nummer aktualisiert wird, muss die Einsatznummer neu generiert werden.
      *
      * @param int $metaId ID des postmeta-Eintrags
      * @param int $objectId Post-ID
      * @param string $metaKey Der Key des postmeta-Eintrags
      * @param mixed $metaValue Der Wert des postmeta-Eintrags
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter) A WordPress hook with fixed signature
+     * @noinspection PhpUnusedParameterInspection
      */
     public function onPostMetaChanged(int $metaId, int $objectId, string $metaKey, $metaValue)
     {

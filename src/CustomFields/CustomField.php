@@ -3,7 +3,11 @@ namespace abrain\Einsatzverwaltung\CustomFields;
 
 use WP_Post;
 use WP_Term;
+use function get_post;
+use function get_post_meta;
+use function get_term_meta;
 use function intval;
+use function term_exists;
 
 /**
  * Base class for additional fields of taxonomies
@@ -17,18 +21,26 @@ abstract class CustomField
     public $defaultValue;
 
     /**
+     * @var bool
+     */
+    private $multiValue;
+
+    /**
      * CustomField constructor.
+     *
      * @param string $key
      * @param string $label
      * @param string $description
      * @param mixed $defaultValue
+     * @param bool $multiValue
      */
-    public function __construct($key, $label, $description, $defaultValue = false)
+    public function __construct(string $key, string $label, string $description, $defaultValue = false, bool $multiValue = false)
     {
         $this->key = $key;
         $this->label = $label;
         $this->description = $description;
         $this->defaultValue = $defaultValue;
+        $this->multiValue = $multiValue;
     }
 
     /**
@@ -78,6 +90,23 @@ abstract class CustomField
     }
 
     /**
+     * @param int $objectId
+     *
+     * @return array
+     */
+    public function getValues(int $objectId): array
+    {
+        $values = [];
+        if (term_exists($objectId) !== null) {
+            $values = get_term_meta($objectId, $this->key, false);
+        } elseif (get_post($objectId) instanceof WP_Post) {
+            $values = get_post_meta($objectId, $this->key, false);
+        }
+
+        return (false === $values ? $this->defaultValue : $values);
+    }
+
+    /**
      * @return string The markup for the input shown when adding a new term.
      */
     abstract public function getAddTermInput(): string;
@@ -99,4 +128,12 @@ abstract class CustomField
      * @return string The markup for the input shown when editing an existing term.
      */
     abstract public function getEditTermInput($tag): string;
+
+    /**
+     * @return bool
+     */
+    public function isMultiValue(): bool
+    {
+        return $this->multiValue;
+    }
 }

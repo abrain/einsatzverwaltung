@@ -4,7 +4,6 @@ namespace abrain\Einsatzverwaltung\Shortcodes;
 use abrain\Einsatzverwaltung\Data;
 use abrain\Einsatzverwaltung\PermalinkController;
 use function esc_url;
-use function shortcode_atts;
 
 /**
  * Renders links to yearly archives for the shortcode [einsatzjahre]
@@ -21,13 +20,6 @@ class ReportArchives extends AbstractShortcode
      */
     private $permalinkController;
 
-    private $defaultAttributes = array(
-        'add_queried_year' => 'yes',
-        'force_current_year' => 'no',
-        'limit' => 0,
-        'sort' => 'DESC',
-    );
-
     /**
      * ReportArchives constructor.
      *
@@ -36,6 +28,13 @@ class ReportArchives extends AbstractShortcode
      */
     public function __construct(Data $data, PermalinkController $permalinkController)
     {
+        parent::__construct([
+            'add_queried_year' => 'yes',
+            'force_current_year' => 'no',
+            'limit' => 0,
+            'sort' => 'DESC',
+        ]);
+
         $this->data = $data;
         $this->permalinkController = $permalinkController;
     }
@@ -50,7 +49,7 @@ class ReportArchives extends AbstractShortcode
         $queriedYear = empty($year) ? $thisYear : $year;
         $yearsWithReports = $this->data->getYearsWithReports();
 
-        $attributes = shortcode_atts($this->defaultAttributes, $attributes);
+        $attributes = $this->getAttributes($attributes);
 
         if ($attributes['add_queried_year'] !== 'no' && !in_array($queriedYear, $yearsWithReports)) {
             $yearsWithReports[] = $queriedYear;

@@ -112,6 +112,7 @@ class ReportListTable
                 $numberString = $report->getNumber();
                 $weight = $report->getWeight();
                 if ($weight > 1) {
+                    // translators: 1: number of incidents represented by this report (at least 2)
                     $numberString .= '<br>' . esc_html(sprintf(__('(%d incidents)', 'einsatzverwaltung'), $weight));
                 }
                 return $numberString;

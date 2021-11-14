@@ -200,6 +200,7 @@ class Advanced extends SubPage
             'sample-incident'
         );
         printf(
+            // translators: 1: sample-incident, 2: sample-incident-2, 3: sample-incident-3
             __('By default, WordPress uses the post name to build the URL. To ensure uniqueness across posts, the post name can have a number appended if there are other posts with the same title (e.g. %1$s, %2$s, %3$s, ...).', 'einsatzverwaltung'),
             esc_html($sampleSlug),
             esc_html("$sampleSlug-2"),

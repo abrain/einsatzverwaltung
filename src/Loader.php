@@ -47,6 +47,7 @@ if (spl_autoload_register(__NAMESPACE__ . '\Loader::load', false) === false) {
     add_action('admin_notices', function () {
         $pluginData = get_plugin_data(einsatzverwaltung_plugin_file());
         $message = sprintf(
+            // translators: 1: plugin name
             __('The plugin %s cannot be initialized (spl_autoload_register() failed)', 'einsatzverwaltung'),
             $pluginData['Name']
         );

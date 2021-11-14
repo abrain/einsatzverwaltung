@@ -188,6 +188,7 @@ class RecentIncidents extends AbstractWidget
             if (!empty($location)) {
                 $locationFormat = sprintf(
                     '<br><span class="einsatzort">%s</span>',
+                    // translators: 1: location of the incident
                     esc_html__('Location: %s', 'einsatzverwaltung')
                 );
                 printf($locationFormat, esc_html($location));

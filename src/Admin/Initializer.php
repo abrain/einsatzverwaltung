@@ -152,6 +152,7 @@ class Initializer
         if (post_type_exists($postType)) {
             $postCounts = wp_count_posts($postType);
             $text = sprintf(
+                // translators: 1: number of reports
                 _n('%d Incident Report', '%d Incident Reports', intval($postCounts->publish), 'einsatzverwaltung'),
                 number_format_i18n($postCounts->publish)
             );

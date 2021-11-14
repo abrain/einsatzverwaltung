@@ -140,7 +140,7 @@ class Advanced extends SubPage
         echo '<p class="description">';
         printf(
             /* translators: 1: archive, 2: feed */
-            __('Base for links to single reports, the %s, and the %s.', 'einsatzverwaltung'),
+            __('Base for links to single reports, the %1$s, and the %2$s.', 'einsatzverwaltung'),
             sprintf(
                 '<a href="%s">%s</a>',
                 get_post_type_archive_link(\abrain\Einsatzverwaltung\Types\Report::getSlug()),

@@ -75,7 +75,7 @@ class TypeRegistry
         $postType = register_post_type($slug, $customPostType->getRegistrationArgs());
         if (is_wp_error($postType)) {
             throw new TypeRegistrationException(sprintf(
-                __('Failed to register post type with slug "%s": %s', 'einsatzverwaltung'),
+                __('Failed to register post type with slug "%1$s": %2$s', 'einsatzverwaltung'),
                 $slug,
                 $postType->get_error_message()
             ));
@@ -107,7 +107,7 @@ class TypeRegistry
         $result = register_taxonomy($slug, $postType, $customTaxonomy->getRegistrationArgs());
         if (is_wp_error($result)) {
             throw new TypeRegistrationException(sprintf(
-                __('Failed to register taxonomy with slug "%s": %s', 'einsatzverwaltung'),
+                __('Failed to register taxonomy with slug "%1$s": %2$s', 'einsatzverwaltung'),
                 $slug,
                 $result->get_error_message()
             ));

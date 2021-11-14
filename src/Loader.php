@@ -43,9 +43,7 @@ if (!defined('ABSPATH')) {
     die('You shall not pass!');
 }
 
-$autoloaderRegistered = spl_autoload_register(__NAMESPACE__ . '\Loader::load', false);
-
-if ($autoloaderRegistered === false) {
+if (spl_autoload_register(__NAMESPACE__ . '\Loader::load', false) === false) {
     add_action('admin_notices', function () {
         $pluginData = get_plugin_data(einsatzverwaltung_plugin_file());
         $message = sprintf(
@@ -57,18 +55,10 @@ if ($autoloaderRegistered === false) {
     return;
 }
 
-// Initialize some basic paths and URLs
-$pluginFile = einsatzverwaltung_plugin_file();
-Core::$pluginBasename = plugin_basename($pluginFile);
-Core::$pluginDir = plugin_dir_path($pluginFile);
-Core::$pluginUrl = plugin_dir_url($pluginFile);
-Core::$scriptUrl = Core::$pluginUrl . 'js/';
-Core::$styleUrl = Core::$pluginUrl . 'css/';
-
-$core = Core::getInstance();
-add_action('init', array($core, 'onInit'));
-register_activation_hook($pluginFile, array($core, 'onActivation'));
-register_deactivation_hook($pluginFile, array($core, 'onDeactivation'));
+$einsatzverwaltung_core = Core::getInstance();
+add_action('init', array($einsatzverwaltung_core, 'onInit'));
+register_activation_hook(einsatzverwaltung_plugin_file(), array($einsatzverwaltung_core, 'onActivation'));
+register_deactivation_hook(einsatzverwaltung_plugin_file(), array($einsatzverwaltung_core, 'onDeactivation'));
 
 // Register REST API routes
 add_action('rest_api_init', function () {

@@ -40,8 +40,7 @@ function einsatzverwaltung_minPHPversion()
 /**
  * Prüfe, ob PHP mindestens in Version $php_version_min läuft
  */
-$php_version = phpversion();
-if (version_compare($php_version, einsatzverwaltung_minPHPversion()) < 0) {
+if (version_compare(phpversion(), einsatzverwaltung_minPHPversion()) < 0) {
     wp_die(
         sprintf(
             __('The plugin Einsatzverwaltung requires PHP version %s or newer. Please update PHP on your server.', 'einsatzverwaltung'),

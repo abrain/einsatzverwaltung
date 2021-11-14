@@ -31,7 +31,7 @@ class Reports extends WP_REST_Controller
     /**
      * @inheritDoc
      */
-    public function register_routes()
+    public function register_routes() // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps -- overridden method
     {
         $namespace = 'einsatzverwaltung/v1';
         register_rest_route($namespace, '/reports', array(
@@ -108,7 +108,7 @@ class Reports extends WP_REST_Controller
     /**
      * @inheritDoc
      */
-    public function create_item($request)
+    public function create_item($request) // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps -- overridden method
     {
         $params = $request->get_params();
 
@@ -160,7 +160,7 @@ class Reports extends WP_REST_Controller
     /**
      * @inheritDoc
      */
-    public function create_item_permissions_check($request)
+    public function create_item_permissions_check($request) // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps -- overridden method
     {
         $params = $request->get_params();
         $publishReport = array_key_exists('publish', $params) && $params['publish'] === true;

@@ -7,8 +7,12 @@ use abrain\Einsatzverwaltung\Shortcodes\Initializer as ShortcodeInitializer;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use function add_action;
 use function add_option;
+use function einsatzverwaltung_plugin_file;
 use function error_log;
 use function get_option;
+use function plugin_basename;
+use function plugin_dir_path;
+use function plugin_dir_url;
 
 /**
  * Grundlegende Funktionen
@@ -75,6 +79,14 @@ class Core
      */
     private function __construct()
     {
+        // Initialize some basic paths and URLs
+        $pluginFile = einsatzverwaltung_plugin_file();
+        self::$pluginBasename = plugin_basename($pluginFile);
+        self::$pluginDir = plugin_dir_path($pluginFile);
+        self::$pluginUrl = plugin_dir_url($pluginFile);
+        self::$scriptUrl = self::$pluginUrl . 'js/';
+        self::$styleUrl = self::$pluginUrl . 'css/';
+
         $this->options = new Options();
 
         $this->customFieldsRepo = new CustomFieldsRepository();

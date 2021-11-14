@@ -5,6 +5,7 @@ define('EINSATZVERWALTUNG_PHPUNIT', true);
 
 // Define fake ABSPATH
 if (! defined('ABSPATH')) {
+    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound
     define('ABSPATH', sys_get_temp_dir());
 }
 
@@ -14,7 +15,7 @@ date_default_timezone_set('UTC');
 require __DIR__ . '/../../vendor/autoload.php';
 require __DIR__ . '/constants.php';
 require __DIR__ . '/UnitTestCase.php';
-require __DIR__ . '/Stubs/WP_REST_Server_Stub.php';
+require __DIR__ . '/Stubs/WPRESTServerStub.php';
 
 spl_autoload_register(function ($class) {
     // Do not load classes from other namespaces

@@ -12,45 +12,47 @@ Requires at least: 5.1.0
 Requires PHP: 7.1.0
 */
 
+use abrain\Einsatzverwaltung\Core;
+
 if (!defined('ABSPATH')) {
     die('You shall not pass!');
 }
 
-/**
- * Gibt die Hauptdatei des Plugins zurück, wichtig für bestimmte Hooks
- * @return string
- */
-function einsatzverwaltung_plugin_file()
-{
-    return __FILE__;
-}
-
-/**
- * Returns the required PHP version for this plugin
- *
- * @return string
- */
-function einsatzverwaltung_minPHPversion()
-{
-    $file = dirname(einsatzverwaltung_plugin_file()) . '/readme.txt';
-    $fileData = get_file_data($file, array('PHPmin' => 'Requires PHP'));
-    return $fileData['PHPmin'];
-}
-
-/**
- * Prüfe, ob PHP mindestens in Version $php_version_min läuft
- */
-if (version_compare(phpversion(), einsatzverwaltung_minPHPversion()) < 0) {
-    wp_die(
-        sprintf(
-            // translators: 1: PHP version number
-            __('The plugin Einsatzverwaltung requires PHP version %s or newer. Please update PHP on your server.', 'einsatzverwaltung'),
-            einsatzverwaltung_minPHPversion()
-        ),
-        __('Outdated PHP version', 'einsatzverwaltung'),
-        array('back_link' => true)
-    );
-}
-
 require_once dirname(__FILE__) . '/backcompat.php';
-require_once dirname(__FILE__) . '/Loader.php';
+
+try {
+    spl_autoload_register(function (string $class) {
+        // Do not load classes from other namespaces
+        if (strpos($class, 'abrain\\Einsatzverwaltung') === false) {
+            return;
+        }
+
+        $parts = explode('\\', $class);
+        $filename = '';
+        for ($index = 2; $index < count($parts); $index++) {
+            $filename .= DIRECTORY_SEPARATOR;
+            $filename .= $parts[$index];
+        }
+
+        include dirname(__FILE__) . "$filename.php";
+    });
+} catch (Exception $exception) {
+    add_action('admin_notices', function () {
+        $pluginData = get_plugin_data(__FILE__);
+        $message = sprintf(
+            // translators: 1: plugin name
+            __('The plugin %s cannot be initialized (spl_autoload_register() failed)', 'einsatzverwaltung'),
+            $pluginData['Name']
+        );
+        printf('<div class="notice notice-error"><p>%1$s</p></div>', esc_html($message));
+    });
+    return;
+}
+
+// Bootstrap the plugin
+Core::getInstance()->setPluginFile(__FILE__)->addHooks();
+
+// Register REST API routes
+add_action('rest_api_init', function () {
+    (new abrain\Einsatzverwaltung\Api\Initializer())->onRestApiInit();
+});

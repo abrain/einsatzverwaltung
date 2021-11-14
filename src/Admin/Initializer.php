@@ -31,7 +31,7 @@ class Initializer
      */
     public function __construct(Data $data, Options $options, Utilities $utilities, PermalinkController $permalinkController)
     {
-        $pluginBasename = plugin_basename(einsatzverwaltung_plugin_file());
+        $pluginBasename = Core::$pluginBasename;
         add_action('admin_menu', array($this, 'hideTaxonomies'));
         add_action('admin_notices', array($this, 'displayAdminNotices'));
         add_action('admin_enqueue_scripts', array($this, 'enqueueEditScripts'));

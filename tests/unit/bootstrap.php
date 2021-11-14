@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignore PSR1.Files.SideEffects.FoundWithSymbols
 
 // Define test environment
 define('EINSATZVERWALTUNG_PHPUNIT', true);

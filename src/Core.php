@@ -7,12 +7,12 @@ use abrain\Einsatzverwaltung\Shortcodes\Initializer as ShortcodeInitializer;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use function add_action;
 use function add_option;
-use function einsatzverwaltung_plugin_file;
 use function error_log;
 use function get_option;
 use function plugin_basename;
-use function plugin_dir_path;
 use function plugin_dir_url;
+use function register_activation_hook;
+use function register_deactivation_hook;
 
 /**
  * Grundlegende Funktionen
@@ -29,10 +29,16 @@ class Core
     private static $instance = null;
 
     public static $pluginBasename;
-    public static $pluginDir;
     public static $pluginUrl;
     public static $scriptUrl;
     public static $styleUrl;
+
+    /**
+     * Absolute path to the main plugin file.
+     *
+     * @var string
+     */
+    private $pluginFile;
 
     /**
      * @var Data
@@ -79,14 +85,6 @@ class Core
      */
     private function __construct()
     {
-        // Initialize some basic paths and URLs
-        $pluginFile = einsatzverwaltung_plugin_file();
-        self::$pluginBasename = plugin_basename($pluginFile);
-        self::$pluginDir = plugin_dir_path($pluginFile);
-        self::$pluginUrl = plugin_dir_url($pluginFile);
-        self::$scriptUrl = self::$pluginUrl . 'js/';
-        self::$styleUrl = self::$pluginUrl . 'css/';
-
         $this->options = new Options();
 
         $this->customFieldsRepo = new CustomFieldsRepository();
@@ -94,9 +92,18 @@ class Core
 
         $this->permalinkController = new PermalinkController();
         $this->formatter = new Formatter($this->options, $this->permalinkController);
+    }
 
-        $widgetInitializer = new Widgets\Initializer($this->formatter);
-        add_action('widgets_init', array($widgetInitializer, 'registerWidgets'));
+    /**
+     * Registers action hooks that are essential to load the plugin.
+     */
+    public function addHooks()
+    {
+        register_activation_hook($this->pluginFile, array($this, 'onActivation'));
+        register_deactivation_hook($this->pluginFile, array($this, 'onDeactivation'));
+
+        add_action('init', array($this, 'onInit'));
+        add_action('widgets_init', array(new Widgets\Initializer($this->formatter), 'registerWidgets'));
     }
 
     /**
@@ -190,7 +197,7 @@ class Core
             return;
         }
         
-        $pluginData = get_plugin_data(einsatzverwaltung_plugin_file());
+        $pluginData = get_plugin_data($this->pluginFile);
         foreach ($this->adminErrorMessages as $errorMessage) {
             $message = sprintf('Plugin %s: %s', $pluginData['Name'], $errorMessage);
             printf('<div class="%1$s"><p>%2$s</p></div>', esc_attr('notice notice-error'), esc_html($message));
@@ -225,11 +232,31 @@ class Core
      *
      * @return   Core
      */
-    public static function getInstance(): ?Core
+    public static function getInstance(): Core
     {
         if (null === self::$instance) {
             self::$instance = new Core();
         }
         return self::$instance;
+    }
+
+    /**
+     * Intializes basic path variables crucial to plugin functionality
+     *
+     * @param string $fileName
+     *
+     * @return $this
+     */
+    public function setPluginFile(string $fileName): Core
+    {
+        $this->pluginFile = $fileName;
+
+        // Initialize some basic paths and URLs
+        self::$pluginBasename = plugin_basename($this->pluginFile);
+        self::$pluginUrl = plugin_dir_url($this->pluginFile);
+        self::$scriptUrl = self::$pluginUrl . 'js/';
+        self::$styleUrl = self::$pluginUrl . 'css/';
+
+        return $this;
     }
 }

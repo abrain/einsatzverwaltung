@@ -99,6 +99,11 @@ class Core
      */
     public function addHooks()
     {
+        if (empty($this->pluginFile)) {
+            error_log('einsatzverwaltung: Plugin file has not been set via setPluginFile()');
+            return;
+        }
+
         register_activation_hook($this->pluginFile, array($this, 'onActivation'));
         register_deactivation_hook($this->pluginFile, array($this, 'onDeactivation'));
 

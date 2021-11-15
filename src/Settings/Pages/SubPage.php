@@ -107,6 +107,7 @@ abstract class SubPage
         $currentValue = get_option($name, $defaultValue);
         foreach ($options as $value => $option) {
             if ($value === $defaultValue) {
+                // translators: 1: label of the default option
                 $label = esc_html(sprintf(__('%s (default)', 'einsatzverwaltung'), $option['label']));
             } else {
                 $label = esc_html($option['label']);

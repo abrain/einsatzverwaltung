@@ -71,6 +71,9 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/phpcompatibility/php-compatibility" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/dealerdirect/phpcodesniffer-composer-installer" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/yoast/phpunit-polyfills" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/phpcompatibility/phpcompatibility-wp" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/phpcompatibility/phpcompatibility-paragonie" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/wp-coding-standards/wpcs" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

@@ -18,7 +18,7 @@ class SequenceNumberTest extends WP_UnitTestCase
      */
     private $reportFactory;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->reportFactory = new ReportFactory();

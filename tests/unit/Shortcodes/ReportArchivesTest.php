@@ -26,7 +26,7 @@ class ReportArchivesTest extends UnitTestCase
      */
     private $thisYear;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $permalinkController = $this->createMock('\abrain\Einsatzverwaltung\PermalinkController');

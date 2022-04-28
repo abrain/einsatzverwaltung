@@ -18,7 +18,7 @@ use WP_User;
  */
 class ReportEditTest extends WP_UnitTestCase
 {
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         parent::tearDownAfterClass();
 

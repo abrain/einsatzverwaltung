@@ -1,3 +1,4 @@
+---
 kind: pipeline
 type: docker
 name: compliance
@@ -100,3 +101,8 @@ depends_on:
 trigger:
   event:
     - tag
+---
+kind: signature
+hmac: b987dfc356a412d5fbfa3bf77f0883c3fd3aa1651e5918244b3173423de2b9d0
+
+...

@@ -93,6 +93,7 @@
   <component name="PhpRuntimeConfiguration">
     <extensions>
       <extension name="Ev" enabled="false" />
+      <extension name="FFI" enabled="true" />
       <extension name="SQLite" enabled="false" />
       <extension name="SplType" enabled="false" />
       <extension name="ZendDebugger" enabled="false" />
@@ -103,6 +104,9 @@
       <extension name="cassandra" enabled="false" />
       <extension name="couchbase" enabled="false" />
       <extension name="cubrid" enabled="false" />
+      <extension name="decimal" enabled="false" />
+      <extension name="dio" enabled="false" />
+      <extension name="elastic_apm" enabled="false" />
       <extension name="enchant" enabled="false" />
       <extension name="fann" enabled="false" />
       <extension name="ffmpeg" enabled="false" />
@@ -115,6 +119,7 @@
       <extension name="http" enabled="false" />
       <extension name="ibm_db2" enabled="false" />
       <extension name="igbinary" enabled="false" />
+      <extension name="imagick" enabled="false" />
       <extension name="imap" enabled="false" />
       <extension name="inotify" enabled="false" />
       <extension name="interbase" enabled="false" />
@@ -122,11 +127,13 @@
       <extension name="libevent" enabled="false" />
       <extension name="libsodium" enabled="false" />
       <extension name="mailparse" enabled="false" />
+      <extension name="mcrypt" enabled="false" />
       <extension name="memcache" enabled="false" />
       <extension name="memcached" enabled="false" />
       <extension name="ming" enabled="false" />
       <extension name="mongo" enabled="false" />
       <extension name="mongodb" enabled="false" />
+      <extension name="mosquitto-php" enabled="false" />
       <extension name="mqseries" enabled="false" />
       <extension name="mssql" enabled="false" />
       <extension name="mysql" enabled="false" />
@@ -138,7 +145,6 @@
       <extension name="pdflib" enabled="false" />
       <extension name="pdo_ibm" enabled="false" />
       <extension name="pthreads" enabled="false" />
-      <extension name="radius" enabled="false" />
       <extension name="rar" enabled="false" />
       <extension name="recode" enabled="false" />
       <extension name="redis" enabled="false" />
@@ -150,9 +156,13 @@
       <extension name="svn" enabled="false" />
       <extension name="sybase" enabled="false" />
       <extension name="v8js" enabled="false" />
+      <extension name="wddx" enabled="false" />
       <extension name="win32service" enabled="false" />
       <extension name="wincache" enabled="false" />
+      <extension name="xdebug" enabled="false" />
       <extension name="xhprof" enabled="false" />
+      <extension name="xlswriter" enabled="false" />
+      <extension name="xmlrpc" enabled="false" />
       <extension name="yaml" enabled="false" />
       <extension name="zend" enabled="false" />
       <extension name="zmq" enabled="false" />

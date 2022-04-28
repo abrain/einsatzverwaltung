@@ -22,7 +22,13 @@
   "config": {
     "platform": {
       "php": "7.1.27"
+    },
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
     }
+  },
+  "scripts": {
+    "lint": "phpcs"
   },
   "require": {
     "php": ">=7.1.0"

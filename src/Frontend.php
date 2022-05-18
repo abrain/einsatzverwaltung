@@ -188,6 +188,10 @@ class Frontend
      */
     public function renderContent(string $content): string
     {
+        if (!is_singular() || !in_the_loop() || !is_main_query()) {
+            return $content;
+        }
+        
         $post = get_post();
 
         // Bail, if the post object is empty, not a report, or the content is password protected

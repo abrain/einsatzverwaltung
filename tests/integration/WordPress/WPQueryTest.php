@@ -15,7 +15,7 @@ class WPQueryTest extends WP_UnitTestCase
     /**
      * Erzeugt vor jedem Test die benötigten Testdaten
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

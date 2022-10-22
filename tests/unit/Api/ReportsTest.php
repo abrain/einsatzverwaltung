@@ -16,11 +16,11 @@ use function Brain\Monkey\Functions\expect;
  */
 class ReportsTest extends UnitTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         Mockery::mock('WP_REST_Controller');
-        Mockery::namedMock('WP_REST_Server', 'abrain\Einsatzverwaltung\Stubs\WP_REST_Server_Stub');
+        Mockery::namedMock('WP_REST_Server', 'abrain\Einsatzverwaltung\Stubs\WPRESTServerStub');
     }
 
     /**

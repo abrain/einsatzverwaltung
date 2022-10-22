@@ -6,7 +6,7 @@ use DateTime;
 use DateTimeZone;
 use Exception;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
-use PHPUnit\Framework\TestCase;
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
 use function Brain\Monkey\Functions\when;
 use function gmdate;
 
@@ -18,7 +18,7 @@ class UnitTestCase extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         Monkey\setUp();
@@ -52,7 +52,7 @@ class UnitTestCase extends TestCase
         when('sanitize_text_field')->returnArg();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         Monkey\tearDown();
         parent::tearDown();

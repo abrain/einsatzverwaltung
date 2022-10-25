@@ -27,7 +27,7 @@ class Excel extends Csv
             <input type="checkbox" name="export_options[excel][columns]" id="excel_columns" value="1" checked="checked">
             <label for="excel_columns">Spaltennamen in die erste Zeile setzen</label>
         </li>
-<?php
+        <?php
     }
 
     /**

@@ -87,7 +87,7 @@ class MainPage
     public function echoSettingsPage()
     {
         if (!current_user_can('manage_options')) {
-            wp_die(__('You do not have sufficient permissions to manage options for this site.'));
+            wp_die(__('You do not have sufficient permissions to manage options for this site.', 'einsatzverwaltung'));
         }
 
         echo '<div class="wrap">';
@@ -102,6 +102,7 @@ class MainPage
                 esc_html($conflictingPage->post_title)
             );
             $message = sprintf(
+                // translators: 1: title of the page, 2: URL
                 esc_html__('The page %1$s uses the same permalink as the archive (%2$s). Please change the permalink of the page.', 'einsatzverwaltung'),
                 $pageEditLink,
                 sprintf('<code>%s</code>', esc_html(get_permalink($conflictingPage)))

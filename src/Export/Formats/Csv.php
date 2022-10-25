@@ -65,7 +65,7 @@ class Csv extends AbstractFormat
             <input type="checkbox" name="export_options[csv][headers]" id="csv_headers" value="1" checked="checked">
             <label for="csv_headers">Spaltennamen in die erste Zeile setzen</label>
         </li>
-<?php
+        <?php
     }
 
     /**

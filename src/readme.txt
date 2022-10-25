@@ -3,9 +3,9 @@ Contributors: abrain
 Donate link: https://einsatzverwaltung.org/unterstuetzen/
 Tags: Feuerwehr, fire department, EMS
 Requires at least: 5.1.0
-Tested up to: 5.9
+Tested up to: 6.0
 Requires PHP: 7.1.0
-Stable tag: 1.10.0
+Stable tag: 1.10.1
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -52,6 +52,9 @@ Yes, you can find them on [our website](https://einsatzverwaltung.org/faq/).
 
 == Changelog ==
 
+= 1.10.1 =
+* Fix: Compatibility issue with PHP 8
+
 = 1.10.0 =
 * New API endpoint for third-party systems to create incident reports
 * Roles for user permissions
@@ -95,6 +98,8 @@ Yes, you can find them on [our website](https://einsatzverwaltung.org/faq/).
 * Internationalized more labels
 
 == Upgrade Notice ==
+= 1.10.1 =
+Maintenance Release
 
 = 1.10.0 =
 New API endpoint, roles, and more

@@ -2,6 +2,7 @@
 namespace abrain\Einsatzverwaltung;
 
 use WP_UnitTestCase;
+use Yoast\PHPUnitPolyfills\Polyfills\AssertIsType;
 
 /**
  * Class DataTest
@@ -9,6 +10,8 @@ use WP_UnitTestCase;
  */
 class DataTest extends WP_UnitTestCase
 {
+    use AssertIsType;
+
     /**
      * @group unittests
      */
@@ -24,7 +27,7 @@ class DataTest extends WP_UnitTestCase
         $yearsWithReports = $data->getYearsWithReports();
         $this->assertEqualSets(array(2013, 2016, 2017), $yearsWithReports);
         foreach ($yearsWithReports as $year) {
-            $this->assertInternalType('int', $year);
+            $this->assertIsInt($year);
         }
     }
 }

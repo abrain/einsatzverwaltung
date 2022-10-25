@@ -1,11 +1,7 @@
 version: "2"
 plugins:
   phpcodesniffer:
-    enabled: true
-    config:
-      file_extensions: "php"
-      standard: "PSR1,PSR2"
-      encoding: utf-8
+    enabled: false
   phpmd:
     enabled: true
     config:

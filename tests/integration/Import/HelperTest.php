@@ -4,13 +4,17 @@ namespace abrain\Einsatzverwaltung\Import;
 use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\Exceptions\ImportPreparationException;
 use DateTime;
+use WP_UnitTestCase;
+use Yoast\PHPUnitPolyfills\Polyfills\AssertIsType;
 
 /**
  * Class HelperTest
  * @package abrain\Einsatzverwaltung
  */
-class HelperTest extends \WP_UnitTestCase
+class HelperTest extends WP_UnitTestCase
 {
+    use AssertIsType;
+
     /** @var Core */
     private static $core;
 
@@ -20,7 +24,7 @@ class HelperTest extends \WP_UnitTestCase
     /**
      * @inheritDoc
      */
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$core = Core::getInstance();
         self::$helper = new Helper(self::$core->utilities, self::$core->getData());
@@ -72,7 +76,7 @@ class HelperTest extends \WP_UnitTestCase
 
         // Create one upfront
         $term = wp_insert_term($terms[0], 'hierarchy');
-        $this->assertInternalType('array', $term);
+        $this->assertIsArray($term);
         $exitingId = $term['term_id'];
 
         $input = implode(',', $terms);
@@ -104,7 +108,7 @@ class HelperTest extends \WP_UnitTestCase
         // Make sure term exists
         $termName = 'existingTerm';
         $term = wp_insert_term($termName, 'hierarchy');
-        $this->assertInternalType('array', $term);
+        $this->assertIsArray($term);
 
         try {
             $returnedTermId = self::$helper->getTermId($termName, 'hierarchy');

@@ -25,7 +25,7 @@ class ReportQueryTest extends WP_UnitTestCase
     private $postIds;
     private $unitIds;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

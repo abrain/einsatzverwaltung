@@ -52,6 +52,9 @@ Yes, you can find them on [our website](https://einsatzverwaltung.org/faq/).
 
 == Changelog ==
 
+= 1.10.1 =
+* Fix: Compatibility issue with PHP 8
+
 = 1.10.0 =
 * New API endpoint for third-party systems to create incident reports
 * Roles for user permissions
@@ -95,6 +98,8 @@ Yes, you can find them on [our website](https://einsatzverwaltung.org/faq/).
 * Internationalized more labels
 
 == Upgrade Notice ==
+= 1.10.1 =
+Maintenance Release
 
 = 1.10.0 =
 New API endpoint, roles, and more

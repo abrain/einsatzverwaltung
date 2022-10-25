@@ -40,6 +40,7 @@ class IncidentType implements CustomTaxonomy
                 'all_items' => __('All Incident Categories', 'einsatzverwaltung'),
                 'parent_item' => __('Parent Incident Category', 'einsatzverwaltung'),
                 'parent_item_colon' => __('Parent Incident Category:', 'einsatzverwaltung'),
+                'parent_field_description' => __('Assign a parent Incident Category to create a hierarchy.', 'einsatzverwaltung'),
                 'edit_item' => __('Edit Incident Category', 'einsatzverwaltung'),
                 'view_item' => __('View Incident Category', 'einsatzverwaltung'),
                 'update_item' => __('Update Incident Category', 'einsatzverwaltung'),

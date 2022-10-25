@@ -276,8 +276,8 @@ class Update
             require_once(ABSPATH . 'wp-admin/includes/taxonomy.php');
         }
 
-        $categoryId = get_option('einsatzvw_category', -1);
-        if (category_exists($categoryId)) {
+        $categoryId = get_option('einsatzvw_category');
+        if ($categoryId && category_exists($categoryId)) {
             $posts = get_posts(array(
                 'post_type' => 'einsatz',
                 'post_status' => array('publish', 'private'),

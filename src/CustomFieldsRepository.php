@@ -279,7 +279,7 @@ class CustomFieldsRepository
     }
 
     /**
-     * Speichert zusätzliche Infos zu Terms als options ab
+     * Saves custom taxonomy fields to termmeta.
      *
      * @param int $termId Term ID
      * @param int $ttId Term taxonomy ID

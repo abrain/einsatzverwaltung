@@ -76,6 +76,7 @@ steps:
     image: php:7.4-cli-bullseye
     commands:
       - apt-get update && apt-get install -y subversion mariadb-client
+      - docker-php-ext-install mysqli
       - ./bin/install-wp-tests.sh wptest_latest root wptestroot database
       - ./vendor/bin/phpunit -c phpunit-integration.xml
   - name: downgrade-phpunit
@@ -86,6 +87,7 @@ steps:
     image: php:7.4-cli-bullseye
     commands:
       - apt-get update && apt-get install -y subversion mariadb-client
+      - docker-php-ext-install mysqli
       - ./bin/install-wp-tests.sh wptest_min root wptestroot database 5.3
       - ./vendor/bin/phpunit -c phpunit-integration.xml
   - name: codecov
@@ -123,6 +125,6 @@ trigger:
     - tag
 ---
 kind: signature
-hmac: d424693d5de7b63e1c8c625f8e0bd7bd3cc9d6bc3fe3ce6f68b50fe77f14c198
+hmac: 066b77cbb9806aa95eb9253ced459704787fe2026d804bbf9900d328f9dec835
 
 ...

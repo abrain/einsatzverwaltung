@@ -123,6 +123,6 @@ trigger:
     - tag
 ---
 kind: signature
-hmac: f1507663db14c0980478a264d68365163f962fb1d5f23d5752642c9cb909a240
+hmac: d424693d5de7b63e1c8c625f8e0bd7bd3cc9d6bc3fe3ce6f68b50fe77f14c198
 
 ...

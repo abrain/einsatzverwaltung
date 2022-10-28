@@ -1,6 +1,7 @@
 <?php
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals
-$tmpdir = rtrim(getenv('TMPDIR') ?? '/tmp', '/');
+$tmpDirEnv = getenv('TMPDIR');
+$tmpdir = rtrim(empty($tmpDirEnv) ? '/tmp' : $tmpDirEnv, '/');
 $_tests_dir = "{$tmpdir}/wordpress-tests-lib";
 
 require_once $_tests_dir . '/includes/functions.php';

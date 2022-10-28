@@ -75,13 +75,13 @@ steps:
   - name: integration-tests-minimum
     image: php:7.4-cli-bullseye
     commands:
-      - apt-get update && apt-get install -y subversion
+      - apt-get update && apt-get install -y subversion mariadb-client
       - ./bin/install-wp-tests.sh wptest_min root wptestroot database 5.1
       - ./vendor/bin/phpunit -c phpunit-integration.xml
   - name: integration-tests-latest
     image: php:7.4-cli-bullseye
     commands:
-      - apt-get update && apt-get install -y subversion
+      - apt-get update && apt-get install -y subversion mariadb-client
       - ./bin/install-wp-tests.sh wptest_latest root wptestroot database
       - ./vendor/bin/phpunit -c phpunit-integration.xml
   - name: codecov
@@ -119,6 +119,6 @@ trigger:
     - tag
 ---
 kind: signature
-hmac: 6175a6d17e468b4e78d2814c6d05559ac138fcd743950b86a4d4253358461024
+hmac: f1507663db14c0980478a264d68365163f962fb1d5f23d5752642c9cb909a240
 
 ...

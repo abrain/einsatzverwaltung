@@ -76,7 +76,7 @@ steps:
     image: php:7.4-cli-bullseye
     commands:
       - apt-get update && apt-get install -y subversion mariadb-client
-      - ./bin/install-wp-tests.sh wptest_min root wptestroot database 5.1
+      - ./bin/install-wp-tests.sh wptest_min root wptestroot database 5.3
       - ./vendor/bin/phpunit -c phpunit-integration.xml
   - name: integration-tests-latest
     image: php:7.4-cli-bullseye

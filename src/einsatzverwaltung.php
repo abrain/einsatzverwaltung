@@ -8,7 +8,7 @@ Author: Andreas Brain
 Author URI: https://www.abrain.de
 License: GPLv2
 Text Domain: einsatzverwaltung
-Requires at least: 5.1.0
+Requires at least: 5.3.0
 Requires PHP: 7.1.0
 */
 
@@ -17,8 +17,6 @@ use abrain\Einsatzverwaltung\Core;
 if (!defined('ABSPATH')) {
     die('You shall not pass!');
 }
-
-require_once dirname(__FILE__) . '/backcompat.php';
 
 try {
     spl_autoload_register(function (string $class) {

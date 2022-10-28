@@ -82,7 +82,7 @@ steps:
   - name: downgrade-phpunit
     image: composer
     commands:
-      - composer require --dev "phpunit/phpunit:^7.5"
+      - composer require --dev --update-with-all-dependencies "phpunit/phpunit:^7.5"
   - name: integration-tests-minimum
     image: php:7.4-cli-bullseye
     commands:
@@ -125,6 +125,6 @@ trigger:
     - tag
 ---
 kind: signature
-hmac: 066b77cbb9806aa95eb9253ced459704787fe2026d804bbf9900d328f9dec835
+hmac: bfef7655457a29abbc6e2a0de1f103a079426379c0612c412766a6611f53e90a
 
 ...

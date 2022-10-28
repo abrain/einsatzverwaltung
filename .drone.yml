@@ -70,7 +70,7 @@ steps:
       CODECOV_TOKEN:
         from_secret: codecov_token
     commands:
-      - apk add curl gnupg coreutils
+      - apk add curl gnupg coreutils git
       - curl https://uploader.codecov.io/verification.gpg | gpg --no-default-keyring --keyring trustedkeys.gpg --import
       - curl -Os https://uploader.codecov.io/latest/alpine/codecov
       - curl -Os https://uploader.codecov.io/latest/alpine/codecov.SHA256SUM
@@ -118,6 +118,6 @@ trigger:
     - tag
 ---
 kind: signature
-hmac: f225571fa6ba5fa499f361c64f459542c4fe29d6f9d2d003d74b3a148c3c243a
+hmac: 932442ed52475aa85fc8431dbefdd695f0360f7bc7082d85aa93b9adb3ddcff3
 
 ...

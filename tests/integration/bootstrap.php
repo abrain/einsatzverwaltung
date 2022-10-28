@@ -1,14 +1,12 @@
 <?php
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals
-$_tests_dir = getenv('WP_TESTS_DIR');
-if (!$_tests_dir) {
-    $_tests_dir = '/tmp/wordpress-tests-lib';
-}
+$tmpdir = rtrim(getenv('TMPDIR') ?? '/tmp', '/');
+$_tests_dir = "{$tmpdir}/wordpress-tests-lib";
 
 require_once $_tests_dir . '/includes/functions.php';
 
 tests_add_filter('muplugins_loaded', function () {
-    require dirname(dirname(__FILE__)) . '/../src/einsatzverwaltung.php';
+    require dirname(__FILE__, 2) . '/../src/einsatzverwaltung.php';
 
     // Simulate the activation of the plugin
     do_action('activate_src/einsatzverwaltung.php');

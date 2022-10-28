@@ -79,17 +79,6 @@ steps:
       - sha256sum -c codecov.SHA256SUM
       - chmod +x codecov
       - ./codecov --file build/logs/clover.xml --flags unit
-  - name: slack
-    image: plugins/slack
-    settings:
-      webhook:
-        from_secret: slack_hook
-    when:
-      status:
-        - failure
-      event:
-        exclude:
-          - pull_request
 
 ---
 kind: pipeline
@@ -101,14 +90,6 @@ steps:
     image: alpine
     commands:
       - ./bin/check-version-tags.sh
-  - name: slack
-    image: plugins/slack
-    settings:
-      webhook:
-        from_secret: slack_hook
-    when:
-      status:
-        - failure
 
 depends_on:
   - unit-tests
@@ -118,6 +99,6 @@ trigger:
     - tag
 ---
 kind: signature
-hmac: 932442ed52475aa85fc8431dbefdd695f0360f7bc7082d85aa93b9adb3ddcff3
+hmac: 32e92762c43fd00913b4ac5788ab01562b8e9998df11f35cf1904e4f918e5820
 
 ...

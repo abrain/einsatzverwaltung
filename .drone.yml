@@ -82,7 +82,7 @@ steps:
   - name: downgrade-phpunit
     image: composer
     commands:
-      - composer require --dev --update-with-all-dependencies "phpunit/phpunit:^7.5"
+      - composer require --dev --update-with-all-dependencies "phpunit/phpunit:^7.5" "mockery/mockery:1.3.6"
   - name: integration-tests-minimum
     image: php:7.4-cli-bullseye
     commands:
@@ -125,6 +125,6 @@ trigger:
     - tag
 ---
 kind: signature
-hmac: bfef7655457a29abbc6e2a0de1f103a079426379c0612c412766a6611f53e90a
+hmac: 75f7b09d08371cc420dfd76e9e8bdf822e60ce4856e71ca1eb6e7782a1ae1266
 
 ...

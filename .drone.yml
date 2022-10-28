@@ -78,7 +78,7 @@ steps:
       - apt-get update && apt-get install -y subversion mariadb-client
       - docker-php-ext-install mysqli
       - ./bin/install-wp-tests.sh wptest_latest root wptestroot database
-      - ./vendor/bin/phpunit -c phpunit-integration.xml
+      - XDEBUG_MODE=coverage ./vendor/bin/phpunit -c phpunit-integration.xml
   - name: downgrade-phpunit
     image: composer
     commands:
@@ -89,7 +89,7 @@ steps:
       - apt-get update && apt-get install -y subversion mariadb-client
       - docker-php-ext-install mysqli
       - ./bin/install-wp-tests.sh wptest_min root wptestroot database 5.3
-      - ./vendor/bin/phpunit -c phpunit-integration.xml
+      - ./vendor/bin/phpunit -c phpunit-integration.xml --no-coverage
   - name: codecov
     image: alpine
     environment:
@@ -105,6 +105,7 @@ steps:
       - sha256sum -c codecov.SHA256SUM
       - chmod +x codecov
       - ./codecov --file build/logs/clover.xml --flags unit
+      - ./codecov --file build/logs/clover-integration.xml --flags integration
 
 ---
 kind: pipeline
@@ -125,6 +126,6 @@ trigger:
     - tag
 ---
 kind: signature
-hmac: 75f7b09d08371cc420dfd76e9e8bdf822e60ce4856e71ca1eb6e7782a1ae1266
+hmac: 22d5e041cab1331ec8873d0cc883420858bfd77231a1f72154b8d65025142718
 
 ...

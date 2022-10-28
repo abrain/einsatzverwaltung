@@ -32,7 +32,7 @@ steps:
 ---
 kind: pipeline
 type: docker
-name: unit-tests
+name: tests
 
 trigger:
   event:
@@ -45,12 +45,20 @@ trigger:
 depends_on:
   - compliance
 
+services:
+  - name: database
+    image: mariadb:10.8
+    pull: always
+    environment:
+      MARIADB_ROOT_PASSWORD: wptestroot
+      TZ: Europe/Berlin
+
 steps:
   - name: install
     image: composer
     commands:
       - composer install
-  - name: test
+  - name: unit-tests
     image: php:7.4-cli-bullseye
     environment:
       CC_TEST_REPORTER_ID:
@@ -64,6 +72,16 @@ steps:
       - ./cc-test-reporter before-build
       - XDEBUG_MODE=coverage ./vendor/bin/phpunit -c phpunit.xml
       - ./bin/report-code-coverage.sh
+  - name: integration-tests-minimum
+    image: php:7.4-cli-bullseye
+    commands:
+      - ./bin/install-wp-tests.sh wptest_min root wptestroot database 5.1
+      - ./vendor/bin/phpunit -c phpunit-integration.xml
+  - name: integration-tests-latest
+    image: php:7.4-cli-bullseye
+    commands:
+      - ./bin/install-wp-tests.sh wptest_latest root wptestroot database
+      - ./vendor/bin/phpunit -c phpunit-integration.xml
   - name: codecov
     image: alpine
     environment:
@@ -92,13 +110,13 @@ steps:
       - ./bin/check-version-tags.sh
 
 depends_on:
-  - unit-tests
+  - tests
 
 trigger:
   event:
     - tag
 ---
 kind: signature
-hmac: 32e92762c43fd00913b4ac5788ab01562b8e9998df11f35cf1904e4f918e5820
+hmac: 9fbbfb74528ffedfce70e42bed61f06d61bad0d4108f4bc9bae899c140d7d943
 
 ...

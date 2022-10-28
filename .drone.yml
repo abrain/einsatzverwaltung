@@ -76,7 +76,7 @@ steps:
       - curl -Os https://uploader.codecov.io/latest/alpine/codecov.SHA256SUM
       - curl -Os https://uploader.codecov.io/latest/alpine/codecov.SHA256SUM.sig
       - gpgv codecov.SHA256SUM.sig codecov.SHA256SUM
-      - shasum -a 256 -c codecov.SHA256SUM
+      - sha256sum -c codecov.SHA256SUM
       - chmod +x codecov
       - ./codecov --file build/logs/clover.xml --flags unit
   - name: slack
@@ -118,6 +118,6 @@ trigger:
     - tag
 ---
 kind: signature
-hmac: 23016439e3715648982d29accf16be038a0ba2fddc890b5afd1f60abaca87d36
+hmac: f225571fa6ba5fa499f361c64f459542c4fe29d6f9d2d003d74b3a148c3c243a
 
 ...

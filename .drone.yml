@@ -32,7 +32,7 @@ steps:
 ---
 kind: pipeline
 type: docker
-name: unit-tests
+name: tests
 
 trigger:
   event:
@@ -45,12 +45,20 @@ trigger:
 depends_on:
   - compliance
 
+services:
+  - name: database
+    image: mariadb:10.8
+    pull: always
+    environment:
+      MARIADB_ROOT_PASSWORD: wptestroot
+      TZ: Europe/Berlin
+
 steps:
   - name: install
     image: composer
     commands:
       - composer install
-  - name: test
+  - name: unit-tests
     image: php:7.4-cli-bullseye
     environment:
       CC_TEST_REPORTER_ID:
@@ -64,6 +72,26 @@ steps:
       - ./cc-test-reporter before-build
       - XDEBUG_MODE=coverage ./vendor/bin/phpunit -c phpunit.xml
       - ./bin/report-code-coverage.sh
+  - name: integration-tests-latest
+    image: php:7.4-cli-bullseye
+    commands:
+      - apt-get update && apt-get install -y subversion mariadb-client
+      - pecl install xdebug
+      - docker-php-ext-enable xdebug
+      - docker-php-ext-install mysqli
+      - ./bin/install-wp-tests.sh wptest_latest root wptestroot database
+      - XDEBUG_MODE=coverage ./vendor/bin/phpunit -c phpunit-integration.xml
+  - name: downgrade-phpunit
+    image: composer
+    commands:
+      - composer require --dev --update-with-all-dependencies "phpunit/phpunit:^7.5" "mockery/mockery:1.3.6"
+  - name: integration-tests-minimum
+    image: php:7.4-cli-bullseye
+    commands:
+      - apt-get update && apt-get install -y subversion mariadb-client
+      - docker-php-ext-install mysqli
+      - ./bin/install-wp-tests.sh wptest_min root wptestroot database 5.3
+      - ./vendor/bin/phpunit -c phpunit-integration.xml --no-coverage
   - name: codecov
     image: alpine
     environment:
@@ -79,17 +107,7 @@ steps:
       - sha256sum -c codecov.SHA256SUM
       - chmod +x codecov
       - ./codecov --file build/logs/clover.xml --flags unit
-  - name: slack
-    image: plugins/slack
-    settings:
-      webhook:
-        from_secret: slack_hook
-    when:
-      status:
-        - failure
-      event:
-        exclude:
-          - pull_request
+      - ./codecov --file build/logs/clover-integration.xml --flags integration
 
 ---
 kind: pipeline
@@ -101,23 +119,15 @@ steps:
     image: alpine
     commands:
       - ./bin/check-version-tags.sh
-  - name: slack
-    image: plugins/slack
-    settings:
-      webhook:
-        from_secret: slack_hook
-    when:
-      status:
-        - failure
 
 depends_on:
-  - unit-tests
+  - tests
 
 trigger:
   event:
     - tag
 ---
 kind: signature
-hmac: 932442ed52475aa85fc8431dbefdd695f0360f7bc7082d85aa93b9adb3ddcff3
+hmac: 07decfc01317c337d4515c412a6289cd676c09963c08d6ac90ac6d5636f5bf4e
 
 ...

@@ -30,7 +30,7 @@
   "scripts": {
     "lint": "phpcs",
     "test": "XDEBUG_MODE=coverage phpunit",
-    "integration-test": "phpunit -c phpunit-integration.xml"
+    "integration-test": "XDEBUG_MODE=coverage phpunit -c phpunit-integration.xml"
   },
   "require": {
     "php": ">=7.1.0"

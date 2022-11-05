@@ -182,7 +182,7 @@ class Unit implements CustomTaxonomy
         $customFields->add($this, new NumberInput(
             'unit_order',
             'Reihenfolge',
-            'Optionale Angabe, mit der die Anzeigereihenfolge der Einheiten beeinflusst werden kann. Einheiten mit der kleineren Zahl werden zuerst angezeigt, anschlie&szlig;end diejenigen ohne Angabe bzw. dem Wert 0. Haben mehrere Einheiten den gleichen Wert, werden sie in alphabetischer Reihenfolge ausgegeben.'
+            'Einheiten mit der kleineren Zahl werden zuerst angezeigt, anschlie&szlig;end diejenigen mit dem Wert 0. Bei gleichem Wert werden Einheiten in alphabetischer Reihenfolge ausgegeben.'
         ));
     }
 

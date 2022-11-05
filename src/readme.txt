@@ -5,7 +5,7 @@ Tags: Feuerwehr, fire department, EMS
 Requires at least: 5.3.0
 Tested up to: 6.0
 Requires PHP: 7.1.0
-Stable tag: 1.10.1
+Stable tag: 1.10.2
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -51,6 +51,10 @@ Ideally, you check the issues on [GitHub](https://github.com/abrain/einsatzverwa
 Yes, you can find them on [our website](https://einsatzverwaltung.org/faq/).
 
 == Changelog ==
+
+= 1.10.2 =
+* Fix: Reports created with the API endpoint could show up as special reports
+* Fix: Table was missing columns when creating e.g. units or vehicles
 
 = 1.10.1 =
 * Fix: Compatibility issue with PHP 8

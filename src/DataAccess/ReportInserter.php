@@ -52,7 +52,7 @@ class ReportInserter
         $args = array(
             'post_type' => Report::getSlug(),
             'post_title' => $reportImportObject->getTitle(),
-            'meta_input' => array(),
+            'meta_input' => array('einsatz_special' => 0),
             'tax_input' => array()
         );
 

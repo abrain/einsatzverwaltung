@@ -185,4 +185,23 @@ class UpdateTest extends UnitTestCase
         expect('update_option')->once()->with('einsatzvw_db_version', 71);
         (new Update())->upgrade1100();
     }
+
+    /**
+     * @throws ExpectationArgsRequired
+     */
+    public function testUpgrade1102Foo()
+    {
+        // Return some posts that are missing the 'special' postmeta
+        $post1 = Mockery::mock('\WP_Post');
+        $post1->ID = 2893;
+        $post2 = Mockery::mock('\WP_Post');
+        $post2->ID = 11280;
+        expect('get_posts')->once()->andReturn([$post1, $post2]);
+
+        expect('add_post_meta')->once()->with($post1->ID, 'einsatz_special', 0, true);
+        expect('add_post_meta')->once()->with($post2->ID, 'einsatz_special', 0, true);
+
+        expect('update_option')->once()->with('einsatzvw_db_version', 72);
+        (new Update())->upgrade1102();
+    }
 }

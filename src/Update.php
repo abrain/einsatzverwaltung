@@ -4,6 +4,7 @@ namespace abrain\Einsatzverwaltung;
 use WP_Error;
 use WP_User;
 use function add_option;
+use function add_post_meta;
 use function add_term_meta;
 use function array_key_exists;
 use function array_keys;
@@ -123,6 +124,10 @@ class Update
 
         if ($currentDbVersion < 71 && $targetDbVersion >= 71) {
             $this->upgrade1100();
+        }
+
+        if ($currentDbVersion < 72 && $targetDbVersion >= 72) {
+            $this->upgrade1102();
         }
     }
 
@@ -638,6 +643,30 @@ class Update
         update_option(UserRightsManager::ROLE_UPDATE_OPTION, '1');
 
         update_option('einsatzvw_db_version', 71);
+    }
+
+    /**
+     * - Adds missing 'special' postmeta for reports that got created via the API
+     *
+     * @since 1.10.2
+     */
+    public function upgrade1102()
+    {
+        $postsWithoutPostmeta = get_posts([
+            'post_type' => 'einsatz',
+            'post_status' => ['publish', 'private', 'draft'],
+            'nopaging' => true,
+            'meta_query' => [
+                [
+                    'key' => 'einsatz_special',
+                    'compare' => 'NOT EXISTS'
+                ]
+            ]
+        ]);
+        foreach ($postsWithoutPostmeta as $post) {
+            add_post_meta($post->ID, 'einsatz_special', 0, true);
+        }
+        update_option('einsatzvw_db_version', 72);
     }
 
     /**

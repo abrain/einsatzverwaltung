@@ -20,7 +20,7 @@ use function register_deactivation_hook;
 class Core
 {
     const VERSION = '1.10.1';
-    const DB_VERSION = 71;
+    const DB_VERSION = 72;
 
     /**
      * Statische Variable, um die aktuelle (einzige!) Instanz dieser Klasse zu halten

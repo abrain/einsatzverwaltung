@@ -108,7 +108,7 @@ class AnnotationIconBar
     {
         return sprintf(
             '<i class="%s" aria-hidden="true" title="%s" style="%s"></i>',
-            esc_attr('fa fa-' . $icon),
+            esc_attr('fa-solid fa-' . $icon),
             esc_attr($titles[$state ? 1 : 0]),
             esc_attr($state ? '' : "color: {$this->iconColorOff};")
         );

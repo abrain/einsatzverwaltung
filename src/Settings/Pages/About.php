@@ -31,11 +31,11 @@ class About extends SubPage
     {
         ?>
         <div class="aboutpage-icons">
-            <div class="aboutpage-icon"><a href="https://einsatzverwaltung.org" target="_blank"><i class="fa fa-globe fa-4x"></i><br>Webseite</a></div>
-            <div class="aboutpage-icon"><a href="https://einsatzverwaltung.org/dokumentation/" target="_blank"><i class="fa fa-book fa-4x"></i><br>Dokumentation</a></div>
-            <div class="aboutpage-icon"><a href="https://wordpress.org/support/plugin/einsatzverwaltung/" target="_blank"><i class="fa fa-life-ring fa-4x"></i><br>Support-Forum</a></div>
-            <div class="aboutpage-icon"><a href="https://github.com/abrain/einsatzverwaltung" target="_blank"><i class="fa fa-github fa-4x"></i><br>GitHub</a></div>
-            <div class="aboutpage-icon"><a href="https://de.wordpress.org/plugins/einsatzverwaltung/" target="_blank"><i class="fa fa-wordpress fa-4x"></i><br>Plugin-Verzeichnis</a></div>
+            <div class="aboutpage-icon"><a href="https://einsatzverwaltung.org" target="_blank"><i class="fa-solid fa-globe fa-4x"></i><br>Webseite</a></div>
+            <div class="aboutpage-icon"><a href="https://einsatzverwaltung.org/dokumentation/" target="_blank"><i class="fa-solid fa-book fa-4x"></i><br>Dokumentation</a></div>
+            <div class="aboutpage-icon"><a href="https://wordpress.org/support/plugin/einsatzverwaltung/" target="_blank"><i class="fa-solid fa-circle-question fa-4x"></i><br>Support-Forum</a></div>
+            <div class="aboutpage-icon"><a href="https://github.com/abrain/einsatzverwaltung" target="_blank"><i class="fa-brands fa-github fa-4x"></i><br>GitHub</a></div>
+            <div class="aboutpage-icon"><a href="https://de.wordpress.org/plugins/einsatzverwaltung/" target="_blank"><i class="fa-brands fa-wordpress fa-4x"></i><br>Plugin-Verzeichnis</a></div>
         </div>
 
         <h2>Support</h2>
@@ -52,8 +52,14 @@ class About extends SubPage
 
         <h2>Spenden</h2>
         <p>Unterst&uuml;tze die Weiterentwicklung des Plugins mit einer Spende.</p>
-        <a class="button" href="https://www.paypal.com/donate?hosted_button_id=U7LCWUZ8E54JG" target="_blank">Spende via PayPal</a>
-        <a class="button" href="https://einsatzverwaltung.org/unterstuetzen/" target="_blank">Weitere Optionen</a>
+        <a class="button" href="https://www.paypal.com/donate?hosted_button_id=U7LCWUZ8E54JG" target="_blank">
+            <i class="fa-brands fa-paypal"></i>
+            Spende via PayPal
+        </a>
+        <a class="button" href="https://einsatzverwaltung.org/unterstuetzen/" target="_blank">
+            <i class="fa-solid fa-piggy-bank"></i>
+            Weitere Optionen
+        </a>
 
         <h2>Social Media</h2>
         <ul>

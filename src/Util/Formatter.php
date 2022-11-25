@@ -319,7 +319,7 @@ class Formatter
 
             if ($makeLinks && $showArchiveLinks) {
                 $link = sprintf(
-                    '<a href="%s" class="fa fa-filter" style="text-decoration:none;" title="%s"></a>',
+                    '<a href="%s" class="fa-solid fa-filter" style="text-decoration:none;" title="%s"></a>',
                     esc_url(get_term_link($typeOfIncident)),
                     esc_attr(sprintf('Alle Eins&auml;tze vom Typ %s anzeigen', $typeOfIncident->name))
                 );
@@ -567,7 +567,7 @@ class Formatter
     private function getFilterLink(WP_Term $term): string
     {
         return sprintf(
-            '<a href="%s" class="fa fa-filter" style="text-decoration: none;" title="%s"></a>',
+            '<a href="%s" class="fa-solid fa-filter" style="text-decoration: none;" title="%s"></a>',
             esc_url(get_term_link($term)),
             esc_attr(sprintf('Eins&auml;tze unter Beteiligung von %s anzeigen', $term->name))
         );

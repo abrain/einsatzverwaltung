@@ -18,6 +18,7 @@ use function get_the_terms;
 use function in_array;
 use function is_wp_error;
 use function sprintf;
+use function wp_enqueue_style;
 use function wp_kses;
 
 /**
@@ -71,9 +72,21 @@ class Frontend
     {
         wp_enqueue_style(
             'font-awesome',
-            Core::$pluginUrl . 'font-awesome/css/font-awesome.min.css',
+            Core::$pluginUrl . 'font-awesome/css/fontawesome.min.css',
             false,
-            '4.7.0'
+            '6.2.1'
+        );
+        wp_enqueue_style(
+            'font-awesome-solid',
+            Core::$pluginUrl . 'font-awesome/css/solid.min.css',
+            array('font-awesome'),
+            '6.2.1'
+        );
+        wp_enqueue_style(
+            'font-awesome-brands',
+            Core::$pluginUrl . 'font-awesome/css/brands.min.css',
+            array('font-awesome'),
+            '6.2.1'
         );
         wp_enqueue_style(
             'einsatzverwaltung-frontend',

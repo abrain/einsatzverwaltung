@@ -31,11 +31,11 @@ class About extends SubPage
     {
         ?>
         <div class="aboutpage-icons">
-            <div class="aboutpage-icon"><a href="https://einsatzverwaltung.org" target="_blank"><i class="fa fa-globe fa-4x"></i><br>Webseite</a></div>
-            <div class="aboutpage-icon"><a href="https://einsatzverwaltung.org/dokumentation/" target="_blank"><i class="fa fa-book fa-4x"></i><br>Dokumentation</a></div>
-            <div class="aboutpage-icon"><a href="https://wordpress.org/support/plugin/einsatzverwaltung/" target="_blank"><i class="fa fa-life-ring fa-4x"></i><br>Support-Forum</a></div>
-            <div class="aboutpage-icon"><a href="https://github.com/abrain/einsatzverwaltung" target="_blank"><i class="fa fa-github fa-4x"></i><br>GitHub</a></div>
-            <div class="aboutpage-icon"><a href="https://de.wordpress.org/plugins/einsatzverwaltung/" target="_blank"><i class="fa fa-wordpress fa-4x"></i><br>Plugin-Verzeichnis</a></div>
+            <div class="aboutpage-icon"><a href="https://einsatzverwaltung.org" target="_blank"><i class="fa-solid fa-globe fa-4x"></i><br>Webseite</a></div>
+            <div class="aboutpage-icon"><a href="https://einsatzverwaltung.org/dokumentation/" target="_blank"><i class="fa-solid fa-book fa-4x"></i><br>Dokumentation</a></div>
+            <div class="aboutpage-icon"><a href="https://wordpress.org/support/plugin/einsatzverwaltung/" target="_blank"><i class="fa-solid fa-circle-question fa-4x"></i><br>Support-Forum</a></div>
+            <div class="aboutpage-icon"><a href="https://github.com/abrain/einsatzverwaltung" target="_blank"><i class="fa-brands fa-github fa-4x"></i><br>GitHub</a></div>
+            <div class="aboutpage-icon"><a href="https://de.wordpress.org/plugins/einsatzverwaltung/" target="_blank"><i class="fa-brands fa-wordpress fa-4x"></i><br>Plugin-Verzeichnis</a></div>
         </div>
 
         <h2>Support</h2>

@@ -83,12 +83,6 @@ class Frontend
             '6.2.1'
         );
         wp_enqueue_style(
-            'font-awesome-brands',
-            Core::$pluginUrl . 'font-awesome/css/brands.min.css',
-            array('font-awesome'),
-            '6.2.1'
-        );
-        wp_enqueue_style(
             'einsatzverwaltung-frontend',
             Core::$styleUrl . 'style-frontend.css',
             array(),

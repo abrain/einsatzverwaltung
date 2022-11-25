@@ -52,8 +52,14 @@ class About extends SubPage
 
         <h2>Spenden</h2>
         <p>Unterst&uuml;tze die Weiterentwicklung des Plugins mit einer Spende.</p>
-        <a class="button" href="https://www.paypal.com/donate?hosted_button_id=U7LCWUZ8E54JG" target="_blank">Spende via PayPal</a>
-        <a class="button" href="https://einsatzverwaltung.org/unterstuetzen/" target="_blank">Weitere Optionen</a>
+        <a class="button" href="https://www.paypal.com/donate?hosted_button_id=U7LCWUZ8E54JG" target="_blank">
+            <i class="fa-brands fa-paypal"></i>
+            Spende via PayPal
+        </a>
+        <a class="button" href="https://einsatzverwaltung.org/unterstuetzen/" target="_blank">
+            <i class="fa-solid fa-piggy-bank"></i>
+            Weitere Optionen
+        </a>
 
         <h2>Social Media</h2>
         <ul>

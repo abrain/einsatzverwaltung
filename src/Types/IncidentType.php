@@ -16,7 +16,7 @@ use function add_filter;
  * Description of the custom taxonomy 'Type of incident'
  * @package abrain\Einsatzverwaltung\Types
  */
-class IncidentType implements CustomTaxonomy
+class IncidentType extends CustomTaxonomy
 {
     /**
      * @return string

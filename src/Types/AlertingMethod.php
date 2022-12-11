@@ -7,7 +7,7 @@ use abrain\Einsatzverwaltung\CustomFieldsRepository;
  * Description of the custom taxonomy 'Alerting Methods'
  * @package abrain\Einsatzverwaltung\Types
  */
-class AlertingMethod implements CustomTaxonomy
+class AlertingMethod extends CustomTaxonomy
 {
     /**
      * @return string

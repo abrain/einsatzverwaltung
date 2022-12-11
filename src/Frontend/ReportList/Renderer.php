@@ -367,7 +367,7 @@ class Renderer
                 $cellContent = $this->formatter->getVehicleString($report->getVehicles(), $parameters->linkVehicles, false);
                 break;
             case 'alarmType':
-                $cellContent = $this->formatter->getTypesOfAlerting($report);
+                $cellContent = $this->formatter->getTypesOfAlerting($report, false);
                 break;
             case 'additionalForces':
                 $cellContent = $this->formatter->getAdditionalForces($report, $parameters->linkAdditionalForces, false);

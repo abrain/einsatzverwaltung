@@ -65,7 +65,7 @@ steps:
         from_secret: cc_test_reporter_id
     commands:
       - apt-get update && apt-get install -y git
-      - pecl install xdebug
+      - pecl install xdebug-3.1.6
       - docker-php-ext-enable xdebug
       - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
       - chmod +x ./cc-test-reporter
@@ -76,7 +76,7 @@ steps:
     image: php:7.4-cli-bullseye
     commands:
       - apt-get update && apt-get install -y subversion mariadb-client
-      - pecl install xdebug
+      - pecl install xdebug-3.1.6
       - docker-php-ext-enable xdebug
       - docker-php-ext-install mysqli
       - ./bin/install-wp-tests.sh wptest_latest root wptestroot database
@@ -128,6 +128,6 @@ trigger:
     - tag
 ---
 kind: signature
-hmac: 07decfc01317c337d4515c412a6289cd676c09963c08d6ac90ac6d5636f5bf4e
+hmac: a64f5e5de560d63ca0f4408f5cbb89093cd2cf8daed8647684c2c31098c7f011
 
 ...

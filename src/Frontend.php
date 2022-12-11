@@ -128,7 +128,7 @@ class Frontend
         );
         $headerstring = $this->getDetailString(__('Date', 'einsatzverwaltung'), $dateAndTime);
 
-        $headerstring .= $this->getDetailString(__('Alerting method', 'einsatzverwaltung'), $this->formatter->getTypesOfAlerting($report));
+        $headerstring .= $this->getDetailString(__('Alerting method', 'einsatzverwaltung'), $this->formatter->getTypesOfAlerting($report, true));
         $headerstring .= $this->getDetailString(__('Duration', 'einsatzverwaltung'), $durationString);
         $headerstring .= $this->getDetailString(__('Incident Category', 'einsatzverwaltung'), $art);
         $headerstring .= $this->getDetailString(__('Location', 'einsatzverwaltung'), $report->getLocation());

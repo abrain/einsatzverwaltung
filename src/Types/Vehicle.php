@@ -26,7 +26,7 @@ use function url_to_postid;
  * Description of the custom taxonomy 'Vehicle'
  * @package abrain\Einsatzverwaltung\Types
  */
-class Vehicle implements CustomTaxonomy
+class Vehicle extends CustomTaxonomy
 {
     /**
      * Comparison function for vehicles

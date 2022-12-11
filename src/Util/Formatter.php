@@ -5,6 +5,7 @@ use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\PermalinkController;
+use abrain\Einsatzverwaltung\Types\AlertingMethod;
 use abrain\Einsatzverwaltung\Types\Unit;
 use DateTime;
 use WP_Post;
@@ -13,6 +14,7 @@ use function array_map;
 use function current_theme_supports;
 use function date;
 use function date_i18n;
+use function esc_attr;
 use function esc_html;
 use function esc_url;
 use function get_permalink;
@@ -210,7 +212,7 @@ class Formatter
                 $replace = $this->getAdditionalForces($incidentReport, ($context === 'post'), ($context === 'post'));
                 break;
             case '%typesOfAlerting%':
-                $replace = $this->getTypesOfAlerting($incidentReport);
+                $replace = $this->getTypesOfAlerting($incidentReport, ($context === 'post'));
                 break;
             case '%content%':
                 $replace = $post->post_content;
@@ -269,21 +271,37 @@ class Formatter
      *
      * @return string
      */
-    public function getTypesOfAlerting(IncidentReport $report): string
+    public function getTypesOfAlerting(IncidentReport $report, bool $makeLinks): string
     {
         if (empty($report)) {
             return '';
         }
 
-        $typesOfAlerting = $report->getTypesOfAlerting();
+        $alertingMethods = $report->getTypesOfAlerting();
 
-        if (empty($typesOfAlerting)) {
+        if (empty($alertingMethods)) {
             return '';
         }
 
         $names = array();
-        foreach ($typesOfAlerting as $type) {
-            $names[] = $type->name;
+        foreach ($alertingMethods as $alertingMethod) {
+            if ($makeLinks === true) {
+                $name = $alertingMethod->name;
+                $infoUrl = AlertingMethod::getInfoUrl($alertingMethod);
+                if (empty($infoUrl)) {
+                    $names[] = esc_html($name);
+                    continue;
+                }
+
+                $names[] = sprintf(
+                    '<a href="%s" title="Mehr Informationen über die Alarmierungsart %s">%s</a>',
+                    esc_url($infoUrl),
+                    esc_attr($name),
+                    esc_html($name)
+                );
+            } else {
+                $names[] = esc_html($alertingMethod->name);
+            }
         }
         return join(", ", $names);
     }

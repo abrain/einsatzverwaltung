@@ -81,8 +81,12 @@ steps:
       - docker-php-ext-install mysqli
       - ./bin/install-wp-tests.sh wptest_latest root wptestroot database
       - XDEBUG_MODE=coverage ./vendor/bin/phpunit -c phpunit-integration.xml
+  - name: downgrade-phpunit
+    image: composer
+    commands:
+      - composer require --dev --update-with-all-dependencies --ignore-platform-req=php "phpunit/phpunit:^7.5" "mockery/mockery:1.3.6" "sebastian/comparator:^3.0"
   - name: integration-tests-minimum
-    image: php:8.0-cli-bullseye
+    image: php:7.4-cli-bullseye
     commands:
       - apt-get update && apt-get install -y subversion mariadb-client
       - docker-php-ext-install mysqli
@@ -124,6 +128,6 @@ trigger:
     - tag
 ---
 kind: signature
-hmac: d9ff5d55b77b2c634f4740675f84a941abad5c3968df1b082cbeb16c9da008a9
+hmac: 3813e48e6e9426d8e5b4713fce46c4f41a87d30587ff35d0d30a8cbfc6474ed0
 
 ...

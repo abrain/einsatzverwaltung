@@ -30,7 +30,7 @@ Klassen werden automatisch geladen, die Dateien sind nach [PSR-4](https://www.ph
 
 ### Mindestvoraussetzungen
 * PHP: 7.1
-* WordPress: 5.3
+* WordPress: 5.6
 
 ### Social Media
 

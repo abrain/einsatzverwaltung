@@ -13,4 +13,7 @@ else
     export GIT_BRANCH="$DRONE_COMMIT_BRANCH"
 fi
 
-./cc-test-reporter after-build --coverage-input-type clover
+./cc-test-reporter format-coverage --input-type clover --output coverage/cc-unit.json build/logs/clover.xml
+./cc-test-reporter format-coverage --input-type clover --output coverage/cc-integration.json build/logs/clover-integration.xml
+./cc-test-reporter sum-coverage --parts 2 coverage/cc-*.json
+./cc-test-reporter upload-coverage

@@ -54,12 +54,12 @@ class HelperTest extends WP_UnitTestCase
     {
         $input = 'term1, term78, term99';
         try {
-            $result = self::$helper->getTaxInputString('nohierarchy', $input);
+            $result = self::$helper->getTaxInputList('nohierarchy', $input);
         } catch (ImportPreparationException $e) {
             $this->fail($e->getMessage());
             return;
         }
-        $this->assertEquals($input, $result);
+        $this->assertEquals(['term1', 'term78', 'term99'], $result);
     }
 
     /**
@@ -81,12 +81,11 @@ class HelperTest extends WP_UnitTestCase
 
         $input = implode(',', $terms);
         try {
-            $result = self::$helper->getTaxInputString('hierarchy', $input);
+            $returnedIds = self::$helper->getTaxInputList('hierarchy', $input);
         } catch (ImportPreparationException $e) {
             $this->fail($e->getMessage());
             return;
         }
-        $returnedIds = explode(',', $result);
         $this->assertCount(count($terms), $returnedIds);
 
         // Check that the existing term was reused
@@ -183,14 +182,12 @@ class HelperTest extends WP_UnitTestCase
         // Check taxonomies
         $this->assertArrayHasKey('tax_input', $insertArgs);
         $this->assertArrayHasKey('hierarchy', $insertArgs['tax_input']);
-        $inputTaxonomy1 = explode(',', $insertArgs['tax_input']['hierarchy']);
-        $this->assertCount(count($valuesTaxonomy1), $inputTaxonomy1);
-        foreach ($inputTaxonomy1 as $value) {
+        $this->assertCount(count($valuesTaxonomy1), $insertArgs['tax_input']['hierarchy']);
+        foreach ($insertArgs['tax_input']['hierarchy'] as $value) {
             $this->assertTrue(is_numeric($value));
         }
         $this->assertArrayHasKey('nohierarchy', $insertArgs['tax_input']);
-        $inputTaxonomy2 = explode(',', $insertArgs['tax_input']['nohierarchy']);
-        $this->assertEquals($valuesTaxonomy2, $inputTaxonomy2);
+        $this->assertEquals($valuesTaxonomy2, $insertArgs['tax_input']['nohierarchy']);
         $this->assertArrayNotHasKey('someTax', $insertArgs['tax_input']); // empty value should have been ignored
 
         // Check meta data

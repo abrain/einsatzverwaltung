@@ -21,7 +21,7 @@
   },
   "config": {
     "platform": {
-      "php": "7.4.29"
+      "php": "8.0.26"
     },
     "allow-plugins": {
       "dealerdirect/phpcodesniffer-composer-installer": true
@@ -42,11 +42,12 @@
     "friendsofphp/php-cs-fixer": "^2.18",
     "php-cs-fixer/phpunit-constraint-isidenticalstring": "^1.2",
     "php-cs-fixer/phpunit-constraint-xmlmatchesxsd": "^1.2",
-    "sebastian/comparator": "^3.0",
+    "sebastian/comparator": "^4.0",
     "phpcompatibility/php-compatibility": "^9.3",
     "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
     "yoast/phpunit-polyfills": "^1.0",
     "phpcompatibility/phpcompatibility-wp": "^2.1.2",
-    "wp-coding-standards/wpcs": "^2.3.0"
+    "wp-coding-standards/wpcs": "^2.3.0",
+    "phpunit/phpunit": "^9.5"
   }
 }

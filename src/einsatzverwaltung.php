@@ -8,7 +8,7 @@ Author: Andreas Brain
 Author URI: https://www.abrain.de
 License: GPLv2
 Text Domain: einsatzverwaltung
-Requires at least: 5.3.0
+Requires at least: 5.6.0
 Requires PHP: 7.1.0
 */
 

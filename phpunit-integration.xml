@@ -1,25 +1,16 @@
-<phpunit
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/8.5/phpunit.xsd"
-    bootstrap="tests/integration/bootstrap.php"
-    backupGlobals="false"
-    beStrictAboutTestsThatDoNotTestAnything="true"
-    colors="true"
-    convertDeprecationsToExceptions="true"
-    >
-    <testsuites>
-        <testsuite name="integration">
-            <directory suffix="Test.php">./tests/integration</directory>
-        </testsuite>
-    </testsuites>
-
-    <filter>
-        <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory suffix=".php">./src</directory>
-        </whitelist>
-    </filter>
-
-    <logging>
-        <log type="coverage-clover" target="build/logs/clover-integration.xml"/>
-    </logging>
+<?xml version="1.0"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.5/phpunit.xsd" bootstrap="tests/integration/bootstrap.php" colors="true" convertDeprecationsToExceptions="true">
+  <coverage processUncoveredFiles="true">
+    <include>
+      <directory suffix=".php">./src</directory>
+    </include>
+    <report>
+      <clover outputFile="build/logs/clover-integration.xml"/>
+    </report>
+  </coverage>
+  <testsuites>
+    <testsuite name="integration">
+      <directory>./tests/integration</directory>
+    </testsuite>
+  </testsuites>
 </phpunit>

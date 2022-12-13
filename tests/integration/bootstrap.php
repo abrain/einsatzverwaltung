@@ -4,6 +4,7 @@ $tmpDirEnv = getenv('TMPDIR');
 $tmpdir = rtrim(empty($tmpDirEnv) ? '/tmp' : $tmpDirEnv, '/');
 $_tests_dir = "{$tmpdir}/wordpress-tests-lib";
 
+require __DIR__ . '/../../vendor/autoload.php';
 require_once $_tests_dir . '/includes/functions.php';
 
 tests_add_filter('muplugins_loaded', function () {

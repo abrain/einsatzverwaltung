@@ -73,6 +73,9 @@ steps:
       - XDEBUG_MODE=coverage ./vendor/bin/phpunit -c phpunit.xml
   - name: integration-tests-latest
     image: php:8.0-cli-bullseye
+    environment:
+      CC_TEST_REPORTER_ID:
+        from_secret: cc_test_reporter_id
     commands:
       - apt-get update && apt-get install -y git subversion mariadb-client
       - pecl install xdebug
@@ -128,6 +131,6 @@ trigger:
     - tag
 ---
 kind: signature
-hmac: 500cfd9d5483a178c93012439f609b76ad1b13b375d166035fda411c69fb77d1
+hmac: 161a536174546d330fbf3a7235d3ed4bab66d65e383581e05cf205cef74c48ea
 
 ...

@@ -74,7 +74,7 @@ steps:
   - name: integration-tests-latest
     image: php:8.0-cli-bullseye
     commands:
-      - apt-get update && apt-get install -y subversion mariadb-client
+      - apt-get update && apt-get install -y git subversion mariadb-client
       - pecl install xdebug
       - docker-php-ext-enable xdebug
       - docker-php-ext-install mysqli
@@ -128,6 +128,6 @@ trigger:
     - tag
 ---
 kind: signature
-hmac: f11d61f1084b73d77bc70cc3d3fba28c9a2f39622b879537e3fd7605f82682e9
+hmac: 500cfd9d5483a178c93012439f609b76ad1b13b375d166035fda411c69fb77d1
 
 ...

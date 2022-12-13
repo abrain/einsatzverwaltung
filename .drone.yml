@@ -71,7 +71,6 @@ steps:
       - chmod +x ./cc-test-reporter
       - ./cc-test-reporter before-build
       - XDEBUG_MODE=coverage ./vendor/bin/phpunit -c phpunit.xml
-      - ./bin/report-code-coverage.sh
   - name: integration-tests-latest
     image: php:8.0-cli-bullseye
     commands:
@@ -81,6 +80,7 @@ steps:
       - docker-php-ext-install mysqli
       - ./bin/install-wp-tests.sh wptest_latest root wptestroot database
       - XDEBUG_MODE=coverage ./vendor/bin/phpunit -c phpunit-integration.xml
+      - ./bin/report-code-coverage.sh
   - name: downgrade-phpunit
     image: composer
     commands:
@@ -128,6 +128,6 @@ trigger:
     - tag
 ---
 kind: signature
-hmac: 3813e48e6e9426d8e5b4713fce46c4f41a87d30587ff35d0d30a8cbfc6474ed0
+hmac: f11d61f1084b73d77bc70cc3d3fba28c9a2f39622b879537e3fd7605f82682e9
 
 ...

@@ -30,6 +30,7 @@ class ReportCount extends AbstractShortcode
         parent::__construct([
             'status' => '',
             'icategories' => '',
+            'ignore_weights' => 'no',
             'alertingmethods' => '',
             'units' => '',
             'year' => ''
@@ -79,9 +80,14 @@ class ReportCount extends AbstractShortcode
         }
 
         $incidentReports = $this->reportQuery->getReports();
-        $reportCount = array_reduce($incidentReports, function ($sum, IncidentReport $report) {
-            return $sum + $report->getWeight();
-        }, 0);
+        if ($attributes['ignore_weights'] === 'yes') {
+            $reportCount = count($incidentReports);
+        } else {
+            $reportCount = array_reduce($incidentReports, function ($sum, IncidentReport $report) {
+                return $sum + $report->getWeight();
+            }, 0);
+        }
+
         return sprintf('%d', $reportCount);
     }
 

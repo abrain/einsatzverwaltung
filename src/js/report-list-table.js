@@ -15,7 +15,7 @@ jQuery(function () {
             let postRow = document.getElementById('post-' + postId);
 
             // Fill the inputs
-            let reportNumberInput = editRow.querySelector('input[name="e_nummer"]');
+            let reportNumberInput = editRow.querySelector('input[name="einsatz_number"]');
             if (reportNumberInput) {
                 reportNumberInput.value = postRow.querySelector('#report_number_' + postId).textContent;
             }

@@ -236,7 +236,7 @@ class ReportListTable
             esc_html($this->getColumnLabel($columnName))
         );
         if ($columnName === 'e_nummer') {
-            echo '<input type="text" name="e_nummer">';
+            echo '<input type="text" name="einsatz_number">';
         }
     }
 

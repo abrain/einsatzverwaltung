@@ -4,10 +4,15 @@ namespace abrain\Einsatzverwaltung\Admin;
 
 use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
+use abrain\Einsatzverwaltung\ReportNumberController;
 use abrain\Einsatzverwaltung\Types\Report;
+use WP_Post;
+use WP_Post_Type;
 use WP_Term;
 use function array_map;
 use function esc_html;
+use function join;
+use function printf;
 use function sprintf;
 
 /**
@@ -35,7 +40,7 @@ class ReportListTable
             ),
             'e_nummer' => array(
                 'label' => __('Incident number', 'einsatzverwaltung'),
-                'quickedit' => false
+                'quickedit' => true
             ),
             'einsatzverwaltung_annotations' => array(
                 'label' => __('Annotations', 'einsatzverwaltung'),
@@ -62,6 +67,22 @@ class ReportListTable
                 'quickedit' => false
             )
         );
+    }
+
+    /**
+     * Echo the values of custom columns for a post, to be used for Quick Edit mode.
+     *
+     * @param WP_Post $post
+     * @param WP_Post_Type $postTypeObject
+     */
+    public function addInlineData(WP_Post $post, WP_Post_Type $postTypeObject)
+    {
+        if ($postTypeObject->name !== Report::getSlug()) {
+            return;
+        }
+
+        $report = new IncidentReport($post);
+        printf('<div id="report_number_%1$d" class="meta_input">%2$s</div>', $post->ID, $report->getNumber());
     }
 
     /**
@@ -176,9 +197,11 @@ class ReportListTable
         }
 
         if ($this->columnHasCustomBox($columnName)) {
-            echo '<fieldset class="inline-edit-col-right"><div class="inline-edit-col">';
+            echo '<fieldset class="inline-edit-col-right inline-edit-' . $postType.'">';
+            echo '<div class="inline-edit-col column-' . $columnName.'">';
+            echo '<label class="inline-edit-group">';
             $this->echoEditCustomBox($columnName);
-            echo '</div></fieldset>';
+            echo '</label></div></fieldset>';
         }
     }
 
@@ -206,12 +229,15 @@ class ReportListTable
      *
      * @param string $columnName Identifier of the custom column
      */
-    private function echoEditCustomBox($columnName)
+    private function echoEditCustomBox(string $columnName)
     {
         printf(
-            '<span class="title inline-edit-categories-label">%s</span>',
+            '<span class="title">%s</span>',
             esc_html($this->getColumnLabel($columnName))
         );
+        if ($columnName === 'e_nummer') {
+            echo '<input type="text" name="e_nummer">';
+        }
     }
 
     /**
@@ -221,9 +247,15 @@ class ReportListTable
      *
      * @return bool
      */
-    private function columnHasCustomBox($columnName): bool
+    private function columnHasCustomBox(string $columnName): bool
     {
-        return array_key_exists($columnName, $this->customColumns) && $this->customColumns[$columnName]['quickedit'];
+        $quickEditEnabled = array_key_exists($columnName, $this->customColumns) && $this->customColumns[$columnName]['quickedit'];
+
+        if ($columnName === 'e_nummer' && ReportNumberController::isAutoIncidentNumbers()) {
+            return false;
+        }
+
+        return $quickEditEnabled;
     }
 
     /**

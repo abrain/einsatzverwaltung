@@ -14,6 +14,7 @@ use abrain\Einsatzverwaltung\Utilities;
 use function add_filter;
 use function esc_html__;
 use function sprintf;
+use function wp_enqueue_script;
 use function wp_enqueue_style;
 
 /**
@@ -46,6 +47,7 @@ class Initializer
         add_action('manage_einsatz_posts_custom_column', array($reportListTable, 'filterColumnContentEinsatz'), 10, 2);
         add_action('quick_edit_custom_box', array($reportListTable, 'quickEditCustomBox'), 10, 3);
         add_action('bulk_edit_custom_box', array($reportListTable, 'bulkEditCustomBox'), 10, 2);
+        add_action('add_inline_data', array($reportListTable, 'addInlineData'), 10, 2);
 
         $reportEditScreen = new ReportEditScreen();
         add_action('add_meta_boxes_einsatz', array($reportEditScreen, 'addMetaBoxes'));
@@ -117,6 +119,17 @@ class Initializer
                 array('jquery-ui-draggable', 'jquery-ui-droppable', 'jquery-ui-sortable'),
                 Core::VERSION
             );
+        } elseif ('edit.php' == $hook) {
+            $screen = get_current_screen();
+            if ($screen && $screen->post_type === Report::getSlug()) {
+                wp_enqueue_script(
+                    'einsatzverwaltung-report-list-table',
+                    Core::$scriptUrl . 'report-list-table.js',
+                    false,
+                    null,
+                    true
+                );
+            }
         }
 
         wp_enqueue_style(

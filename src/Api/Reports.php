@@ -67,7 +67,7 @@ class Reports extends WP_REST_Controller
                         'description' => __('The content of the report. No HTML allowed, but line breaks are preserved.', 'einsatzverwaltung'),
                         'type' => 'string',
                         'validate_callback' => array($this, 'validateIsString'),
-                        'sanitize_callback' => 'sanitize_textarea_field',
+                        'sanitize_callback' => 'wp_kses_post',
                         'required' => false,
                     ),
                     'keyword' => array(

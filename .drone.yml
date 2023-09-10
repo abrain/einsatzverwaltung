@@ -102,11 +102,11 @@ steps:
         from_secret: codecov_token
     commands:
       - apk add curl gnupg coreutils git
-      - curl https://uploader.codecov.io/verification.gpg | gpg --no-default-keyring --keyring trustedkeys.gpg --import
+      - curl https://uploader.codecov.io/verification.gpg | gpg --no-default-keyring --keyring /root/trustedkeys.gpg --import
       - curl -Os https://uploader.codecov.io/latest/alpine/codecov
       - curl -Os https://uploader.codecov.io/latest/alpine/codecov.SHA256SUM
       - curl -Os https://uploader.codecov.io/latest/alpine/codecov.SHA256SUM.sig
-      - gpgv codecov.SHA256SUM.sig codecov.SHA256SUM
+      - gpgv --keyring /root/trustedkeys.gpg codecov.SHA256SUM.sig codecov.SHA256SUM
       - sha256sum -c codecov.SHA256SUM
       - chmod +x codecov
       - ./codecov --file build/logs/clover.xml --flags unit

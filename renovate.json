@@ -1,3 +1,22 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json"
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":semanticCommits",
+    ":semanticPrefixFixDepsChoreOthers",
+    ":prHourlyLimit2",
+    ":prConcurrentLimit10",
+    "group:allNonMajor",
+    ":pinVersions"
+  ],
+  "major": {
+    "dependencyDashboardApproval": true
+  },
+  "packageRules": [
+      {
+      "depTypeList": [ "require-dev" ],
+      "updateTypes": [ "patch", "minor", "digest"],
+      "groupName": "devDependencies (non-major)"
+    }
+  ]
 }

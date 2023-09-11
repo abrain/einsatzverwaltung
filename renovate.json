@@ -17,6 +17,11 @@
       "depTypeList": [ "require-dev" ],
       "updateTypes": [ "patch", "minor", "digest"],
       "groupName": "devDependencies (non-major)"
+    },
+    {
+      "matchPackageNames": ["php"],
+      "depTypeList": [ "require" ],
+      "rangeStrategy": "widen"
     }
   ]
 }

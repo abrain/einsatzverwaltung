@@ -48,6 +48,6 @@
     "yoast/phpunit-polyfills": "1.1.0",
     "phpcompatibility/phpcompatibility-wp": "2.1.4",
     "wp-coding-standards/wpcs": "3.0.0",
-    "phpunit/phpunit": "9.6.11"
+    "phpunit/phpunit": "9.6.12"
   }
 }

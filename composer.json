@@ -20,9 +20,6 @@
     "docs": "https://einsatzverwaltung.org/dokumentation/"
   },
   "config": {
-    "platform": {
-      "php": "8.0.26"
-    },
     "allow-plugins": {
       "dealerdirect/phpcodesniffer-composer-installer": true
     }

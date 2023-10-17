@@ -5,6 +5,7 @@ use Brain\Monkey;
 use DateTime;
 use DateTimeZone;
 use Exception;
+use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Yoast\PHPUnitPolyfills\TestCases\TestCase;
 use function Brain\Monkey\Functions\when;
@@ -25,6 +26,11 @@ class UnitTestCase extends TestCase
         Monkey\Functions\stubTranslationFunctions();
         Monkey\Functions\stubEscapeFunctions();
 
+        // Plurals are not yet covered by Brain Monkey
+        Monkey\Functions\when('_n')->alias(function ($single, $plural, $number) {
+            return $number === 1 ? $single : $plural;
+        });
+
         Monkey\Functions\when('shortcode_atts')->alias(function ($defaults, $attributes) {
             $attributes = (array) $attributes;
             $result = [];
@@ -37,6 +43,11 @@ class UnitTestCase extends TestCase
             }
             return $result;
         });
+
+        // Fake the global database object
+        global $wpdb;
+        $wpdb = Mockery::mock('\wpdb');
+        $wpdb->prefix = 'wpunit_';
 
         when('get_date_from_gmt')->alias(function ($string, $format = 'Y-m-d H:i:s') {
             try {

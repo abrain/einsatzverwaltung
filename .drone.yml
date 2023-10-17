@@ -47,7 +47,7 @@ depends_on:
 
 services:
   - name: database
-    image: mariadb:10.8
+    image: mariadb:10.11
     pull: always
     environment:
       MARIADB_ROOT_PASSWORD: wptestroot
@@ -72,7 +72,7 @@ steps:
       - ./cc-test-reporter before-build
       - XDEBUG_MODE=coverage ./vendor/bin/phpunit -c phpunit.xml
   - name: integration-tests-latest
-    image: php:8.0-cli-bullseye
+    image: php:8.2-cli-bullseye
     environment:
       CC_TEST_REPORTER_ID:
         from_secret: cc_test_reporter_id

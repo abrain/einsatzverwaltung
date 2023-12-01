@@ -178,7 +178,7 @@ class Tool
         }
 
         // 'Sofort veröffentlichen'-Option übernehmen
-        $publishReports = filter_input(INPUT_POST, 'import_publish_reports', FILTER_SANITIZE_STRING);
+        $publishReports = filter_input(INPUT_POST, 'import_publish_reports');
         $this->currentSource->putArg(
             'import_publish_reports',
             Utilities::sanitizeCheckbox($publishReports)

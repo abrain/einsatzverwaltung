@@ -88,7 +88,7 @@ class ReportFactory extends WP_UnitTest_Factory_For_Post
         if ($count > 2) {
             $timestampDistance = ($lastDate - $firstDate) / ($count - 1);
             for ($i = 1; $i < $count - 1; $i++) {
-                $dates[] = date('Y-m-d H:i:s', $firstDate + $timestampDistance * $i);
+                $dates[] = date('Y-m-d H:i:s', $firstDate + floor($timestampDistance * $i));
             }
         }
 

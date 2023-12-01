@@ -47,7 +47,7 @@ depends_on:
 
 services:
   - name: database
-    image: mariadb:10.8
+    image: mariadb:10.11
     pull: always
     environment:
       MARIADB_ROOT_PASSWORD: wptestroot
@@ -131,6 +131,6 @@ trigger:
     - tag
 ---
 kind: signature
-hmac: d83b634a99211401edb8e585e71cb96e169d1dc0c8e6483d139a49b070522c6a
+hmac: baa058d38eb6b80f3e9472f1615a5038ccbaa3ee447925cf000142f30628e71b
 
 ...

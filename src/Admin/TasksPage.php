@@ -62,7 +62,7 @@ class TasksPage
         $action = filter_input(
             INPUT_GET,
             'action',
-            FILTER_SANITIZE_STRING,
+            FILTER_SANITIZE_SPECIAL_CHARS,
             FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH
         );
 

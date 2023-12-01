@@ -173,7 +173,7 @@ class MainPage
     private function getCurrentSubPage(): SubPage
     {
         $flags = FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH;
-        $tab = filter_input(INPUT_GET, 'tab', FILTER_SANITIZE_STRING, $flags);
+        $tab = filter_input(INPUT_GET, 'tab', FILTER_SANITIZE_SPECIAL_CHARS, $flags);
 
         if (empty($tab) || !array_key_exists($tab, $this->subPages)) {
             $subPageObjects = array_values($this->subPages);

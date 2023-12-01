@@ -72,7 +72,7 @@ steps:
       - ./cc-test-reporter before-build
       - XDEBUG_MODE=coverage ./vendor/bin/phpunit -c phpunit.xml
   - name: integration-tests-latest
-    image: php:8.0-cli-bullseye
+    image: php:8.2-cli-bullseye
     environment:
       CC_TEST_REPORTER_ID:
         from_secret: cc_test_reporter_id
@@ -131,6 +131,6 @@ trigger:
     - tag
 ---
 kind: signature
-hmac: d8cef72952942bbccec090162534aff1609d8a911609b825efbfe9861303f934
+hmac: d83b634a99211401edb8e585e71cb96e169d1dc0c8e6483d139a49b070522c6a
 
 ...

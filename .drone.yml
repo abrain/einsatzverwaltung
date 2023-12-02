@@ -25,7 +25,7 @@ steps:
     commands:
       - composer install
   - name: check-php-compatibility
-    image: php:8.2-cli-bullseye
+    image: php:8.2.13-cli-bullseye
     commands:
       - ./vendor/bin/phpcs
 
@@ -47,7 +47,7 @@ depends_on:
 
 services:
   - name: database
-    image: mariadb:10.11
+    image: mariadb:10.11.6
     pull: always
     environment:
       MARIADB_ROOT_PASSWORD: wptestroot
@@ -59,7 +59,7 @@ steps:
     commands:
       - composer install
   - name: unit-tests
-    image: php:8.2-cli-bullseye
+    image: php:8.2.13-cli-bullseye
     environment:
       CC_TEST_REPORTER_ID:
         from_secret: cc_test_reporter_id
@@ -72,7 +72,7 @@ steps:
       - ./cc-test-reporter before-build
       - XDEBUG_MODE=coverage ./vendor/bin/phpunit -c phpunit.xml
   - name: integration-tests-latest
-    image: php:8.2-cli-bullseye
+    image: php:8.2.13-cli-bullseye
     environment:
       CC_TEST_REPORTER_ID:
         from_secret: cc_test_reporter_id
@@ -89,7 +89,7 @@ steps:
     commands:
       - composer require --dev --update-with-all-dependencies --ignore-platform-req=php "phpunit/phpunit:^7.5" "mockery/mockery:1.3.6" "sebastian/comparator:^3.0"
   - name: integration-tests-minimum
-    image: php:7.4-cli-bullseye
+    image: php:7.4.33-cli-bullseye
     commands:
       - apt-get update && apt-get install -y subversion mariadb-client
       - docker-php-ext-install mysqli
@@ -131,6 +131,6 @@ trigger:
     - tag
 ---
 kind: signature
-hmac: baa058d38eb6b80f3e9472f1615a5038ccbaa3ee447925cf000142f30628e71b
+hmac: d0ce96f5668e5815871d993d13236faddc2bf607d7d5eccaeceecc822adcf748
 
 ...

@@ -41,7 +41,7 @@
     "php-cs-fixer/phpunit-constraint-xmlmatchesxsd": "1.4.0",
     "sebastian/comparator": "4.0.8",
     "phpcompatibility/php-compatibility": "9.3.5",
-    "dealerdirect/phpcodesniffer-composer-installer": "0.7.2",
+    "dealerdirect/phpcodesniffer-composer-installer": "1.0.0",
     "yoast/phpunit-polyfills": "1.1.0",
     "phpcompatibility/phpcompatibility-wp": "2.1.4",
     "wp-coding-standards/wpcs": "3.0.1",

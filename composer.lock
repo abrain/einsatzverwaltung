@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8a8d2b8470cc565d665e2a5386c7cbbb",
+    "content-hash": "41f5e8570ba12760cd153010cab9f6ce",
     "packages": [],
     "packages-dev": [
         {
@@ -1286,21 +1286,21 @@
         },
         {
             "name": "php-cs-fixer/phpunit-constraint-isidenticalstring",
-            "version": "v1.4.0",
+            "version": "v1.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHP-CS-Fixer/phpunit-constraint-isidenticalstring.git",
-                "reference": "4a5ced7f61cdb2fe80b884c2403b325bbcb13608"
+                "reference": "2c55d31fcbda32b48780cbeff87f188354813db0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHP-CS-Fixer/phpunit-constraint-isidenticalstring/zipball/4a5ced7f61cdb2fe80b884c2403b325bbcb13608",
-                "reference": "4a5ced7f61cdb2fe80b884c2403b325bbcb13608",
+                "url": "https://api.github.com/repos/PHP-CS-Fixer/phpunit-constraint-isidenticalstring/zipball/2c55d31fcbda32b48780cbeff87f188354813db0",
+                "reference": "2c55d31fcbda32b48780cbeff87f188354813db0",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.0 || ^8.0",
-                "phpunit/phpunit": "^6.5.14 || ^7.5.20 || ^8.0 || ^9.0 || ^10.0"
+                "phpunit/phpunit": "^6.5.14 || ^7.5.20 || ^8.0 || ^9.0 || ^10.0 || ^11.0.1"
             },
             "type": "library",
             "autoload": {
@@ -1324,29 +1324,29 @@
             "description": "Constraint for testing strings considering not-same line endings.",
             "support": {
                 "issues": "https://github.com/PHP-CS-Fixer/phpunit-constraint-isidenticalstring/issues",
-                "source": "https://github.com/PHP-CS-Fixer/phpunit-constraint-isidenticalstring/tree/v1.4.0"
+                "source": "https://github.com/PHP-CS-Fixer/phpunit-constraint-isidenticalstring/tree/v1.5.0"
             },
-            "time": "2023-11-25T20:17:05+00:00"
+            "time": "2024-02-04T19:08:54+00:00"
         },
         {
             "name": "php-cs-fixer/phpunit-constraint-xmlmatchesxsd",
-            "version": "v1.4.0",
+            "version": "v1.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHP-CS-Fixer/phpunit-constraint-xmlmatchesxsd.git",
-                "reference": "b1f1ea99750b1cd596e3cdec50142316e605efdb"
+                "reference": "db3feb2b6d2cf5cd18f7053c6aa60a21dccf18d3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHP-CS-Fixer/phpunit-constraint-xmlmatchesxsd/zipball/b1f1ea99750b1cd596e3cdec50142316e605efdb",
-                "reference": "b1f1ea99750b1cd596e3cdec50142316e605efdb",
+                "url": "https://api.github.com/repos/PHP-CS-Fixer/phpunit-constraint-xmlmatchesxsd/zipball/db3feb2b6d2cf5cd18f7053c6aa60a21dccf18d3",
+                "reference": "db3feb2b6d2cf5cd18f7053c6aa60a21dccf18d3",
                 "shasum": ""
             },
             "require": {
                 "ext-dom": "*",
                 "ext-libxml": "*",
                 "php": "^7.0 || ^8.0",
-                "phpunit/phpunit": "^6.5.14 || ^7.5.20 || ^8.0 || ^9.0 || ^10.0"
+                "phpunit/phpunit": "^6.5.14 || ^7.5.20 || ^8.0 || ^9.0 || ^10.0 || ^11.0.1"
             },
             "type": "library",
             "autoload": {
@@ -1373,9 +1373,9 @@
             "description": "Constraint for testing XML against XSD.",
             "support": {
                 "issues": "https://github.com/PHP-CS-Fixer/phpunit-constraint-xmlmatchesxsd/issues",
-                "source": "https://github.com/PHP-CS-Fixer/phpunit-constraint-xmlmatchesxsd/tree/v1.4.0"
+                "source": "https://github.com/PHP-CS-Fixer/phpunit-constraint-xmlmatchesxsd/tree/v1.5.0"
             },
-            "time": "2023-11-25T20:16:32+00:00"
+            "time": "2024-02-04T19:08:56+00:00"
         },
         {
             "name": "phpcompatibility/php-compatibility",

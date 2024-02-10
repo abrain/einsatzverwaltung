@@ -25,7 +25,7 @@ steps:
     commands:
       - composer install
   - name: check-php-compatibility
-    image: php:8.2.13-cli-bullseye
+    image: php:8.3.2-cli-bullseye
     commands:
       - ./vendor/bin/phpcs
 
@@ -59,7 +59,7 @@ steps:
     commands:
       - composer install
   - name: unit-tests
-    image: php:8.2.13-cli-bullseye
+    image: php:8.3.2-cli-bullseye
     environment:
       CC_TEST_REPORTER_ID:
         from_secret: cc_test_reporter_id
@@ -72,7 +72,7 @@ steps:
       - ./cc-test-reporter before-build
       - XDEBUG_MODE=coverage ./vendor/bin/phpunit -c phpunit.xml
   - name: integration-tests-latest
-    image: php:8.2.13-cli-bullseye
+    image: php:8.3.2-cli-bullseye
     environment:
       CC_TEST_REPORTER_ID:
         from_secret: cc_test_reporter_id
@@ -131,6 +131,6 @@ trigger:
     - tag
 ---
 kind: signature
-hmac: d0ce96f5668e5815871d993d13236faddc2bf607d7d5eccaeceecc822adcf748
+hmac: d78c019b7979426052d6dd969d216ca58b878dfac6836531e5cf1d5f9cf381f2
 
 ...

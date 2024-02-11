@@ -1,0 +1,28 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base",
+    ":semanticCommits",
+    ":semanticPrefixFixDepsChoreOthers",
+    ":prHourlyLimit2",
+    ":prConcurrentLimit10",
+    "group:allNonMajor",
+    "docker:disable",
+    ":pinVersions"
+  ],
+  "major": {
+    "dependencyDashboardApproval": true
+  },
+  "packageRules": [
+      {
+      "depTypeList": [ "require-dev" ],
+      "updateTypes": [ "patch", "minor", "digest"],
+      "groupName": "devDependencies (non-major)"
+    },
+    {
+      "matchPackageNames": ["php"],
+      "depTypeList": [ "require" ],
+      "rangeStrategy": "widen"
+    }
+  ]
+}

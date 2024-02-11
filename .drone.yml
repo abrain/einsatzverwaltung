@@ -25,14 +25,14 @@ steps:
     commands:
       - composer install
   - name: check-php-compatibility
-    image: php:7.4-cli-bullseye
+    image: php:8.3.2-cli-bullseye
     commands:
       - ./vendor/bin/phpcs
 
 ---
 kind: pipeline
 type: docker
-name: unit-tests
+name: tests
 
 trigger:
   event:
@@ -45,13 +45,21 @@ trigger:
 depends_on:
   - compliance
 
+services:
+  - name: database
+    image: mariadb:10.11.6
+    pull: always
+    environment:
+      MARIADB_ROOT_PASSWORD: wptestroot
+      TZ: Europe/Berlin
+
 steps:
   - name: install
     image: composer
     commands:
       - composer install
-  - name: test
-    image: php:7.4-cli-bullseye
+  - name: unit-tests
+    image: php:8.3.2-cli-bullseye
     environment:
       CC_TEST_REPORTER_ID:
         from_secret: cc_test_reporter_id
@@ -63,18 +71,46 @@ steps:
       - chmod +x ./cc-test-reporter
       - ./cc-test-reporter before-build
       - XDEBUG_MODE=coverage ./vendor/bin/phpunit -c phpunit.xml
+  - name: integration-tests-latest
+    image: php:8.3.2-cli-bullseye
+    environment:
+      CC_TEST_REPORTER_ID:
+        from_secret: cc_test_reporter_id
+    commands:
+      - apt-get update && apt-get install -y git subversion mariadb-client
+      - pecl install xdebug
+      - docker-php-ext-enable xdebug
+      - docker-php-ext-install mysqli
+      - ./bin/install-wp-tests.sh wptest_latest root wptestroot database
+      - XDEBUG_MODE=coverage ./vendor/bin/phpunit -c phpunit-integration.xml
       - ./bin/report-code-coverage.sh
-  - name: slack
-    image: plugins/slack
-    settings:
-      webhook:
-        from_secret: slack_hook
-    when:
-      status:
-        - failure
-      event:
-        exclude:
-          - pull_request
+  - name: downgrade-phpunit
+    image: composer
+    commands:
+      - composer require --dev --update-with-all-dependencies --ignore-platform-req=php "phpunit/phpunit:^7.5" "mockery/mockery:1.3.6" "sebastian/comparator:^3.0"
+  - name: integration-tests-minimum
+    image: php:7.4.33-cli-bullseye
+    commands:
+      - apt-get update && apt-get install -y subversion mariadb-client
+      - docker-php-ext-install mysqli
+      - ./bin/install-wp-tests.sh wptest_min root wptestroot database 5.6
+      - ./vendor/bin/phpunit -c phpunit-integration.xml --no-coverage
+  - name: codecov
+    image: alpine
+    environment:
+      CODECOV_TOKEN:
+        from_secret: codecov_token
+    commands:
+      - apk add curl gnupg coreutils git
+      - curl https://uploader.codecov.io/verification.gpg | gpg --no-default-keyring --keyring /root/trustedkeys.gpg --import
+      - curl -Os https://uploader.codecov.io/latest/alpine/codecov
+      - curl -Os https://uploader.codecov.io/latest/alpine/codecov.SHA256SUM
+      - curl -Os https://uploader.codecov.io/latest/alpine/codecov.SHA256SUM.sig
+      - gpgv --keyring /root/trustedkeys.gpg codecov.SHA256SUM.sig codecov.SHA256SUM
+      - sha256sum -c codecov.SHA256SUM
+      - chmod +x codecov
+      - ./codecov --file build/logs/clover.xml --flags unit
+      - ./codecov --file build/logs/clover-integration.xml --flags integration
 
 ---
 kind: pipeline
@@ -86,23 +122,15 @@ steps:
     image: alpine
     commands:
       - ./bin/check-version-tags.sh
-  - name: slack
-    image: plugins/slack
-    settings:
-      webhook:
-        from_secret: slack_hook
-    when:
-      status:
-        - failure
 
 depends_on:
-  - unit-tests
+  - tests
 
 trigger:
   event:
     - tag
 ---
 kind: signature
-hmac: 8c29bef07eebae363c6e40220f4ab9adda9ecc095d300b8b8e481c9fd38333d6
+hmac: d78c019b7979426052d6dd969d216ca58b878dfac6836531e5cf1d5f9cf381f2
 
 ...

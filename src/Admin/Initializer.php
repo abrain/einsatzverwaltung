@@ -14,6 +14,7 @@ use abrain\Einsatzverwaltung\Utilities;
 use function add_filter;
 use function esc_html__;
 use function sprintf;
+use function wp_enqueue_style;
 
 /**
  * Bootstraps and registers all the things we can do in WordPress' admin area
@@ -120,9 +121,21 @@ class Initializer
 
         wp_enqueue_style(
             'font-awesome',
-            Core::$pluginUrl . 'font-awesome/css/font-awesome.min.css',
+            Core::$pluginUrl . 'font-awesome/css/fontawesome.min.css',
             false,
-            '4.7.0'
+            '6.2.1'
+        );
+        wp_enqueue_style(
+            'font-awesome-solid',
+            Core::$pluginUrl . 'font-awesome/css/solid.min.css',
+            array('font-awesome'),
+            '6.2.1'
+        );
+        wp_enqueue_style(
+            'font-awesome-brands',
+            Core::$pluginUrl . 'font-awesome/css/brands.min.css',
+            array('font-awesome'),
+            '6.2.1'
         );
         wp_enqueue_style(
             'einsatzverwaltung-admin',

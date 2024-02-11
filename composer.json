@@ -20,9 +20,6 @@
     "docs": "https://einsatzverwaltung.org/dokumentation/"
   },
   "config": {
-    "platform": {
-      "php": "7.4.29"
-    },
     "allow-plugins": {
       "dealerdirect/phpcodesniffer-composer-installer": true
     }
@@ -30,23 +27,22 @@
   "scripts": {
     "lint": "phpcs",
     "test": "XDEBUG_MODE=coverage phpunit",
-    "integration-test": "phpunit -c phpunit-integration.xml"
+    "integration-test": "XDEBUG_MODE=coverage phpunit -c phpunit-integration.xml"
   },
   "require": {
     "php": ">=7.1.0"
   },
   "require-dev": {
-    "phpmd/phpmd": "^2.9",
-    "squizlabs/php_codesniffer": "^3.5",
-    "brain/monkey": "^2.6",
-    "friendsofphp/php-cs-fixer": "^2.18",
-    "php-cs-fixer/phpunit-constraint-isidenticalstring": "^1.2",
-    "php-cs-fixer/phpunit-constraint-xmlmatchesxsd": "^1.2",
-    "sebastian/comparator": "^3.0",
-    "phpcompatibility/php-compatibility": "^9.3",
-    "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
-    "yoast/phpunit-polyfills": "^1.0",
-    "phpcompatibility/phpcompatibility-wp": "^2.1.2",
-    "wp-coding-standards/wpcs": "^2.3.0"
+    "phpmd/phpmd": "2.15.0",
+    "brain/monkey": "2.6.1",
+    "friendsofphp/php-cs-fixer": "2.19.3",
+    "php-cs-fixer/phpunit-constraint-isidenticalstring": "1.5.0",
+    "php-cs-fixer/phpunit-constraint-xmlmatchesxsd": "1.5.0",
+    "sebastian/comparator": "4.0.8",
+    "phpcompatibility/php-compatibility": "9.3.5",
+    "yoast/phpunit-polyfills": "1.1.0",
+    "phpcompatibility/phpcompatibility-wp": "2.1.4",
+    "wp-coding-standards/wpcs": "3.0.1",
+    "phpunit/phpunit": "9.6.16"
   }
 }

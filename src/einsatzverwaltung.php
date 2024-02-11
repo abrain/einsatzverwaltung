@@ -3,12 +3,12 @@
 Plugin Name: Einsatzverwaltung
 Plugin URI: https://einsatzverwaltung.org
 Description: Public incident reports for fire departments and other rescue services
-Version: 1.10.2
+Version: 1.11.0
 Author: Andreas Brain
 Author URI: https://www.abrain.de
 License: GPLv2
 Text Domain: einsatzverwaltung
-Requires at least: 5.1.0
+Requires at least: 5.6.0
 Requires PHP: 7.1.0
 */
 
@@ -17,8 +17,6 @@ use abrain\Einsatzverwaltung\Core;
 if (!defined('ABSPATH')) {
     die('You shall not pass!');
 }
-
-require_once dirname(__FILE__) . '/backcompat.php';
 
 try {
     spl_autoload_register(function (string $class) {

@@ -297,7 +297,11 @@ class CustomFieldsRepository
         /** @var CustomField $field */
         foreach ($this->taxonomyFields[$taxonomy] as $field) {
             // TODO choose filter based on type of CustomField
-            $value = filter_input(INPUT_POST, $field->key, FILTER_SANITIZE_STRING);
+            $value = filter_input(INPUT_POST, $field->key);
+
+            if ($value === null) {
+                continue;
+            }
 
             if ($field->isMultiValue()) {
                 $existingValues = get_term_meta($termId, $field->key);

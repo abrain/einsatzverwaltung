@@ -48,7 +48,7 @@ class MediaSelector extends CustomField
             return '';
         }
 
-        return '<span class="fa fa-picture-o"></span>';
+        return '<span class="fa-solid fa-image"></span>';
     }
 
     /**

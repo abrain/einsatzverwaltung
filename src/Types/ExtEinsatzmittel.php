@@ -11,7 +11,7 @@ use function add_filter;
  * Description of the custom taxonomy 'Externes Einsatzmittel'
  * @package abrain\Einsatzverwaltung\Types
  */
-class ExtEinsatzmittel implements CustomTaxonomy
+class ExtEinsatzmittel extends CustomTaxonomy
 {
     /**
      * @return string

@@ -64,6 +64,20 @@ class ReportCountTest extends UnitTestCase
         $this->assertEquals('8', $reportCount->render([]));
     }
 
+    public function testReturnsNumberOfReportsIgnoringWeight()
+    {
+        $report1 = Mockery::mock(IncidentReport::class);
+        $report2 = Mockery::mock(IncidentReport::class);
+
+        $reportQuery = Mockery::mock(ReportQuery::class);
+        $reportQuery->expects('resetQueryVars')->once();
+        $reportQuery->expects('setYear')->never();
+        $reportQuery->expects('getReports')->once()->andReturn([$report1, $report2]);
+
+        $reportCount = new ReportCount($reportQuery);
+        $this->assertEquals('2', $reportCount->render(['ignore_weights' => 'yes']));
+    }
+
     public function testQueriesActualIncidentsFromCurrentYear()
     {
         $reportQuery = Mockery::mock(ReportQuery::class);

@@ -89,7 +89,7 @@ class RecentIncidents extends AbstractWidget
 
         if ($instance['zeigeFeedlink']) {
             printf(
-                '<p class="einsatzfeed"><span class="fa fa-rss"></span>&nbsp;<a href="%s">%s</a></p>',
+                '<p class="einsatzfeed"><span class="fa-solid fa-rss"></span>&nbsp;<a href="%s">%s</a></p>',
                 get_post_type_archive_feed_link('einsatz'),
                 esc_html__('Incident Reports feed', 'einsatzverwaltung')
             );

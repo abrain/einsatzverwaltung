@@ -52,6 +52,13 @@ Yes, you can find them on [our website](https://einsatzverwaltung.org/faq/).
 
 == Changelog ==
 
+= 1.11.0 =
+* Alerting Methods: Can now be linked with a page from the same site or an arbitrary URL
+* Shortcode `reportcount` can ignore weights
+* Upgraded Font Awesome from version 4 to version 6
+* Improved compatibility with PHP 8.2
+* Dropped support for WordPress 5.5 and older
+
 = 1.10.2 =
 * Fix: Reports created with the API endpoint could show up as special reports
 * Fix: Table was missing columns when creating e.g. units or vehicles
@@ -68,6 +75,9 @@ Yes, you can find them on [our website](https://einsatzverwaltung.org/faq/).
 * Fix: Changing the category setting for incident reports caused an error on fresh installations
 
 == Upgrade Notice ==
+= 1.11.0 =
+Minor enhancements, upgraded Font Awesome, improved compatibility with PHP 8.2
+
 = 1.10.1 =
 Maintenance Release
 

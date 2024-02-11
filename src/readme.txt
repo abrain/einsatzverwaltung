@@ -3,9 +3,9 @@ Contributors: abrain
 Donate link: https://einsatzverwaltung.org/unterstuetzen/
 Tags: Feuerwehr, fire department, EMS
 Requires at least: 5.6.0
-Tested up to: 6.1
+Tested up to: 6.4
 Requires PHP: 7.1.0
-Stable tag: 1.10.2
+Stable tag: 1.11.0
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -52,6 +52,13 @@ Yes, you can find them on [our website](https://einsatzverwaltung.org/faq/).
 
 == Changelog ==
 
+= 1.11.0 =
+* Alerting Methods: Can now be linked with a page from the same site or an arbitrary URL
+* Shortcode `reportcount` can ignore weights
+* Upgraded Font Awesome from version 4 to version 6
+* Improved compatibility with PHP 8.2
+* Dropped support for WordPress 5.5 and older
+
 = 1.10.2 =
 * Fix: Reports created with the API endpoint could show up as special reports
 * Fix: Table was missing columns when creating e.g. units or vehicles
@@ -67,46 +74,12 @@ Yes, you can find them on [our website](https://einsatzverwaltung.org/faq/).
 * Autocomplete for incident location
 * Fix: Changing the category setting for incident reports caused an error on fresh installations
 
-= 1.9.7 =
-* Fix: Compatibility issue with Elementor
-
-= 1.9.6 =
-* Fix: Compatibility issue with PHP 7.4 and newer during import
-
-= 1.9.5 =
-* Fix: In some cases incident numbers were not regenerated after changing the format
-* Accessibility: Improve navigation of the widgets if the theme supports the navigation-widgets feature
-
-= 1.9.4 =
-* Fix: Editor would not show checkboxes for units if no vehicles existed
-
-= 1.9.3 =
-* Fix: Editor would not show checkboxes for units on a new site
-* Fix: Unexpected format of the global post object could cause an error
-
-= 1.9.2 =
-* Fix: Units without vehicles could not be selected in the editor
-
-= 1.9.1 =
-* Fix: Too narrow PHP type check prevented creation of other post types
-
-= 1.9.0 =
-* Vehicles can be associated with a unit
-* Incident numbers can have a separator between the year the and sequential number
-* Classic singular view of reports shows vehicles grouped by unit, if units are used
-* Templates: Added placeholder for vehicles grouped by unit
-* Units: Display order can be customized
-* Editor: Vehicles appear grouped by unit
-* Editor: Meta box for incident details is now mobile friendly
-* Editor: Notice about wrong date format only appears after leaving the field
-* Internationalized more labels
-
 == Upgrade Notice ==
+= 1.11.0 =
+Minor enhancements, upgraded Font Awesome, improved compatibility with PHP 8.2
+
 = 1.10.1 =
 Maintenance Release
 
 = 1.10.0 =
 New API endpoint, roles, and more
-
-= 1.9.7 =
-Maintenance Release

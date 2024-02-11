@@ -19,7 +19,7 @@ use function register_deactivation_hook;
  */
 class Core
 {
-    const VERSION = '1.10.2';
+    const VERSION = '1.11.0';
     const DB_VERSION = 72;
 
     /**

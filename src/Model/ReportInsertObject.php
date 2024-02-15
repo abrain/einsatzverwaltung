@@ -34,6 +34,11 @@ class ReportInsertObject
     private $resources;
 
     /**
+     * @var int
+     */
+    private $einsatz_mannschaft;
+    
+    /**
      * @var DateTimeImmutable
      */
     private $startDateTime;
@@ -101,6 +106,14 @@ class ReportInsertObject
     }
 
     /**
+     * @return int
+     */
+    public function geteinsatz_mannschaft(): int
+    {
+        return $this->einsatz_mannschaft;
+    }
+    
+    /**
      * @return DateTimeImmutable
      */
     public function getStartDateTime(): DateTimeImmutable
@@ -154,5 +167,13 @@ class ReportInsertObject
     public function setResources(array $resources): void
     {
         $this->resources = $resources;
+    }
+
+    /**
+     * @param string[] $einsatz_mannschaft
+     */
+    public function seteinsatz_mannschaft(int $einsatz_mannschaft): void
+    {
+        $this->einsatz_mannschaft = $einsatz_mannschaft;
     }
 }

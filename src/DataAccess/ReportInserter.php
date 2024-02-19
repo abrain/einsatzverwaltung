@@ -106,6 +106,11 @@ class ReportInserter
             }
         }
 
+        $workforce = $reportImportObject->getWorkforce();
+        if (!empty($workforce)) {
+            $args['meta_input']['einsatz_mannschaft'] = $workforce;
+        }
+
         return $args;
     }
 

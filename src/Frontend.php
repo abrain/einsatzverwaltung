@@ -71,15 +71,15 @@ class Frontend
     public function enqueueStyleAndScripts()
     {
         wp_enqueue_style(
-            'font-awesome',
+            'einsatzverwaltung-font-awesome',
             Core::$pluginUrl . 'font-awesome/css/fontawesome.min.css',
             false,
             '6.2.1'
         );
         wp_enqueue_style(
-            'font-awesome-solid',
+            'einsatzverwaltung-font-awesome-solid',
             Core::$pluginUrl . 'font-awesome/css/solid.min.css',
-            array('font-awesome'),
+            array('einsatzverwaltung-font-awesome'),
             '6.2.1'
         );
         wp_enqueue_style(

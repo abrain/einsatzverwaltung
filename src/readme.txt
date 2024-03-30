@@ -52,6 +52,10 @@ Yes, you can find them on [our website](https://einsatzverwaltung.org/faq/).
 
 == Changelog ==
 
+= 1.11.1 =
+* Reduce collisions with other occurrences of Font Awesome
+* Add option to disable Font Awesome
+
 = 1.11.0 =
 * Alerting Methods: Can now be linked with a page from the same site or an arbitrary URL
 * Shortcode `reportcount` can ignore weights
@@ -75,6 +79,9 @@ Yes, you can find them on [our website](https://einsatzverwaltung.org/faq/).
 * Fix: Changing the category setting for incident reports caused an error on fresh installations
 
 == Upgrade Notice ==
+= 1.11.1 =
+Maintenance Release
+
 = 1.11.0 =
 Minor enhancements, upgraded Font Awesome, improved compatibility with PHP 8.2
 

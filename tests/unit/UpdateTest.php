@@ -204,4 +204,14 @@ class UpdateTest extends UnitTestCase
         expect('update_option')->once()->with('einsatzvw_db_version', 72);
         (new Update())->upgrade1102();
     }
+
+    /**
+     * @throws ExpectationArgsRequired
+     */
+    public function testUpgrade1111AddsOptionDefault()
+    {
+        expect('add_option')->once()->with('einsatzvw_disable_fontawesome', '0');
+        expect('update_option')->once()->with('einsatzvw_db_version', 80);
+        (new Update())->upgrade1111();
+    }
 }

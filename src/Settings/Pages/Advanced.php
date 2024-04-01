@@ -76,6 +76,13 @@ class Advanced extends SubPage
             $this->settingsApiPage,
             'einsatzvw_settings_advreport'
         );
+        add_settings_field(
+            'einsatzvw_compatibility_fontawesome',
+            __('Font Awesome', 'einsatzverwaltung'),
+            array($this, 'echoFieldFontAwesome'),
+            $this->settingsApiPage,
+            'einsatzvw_settings_advanced_compatibility'
+        );
     }
 
     public function addSettingsSections()
@@ -109,6 +116,12 @@ class Advanced extends SubPage
         add_settings_section(
             'einsatzvw_settings_advreport',
             __('Incident Reports', 'einsatzverwaltung'),
+            null,
+            $this->settingsApiPage
+        );
+        add_settings_section(
+            'einsatzvw_settings_advanced_compatibility',
+            __('Compatibility', 'einsatzverwaltung'),
             null,
             $this->settingsApiPage
         );
@@ -170,6 +183,20 @@ class Advanced extends SubPage
         printf(
             '<p class="description">%s</p>',
             __('You can activate these features of Posts also for Incident Reports.', 'einsatzverwaltung')
+        );
+        echo '</fieldset>';
+    }
+
+    public function echoFieldFontAwesome()
+    {
+        echo '<fieldset>';
+        $this->echoSettingsCheckbox(
+            'einsatzvw_disable_fontawesome',
+            __('Disable Font Awesome', 'einsatzverwaltung')
+        );
+        printf(
+            '<p class="description">%s</p>',
+            esc_html__('If the icons are not shown correctly, there may be a collision with another installed version of Font Awesome. You can try and deactivate this plugin\'s version. This will not affect the admin area.', 'einsatzverwaltung')
         );
         echo '</fieldset>';
     }
@@ -263,6 +290,11 @@ class Advanced extends SubPage
         register_setting(
             'einsatzvw_settings_advanced',
             'einsatz_disable_blockeditor',
+            array(Utilities::class, 'sanitizeCheckbox')
+        );
+        register_setting(
+            'einsatzvw_settings_advanced',
+            'einsatzvw_disable_fontawesome',
             array(Utilities::class, 'sanitizeCheckbox')
         );
     }

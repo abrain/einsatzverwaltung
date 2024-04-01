@@ -70,18 +70,21 @@ class Frontend
      */
     public function enqueueStyleAndScripts()
     {
-        wp_enqueue_style(
-            'font-awesome',
-            Core::$pluginUrl . 'font-awesome/css/fontawesome.min.css',
-            false,
-            '6.2.1'
-        );
-        wp_enqueue_style(
-            'font-awesome-solid',
-            Core::$pluginUrl . 'font-awesome/css/solid.min.css',
-            array('font-awesome'),
-            '6.2.1'
-        );
+        if (get_option('einsatzvw_disable_fontawesome') !== '1') {
+            wp_enqueue_style(
+                'einsatzverwaltung-font-awesome',
+                Core::$pluginUrl . 'font-awesome/css/fontawesome.min.css',
+                false,
+                '6.2.1'
+            );
+            wp_enqueue_style(
+                'einsatzverwaltung-font-awesome-solid',
+                Core::$pluginUrl . 'font-awesome/css/solid.min.css',
+                array('einsatzverwaltung-font-awesome'),
+                '6.2.1'
+            );
+        }
+
         wp_enqueue_style(
             'einsatzverwaltung-frontend',
             Core::$styleUrl . 'style-frontend.css',

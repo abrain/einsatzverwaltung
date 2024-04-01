@@ -129,6 +129,10 @@ class Update
         if ($currentDbVersion < 72 && $targetDbVersion >= 72) {
             $this->upgrade1102();
         }
+
+        if ($currentDbVersion < 80 && $targetDbVersion >= 80) {
+            $this->upgrade1111();
+        }
     }
 
     /**
@@ -667,6 +671,16 @@ class Update
             add_post_meta($post->ID, 'einsatz_special', 0, true);
         }
         update_option('einsatzvw_db_version', 72);
+    }
+
+    /**
+     * @since 1.11.1
+     */
+    public function upgrade1111()
+    {
+        add_option('einsatzvw_disable_fontawesome', '0');
+
+        update_option('einsatzvw_db_version', 80);
     }
 
     /**

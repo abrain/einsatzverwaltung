@@ -108,7 +108,7 @@ class ReportInsertObject
     /**
      * @return int
      */
-    public function geteinsatz_mannschaft(): int
+    public function getEinsatzMannschaft(): int
     {
         return $this->einsatz_mannschaft;
     }
@@ -172,7 +172,7 @@ class ReportInsertObject
     /**
      * @param string[] $einsatz_mannschaft
      */
-    public function seteinsatz_mannschaft(int $einsatz_mannschaft): void
+    public function setEinsatzMannschaft(int $einsatz_mannschaft): void
     {
         $this->einsatz_mannschaft = $einsatz_mannschaft;
     }

@@ -131,7 +131,7 @@ class ReportQuery
         $metaQuery = [];
 
         if ($this->onlySpecialReports) {
-            $metaQuery[] = ['key' => 'einsatz_special', 'value' => '1'];
+            $metaQuery[] = ['key' => 'einsatz_hasimages', 'value' => '1'];
         }
 
         if (!empty($this->onlyReportStatus)) {

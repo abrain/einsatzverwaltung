@@ -67,7 +67,7 @@ class Reports extends WP_REST_Controller
                         'description' => __('The content of the report. No HTML allowed, but line breaks are preserved.', 'einsatzverwaltung'),
                         'type' => 'string',
                         'validate_callback' => array($this, 'validateIsString'),
-                        'sanitize_callback' => 'sanitize_textarea_field',
+                        'sanitize_callback' => 'wp_kses_post',
                         'required' => false,
                     ),
                     'keyword' => array(
@@ -98,6 +98,12 @@ class Reports extends WP_REST_Controller
                         'type' => 'string',
                         'validate_callback' => array($this, 'validateIsString'),
                         'sanitize_callback' => 'sanitize_text_field',
+                        'required' => false,
+                    ),
+                    'workforce' => array(
+                        'description' => __('The workforce to be displayed in the report. Only integer values are allowed.', 'einsatzverwaltung'),
+                        'type' => 'integer',
+                        'validate_callback' => array($this, 'validateIsInt'),
                         'required' => false,
                     ),
                 ),
@@ -140,6 +146,11 @@ class Reports extends WP_REST_Controller
         if (array_key_exists('resources', $params) && !empty($params['resources'])) {
             $resources = explode(',', $params['resources']);
             $importObject->setResources(array_map('trim', $resources));
+        }
+
+        // Process optional parameter workforce
+        if (array_key_exists('workforce', $params) && !empty($params['workforce'])) {
+            $importObject->setWorkforce($params['workforce']);
         }
 
         // Add post to database
@@ -200,6 +211,11 @@ class Reports extends WP_REST_Controller
     public function validateIsString($value, WP_REST_Request $request, string $key): bool
     {
         return is_string($value);
+    }
+
+    public function validateIsInt($value, WP_REST_Request $request, string $key): bool
+    {
+        return is_int($value);
     }
 
     /**

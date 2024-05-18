@@ -34,6 +34,12 @@ class ReportInsertObject
     private $resources;
 
     /**
+     * @var int
+     */
+    private $workforce;
+
+
+    /**
      * @var DateTimeImmutable
      */
     private $startDateTime;
@@ -101,6 +107,14 @@ class ReportInsertObject
     }
 
     /**
+     * @return int
+     */
+    public function getWorkforce(): int
+    {
+        return $this->workforce;
+    }
+
+    /**
      * @return DateTimeImmutable
      */
     public function getStartDateTime(): DateTimeImmutable
@@ -154,5 +168,13 @@ class ReportInsertObject
     public function setResources(array $resources): void
     {
         $this->resources = $resources;
+    }
+
+    /**
+     * @param string[] $workforce
+     */
+    public function setWorkforce(int $workforce): void
+    {
+        $this->workforce = $workforce;
     }
 }

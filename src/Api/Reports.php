@@ -100,6 +100,12 @@ class Reports extends WP_REST_Controller
                         'sanitize_callback' => 'sanitize_text_field',
                         'required' => false,
                     ),
+                    'einsatz_mannschaft' => array(
+                        'description' => __('The einsatz_mannschaft to be displayed in the report. Only integer values are allowed.', 'einsatzverwaltung'),
+                        'type' => 'integer',
+                        'validate_callback' => array($this, 'validateIsInt'),
+                        'required' => false,
+                    ),
                 ),
             ),
         ));
@@ -142,6 +148,11 @@ class Reports extends WP_REST_Controller
             $importObject->setResources(array_map('trim', $resources));
         }
 
+        // Process optional parameter einsatz_mannschaft
+        if (array_key_exists('einsatz_mannschaft', $params) && !empty($params['einsatz_mannschaft'])) {
+            $importObject->seteinsatz_mannschaft($params['einsatz_mannschaft']);
+        }
+        
         // Add post to database
         $publishReport = array_key_exists('publish', $params) && $params['publish'] === true;
         $reportInserter = new ReportInserter($publishReport);
@@ -200,6 +211,23 @@ class Reports extends WP_REST_Controller
     public function validateIsString($value, WP_REST_Request $request, string $key): bool
     {
         return is_string($value);
+    }
+
+    /**
+     * Validates if the passed parameter value is a int
+     *
+     * @param mixed $value
+     * @param WP_REST_Request $request
+     * @param string $key
+     *
+     * @return bool
+     *
+     * @noinspection PhpUnusedParameterInspection
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    public function validateIsInt($value, WP_REST_Request $request, string $key): bool
+    {
+        return is_int($value);
     }
 
     /**

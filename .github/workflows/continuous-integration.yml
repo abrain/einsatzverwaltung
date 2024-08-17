@@ -14,10 +14,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@2.31.1
+        uses: shivammathur/setup-php@c541c155eee45413f5b09a52248675b1a2575231 # 2.31.1
         with:
           php-version: '8.3'
           coverage: none
@@ -27,7 +27,7 @@ jobs:
 
       - name: Cache Composer packages
         id: composer-cache
-        uses: actions/cache@v3
+        uses: actions/cache@e12d46a63a90f2fae62d114769bbf2a179198b5c # v3
         with:
           path: vendor
           key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
@@ -47,7 +47,7 @@ jobs:
 
     services:
       mysql:
-        image: mariadb:10.11.9
+        image: mariadb:10.11.9@sha256:5e07c0d90fe1421e9b0b0114a7236eb519fdd873679bdb2ecc771d3c226c1f4e
         env:
           MARIADB_USER: wptestuser
           MARIADB_PASSWORD: wptestpass
@@ -59,10 +59,10 @@ jobs:
         options: --health-cmd="mariadb-admin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@2.31.1
+        uses: shivammathur/setup-php@c541c155eee45413f5b09a52248675b1a2575231 # 2.31.1
         with:
           php-version: '8.3'
           coverage: xdebug
@@ -70,7 +70,7 @@ jobs:
 
       - name: Cache Composer packages
         id: composer-cache
-        uses: actions/cache@v3
+        uses: actions/cache@e12d46a63a90f2fae62d114769bbf2a179198b5c # v3
         with:
           path: vendor
           key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
@@ -90,7 +90,7 @@ jobs:
         run: composer exec phpunit -- -c phpunit-integration.xml
 
       - name: Upload code coverage to Code Climate
-        uses: paambaati/codeclimate-action@v8.0.0
+        uses: paambaati/codeclimate-action@7c100bd1ed15de0bdee476b38ca759d8c94207b5 # v8.0.0
         env:
           CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
         with:
@@ -99,7 +99,7 @@ jobs:
             ${{github.workspace}}/build/logs/clover-integration.xml:clover
 
       - name: Upload code coverage to Codecov (unit)
-        uses: codecov/codecov-action@v4.5.0
+        uses: codecov/codecov-action@e28ff129e5465c2c0dcc6f003fc735cb6ae0c673 # v4.5.0
         with:
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -108,7 +108,7 @@ jobs:
           flags: unit
 
       - name: Upload code coverage to Codecov (integration)
-        uses: codecov/codecov-action@v4.5.0
+        uses: codecov/codecov-action@e28ff129e5465c2c0dcc6f003fc735cb6ae0c673 # v4.5.0
         with:
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -124,7 +124,7 @@ jobs:
 
     services:
       mysql:
-        image: mariadb:10.11.9
+        image: mariadb:10.11.9@sha256:5e07c0d90fe1421e9b0b0114a7236eb519fdd873679bdb2ecc771d3c226c1f4e
         env:
           MARIADB_USER: wptestuser
           MARIADB_PASSWORD: wptestpass
@@ -136,11 +136,11 @@ jobs:
         options: --health-cmd="mariadb-admin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
 
       - name: Setup PHP
         id: setup-minimum-php
-        uses: shivammathur/setup-php@2.31.1
+        uses: shivammathur/setup-php@c541c155eee45413f5b09a52248675b1a2575231 # 2.31.1
         with:
           php-version: '7.4'
           coverage: none

@@ -13,8 +13,12 @@
   ],
   "packageRules": [
     {
-      "matchDepNames": ["php"],
-      "depTypeList": [ "require" ],
+      "matchDepNames": [
+        "php"
+      ],
+      "matchDepTypes": [
+        "require"
+      ],
       "rangeStrategy": "widen"
     }
   ]

@@ -145,7 +145,9 @@ jobs:
           extensions: mysqli
 
       - name: Downgrade PHPUnit
-        run: composer require --dev --update-with-all-dependencies --no-install --ignore-platform-req=php "phpunit/phpunit:^7.5" "mockery/mockery:1.3.6" "sebastian/comparator:^3.0"
+        run: |
+          composer require --no-install "php:>=7.4.0"
+          composer require --dev --update-with-all-dependencies --no-install "phpunit/phpunit:^7.5" "mockery/mockery:1.3.6" "sebastian/comparator:^3.0"
 
       - name: Cache Composer packages
         id: composer-cache

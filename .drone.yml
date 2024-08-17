@@ -25,7 +25,7 @@ steps:
     commands:
       - composer install
   - name: check-php-compatibility
-    image: php:8.3.9-cli-bullseye
+    image: php:8.3.10-cli-bullseye
     commands:
       - ./vendor/bin/phpcs
 
@@ -47,7 +47,7 @@ depends_on:
 
 services:
   - name: database
-    image: mariadb:10.11.8
+    image: mariadb:10.11.9
     pull: always
     environment:
       MARIADB_ROOT_PASSWORD: wptestroot
@@ -59,7 +59,7 @@ steps:
     commands:
       - composer install
   - name: unit-tests
-    image: php:8.3.9-cli-bullseye
+    image: php:8.3.10-cli-bullseye
     environment:
       CC_TEST_REPORTER_ID:
         from_secret: cc_test_reporter_id
@@ -72,7 +72,7 @@ steps:
       - ./cc-test-reporter before-build
       - XDEBUG_MODE=coverage ./vendor/bin/phpunit -c phpunit.xml
   - name: integration-tests-latest
-    image: php:8.3.9-cli-bullseye
+    image: php:8.3.10-cli-bullseye
     environment:
       CC_TEST_REPORTER_ID:
         from_secret: cc_test_reporter_id
@@ -131,6 +131,6 @@ trigger:
     - tag
 ---
 kind: signature
-hmac: c44edd35989ac388cf2a2b43d35c6554937d80b4bdaa3b52eb052814101c9dba
+hmac: dcaa3cfdc7c170af63420af1609cee21238746915e82c939bf7e9ded5df97467
 
 ...

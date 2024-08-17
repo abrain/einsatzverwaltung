@@ -103,7 +103,7 @@ jobs:
         with:
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
-          directory: ${{github.workspace}}/build/logs/clover.xml
+          file: ${{github.workspace}}/build/logs/clover.xml
           flags: unit
 
       - name: Upload code coverage to Codecov (integration)
@@ -111,7 +111,7 @@ jobs:
         with:
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
-          directory: ${{github.workspace}}/build/logs/clover-integration.xml
+          file: ${{github.workspace}}/build/logs/clover-integration.xml
           flags: integration
 
 

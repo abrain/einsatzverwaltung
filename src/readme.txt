@@ -3,9 +3,9 @@ Contributors: abrain
 Donate link: https://einsatzverwaltung.org/unterstuetzen/
 Tags: Feuerwehr, fire department, EMS
 Requires at least: 5.6.0
-Tested up to: 6.5
+Tested up to: 6.6
 Requires PHP: 7.1.0
-Stable tag: 1.11.1
+Stable tag: 1.11.2
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 

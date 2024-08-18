@@ -38,7 +38,7 @@
     "friendsofphp/php-cs-fixer": "2.19.3",
     "php-cs-fixer/phpunit-constraint-isidenticalstring": "1.5.0",
     "php-cs-fixer/phpunit-constraint-xmlmatchesxsd": "1.5.0",
-    "sebastian/comparator": "4.0.8",
+    "sebastian/comparator": "6.0.2",
     "phpcompatibility/php-compatibility": "9.3.5",
     "yoast/phpunit-polyfills": "1.1.1",
     "phpcompatibility/phpcompatibility-wp": "2.1.5",

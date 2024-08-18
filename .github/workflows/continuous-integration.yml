@@ -145,9 +145,11 @@ jobs:
           php-version: '7.1'
           coverage: none
           extensions: mysqli
-          tools: phpunit:6, yoast/phpunit-polyfills:1.1.1, brain/monkey:2.6.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install minimal test requirements
+        run: |
+          rm composer.json composer.lock
+          composer require --dev --no-progress "phpunit/phpunit:^6" "yoast/phpunit-polyfills:1.1.1" "brain/monkey:2.6.1"
 
       - name: Set up integration test
         run: ./bin/install-wp-tests.sh wptest_minimum wptestuser wptestpass 127.0.0.1:${{ job.services.mysql.ports['3306'] }} 5.6 true

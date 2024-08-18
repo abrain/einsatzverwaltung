@@ -13,6 +13,12 @@
     border-bottom: 2px solid #ddd;
 }
 
+.einsatzverwaltung-reportlist .einsatz-column-number,
+.einsatzverwaltung-reportlist .einsatz-column-date,
+.einsatzverwaltung-reportlist .einsatz-column-time {
+    white-space: nowrap;
+}
+
 .einsatzverwaltung-reportlist .zebracorrection {
     visibility: hidden;
     display: none;

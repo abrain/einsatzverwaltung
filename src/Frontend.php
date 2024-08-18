@@ -63,6 +63,14 @@ class Frontend
         add_filter('the_excerpt_embed', array($this, 'filterEinsatzExcerpt'));
         add_action('pre_get_posts', array($this, 'addReportsToQuery'));
         add_filter('default_post_metadata', array($this, 'filterDefaultThumbnail'), 10, 3);
+
+        // Adjustment for Avada theme
+        add_action('awb_remove_third_party_the_content_changes', function () {
+            remove_filter('the_content', array($this, 'renderContent'), 9);
+        }, 5);
+        add_action('awb_readd_third_party_the_content_changes', function () {
+            add_filter('the_content', array($this, 'renderContent'), 9);
+        }, 99);
     }
 
     /**
@@ -70,18 +78,21 @@ class Frontend
      */
     public function enqueueStyleAndScripts()
     {
-        wp_enqueue_style(
-            'font-awesome',
-            Core::$pluginUrl . 'font-awesome/css/fontawesome.min.css',
-            false,
-            '6.2.1'
-        );
-        wp_enqueue_style(
-            'font-awesome-solid',
-            Core::$pluginUrl . 'font-awesome/css/solid.min.css',
-            array('font-awesome'),
-            '6.2.1'
-        );
+        if (get_option('einsatzvw_disable_fontawesome') !== '1') {
+            wp_enqueue_style(
+                'einsatzverwaltung-font-awesome',
+                Core::$pluginUrl . 'font-awesome/css/fontawesome.min.css',
+                false,
+                '6.2.1'
+            );
+            wp_enqueue_style(
+                'einsatzverwaltung-font-awesome-solid',
+                Core::$pluginUrl . 'font-awesome/css/solid.min.css',
+                array('einsatzverwaltung-font-awesome'),
+                '6.2.1'
+            );
+        }
+
         wp_enqueue_style(
             'einsatzverwaltung-frontend',
             Core::$styleUrl . 'style-frontend.css',

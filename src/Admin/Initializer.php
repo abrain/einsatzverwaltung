@@ -133,21 +133,21 @@ class Initializer
         }
 
         wp_enqueue_style(
-            'font-awesome',
+            'einsatzverwaltung-font-awesome',
             Core::$pluginUrl . 'font-awesome/css/fontawesome.min.css',
             false,
             '6.2.1'
         );
         wp_enqueue_style(
-            'font-awesome-solid',
+            'einsatzverwaltung-font-awesome-solid',
             Core::$pluginUrl . 'font-awesome/css/solid.min.css',
-            array('font-awesome'),
+            array('einsatzverwaltung-font-awesome'),
             '6.2.1'
         );
         wp_enqueue_style(
-            'font-awesome-brands',
+            'einsatzverwaltung-font-awesome-brands',
             Core::$pluginUrl . 'font-awesome/css/brands.min.css',
-            array('font-awesome'),
+            array('einsatzverwaltung-font-awesome'),
             '6.2.1'
         );
         wp_enqueue_style(

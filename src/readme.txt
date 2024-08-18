@@ -30,7 +30,7 @@ Uses Font Awesome by Dave Gandy - http://fontawesome.io
 
 == Installation ==
 
-The plugin does not require any setup but it is recommended to take a look at the settings before you start publishing. Especially those in the Advanced section should not be changed inconsiderately later on.
+The plugin does not require any setup, but it is recommended to take a look at the settings before you start publishing. Especially those in the Advanced section should not be changed inconsiderately later on.
 
 == Frequently Asked Questions ==
 
@@ -51,6 +51,10 @@ Ideally, you check the issues on [GitHub](https://github.com/abrain/einsatzverwa
 Yes, you can find them on [our website](https://einsatzverwaltung.org/faq/).
 
 == Changelog ==
+
+= 1.11.2 =
+* Fix: Content was duplicated when using the Avada Website Builder
+* Fix: Prevent linebreaks for certain columns of the report list
 
 = 1.11.1 =
 * Reduce collisions with other occurrences of Font Awesome
@@ -79,6 +83,9 @@ Yes, you can find them on [our website](https://einsatzverwaltung.org/faq/).
 * Fix: Changing the category setting for incident reports caused an error on fresh installations
 
 == Upgrade Notice ==
+= 1.11.2 =
+Maintenance Release
+
 = 1.11.1 =
 Maintenance Release
 

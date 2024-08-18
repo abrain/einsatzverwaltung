@@ -1,0 +1,158 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [ "develop", "master" ]
+  pull_request:
+    branches: [ "develop", "master" ]
+
+permissions:
+  contents: read
+
+jobs:
+  compliance:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@c541c155eee45413f5b09a52248675b1a2575231 # 2.31.1
+        with:
+          php-version: '8.3'
+          coverage: none
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate --strict
+
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Check style and compatibility
+        run: composer exec phpcs
+
+  test-latest:
+    runs-on: ubuntu-latest
+    needs:
+      - compliance
+
+    services:
+      mysql:
+        image: mariadb:11.5.2@sha256:4b812bbd9a025569fbe5a7a70e4a3cd3af53aa36621fecb1c2e108af2113450a
+        env:
+          MARIADB_USER: wptestuser
+          MARIADB_PASSWORD: wptestpass
+          MARIADB_ROOT_PASSWORD: wptestroot
+          MARIADB_DATABASE: wptest_latest
+          TZ: Europe/Berlin
+        ports:
+          - 3306/tcp
+        options: --health-cmd="mariadb-admin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@c541c155eee45413f5b09a52248675b1a2575231 # 2.31.1
+        with:
+          php-version: '8.3'
+          coverage: xdebug
+          extensions: mysqli
+
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Run unit tests
+        run: composer exec phpunit
+
+      - name: Set up integration test
+        run: ./bin/install-wp-tests.sh wptest_latest wptestuser wptestpass 127.0.0.1:${{ job.services.mysql.ports['3306'] }} latest true
+
+      - name: Run integration tests
+        run: composer exec phpunit -- -c phpunit-integration.xml
+
+      - name: Upload code coverage to Code Climate
+        uses: paambaati/codeclimate-action@7c100bd1ed15de0bdee476b38ca759d8c94207b5 # v8.0.0
+        env:
+          CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
+        with:
+          coverageLocations: |
+            ${{github.workspace}}/build/logs/clover.xml:clover
+            ${{github.workspace}}/build/logs/clover-integration.xml:clover
+
+      - name: Upload code coverage to Codecov (unit)
+        uses: codecov/codecov-action@e28ff129e5465c2c0dcc6f003fc735cb6ae0c673 # v4.5.0
+        with:
+          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+          disable_search: true
+          file: ${{github.workspace}}/build/logs/clover.xml
+          flags: unit
+
+      - name: Upload code coverage to Codecov (integration)
+        uses: codecov/codecov-action@e28ff129e5465c2c0dcc6f003fc735cb6ae0c673 # v4.5.0
+        with:
+          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+          disable_search: true
+          file: ${{github.workspace}}/build/logs/clover-integration.xml
+          flags: integration
+
+
+  test-minimum:
+    runs-on: ubuntu-latest
+    needs:
+      - compliance
+
+    services:
+      mysql:
+        image: mariadb:11.5.2@sha256:4b812bbd9a025569fbe5a7a70e4a3cd3af53aa36621fecb1c2e108af2113450a
+        env:
+          MARIADB_USER: wptestuser
+          MARIADB_PASSWORD: wptestpass
+          MARIADB_ROOT_PASSWORD: wptestroot
+          MARIADB_DATABASE: wptest_minimum
+          TZ: Europe/Berlin
+        ports:
+          - 3306/tcp
+        options: --health-cmd="mariadb-admin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+
+      - name: Setup PHP
+        id: setup-minimum-php
+        uses: shivammathur/setup-php@c541c155eee45413f5b09a52248675b1a2575231 # 2.31.1
+        with:
+          php-version: '7.1'
+          coverage: none
+          extensions: mysqli
+
+      - name: Install minimal test requirements
+        run: |
+          rm composer.json composer.lock
+          composer require --dev --no-progress "phpunit/phpunit:^6" "yoast/phpunit-polyfills:1.1.1" "brain/monkey:2.6.1"
+
+      - name: Set up integration test
+        run: ./bin/install-wp-tests.sh wptest_minimum wptestuser wptestpass 127.0.0.1:${{ job.services.mysql.ports['3306'] }} 5.6 true
+
+      - name: Run integration tests
+        run: composer exec phpunit -- -c phpunit-integration.xml --no-coverage

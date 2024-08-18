@@ -38,6 +38,7 @@
     </rule>
 
     <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+        <exclude-pattern>tests/</exclude-pattern>
         <properties>
             <property name="prefixes" type="array">
                 <element value="einsatzverwaltung"/>

@@ -63,6 +63,14 @@ class Frontend
         add_filter('the_excerpt_embed', array($this, 'filterEinsatzExcerpt'));
         add_action('pre_get_posts', array($this, 'addReportsToQuery'));
         add_filter('default_post_metadata', array($this, 'filterDefaultThumbnail'), 10, 3);
+
+        // Adjustment for Avada theme
+        add_action('awb_remove_third_party_the_content_changes', function () {
+            remove_filter('the_content', array($this, 'renderContent'), 9);
+        }, 5);
+        add_action('awb_readd_third_party_the_content_changes', function () {
+            add_filter('the_content', array($this, 'renderContent'), 9);
+        }, 99);
     }
 
     /**

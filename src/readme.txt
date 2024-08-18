@@ -3,9 +3,9 @@ Contributors: abrain
 Donate link: https://einsatzverwaltung.org/unterstuetzen/
 Tags: Feuerwehr, fire department, EMS
 Requires at least: 5.6.0
-Tested up to: 6.5
+Tested up to: 6.6
 Requires PHP: 7.1.0
-Stable tag: 1.11.1
+Stable tag: 1.11.2
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -30,7 +30,7 @@ Uses Font Awesome by Dave Gandy - http://fontawesome.io
 
 == Installation ==
 
-The plugin does not require any setup but it is recommended to take a look at the settings before you start publishing. Especially those in the Advanced section should not be changed inconsiderately later on.
+The plugin does not require any setup, but it is recommended to take a look at the settings before you start publishing. Especially those in the Advanced section should not be changed inconsiderately later on.
 
 == Frequently Asked Questions ==
 
@@ -51,6 +51,10 @@ Ideally, you check the issues on [GitHub](https://github.com/abrain/einsatzverwa
 Yes, you can find them on [our website](https://einsatzverwaltung.org/faq/).
 
 == Changelog ==
+
+= 1.11.2 =
+* Fix: Content was duplicated when using the Avada Website Builder
+* Fix: Prevent linebreaks for certain columns of the report list
 
 = 1.11.1 =
 * Reduce collisions with other occurrences of Font Awesome
@@ -79,6 +83,9 @@ Yes, you can find them on [our website](https://einsatzverwaltung.org/faq/).
 * Fix: Changing the category setting for incident reports caused an error on fresh installations
 
 == Upgrade Notice ==
+= 1.11.2 =
+Maintenance Release
+
 = 1.11.1 =
 Maintenance Release
 

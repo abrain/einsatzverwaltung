@@ -55,6 +55,7 @@ class WpEinsatz extends AbstractSource
         }
         if (!empty($this->problematicFields)) {
             throw new ImportCheckException(sprintf(
+                // translators: 1: comma-separated list of field names
                 __('One or more fields have a special character in their name. This can become a problem during the import. Please rename the following fields in the settings of wp-einsatz: %s', 'einsatzverwaltung'),
                 esc_html(join(', ', $this->problematicFields))
             ));

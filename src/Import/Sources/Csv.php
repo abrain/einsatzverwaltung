@@ -188,6 +188,7 @@ class Csv extends FileSource
         // If the first line does not contain the column names, return names like Coulumn 1, Column 2, ...
         if (!$this->fileHasHeadlines) {
             return array_map(function ($number) {
+                // translators: 1: column number
                 return sprintf(__('Column %d', 'einsatzverwaltung'), $number);
             }, range(1, count($fields)));
         }

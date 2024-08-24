@@ -57,6 +57,7 @@ class CsvReader
     {
         $handle = fopen($this->filePath, 'r');
         if ($handle === false) {
+            // translators: 1: file path
             $message = sprintf(__('Could not open file %s', 'einsatzverwaltung'), $this->filePath);
             throw new FileReadException($message);
         }

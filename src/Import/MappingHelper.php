@@ -41,6 +41,7 @@ class MappingHelper
             }
 
             if (!array_key_exists($ownField, $ownFields)) {
+                // translators: 1: field name
                 throw new ImportCheckException(sprintf(__('Unknown field: %s', 'einsatzverwaltung'), $ownField));
             }
 

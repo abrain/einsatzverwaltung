@@ -175,6 +175,7 @@ class Page extends AdminPage
         }
         $numberOfFields = count($fields);
         $this->printSuccess(sprintf(
+            // translators: 1: number of fields, 2: comma-separated list of field names
             _n('Found %1$d field: %2$s', 'Found %1$d fields: %2$s', $numberOfFields, 'einsatzverwaltung'),
             $numberOfFields,
             esc_html(implode(', ', $fields))
@@ -237,6 +238,7 @@ class Page extends AdminPage
         ));
 
         if (empty($attachments)) {
+            // translators: 1: MIME type
             $this->printInfo(sprintf(__('No files of type %s found.', 'einsatzverwaltung'), $mimeType));
             return;
         }

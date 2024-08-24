@@ -2,6 +2,7 @@
 namespace abrain\Einsatzverwaltung;
 
 use abrain\Einsatzverwaltung\Model\IncidentReport;
+use abrain\Einsatzverwaltung\Types\AlertingMethod;
 use abrain\Einsatzverwaltung\Types\Unit;
 use function count;
 use function in_array;
@@ -12,6 +13,11 @@ use function in_array;
  */
 class ReportQuery
 {
+    /**
+     * @var int[]
+     */
+    private $alertingMethodIds;
+
     /**
      * Beinhaltet Post-IDs, die nicht im Ergebnis auftauchen sollen
      *
@@ -197,6 +203,10 @@ class ReportQuery
     {
         $taxQuery = array();
 
+        if (!empty($this->alertingMethodIds)) {
+            $taxQuery[] = array('taxonomy' => AlertingMethod::getSlug(), 'terms' => $this->alertingMethodIds);
+        }
+
         if (!empty($this->incidentTypeIds)) {
             $taxQuery[] = array('taxonomy' => 'einsatzart', 'terms' => $this->incidentTypeIds);
         }
@@ -206,6 +216,14 @@ class ReportQuery
         }
 
         return $taxQuery;
+    }
+
+    /**
+     * @param int[] $alertingMethodIds
+     */
+    public function setAlertingMethodIds(array $alertingMethodIds): void
+    {
+        $this->alertingMethodIds = $alertingMethodIds;
     }
 
     /**

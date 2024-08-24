@@ -25,7 +25,6 @@ use function update_post_meta;
 use function wp_update_post;
 use function wp_verify_nonce;
 use const FILTER_SANITIZE_NUMBER_INT;
-use const FILTER_SANITIZE_STRING;
 use const INPUT_POST;
 
 /**
@@ -54,6 +53,18 @@ class Data
     public function __construct(Options $options)
     {
         $this->options = $options;
+    }
+
+    /**
+     * Register the actions and filters, that this class expects.
+     */
+    public function addHooks()
+    {
+        add_action('save_post_einsatz', array($this, 'savePostdata'), 10, 2);
+        add_action('private_einsatz', array($this, 'onPublish'), 10, 2);
+        add_action('publish_einsatz', array($this, 'onPublish'), 10, 2);
+        add_action('trash_einsatz', array($this, 'onTrash'), 10, 2);
+        add_action('transition_post_status', array($this, 'onTransitionPostStatus'), 10, 3);
     }
 
     /**
@@ -135,14 +146,14 @@ class Data
 
         // Einsatznummer setzen, sofern sie nicht automatisch verwaltet wird
         if (!ReportNumberController::isAutoIncidentNumbers()) {
-            $number = filter_input(INPUT_POST, 'einsatzverwaltung_nummer', FILTER_SANITIZE_STRING);
+            $number = filter_input(INPUT_POST, 'einsatzverwaltung_nummer');
             $updateArgs['meta_input']['einsatz_incidentNumber'] = $number;
         }
 
         // Einsatzdetails speichern
         $metaFields = array('einsatz_einsatzende', 'einsatz_einsatzort', 'einsatz_einsatzleiter', 'einsatz_mannschaft');
         foreach ($metaFields as $metaField) {
-            $value = filter_input(INPUT_POST, $metaField, FILTER_SANITIZE_STRING);
+            $value = filter_input(INPUT_POST, $metaField);
             $updateArgs['meta_input'][$metaField] = empty($value) ? '' : $value;
         }
 
@@ -154,12 +165,12 @@ class Data
         // Vermerke speichern (werden explizit deaktiviert, wenn sie nicht gesetzt wurden)
         $annotations = array('einsatz_fehlalarm', 'einsatz_hasimages', 'einsatz_special');
         foreach ($annotations as $annotation) {
-            $value = filter_input(INPUT_POST, $annotation, FILTER_SANITIZE_STRING);
+            $value = filter_input(INPUT_POST, $annotation);
             $updateArgs['meta_input'][$annotation] = empty($value) ? '0' : $value;
         }
 
         // Explicitly set an empty collection for a taxonomy if no values have been selected
-        $taxInput = (array)filter_input(INPUT_POST, 'tax_input', FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY);
+        $taxInput = (array)filter_input(INPUT_POST, 'tax_input', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY);
         foreach ([Vehicle::getSlug(), Unit::getSlug()] as $taxonomy) {
             if (!array_key_exists($taxonomy, $taxInput)) {
                 $updateArgs['tax_input'][$taxonomy] = [];

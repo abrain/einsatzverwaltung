@@ -9,24 +9,23 @@ use WP_REST_Response;
 use WP_Term;
 use function add_action;
 use function add_filter;
-use function esc_html;
-use function esc_url;
-use function get_permalink;
 use function get_term;
 use function get_term_meta;
 use function get_terms;
-use function get_the_title;
 use function is_numeric;
-use function sprintf;
 use function strcasecmp;
-use function url_to_postid;
 
 /**
  * Description of the custom taxonomy for units
  * @package abrain\Einsatzverwaltung\Types
  */
-class Unit implements CustomTaxonomy
+class Unit extends CustomTaxonomy
 {
+    public static function getInfoUrl(WP_Term $term): string
+    {
+        return parent::getInfoUrlForTerm($term, 'unit_exturl', 'unit_pid');
+    }
+
     /**
      * Comparison function for unis
      *
@@ -57,36 +56,6 @@ class Unit implements CustomTaxonomy
     }
 
     /**
-     * Retrieve the URL to more info about a given Unit. This can be a permalink to an internal page or an external URL.
-     *
-     * @param WP_Term $unit
-     *
-     * @return string A URL or an empty string
-     */
-    public static function getInfoUrl(WP_Term $unit): string
-    {
-        // The external URL takes precedence over an internal page
-        $extUrl = get_term_meta($unit->term_id, 'unit_exturl', true);
-        if (!empty($extUrl)) {
-            return $extUrl;
-        }
-
-        // Figure out if an internal page has been assigned
-        $pageid = get_term_meta($unit->term_id, 'unit_pid', true);
-        if (empty($pageid)) {
-            return '';
-        }
-
-        // Try to get the permalink of this page
-        $pageUrl = get_permalink($pageid);
-        if ($pageUrl === false) {
-            return '';
-        }
-
-        return $pageUrl;
-    }
-
-    /**
      * @return array
      */
     private function getLabels(): array
@@ -95,22 +64,22 @@ class Unit implements CustomTaxonomy
             'name' => _x('Units', 'taxonomy general name', 'einsatzverwaltung'),
             'singular_name' => _x('Unit', 'taxonomy singular name', 'einsatzverwaltung'),
             'search_items' => __('Search Units', 'einsatzverwaltung'),
-            'popular_items' => 'H&auml;ufig eingesetzte Einheiten',
-            'all_items' => 'Alle Einheiten',
+            'popular_items' => __('Popular Units', 'einsatzverwaltung'),
+            'all_items' => __('All Units', 'einsatzverwaltung'),
             'edit_item' => __('Edit Unit', 'einsatzverwaltung'),
             'view_item' => __('View Unit', 'einsatzverwaltung'),
-            'update_item' => 'Einheit aktualisieren',
+            'update_item' => __('Update Unit', 'einsatzverwaltung'),
             'add_new_item' => __('Add New Unit', 'einsatzverwaltung'),
-            'new_item_name' => 'Einheit hinzuf&uuml;gen',
-            'separate_items_with_commas' => 'Separate tags with commas',
-            'add_or_remove_items' => 'Add or remove tags',
-            'choose_from_most_used' => 'Choose from the most used tags',
+            'new_item_name' => __('New Unit Name', 'einsatzverwaltung'),
+            'separate_items_with_commas' => __('Separate units with commas', 'einsatzverwaltung'),
+            'add_or_remove_items' => __('Add or remove units', 'einsatzverwaltung'),
+            'choose_from_most_used' => __('Choose from the most used units', 'einsatzverwaltung'),
             'not_found' => __('No units found.', 'einsatzverwaltung'),
-            'no_terms' => 'Keine Einheiten',
+            'no_terms' => __('No units', 'einsatzverwaltung'),
             'items_list_navigation' => __('Units list navigation', 'einsatzverwaltung'),
             'items_list' => __('Units list', 'einsatzverwaltung'),
-            'most_used' => 'Most Used',
-            'back_to_items' => '&larr; Zur&uuml;ck zu den Einheiten',
+            'most_used' => _x('Most Used', 'units', 'einsatzverwaltung'),
+            'back_to_items' =>  __('&larr; Go to Units', 'einsatzverwaltung'),
         );
     }
 
@@ -182,7 +151,7 @@ class Unit implements CustomTaxonomy
         $customFields->add($this, new NumberInput(
             'unit_order',
             'Reihenfolge',
-            'Optionale Angabe, mit der die Anzeigereihenfolge der Einheiten beeinflusst werden kann. Einheiten mit der kleineren Zahl werden zuerst angezeigt, anschlie&szlig;end diejenigen ohne Angabe bzw. dem Wert 0. Haben mehrere Einheiten den gleichen Wert, werden sie in alphabetischer Reihenfolge ausgegeben.'
+            'Einheiten mit der kleineren Zahl werden zuerst angezeigt, anschlie&szlig;end diejenigen mit dem Wert 0. Bei gleichem Wert werden Einheiten in alphabetischer Reihenfolge ausgegeben.'
         ));
     }
 
@@ -239,25 +208,11 @@ class Unit implements CustomTaxonomy
     public function onTaxonomyColumnContent(string $content, string $columnName, int $termId): string
     {
         // We only want to change a specific column
-        if ($columnName !== 'unit_pid') {
-            return $content;
+        if ($columnName === 'unit_pid') {
+            $url = self::getInfoUrl(get_term($termId));
+            return empty($url) ? '' : self::getUrlColumnContent($url);
         }
 
-        $unit = get_term($termId);
-        $url = Unit::getInfoUrl($unit);
-        // If no info URL is set, there's nothing to do
-        if (empty($url)) {
-            return $content;
-        }
-
-        // Check if it is a local link after all so we can display the post title
-        $linkTitle = __('External URL', 'einsatzverwaltung');
-        $postId = url_to_postid($url);
-        if ($postId !== 0) {
-            $title = get_the_title($postId);
-            $linkTitle = empty($title) ? __('Internal URL', 'einsatzverwaltung') : $title;
-        }
-
-        return sprintf('<a href="%1$s">%2$s</a>', esc_url($url), esc_html($linkTitle));
+        return $content;
     }
 }

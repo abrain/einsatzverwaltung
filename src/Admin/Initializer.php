@@ -13,6 +13,8 @@ use abrain\Einsatzverwaltung\Types\Report;
 use abrain\Einsatzverwaltung\Utilities;
 use function add_filter;
 use function esc_html__;
+use function sprintf;
+use function wp_enqueue_style;
 
 /**
  * Bootstraps and registers all the things we can do in WordPress' admin area
@@ -30,7 +32,7 @@ class Initializer
      */
     public function __construct(Data $data, Options $options, Utilities $utilities, PermalinkController $permalinkController)
     {
-        $pluginBasename = plugin_basename(einsatzverwaltung_plugin_file());
+        $pluginBasename = Core::$pluginBasename;
         add_action('admin_menu', array($this, 'hideTaxonomies'));
         add_action('admin_notices', array($this, 'displayAdminNotices'));
         add_action('admin_enqueue_scripts', array($this, 'enqueueEditScripts'));
@@ -96,6 +98,11 @@ class Initializer
                 array('jquery', 'jquery-ui-autocomplete', 'wp-i18n'),
                 Core::VERSION
             );
+            wp_localize_script(
+                'einsatzverwaltung-edit-script',
+                'einsatzverwaltung_ajax_object',
+                array('ajax_url' => admin_url('admin-ajax.php'), 'nonce' => wp_create_nonce('einsatzverwaltung_used_values'))
+            );
             wp_set_script_translations('einsatzverwaltung-edit-script', 'einsatzverwaltung');
             wp_enqueue_style(
                 'einsatzverwaltung-edit',
@@ -113,10 +120,22 @@ class Initializer
         }
 
         wp_enqueue_style(
-            'font-awesome',
-            Core::$pluginUrl . 'font-awesome/css/font-awesome.min.css',
+            'einsatzverwaltung-font-awesome',
+            Core::$pluginUrl . 'font-awesome/css/fontawesome.min.css',
             false,
-            '4.7.0'
+            '6.2.1'
+        );
+        wp_enqueue_style(
+            'einsatzverwaltung-font-awesome-solid',
+            Core::$pluginUrl . 'font-awesome/css/solid.min.css',
+            array('einsatzverwaltung-font-awesome'),
+            '6.2.1'
+        );
+        wp_enqueue_style(
+            'einsatzverwaltung-font-awesome-brands',
+            Core::$pluginUrl . 'font-awesome/css/brands.min.css',
+            array('einsatzverwaltung-font-awesome'),
+            '6.2.1'
         );
         wp_enqueue_style(
             'einsatzverwaltung-admin',
@@ -146,6 +165,7 @@ class Initializer
         if (post_type_exists($postType)) {
             $postCounts = wp_count_posts($postType);
             $text = sprintf(
+                // translators: 1: number of reports
                 _n('%d Incident Report', '%d Incident Reports', intval($postCounts->publish), 'einsatzverwaltung'),
                 number_format_i18n($postCounts->publish)
             );
@@ -176,6 +196,11 @@ class Initializer
     public function pluginMetaLinks($links, $file): array
     {
         if (Core::$pluginBasename === $file) {
+            $links[] = sprintf(
+                '<a href="%1$s" target="_blank">%2$s</a>',
+                'https://www.paypal.com/donate?hosted_button_id=U7LCWUZ8E54JG',
+                esc_html__('Donate', 'einsatzverwaltung')
+            );
             $links[] = sprintf(
                 '<a href="%1$s">%2$s</a>',
                 admin_url('options-general.php?page=' . MainPage::EVW_SETTINGS_SLUG . '&tab=about'),

@@ -156,8 +156,62 @@ class UpdateTest extends UnitTestCase
      */
     public function testUpgrade1100ScheduleRoleUpdate()
     {
-        expect('update_option')->once()->with('einsatzverwaltung_update_roles', '1');
-        expect('update_option')->once()->with('einsatzvw_db_version', 70);
+        expect('add_option')->once()->with('einsatzvw_category', '-1');
+
+        expect('update_option')->once()->with(UserRightsManager::ROLE_UPDATE_OPTION, '1');
+        expect('get_editable_roles')->once()->andReturn([]);
+        expect('update_option')->once()->with('einsatzvw_db_version', 71);
         (new Update())->upgrade1100();
+    }
+
+    /**
+     * @throws ExpectationArgsRequired
+     */
+    public function testUpgrade1100AssignsUserRoles()
+    {
+        expect('add_option')->once()->with('einsatzvw_category', '-1');
+
+        expect('get_editable_roles')->once()->andReturn(['role1' => [], 'role4' => [], 'administrator' => []]);
+        expect('get_option')->once()->with('einsatzvw_cap_roles_role1', '0')->andReturn('0');
+        expect('get_option')->once()->with('einsatzvw_cap_roles_role4', '0')->andReturn('1');
+        expect('get_option')->never()->with('einsatzvw_cap_roles_administrator', '0');
+
+        $user1 = Mockery::mock('\WP_User');
+        $user2 = Mockery::mock('\WP_User');
+        expect('get_users')->once()->with(['role__in' => ['role4']])->andReturn([$user1, $user2]);
+        $user1->expects('add_role')->once()->with('einsatzverwaltung_reports_editor');
+        $user2->expects('add_role')->once()->with('einsatzverwaltung_reports_editor');
+
+        expect('update_option')->once()->with('einsatzvw_db_version', 71);
+        (new Update())->upgrade1100();
+    }
+
+    /**
+     * @throws ExpectationArgsRequired
+     */
+    public function testUpgrade1102Foo()
+    {
+        // Return some posts that are missing the 'special' postmeta
+        $post1 = Mockery::mock('\WP_Post');
+        $post1->ID = 2893;
+        $post2 = Mockery::mock('\WP_Post');
+        $post2->ID = 11280;
+        expect('get_posts')->once()->andReturn([$post1, $post2]);
+
+        expect('add_post_meta')->once()->with($post1->ID, 'einsatz_special', 0, true);
+        expect('add_post_meta')->once()->with($post2->ID, 'einsatz_special', 0, true);
+
+        expect('update_option')->once()->with('einsatzvw_db_version', 72);
+        (new Update())->upgrade1102();
+    }
+
+    /**
+     * @throws ExpectationArgsRequired
+     */
+    public function testUpgrade1111AddsOptionDefault()
+    {
+        expect('add_option')->once()->with('einsatzvw_disable_fontawesome', '0');
+        expect('update_option')->once()->with('einsatzvw_db_version', 80);
+        (new Update())->upgrade1111();
     }
 }

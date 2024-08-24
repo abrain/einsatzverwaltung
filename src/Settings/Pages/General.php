@@ -97,12 +97,12 @@ class General extends SubPage
      * Prüft, ob sich die Kategorie der Einsatzberichte ändert und veranlasst gegebenenfalls ein Erneuern der
      * Kategoriezuordnung
      *
-     * @param string $newValue Der neue Wert
-     * @param string $oldValue Der alte Wert
+     * @param mixed $newValue The new, unserialized option value.
+     * @param mixed $oldValue The old option value.
      *
      * @return string Der zu speichernde Wert
      */
-    public function maybeCategoryChanged(string $newValue, string $oldValue): string
+    public function maybeCategoryChanged($newValue, $oldValue): string
     {
         // Nur Änderungen sind interessant
         if ($newValue == $oldValue) {
@@ -114,7 +114,7 @@ class General extends SubPage
         $reports = $reportQuery->getReports();
 
         // Wenn zuvor eine Kategorie gesetzt war, müssen die Einsatzberichte aus dieser entfernt werden
-        if ($oldValue != -1) {
+        if (!empty($oldValue) && $oldValue != -1) {
             foreach ($reports as $report) {
                 Utilities::removePostFromCategory($report->getPostId(), $oldValue);
             }
@@ -137,12 +137,12 @@ class General extends SubPage
      * Prüft, ob sich die Beschränkung, nur als besonders markierte Einsatzberichte der Kategorie zuzuordnen, ändert
      * und veranlasst gegebenenfalls ein Erneuern der Kategoriezuordnung
      *
-     * @param string $newValue Der neue Wert
-     * @param string $oldValue Der alte Wert
+     * @param mixed $newValue The new, unserialized option value.
+     * @param mixed $oldValue The old option value.
      *
      * @return string Der zu speichernde Wert
      */
-    public function maybeCategorySpecialChanged(string $newValue, string $oldValue): string
+    public function maybeCategorySpecialChanged($newValue, $oldValue): string
     {
         // Nur Änderungen sind interessant
         if ($newValue == $oldValue) {

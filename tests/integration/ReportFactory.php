@@ -1,6 +1,7 @@
 <?php
 namespace abrain\Einsatzverwaltung;
 
+use WP_Error;
 use WP_UnitTest_Factory_For_Post;
 
 /**
@@ -40,9 +41,9 @@ class ReportFactory extends WP_UnitTest_Factory_For_Post
      * @param array|null $generation_definitions
      * @param callable|null $callbacks
      *
-     * @return array|\WP_Error
+     * @return array|WP_Error
      */
-    public function generate_args($args = array(), $generation_definitions = null, &$callbacks = null)
+    public function generate_args($args = array(), $generation_definitions = null, &$callbacks = null) // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps -- overridden method
     {
         $generatedArgs = parent::generate_args($args, $generation_definitions, $callbacks);
 
@@ -87,7 +88,7 @@ class ReportFactory extends WP_UnitTest_Factory_For_Post
         if ($count > 2) {
             $timestampDistance = ($lastDate - $firstDate) / ($count - 1);
             for ($i = 1; $i < $count - 1; $i++) {
-                $dates[] = date('Y-m-d H:i:s', $firstDate + $timestampDistance * $i);
+                $dates[] = date('Y-m-d H:i:s', $firstDate + floor($timestampDistance * $i));
             }
         }
 

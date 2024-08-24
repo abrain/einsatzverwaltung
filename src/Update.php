@@ -2,18 +2,25 @@
 namespace abrain\Einsatzverwaltung;
 
 use WP_Error;
+use WP_User;
+use function add_option;
+use function add_post_meta;
 use function add_term_meta;
 use function array_key_exists;
+use function array_keys;
 use function array_map;
 use function delete_option;
 use function delete_term_meta;
 use function error_log;
+use function function_exists;
+use function get_editable_roles;
 use function get_option;
 use function get_permalink;
 use function get_post_meta;
 use function get_post_type;
 use function get_posts;
 use function get_term_meta;
+use function get_users;
 use function is_array;
 use function is_wp_error;
 use function register_taxonomy;
@@ -23,6 +30,7 @@ use function update_option;
 use function update_term_meta;
 use function wp_insert_term;
 use function wp_schedule_single_event;
+use const ABSPATH;
 
 /**
  * Performs data structure and data migrations after a plugin upgrade
@@ -114,8 +122,16 @@ class Update
         // Unregister the taxonomy again, so it can be registered properly later
         unregister_taxonomy('evw_unit');
 
-        if ($currentDbVersion < 70 && $targetDbVersion >= 70) {
+        if ($currentDbVersion < 71 && $targetDbVersion >= 71) {
             $this->upgrade1100();
+        }
+
+        if ($currentDbVersion < 72 && $targetDbVersion >= 72) {
+            $this->upgrade1102();
+        }
+
+        if ($currentDbVersion < 80 && $targetDbVersion >= 80) {
+            $this->upgrade1111();
         }
     }
 
@@ -154,7 +170,19 @@ class Update
     {
         update_option('einsatzvw_cap_roles_administrator', 1);
         $roleObject = get_role('administrator');
-        foreach (UserRightsManager::$capabilities as $cap) {
+        $capabilities = array(
+            'edit_einsatzberichte',
+            'edit_private_einsatzberichte',
+            'edit_published_einsatzberichte',
+            'edit_others_einsatzberichte',
+            'publish_einsatzberichte',
+            'read_private_einsatzberichte',
+            'delete_einsatzberichte',
+            'delete_private_einsatzberichte',
+            'delete_published_einsatzberichte',
+            'delete_others_einsatzberichte'
+        );
+        foreach ($capabilities as $cap) {
             $roleObject->add_cap($cap);
         }
 
@@ -206,9 +234,21 @@ class Update
         }
         $roles = get_editable_roles();
         if (!empty($roles)) {
+            $capabilities = array(
+                'edit_einsatzberichte',
+                'edit_private_einsatzberichte',
+                'edit_published_einsatzberichte',
+                'edit_others_einsatzberichte',
+                'publish_einsatzberichte',
+                'read_private_einsatzberichte',
+                'delete_einsatzberichte',
+                'delete_private_einsatzberichte',
+                'delete_published_einsatzberichte',
+                'delete_others_einsatzberichte'
+            );
             foreach (array_keys($roles) as $roleSlug) {
                 $roleObject = get_role($roleSlug);
-                foreach (UserRightsManager::$capabilities as $cap) {
+                foreach ($capabilities as $cap) {
                     $roleObject->remove_cap($cap);
                 }
             }
@@ -245,8 +285,8 @@ class Update
             require_once(ABSPATH . 'wp-admin/includes/taxonomy.php');
         }
 
-        $categoryId = get_option('einsatzvw_category', -1);
-        if (category_exists($categoryId)) {
+        $categoryId = get_option('einsatzvw_category');
+        if ($categoryId && category_exists($categoryId)) {
             $posts = get_posts(array(
                 'post_type' => 'einsatz',
                 'post_status' => array('publish', 'private'),
@@ -571,16 +611,76 @@ class Update
     }
 
     /**
+     * - Adds missing default value for incicent report category setting
      * - Adds new user roles
+     * - Adds role with full permission to users which had those rights before
      *
      * @since 1.10.0
      */
     public function upgrade1100()
     {
-        // Set option that the user roles should be updated on the next init hook
-        update_option('einsatzverwaltung_update_roles', '1');
+        add_option('einsatzvw_category', '-1');
 
-        update_option('einsatzvw_db_version', 70);
+        // Get roles and check if they were allowed to edit reports before
+        if (!function_exists('get_editable_roles')) {
+            require_once(ABSPATH . 'wp-admin/includes/user.php');
+        }
+        $roles = get_editable_roles();
+        if (!empty($roles)) {
+            foreach (array_keys($roles) as $roleSlug) {
+                // The administrator role can be skipped
+                if ('administrator' === $roleSlug) {
+                    continue;
+                }
+
+                if (get_option("einsatzvw_cap_roles_{$roleSlug}", '0') === '1') {
+                    // Check for users with this previously allowed role and give them the new editor role as well
+                    $users = get_users(['role__in' => [$roleSlug]]); /** @var WP_User[] $users */
+                    foreach ($users as $user) {
+                        $user->add_role('einsatzverwaltung_reports_editor');
+                    }
+                }
+            }
+        }
+
+        // Set option that the user roles should be updated on the next init hook
+        update_option(UserRightsManager::ROLE_UPDATE_OPTION, '1');
+
+        update_option('einsatzvw_db_version', 71);
+    }
+
+    /**
+     * - Adds missing 'special' postmeta for reports that got created via the API
+     *
+     * @since 1.10.2
+     */
+    public function upgrade1102()
+    {
+        $postsWithoutPostmeta = get_posts([
+            'post_type' => 'einsatz',
+            'post_status' => ['publish', 'private', 'draft'],
+            'nopaging' => true,
+            'meta_query' => [
+                [
+                    'key' => 'einsatz_special',
+                    'compare' => 'NOT EXISTS'
+                ]
+            ]
+        ]);
+        foreach ($postsWithoutPostmeta as $post) {
+            add_post_meta($post->ID, 'einsatz_special', 0, true);
+        }
+        update_option('einsatzvw_db_version', 72);
+    }
+
+    /**
+     * @since 1.11.1
+     */
+    public function upgrade1111()
+    {
+        add_option('einsatzvw_disable_fontawesome', '0');
+
+        update_option('einsatzvw_db_version', 80);
     }
 
     /**

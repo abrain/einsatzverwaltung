@@ -3,8 +3,10 @@ namespace abrain\Einsatzverwaltung;
 
 use WP_UnitTestCase;
 use wpdb;
+use Yoast\PHPUnitPolyfills\Polyfills\AssertIsType;
 use function add_post_meta;
 use function array_map;
+use function delete_option;
 use function get_permalink;
 use function get_post_meta;
 use function get_term_meta;
@@ -22,12 +24,14 @@ use function wp_insert_post;
  */
 class UpgradeTest extends WP_UnitTestCase
 {
+    use AssertIsType;
+
     /**
      * @var Update
      */
     private $updater;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -117,9 +121,6 @@ class UpgradeTest extends WP_UnitTestCase
 
         update_option('einsatzvw_cap_roles_administrator', 0);
         $roleObject = get_role('administrator');
-        foreach ($capabilities as $cap) {
-            self::assertFalse($roleObject->has_cap($cap));
-        }
 
         $this->runUpgrade(1, 2);
 
@@ -153,7 +154,7 @@ class UpgradeTest extends WP_UnitTestCase
 
     public function testUpgrade100()
     {
-        self::assertFalse(get_option('einsatzvw_rewrite_slug'));
+        delete_option('einsatzvw_rewrite_slug');
         $this->runUpgrade(4, 5);
         self::assertEquals('einsaetze', get_option('einsatzvw_rewrite_slug'));
     }
@@ -359,7 +360,7 @@ class UpgradeTest extends WP_UnitTestCase
         self::assertEquals('7890', get_post_meta($reportId3, 'einsatz_incidentNumber', true));
 
         // Prüfe auf aktivierte Admin Notice
-        self::assertInternalType('array', get_option('einsatzverwaltung_admin_notices'));
+        self::assertIsArray(get_option('einsatzverwaltung_admin_notices'));
         self::assertContains('regenerateSlugs', get_option('einsatzverwaltung_admin_notices'));
     }
 
@@ -400,6 +401,7 @@ class UpgradeTest extends WP_UnitTestCase
 
     public function testUpgrade162()
     {
+        delete_option('einsatzverwaltung_report_contentifempty');
         update_option('einsatzverwaltung_use_reporttemplate', 'no');
         $this->runUpgrade(40, 41);
         $this->assertNotEmpty(get_option('einsatzverwaltung_report_contentifempty'));
@@ -407,6 +409,7 @@ class UpgradeTest extends WP_UnitTestCase
 
     public function testUpgrade162WithTemplate()
     {
+        delete_option('einsatzverwaltung_report_contentifempty');
         update_option('einsatzverwaltung_use_reporttemplate', 'singular');
         $this->runUpgrade(40, 41);
         $this->assertTrue('' === get_option('einsatzverwaltung_report_contentifempty'));

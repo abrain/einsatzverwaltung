@@ -128,3 +128,9 @@ body.edit-tags-php.post-type-einsatz.taxonomy-fahrzeug .form-wrap div.form-field
     display: none;
     visibility: hidden;
 }
+
+/* Media Selector preview collapses, but shows thumbnail size at max */
+[id^="img-evw-mediasel-"] {
+    max-width: 150px;
+    max-height: 150px;
+}

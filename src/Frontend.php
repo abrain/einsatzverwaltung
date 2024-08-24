@@ -3,6 +3,7 @@ namespace abrain\Einsatzverwaltung;
 
 use abrain\Einsatzverwaltung\Frontend\ReportList\Renderer as ReportListRenderer;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
+use abrain\Einsatzverwaltung\Types\IncidentType;
 use abrain\Einsatzverwaltung\Types\Report;
 use abrain\Einsatzverwaltung\Types\Unit;
 use abrain\Einsatzverwaltung\Types\Vehicle;
@@ -12,8 +13,12 @@ use WP_Query;
 use function add_filter;
 use function date_i18n;
 use function get_post_type;
+use function get_term_meta;
+use function get_the_terms;
 use function in_array;
+use function is_wp_error;
 use function sprintf;
+use function wp_enqueue_style;
 use function wp_kses;
 
 /**
@@ -41,10 +46,9 @@ class Frontend
     {
         $this->formatter = $formatter;
         $this->options = $options;
-        $this->addHooks();
     }
 
-    private function addHooks()
+    public function addHooks()
     {
         add_action('wp_enqueue_scripts', array($this, 'enqueueStyleAndScripts'));
         if (!(
@@ -58,6 +62,15 @@ class Frontend
         add_filter('the_excerpt_rss', array($this, 'filterEinsatzExcerpt'));
         add_filter('the_excerpt_embed', array($this, 'filterEinsatzExcerpt'));
         add_action('pre_get_posts', array($this, 'addReportsToQuery'));
+        add_filter('default_post_metadata', array($this, 'filterDefaultThumbnail'), 10, 3);
+
+        // Adjustment for Avada theme
+        add_action('awb_remove_third_party_the_content_changes', function () {
+            remove_filter('the_content', array($this, 'renderContent'), 9);
+        }, 5);
+        add_action('awb_readd_third_party_the_content_changes', function () {
+            add_filter('the_content', array($this, 'renderContent'), 9);
+        }, 99);
     }
 
     /**
@@ -65,12 +78,21 @@ class Frontend
      */
     public function enqueueStyleAndScripts()
     {
-        wp_enqueue_style(
-            'font-awesome',
-            Core::$pluginUrl . 'font-awesome/css/font-awesome.min.css',
-            false,
-            '4.7.0'
-        );
+        if (get_option('einsatzvw_disable_fontawesome') !== '1') {
+            wp_enqueue_style(
+                'einsatzverwaltung-font-awesome',
+                Core::$pluginUrl . 'font-awesome/css/fontawesome.min.css',
+                false,
+                '6.2.1'
+            );
+            wp_enqueue_style(
+                'einsatzverwaltung-font-awesome-solid',
+                Core::$pluginUrl . 'font-awesome/css/solid.min.css',
+                array('einsatzverwaltung-font-awesome'),
+                '6.2.1'
+            );
+        }
+
         wp_enqueue_style(
             'einsatzverwaltung-frontend',
             Core::$styleUrl . 'style-frontend.css',
@@ -117,7 +139,7 @@ class Frontend
         );
         $headerstring = $this->getDetailString(__('Date', 'einsatzverwaltung'), $dateAndTime);
 
-        $headerstring .= $this->getDetailString('Alarmierungsart', $this->formatter->getTypesOfAlerting($report));
+        $headerstring .= $this->getDetailString(__('Alerting method', 'einsatzverwaltung'), $this->formatter->getTypesOfAlerting($report, true));
         $headerstring .= $this->getDetailString(__('Duration', 'einsatzverwaltung'), $durationString);
         $headerstring .= $this->getDetailString(__('Incident Category', 'einsatzverwaltung'), $art);
         $headerstring .= $this->getDetailString(__('Location', 'einsatzverwaltung'), $report->getLocation());
@@ -354,5 +376,33 @@ class Frontend
                 $query->set('meta_query', $metaQuery);
             }
         }
+    }
+
+    /**
+     * Filters the default value of the thumbnail ID for incident reports. Is used to provide a fallback thumbnail,
+     * which is defined per incident type.
+     *
+     * @param mixed $value The default value to filter, probably null.
+     * @param int $postId ID of the object metadata is for.
+     * @param string $metaKey Metadata key.
+     *
+     * @return mixed
+     */
+    public function filterDefaultThumbnail($value, int $postId, string $metaKey)
+    {
+        // Only continue if this is about the thumbnail of an incident report
+        if ($metaKey !== '_thumbnail_id' || get_post_type($postId) !== Report::getSlug()) {
+            return $value;
+        }
+
+        // Check if an incident type has been assigned
+        $terms = get_the_terms($postId, IncidentType::getSlug());
+        if (empty($terms) || is_wp_error($terms)) {
+            return $value;
+        }
+
+        // Use the fallback thumbnail of the incident type, if set
+        $fallbackThumbId = get_term_meta($terms[0]->term_id, 'default_featured_image', true);
+        return empty($fallbackThumbId) ? $value : $fallbackThumbId;
     }
 }

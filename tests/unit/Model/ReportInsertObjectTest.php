@@ -74,6 +74,4 @@ class ReportInsertObjectTest extends UnitTestCase
         $importObject->setResources(['foo', 'bar']);
         $this->assertEqualSets(['foo', 'bar'], $importObject->getResources());
     }
-
-
 }

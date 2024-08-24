@@ -1,18 +1,22 @@
 <?php
 namespace abrain\Einsatzverwaltung\Types;
 
+use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\CustomFields\Checkbox;
 use abrain\Einsatzverwaltung\CustomFields\ColorPicker;
+use abrain\Einsatzverwaltung\CustomFields\MediaSelector;
 use abrain\Einsatzverwaltung\CustomFields\StringList;
 use abrain\Einsatzverwaltung\CustomFieldsRepository;
 use WP_REST_Response;
+use WP_Screen;
 use function __;
+use function add_filter;
 
 /**
  * Description of the custom taxonomy 'Type of incident'
  * @package abrain\Einsatzverwaltung\Types
  */
-class IncidentType implements CustomTaxonomy
+class IncidentType extends CustomTaxonomy
 {
     /**
      * @return string
@@ -36,6 +40,7 @@ class IncidentType implements CustomTaxonomy
                 'all_items' => __('All Incident Categories', 'einsatzverwaltung'),
                 'parent_item' => __('Parent Incident Category', 'einsatzverwaltung'),
                 'parent_item_colon' => __('Parent Incident Category:', 'einsatzverwaltung'),
+                'parent_field_description' => __('Assign a parent Incident Category to create a hierarchy.', 'einsatzverwaltung'),
                 'edit_item' => __('Edit Incident Category', 'einsatzverwaltung'),
                 'view_item' => __('View Incident Category', 'einsatzverwaltung'),
                 'update_item' => __('Update Incident Category', 'einsatzverwaltung'),
@@ -81,6 +86,11 @@ class IncidentType implements CustomTaxonomy
             __('Color', 'einsatzverwaltung'),
             'Ordne dieser Einsatzart eine Farbe zu. Einsatzarten ohne Farbe erben diese gegebenenfalls von übergeordneten Einsatzarten.'
         ));
+        $customFields->add($this, new MediaSelector(
+            'default_featured_image',
+            __('Default featured image', 'einsatzverwaltung'),
+            __('If a report in this Incident Category has no featured image, this image is shown instead.', 'einsatzverwaltung')
+        ));
         $customFields->add($this, new Checkbox(
             'outdated',
             __('Outdated', 'einsatzverwaltung'),
@@ -109,6 +119,27 @@ class IncidentType implements CustomTaxonomy
                 $response->data['visibility']['show_ui'] = false;
             }
             return $response;
+        }, 10, 2);
+
+        add_action('admin_enqueue_scripts', function () {
+            $screen = get_current_screen();
+            if ($screen === false) {
+                return;
+            }
+
+            // Enqueue the scripts to handle media upload and selection
+            if ($screen->taxonomy === self::getSlug() && in_array($screen->base, array('edit-tags', 'term'))) {
+                wp_enqueue_media();
+                wp_enqueue_script('einsatzverwaltung-media-selector', Core::$scriptUrl . 'media-selector.js');
+            }
+        });
+
+        add_filter('default_hidden_columns', function (array $hiddenColumns, WP_Screen $screen) {
+            if ($screen->taxonomy === self::getSlug()) {
+                $hiddenColumns[] = 'altname';
+                $hiddenColumns[] = 'default_featured_image';
+            }
+            return $hiddenColumns;
         }, 10, 2);
     }
 }

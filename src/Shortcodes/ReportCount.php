@@ -16,15 +16,6 @@ use function is_numeric;
 class ReportCount extends AbstractShortcode
 {
     /**
-     * @var array
-     */
-    private $defaultAttributes = array(
-        'status' => '',
-        'icategories' => '',
-        'units' => '',
-        'year' => ''
-    );
-    /**
      * @var ReportQuery
      */
     private $reportQuery;
@@ -36,6 +27,15 @@ class ReportCount extends AbstractShortcode
      */
     public function __construct(ReportQuery $reportQuery)
     {
+        parent::__construct([
+            'status' => '',
+            'icategories' => '',
+            'ignore_weights' => 'no',
+            'alertingmethods' => '',
+            'units' => '',
+            'year' => ''
+        ]);
+
         $this->reportQuery = $reportQuery;
     }
 
@@ -50,6 +50,11 @@ class ReportCount extends AbstractShortcode
         $this->reportQuery->resetQueryVars();
         if (is_int($year)) {
             $this->reportQuery->setYear(intval($year));
+        }
+
+        $alertingMethodIds = $this->getIntegerList($attributes['alertingmethods']);
+        if (!empty($alertingMethodIds)) {
+            $this->reportQuery->setAlertingMethodIds($alertingMethodIds);
         }
 
         $incidentCategoryIds = $this->getIntegerList($attributes['icategories']);
@@ -75,31 +80,29 @@ class ReportCount extends AbstractShortcode
         }
 
         $incidentReports = $this->reportQuery->getReports();
-        $reportCount = array_reduce($incidentReports, function ($sum, IncidentReport $report) {
-            return $sum + $report->getWeight();
-        }, 0);
+        if ($attributes['ignore_weights'] === 'yes') {
+            $reportCount = count($incidentReports);
+        } else {
+            $reportCount = array_reduce($incidentReports, function ($sum, IncidentReport $report) {
+                return $sum + $report->getWeight();
+            }, 0);
+        }
+
         return sprintf('%d', $reportCount);
     }
 
     /**
-     * @param array|string $attributes
-     *
-     * @return array
+     * @inheritDoc
      */
-    private function getAttributes($attributes): array
+    protected function fixOutdatedAttributes(array $attributes): array
     {
-        // See https://core.trac.wordpress.org/ticket/45929
-        if ($attributes === '') {
-            $attributes = [];
-        }
-
-        // Ensure backwards compatibility
+        // 'einsatzart' has been renamed to 'icategories'
         if (array_key_exists('einsatzart', $attributes) && !array_key_exists('icategories', $attributes) &&
             is_numeric($attributes['einsatzart'])) {
             $attributes['icategories'] = $attributes['einsatzart'];
         }
 
-        return shortcode_atts($this->defaultAttributes, $attributes);
+        return $attributes;
     }
 
     /**

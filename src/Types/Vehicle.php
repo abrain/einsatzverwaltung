@@ -8,8 +8,10 @@ use abrain\Einsatzverwaltung\CustomFields\StringList;
 use abrain\Einsatzverwaltung\CustomFields\UnitSelector;
 use abrain\Einsatzverwaltung\CustomFields\UrlInput;
 use WP_REST_Response;
+use WP_Screen;
 use WP_Term;
 use abrain\Einsatzverwaltung\CustomFieldsRepository;
+use function add_filter;
 use function array_key_exists;
 use function esc_html;
 use function esc_url;
@@ -24,7 +26,7 @@ use function url_to_postid;
  * Description of the custom taxonomy 'Vehicle'
  * @package abrain\Einsatzverwaltung\Types
  */
-class Vehicle implements CustomTaxonomy
+class Vehicle extends CustomTaxonomy
 {
     /**
      * Comparison function for vehicles
@@ -142,7 +144,7 @@ class Vehicle implements CustomTaxonomy
         $customFields->add($this, new NumberInput(
             'vehicleorder',
             'Reihenfolge',
-            'Optionale Angabe, mit der die Anzeigereihenfolge der Fahrzeuge beeinflusst werden kann. Fahrzeuge mit der kleineren Zahl werden zuerst angezeigt, anschlie&szlig;end diejenigen ohne Angabe bzw. dem Wert 0. Haben mehrere Fahrzeuge den gleichen Wert, werden sie in alphabetischer Reihenfolge ausgegeben.'
+            'Fahrzeuge mit der kleineren Zahl werden zuerst angezeigt, anschlie&szlig;end diejenigen mit dem Wert 0. Bei gleichem Wert werden Fahrzeuge in alphabetischer Reihenfolge ausgegeben.'
         ));
         $customFields->add($this, new Checkbox(
             'out_of_service',
@@ -181,6 +183,13 @@ class Vehicle implements CustomTaxonomy
         // Manipulate the columns of the term list after the automatically generated ones have been added
         add_action("manage_edit-{$taxonomySlug}_columns", array($this, 'onCustomColumns'), 20);
         add_filter("manage_{$taxonomySlug}_custom_column", array($this, 'onTaxonomyColumnContent'), 20, 3);
+
+        add_filter('default_hidden_columns', function (array $hiddenColumns, WP_Screen $screen) {
+            if ($screen->taxonomy === self::getSlug()) {
+                $hiddenColumns[] = 'altname';
+            }
+            return $hiddenColumns;
+        }, 10, 2);
     }
 
     /**

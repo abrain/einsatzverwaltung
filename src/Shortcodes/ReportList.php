@@ -7,6 +7,7 @@ use abrain\Einsatzverwaltung\Frontend\ReportList\SplitType;
 use abrain\Einsatzverwaltung\ReportQuery;
 use function array_key_exists;
 use function array_map;
+use function date;
 use function is_numeric;
 
 /**
@@ -14,11 +15,6 @@ use function is_numeric;
  */
 class ReportList extends AbstractShortcode
 {
-    /**
-     * @var array
-     */
-    private $defaultAttributes;
-
     /**
      * @var Renderer
      */
@@ -43,11 +39,7 @@ class ReportList extends AbstractShortcode
      */
     public function __construct(ReportQuery $reportQuery, Renderer $reportList, Parameters $parameters)
     {
-        $this->reportQuery = $reportQuery;
-        $this->reportList = $reportList;
-        $this->parameters = $parameters;
-
-        $this->defaultAttributes = [
+        parent::__construct([
             'jahr' => date('Y'),
             'sort' => 'ab',
             'split' => 'no',
@@ -56,7 +48,11 @@ class ReportList extends AbstractShortcode
             'icategories' => '',
             'units' => '',
             'options' => ''
-        ];
+        ]);
+
+        $this->reportQuery = $reportQuery;
+        $this->reportList = $reportList;
+        $this->parameters = $parameters;
     }
 
     /**
@@ -80,30 +76,26 @@ class ReportList extends AbstractShortcode
     }
 
     /**
-     * @param array|string $attributes
-     *
-     * @return array
+     * @inheritDoc
      */
-    private function getAttributes($attributes): array
+    protected function fixOutdatedAttributes(array $attributes): array
     {
-        // See https://core.trac.wordpress.org/ticket/45929
-        if ($attributes === '') {
-            $attributes = array();
-        }
-
-        // Ensure backwards compatibility
+        // 'monatetrennen' has been changed to 'split'
         if (array_key_exists('monatetrennen', $attributes) && !array_key_exists('split', $attributes) &&
             $attributes['monatetrennen'] == 'ja'
         ) {
             $attributes['split'] = 'monthly';
         }
+
+        // 'einsatzart' has been renamed to 'icategories'
         if (array_key_exists('einsatzart', $attributes) && !array_key_exists('icategories', $attributes) &&
             is_numeric($attributes['einsatzart'])) {
             $attributes['icategories'] = $attributes['einsatzart'];
         }
 
-        return shortcode_atts($this->defaultAttributes, $attributes);
+        return $attributes;
     }
+
 
     /**
      * @param array $attributes

@@ -2,7 +2,7 @@
 namespace abrain\Einsatzverwaltung;
 
 use abrain\Einsatzverwaltung\Exceptions\TypeRegistrationException;
-use abrain\Einsatzverwaltung\Types\Alarmierungsart;
+use abrain\Einsatzverwaltung\Types\AlertingMethod;
 use abrain\Einsatzverwaltung\Types\CustomPostType;
 use abrain\Einsatzverwaltung\Types\CustomTaxonomy;
 use abrain\Einsatzverwaltung\Types\ExtEinsatzmittel;
@@ -50,7 +50,7 @@ class TypeRegistry
         $this->registerTaxonomy(new IncidentType(), $report::getSlug());
         $this->registerTaxonomy(new Vehicle(), $report::getSlug());
         $this->registerTaxonomy(new ExtEinsatzmittel(), $report::getSlug());
-        $this->registerTaxonomy(new Alarmierungsart(), $report::getSlug());
+        $this->registerTaxonomy(new AlertingMethod(), $report::getSlug());
         $this->registerTaxonomy(new Unit(), $report::getSlug());
 
         $permalinkController->addRewriteRules($report);
@@ -68,6 +68,7 @@ class TypeRegistry
         $slug = $customPostType::getSlug();
         if (post_type_exists($slug)) {
             throw new TypeRegistrationException(
+                // translators: 1: custom post type slug
                 sprintf(__('Post type with slug "%s" already exists', 'einsatzverwaltung'), $slug)
             );
         }
@@ -75,7 +76,8 @@ class TypeRegistry
         $postType = register_post_type($slug, $customPostType->getRegistrationArgs());
         if (is_wp_error($postType)) {
             throw new TypeRegistrationException(sprintf(
-                __('Failed to register post type with slug "%s": %s', 'einsatzverwaltung'),
+                // translators: 1: custom post type slug, 2: error message
+                __('Failed to register post type with slug "%1$s": %2$s', 'einsatzverwaltung'),
                 $slug,
                 $postType->get_error_message()
             ));
@@ -100,6 +102,7 @@ class TypeRegistry
         $slug = $customTaxonomy::getSlug();
         if (get_taxonomy($slug) !== false) {
             throw new TypeRegistrationException(
+                // translators: 1: custom taxonomy slug
                 sprintf(__('Taxonomy with slug "%s" already exists', 'einsatzverwaltung'), $slug)
             );
         }
@@ -107,7 +110,8 @@ class TypeRegistry
         $result = register_taxonomy($slug, $postType, $customTaxonomy->getRegistrationArgs());
         if (is_wp_error($result)) {
             throw new TypeRegistrationException(sprintf(
-                __('Failed to register taxonomy with slug "%s": %s', 'einsatzverwaltung'),
+                // translators: 1: custom taxonomy slug, 2: error message
+                __('Failed to register taxonomy with slug "%1$s": %2$s', 'einsatzverwaltung'),
                 $slug,
                 $result->get_error_message()
             ));

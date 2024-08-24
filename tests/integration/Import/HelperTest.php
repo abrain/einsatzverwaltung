@@ -4,13 +4,17 @@ namespace abrain\Einsatzverwaltung\Import;
 use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\Exceptions\ImportPreparationException;
 use DateTime;
+use WP_UnitTestCase;
+use Yoast\PHPUnitPolyfills\Polyfills\AssertIsType;
 
 /**
  * Class HelperTest
  * @package abrain\Einsatzverwaltung
  */
-class HelperTest extends \WP_UnitTestCase
+class HelperTest extends WP_UnitTestCase
 {
+    use AssertIsType;
+
     /** @var Core */
     private static $core;
 
@@ -20,7 +24,7 @@ class HelperTest extends \WP_UnitTestCase
     /**
      * @inheritDoc
      */
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$core = Core::getInstance();
         self::$helper = new Helper(self::$core->utilities, self::$core->getData());
@@ -50,12 +54,12 @@ class HelperTest extends \WP_UnitTestCase
     {
         $input = 'term1, term78, term99';
         try {
-            $result = self::$helper->getTaxInputString('nohierarchy', $input);
+            $result = self::$helper->getTaxInputList('nohierarchy', $input);
         } catch (ImportPreparationException $e) {
             $this->fail($e->getMessage());
             return;
         }
-        $this->assertEquals($input, $result);
+        $this->assertEquals(['term1', 'term78', 'term99'], $result);
     }
 
     /**
@@ -72,17 +76,16 @@ class HelperTest extends \WP_UnitTestCase
 
         // Create one upfront
         $term = wp_insert_term($terms[0], 'hierarchy');
-        $this->assertInternalType('array', $term);
+        $this->assertIsArray($term);
         $exitingId = $term['term_id'];
 
         $input = implode(',', $terms);
         try {
-            $result = self::$helper->getTaxInputString('hierarchy', $input);
+            $returnedIds = self::$helper->getTaxInputList('hierarchy', $input);
         } catch (ImportPreparationException $e) {
             $this->fail($e->getMessage());
             return;
         }
-        $returnedIds = explode(',', $result);
         $this->assertCount(count($terms), $returnedIds);
 
         // Check that the existing term was reused
@@ -104,7 +107,7 @@ class HelperTest extends \WP_UnitTestCase
         // Make sure term exists
         $termName = 'existingTerm';
         $term = wp_insert_term($termName, 'hierarchy');
-        $this->assertInternalType('array', $term);
+        $this->assertIsArray($term);
 
         try {
             $returnedTermId = self::$helper->getTermId($termName, 'hierarchy');
@@ -179,14 +182,12 @@ class HelperTest extends \WP_UnitTestCase
         // Check taxonomies
         $this->assertArrayHasKey('tax_input', $insertArgs);
         $this->assertArrayHasKey('hierarchy', $insertArgs['tax_input']);
-        $inputTaxonomy1 = explode(',', $insertArgs['tax_input']['hierarchy']);
-        $this->assertCount(count($valuesTaxonomy1), $inputTaxonomy1);
-        foreach ($inputTaxonomy1 as $value) {
+        $this->assertCount(count($valuesTaxonomy1), $insertArgs['tax_input']['hierarchy']);
+        foreach ($insertArgs['tax_input']['hierarchy'] as $value) {
             $this->assertTrue(is_numeric($value));
         }
         $this->assertArrayHasKey('nohierarchy', $insertArgs['tax_input']);
-        $inputTaxonomy2 = explode(',', $insertArgs['tax_input']['nohierarchy']);
-        $this->assertEquals($valuesTaxonomy2, $inputTaxonomy2);
+        $this->assertEquals($valuesTaxonomy2, $insertArgs['tax_input']['nohierarchy']);
         $this->assertArrayNotHasKey('someTax', $insertArgs['tax_input']); // empty value should have been ignored
 
         // Check meta data

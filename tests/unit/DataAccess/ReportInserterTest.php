@@ -39,7 +39,8 @@ class ReportInserterTest extends UnitTestCase
             'post_status' => 'draft',
             'post_title' => 'Some title',
             'meta_input' => [
-                '_einsatz_timeofalerting' => '2021-08-29 17:51:15'
+                '_einsatz_timeofalerting' => '2021-08-29 17:51:15',
+                'einsatz_special' => 0,
             ],
             'tax_input' => []
         ], $insertArgs);
@@ -113,7 +114,8 @@ class ReportInserterTest extends UnitTestCase
             'post_content' => 'Some random post content',
             'meta_input' => [
                 'einsatz_einsatzort' => 'The location',
-                'einsatz_einsatzende' => '2021-08-29 21:34:42'
+                'einsatz_einsatzende' => '2021-08-29 21:34:42',
+                'einsatz_special' => 0,
             ],
             'tax_input' => [
                 'einsatzart' => [5123],
@@ -154,7 +156,8 @@ class ReportInserterTest extends UnitTestCase
             'post_status' => 'draft',
             'post_title' => 'Some title',
             'meta_input' => [
-                '_einsatz_timeofalerting' => '2021-08-29 17:51:15'
+                '_einsatz_timeofalerting' => '2021-08-29 17:51:15',
+                'einsatz_special' => 0,
             ],
             'tax_input' => [
                 'einsatzart' => [9384]

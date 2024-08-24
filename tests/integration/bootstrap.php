@@ -1,18 +1,17 @@
 <?php
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals
+$tmpDirEnv = getenv('TMPDIR');
+$tmpdir = rtrim(empty($tmpDirEnv) ? '/tmp' : $tmpDirEnv, '/');
+$_tests_dir = "{$tmpdir}/wordpress-tests-lib";
 
-$_tests_dir = getenv('WP_TESTS_DIR');
-if (!$_tests_dir) {
-    $_tests_dir = '/tmp/wordpress-tests-lib';
-}
-
+require __DIR__ . '/../../vendor/autoload.php';
 require_once $_tests_dir . '/includes/functions.php';
 
 tests_add_filter('muplugins_loaded', function () {
-    require dirname(dirname(__FILE__)) . '/../src/einsatzverwaltung.php';
+    require dirname(__FILE__, 2) . '/../src/einsatzverwaltung.php';
 
-    // DB-Version setzen, damit der Upgrade-Prozess nicht unnötig anläuft
-    // Wird normal bei der Aktivierung des Plugins gemacht, aber diese Action wird bei den Tests nicht aufgerufen
-    add_option('einsatzvw_db_version', \abrain\Einsatzverwaltung\Core::DB_VERSION);
+    // Simulate the activation of the plugin
+    do_action('activate_src/einsatzverwaltung.php');
 
     // Zeitzone setzen
     update_option('timezone_string', 'Europe/Berlin');
@@ -21,3 +20,5 @@ tests_add_filter('muplugins_loaded', function () {
 require $_tests_dir . '/includes/bootstrap.php';
 
 require_once 'ReportFactory.php';
+
+// phpcs:enable WordPress.NamingConventions.PrefixAllGlobals

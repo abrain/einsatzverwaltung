@@ -57,7 +57,7 @@ class ReportList extends SubPage
             'einsatzvw_settings_einsatzliste',
             '',
             function () {
-                echo '<p>Mit diesen Einstellungen kann das Aussehen der Einsatzlisten beeinflusst werden. Einsatzlisten k&ouml;nnen &uuml;ber den <a href="https://einsatzverwaltung.abrain.de/dokumentation/shortcodes/shortcode-einsatzliste/">Shortcode [einsatzliste]</a> in Seiten und Beitr&auml;ge eingebunden werden.</p>';
+                echo '<p>Mit diesen Einstellungen kann das Aussehen der Einsatzlisten beeinflusst werden. Einsatzlisten k&ouml;nnen &uuml;ber den Shortcode [einsatzliste] in Seiten und Beitr&auml;ge eingebunden werden.</p>';
             },
             $this->settingsApiPage
         );

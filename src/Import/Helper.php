@@ -8,6 +8,8 @@ use abrain\Einsatzverwaltung\Import\Sources\AbstractSource;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Utilities;
 use DateTime;
+use function array_map;
+use function explode;
 
 /**
  * Verschiedene Funktionen für den Import von Einsatzberichten
@@ -79,7 +81,7 @@ class Helper
                     continue;
                 }
 
-                $insertArgs['tax_input'][$ownField] = $this->getTaxInputString($ownField, $sourceValue);
+                $insertArgs['tax_input'][$ownField] = $this->getTaxInputList($ownField, $sourceValue);
             } elseif (array_key_exists($ownField, $this->postFields)) {
                 // Wert gehört direkt zum Post
                 $insertArgs[$ownField] = $sourceValue;
@@ -97,17 +99,18 @@ class Helper
      *
      * @param string $taxonomy
      * @param string $terms
-     * @return string
+     *
+     * @return string[]|int[]
      * @throws ImportPreparationException
      */
-    public function getTaxInputString($taxonomy, $terms)
+    public function getTaxInputList(string $taxonomy, string $terms): array
     {
         if (is_taxonomy_hierarchical($taxonomy) === false) {
-            // Termnamen können direkt verwendet werden
-            return $terms;
+            // Use term names/slugs as they are
+            return array_map('trim', explode(',', $terms));
         }
 
-        // Bei hierarchischen Taxonomien muss die ID statt des Namens verwendet werden
+        // Hierarchical taxonomies require a list of IDs instead of names
         $termIds = array();
 
         $termNames = explode(',', $terms);
@@ -115,7 +118,7 @@ class Helper
             $termIds[] = $this->getTermId($termName, $taxonomy);
         }
 
-        return implode(',', $termIds);
+        return $termIds;
     }
 
     /**

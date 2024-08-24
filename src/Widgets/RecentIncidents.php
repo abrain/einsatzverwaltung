@@ -89,7 +89,7 @@ class RecentIncidents extends AbstractWidget
 
         if ($instance['zeigeFeedlink']) {
             printf(
-                '<p class="einsatzfeed"><span class="fa fa-rss"></span>&nbsp;<a href="%s">%s</a></p>',
+                '<p class="einsatzfeed"><span class="fa-solid fa-rss"></span>&nbsp;<a href="%s">%s</a></p>',
                 get_post_type_archive_feed_link('einsatz'),
                 esc_html__('Incident Reports feed', 'einsatzverwaltung')
             );
@@ -188,6 +188,7 @@ class RecentIncidents extends AbstractWidget
             if (!empty($location)) {
                 $locationFormat = sprintf(
                     '<br><span class="einsatzort">%s</span>',
+                    // translators: 1: location of the incident
                     esc_html__('Location: %s', 'einsatzverwaltung')
                 );
                 printf($locationFormat, esc_html($location));

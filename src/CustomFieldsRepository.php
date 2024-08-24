@@ -5,17 +5,23 @@ use abrain\Einsatzverwaltung\CustomFields\CustomField;
 use abrain\Einsatzverwaltung\Types\CustomPostType;
 use abrain\Einsatzverwaltung\Types\CustomTaxonomy;
 use abrain\Einsatzverwaltung\Types\CustomType;
-use abrain\Einsatzverwaltung\Types\Report;
 use WP_Term;
 use function add_action;
 use function add_term_meta;
 use function array_diff;
 use function array_filter;
+use function array_keys;
 use function array_map;
+use function array_merge;
+use function array_search;
+use function array_slice;
 use function array_unique;
+use function current_action;
 use function delete_term_meta;
 use function explode;
 use function get_term_meta;
+use function is_numeric;
+use function preg_match;
 
 /**
  * Keeps track of the custom fields of our custom types
@@ -41,7 +47,13 @@ class CustomFieldsRepository
     {
         $this->postTypeFields = array();
         $this->taxonomyFields = array();
+    }
 
+    /**
+     * Register the actions and filters, that this class expects.
+     */
+    public function addHooks()
+    {
         add_action('edited_term', array($this, 'saveTerm'), 10, 3);
         add_action('created_term', array($this, 'saveTerm'), 10, 3);
     }
@@ -59,7 +71,7 @@ class CustomFieldsRepository
                 $this->taxonomyFields[$taxonomy] = array();
                 add_action("{$taxonomy}_add_form_fields", array($this, 'onAddFormFields'));
                 add_action("{$taxonomy}_edit_form_fields", array($this, 'onEditFormFields'), 10, 2);
-                add_action("manage_edit-{$taxonomy}_columns", array($this, 'onCustomColumns'));
+                add_action("manage_edit-{$taxonomy}_columns", array($this, 'onTaxonomyCustomColumns'));
                 add_filter("manage_{$taxonomy}_custom_column", array($this, 'onTaxonomyColumnContent'), 10, 3);
             }
 
@@ -69,7 +81,7 @@ class CustomFieldsRepository
 
             if (!array_key_exists($postType, $this->postTypeFields)) {
                 $this->postTypeFields[$postType] = array();
-                add_filter("manage_edit-{$postType}_columns", array($this, 'onCustomColumns'));
+                add_filter("manage_edit-{$postType}_columns", array($this, 'onPostCustomColumns'));
                 add_action("manage_{$postType}_posts_custom_column", array($this, 'onPostColumnContent'), 10, 2);
             }
 
@@ -151,54 +163,6 @@ class CustomFieldsRepository
     }
 
     /**
-     * Fügt für die zusätzlichen Felder zusätzliche Spalten in der Übersicht ein
-     *
-     * @param array $columns
-     * @return array
-     */
-    public function onCustomColumns($columns): array
-    {
-        $screen = get_current_screen();
-
-        if (empty($screen)) {
-            return $columns;
-        }
-
-        if ($screen->post_type === Report::getSlug() && !empty($screen->taxonomy)) {
-            $taxonomy = $screen->taxonomy;
-            if (!$this->hasTaxonomy($taxonomy)) {
-                return $columns;
-            }
-
-            // Add the columns after the description column
-            $index = array_search('description', array_keys($columns));
-            $index = is_numeric($index) ? $index + 1 : count($columns);
-            $before = array_slice($columns, 0, $index, true);
-            $after = array_slice($columns, $index, null, true);
-
-            $columnsToAdd = array();
-            /** @var CustomField $field */
-            foreach ($this->taxonomyFields[$taxonomy] as $field) {
-                $columnsToAdd[$field->key] = $field->label;
-            }
-
-            return array_merge($before, $columnsToAdd, $after);
-        }
-
-        $postType = $screen->post_type;
-        if (!$this->hasPostType($postType)) {
-            return $columns;
-        }
-
-        /** @var CustomField $field */
-        foreach ($this->postTypeFields[$postType] as $field) {
-            $columns[$field->key] = $field->label;
-        }
-
-        return $columns;
-    }
-
-    /**
      * @param string $columnId
      * @param int $postId
      */
@@ -220,6 +184,33 @@ class CustomFieldsRepository
     }
 
     /**
+     * Adds custom columns to our own post types.
+     *
+     * @param string[] $columns
+     *
+     * @return string[] An associative array of column headings.
+     */
+    public function onPostCustomColumns($columns): array
+    {
+        $currentAction = current_action();
+        if (preg_match('/^manage_edit-(\w+)_columns$/', $currentAction, $matches) !== 1) {
+            return $columns;
+        }
+
+        $postType = $matches[1];
+        if (!$this->hasPostType($postType)) {
+            return $columns;
+        }
+
+        /** @var CustomField $field */
+        foreach ($this->postTypeFields[$postType] as $field) {
+            $columns[$field->key] = $field->label;
+        }
+
+        return $columns;
+    }
+
+    /**
      * Filterfunktion für den Inhalt der selbst angelegten Spalten
      *
      * @param string $string Leerer String.
@@ -227,6 +218,9 @@ class CustomFieldsRepository
      * @param int $termId Term ID
      *
      * @return string Inhalt der Spalte
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter) A WordPress hook with fixed signature
+     * @noinspection PhpUnusedParameterInspection
      */
     public function onTaxonomyColumnContent($string, $columnName, $termId): string
     {
@@ -251,11 +245,48 @@ class CustomFieldsRepository
     }
 
     /**
-     * Speichert zusätzliche Infos zu Terms als options ab
+     * Adds custom columns to our own taxonomies.
+     *
+     * @param string[] $columns An associative array of column headings.
+     *
+     * @return string[]
+     */
+    public function onTaxonomyCustomColumns($columns): array
+    {
+        $currentAction = current_action();
+        if (preg_match('/^manage_edit-(\w+)_columns$/', $currentAction, $matches) !== 1) {
+            return $columns;
+        }
+
+        $taxonomy = $matches[1];
+        if (!$this->hasTaxonomy($taxonomy)) {
+            return $columns;
+        }
+
+        // Add the columns after the description column
+        $index = array_search('description', array_keys($columns));
+        $index = is_numeric($index) ? $index + 1 : count($columns);
+        $before = array_slice($columns, 0, $index, true);
+        $after = array_slice($columns, $index, null, true);
+
+        $columnsToAdd = array();
+        /** @var CustomField $field */
+        foreach ($this->taxonomyFields[$taxonomy] as $field) {
+            $columnsToAdd[$field->key] = $field->label;
+        }
+
+        return array_merge($before, $columnsToAdd, $after);
+    }
+
+    /**
+     * Saves custom taxonomy fields to termmeta.
      *
      * @param int $termId Term ID
      * @param int $ttId Term taxonomy ID
      * @param string $taxonomy Taxonomy slug
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter) A WordPress hook with fixed signature
+     * @noinspection PhpUnusedParameterInspection
      */
     public function saveTerm($termId, $ttId, $taxonomy)
     {
@@ -266,7 +297,11 @@ class CustomFieldsRepository
         /** @var CustomField $field */
         foreach ($this->taxonomyFields[$taxonomy] as $field) {
             // TODO choose filter based on type of CustomField
-            $value = filter_input(INPUT_POST, $field->key, FILTER_SANITIZE_STRING);
+            $value = filter_input(INPUT_POST, $field->key);
+
+            if ($value === null) {
+                continue;
+            }
 
             if ($field->isMultiValue()) {
                 $existingValues = get_term_meta($termId, $field->key);

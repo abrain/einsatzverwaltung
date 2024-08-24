@@ -1,19 +1,19 @@
 === Einsatzverwaltung ===
 Contributors: abrain
-Donate link: https://einsatzverwaltung.abrain.de/unterstuetzen/
+Donate link: https://einsatzverwaltung.org/unterstuetzen/
 Tags: Feuerwehr, fire department, EMS
-Requires at least: 5.1.0
-Tested up to: 5.8
+Requires at least: 5.6.0
+Tested up to: 6.6
 Requires PHP: 7.1.0
-Stable tag: 1.9.7
+Stable tag: 1.11.2
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Public incident reports for fire brigades and other rescue services
+Public incident reports for fire departments and other rescue services
 
 == Description ==
 
-This plugin lets you create incident reports to inform the public about your work. Although initially developed for fire brigades, it is also used by emergency medical services, mountain rescue services, water rescue services, and others.
+This plugin lets you create incident reports to inform the public about your work. Although initially developed for fire departments, it is also used by emergency medical services, mountain rescue services, water rescue services, and others.
 
 You can assign vehicles, units, type of incident, types of alerting, and external resources to each report. There are shortcodes and widgets to list the reports, optionally filtered by unit. The reports have a default layout, but you can also get creative with the templating feature. Reports can be imported and exported, creating and editing reports can be restricted to certain user roles.
 
@@ -30,7 +30,7 @@ Uses Font Awesome by Dave Gandy - http://fontawesome.io
 
 == Installation ==
 
-The plugin does not require any setup but it is recommended to take a look at the settings before you start publishing. Especially those in the Advanced section should not be changed inconsiderately later on.
+The plugin does not require any setup, but it is recommended to take a look at the settings before you start publishing. Especially those in the Advanced section should not be changed inconsiderately later on.
 
 == Frequently Asked Questions ==
 
@@ -40,7 +40,7 @@ No, this plugin has no affiliation with einsatzverwaltung.eu.
 
 = Is there a manual? =
 
-Yes, there is more [documentation](https://einsatzverwaltung.abrain.de/dokumentation/) on our website.
+Yes, there is more [documentation](https://einsatzverwaltung.org/dokumentation/) on our website.
 
 = Where should I send feature requests and bug reports to? =
 
@@ -48,55 +48,52 @@ Ideally, you check the issues on [GitHub](https://github.com/abrain/einsatzverwa
 
 = Are there more FAQ? =
 
-Yes, you can find them on [our website](https://einsatzverwaltung.abrain.de/faq/).
+Yes, you can find them on [our website](https://einsatzverwaltung.org/faq/).
 
 == Changelog ==
 
-= 1.9.7 =
-* Fix: Compatibility issue with Elementor
+= 1.11.2 =
+* Fix: Content was duplicated when using the Avada Website Builder
+* Fix: Prevent linebreaks for certain columns of the report list
 
-= 1.9.6 =
-* Fix: Compatibility issue with PHP 7.4 and newer during import
+= 1.11.1 =
+* Reduce collisions with other occurrences of Font Awesome
+* Add option to disable Font Awesome
 
-= 1.9.5 =
-* Fix: In some cases incident numbers were not regenerated after changing the format
-* Accessibility: Improve navigation of the widgets if the theme supports the navigation-widgets feature
+= 1.11.0 =
+* Alerting Methods: Can now be linked with a page from the same site or an arbitrary URL
+* Shortcode `reportcount` can ignore weights
+* Upgraded Font Awesome from version 4 to version 6
+* Improved compatibility with PHP 8.2
+* Dropped support for WordPress 5.5 and older
 
-= 1.9.4 =
-* Fix: Editor would not show checkboxes for units if no vehicles existed
+= 1.10.2 =
+* Fix: Reports created with the API endpoint could show up as special reports
+* Fix: Table was missing columns when creating e.g. units or vehicles
 
-= 1.9.3 =
-* Fix: Editor would not show checkboxes for units on a new site
-* Fix: Unexpected format of the global post object could cause an error
+= 1.10.1 =
+* Fix: Compatibility issue with PHP 8
 
-= 1.9.2 =
-* Fix: Units without vehicles could not be selected in the editor
-
-= 1.9.1 =
-* Fix: Too narrow PHP type check prevented creation of other post types
-
-= 1.9.0 =
-* Vehicles can be associated with a unit
-* Incident numbers can have a separator between the year the and sequential number
-* Classic singular view of reports shows vehicles grouped by unit, if units are used
-* Templates: Added placeholder for vehicles grouped by unit
-* Units: Display order can be customized
-* Editor: Vehicles appear grouped by unit
-* Editor: Meta box for incident details is now mobile friendly
-* Editor: Notice about wrong date format only appears after leaving the field
-* Internationalized more labels
-
-= 1.8.0 =
-* Fix: Not all vehicles could be removed from an existing Incident Report
-* Shortcode `reportcount` can be filtered by status (actual or false alarm)
-* Templates: Added placeholder for featured image thumbnail
-* Shortcodes `einsatzliste` and `reportcount` can be filtered by multiple Incident Categories
-* Incident Categories can be marked as outdated
-* Units were converted to a taxonomy
-* Requires PHP 7.1 or newer
-* Requires WordPress 5.1 or newer
+= 1.10.0 =
+* New API endpoint for third-party systems to create incident reports
+* Roles for user permissions
+* Shortcode `reportcount` can be filtered by Alerting Method
+* Fallback featured image for reports based on Incident Category
+* Autocomplete for incident location
+* Fix: Changing the category setting for incident reports caused an error on fresh installations
 
 == Upgrade Notice ==
-
-= 1.9.7 =
+= 1.11.2 =
 Maintenance Release
+
+= 1.11.1 =
+Maintenance Release
+
+= 1.11.0 =
+Minor enhancements, upgraded Font Awesome, improved compatibility with PHP 8.2
+
+= 1.10.1 =
+Maintenance Release
+
+= 1.10.0 =
+New API endpoint, roles, and more

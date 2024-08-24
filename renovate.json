@@ -1,0 +1,25 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:best-practices",
+    "group:linters",
+    "group:test",
+    ":maintainLockFilesWeekly",
+    ":semanticCommits",
+    ":pinVersions",
+    ":prHourlyLimit2",
+    ":prConcurrentLimit10",
+    ":separateMultipleMajorReleases"
+  ],
+  "packageRules": [
+    {
+      "matchDepNames": [
+        "php"
+      ],
+      "matchDepTypes": [
+        "require"
+      ],
+      "rangeStrategy": "widen"
+    }
+  ]
+}

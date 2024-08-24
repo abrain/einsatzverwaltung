@@ -90,7 +90,7 @@ class Report extends SubPage
             'einsatzvw_settings_reporttemplates',
             'Templates',
             function () {
-                echo '<p>Mit den beiden folgenden Templates kann das Aussehen der Einsatzberichte bzw. deren Ausz&uuml;ge individuell angepasst werden. Das ausgef&uuml;llte Template erscheint immer dort, wo normal der Beitragstext stehen w&uuml;rde. Wie die Templates funktionieren ist in der <a href="https://einsatzverwaltung.abrain.de/dokumentation/templates/">Dokumentation</a> beschrieben.</p>';
+                echo '<p>Mit den beiden folgenden Templates kann das Aussehen der Einsatzberichte bzw. deren Ausz&uuml;ge individuell angepasst werden. Das ausgef&uuml;llte Template erscheint immer dort, wo normal der Beitragstext stehen w&uuml;rde. Wie die Templates funktionieren ist in der <a href="https://einsatzverwaltung.org/dokumentation/templates/">Dokumentation</a> beschrieben.</p>';
             },
             $this->settingsApiPage
         );

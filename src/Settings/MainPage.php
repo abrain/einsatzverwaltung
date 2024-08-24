@@ -6,7 +6,6 @@ use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\PermalinkController;
 use abrain\Einsatzverwaltung\Settings\Pages\About;
 use abrain\Einsatzverwaltung\Settings\Pages\Advanced;
-use abrain\Einsatzverwaltung\Settings\Pages\Capabilities;
 use abrain\Einsatzverwaltung\Settings\Pages\General;
 use abrain\Einsatzverwaltung\Settings\Pages\Numbers;
 use abrain\Einsatzverwaltung\Settings\Pages\Report;
@@ -55,7 +54,6 @@ class MainPage
         $this->addSubPage(new Numbers());
         $this->addSubPage(new Report());
         $this->addSubPage(new ReportList());
-        $this->addSubPage(new Capabilities());
         $this->addSubPage(new Advanced($permalinkController));
         $this->addSubPage(new About());
     }
@@ -89,7 +87,7 @@ class MainPage
     public function echoSettingsPage()
     {
         if (!current_user_can('manage_options')) {
-            wp_die(__('You do not have sufficient permissions to manage options for this site.'));
+            wp_die(__('You do not have sufficient permissions to manage options for this site.', 'einsatzverwaltung'));
         }
 
         echo '<div class="wrap">';
@@ -104,6 +102,7 @@ class MainPage
                 esc_html($conflictingPage->post_title)
             );
             $message = sprintf(
+                // translators: 1: title of the page, 2: URL
                 esc_html__('The page %1$s uses the same permalink as the archive (%2$s). Please change the permalink of the page.', 'einsatzverwaltung'),
                 $pageEditLink,
                 sprintf('<code>%s</code>', esc_html(get_permalink($conflictingPage)))
@@ -174,7 +173,7 @@ class MainPage
     private function getCurrentSubPage(): SubPage
     {
         $flags = FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH;
-        $tab = filter_input(INPUT_GET, 'tab', FILTER_SANITIZE_STRING, $flags);
+        $tab = filter_input(INPUT_GET, 'tab', FILTER_SANITIZE_SPECIAL_CHARS, $flags);
 
         if (empty($tab) || !array_key_exists($tab, $this->subPages)) {
             $subPageObjects = array_values($this->subPages);

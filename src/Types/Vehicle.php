@@ -50,7 +50,7 @@ class Vehicle extends CustomTaxonomy
         }
 
         // If no order is set on both or if they are equal, sort by name
-        if (empty($order1) && empty($order2) || $order1 == $order2) {
+        if ((empty($order1) && empty($order2)) || ($order1 == $order2)) {
             return strcasecmp($vehicle1->name, $vehicle2->name);
         }
 

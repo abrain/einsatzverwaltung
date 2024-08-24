@@ -319,7 +319,7 @@ class ReportEditScreen extends EditScreen
             }, $outOfServiceVehicles);
             echo empty(array_intersect($assignedVehicleIds, $outOfServiceIds)) ? '<details>' : '<details open="open">';
 
-            echo sprintf("<summary>%s</summary>", esc_html__('Out of service', 'einsatzverwaltung'));
+            printf("<summary>%s</summary>", esc_html__('Out of service', 'einsatzverwaltung'));
             echo '<ul>';
             $this->echoTermCheckboxes($outOfServiceVehicles, $vehicleTaxonomy, $assignedVehicleIds);
             echo '</ul>';

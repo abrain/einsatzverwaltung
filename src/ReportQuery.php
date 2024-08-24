@@ -109,7 +109,8 @@ class ReportQuery
         if (is_numeric($this->year)) {
             if ($this->year < 0) {
                 $currentYear = date('Y');
-                for ($i = 0; $i < abs(intval($this->year)) && $i < $currentYear; $i++) {
+                $numberOfYears = abs(intval($this->year));
+                for ($i = 0; $i < $numberOfYears && $i < $currentYear; $i++) {
                     $dateQuery[] = array('year' => $currentYear - $i);
                 }
                 $dateQuery['relation'] = 'OR';

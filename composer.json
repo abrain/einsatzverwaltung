@@ -30,7 +30,8 @@
     "integration-test": "XDEBUG_MODE=coverage phpunit -c phpunit-integration.xml"
   },
   "require": {
-    "php": ">=7.1.0"
+    "php": ">=7.1.0",
+    "ext-json": "*"
   },
   "require-dev": {
     "phpmd/phpmd": "2.15.0",

@@ -4,10 +4,10 @@ namespace abrain\Einsatzverwaltung;
 use WP_UnitTestCase;
 
 /**
- * Class PermalinkControllerTest
+ * Class PermalinksTest
  * @package abrain\Einsatzverwaltung
  */
-class PermalinkControllerTest extends WP_UnitTestCase
+class PermalinksTest extends WP_UnitTestCase
 {
     public function testBuildSelector()
     {

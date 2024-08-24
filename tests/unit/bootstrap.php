@@ -25,7 +25,8 @@ spl_autoload_register(function ($class) {
 
     $parts = explode('\\', $class);
     $filename = '';
-    for ($index = 2; $index < count($parts); $index++) {
+    $numberOfParts = count($parts);
+    for ($index = 2; $index < $numberOfParts; $index++) {
         $filename .= DIRECTORY_SEPARATOR;
         $filename .= $parts[$index];
     }

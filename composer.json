@@ -19,12 +19,6 @@
     "source": "https://github.com/abrain/einsatzverwaltung",
     "docs": "https://einsatzverwaltung.org/dokumentation/"
   },
-  "scripts": {
-    "test": [
-      "Composer\\Config::disableProcessTimeout",
-      "phpunit"
-    ]
-  },
   "config": {
     "allow-plugins": {
       "dealerdirect/phpcodesniffer-composer-installer": true

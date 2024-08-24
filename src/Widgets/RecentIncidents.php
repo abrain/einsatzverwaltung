@@ -110,7 +110,7 @@ class RecentIncidents extends AbstractWidget
         $reports = $reportQuery->getReports();
 
         if (empty($reports)) {
-            echo sprintf("<p>%s</p>", esc_html__('No reports', 'einsatzverwaltung'));
+            printf("<p>%s</p>", esc_html__('No reports', 'einsatzverwaltung'));
             return;
         }
 
@@ -258,7 +258,7 @@ class RecentIncidents extends AbstractWidget
         $this->echoCheckbox($instance, 'zeigeFeedlink', __('Show link to RSS feed', 'einsatzverwaltung'));
         echo '</p>';
 
-        echo sprintf("<p><strong>%s</strong></p>", __('Incident details', 'einsatzverwaltung'));
+        printf("<p><strong>%s</strong></p>", __('Incident details', 'einsatzverwaltung'));
 
         echo '<p>';
         $this->echoCheckbox($instance, 'zeigeDatum', __('Show date', 'einsatzverwaltung'));

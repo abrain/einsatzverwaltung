@@ -95,7 +95,7 @@ class Tool
     public function renderToolPage()
     {
         echo '<div class="wrap">';
-        echo '<h1>' . 'Einsatzberichte exportieren' . '</h1>';
+        echo '<h1>Einsatzberichte exportieren</h1>';
         echo '<p>Dieses Werkzeug exportiert Einsatzberichte in verschiedenen Formaten.</p>'; ?>
 <form method="get" id="export-form">
     <input type="hidden" name="page" value="einsatzvw-tool-export">

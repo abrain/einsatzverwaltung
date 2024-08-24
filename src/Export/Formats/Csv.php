@@ -20,11 +20,6 @@ class Csv extends AbstractFormat
     protected $enclosure;
 
     /**
-     * @var string
-     */
-    // protected $escapeChar;
-
-    /**
      * @var boolean
      */
     protected $headers;
@@ -81,10 +76,6 @@ class Csv extends AbstractFormat
         if (empty($this->enclosure)) {
             $this->enclosure = '"';
         }
-        // $this->escapeChar = @$options['escapeChar'];
-        // if (empty($this->escapeChar)) {
-        //     $this->escapeChar = '\\';
-        // }
         $this->headers = (boolean)@$options['headers'];
     }
 
@@ -109,7 +100,7 @@ class Csv extends AbstractFormat
         // füge ggf. Spaltennamen als die erste Zeile ein
         if ($this->headers) {
             $data = $this->getColumnNames();
-            fputcsv($handle, $data, $this->delimiter, $this->enclosure/*, $this->escapeChar*/);
+            fputcsv($handle, $data, $this->delimiter, $this->enclosure);
         }
 
         $query = $this->getQuery();
@@ -117,7 +108,7 @@ class Csv extends AbstractFormat
             $post = $query->next_post();
 
             $data = $this->getValuesForReport($post);
-            fputcsv($handle, $data, $this->delimiter, $this->enclosure/*, $this->escapeChar*/);
+            fputcsv($handle, $data, $this->delimiter, $this->enclosure);
         }
 
         fclose($handle);

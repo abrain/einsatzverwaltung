@@ -219,11 +219,9 @@ class HelperTest extends WP_UnitTestCase
 
         // Post date should not be touched
         $this->assertArrayNotHasKey('post_date', $insertArgs);
-        //$this->assertEquals('2017-12-29 18:24', $insertArgs['post_date']);
 
         // Same goes for the GMT date
         $this->assertArrayNotHasKey('post_date_gmt', $insertArgs);
-        //$this->assertEquals('2017-12-29 17:24:00', $insertArgs['post_date_gmt']);
 
         // Check if the post title has not been modified
         $this->assertArrayHasKey('post_title', $insertArgs);

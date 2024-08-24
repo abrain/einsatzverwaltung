@@ -117,7 +117,7 @@ class Tool
         $this->helper->postFields = IncidentReport::getPostFields();
 
         echo '<div class="wrap">';
-        echo '<h1>' . 'Einsatzberichte importieren' . '</h1>';
+        echo '<h1>Einsatzberichte importieren</h1>';
 
         $aktion = null;
         if (array_key_exists('aktion', $_POST)) {

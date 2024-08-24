@@ -37,7 +37,6 @@ class Excel extends Csv
     {
         $this->delimiter = ';';
         $this->enclosure = '"';
-        // $this->escapeChar = '\\';
         $this->headers = (boolean)@$options['columns'];
     }
 }

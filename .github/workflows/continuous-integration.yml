@@ -21,6 +21,7 @@ jobs:
         with:
           php-version: '8.3'
           coverage: none
+          tools: cs2pr
 
       - name: Validate composer.json and composer.lock
         run: composer validate --strict
@@ -38,7 +39,12 @@ jobs:
         run: composer install --prefer-dist --no-progress
 
       - name: Check style and compatibility
-        run: composer exec phpcs
+        id: phpcs
+        run: composer exec phpcs -- --report-full --report-checkstyle=./phpcs-report.xml
+
+      - name: Show PHPCS results in PR
+        if: ${{ always() && steps.phpcs.outcome == 'failure' }}
+        run: cs2pr ./phpcs-report.xml
 
   test-latest:
     runs-on: ubuntu-latest

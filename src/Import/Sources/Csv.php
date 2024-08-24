@@ -228,12 +228,12 @@ class Csv extends AbstractSource
     }
 
     /**
-     * @param int|null $numLines Maximale Anzahl zu lesender Zeilen, oder null um alle Zeilen einzulesen
+     * @param int|null $numLinesToRead Maximale Anzahl zu lesender Zeilen, oder null um alle Zeilen einzulesen
      * @param array $requestedFields
      *
      * @return array|bool
      */
-    private function readFile($numLines = null, $requestedFields = array())
+    private function readFile($numLinesToRead = null, $requestedFields = array())
     {
         $fieldMap = array();
         if (!empty($requestedFields)) {
@@ -249,13 +249,14 @@ class Csv extends AbstractSource
             return false;
         }
 
-        if ($numLines === 0) {
+        if ($numLinesToRead === 0) {
             fclose($handle);
             return array();
         }
 
         $lines = array();
-        while (null === $numLines || count($lines) < $numLines) {
+        $numberOfLines = 0;
+        while (null === $numLinesToRead || $numberOfLines < $numLinesToRead) {
             $line = fgetcsv($handle, 0, $this->delimiter, $this->enclosure);
 
             // Problem beim Lesen oder Ende der Datei
@@ -279,6 +280,7 @@ class Csv extends AbstractSource
                 $filteredLine[$fieldName] = array_key_exists($index, $line) ? $line[$index] : '';
             }
             $lines[] = $filteredLine;
+            $numberOfLines = count($lines);
         }
 
         fclose($handle);

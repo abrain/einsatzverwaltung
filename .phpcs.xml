@@ -92,4 +92,25 @@
         <exclude name="Generic.CodeAnalysis.UnusedFunctionParameter.FoundInImplementedInterfaceBeforeLastUsed"/>
         <exclude name="Generic.CodeAnalysis.UnusedFunctionParameter.FoundInImplementedInterfaceAfterLastUsed"/>
     </rule>
+
+    <rule ref="Squiz.Classes.SelfMemberReference.NotUsed"/>
+    <rule ref="Squiz.Functions.FunctionDuplicateArgument"/>
+    <rule ref="Squiz.Operators.IncrementDecrementUsage"/>
+    <rule ref="Squiz.Operators.ValidLogicalOperators"/>
+    <rule ref="Squiz.PHP.CommentedOutCode">
+        <properties>
+            <property name="maxPercentage" value="40"/>
+        </properties>
+    </rule>
+    <rule ref="Squiz.PHP.DisallowSizeFunctionsInLoops"/>
+    <rule ref="Squiz.PHP.NonExecutableCode"/>
+
+    <rule ref="Universal.Arrays.DuplicateArrayKey"/>
+    <rule ref="Universal.CodeAnalysis.ConstructorDestructorReturn"/>
+    <rule ref="Universal.CodeAnalysis.ForeachUniqueAssignment"/>
+    <rule ref="Universal.CodeAnalysis.NoDoubleNegative"/>
+    <rule ref="Universal.CodeAnalysis.NoEchoSprintf"/>
+    <rule ref="Universal.CodeAnalysis.StaticInFinalClass"/>
+    <rule ref="Universal.ControlStructures.DisallowLonelyIf"/>
+    <rule ref="Universal.Files.SeparateFunctionsFromOO"/>
 </ruleset>

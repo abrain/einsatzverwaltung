@@ -13,12 +13,19 @@ use function sprintf;
 class UrlInput extends CustomField
 {
     /**
+     * phpcs:disable Generic.CodeAnalysis.UselessOverridingMethod.Found
+     * see https://github.com/squizlabs/PHP_CodeSniffer/issues/3035
+     */
+
+    /**
      * @inheritDoc
      */
     public function __construct($key, $label, $description, $defaultValue = '')
     {
         parent::__construct($key, $label, $description, $defaultValue);
     }
+
+    // phpcs:enable
 
     /**
      * @inheritDoc

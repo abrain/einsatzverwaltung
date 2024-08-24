@@ -390,7 +390,7 @@ class Helper
         echo '<input type="hidden" name="aktion" value="' . $parsedArgs['action_value'] . '" />';
         echo '<table class="evw_match_fields"><tr><th>';
         printf('Feld in %s', $source->getName());
-        echo '</th><th>' . 'Feld in Einsatzverwaltung' . '</th></tr><tbody>';
+        echo '</th><th>Feld in Einsatzverwaltung</th></tr><tbody>';
         foreach ($fields as $field) {
             echo '<tr><td><strong>' . $field . '</strong></td><td>';
             if (array_key_exists($field, $source->getAutoMatchFields())) {

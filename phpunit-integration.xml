@@ -6,6 +6,7 @@
     </include>
     <report>
       <clover outputFile="build/logs/clover-integration.xml"/>
+      <text outputFile="php://stdout"/>
     </report>
   </coverage>
   <testsuites>

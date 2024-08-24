@@ -24,6 +24,14 @@
         <exclude name="Generic.Files.LineLength"/>
     </rule>
 
+    <rule ref="PSR2.Classes.PropertyDeclaration.Underscore">
+        <severity>5</severity>
+    </rule>
+    <rule ref="PSR2.Methods.MethodDeclaration.Underscore">
+        <severity>5</severity>
+    </rule>
+    <rule ref="PSR2.Namespaces.NamespaceDeclaration"/>
+
     <!-- For help in understanding these custom sniff properties:
             https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards/wiki/Customizable-sniff-properties -->
     <config name="minimum_wp_version" value="5.6"/>
@@ -36,6 +44,12 @@
             </property>
         </properties>
     </rule>
+    <rule ref="WordPress.WP.I18n.MissingTranslatorsComment">
+        <type>error</type>
+    </rule>
+    <rule ref="WordPress.WP.I18n.TranslatorsCommentWrongStyle">
+        <type>error</type>
+    </rule>
 
     <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
         <exclude-pattern>tests/</exclude-pattern>
@@ -45,5 +59,37 @@
                 <element value="abrain\Einsatzverwaltung"/>
             </property>
         </properties>
+    </rule>
+
+    <rule ref="Modernize.FunctionCalls.Dirname.Nested"/>
+
+    <rule ref="Generic.PHP.DeprecatedFunctions"/>
+    <rule ref="Generic.PHP.ForbiddenFunctions"/>
+    <rule ref="Generic.PHP.Syntax"/>
+    <rule ref="Generic.Functions.CallTimePassByReference"/>
+    <rule ref="Generic.CodeAnalysis.EmptyStatement"/>
+    <rule ref="Generic.CodeAnalysis.ForLoopShouldBeWhileLoop"/>
+    <rule ref="Generic.CodeAnalysis.ForLoopWithTestFunctionCall"/>
+    <rule ref="Generic.CodeAnalysis.JumbledIncrementer"/>
+    <rule ref="Generic.CodeAnalysis.UnconditionalIfStatement"/>
+    <rule ref="Generic.CodeAnalysis.UnnecessaryFinalModifier"/>
+    <rule ref="Generic.CodeAnalysis.UselessOverridingMethod"/>
+    <rule ref="Generic.Classes.DuplicateClassName"/>
+    <rule ref="Generic.Strings.UnnecessaryStringConcat">
+        <properties>
+            <property name="allowMultiline" value="true"/>
+        </properties>
+    </rule>
+    <rule ref="Generic.CodeAnalysis.RequireExplicitBooleanOperatorPrecedence"/>
+    <rule ref="Generic.CodeAnalysis.UnusedFunctionParameter">
+        <!-- Allow for callback functions which may not need all parameters passed. -->
+        <exclude name="Generic.CodeAnalysis.UnusedFunctionParameter.FoundBeforeLastUsed"/>
+        <!-- Allow for functions in extended classes/implemented interfaces. -->
+        <exclude name="Generic.CodeAnalysis.UnusedFunctionParameter.FoundInExtendedClass"/>
+        <exclude name="Generic.CodeAnalysis.UnusedFunctionParameter.FoundInExtendedClassBeforeLastUsed"/>
+        <exclude name="Generic.CodeAnalysis.UnusedFunctionParameter.FoundInExtendedClassAfterLastUsed"/>
+        <exclude name="Generic.CodeAnalysis.UnusedFunctionParameter.FoundInImplementedInterface"/>
+        <exclude name="Generic.CodeAnalysis.UnusedFunctionParameter.FoundInImplementedInterfaceBeforeLastUsed"/>
+        <exclude name="Generic.CodeAnalysis.UnusedFunctionParameter.FoundInImplementedInterfaceAfterLastUsed"/>
     </rule>
 </ruleset>

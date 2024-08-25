@@ -1,0 +1,6 @@
+{
+  "redefinable-internals": [
+    "feof",
+    "fgetcsv"
+  ]
+}

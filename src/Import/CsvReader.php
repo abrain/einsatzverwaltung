@@ -88,20 +88,16 @@ class CsvReader
         $lines = array();
         while ($numLines === 0 || $linesRead < $numLines) {
             $line = fgetcsv($handle, 0, $this->delimiter, $this->enclosure);
-            $linesRead++;
 
-            // End of file reached?
-            if ($line === false && feof($handle)) {
+            // Error while reading, most likely EOF
+            if ($line === false) {
                 break;
             }
 
-            // Problem while reading the file
-            if (empty($line)) {
-                throw new FileReadException();
-            }
+            $linesRead++;
 
             // Empty line in the file, skip this
-            if (is_array($line) && $line[0] == null) {
+            if ($line == [null]) {
                 continue;
             }
 
@@ -118,6 +114,14 @@ class CsvReader
                 $filteredLine[] = array_key_exists($columnIndex, $line) ? $line[$columnIndex] : '';
             }
             $lines[] = $filteredLine;
+        }
+
+        if (($numLines === 0 || $linesRead < $numLines) && feof($handle) === false) {
+            throw new FileReadException(sprintf(
+                // translators: 1: number of lines
+                _n('Reading was aborted after %d line', 'Reading was aborted after %d lines', $linesRead, 'einsatzverwaltung'),
+                $linesRead
+            ));
         }
 
         return $lines;

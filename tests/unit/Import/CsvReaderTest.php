@@ -3,6 +3,7 @@ namespace abrain\Einsatzverwaltung\Import;
 
 use abrain\Einsatzverwaltung\Exceptions\FileReadException;
 use abrain\Einsatzverwaltung\UnitTestCase;
+use function Brain\Monkey\Functions\when;
 
 /**
  * Class CsvReaderTest
@@ -67,5 +68,43 @@ class CsvReaderTest extends UnitTestCase
             ['Ru18STzsnj', ''],
             ['9f0NPAB0HU', '']
         ], $lines);
+    }
+
+    public function testThrowsWhenReadingTooFewLines()
+    {
+        $this->expectException(FileReadException::class);
+        $this->expectExceptionMessage('2 lines');
+        $csvReader = new CsvReader(__DIR__ . '/reports.csv', ';', '"');
+
+        $counter = 0;
+        when('fgetcsv')->alias(function () use (&$counter) {
+            if ($counter++ > 1) {
+                return false;
+            }
+            return ['lorem', 'ipsum'];
+        });
+        when('feof')->justReturn(false);
+
+        // Suppress the warning, otherwise PHPUnit would convert it to an exception
+        @$csvReader->getLines(3);
+    }
+
+    public function testThrowsWhenStoppingBeforeEndOfFile()
+    {
+        $this->expectException(FileReadException::class);
+        $this->expectExceptionMessage('1 line');
+        $csvReader = new CsvReader(__DIR__ . '/reports.csv', ';', '"');
+
+        $counter = 0;
+        when('fgetcsv')->alias(function () use (&$counter) {
+            if ($counter++ > 0) {
+                return false;
+            }
+            return ['lorem', 'ipsum'];
+        });
+        when('feof')->justReturn(false);
+
+        // Suppress the warning, otherwise PHPUnit would convert it to an exception
+        @$csvReader->getLines(0);
     }
 }

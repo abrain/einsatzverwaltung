@@ -1,57 +1,49 @@
 <?php
 namespace abrain\Einsatzverwaltung\Import\Sources;
 
+use abrain\Einsatzverwaltung\Exceptions\FileReadException;
+use abrain\Einsatzverwaltung\Exceptions\ImportCheckException;
+use abrain\Einsatzverwaltung\Exceptions\ImportException;
+use abrain\Einsatzverwaltung\Import\CsvReader;
+use abrain\Einsatzverwaltung\Import\Step;
 use abrain\Einsatzverwaltung\Utilities;
+use function __;
+use function array_map;
+use function array_search;
+use function error_log;
+use function in_array;
+use function print_r;
 
 /**
  * Importiert Einsatzberichte aus einer CSV-Datei
  */
-class Csv extends AbstractSource
+class Csv extends FileSource
 {
-    /**
-     * @var Utilities
-     */
-    protected $utilities;
-    private $dateFormats = array('d.m.Y', 'd.m.y', 'Y-m-d', 'm/d/Y', 'm/d/y');
-    private $timeFormats = array('H:i', 'G:i', 'H:i:s', 'G:i:s');
     private $csvFilePath;
+    private $dateFormats = array('d.m.Y', 'd.m.y', 'Y-m-d', 'm/d/Y', 'm/d/y');
     private $delimiter = ';';
     private $enclosure = '"';
     private $fileHasHeadlines = false;
+    private $timeFormats = array('H:i', 'G:i', 'H:i:s', 'G:i:s');
 
     /**
      * Csv constructor.
      *
-     * @param Utilities $utilities
      */
-    public function __construct($utilities)
+    public function __construct()
     {
-        $this->utilities = $utilities;
+        $this->description = 'Importiert Einsatzberichte aus einer CSV-Datei.';
+        $this->identifier = 'evw_csv';
+        $this->mimeType = 'text/csv';
+        $this->name = 'CSV';
 
-        $this->actionOrder = array(
-            array(
-                'slug' => 'selectcsvfile',
-                'name' => 'Dateiauswahl',
-                'button_text' => 'Datei ausw&auml;hlen',
-                'args' => array()
-            ),
-            array(
-                'slug' => 'analysis',
-                'name' => 'Analyse',
-                'button_text' => 'Datei analysieren',
-                'args' => array('csv_file_id', 'has_headlines', 'delimiter')
-            ),
-            array(
-                'slug' => 'import',
-                'name' => 'Import',
-                'button_text' => 'Import starten',
-                'args' => array('csv_file_id', 'has_headlines', 'delimiter')
-            )
-        );
+        $this->steps[] = new Step(self::STEP_CHOOSEFILE, __('Choose a CSV file', 'einsatzverwaltung'), 'Datei ausw&auml;hlen');
+        $this->steps[] = new Step(self::STEP_ANALYSIS, 'Analyse', 'Datei analysieren', ['file_id', 'has_headlines', 'delimiter']);
+        $this->steps[] = new Step(self::STEP_IMPORT, 'Import', 'Import starten', ['file_id', 'has_headlines', 'delimiter']);
     }
 
     /**
-     * @return boolean True, wenn Voraussetzungen stimmen, ansonsten false
+     * @inheritDoc
      */
     public function checkPreconditions()
     {
@@ -62,62 +54,70 @@ class Csv extends AbstractSource
             $this->delimiter = $delimiter;
         }
 
-        $attachmentId = $this->args['csv_file_id'];
+        $attachmentId = $this->args['file_id'];
         if (empty($attachmentId)) {
-            $this->utilities->printError('Keine Datei ausgew&auml;hlt');
-            return false;
+            throw new ImportCheckException('Keine Datei ausgew&auml;hlt');
         }
 
         if (!is_numeric($attachmentId)) {
-            $this->utilities->printError('Attachment ID ist keine Zahl');
-            return false;
+            throw new ImportCheckException('Attachment ID ist keine Zahl');
         }
 
         $csvFilePath = get_attached_file($attachmentId);
         if (empty($csvFilePath)) {
-            $this->utilities->printError(sprintf('Konnte Attachment mit ID %d nicht finden', $attachmentId));
-            return false;
+            throw new ImportCheckException(sprintf('Konnte Attachment mit ID %d nicht finden', $attachmentId));
         }
 
         $this->csvFilePath = $csvFilePath;
         if (!file_exists($csvFilePath)) {
-            $this->utilities->printError('Datei existiert nicht');
-            return false;
+            throw new ImportCheckException('Datei existiert nicht');
         }
 
-        $readFile = $this->readFile(0);
-        if (false === $readFile) {
-            return false;
+        try {
+            $csvReader = new CsvReader($csvFilePath, $this->delimiter, $this->enclosure);
+            $csvReader->getLines(1);
+        } catch (FileReadException $e) {
+            throw new ImportCheckException($e->getMessage());
         }
-
-        return true;
     }
 
     /**
      * @inheritDoc
      */
-    public function echoExtraFormFields($nextAction)
+    public function echoExtraFormFields(string $currentAction, Step $nextStep)
     {
-        echo '<h3>Datums- und Zeitformat</h3>';
-        $dateExample = strtotime('December 31st 5:29 am');
+        if ($currentAction === self::STEP_CHOOSEFILE) {
+            echo '<h3>Aufbau der CSV-Datei</h3>';
+            echo '<input id="has_headlines" name="has_headlines" type="checkbox" value="1" />';
+            echo '<label for="has_headlines">Erste Zeile der Datei enth&auml;lt Spaltenbeschriftung</label>';
+            echo '<p class="description">Setze diesen Haken, wenn die erste Zeile der CSV-Datei keine Daten von Eins&auml;tzen enth&auml;lt, sondern nur die &Uuml;berschriften der jeweiligen Spalten.</p>';
+            echo '<br>Trennzeichen zwischen den Spalten:&nbsp;';
+            echo '<label><input type="radio" name="delimiter" value=";" checked="checked"><code>;</code> Semikolon</label>';
+            echo '&nbsp;<label><input type="radio" name="delimiter" value=","><code>,</code> Komma</label>';
+            echo '<p class="description">Wenn du unsicher bist, kannst du die CSV-Datei mit einem Texteditor &ouml;ffnen und nachsehen.</p>';
+            echo '<p class="description">Als Feldbegrenzerzeichen (umschlie&szlig;t ggf. den Inhalt einer Spalte) wird das Anf&uuml;hrungszeichen <code>&quot;</code> erwartet.</p>';
+        } elseif (in_array($currentAction, [self::STEP_ANALYSIS, self::STEP_IMPORT])) {
+            echo '<h3>Datums- und Zeitformat</h3>';
+            $dateExample = strtotime('December 31st 5:29 am');
 
-        echo '<div class="import-date-formats">';
-        foreach ($this->dateFormats as $dateFormat) {
-            echo '<label><input type="radio" name="import_date_format" value="'.$dateFormat.'"';
-            checked($this->getDateFormat(), $dateFormat);
-            echo ' />' . date($dateFormat, $dateExample) . '</label><br/>';
+            echo '<div class="import-date-formats">';
+            foreach ($this->dateFormats as $dateFormat) {
+                echo '<label><input type="radio" name="import_date_format" value="'.$dateFormat.'"';
+                checked($this->getDateFormat(), $dateFormat);
+                echo ' />' . date($dateFormat, $dateExample) . '</label><br/>';
+            }
+            echo '</div>';
+
+            echo '<div class="import-time-formats">';
+            foreach ($this->timeFormats as $timeFormat) {
+                echo '<label><input type="radio" name="import_time_format" value="'.$timeFormat.'"';
+                checked($this->getTimeFormat(), $timeFormat);
+                echo ' />' . date($timeFormat, $dateExample) . '</label><br/>';
+            }
+            echo '</div>';
         }
-        echo '</div>';
 
-        echo '<div class="import-time-formats">';
-        foreach ($this->timeFormats as $timeFormat) {
-            echo '<label><input type="radio" name="import_time_format" value="'.$timeFormat.'"';
-            checked($this->getTimeFormat(), $timeFormat);
-            echo ' />' . date($timeFormat, $dateExample) . '</label><br/>';
-        }
-        echo '</div>';
-
-        parent::echoExtraFormFields($nextAction);
+        parent::echoExtraFormFields($currentAction, $nextStep);
     }
 
     /**
@@ -126,34 +126,32 @@ class Csv extends AbstractSource
     public function getDateFormat()
     {
         if (!array_key_exists('import_date_format', $this->args)) {
-            $fallbackDateFormat = $this->dateFormats[0];
-            return $fallbackDateFormat;
+            return $this->dateFormats[0];
         }
 
         return $this->args['import_date_format'];
     }
 
     /**
-     * Gibt die Beschreibung der Importquelle zurück
-     *
-     * @return string Beschreibung der Importquelle
+     * @inheritDoc
      */
-    public function getDescription()
+    public function getEntries(array $requestedFields = [])
     {
-        return 'Importiert Einsatzberichte aus einer CSV-Datei.';
-    }
+        $columns = [];
+        if (!empty($requestedFields)) {
+            $fields = $this->getFields();
+            foreach ($requestedFields as $requestedField) {
+                $columns[] = array_search($requestedField, $fields);
+            }
+            error_log('Requested fields: '.print_r($requestedFields, true).', columns: '.print_r($columns, true));
+        }
 
-    /**
-     * Gibt die Einsatzberichte der Importquelle zurück
-     *
-     * @param array $fields Felder der Importquelle, die abgefragt werden sollen. Ist dieser Parameter null, werden alle
-     * Felder abgefragt.
-     *
-     * @return array|bool
-     */
-    public function getEntries($fields)
-    {
-        $lines = $this->readFile(null, $fields);
+        $csvReader = new CsvReader($this->csvFilePath, $this->delimiter, $this->enclosure);
+        try {
+            $lines = $csvReader->getLines(0, $columns);
+        } catch (FileReadException $e) {
+            throw new ImportException($e->getMessage());
+        }
 
         if (empty($lines)) {
             return false;
@@ -167,7 +165,7 @@ class Csv extends AbstractSource
     }
 
     /**
-     * @return array
+     * @inheritDoc
      */
     public function getFields()
     {
@@ -175,43 +173,29 @@ class Csv extends AbstractSource
             return $this->cachedFields;
         }
 
-        $fields = $this->readFile(1);
+        $csvReader = new CsvReader($this->csvFilePath, $this->delimiter, $this->enclosure);
+        try {
+            $lines = $csvReader->getLines(1);
+            $fields = $lines[0];
+        } catch (FileReadException $e) {
+            throw new ImportCheckException($e->getMessage());
+        }
 
         if (empty($fields)) {
             return array();
         }
 
-        // Gebe nummerierte Spalten zurück, wenn es keine Überschriften gibt
+        // If the first line does not contain the column names, return names like Coulumn 1, Column 2, ...
         if (!$this->fileHasHeadlines) {
             return array_map(function ($number) {
-                return sprintf('Spalte %d', $number);
-            }, range(1, count($fields[0])));
+                // translators: 1: column number
+                return sprintf(__('Column %d', 'einsatzverwaltung'), $number);
+            }, range(1, count($fields)));
         }
 
-        $this->cachedFields = $fields[0];
+        $this->cachedFields = $fields;
 
-        // Gebe die Überschriften der Spalten zurück
-        return $fields[0];
-    }
-
-    /**
-     * Gibt den eindeutigen Bezeichner der Importquelle zurück
-     *
-     * @return string Eindeutiger Bezeichner der Importquelle
-     */
-    public function getIdentifier()
-    {
-        return 'evw_csv';
-    }
-
-    /**
-     * Gibt den Namen der Importquelle zurück
-     *
-     * @return string Name der Importquelle
-     */
-    public function getName()
-    {
-        return 'CSV';
+        return $fields;
     }
 
     /**
@@ -220,70 +204,9 @@ class Csv extends AbstractSource
     public function getTimeFormat()
     {
         if (!array_key_exists('import_time_format', $this->args)) {
-            $fallbackTimeFormat = $this->timeFormats[0];
-            return $fallbackTimeFormat;
+            return $this->timeFormats[0];
         }
 
         return $this->args['import_time_format'];
-    }
-
-    /**
-     * @param int|null $numLinesToRead Maximale Anzahl zu lesender Zeilen, oder null um alle Zeilen einzulesen
-     * @param array $requestedFields
-     *
-     * @return array|bool
-     */
-    private function readFile($numLinesToRead = null, $requestedFields = array())
-    {
-        $fieldMap = array();
-        if (!empty($requestedFields)) {
-            $fields = $this->getFields();
-            foreach ($requestedFields as $requestedField) {
-                $fieldMap[$requestedField] = array_search($requestedField, $fields);
-            }
-        }
-
-        $handle = fopen($this->csvFilePath, 'r');
-        if (empty($handle)) {
-            $this->utilities->printError('Konnte Datei nicht öffnen');
-            return false;
-        }
-
-        if ($numLinesToRead === 0) {
-            fclose($handle);
-            return array();
-        }
-
-        $lines = array();
-        $numberOfLines = 0;
-        while (null === $numLinesToRead || $numberOfLines < $numLinesToRead) {
-            $line = fgetcsv($handle, 0, $this->delimiter, $this->enclosure);
-
-            // Problem beim Lesen oder Ende der Datei
-            if (empty($line)) {
-                break;
-            }
-
-            // Leere Zeile
-            if (is_array($line) && $line[0] == null) {
-                continue;
-            }
-
-            if (empty($requestedFields)) {
-                $lines[] = $line;
-                continue;
-            }
-
-            $filteredLine = array();
-            foreach ($fieldMap as $fieldName => $index) {
-                // Fehlende Felder in zu kurzen Zeilen werden als leer gewertet
-                $filteredLine[$fieldName] = array_key_exists($index, $line) ? $line[$index] : '';
-            }
-            $lines[] = $filteredLine;
-            $numberOfLines = count($lines);
-        }
-
-        fclose($handle);
-        return $lines;
     }
 }

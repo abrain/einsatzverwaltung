@@ -5,7 +5,7 @@ namespace abrain\Einsatzverwaltung\Admin;
 use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\Data;
 use abrain\Einsatzverwaltung\Export\Tool as ExportTool;
-use abrain\Einsatzverwaltung\Import\Tool as ImportTool;
+use abrain\Einsatzverwaltung\Import\Page as ImportPage;
 use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\PermalinkController;
 use abrain\Einsatzverwaltung\Settings\MainPage;
@@ -57,8 +57,8 @@ class Initializer
         add_action('admin_menu', array($mainPage, 'addToSettingsMenu'));
         add_action('admin_init', array($mainPage, 'registerSettings'));
 
-        $importTool = new ImportTool($utilities, $data);
-        add_action('admin_menu', array($importTool, 'addToolToMenu'));
+        $importPage = new ImportPage($utilities, $data);
+        add_action('admin_menu', array($importPage, 'registerAsToolPage'));
 
         $exportTool = new ExportTool();
         add_action('admin_menu', array($exportTool, 'addToolToMenu'));

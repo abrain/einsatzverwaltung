@@ -1,6 +1,7 @@
 <?php
 namespace abrain\Einsatzverwaltung\Import;
 
+use abrain\Einsatzverwaltung\AdminPage;
 use abrain\Einsatzverwaltung\Data;
 use abrain\Einsatzverwaltung\Exceptions\ImportException;
 use abrain\Einsatzverwaltung\Exceptions\ImportPreparationException;
@@ -14,10 +15,8 @@ use WP_Post;
 /**
  * Werkzeug für den Import von Einsatzberichten aus verschiedenen Quellen
  */
-class Tool
+class Page extends AdminPage
 {
-    const EVW_TOOL_IMPORT_SLUG = 'einsatzvw-tool-import';
-
     private $sources = array();
 
     /**
@@ -58,24 +57,11 @@ class Tool
      */
     public function __construct($utilities, $data)
     {
+        parent::__construct('Einsatzberichte importieren', 'einsatzvw-tool-import');
         $this->utilities = $utilities;
         $this->data = $data;
 
         $this->loadSources();
-    }
-
-    /**
-     * Fügt das Werkzeug zum Menü hinzu
-     */
-    public function addToolToMenu()
-    {
-        add_management_page(
-            'Einsatzberichte importieren',
-            'Einsatzberichte importieren',
-            'manage_options',
-            self::EVW_TOOL_IMPORT_SLUG,
-            array($this, 'renderToolPage')
-        );
     }
 
     /**
@@ -109,15 +95,12 @@ class Tool
     /**
      * Generiert den Inhalt der Werkzeugseite
      */
-    public function renderToolPage()
+    protected function echoPageContent()
     {
         $this->helper = new Helper($this->utilities, $this->data);
         $this->helper->metaFields = IncidentReport::getMetaFields();
         $this->helper->taxonomies = IncidentReport::getTerms();
         $this->helper->postFields = IncidentReport::getPostFields();
-
-        echo '<div class="wrap">';
-        echo '<h1>Einsatzberichte importieren</h1>';
 
         $aktion = null;
         if (array_key_exists('aktion', $_POST)) {
@@ -193,7 +176,7 @@ class Tool
             $this->importPage();
         } elseif ('selectcsvfile' == $aktion) {
             if (false === $this->nextAction) {
-                $this->utilities->printError('Keine Nachfolgeaktion gefunden!');
+                $this->printError('Keine Nachfolgeaktion gefunden!');
                 return;
             }
 
@@ -202,7 +185,7 @@ class Tool
 
             echo '<h3>In der Mediathek gefundene CSV-Dateien</h3>';
             echo 'Bevor eine Datei f&uuml;r den Import verwendet werden kann, muss sie in die <a href="' . admin_url('upload.php') . '">Mediathek</a> hochgeladen worden sein. Nach erfolgreichem Import kann die Datei gel&ouml;scht werden.';
-            $this->utilities->printWarning('Der Inhalt der Mediathek ist &ouml;ffentlich abrufbar. Achte darauf, dass die Importdatei keine sensiblen Daten enth&auml;lt.');
+            $this->printWarning('Der Inhalt der Mediathek ist &ouml;ffentlich abrufbar. Achte darauf, dass die Importdatei keine sensiblen Daten enth&auml;lt.');
 
             $csvAttachments = get_posts(array(
                 'post_type' => 'attachment',
@@ -243,8 +226,6 @@ class Tool
             submit_button($this->nextAction['button_text']);
             echo '</form>';
         }
-
-        echo '</div>';
     }
 
     private function analysisPage()
@@ -255,16 +236,15 @@ class Tool
 
         $felder = $this->currentSource->getFields();
         if (empty($felder)) {
-            $this->utilities->printError('Es wurden keine Felder gefunden');
+            $this->printError('Es wurden keine Felder gefunden');
             return;
         }
-        $this->utilities->printSuccess('Es wurden ' . count($felder) . ' Feld(er) gefunden: ' . implode(', ', $felder));
 
         // Auf Pflichtfelder prüfen
         $mandatoryFieldsOk = true;
         foreach (array_keys($this->currentSource->getAutoMatchFields()) as $autoMatchField) {
             if (!in_array($autoMatchField, $felder)) {
-                $this->utilities->printError(
+                $this->printError(
                     sprintf('Das automatisch zu importierende Feld %s konnte nicht gefunden werden!', $autoMatchField)
                 );
                 $mandatoryFieldsOk = false;
@@ -277,10 +257,10 @@ class Tool
         // Einsätze zählen
         $entries = $this->currentSource->getEntries(null);
         if (empty($entries)) {
-            $this->utilities->printWarning('Es wurden keine Eins&auml;tze gefunden.');
+            $this->printWarning('Es wurden keine Eins&auml;tze gefunden.');
             return;
         }
-        $this->utilities->printSuccess(sprintf("Es wurden %s Eins&auml;tze gefunden", count($entries)));
+        $this->printSuccess(sprintf("Es wurden %s Eins&auml;tze gefunden", count($entries)));
 
         if ('evw_wpe' == $this->currentSource->getIdentifier()) {
             $this->printDataNotice();
@@ -304,7 +284,7 @@ class Tool
 
         $sourceFields = $this->currentSource->getFields();
         if (empty($sourceFields)) {
-            $this->utilities->printError('Es wurden keine Felder gefunden');
+            $this->printError('Es wurden keine Felder gefunden');
             return;
         }
 
@@ -334,16 +314,16 @@ class Tool
             $importStatus->abort(sprintf('Import abgebrochen, Ursache: %1$s', $e->getMessage()));
             $errorDetails = $e->getDetails();
             if (count($errorDetails) > 0) {
-                $this->utilities->printError('WordPress gab folgende Details zur Fehlerursache zurück: ' . join(' ', $errorDetails));
+                $this->printError('WordPress gab folgende Details zur Fehlerursache zurück: ' . join(' ', $errorDetails));
             }
-            $this->utilities->printInfo(sprintf('Erfolgreich importiert: %1$d von %2$d', $importStatus->currentStep, $importStatus->totalSteps));
+            $this->printInfo(sprintf('Erfolgreich importiert: %1$d von %2$d', $importStatus->currentStep, $importStatus->totalSteps));
             return;
         } catch (ImportPreparationException $e) {
             $importStatus->abort('Importvorbereitung abgebrochen, Ursache: ' . $e->getMessage());
             return;
         }
 
-        $this->utilities->printSuccess('Der Import ist abgeschlossen');
+        $this->printSuccess('Der Import ist abgeschlossen');
         $url = admin_url('edit.php?post_type=einsatz');
         printf('<a href="%s">Zu den Einsatzberichten</a>', $url);
     }

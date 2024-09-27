@@ -20,6 +20,16 @@ class AdminPageTest extends UnitTestCase
         $page->registerAsToolPage();
     }
 
+    /**
+     * @throws ExpectationArgsRequired
+     */
+    public function testRegistersPageWithCustomCapability()
+    {
+        $page = $this->getMockForAbstractClass(AdminPage::class, ['Title of the page', 'menu-slug', 'needed-capability']);
+        expect('add_management_page')->once()->with('Title of the page', 'Title of the page', 'needed-capability', 'menu-slug', array($page, 'render'));
+        $page->registerAsToolPage();
+    }
+
     public function testRenderPage()
     {
         $page = $this->getMockForAbstractClass(AdminPage::class, ['Page Title', 'test-page']);

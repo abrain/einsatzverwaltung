@@ -24,13 +24,20 @@ abstract class AdminPage
     private $pageTitle;
 
     /**
+     * @var string
+     */
+    private $capability;
+
+    /**
      * @param string $pageTitle
      * @param string $menuSlug
+     * @param string $capability
      */
-    public function __construct(string $pageTitle, string $menuSlug)
+    public function __construct(string $pageTitle, string $menuSlug, string $capability = 'manage_options')
     {
         $this->pageTitle = $pageTitle;
         $this->menuSlug = $menuSlug;
+        $this->capability = $capability;
     }
 
     abstract protected function echoPageContent();
@@ -83,7 +90,7 @@ abstract class AdminPage
         add_management_page(
             $this->pageTitle,
             esc_html($this->pageTitle),
-            'manage_options',
+            $this->capability,
             $this->menuSlug,
             array($this, 'render')
         );

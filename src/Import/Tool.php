@@ -331,7 +331,12 @@ class Tool
         try {
             $this->helper->import($this->currentSource, $mapping, $importStatus);
         } catch (ImportException $e) {
-            $importStatus->abort('Import abgebrochen, Ursache: ' . $e->getMessage());
+            $importStatus->abort(sprintf('Import abgebrochen, Ursache: %1$s', $e->getMessage()));
+            $errorDetails = $e->getDetails();
+            if (count($errorDetails) > 0) {
+                $this->utilities->printError('WordPress gab folgende Details zur Fehlerursache zurück: ' . join(' ', $errorDetails));
+            }
+            $this->utilities->printInfo(sprintf('Erfolgreich importiert: %1$d von %2$d', $importStatus->currentStep, $importStatus->totalSteps));
             return;
         } catch (ImportPreparationException $e) {
             $importStatus->abort('Importvorbereitung abgebrochen, Ursache: ' . $e->getMessage());

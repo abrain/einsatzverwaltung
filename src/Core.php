@@ -172,7 +172,9 @@ class Core
 
         if (is_admin()) {
             add_action('admin_notices', array($this, 'onAdminNotices'));
-            new Admin\Initializer($this->data, $this->options, $this->utilities, $this->permalinkController);
+            $adminInitializer = new Admin\Initializer($this->data, $this->options, $this->utilities, $this->permalinkController);
+            $adminInitializer->addHooks();
+            $adminInitializer->onInit();
             (new Ajax())->addHooks();
         }
 

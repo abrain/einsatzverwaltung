@@ -28,6 +28,13 @@ class Page extends AdminPage
         $this->loadFormats();
     }
 
+    public function addHooks()
+    {
+        parent::addHooks();
+        add_action('init', array($this, 'startExport'), 20); // later priority, because this functions gets called during init hook with priority 10
+        add_action('admin_enqueue_scripts', array($this, 'enqueueAdminScripts'));
+    }
+
     /**
      * @param string $hook
      */

@@ -40,7 +40,7 @@
     "php-cs-fixer/phpunit-constraint-isidenticalstring": "1.5.0",
     "php-cs-fixer/phpunit-constraint-xmlmatchesxsd": "1.5.0",
     "phpcompatibility/php-compatibility": "9.3.5",
-    "yoast/phpunit-polyfills": "2.0.2",
+    "yoast/phpunit-polyfills": "3.0.0",
     "phpcompatibility/phpcompatibility-wp": "2.1.5",
     "wp-coding-standards/wpcs": "3.1.0",
     "phpunit/phpunit": "9.6.21"

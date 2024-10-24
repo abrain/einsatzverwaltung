@@ -44,7 +44,7 @@ class Reports extends WP_REST_Controller
                         'description' => __('Very short description of the incident, will be used in the title', 'einsatzverwaltung'),
                         'type' => 'string',
                         'validate_callback' => array($this, 'validateStringNotEmpty'),
-                        'sanitize_callback' => function ($param, $request, $key) {
+                        'sanitize_callback' => function ($param, $request, $key) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
                             return wp_strip_all_tags($param);
                         },
                         'required' => true,
@@ -88,7 +88,7 @@ class Reports extends WP_REST_Controller
                         'description' => __('If the report should be published immediately.', 'einsatzverwaltung'),
                         'type' => 'boolean',
                         'default' => false,
-                        'validate_callback' => function ($param, $request, $key) {
+                        'validate_callback' => function ($param, $request, $key) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
                             return is_bool($param);
                         },
                         'required' => false,

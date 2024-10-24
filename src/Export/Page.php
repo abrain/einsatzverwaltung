@@ -1,6 +1,7 @@
 <?php
 namespace abrain\Einsatzverwaltung\Export;
 
+use abrain\Einsatzverwaltung\AdminPage;
 use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\Export\Formats\Csv;
 use abrain\Einsatzverwaltung\Export\Formats\Excel;
@@ -9,7 +10,7 @@ use abrain\Einsatzverwaltung\Export\Formats\Json;
 /**
  * Werkzeug für den Export von Einsatzberichten in verschiedenen Formaten
  */
-class Tool
+class Page extends AdminPage
 {
     const EVW_TOOL_EXPORT_SLUG = 'einsatzvw-tool-export';
 
@@ -23,21 +24,8 @@ class Tool
      */
     public function __construct()
     {
+        parent::__construct('Einsatzberichte exportieren', self::EVW_TOOL_EXPORT_SLUG, 'export');
         $this->loadFormats();
-    }
-
-    /**
-     * Fügt das Werkzeug zum Menü hinzu
-     */
-    public function addToolToMenu()
-    {
-        add_management_page(
-            'Einsatzberichte exportieren',
-            'Einsatzberichte exportieren',
-            'export',
-            self::EVW_TOOL_EXPORT_SLUG,
-            array($this, 'renderToolPage')
-        );
     }
 
     /**
@@ -92,10 +80,8 @@ class Tool
     /**
      * Generiert den Inhalt der Werkzeugseite
      */
-    public function renderToolPage()
+    protected function echoPageContent()
     {
-        echo '<div class="wrap">';
-        echo '<h1>Einsatzberichte exportieren</h1>';
         echo '<p>Dieses Werkzeug exportiert Einsatzberichte in verschiedenen Formaten.</p>'; ?>
 <form method="get" id="export-form">
     <input type="hidden" name="page" value="einsatzvw-tool-export">
@@ -145,7 +131,6 @@ class Tool
 </form>
 
         <?php
-        echo '</div>';
     }
 
     private function renderDateOptions()

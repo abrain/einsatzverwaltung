@@ -23,6 +23,26 @@ use function wp_enqueue_style;
 class Initializer
 {
     /**
+     * @var Data
+     */
+    private $data;
+
+    /**
+     * @var Options
+     */
+    private $options;
+
+    /**
+     * @var Utilities
+     */
+    private $utilities;
+
+    /**
+     * @var PermalinkController
+     */
+    private $permalinkController;
+
+    /**
      * Initializer constructor.
      *
      * @param Data $data
@@ -32,6 +52,14 @@ class Initializer
      */
     public function __construct(Data $data, Options $options, Utilities $utilities, PermalinkController $permalinkController)
     {
+        $this->data = $data;
+        $this->options = $options;
+        $this->utilities = $utilities;
+        $this->permalinkController = $permalinkController;
+    }
+
+    public function addHooks()
+    {
         $pluginBasename = Core::$pluginBasename;
         add_action('admin_menu', array($this, 'hideTaxonomies'));
         add_action('admin_notices', array($this, 'displayAdminNotices'));
@@ -40,7 +68,10 @@ class Initializer
         add_filter('plugin_row_meta', array($this, 'pluginMetaLinks'), 10, 2);
         add_filter("plugin_action_links_{$pluginBasename}", array($this,'addActionLinks'));
         add_filter('use_block_editor_for_post_type', array($this, 'useBlockEditorForReports'), 10, 2);
+    }
 
+    public function onInit()
+    {
         $reportListTable = new ReportListTable();
         add_filter('manage_edit-einsatz_columns', array($reportListTable, 'filterColumnsEinsatz'));
         add_action('manage_einsatz_posts_custom_column', array($reportListTable, 'filterColumnContentEinsatz'), 10, 2);
@@ -53,11 +84,11 @@ class Initializer
         add_filter('wp_dropdown_cats', array($reportEditScreen, 'filterIncidentCategoryDropdown'), 10, 2);
 
         // Register Settings
-        $mainPage = new MainPage($options, $permalinkController);
+        $mainPage = new MainPage($this->options, $this->permalinkController);
         add_action('admin_menu', array($mainPage, 'addToSettingsMenu'));
         add_action('admin_init', array($mainPage, 'registerSettings'));
 
-        $importTool = new ImportTool($utilities, $data);
+        $importTool = new ImportTool($this->utilities, $this->data);
         add_action('admin_menu', array($importTool, 'addToolToMenu'));
 
         $exportTool = new ExportTool();
@@ -65,7 +96,7 @@ class Initializer
         add_action('init', array($exportTool, 'startExport'), 20); // 20, damit alles andere initialisiert ist
         add_action('admin_enqueue_scripts', array($exportTool, 'enqueueAdminScripts'));
 
-        $tasksPage = new TasksPage($utilities, $data);
+        $tasksPage = new TasksPage($this->utilities, $this->data);
         add_action('admin_menu', array($tasksPage, 'registerPage'));
         add_action('admin_menu', array($tasksPage, 'hidePage'), 999);
     }

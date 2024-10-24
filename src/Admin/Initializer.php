@@ -4,8 +4,8 @@ namespace abrain\Einsatzverwaltung\Admin;
 
 use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\Data;
-use abrain\Einsatzverwaltung\Export\Tool as ExportTool;
-use abrain\Einsatzverwaltung\Import\Tool as ImportTool;
+use abrain\Einsatzverwaltung\Export\Page as ExportPage;
+use abrain\Einsatzverwaltung\Import\Page as ImportPage;
 use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\PermalinkController;
 use abrain\Einsatzverwaltung\Settings\MainPage as MainSettingsPage;
@@ -75,8 +75,8 @@ class Initializer
         (new ReportListTable())->addHooks();
         (new ReportEditScreen())->addHooks();
         (new MainSettingsPage($this->options, $this->permalinkController))->addHooks();
-        (new ImportTool($this->utilities, $this->data))->addHooks();
-        (new ExportTool())->addHooks();
+        (new ImportPage($this->utilities, $this->data))->addHooks();
+        (new ExportPage())->addHooks();
         (new TasksPage($this->utilities, $this->data))->addHooks();
     }
 

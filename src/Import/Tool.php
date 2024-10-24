@@ -64,6 +64,11 @@ class Tool
         $this->loadSources();
     }
 
+    public function addHooks()
+    {
+        add_action('admin_menu', array($this, 'addToolToMenu'));
+    }
+
     /**
      * Fügt das Werkzeug zum Menü hinzu
      */

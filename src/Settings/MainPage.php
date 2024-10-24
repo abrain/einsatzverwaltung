@@ -58,6 +58,12 @@ class MainPage
         $this->addSubPage(new About());
     }
 
+    public function addHooks()
+    {
+        add_action('admin_menu', array($this, 'addToSettingsMenu'));
+        add_action('admin_init', array($this, 'registerSettings'));
+    }
+
     /**
      * Fügt der Einstellungsseite eine Unterseite hinzu
      * @param SubPage $subPage

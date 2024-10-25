@@ -90,8 +90,8 @@ class ReportListTable
             return;
         }
 
-        $report = new IncidentReport($post);
-        printf('<div id="report_number_%1$d" class="meta_input">%2$s</div>', $post->ID, $report->getNumber());
+        $meta = get_post_meta($post->ID, 'einsatz_incidentNumber', true);
+        printf('<div id="report_number_%1$d" class="meta_input">%2$s</div>', $post->ID, empty($meta) ? '' : esc_html($meta));
     }
 
     /**

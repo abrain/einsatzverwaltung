@@ -81,6 +81,11 @@ class Core
     private $permalinkController;
 
     /**
+     * @var ReportNumberController
+     */
+    private $reportNumberController;
+
+    /**
      * Private Constructor, use ::getInstance() instead.
      */
     private function __construct()
@@ -91,7 +96,9 @@ class Core
         $this->typeRegistry = new TypeRegistry($this->customFieldsRepo);
 
         $this->permalinkController = new PermalinkController();
-        $this->formatter = new Formatter($this->options, $this->permalinkController);
+        $this->data = new Data($this->options);
+        $this->reportNumberController = new ReportNumberController($this->data);
+        $this->formatter = new Formatter($this->options, $this->permalinkController, $this->reportNumberController);
     }
 
     /**
@@ -158,8 +165,6 @@ class Core
 
         $this->customFieldsRepo->addHooks();
         $this->permalinkController->addHooks();
-
-        $this->data = new Data($this->options);
         $this->data->addHooks();
 
         $frontend = new Frontend($this->options, $this->formatter);
@@ -167,8 +172,7 @@ class Core
 
         new ShortcodeInitializer($this->data, $this->formatter, $this->permalinkController);
 
-        $numberController = new ReportNumberController($this->data);
-        $numberController->addHooks();
+        $this->reportNumberController->addHooks();
 
         if (is_admin()) {
             add_action('admin_notices', array($this, 'onAdminNotices'));
@@ -195,7 +199,7 @@ class Core
             $this->options->setFlushRewriteRules(false);
         }
 
-        $numberController->maybeReformatIncidentNumbers();
+        $this->reportNumberController->maybeReformatIncidentNumbers();
     }
 
     public function onAdminNotices()

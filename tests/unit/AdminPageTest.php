@@ -13,6 +13,16 @@ class AdminPageTest extends UnitTestCase
     /**
      * @throws ExpectationArgsRequired
      */
+    public function testAddsHooks()
+    {
+        $page = $this->getMockForAbstractClass(AdminPage::class, ['Title', 'slug']);
+        expect('add_action')->once()->with('admin_menu', [$page, 'registerAsToolPage']);
+        $page->addHooks();
+    }
+
+    /**
+     * @throws ExpectationArgsRequired
+     */
     public function testRegistersPage()
     {
         $page = $this->getMockForAbstractClass(AdminPage::class, ['Title of the page', 'menu-slug']);

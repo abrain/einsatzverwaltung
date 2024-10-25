@@ -33,6 +33,12 @@ class TasksPage
         $this->data = $data;
     }
 
+    public function addHooks()
+    {
+        add_action('admin_menu', array($this, 'registerPage'));
+        add_action('admin_menu', array($this, 'hidePage'), 999);
+    }
+
     public function registerPage()
     {
         add_management_page(

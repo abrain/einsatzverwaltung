@@ -64,6 +64,14 @@ class ReportListTable
         );
     }
 
+    public function addHooks()
+    {
+        add_filter('manage_edit-einsatz_columns', array($this, 'filterColumnsEinsatz'));
+        add_action('manage_einsatz_posts_custom_column', array($this, 'filterColumnContentEinsatz'), 10, 2);
+        add_action('quick_edit_custom_box', array($this, 'quickEditCustomBox'), 10, 3);
+        add_action('bulk_edit_custom_box', array($this, 'bulkEditCustomBox'), 10, 2);
+    }
+
     /**
      * Legt fest, welche Spalten bei der Übersicht der Einsatzberichte im
      * Adminbereich angezeigt werden

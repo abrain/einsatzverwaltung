@@ -52,6 +52,13 @@ class ReportEditScreen extends EditScreen
         $this->customTypeSlug = Report::getSlug();
     }
 
+    public function addHooks()
+    {
+        add_action('add_meta_boxes_einsatz', array($this, 'addMetaBoxes'));
+        add_filter('default_hidden_meta_boxes', array($this, 'filterDefaultHiddenMetaboxes'), 10, 2);
+        add_filter('wp_dropdown_cats', array($this, 'filterIncidentCategoryDropdown'), 10, 2);
+    }
+
     /**
      * Fügt die Metabox zum Bearbeiten der Einsatzdetails ein
      */

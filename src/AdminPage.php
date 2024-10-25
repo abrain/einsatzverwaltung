@@ -40,6 +40,11 @@ abstract class AdminPage
         $this->capability = $capability;
     }
 
+    public function addHooks()
+    {
+        add_action('admin_menu', array($this, 'registerAsToolPage'));
+    }
+
     abstract protected function echoPageContent();
 
     /**

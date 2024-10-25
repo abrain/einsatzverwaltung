@@ -14,6 +14,7 @@ use abrain\Einsatzverwaltung\Utilities;
 use function add_filter;
 use function esc_html__;
 use function sprintf;
+use function wp_enqueue_script;
 use function wp_enqueue_style;
 
 /**
@@ -127,6 +128,17 @@ class Initializer
                 array('jquery-ui-draggable', 'jquery-ui-droppable', 'jquery-ui-sortable'),
                 Core::VERSION
             );
+        } elseif ('edit.php' == $hook) {
+            $screen = get_current_screen();
+            if ($screen && $screen->post_type === Report::getSlug()) {
+                wp_enqueue_script(
+                    'einsatzverwaltung-report-list-table',
+                    Core::$scriptUrl . 'report-list-table.js',
+                    false,
+                    null,
+                    true
+                );
+            }
         }
 
         wp_enqueue_style(

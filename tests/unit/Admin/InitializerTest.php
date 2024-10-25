@@ -3,6 +3,7 @@
 namespace abrain\Einsatzverwaltung\Admin;
 
 use abrain\Einsatzverwaltung\UnitTestCase;
+use Brain\Monkey\Expectation\Exception\ExpectationArgsRequired;
 use Mockery;
 use function Brain\Monkey\Functions\expect;
 use function Brain\Monkey\Functions\when;
@@ -57,6 +58,38 @@ class InitializerTest extends UnitTestCase
         expect('wp_set_script_translations')->atLeast()->once()->withAnyArgs();
 
         $this->initializer->enqueueEditScripts('post.php');
+    }
+
+    /**
+     * @uses \abrain\Einsatzverwaltung\Types\Report::getSlug()
+     * @throws ExpectationArgsRequired
+     */
+    public function testEnqueueReportListTableScripts()
+    {
+        expect('wp_enqueue_script')->once()->with('einsatzverwaltung-report-list-table', Mockery::type('string'), false, null, true);
+        expect('wp_enqueue_style')->atLeast()->once()->withAnyArgs();
+
+        $screen = Mockery::mock('\WP_Screen');
+        $screen->post_type = 'einsatz';
+        when('get_current_screen')->justReturn($screen);
+
+        $this->initializer->enqueueEditScripts('edit.php');
+    }
+
+    /**
+     * @uses \abrain\Einsatzverwaltung\Types\Report::getSlug()
+     * @throws ExpectationArgsRequired
+     */
+    public function testDoNotEnqueueReportListTableScriptsForOtherPostTypes()
+    {
+        expect('wp_enqueue_script')->never()->with('einsatzverwaltung-report-list-table', Mockery::type('string'), false, null, true);
+        expect('wp_enqueue_style')->atLeast()->once()->withAnyArgs();
+
+        $screen = Mockery::mock('\WP_Screen');
+        $screen->post_type = 'post';
+        when('get_current_screen')->justReturn($screen);
+
+        $this->initializer->enqueueEditScripts('edit.php');
     }
 
     public function testEnqueueSettingsScripts()

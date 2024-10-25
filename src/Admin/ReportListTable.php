@@ -36,35 +36,43 @@ class ReportListTable
         $this->customColumns = array(
             'title' => array(
                 'label' => __('Title', 'einsatzverwaltung'),
-                'quickedit' => false
+                'bulkEdit' => false,
+                'quickEdit' => false
             ),
             'e_nummer' => array(
                 'label' => __('Incident number', 'einsatzverwaltung'),
-                'quickedit' => true
+                'bulkEdit' => false,
+                'quickEdit' => true
             ),
             'einsatzverwaltung_annotations' => array(
                 'label' => __('Annotations', 'einsatzverwaltung'),
-                'quickedit' => false
+                'bulkEdit' => false,
+                'quickEdit' => false
             ),
             'e_alarmzeit' => array(
                 'label' => __('Alarm time', 'einsatzverwaltung'),
-                'quickedit' => false
+                'bulkEdit' => false,
+                'quickEdit' => false
             ),
             'e_einsatzende' => array(
                 'label' => __('End time', 'einsatzverwaltung'),
-                'quickedit' => false
+                'bulkEdit' => false,
+                'quickEdit' => false
             ),
             'e_art' => array(
                 'label' => __('Incident Category', 'einsatzverwaltung'),
-                'quickedit' => false
+                'bulkEdit' => false,
+                'quickEdit' => false
             ),
             'einsatzverwaltung_units' => array(
                 'label' => __('Units', 'einsatzverwaltung'),
-                'quickedit' => false
+                'bulkEdit' => false,
+                'quickEdit' => false
             ),
             'e_fzg' => array(
                 'label' => __('Vehicles', 'einsatzverwaltung'),
-                'quickedit' => false
+                'bulkEdit' => false,
+                'quickEdit' => false
             )
         );
     }
@@ -205,7 +213,7 @@ class ReportListTable
             return;
         }
 
-        if ($this->columnHasCustomBox($columnName)) {
+        if ($this->columnHasCustomBox($columnName, 'quickEdit')) {
             echo '<fieldset class="inline-edit-col-right inline-edit-' . $postType.'">';
             echo '<div class="inline-edit-col column-' . $columnName.'">';
             echo '<label class="inline-edit-group">';
@@ -226,7 +234,7 @@ class ReportListTable
             return;
         }
 
-        if ($this->columnHasCustomBox($columnName)) {
+        if ($this->columnHasCustomBox($columnName, 'bulkEdit')) {
             echo '<fieldset class="inline-edit-col-right"><div class="inline-edit-col">';
             $this->echoEditCustomBox($columnName);
             echo '</div></fieldset>';
@@ -250,21 +258,21 @@ class ReportListTable
     }
 
     /**
-     * Checks wether a custom column should have a custom edit box in Quick Edit / Bulk Edit mode.
+     * Checks whether a custom column should have a custom edit box in Quick Edit / Bulk Edit mode.
      *
-     * @param string $columnName
-     *
+     * @param string $columnName Identifier of the column.
+     * @param string $context Either 'quickEdit' or 'bulkEdit'
      * @return bool
      */
-    private function columnHasCustomBox(string $columnName): bool
+    private function columnHasCustomBox(string $columnName, string $context): bool
     {
-        $quickEditEnabled = array_key_exists($columnName, $this->customColumns) && $this->customColumns[$columnName]['quickedit'];
+        $enabled = array_key_exists($columnName, $this->customColumns) && $this->customColumns[$columnName][$context] === true;
 
         if ($columnName === 'e_nummer' && ReportNumberController::isAutoIncidentNumbers()) {
             return false;
         }
 
-        return $quickEditEnabled;
+        return $enabled;
     }
 
     /**

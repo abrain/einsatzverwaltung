@@ -5,6 +5,7 @@ use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\PermalinkController;
+use abrain\Einsatzverwaltung\ReportNumberController;
 use abrain\Einsatzverwaltung\Types\AlertingMethod;
 use abrain\Einsatzverwaltung\Types\Unit;
 use DateTime;
@@ -53,6 +54,7 @@ class Formatter
         '%location%' => 'Ort des Einsatzes',
         '%feedUrl%' => 'URL zum Feed',
         '%number%' => 'Einsatznummer',
+        '%numberRange%' => 'Einsatznummer, ggf. als Intervall',
         '%seqNum%' => 'Laufende Nummer',
         '%annotations%' => 'Vermerke',
         '%vehicles%' => 'Fahrzeuge',
@@ -83,16 +85,23 @@ class Formatter
     private $permalinkController;
 
     /**
+     * @var ReportNumberController
+     */
+    private $reportNumberController;
+
+    /**
      * Formatter constructor.
      *
      * @param Options $options
      * @param PermalinkController $permalinkController
+     * @param ReportNumberController $reportNumberController
      */
-    public function __construct(Options $options, PermalinkController $permalinkController)
+    public function __construct(Options $options, PermalinkController $permalinkController, ReportNumberController $reportNumberController)
     {
         $this->options = $options;
         $this->permalinkController = $permalinkController;
         $this->annotationIconBar = AnnotationIconBar::getInstance();
+        $this->reportNumberController = $reportNumberController;
     }
 
 
@@ -190,6 +199,13 @@ class Formatter
                 break;
             case '%number%':
                 $replace = $incidentReport->getNumber();
+                break;
+            case '%numberRange%':
+                if ($incidentReport->getWeight() > 1 && ReportNumberController::isAutoIncidentNumbers()) {
+                    $replace = $this->getReportNumberRange($incidentReport);
+                } else {
+                    $replace = $incidentReport->getNumber();
+                }
                 break;
             case '%seqNum%':
                 $replace = $incidentReport->getSequentialNumber();
@@ -633,5 +649,15 @@ class Formatter
         }
 
         return $this->availableTags[$tag];
+    }
+
+    public function getReportNumberRange(IncidentReport $report): string
+    {
+        if ($report->getWeight() === 1 || ReportNumberController::isAutoIncidentNumbers() === false) {
+            return $report->getNumber();
+        }
+
+        $year = intval($report->getTimeOfAlerting()->format('Y'));
+        return $this->reportNumberController->formatNumberRange($year, intval($report->getSequentialNumber()), $report->getWeight());
     }
 }

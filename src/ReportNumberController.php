@@ -87,6 +87,21 @@ class ReportNumberController
     }
 
     /**
+     * @return string
+     */
+    private function determineSeparator(): string
+    {
+        switch (self::sanitizeSeparator(get_option('einsatzvw_numbers_separator', self::DEFAULT_SEPARATOR))) {
+            case 'slash':
+                return '/';
+            case 'hyphen':
+                return '-';
+            default:
+                return '';
+        }
+    }
+
+    /**
      * Formatiert die Einsatznummer
      *
      * @param string $jahr Jahreszahl
@@ -98,23 +113,27 @@ class ReportNumberController
     {
         $stellen = self::sanitizeNumberOfDigits(get_option('einsatzvw_einsatznummer_stellen'));
         $sequentialFirst = (get_option('einsatzvw_einsatznummer_lfdvorne', false) == '1');
-
-        // Determine the separator
-        switch (self::sanitizeSeparator(get_option('einsatzvw_numbers_separator', self::DEFAULT_SEPARATOR))) {
-            case 'slash':
-                $separator = '/';
-                break;
-            case 'hyphen':
-                $separator = '-';
-                break;
-            default:
-                $separator = '';
-        }
+        $separator = $this->determineSeparator();
 
         return sprintf(
             $sequentialFirst ? '%2$s%3$s%1$s' : '%1$s%3$s%2$s',
             $jahr,
             str_pad($nummer, $stellen, "0", STR_PAD_LEFT),
+            $separator
+        );
+    }
+
+    public function formatNumberRange(int $year, int $start, int $count): string
+    {
+        $minimumNumberOfDigits = self::sanitizeNumberOfDigits(get_option('einsatzvw_einsatznummer_stellen'));
+        $sequentialFirst = (get_option('einsatzvw_einsatznummer_lfdvorne', false) == '1');
+        $separator = $this->determineSeparator();
+
+        return sprintf(
+            $sequentialFirst ? '%2$s – %3$s%4$s%1$d' : '%1$d%4$s%2$s – %3$s',
+            $year,
+            zeroise($start, $minimumNumberOfDigits),
+            zeroise($start + $count - 1, $minimumNumberOfDigits),
             $separator
         );
     }

@@ -30,6 +30,7 @@ class ColumnRepository
     private function __construct()
     {
         $this->addColumn(new Column('number', __('Number', 'einsatzverwaltung'), __('Incident number', 'einsatzverwaltung'), true));
+        $this->addColumn(new Column('numberRange', __('Number', 'einsatzverwaltung'), __('Incident number (range)', 'einsatzverwaltung'), true));
         $this->addColumn(new Column('date', __('Date', 'einsatzverwaltung'), '', true));
         $this->addColumn(new Column('time', __('Time', 'einsatzverwaltung'), '', true));
         $this->addColumn(new Column('datetime', __('Date', 'einsatzverwaltung'), __('Date and time', 'einsatzverwaltung'), true));

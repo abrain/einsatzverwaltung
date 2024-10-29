@@ -57,7 +57,6 @@ class AlertingMethod extends CustomTaxonomy
                 'back_to_items' => __('&larr; Go to Alerting Methods', 'einsatzverwaltung'),
             ),
             'public' => true,
-            'show_in_nav_menus' => false,
             'show_in_rest' => true,
             'capabilities' => array(
                 'manage_terms' => 'edit_einsatzberichte',

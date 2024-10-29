@@ -93,7 +93,6 @@ class Vehicle extends CustomTaxonomy
                 'back_to_items' => '&larr; Zur&uuml;ck zu den Fahrzeugen',
             ),
             'public' => true,
-            'show_in_nav_menus' => false,
             'show_in_rest' => true,
             'meta_box_cb' => false,
             'hierarchical' => true,

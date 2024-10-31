@@ -52,6 +52,13 @@ Yes, you can find them on [our website](https://einsatzverwaltung.org/faq/).
 
 == Changelog ==
 
+= 1.12.0 =
+* Report number can be changed with QuickEdit
+* Show more details in case of import errors
+* More details can be used with Elementor
+* Optionally show a range of report numbers
+* Comments can be enabled for reports
+
 = 1.11.2 =
 * Fix: Content was duplicated when using the Avada Website Builder
 * Fix: Prevent linebreaks for certain columns of the report list
@@ -68,6 +75,9 @@ Yes, you can find them on [our website](https://einsatzverwaltung.org/faq/).
 * Dropped support for WordPress 5.5 and older
 
 == Upgrade Notice ==
+= 1.12.0 =
+Minor enhancements, better compatibility with Elementor
+
 = 1.11.2 =
 Maintenance Release
 

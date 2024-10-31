@@ -134,6 +134,10 @@ class Report implements CustomPostType
             $features[] = 'excerpt';
         }
 
+        if (get_option('einsatz_support_comments', '0') === '1') {
+            $features[] = 'comments';
+        }
+
         return $features;
     }
 

@@ -50,7 +50,6 @@ class ExtEinsatzmittel extends CustomTaxonomy
                 'back_to_items' => '&larr; Zur&uuml;ck zu den externen Einsatzmitteln',
             ),
             'public' => true,
-            'show_in_nav_menus' => false,
             'show_in_rest' => true,
             'capabilities' => array(
                 'manage_terms' => 'edit_einsatzberichte',

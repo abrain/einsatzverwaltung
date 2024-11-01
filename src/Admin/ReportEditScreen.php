@@ -52,6 +52,13 @@ class ReportEditScreen extends EditScreen
         $this->customTypeSlug = Report::getSlug();
     }
 
+    public function addHooks()
+    {
+        add_action('add_meta_boxes_einsatz', array($this, 'addMetaBoxes'));
+        add_filter('default_hidden_meta_boxes', array($this, 'filterDefaultHiddenMetaboxes'), 10, 2);
+        add_filter('wp_dropdown_cats', array($this, 'filterIncidentCategoryDropdown'), 10, 2);
+    }
+
     /**
      * Fügt die Metabox zum Bearbeiten der Einsatzdetails ein
      */
@@ -319,7 +326,7 @@ class ReportEditScreen extends EditScreen
             }, $outOfServiceVehicles);
             echo empty(array_intersect($assignedVehicleIds, $outOfServiceIds)) ? '<details>' : '<details open="open">';
 
-            echo sprintf("<summary>%s</summary>", esc_html__('Out of service', 'einsatzverwaltung'));
+            printf("<summary>%s</summary>", esc_html__('Out of service', 'einsatzverwaltung'));
             echo '<ul>';
             $this->echoTermCheckboxes($outOfServiceVehicles, $vehicleTaxonomy, $assignedVehicleIds);
             echo '</ul>';

@@ -21,6 +21,7 @@ use function get_post_meta;
 use function get_post_type;
 use function is_wp_error;
 use function remove_action;
+use function sanitize_text_field;
 use function update_post_meta;
 use function wp_update_post;
 use function wp_verify_nonce;
@@ -104,6 +105,7 @@ class Data
 
         // Fängt Speichervorgänge per QuickEdit ab
         if (defined('DOING_AJAX') && DOING_AJAX) {
+            $this->handleQuickEdit($postId);
             return;
         }
 
@@ -354,5 +356,13 @@ class Data
         }
 
         return false;
+    }
+
+    private function handleQuickEdit(int $postId)
+    {
+        if (!ReportNumberController::isAutoIncidentNumbers()) {
+            $reportNumber = sanitize_text_field(filter_input(INPUT_POST, 'einsatz_number'));
+            update_post_meta($postId, 'einsatz_incidentNumber', $reportNumber);
+        }
     }
 }

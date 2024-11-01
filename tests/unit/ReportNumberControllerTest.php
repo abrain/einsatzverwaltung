@@ -98,4 +98,38 @@ class ReportNumberControllerTest extends UnitTestCase
         expect('get_option')->once()->with('einsatzvw_numbers_separator', 'none')->andReturn('hyphen');
         self::assertEquals('2019-623', $controller->formatEinsatznummer('2019', 623));
     }
+
+    /**
+     * @throws ExpectationArgsRequired
+     */
+    public function testFormatRangeWithTrailingSequential()
+    {
+        $data = Mockery::mock(Data::class);
+        $controller = new ReportNumberController($data);
+
+        expect('get_option')->once()->with('einsatzvw_einsatznummer_stellen')->andReturn('4');
+        expect('get_option')->once()->with('einsatzvw_einsatznummer_lfdvorne', false)->andReturn('0');
+        expect('get_option')->once()->with('einsatzvw_numbers_separator', 'none')->andReturn('slash');
+        expect('zeroise')->once()->with(4, 4)->andReturn('0004');
+        expect('zeroise')->once()->with(6, 4)->andReturn('0006');
+
+        $this->assertEquals('2023/0004 – 0006', $controller->formatNumberRange(2023, 4, 3));
+    }
+
+    /**
+     * @throws ExpectationArgsRequired
+     */
+    public function testFormatRangeWithLeadingSequential()
+    {
+        $data = Mockery::mock(Data::class);
+        $controller = new ReportNumberController($data);
+
+        expect('get_option')->once()->with('einsatzvw_einsatznummer_stellen')->andReturn('2');
+        expect('get_option')->once()->with('einsatzvw_einsatznummer_lfdvorne', false)->andReturn('1');
+        expect('get_option')->once()->with('einsatzvw_numbers_separator', 'none')->andReturn('hyphen');
+        expect('zeroise')->once()->with(9, 2)->andReturn('09');
+        expect('zeroise')->once()->with(13, 2)->andReturn('13');
+
+        $this->assertEquals('09 – 13-2021', $controller->formatNumberRange(2021, 9, 5));
+    }
 }

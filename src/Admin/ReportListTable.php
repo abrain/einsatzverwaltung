@@ -4,10 +4,15 @@ namespace abrain\Einsatzverwaltung\Admin;
 
 use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
+use abrain\Einsatzverwaltung\ReportNumberController;
 use abrain\Einsatzverwaltung\Types\Report;
+use WP_Post;
+use WP_Post_Type;
 use WP_Term;
 use function array_map;
 use function esc_html;
+use function join;
+use function printf;
 use function sprintf;
 
 /**
@@ -31,37 +36,70 @@ class ReportListTable
         $this->customColumns = array(
             'title' => array(
                 'label' => __('Title', 'einsatzverwaltung'),
-                'quickedit' => false
+                'bulkEdit' => false,
+                'quickEdit' => false
             ),
             'e_nummer' => array(
                 'label' => __('Incident number', 'einsatzverwaltung'),
-                'quickedit' => false
+                'bulkEdit' => false,
+                'quickEdit' => true
             ),
             'einsatzverwaltung_annotations' => array(
                 'label' => __('Annotations', 'einsatzverwaltung'),
-                'quickedit' => false
+                'bulkEdit' => false,
+                'quickEdit' => false
             ),
             'e_alarmzeit' => array(
                 'label' => __('Alarm time', 'einsatzverwaltung'),
-                'quickedit' => false
+                'bulkEdit' => false,
+                'quickEdit' => false
             ),
             'e_einsatzende' => array(
                 'label' => __('End time', 'einsatzverwaltung'),
-                'quickedit' => false
+                'bulkEdit' => false,
+                'quickEdit' => false
             ),
             'e_art' => array(
                 'label' => __('Incident Category', 'einsatzverwaltung'),
-                'quickedit' => false
+                'bulkEdit' => false,
+                'quickEdit' => false
             ),
             'einsatzverwaltung_units' => array(
                 'label' => __('Units', 'einsatzverwaltung'),
-                'quickedit' => false
+                'bulkEdit' => false,
+                'quickEdit' => false
             ),
             'e_fzg' => array(
                 'label' => __('Vehicles', 'einsatzverwaltung'),
-                'quickedit' => false
+                'bulkEdit' => false,
+                'quickEdit' => false
             )
         );
+    }
+
+    public function addHooks()
+    {
+        add_filter('manage_edit-einsatz_columns', array($this, 'filterColumnsEinsatz'));
+        add_action('manage_einsatz_posts_custom_column', array($this, 'filterColumnContentEinsatz'), 10, 2);
+        add_action('quick_edit_custom_box', array($this, 'quickEditCustomBox'), 10, 3);
+        add_action('bulk_edit_custom_box', array($this, 'bulkEditCustomBox'), 10, 2);
+        add_action('add_inline_data', array($this, 'addInlineData'), 10, 2);
+    }
+
+    /**
+     * Echo the values of custom columns for a post, to be used for Quick Edit mode.
+     *
+     * @param WP_Post $post
+     * @param WP_Post_Type $postTypeObject
+     */
+    public function addInlineData(WP_Post $post, WP_Post_Type $postTypeObject)
+    {
+        if ($postTypeObject->name !== Report::getSlug()) {
+            return;
+        }
+
+        $meta = get_post_meta($post->ID, 'einsatz_incidentNumber', true);
+        printf('<div id="report_number_%1$d" class="meta_input">%2$s</div>', $post->ID, empty($meta) ? '' : esc_html($meta));
     }
 
     /**
@@ -175,10 +213,12 @@ class ReportListTable
             return;
         }
 
-        if ($this->columnHasCustomBox($columnName)) {
-            echo '<fieldset class="inline-edit-col-right"><div class="inline-edit-col">';
+        if ($this->columnHasCustomBox($columnName, 'quickEdit')) {
+            echo '<fieldset class="inline-edit-col-right inline-edit-' . $postType.'">';
+            echo '<div class="inline-edit-col column-' . $columnName.'">';
+            echo '<label class="inline-edit-group">';
             $this->echoEditCustomBox($columnName);
-            echo '</div></fieldset>';
+            echo '</label></div></fieldset>';
         }
     }
 
@@ -194,7 +234,7 @@ class ReportListTable
             return;
         }
 
-        if ($this->columnHasCustomBox($columnName)) {
+        if ($this->columnHasCustomBox($columnName, 'bulkEdit')) {
             echo '<fieldset class="inline-edit-col-right"><div class="inline-edit-col">';
             $this->echoEditCustomBox($columnName);
             echo '</div></fieldset>';
@@ -206,24 +246,33 @@ class ReportListTable
      *
      * @param string $columnName Identifier of the custom column
      */
-    private function echoEditCustomBox($columnName)
+    private function echoEditCustomBox(string $columnName)
     {
         printf(
-            '<span class="title inline-edit-categories-label">%s</span>',
+            '<span class="title">%s</span>',
             esc_html($this->getColumnLabel($columnName))
         );
+        if ($columnName === 'e_nummer') {
+            echo '<input type="text" name="einsatz_number">';
+        }
     }
 
     /**
-     * Checks wether a custom column should have a custom edit box in Quick Edit / Bulk Edit mode.
+     * Checks whether a custom column should have a custom edit box in Quick Edit / Bulk Edit mode.
      *
-     * @param string $columnName
-     *
+     * @param string $columnName Identifier of the column.
+     * @param string $context Either 'quickEdit' or 'bulkEdit'
      * @return bool
      */
-    private function columnHasCustomBox($columnName): bool
+    private function columnHasCustomBox(string $columnName, string $context): bool
     {
-        return array_key_exists($columnName, $this->customColumns) && $this->customColumns[$columnName]['quickedit'];
+        $enabled = array_key_exists($columnName, $this->customColumns) && $this->customColumns[$columnName][$context] === true;
+
+        if ($columnName === 'e_nummer' && ReportNumberController::isAutoIncidentNumbers()) {
+            return false;
+        }
+
+        return $enabled;
     }
 
     /**

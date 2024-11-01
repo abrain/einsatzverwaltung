@@ -4,16 +4,17 @@ namespace abrain\Einsatzverwaltung\Admin;
 
 use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\Data;
-use abrain\Einsatzverwaltung\Export\Tool as ExportTool;
-use abrain\Einsatzverwaltung\Import\Tool as ImportTool;
+use abrain\Einsatzverwaltung\Export\Page as ExportPage;
+use abrain\Einsatzverwaltung\Import\Page as ImportPage;
 use abrain\Einsatzverwaltung\Options;
 use abrain\Einsatzverwaltung\PermalinkController;
-use abrain\Einsatzverwaltung\Settings\MainPage;
+use abrain\Einsatzverwaltung\Settings\MainPage as MainSettingsPage;
 use abrain\Einsatzverwaltung\Types\Report;
 use abrain\Einsatzverwaltung\Utilities;
 use function add_filter;
 use function esc_html__;
 use function sprintf;
+use function wp_enqueue_script;
 use function wp_enqueue_style;
 
 /**
@@ -22,6 +23,26 @@ use function wp_enqueue_style;
  */
 class Initializer
 {
+    /**
+     * @var Data
+     */
+    private $data;
+
+    /**
+     * @var Options
+     */
+    private $options;
+
+    /**
+     * @var Utilities
+     */
+    private $utilities;
+
+    /**
+     * @var PermalinkController
+     */
+    private $permalinkController;
+
     /**
      * Initializer constructor.
      *
@@ -32,6 +53,14 @@ class Initializer
      */
     public function __construct(Data $data, Options $options, Utilities $utilities, PermalinkController $permalinkController)
     {
+        $this->data = $data;
+        $this->options = $options;
+        $this->utilities = $utilities;
+        $this->permalinkController = $permalinkController;
+    }
+
+    public function addHooks()
+    {
         $pluginBasename = Core::$pluginBasename;
         add_action('admin_menu', array($this, 'hideTaxonomies'));
         add_action('admin_notices', array($this, 'displayAdminNotices'));
@@ -40,34 +69,16 @@ class Initializer
         add_filter('plugin_row_meta', array($this, 'pluginMetaLinks'), 10, 2);
         add_filter("plugin_action_links_{$pluginBasename}", array($this,'addActionLinks'));
         add_filter('use_block_editor_for_post_type', array($this, 'useBlockEditorForReports'), 10, 2);
+    }
 
-        $reportListTable = new ReportListTable();
-        add_filter('manage_edit-einsatz_columns', array($reportListTable, 'filterColumnsEinsatz'));
-        add_action('manage_einsatz_posts_custom_column', array($reportListTable, 'filterColumnContentEinsatz'), 10, 2);
-        add_action('quick_edit_custom_box', array($reportListTable, 'quickEditCustomBox'), 10, 3);
-        add_action('bulk_edit_custom_box', array($reportListTable, 'bulkEditCustomBox'), 10, 2);
-
-        $reportEditScreen = new ReportEditScreen();
-        add_action('add_meta_boxes_einsatz', array($reportEditScreen, 'addMetaBoxes'));
-        add_filter('default_hidden_meta_boxes', array($reportEditScreen, 'filterDefaultHiddenMetaboxes'), 10, 2);
-        add_filter('wp_dropdown_cats', array($reportEditScreen, 'filterIncidentCategoryDropdown'), 10, 2);
-
-        // Register Settings
-        $mainPage = new MainPage($options, $permalinkController);
-        add_action('admin_menu', array($mainPage, 'addToSettingsMenu'));
-        add_action('admin_init', array($mainPage, 'registerSettings'));
-
-        $importTool = new ImportTool($utilities, $data);
-        add_action('admin_menu', array($importTool, 'addToolToMenu'));
-
-        $exportTool = new ExportTool();
-        add_action('admin_menu', array($exportTool, 'addToolToMenu'));
-        add_action('init', array($exportTool, 'startExport'), 20); // 20, damit alles andere initialisiert ist
-        add_action('admin_enqueue_scripts', array($exportTool, 'enqueueAdminScripts'));
-
-        $tasksPage = new TasksPage($utilities, $data);
-        add_action('admin_menu', array($tasksPage, 'registerPage'));
-        add_action('admin_menu', array($tasksPage, 'hidePage'), 999);
+    public function onInit()
+    {
+        (new ReportListTable())->addHooks();
+        (new ReportEditScreen())->addHooks();
+        (new MainSettingsPage($this->options, $this->permalinkController))->addHooks();
+        (new ImportPage($this->utilities, $this->data))->addHooks();
+        (new ExportPage())->addHooks();
+        (new TasksPage($this->utilities, $this->data))->addHooks();
     }
 
     /**
@@ -117,6 +128,17 @@ class Initializer
                 array('jquery-ui-draggable', 'jquery-ui-droppable', 'jquery-ui-sortable'),
                 Core::VERSION
             );
+        } elseif ('edit.php' == $hook) {
+            $screen = get_current_screen();
+            if ($screen && $screen->post_type === Report::getSlug()) {
+                wp_enqueue_script(
+                    'einsatzverwaltung-report-list-table',
+                    Core::$scriptUrl . 'report-list-table.js',
+                    false,
+                    null,
+                    true
+                );
+            }
         }
 
         wp_enqueue_style(
@@ -203,7 +225,7 @@ class Initializer
             );
             $links[] = sprintf(
                 '<a href="%1$s">%2$s</a>',
-                admin_url('options-general.php?page=' . MainPage::EVW_SETTINGS_SLUG . '&tab=about'),
+                admin_url('options-general.php?page=' . MainSettingsPage::EVW_SETTINGS_SLUG . '&tab=about'),
                 esc_html__('Support & Links', 'einsatzverwaltung')
             );
         }
@@ -220,7 +242,7 @@ class Initializer
      */
     public function addActionLinks($links): array
     {
-        $settingsPage = 'options-general.php?page=' . MainPage::EVW_SETTINGS_SLUG;
+        $settingsPage = 'options-general.php?page=' . MainSettingsPage::EVW_SETTINGS_SLUG;
         $actionLinks = [
             sprintf('<a href="%s">%s</a>', admin_url($settingsPage), esc_html__('Settings', 'einsatzverwaltung'))
         ];

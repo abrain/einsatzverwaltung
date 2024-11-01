@@ -3,6 +3,7 @@ namespace abrain\Einsatzverwaltung\Frontend\ReportList;
 
 use abrain\Einsatzverwaltung\Frontend\AnnotationIconBar;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
+use abrain\Einsatzverwaltung\ReportNumberController;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use DateTime;
 use function esc_html__;
@@ -336,6 +337,13 @@ class Renderer
         switch ($colId) {
             case 'number':
                 $cellContent = $report->getNumber();
+                break;
+            case 'numberRange':
+                if ($report->getWeight() > 1 && ReportNumberController::isAutoIncidentNumbers()) {
+                    $cellContent = $this->formatter->getReportNumberRange($report);
+                } else {
+                    $cellContent = $report->getNumber();
+                }
                 break;
             case 'date':
                 $cellContent = $timeOfAlerting->format('d.m.Y');

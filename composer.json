@@ -30,18 +30,19 @@
     "integration-test": "XDEBUG_MODE=coverage phpunit -c phpunit-integration.xml"
   },
   "require": {
-    "php": ">=7.1.0"
+    "php": ">=7.1.0",
+    "ext-json": "*"
   },
   "require-dev": {
     "phpmd/phpmd": "2.15.0",
-    "brain/monkey": "2.6.1",
-    "friendsofphp/php-cs-fixer": "3.62.0",
+    "brain/monkey": "2.6.2",
+    "friendsofphp/php-cs-fixer": "3.64.0",
     "php-cs-fixer/phpunit-constraint-isidenticalstring": "1.5.0",
     "php-cs-fixer/phpunit-constraint-xmlmatchesxsd": "1.5.0",
     "phpcompatibility/php-compatibility": "9.3.5",
-    "yoast/phpunit-polyfills": "1.1.1",
+    "yoast/phpunit-polyfills": "2.0.2",
     "phpcompatibility/phpcompatibility-wp": "2.1.5",
     "wp-coding-standards/wpcs": "3.1.0",
-    "phpunit/phpunit": "9.6.20"
+    "phpunit/phpunit": "9.6.21"
   }
 }

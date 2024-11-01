@@ -180,6 +180,11 @@ class Advanced extends SubPage
             'einsatz_support_posttag',
             __('Tags', 'einsatzverwaltung')
         );
+        echo '<br>';
+        $this->echoSettingsCheckbox(
+            'einsatz_support_comments',
+            __('Comments', 'default')
+        );
         printf(
             '<p class="description">%s</p>',
             __('You can activate these features of Posts also for Incident Reports.', 'einsatzverwaltung')
@@ -285,6 +290,11 @@ class Advanced extends SubPage
         register_setting(
             'einsatzvw_settings_advanced',
             'einsatz_support_posttag',
+            array(Utilities::class, 'sanitizeCheckbox')
+        );
+        register_setting(
+            'einsatzvw_settings_advanced',
+            'einsatz_support_comments',
             array(Utilities::class, 'sanitizeCheckbox')
         );
         register_setting(

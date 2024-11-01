@@ -35,6 +35,11 @@ class MainPage
     const EVW_SETTINGS_SLUG = 'einsatzvw-settings';
 
     /**
+     * @var PermalinkController
+     */
+    private $permalinkController;
+
+    /**
      * @var SubPage[]
      */
     private $subPages;
@@ -47,15 +52,16 @@ class MainPage
      */
     public function __construct(Options $options, PermalinkController $permalinkController)
     {
-        $this->subPages = array();
-
         SubPage::$options = $options;
-        $this->addSubPage(new General());
-        $this->addSubPage(new Numbers());
-        $this->addSubPage(new Report());
-        $this->addSubPage(new ReportList());
-        $this->addSubPage(new Advanced($permalinkController));
-        $this->addSubPage(new About());
+        $this->permalinkController = $permalinkController;
+
+        $this->subPages = array();
+    }
+
+    public function addHooks()
+    {
+        add_action('admin_menu', array($this, 'addToSettingsMenu'));
+        add_action('admin_init', array($this, 'registerSettings'));
     }
 
     /**
@@ -91,7 +97,7 @@ class MainPage
         }
 
         echo '<div class="wrap">';
-        echo sprintf('<h1>%s &rsaquo; Einsatzverwaltung</h1>', __('Settings', 'einsatzverwaltung'));
+        printf('<h1>%s &rsaquo; Einsatzverwaltung</h1>', __('Settings', 'einsatzverwaltung'));
 
         // Check if any page uses the same permalink as the archive
         $conflictingPage = $this->getConflictingPage();
@@ -198,6 +204,13 @@ class MainPage
      */
     public function registerSettings()
     {
+        $this->addSubPage(new General());
+        $this->addSubPage(new Numbers());
+        $this->addSubPage(new Report());
+        $this->addSubPage(new ReportList());
+        $this->addSubPage(new Advanced($this->permalinkController));
+        $this->addSubPage(new About());
+
         // NEEDS_WP4.7 Standardwerte in register_setting() mitgeben
         foreach ($this->subPages as $subPage) {
             $subPage->addSettingsSections();

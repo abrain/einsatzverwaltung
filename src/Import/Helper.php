@@ -390,7 +390,7 @@ class Helper
         echo '<input type="hidden" name="aktion" value="' . $parsedArgs['action_value'] . '" />';
         echo '<table class="evw_match_fields"><tr><th>';
         printf('Feld in %s', $source->getName());
-        echo '</th><th>' . 'Feld in Einsatzverwaltung' . '</th></tr><tbody>';
+        echo '</th><th>Feld in Einsatzverwaltung</th></tr><tbody>';
         foreach ($fields as $field) {
             echo '<tr><td><strong>' . $field . '</strong></td><td>';
             if (array_key_exists($field, $source->getAutoMatchFields())) {
@@ -441,7 +441,11 @@ class Helper
             // Neuen Beitrag anlegen
             $postId = wp_insert_post($insertArgs, true);
             if (is_wp_error($postId)) {
-                throw new ImportException('Konnte Einsatz nicht importieren: ' . $postId->get_error_message());
+                $errorMessage = sprintf('Konnte Einsatz nicht importieren: %s', $postId->get_error_message());
+                $details = array_filter($postId->get_all_error_data(), function ($value) {
+                    return is_string($value);
+                });
+                throw new ImportException($errorMessage, $details);
             }
 
             $importStatus->importSuccesss($postId);

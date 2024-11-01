@@ -55,7 +55,6 @@ class IncidentType extends CustomTaxonomy
                 'back_to_items' => __('&larr; Go to Incident Categories', 'einsatzverwaltung'),
             ),
             'public' => true,
-            'show_in_nav_menus' => false,
             'show_in_rest' => true,
             'meta_box_cb' => false,
             'capabilities' => array(

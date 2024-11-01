@@ -1,3 +1,18 @@
+= 1.10.2 =
+* Fix: Reports created with the API endpoint could show up as special reports
+* Fix: Table was missing columns when creating e.g. units or vehicles
+
+= 1.10.1 =
+* Fix: Compatibility issue with PHP 8
+
+= 1.10.0 =
+* New API endpoint for third-party systems to create incident reports
+* Roles for user permissions
+* Shortcode `reportcount` can be filtered by Alerting Method
+* Fallback featured image for reports based on Incident Category
+* Autocomplete for incident location
+* Fix: Changing the category setting for incident reports caused an error on fresh installations
+
 = 1.9.7 =
 * Fix: Compatibility issue with Elementor
 

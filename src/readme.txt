@@ -5,7 +5,7 @@ Tags: Feuerwehr, fire department, EMS
 Requires at least: 5.6.0
 Tested up to: 6.6
 Requires PHP: 7.1.0
-Stable tag: 1.11.2
+Stable tag: 1.12.0
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -52,6 +52,13 @@ Yes, you can find them on [our website](https://einsatzverwaltung.org/faq/).
 
 == Changelog ==
 
+= 1.12.0 =
+* Report number can be changed with QuickEdit
+* Show more details in case of import errors
+* More details can be used with Elementor
+* Optionally show a range of report numbers
+* Comments can be enabled for reports
+
 = 1.11.2 =
 * Fix: Content was duplicated when using the Avada Website Builder
 * Fix: Prevent linebreaks for certain columns of the report list
@@ -67,22 +74,10 @@ Yes, you can find them on [our website](https://einsatzverwaltung.org/faq/).
 * Improved compatibility with PHP 8.2
 * Dropped support for WordPress 5.5 and older
 
-= 1.10.2 =
-* Fix: Reports created with the API endpoint could show up as special reports
-* Fix: Table was missing columns when creating e.g. units or vehicles
-
-= 1.10.1 =
-* Fix: Compatibility issue with PHP 8
-
-= 1.10.0 =
-* New API endpoint for third-party systems to create incident reports
-* Roles for user permissions
-* Shortcode `reportcount` can be filtered by Alerting Method
-* Fallback featured image for reports based on Incident Category
-* Autocomplete for incident location
-* Fix: Changing the category setting for incident reports caused an error on fresh installations
-
 == Upgrade Notice ==
+= 1.12.0 =
+Minor enhancements, better compatibility with Elementor
+
 = 1.11.2 =
 Maintenance Release
 
@@ -91,9 +86,3 @@ Maintenance Release
 
 = 1.11.0 =
 Minor enhancements, upgraded Font Awesome, improved compatibility with PHP 8.2
-
-= 1.10.1 =
-Maintenance Release
-
-= 1.10.0 =
-New API endpoint, roles, and more

@@ -34,6 +34,6 @@ spl_autoload_register(function ($class) {
     if (str_ends_with($filename, 'Test')) {
         include __DIR__ . '/../../tests/unit' . $filename . '.php';
     } else {
-        include __DIR__ . '/../../src' . $filename . '.php';
+        include __DIR__ . '/../../src/includes' . $filename . '.php';
     }
 }, true);

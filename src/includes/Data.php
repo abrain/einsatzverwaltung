@@ -15,7 +15,6 @@ use function array_map;
 use function current_user_can;
 use function defined;
 use function delete_post_meta;
-use function error_log;
 use function filter_input;
 use function get_post_meta;
 use function get_post_type;
@@ -286,7 +285,7 @@ class Data
         $updateArgs['post_date_gmt'] = get_gmt_from_date($updateArgs['post_date']);
         $updateResult = wp_update_post($updateArgs);
         if (is_wp_error($updateResult)) {
-            error_log($updateResult->get_error_message());
+            wp_trigger_error(__FUNCTION__, 'Error updating post date: ' . $updateResult->get_error_message(), E_USER_WARNING);
         }
 
         // Zwischenspeicher wird nur in der Entwurfsphase benötigt

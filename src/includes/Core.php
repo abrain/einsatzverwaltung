@@ -7,7 +7,6 @@ use abrain\Einsatzverwaltung\Shortcodes\Initializer as ShortcodeInitializer;
 use abrain\Einsatzverwaltung\Util\Formatter;
 use function add_action;
 use function add_option;
-use function error_log;
 use function get_option;
 use function plugin_basename;
 use function plugin_dir_url;
@@ -107,7 +106,7 @@ class Core
     public function addHooks()
     {
         if (empty($this->pluginFile)) {
-            error_log('einsatzverwaltung: Plugin file has not been set via setPluginFile()');
+            wp_trigger_error(__FUNCTION__, 'Plugin file has not been set via setPluginFile()', E_USER_WARNING);
             return;
         }
 
@@ -225,7 +224,11 @@ class Core
         $update = new Update();
         $updateResult = $update->doUpdate($currentDbVersion, self::DB_VERSION);
         if (is_wp_error($updateResult)) {
-            error_log("Das Datenbank-Upgrade wurde mit folgendem Fehler beendet: {$updateResult->get_error_message()}");
+            wp_trigger_error(
+                __FUNCTION__,
+                'The database upgrade was terminated with the following error: ' . $updateResult->get_error_message(),
+                E_USER_WARNING
+            );
         }
     }
 

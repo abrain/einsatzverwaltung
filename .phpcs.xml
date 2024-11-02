@@ -113,4 +113,12 @@
     <rule ref="Universal.CodeAnalysis.StaticInFinalClass"/>
     <rule ref="Universal.ControlStructures.DisallowLonelyIf"/>
     <rule ref="Universal.Files.SeparateFunctionsFromOO"/>
+
+    <rule ref="WordPress.CodeAnalysis.EscapedNotTranslated"/>
+    <rule ref="WordPress.NamingConventions.ValidPostTypeSlug"/>
+
+    <rule ref="WordPress.PHP.DevelopmentFunctions"/>
+    <rule ref="WordPress.PHP.DiscouragedPHPFunctions"/>
+    <rule ref="WordPress.PHP.IniSet"/>
+    <rule ref="WordPress.PHP.PregQuoteDelimiter"/>
 </ruleset>

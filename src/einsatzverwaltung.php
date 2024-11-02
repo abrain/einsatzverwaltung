@@ -26,14 +26,10 @@ try {
         }
 
         $parts = explode('\\', $class);
-        $filename = '';
-        $numberOfParts = count($parts);
-        for ($index = 2; $index < $numberOfParts; $index++) {
-            $filename .= DIRECTORY_SEPARATOR;
-            $filename .= $parts[$index];
-        }
+        array_splice($parts, 0, 2);
+        $filename = 'includes' . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $parts) . '.php';
 
-        include dirname(__FILE__) . "$filename.php";
+        include dirname(__FILE__) . DIRECTORY_SEPARATOR . $filename;
     });
 } catch (Exception $exception) {
     add_action('admin_notices', function () {

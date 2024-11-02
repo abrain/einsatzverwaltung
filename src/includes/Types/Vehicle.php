@@ -166,7 +166,6 @@ class Vehicle extends CustomTaxonomy
     {
         $taxonomySlug = self::getSlug();
         add_action("{$taxonomySlug}_pre_add_form", array($this, 'deprectatedHierarchyNotice'));
-        add_action('admin_menu', array($this, 'addBadgeToMenu'));
 
         /**
          * Prevent the Gutenberg Editor from creating a UI for this taxonomy, so we can use our own
@@ -202,28 +201,6 @@ class Vehicle extends CustomTaxonomy
                 '<div class="notice notice-warning"><p>%s</p></div>',
                 esc_html__('The vehicles will soon be reworked and only vehicles without children will remain. Please use the recently introduced Units instead.', 'einsatzverwaltung')
             );
-        }
-    }
-
-    public function addBadgeToMenu()
-    {
-        global $submenu;
-        $termsWithParentCount = $this->getTermsWithParentCount();
-        if ($termsWithParentCount > 0) {
-            $submenuKey = 'edit.php?post_type=' . Report::getSlug();
-            if (array_key_exists($submenuKey, $submenu)) {
-                $vehicleEntry = array_filter($submenu[$submenuKey], function ($entry) {
-                    return $entry[2] === 'edit-tags.php?taxonomy=fahrzeug&amp;post_type=einsatz';
-                });
-
-                foreach ($vehicleEntry as $id => $entry) {
-                    $entry[0] .= sprintf(
-                        ' <span class="awaiting-mod"><span class="pending-count">%d</span></span>',
-                        esc_html($termsWithParentCount)
-                    );
-                    $submenu[$submenuKey][$id] = $entry;
-                }
-            }
         }
     }
 

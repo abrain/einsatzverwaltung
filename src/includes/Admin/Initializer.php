@@ -107,7 +107,8 @@ class Initializer
                 'einsatzverwaltung-edit-script',
                 Core::$scriptUrl . 'einsatzverwaltung-edit.js',
                 array('jquery', 'jquery-ui-autocomplete', 'wp-i18n'),
-                Core::VERSION
+                Core::VERSION,
+                true
             );
             wp_localize_script(
                 'einsatzverwaltung-edit-script',
@@ -126,7 +127,8 @@ class Initializer
                 'einsatzverwaltung-settings-script',
                 Core::$scriptUrl . 'einsatzverwaltung-settings.js',
                 array('jquery-ui-draggable', 'jquery-ui-droppable', 'jquery-ui-sortable'),
-                Core::VERSION
+                Core::VERSION,
+                true
             );
         } elseif ('edit.php' == $hook) {
             $screen = get_current_screen();
@@ -135,7 +137,7 @@ class Initializer
                     'einsatzverwaltung-report-list-table',
                     Core::$scriptUrl . 'report-list-table.js',
                     false,
-                    null,
+                    Core::VERSION,
                     true
                 );
             }
@@ -169,7 +171,8 @@ class Initializer
             'einsatzverwaltung-admin-script',
             Core::$scriptUrl . 'einsatzverwaltung-admin.js',
             array('wp-color-picker'),
-            Core::VERSION
+            Core::VERSION,
+            true
         );
         wp_enqueue_style('wp-color-picker');
     }

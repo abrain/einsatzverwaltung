@@ -20,9 +20,9 @@ use function get_page_by_path;
 use function get_permalink;
 use function get_post_type_archive_link;
 use function home_url;
-use function parse_url;
 use function str_replace;
 use function strpos;
+use function wp_parse_url;
 use const PHP_URL_PATH;
 
 /**
@@ -165,7 +165,7 @@ class MainPage
         if (strpos($reportArchiveUrl, $homeUrl) === 0) {
             $reportArchivePath = str_replace($homeUrl, '', $reportArchiveUrl);
         } else {
-            $reportArchivePath = parse_url($reportArchiveUrl, PHP_URL_PATH);
+            $reportArchivePath = wp_parse_url($reportArchiveUrl, PHP_URL_PATH);
         }
 
         return get_page_by_path($reportArchivePath);

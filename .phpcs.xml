@@ -113,4 +113,49 @@
     <rule ref="Universal.CodeAnalysis.StaticInFinalClass"/>
     <rule ref="Universal.ControlStructures.DisallowLonelyIf"/>
     <rule ref="Universal.Files.SeparateFunctionsFromOO"/>
+
+    <rule ref="WordPress.CodeAnalysis.EscapedNotTranslated"/>
+    <rule ref="WordPress.NamingConventions.ValidPostTypeSlug"/>
+
+    <rule ref="WordPress.PHP.DevelopmentFunctions"/>
+    <rule ref="WordPress.PHP.DiscouragedPHPFunctions"/>
+    <rule ref="WordPress.PHP.IniSet"/>
+    <rule ref="WordPress.PHP.PregQuoteDelimiter"/>
+
+    <rule ref="WordPress.Security.SafeRedirect"/>
+    <rule ref="WordPress.Security.PluginMenuSlug"/>
+
+    <rule ref="WordPress.WP.DeprecatedFunctions"/>
+    <rule ref="WordPress.WP.DeprecatedClasses"/>
+    <rule ref="WordPress.WP.DeprecatedParameters"/>
+    <rule ref="WordPress.WP.DeprecatedParameterValues"/>
+    <rule ref="WordPress.WP.AlternativeFunctions"/>
+    <rule ref="WordPress.WP.DiscouragedConstants"/>
+    <rule ref="WordPress.WP.DiscouragedFunctions"/>
+    <rule ref="WordPress.WP.EnqueuedResourceParameters"/>
+    <rule ref="WordPress.WP.CronInterval"/>
+    <rule ref="WordPress.WP.PostsPerPage"/>
+    <rule ref="WordPress.WP.EnqueuedResources"/>
+    <rule ref="WordPress.WP.GlobalVariablesOverride">
+        <exclude-pattern>tests/</exclude-pattern>
+    </rule>
+    <rule ref="WordPress.WP.Capabilities">
+        <properties>
+            <property name="custom_capabilities" type="array">
+                <element value="edit_einsatzbericht"/>
+                <element value="read_einsatzbericht"/>
+                <element value="delete_einsatzbericht"/>
+                <element value="edit_einsatzberichte"/>
+                <element value="edit_others_einsatzberichte"/>
+                <element value="publish_einsatzberichte"/>
+                <element value="read_private_einsatzberichte"/>
+                <element value="delete_einsatzberichte"/>
+                <element value="delete_private_einsatzberichte"/>
+                <element value="delete_published_einsatzberichte"/>
+                <element value="delete_others_einsatzberichte"/>
+                <element value="edit_private_einsatzberichte"/>
+                <element value="edit_published_einsatzbericht"/>
+            </property>
+        </properties>
+    </rule>
 </ruleset>

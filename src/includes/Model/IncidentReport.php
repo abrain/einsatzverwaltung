@@ -7,6 +7,7 @@ use abrain\Einsatzverwaltung\Types\Unit;
 use abrain\Einsatzverwaltung\Types\Vehicle;
 use abrain\Einsatzverwaltung\Utilities;
 use DateTime;
+use Exception;
 use WP_Post;
 use WP_Term;
 use function array_filter;
@@ -15,7 +16,6 @@ use function array_keys;
 use function array_map;
 use function get_post;
 use function get_post_type;
-use function error_log;
 use function get_the_terms;
 use function in_array;
 use function intval;
@@ -42,6 +42,7 @@ class IncidentReport
      * IncidentReport constructor.
      *
      * @param int|WP_Post $post
+     * @throws Exception
      */
     public function __construct($post = null)
     {
@@ -50,8 +51,7 @@ class IncidentReport
         }
 
         if (get_post_type($post) !== 'einsatz') {
-            error_log('The given post object is not an incident report'); // TODO throw exception
-            return;
+            throw new Exception('The given post object is not an incident report');
         }
 
         $this->post = get_post($post);

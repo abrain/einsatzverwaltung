@@ -20,9 +20,9 @@ use function get_page_by_path;
 use function get_permalink;
 use function get_post_type_archive_link;
 use function home_url;
-use function parse_url;
 use function str_replace;
 use function strpos;
+use function wp_parse_url;
 use const PHP_URL_PATH;
 
 /**
@@ -93,27 +93,22 @@ class MainPage
     public function echoSettingsPage()
     {
         if (!current_user_can('manage_options')) {
-            wp_die(__('You do not have sufficient permissions to manage options for this site.', 'einsatzverwaltung'));
+            wp_die(esc_html__('You do not have sufficient permissions to manage options for this site.', 'einsatzverwaltung'));
         }
 
-        echo '<div class="wrap">';
-        printf('<h1>%s &rsaquo; Einsatzverwaltung</h1>', __('Settings', 'einsatzverwaltung'));
+        $heading = sprintf('%s &rsaquo; Einsatzverwaltung', __('Settings', 'einsatzverwaltung'));
+        echo '<div class="wrap"><h1>' . esc_html($heading) . '</h1>';
 
         // Check if any page uses the same permalink as the archive
         $conflictingPage = $this->getConflictingPage();
         if ($conflictingPage instanceof WP_Post) {
-            $pageEditLink = sprintf(
-                '<a href="%1$s">%2$s</a>',
-                esc_url(get_edit_post_link($conflictingPage->ID)),
-                esc_html($conflictingPage->post_title)
-            );
             $message = sprintf(
-                // translators: 1: title of the page, 2: URL
-                esc_html__('The page %1$s uses the same permalink as the archive (%2$s). Please change the permalink of the page.', 'einsatzverwaltung'),
-                $pageEditLink,
-                sprintf('<code>%s</code>', esc_html(get_permalink($conflictingPage)))
+                // translators: 1: title of the page, 2: page ID, 3: URL
+                __('The page "%1$s" uses the same permalink as the archive (%2$s). Please change the permalink of the page.', 'einsatzverwaltung'),
+                $conflictingPage->post_title,
+                get_permalink($conflictingPage)
             );
-            printf('<div class="error"><p>%s</p></div>', $message);
+            printf('<div class="error"><p>%s</p></div>', esc_html($message));
         }
 
         $currentSubPage = $this->getCurrentSubPage();
@@ -127,17 +122,20 @@ class MainPage
         );
         foreach ($this->subPages as $subPage) {
             if ($this->isCurrentSubPage($subPage)) {
-                $format = '<a href="?page=%s&tab=%s" class="%s" aria-current="page">%s</a>';
+                printf(
+                    '<a href="%s" class="%s" aria-current="page">%s</a>',
+                    esc_url(sprintf("?page=%s&tab=%s", self::EVW_SETTINGS_SLUG, $subPage->identifier)),
+                    "nav-tab nav-tab-active",
+                    esc_html($subPage->title)
+                );
             } else {
-                $format = '<a href="?page=%s&tab=%s" class="%s">%s</a>';
+                printf(
+                    '<a href="%s" class="%s">%s</a>',
+                    esc_url(sprintf("?page=%s&tab=%s", self::EVW_SETTINGS_SLUG, $subPage->identifier)),
+                    "nav-tab",
+                    esc_html($subPage->title)
+                );
             }
-            printf(
-                $format,
-                self::EVW_SETTINGS_SLUG,
-                $subPage->identifier,
-                $this->isCurrentSubPage($subPage) ? "nav-tab nav-tab-active" : "nav-tab",
-                esc_html($subPage->title)
-            );
         }
         echo '</nav>';
 
@@ -167,7 +165,7 @@ class MainPage
         if (strpos($reportArchiveUrl, $homeUrl) === 0) {
             $reportArchivePath = str_replace($homeUrl, '', $reportArchiveUrl);
         } else {
-            $reportArchivePath = parse_url($reportArchiveUrl, PHP_URL_PATH);
+            $reportArchivePath = wp_parse_url($reportArchiveUrl, PHP_URL_PATH);
         }
 
         return get_page_by_path($reportArchivePath);

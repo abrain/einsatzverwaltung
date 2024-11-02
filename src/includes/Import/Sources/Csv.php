@@ -3,6 +3,8 @@ namespace abrain\Einsatzverwaltung\Import\Sources;
 
 use abrain\Einsatzverwaltung\Utilities;
 
+// phpcs:disable WordPress.WP.AlternativeFunctions
+
 /**
  * Importiert Einsatzberichte aus einer CSV-Datei
  */

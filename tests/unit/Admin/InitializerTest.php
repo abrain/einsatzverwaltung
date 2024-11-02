@@ -52,7 +52,7 @@ class InitializerTest extends UnitTestCase
         });
         when('wp_create_nonce')->justReturn('a-great-nonce');
 
-        expect('wp_enqueue_script')->once()->with('einsatzverwaltung-admin-script', Mockery::type('string'), Mockery::type('array'), Mockery::type('string'));
+        expect('wp_enqueue_script')->once()->with('einsatzverwaltung-admin-script', Mockery::type('string'), Mockery::type('array'), Mockery::type('string'), true);
         expect('wp_enqueue_style')->atLeast()->once()->withAnyArgs();
         expect('wp_localize_script')->atLeast()->once()->withAnyArgs();
         expect('wp_set_script_translations')->atLeast()->once()->withAnyArgs();
@@ -66,7 +66,7 @@ class InitializerTest extends UnitTestCase
      */
     public function testEnqueueReportListTableScripts()
     {
-        expect('wp_enqueue_script')->once()->with('einsatzverwaltung-report-list-table', Mockery::type('string'), false, null, true);
+        expect('wp_enqueue_script')->once()->with('einsatzverwaltung-report-list-table', Mockery::type('string'), false, Mockery::type('string'), true);
         expect('wp_enqueue_style')->atLeast()->once()->withAnyArgs();
 
         $screen = Mockery::mock('\WP_Screen');
@@ -94,7 +94,7 @@ class InitializerTest extends UnitTestCase
 
     public function testEnqueueSettingsScripts()
     {
-        expect('wp_enqueue_script')->once()->with('einsatzverwaltung-settings-script', Mockery::type('string'), Mockery::type('array'), Mockery::type('string'));
+        expect('wp_enqueue_script')->once()->with('einsatzverwaltung-settings-script', Mockery::type('string'), Mockery::type('array'), Mockery::type('string'), true);
         expect('wp_enqueue_style')->atLeast()->once()->withAnyArgs();
 
         $this->initializer->enqueueEditScripts('settings_page_einsatzvw-settings');

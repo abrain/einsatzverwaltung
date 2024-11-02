@@ -48,7 +48,8 @@ class Page extends AdminPage
             'einsatzverwaltung-export',
             Core::$scriptUrl . 'export.js',
             array('jquery'),
-            Core::VERSION
+            Core::VERSION,
+            true
         );
     }
 

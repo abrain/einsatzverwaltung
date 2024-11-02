@@ -129,7 +129,7 @@ class IncidentType extends CustomTaxonomy
             // Enqueue the scripts to handle media upload and selection
             if ($screen->taxonomy === self::getSlug() && in_array($screen->base, array('edit-tags', 'term'))) {
                 wp_enqueue_media();
-                wp_enqueue_script('einsatzverwaltung-media-selector', Core::$scriptUrl . 'media-selector.js');
+                wp_enqueue_script('einsatzverwaltung-media-selector', Core::$scriptUrl . 'media-selector.js', [], Core::VERSION, true);
             }
         });
 

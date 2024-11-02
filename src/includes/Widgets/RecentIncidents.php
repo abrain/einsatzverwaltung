@@ -16,8 +16,8 @@ use function esc_html__;
 use function get_queried_object_id;
 use function get_taxonomy;
 use function printf;
-use function strip_tags;
 use function trim;
+use function wp_strip_all_tags;
 
 /**
  * WordPress-Widget für die letzten X Einsätze
@@ -116,7 +116,7 @@ class RecentIncidents extends AbstractWidget
 
         // Add a nav element for accessibility
         if (current_theme_supports('html5', 'navigation-widgets')) {
-            $title = trim(strip_tags($title));
+            $title = trim(wp_strip_all_tags($title));
             $ariaLabel = !empty($title) ? $title : $this->defaultTitle;
             printf('<nav role="navigation" aria-label="%s">', esc_attr($ariaLabel));
         }
@@ -202,7 +202,7 @@ class RecentIncidents extends AbstractWidget
     public function update($newInstance, $oldInstance): array
     {
         $instance = array();
-        $instance['title'] = strip_tags($newInstance['title']);
+        $instance['title'] = wp_strip_all_tags($newInstance['title']);
 
         $anzahl = $newInstance['anzahl'];
         if (empty($anzahl) || !is_numeric($anzahl) || $anzahl < 1) {

@@ -35,7 +35,7 @@ class Options
 
         // Fehlenden Standardwert beklagen, außer es handelt sich um eine Rechteeinstellung
         if (strpos($key, 'einsatzvw_cap_roles_') !== 0) {
-            error_log(sprintf('Kein Standardwert für %s gefunden!', $key));
+            wp_trigger_error(__FUNCTION__, sprintf('Did not find default value for option %s', $key), E_USER_WARNING);
         }
 
         return get_option($key, false);

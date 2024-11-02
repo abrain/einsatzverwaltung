@@ -46,7 +46,7 @@ class About extends SubPage
         <p>
             Bei Problembeschreibungen helfen mir die folgenden Angaben bei der Eingrenzung der Ursache:
             <code>
-                <?php printf('Plugin: %s, WordPress: %s, PHP: %s', Core::VERSION, get_bloginfo('version'), phpversion()); ?>
+                <?php printf('Plugin: %s, WordPress: %s, PHP: %s', esc_html(Core::VERSION), esc_html(get_bloginfo('version')), esc_html(phpversion())); ?>
             </code>
         </p>
 

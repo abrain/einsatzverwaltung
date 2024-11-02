@@ -1,6 +1,8 @@
 <?php
 namespace abrain\Einsatzverwaltung\Export\Formats;
 
+// phpcs:disable WordPress.WP.AlternativeFunctions
+
 /**
  * Exportiert Einsatzberichte in eine JSON-Datei.
  *

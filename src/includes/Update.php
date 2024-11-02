@@ -11,7 +11,6 @@ use function array_keys;
 use function array_map;
 use function delete_option;
 use function delete_term_meta;
-use function error_log;
 use function function_exists;
 use function get_editable_roles;
 use function get_option;
@@ -159,7 +158,7 @@ class Update
                 array('%d')
             );
             if (false === $result) {
-                error_log('Problem beim Aktualisieren des GMT-Datums bei Post-ID ' . $bericht->ID);
+                wp_trigger_error(__FUNCTION__, 'Problem beim Aktualisieren des GMT-Datums bei Post-ID ' . $bericht->ID);
             }
         }
 
@@ -565,7 +564,7 @@ class Update
         foreach ($oldUnits as $oldUnit) {
             $newUnit = wp_insert_term($oldUnit->post_title, 'evw_unit');
             if (is_wp_error($newUnit)) {
-                error_log('Could not create term for Unit: ' . $newUnit->get_error_message());
+                wp_trigger_error(__FUNCTION__, 'Could not create term for Unit: ' . $newUnit->get_error_message());
                 continue;
             }
             $termId = $newUnit['term_id'];

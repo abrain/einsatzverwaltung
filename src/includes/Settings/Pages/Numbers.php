@@ -69,7 +69,7 @@ class Numbers extends SubPage
         );
         printf(
             '<p class="description">%s</p>',
-            __('If deactivated, incident numbers can be maintained manually.', 'einsatzverwaltung')
+            esc_html__('If deactivated, incident numbers can be maintained manually.', 'einsatzverwaltung')
         );
     }
 
@@ -84,7 +84,7 @@ class Numbers extends SubPage
         echo '</fieldset>';
         printf(
             '<p class="description">%s</p>',
-            __('The sequential number gets padded with leading zeros until it has this length.', 'einsatzverwaltung')
+            esc_html__('The sequential number gets padded with leading zeros until it has this length.', 'einsatzverwaltung')
         );
     }
 
@@ -96,7 +96,7 @@ class Numbers extends SubPage
         );
         printf(
             '<p class="description">%s</p>',
-            __('By default, the year comes before the sequential number. Activate this option to reverse the order.', 'einsatzverwaltung')
+            esc_html__('By default, the year comes before the sequential number. Activate this option to reverse the order.', 'einsatzverwaltung')
         );
     }
 
@@ -111,7 +111,7 @@ class Numbers extends SubPage
         echo '</fieldset>';
         printf(
             '<p class="description">%s</p>',
-            __('This character separates the year and the sequential number.', 'einsatzverwaltung')
+            esc_html__('This character separates the year and the sequential number.', 'einsatzverwaltung')
         );
     }
 

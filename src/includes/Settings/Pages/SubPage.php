@@ -106,22 +106,24 @@ abstract class SubPage
     {
         $currentValue = get_option($name, $defaultValue);
         foreach ($options as $value => $option) {
-            if ($value === $defaultValue) {
-                // translators: 1: label of the default option
-                $label = esc_html(sprintf(__('%s (default)', 'einsatzverwaltung'), $option['label']));
-            } else {
-                $label = esc_html($option['label']);
-            }
-            if (array_key_exists('code', $option) && !empty($option['code'])) {
-                $label .= sprintf('<code>%s</code>', esc_html($option['code']));
-            }
             printf(
-                '<label><input type="radio" name="%s" value="%s"%s>%s</label><br>',
+                '<label><input type="radio" name="%s" value="%s"%s>',
                 esc_attr($name),
                 esc_attr($value),
-                checked($value, $currentValue, false),
-                $label
+                checked($value, $currentValue, false)
             );
+
+            if ($value === $defaultValue) {
+                // translators: 1: label of the default option
+                echo esc_html(sprintf(__('%s (default)', 'einsatzverwaltung'), $option['label']));
+            } else {
+                echo esc_html($option['label']);
+            }
+            if (array_key_exists('code', $option) && !empty($option['code'])) {
+                printf('<code>%s</code>', esc_html($option['code']));
+            }
+
+            echo '</label><br>';
         }
     }
 

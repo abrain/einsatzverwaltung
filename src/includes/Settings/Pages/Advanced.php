@@ -93,17 +93,8 @@ class Advanced extends SubPage
             function () {
                 global $wp_rewrite;
                 if ($wp_rewrite->using_permalinks() === false) {
-                    echo '<p style="">';
-                    printf('<strong>%s</strong> ', esc_html(__('Note:', 'einsatzverwaltung')));
-                    printf(
-                        // Translators: %s: permalinks
-                        __('These settings currently have no effect, as WordPress uses plain %s', 'einsatzverwaltung'),
-                        sprintf(
-                            '<a href="%s">%s</a>',
-                            admin_url('options-permalink.php'),
-                            __('permalinks', 'einsatzverwaltung')
-                        )
-                    );
+                    printf('<p class="notice notice-warning"><strong>%s</strong> ', esc_html__('Note:', 'einsatzverwaltung'));
+                    esc_html_e('These settings currently have no effect, as WordPress uses plain permalinks', 'einsatzverwaltung');
                     echo '</p>';
                 }
                 printf(
@@ -187,7 +178,7 @@ class Advanced extends SubPage
         );
         printf(
             '<p class="description">%s</p>',
-            __('You can activate these features of Posts also for Incident Reports.', 'einsatzverwaltung')
+            esc_html__('You can activate these features of Posts also for Incident Reports.', 'einsatzverwaltung')
         );
         echo '</fieldset>';
     }

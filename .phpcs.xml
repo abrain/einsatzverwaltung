@@ -121,4 +121,7 @@
     <rule ref="WordPress.PHP.DiscouragedPHPFunctions"/>
     <rule ref="WordPress.PHP.IniSet"/>
     <rule ref="WordPress.PHP.PregQuoteDelimiter"/>
+
+    <rule ref="WordPress.Security.SafeRedirect"/>
+    <rule ref="WordPress.Security.PluginMenuSlug"/>
 </ruleset>

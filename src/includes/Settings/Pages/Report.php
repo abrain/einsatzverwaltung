@@ -173,7 +173,7 @@ class Report extends SubPage
         echo '<fieldset>';
         $this->echoRadioButtons('einsatzverwaltung_use_reporttemplate', $this->useReportTemplateOptions, 'no');
         echo '<p class="description">';
-        printf('Die Option &quot;%s&quot; wird nicht empfohlen, ist aber bei manchen Themes die einzige M&ouml;glichkeit, das Template in &Uuml;bersichten nutzen zu k&ouml;nnen.', $this->useReportTemplateOptions['everywhere']['label']);
+        printf('Die Option &quot;%s&quot; wird nicht empfohlen, ist aber bei manchen Themes die einzige M&ouml;glichkeit, das Template in &Uuml;bersichten nutzen zu k&ouml;nnen.', esc_html($this->useReportTemplateOptions['everywhere']['label']));
         echo '</p>';
         $this->echoTextarea('einsatzverwaltung_reporttemplate');
         echo '<p class="description">Es kann sein, dass das Theme in &Uuml;bersichten nur den Auszug anzeigt. Dessen Aussehen kann mit einem eigenen Template festgelegt werden (siehe unten).</p>';

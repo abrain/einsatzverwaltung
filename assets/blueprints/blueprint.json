@@ -1,0 +1,34 @@
+{
+  "preferredVersions": {
+    "php": "8.1",
+    "wp": "latest"
+  },
+  "login": true,
+  "landingPage": "/wp-admin/edit.php?post_type=einsatz",
+  "steps": [
+    {
+      "step": "setSiteOptions",
+      "options": {
+        "blogname": "Einsatzverwaltung Demo",
+        "einsatzverwaltung_incidentnumbers_auto": "1",
+        "einsatzvw_numbers_separator": "slash",
+        "einsatzvw_list_columns": "numberRange,annotationSpecial,title,datetime"
+      }
+    },
+    {
+      "step": "installPlugin",
+      "pluginData": {
+        "resource": "wordpress.org/plugins",
+        "slug": "einsatzverwaltung"
+      }
+    },
+    {
+      "step": "runPHP",
+      "code": "<?php require_once 'wordpress/wp-load.php'; wp_insert_post(array('post_title' => 'Lorem ipsum 1', 'post_type' => 'einsatz', 'post_status' => 'publish', 'post_date' => date_format(date_create('8 days ago 14:00'), 'Y-m-d H:i:s'), 'post_content' => 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', 'meta_input' => ['einsatz_einsatzende' => date_format(date_create('8 days ago 15:40'), 'Y-m-d H:i:s')])); wp_insert_post(array('post_title' => 'Lorem ipsum 2', 'post_type' => 'einsatz', 'post_status' => 'publish', 'post_date' => date_format(date_create('4 days ago 6:51'), 'Y-m-d H:i:s'), 'post_content' => 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', 'meta_input' => ['einsatz_einsatzende' => date_format(date_create('4 days ago 15:30'), 'Y-m-d H:i:s'), 'einsatz_special' => '1', 'einsatz_weight' => '3'])); wp_insert_post(array('post_title' => 'Lorem ipsum 3', 'post_type' => 'einsatz', 'post_status' => 'publish', 'post_date' => date_format(date_create('yesterday 17:25'), 'Y-m-d H:i:s'), 'post_content' => 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', 'meta_input' => ['einsatz_einsatzende' => date_format(date_create('yesterday 18:00'), 'Y-m-d H:i:s')])); ?>"
+    },
+    {
+      "step": "runPHP",
+      "code": "<?php require_once 'wordpress/wp-load.php'; wp_insert_post(array('post_title' => 'Demo', 'post_type' => 'page', 'post_status' => 'publish', 'post_content' => '[einsatzliste]')); ?>"
+    }
+  ]
+}

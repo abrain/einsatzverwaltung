@@ -44,6 +44,11 @@ class ReportInsertObject
     private $title;
 
     /**
+     * @var int|null
+     */
+    private $imageId = null;
+
+    /**
      * @param DateTimeImmutable $startDate
      * @param string $title
      */
@@ -154,5 +159,21 @@ class ReportInsertObject
     public function setResources(array $resources): void
     {
         $this->resources = $resources;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getImageId(): ?int
+    {
+        return $this->imageId;
+    }
+
+    /**
+     * @param int|null $imageId
+     */
+    public function setImageId(?int $imageId): void
+    {
+        $this->imageId = $imageId;
     }
 }

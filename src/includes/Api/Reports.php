@@ -20,6 +20,8 @@ use function is_wp_error;
 use function strlen;
 use function trim;
 use function wp_strip_all_tags;
+use function wp_get_attachment_url;
+use function wp_attachment_is_image;
 use const DATE_RFC3339;
 
 /**
@@ -100,6 +102,13 @@ class Reports extends WP_REST_Controller
                         'sanitize_callback' => 'sanitize_text_field',
                         'required' => false,
                     ),
+                    'image_id' => array(
+                        'description' => __('The ID of an image in the WordPress Media Library to be set as the featured image.', 'einsatzverwaltung'),
+                        'type' => 'integer',
+                        'validate_callback' => array($this, 'validateAttachmentId'),
+                        'sanitize_callback' => 'absint',
+                        'required' => false,
+                    ),
                 ),
             ),
         ));
@@ -140,6 +149,11 @@ class Reports extends WP_REST_Controller
         if (array_key_exists('resources', $params) && !empty($params['resources'])) {
             $resources = explode(',', $params['resources']);
             $importObject->setResources(array_map('trim', $resources));
+        }
+
+        // Process optional parameter image_id
+        if (array_key_exists('image_id', $params) && !empty($params['image_id'])) {
+            $importObject->setImageId((int)$params['image_id']);
         }
 
         // Add post to database
@@ -217,5 +231,29 @@ class Reports extends WP_REST_Controller
     public function validateStringNotEmpty($value, WP_REST_Request $request, string $key): bool
     {
         return is_string($value) && strlen(trim($value)) > 0;
+    }
+
+    /**
+     * Validates if the passed parameter value is an existing attachment ID and if this attachment is an image.
+     *
+     * @param mixed $value
+     * @param WP_REST_Request $request
+     * @param string $key
+     *
+     * @return bool
+     *
+     * @noinspection PhpUnusedParameterInspection
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    public function validateAttachmentId($value, WP_REST_Request $request, string $key): bool
+    {
+        if (!is_numeric($value)) {
+            return false;
+        }
+        $id = (int)$value;
+        if ($id <= 0) {
+            return false;
+        }
+        return wp_get_attachment_url($id) !== false && wp_attachment_is_image($id);
     }
 }

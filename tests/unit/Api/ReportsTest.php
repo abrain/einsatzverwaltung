@@ -6,6 +6,7 @@ use abrain\Einsatzverwaltung\UnitTestCase;
 use Brain\Monkey\Expectation\Exception\ExpectationArgsRequired;
 use DateTimeImmutable;
 use Mockery;
+use WP_REST_Request; // Added for type hinting
 use function array_key_exists;
 use function Brain\Monkey\Functions\expect;
 
@@ -21,6 +22,13 @@ class ReportsTest extends UnitTestCase
         parent::setUp();
         Mockery::mock('WP_REST_Controller');
         Mockery::namedMock('WP_REST_Server', 'abrain\Einsatzverwaltung\Stubs\WPRESTServerStub');
+        // Mock WordPress functions that might be called directly or as callbacks
+        expect('__')->atLeast()->zeroTimes()->andReturnUsing(function ($text, $domain) {
+            return $text; // Simple passthrough for descriptions
+        });
+        expect('absint')->atLeast()->zeroTimes()->andReturnUsing(function ($value) {
+            return abs((int)$value);
+        });
     }
 
     /**
@@ -54,6 +62,24 @@ class ReportsTest extends UnitTestCase
                 }
             }
         }
+
+        // Specifically check image_id argument in the CREATABLE route
+        $creatableRouteArgs = null;
+        foreach ($routeArgs as $routeOptions) {
+            if (isset($routeOptions['methods']) && $routeOptions['methods'] === \WP_REST_Server::CREATABLE) {
+                $creatableRouteArgs = $routeOptions['args'];
+                break;
+            }
+        }
+        $this->assertNotNull($creatableRouteArgs, "CREATABLE route options not found.");
+        $this->assertArrayHasKey('image_id', $creatableRouteArgs, "image_id argument not found in CREATABLE route.");
+
+        $imageIdArgs = $creatableRouteArgs['image_id'];
+        $this->assertEquals(__('The ID of an image in the WordPress Media Library to be set as the featured image.', 'einsatzverwaltung'), $imageIdArgs['description']);
+        $this->assertEquals('integer', $imageIdArgs['type']);
+        $this->assertEquals([new Reports(), 'validateAttachmentId'], $imageIdArgs['validate_callback']);
+        $this->assertEquals('absint', $imageIdArgs['sanitize_callback']);
+        $this->assertFalse($imageIdArgs['required']);
     }
 
     /**
@@ -124,6 +150,47 @@ class ReportsTest extends UnitTestCase
     }
 
     /**
+     * @dataProvider provideValidateAttachmentIdCases
+     */
+    public function testValidateAttachmentId($value, $urlReturnValue, $isImageReturnValue, $expectedResult)
+    {
+        $request = Mockery::mock(WP_REST_Request::class); // Mock WP_REST_Request
+        $reports = new Reports();
+
+        // Reset mocks for WordPress functions for each data set
+        Mockery::getContainer()->mockery_close(); // Close any existing Mockery instances from previous tests/data providers
+        parent::setUp(); // Re-run setup to re-initialize mocks if needed, or manage mocks more granularly
+
+        if (is_int($value) && $value > 0) { // Only mock for positive integer IDs
+            expect('wp_get_attachment_url')
+                ->once()
+                ->with($value)
+                ->andReturn($urlReturnValue);
+
+            if ($urlReturnValue !== false) {
+                expect('wp_attachment_is_image')
+                    ->once()
+                    ->with($value)
+                    ->andReturn($isImageReturnValue);
+            }
+        }
+
+        $this->assertEquals($expectedResult, $reports->validateAttachmentId($value, $request, 'image_id'));
+    }
+
+    public function provideValidateAttachmentIdCases(): array
+    {
+        return [
+            'valid image ID' => [123, 'http://example.com/image.jpg', true, true],
+            'non-image attachment ID' => [124, 'http://example.com/document.pdf', false, false],
+            'non-existent attachment ID' => [125, false, null, false], // wp_attachment_is_image not called
+            'non-integer value' => ['abc', null, null, false], // WordPress functions not called
+            'zero ID' => [0, null, null, false], // WordPress functions not called
+            'negative ID' => [-1, null, null, false], // WordPress functions not called
+        ];
+    }
+
+    /**
      * @throws ExpectationArgsRequired
      */
     public function testCreateItemMinimalData()
@@ -139,6 +206,7 @@ class ReportsTest extends UnitTestCase
         $importObject->expects('__construct')->once()->with(Mockery::on(function ($arg) {
             return $arg instanceof DateTimeImmutable && $arg->getTimestamp() === 1630266479;
         }), 'A reason');
+        $importObject->expects('setImageId')->never(); // Ensure it's not called
 
         $reportInserter = Mockery::mock('overload:abrain\Einsatzverwaltung\DataAccess\ReportInserter');
         $reportInserter->expects('__construct')->once()->with(false);
@@ -159,9 +227,9 @@ class ReportsTest extends UnitTestCase
     /**
      * @throws ExpectationArgsRequired
      */
-    public function testCreateItemComplete()
+    public function testCreateItemCompleteWithoutImageId()
     {
-        $request = Mockery::mock('WP_REST_Request');
+        $request = Mockery::mock(WP_REST_Request::class); // Mock WP_REST_Request
         $request->expects('get_params')->once()->andReturn([
             'reason' => 'A reason',
             'date_start' => '2021-08-29T21:47:59+0200',
@@ -185,6 +253,7 @@ class ReportsTest extends UnitTestCase
         $importObject->expects('setKeyword')->once()->with('key-word');
         $importObject->expects('setLocation')->once()->with('It happened here');
         $importObject->expects('setResources')->once()->with(['resource 1', 'another resource', 'and number three']);
+        $importObject->expects('setImageId')->never(); // Ensure it's not called
 
         $reportInserter = Mockery::mock('overload:abrain\Einsatzverwaltung\DataAccess\ReportInserter');
         $reportInserter->expects('__construct')->once()->with(true);
@@ -204,9 +273,64 @@ class ReportsTest extends UnitTestCase
     /**
      * @throws ExpectationArgsRequired
      */
+    public function testCreateItemWithValidImageId()
+    {
+        $validImageId = 123;
+        // sanitize_callback 'absint' is mocked in setUp to return abs((int)$value)
+        // So, if $validImageId is '123', absint will make it 123.
+        // If it were '-123', absint would make it 123.
+
+        $request = Mockery::mock(WP_REST_Request::class);
+        $request->expects('get_params')->once()->andReturn([
+            'reason' => 'A reason with image',
+            'date_start' => '2021-08-29T21:47:59+0200',
+            'image_id' => $validImageId, // Raw value before sanitization
+            'publish' => false,
+        ]);
+
+        // These mocks are for the check within create_item, not for the validate_callback.
+        // The validate_callback is tested separately by testValidateAttachmentId
+        // and its correct registration is tested in testRegisterRoutes.
+        // For this create_item test, we assume the image_id has passed validation
+        // and is now being processed.
+        // The `absint` sanitize_callback (mocked in setUp) will have run.
+        $sanitizedImageId = abs((int)$validImageId);
+
+
+        $importObject = Mockery::mock('overload:abrain\Einsatzverwaltung\Model\ReportInsertObject');
+        $importObject->expects('__construct')->once()->with(
+            Mockery::on(function ($arg) {
+                return $arg instanceof DateTimeImmutable && $arg->getTimestamp() === 1630266479;
+            }),
+            'A reason with image'
+        );
+        // Expect setImageId to be called with the *sanitized* image_id
+        $importObject->expects('setImageId')->once()->with($sanitizedImageId);
+
+
+        $reportInserter = Mockery::mock('overload:abrain\Einsatzverwaltung\DataAccess\ReportInserter');
+        $reportInserter->expects('__construct')->once()->with(false); // publish is false
+        $reportInserter->expects('insertReport')->once()->with(Mockery::on(function ($arg) use ($sanitizedImageId) {
+            // Check that the ReportInsertObject passed to ReportInserter has the correct imageId
+            return $arg instanceof ReportInsertObject && $arg->getImageId() === $sanitizedImageId;
+        }))->andReturn(789); // New post ID
+
+        $response = Mockery::mock('overload:WP_REST_Response');
+        $response->expects('__construct')->once()->with(['id' => 789]);
+        $response->expects('set_status')->once()->with(201);
+
+        $reportsApi = new Reports();
+        $restResponse = $reportsApi->create_item($request);
+        $this->assertInstanceOf('WP_REST_Response', $restResponse);
+    }
+
+
+    /**
+     * @throws ExpectationArgsRequired
+     */
     public function testCreateItemError()
     {
-        $request = Mockery::mock('WP_REST_Request');
+        $request = Mockery::mock(WP_REST_Request::class); // Mock WP_REST_Request
         $request->expects('get_params')->once()->andReturn([
             'reason' => 'A reason',
             'date_start' => '2021-08-29T21:47:59+0200'
@@ -214,11 +338,11 @@ class ReportsTest extends UnitTestCase
 
         $wpError = Mockery::mock('WP_Error');
 
-        // Create an overload mock, as the object gets created inside the tested function
         $importObject = Mockery::mock('overload:abrain\Einsatzverwaltung\Model\ReportInsertObject');
         $importObject->expects('__construct')->once()->with(Mockery::on(function ($arg) {
             return $arg instanceof DateTimeImmutable && $arg->getTimestamp() === 1630266479;
         }), 'A reason');
+        $importObject->expects('setImageId')->never(); // Ensure it's not called
 
         $reportInserter = Mockery::mock('overload:abrain\Einsatzverwaltung\DataAccess\ReportInserter');
         $reportInserter->expects('__construct')->once()->with(false);
@@ -226,11 +350,8 @@ class ReportsTest extends UnitTestCase
             return $arg instanceof ReportInsertObject;
         }))->andReturn($wpError);
 
-
-        // Create an overload mock, as the object gets created inside the tested function
-        $response = Mockery::mock('overload:WP_REST_Response');
-        $response->expects('__construct')->once()->with(['id' => 614]);
-        $response->expects('set_status')->once()->with(201);
+        // If insertReport returns WP_Error, a WP_REST_Response is not constructed by our code.
+        // So, no need to mock WP_REST_Response here for the error path.
 
         $reportsApi = new Reports();
         $this->assertEquals($wpError, $reportsApi->create_item($request));

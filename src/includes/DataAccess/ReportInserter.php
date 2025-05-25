@@ -21,6 +21,7 @@ use function get_terms;
 use function is_wp_error;
 use function wp_insert_post;
 use function wp_insert_term;
+use function set_post_thumbnail;
 
 /**
  * Inserts incident reports into the database
@@ -202,6 +203,17 @@ class ReportInserter
             return $insertArgs;
         }
 
-        return wp_insert_post($insertArgs, true);
+        $postId = wp_insert_post($insertArgs, true);
+
+        if (is_wp_error($postId)) {
+            return $postId;
+        }
+
+        $imageId = $importObject->getImageId();
+        if ($imageId !== null && $imageId > 0) {
+            set_post_thumbnail($postId, $imageId);
+        }
+
+        return $postId;
     }
 }

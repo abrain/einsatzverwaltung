@@ -1,14 +1,16 @@
 <?xml version="1.0"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.5/phpunit.xsd" bootstrap="tests/unit/bootstrap.php" beStrictAboutCoversAnnotation="true" beStrictAboutTodoAnnotatedTests="true" colors="true" forceCoversAnnotation="true" convertDeprecationsToExceptions="true">
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.5/phpunit.xsd" bootstrap="tests/unit/bootstrap.php" beStrictAboutCoverageMetadata="true" colors="true" requireCoverageMetadata="true">
   <coverage>
-    <include>
-      <directory suffix=".php">./src</directory>
-    </include>
     <report>
       <clover outputFile="build/logs/clover.xml"/>
       <text outputFile="php://stdout"/>
     </report>
   </coverage>
+  <source>
+    <include>
+      <directory>./src</directory>
+    </include>
+  </source>
   <testsuites>
     <testsuite name="unit">
       <directory>./tests/unit/</directory>

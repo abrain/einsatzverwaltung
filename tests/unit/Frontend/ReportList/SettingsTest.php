@@ -61,7 +61,7 @@ class SettingsTest extends UnitTestCase
      *
      * @return array
      */
-    public function zebraColorData()
+    public static function zebraColorData()
     {
         return array(
             array('some_option_value', null, self::DEFAULT_ZEBRACOLOR),

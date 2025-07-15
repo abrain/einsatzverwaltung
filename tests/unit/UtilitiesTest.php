@@ -29,7 +29,7 @@ class UtilitiesTest extends UnitTestCase
     /**
      * @return array
      */
-    public function dataForGetArrayValue(): array
+    public static function dataForGetArrayValue(): array
     {
         return array(
             array(array(), 'key', 'defaultValue', 'defaultValue'),

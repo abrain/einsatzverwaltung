@@ -62,6 +62,25 @@ abstract class EditScreen
     }
 
     /**
+     * Gibt ein DateTime-Eingabefeld für die Metabox aus
+     *
+     * @param string $label Beschriftung
+     * @param string $name Feld-ID
+     * @param string $value Feldwert
+     * @param string $placeholder Platzhalter
+     */
+    protected function echoInputDateTime(string $label, string $name, string $value, $placeholder = '')
+    {
+        printf('<tr><td><label for="%1$s">%2$s</label></td>', esc_attr($name), esc_html($label));
+        printf(
+            '<td><input type="datetime-local" id="%1$s" name="%1$s" value="%2$s" placeholder="%3$s" /></td></tr>',
+            esc_attr($name),
+            esc_attr($value),
+            esc_attr($placeholder)
+        );
+    }
+
+    /**
      * @param WP_Term[] $terms
      * @param WP_Taxonomy $taxonomy
      * @param int[] $assignedIds

@@ -185,17 +185,17 @@ class ReportEditScreen extends EditScreen
             );
         }
 
-        $this->echoInputText(
+        $this->echoInputDateTime(
             __('Alarm time', 'einsatzverwaltung'),
             'einsatzverwaltung_alarmzeit',
-            esc_attr($alarmzeit->format('Y-m-d H:i')),
+            esc_attr($alarmzeit->format('Y-m-d\TH:i')),
             'YYYY-MM-DD hh:mm'
         );
 
-        $this->echoInputText(
+        $this->echoInputDateTime(
             __('End time', 'einsatzverwaltung'),
             'einsatz_einsatzende',
-            esc_attr($einsatzende),
+            esc_attr(str_replace(' ', 'T', $einsatzende)),
             'YYYY-MM-DD hh:mm'
         );
 

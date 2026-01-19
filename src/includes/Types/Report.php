@@ -287,6 +287,7 @@ class Report implements CustomPostType
     {
         $sanitizedValue = sanitize_text_field($value);
         if (!empty($sanitizedValue)) {
+            $sanitizedValue = str_replace('T', ' ', $sanitizedValue);
             $dateTime = date_create($sanitizedValue);
         }
 

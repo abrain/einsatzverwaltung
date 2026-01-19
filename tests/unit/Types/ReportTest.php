@@ -69,4 +69,13 @@ class ReportTest extends UnitTestCase
         $registrationArgs = (new Report())->getRegistrationArgs();
         $this->assertContainsEquals('excerpt', $registrationArgs['supports']);
     }
+
+    public function testSanitizeTimeOfEnding()
+    {
+        $report = new Report();
+        $this->assertEquals('2021-08-29 21:34', $report->sanitizeTimeOfEnding('2021-08-29 21:34'));
+        $this->assertEquals('2021-08-29 21:34', $report->sanitizeTimeOfEnding('2021-08-29T21:34'));
+        $this->assertEquals('', $report->sanitizeTimeOfEnding('invalid'));
+        $this->assertEquals('', $report->sanitizeTimeOfEnding(''));
+    }
 }

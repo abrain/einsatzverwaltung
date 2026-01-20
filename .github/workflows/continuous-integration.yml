@@ -95,25 +95,6 @@ jobs:
       - name: Run integration tests
         run: composer exec phpunit -- -c phpunit-integration.xml
 
-      - name: Upload code coverage to Codecov (unit)
-        uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
-        with:
-          fail_ci_if_error: true
-          token: ${{ secrets.CODECOV_TOKEN }}
-          disable_search: true
-          files: ${{github.workspace}}/build/logs/clover.xml
-          flags: unit
-
-      - name: Upload code coverage to Codecov (integration)
-        uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
-        with:
-          fail_ci_if_error: true
-          token: ${{ secrets.CODECOV_TOKEN }}
-          disable_search: true
-          files: ${{github.workspace}}/build/logs/clover-integration.xml
-          flags: integration
-
-
   test-minimum:
     runs-on: ubuntu-22.04
     needs:

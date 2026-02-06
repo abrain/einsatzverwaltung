@@ -36,7 +36,7 @@
   "require-dev": {
     "phpmd/phpmd": "2.15.0",
     "brain/monkey": "2.6.2",
-    "friendsofphp/php-cs-fixer": "3.88.2",
+    "friendsofphp/php-cs-fixer": "3.93.1",
     "php-cs-fixer/phpunit-constraint-isidenticalstring": "1.6.0",
     "php-cs-fixer/phpunit-constraint-xmlmatchesxsd": "1.6.0",
     "phpcompatibility/php-compatibility": "9.3.5",

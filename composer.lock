@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "06f88319a670aa802d096fb2d182cab4",
+    "content-hash": "6616467963e01de4f57610f8c7cc827a",
     "packages": [],
     "packages-dev": [
         {
@@ -1254,23 +1254,23 @@
         },
         {
             "name": "php-cs-fixer/phpunit-constraint-xmlmatchesxsd",
-            "version": "v1.6.0",
+            "version": "v1.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHP-CS-Fixer/phpunit-constraint-xmlmatchesxsd.git",
-                "reference": "c72b45d101d7d00bb938347ada14767e7416ed85"
+                "reference": "54e76ea950303d868c2af819b64753e9a2e38ad4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHP-CS-Fixer/phpunit-constraint-xmlmatchesxsd/zipball/c72b45d101d7d00bb938347ada14767e7416ed85",
-                "reference": "c72b45d101d7d00bb938347ada14767e7416ed85",
+                "url": "https://api.github.com/repos/PHP-CS-Fixer/phpunit-constraint-xmlmatchesxsd/zipball/54e76ea950303d868c2af819b64753e9a2e38ad4",
+                "reference": "54e76ea950303d868c2af819b64753e9a2e38ad4",
                 "shasum": ""
             },
             "require": {
                 "ext-dom": "*",
                 "ext-libxml": "*",
                 "php": "^7.0 || ^8.0",
-                "phpunit/phpunit": "^6.5.14 || ^7.5.20 || ^8.5.41 || ^9.6.22 || ^10.5.45 || ^11.5.7 || ^12.0.2"
+                "phpunit/phpunit": "^6.5.14 || ^7.5.20 || ^8.5.41 || ^9.6.22 || ^10.5.45 || ^11.5.7 || ^12.0.2 || ^13.0.0"
             },
             "type": "library",
             "autoload": {
@@ -1297,9 +1297,9 @@
             "description": "Constraint for testing XML against XSD.",
             "support": {
                 "issues": "https://github.com/PHP-CS-Fixer/phpunit-constraint-xmlmatchesxsd/issues",
-                "source": "https://github.com/PHP-CS-Fixer/phpunit-constraint-xmlmatchesxsd/tree/v1.6.0"
+                "source": "https://github.com/PHP-CS-Fixer/phpunit-constraint-xmlmatchesxsd/tree/v1.7.0"
             },
-            "time": "2025-02-09T22:30:45+00:00"
+            "time": "2026-02-07T19:57:47+00:00"
         },
         {
             "name": "phpcompatibility/php-compatibility",

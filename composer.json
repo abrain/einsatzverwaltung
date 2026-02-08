@@ -38,7 +38,7 @@
     "brain/monkey": "2.6.2",
     "friendsofphp/php-cs-fixer": "3.93.1",
     "php-cs-fixer/phpunit-constraint-isidenticalstring": "1.7.0",
-    "php-cs-fixer/phpunit-constraint-xmlmatchesxsd": "1.6.0",
+    "php-cs-fixer/phpunit-constraint-xmlmatchesxsd": "1.7.0",
     "phpcompatibility/php-compatibility": "9.3.5",
     "yoast/phpunit-polyfills": "3.1.2",
     "phpcompatibility/phpcompatibility-wp": "2.1.8",

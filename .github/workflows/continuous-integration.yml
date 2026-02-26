@@ -53,7 +53,7 @@ jobs:
 
     services:
       mysql:
-        image: mariadb:12.1.2@sha256:e487701b1f7e3f47319fe005b417c72becb67824a58b7bd35c6505f070f66dcd
+        image: mariadb:12.2.2@sha256:b1cb255a9939d28a1856815f0de6046c20c28c21b92a9f2696bc782b247a47ee
         env:
           MARIADB_USER: wptestuser
           MARIADB_PASSWORD: wptestpass
@@ -121,7 +121,7 @@ jobs:
 
     services:
       mysql:
-        image: mariadb:12.1.2@sha256:e487701b1f7e3f47319fe005b417c72becb67824a58b7bd35c6505f070f66dcd
+        image: mariadb:12.2.2@sha256:b1cb255a9939d28a1856815f0de6046c20c28c21b92a9f2696bc782b247a47ee
         env:
           MARIADB_USER: wptestuser
           MARIADB_PASSWORD: wptestpass

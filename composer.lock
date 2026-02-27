@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "118b38de5000d0dc58850442deb26131",
+    "content-hash": "68dfa58904b37117ad467dd22795a2e6",
     "packages": [],
     "packages-dev": [
         {
@@ -1268,23 +1268,23 @@
         },
         {
             "name": "php-cs-fixer/phpunit-constraint-xmlmatchesxsd",
-            "version": "v1.7.0",
+            "version": "v1.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHP-CS-Fixer/phpunit-constraint-xmlmatchesxsd.git",
-                "reference": "54e76ea950303d868c2af819b64753e9a2e38ad4"
+                "reference": "a08211257f128fa4673390df5776ec2797540565"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHP-CS-Fixer/phpunit-constraint-xmlmatchesxsd/zipball/54e76ea950303d868c2af819b64753e9a2e38ad4",
-                "reference": "54e76ea950303d868c2af819b64753e9a2e38ad4",
+                "url": "https://api.github.com/repos/PHP-CS-Fixer/phpunit-constraint-xmlmatchesxsd/zipball/a08211257f128fa4673390df5776ec2797540565",
+                "reference": "a08211257f128fa4673390df5776ec2797540565",
                 "shasum": ""
             },
             "require": {
                 "ext-dom": "*",
                 "ext-libxml": "*",
-                "php": "^7.0 || ^8.0",
-                "phpunit/phpunit": "^6.5.14 || ^7.5.20 || ^8.5.41 || ^9.6.22 || ^10.5.45 || ^11.5.7 || ^12.0.2 || ^13.0.0"
+                "php": "^7.4 || ^8.0",
+                "phpunit/phpunit": "^9.6.34 || ^10.5.53 || ^11.5.55 || ^12.5.14 || ^13.0.5"
             },
             "type": "library",
             "autoload": {
@@ -1311,9 +1311,9 @@
             "description": "Constraint for testing XML against XSD.",
             "support": {
                 "issues": "https://github.com/PHP-CS-Fixer/phpunit-constraint-xmlmatchesxsd/issues",
-                "source": "https://github.com/PHP-CS-Fixer/phpunit-constraint-xmlmatchesxsd/tree/v1.7.0"
+                "source": "https://github.com/PHP-CS-Fixer/phpunit-constraint-xmlmatchesxsd/tree/v1.8.0"
             },
-            "time": "2026-02-07T19:57:47+00:00"
+            "time": "2026-02-26T12:12:03+00:00"
         },
         {
             "name": "phpcompatibility/php-compatibility",

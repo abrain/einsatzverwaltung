@@ -5,13 +5,21 @@
     "group:allDigest",
     "group:linters",
     "group:test",
-    ":maintainLockFilesWeekly",
+    "schedule:weekends",
     ":semanticCommits",
     ":pinVersions",
     ":prHourlyLimit2",
     ":prConcurrentLimit10",
     ":separateMultipleMajorReleases"
   ],
+  {
+    "lockFileMaintenance": {
+      "enabled": true,
+      "extends": [
+        "schedule:weekends" 
+      ]
+    }
+  },
   "packageRules": [
     {
       "matchDepNames": [

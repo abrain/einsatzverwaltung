@@ -12,13 +12,11 @@
     ":prConcurrentLimit10",
     ":separateMultipleMajorReleases"
   ],
-  {
-    "lockFileMaintenance": {
-      "enabled": true,
-      "extends": [
-        "schedule:weekends" 
-      ]
-    }
+  "lockFileMaintenance": {
+    "enabled": true,
+    "extends": [
+      "schedule:weekends" 
+    ]
   },
   "packageRules": [
     {

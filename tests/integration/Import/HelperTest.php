@@ -5,7 +5,6 @@ use abrain\Einsatzverwaltung\Core;
 use abrain\Einsatzverwaltung\Exceptions\ImportPreparationException;
 use DateTime;
 use WP_UnitTestCase;
-use Yoast\PHPUnitPolyfills\Polyfills\AssertIsType;
 
 /**
  * Class HelperTest
@@ -13,8 +12,6 @@ use Yoast\PHPUnitPolyfills\Polyfills\AssertIsType;
  */
 class HelperTest extends WP_UnitTestCase
 {
-    use AssertIsType;
-
     /** @var Core */
     private static $core;
 

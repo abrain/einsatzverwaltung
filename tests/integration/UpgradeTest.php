@@ -3,7 +3,6 @@ namespace abrain\Einsatzverwaltung;
 
 use WP_UnitTestCase;
 use wpdb;
-use Yoast\PHPUnitPolyfills\Polyfills\AssertIsType;
 use function add_post_meta;
 use function array_map;
 use function delete_option;
@@ -24,8 +23,6 @@ use function wp_insert_post;
  */
 class UpgradeTest extends WP_UnitTestCase
 {
-    use AssertIsType;
-
     /**
      * @var Update
      */

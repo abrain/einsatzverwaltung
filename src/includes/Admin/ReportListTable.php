@@ -189,7 +189,7 @@ class ReportListTable
      * @param WP_Term|null $term
      * @return string An HTML anchor to filter this list table for occurrences of a certain term
      */
-    private function getTermFilterLink(WP_Term $term = null): string
+    private function getTermFilterLink(?WP_Term $term = null): string
     {
         if (empty($term)) {
             return '';

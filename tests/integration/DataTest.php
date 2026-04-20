@@ -2,7 +2,6 @@
 namespace abrain\Einsatzverwaltung;
 
 use WP_UnitTestCase;
-use Yoast\PHPUnitPolyfills\Polyfills\AssertIsType;
 
 /**
  * Class DataTest
@@ -10,8 +9,6 @@ use Yoast\PHPUnitPolyfills\Polyfills\AssertIsType;
  */
 class DataTest extends WP_UnitTestCase
 {
-    use AssertIsType;
-
     /**
      * @group unittests
      */

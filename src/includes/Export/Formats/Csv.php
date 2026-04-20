@@ -78,7 +78,7 @@ class Csv extends AbstractFormat
         if (empty($this->enclosure)) {
             $this->enclosure = '"';
         }
-        $this->headers = (boolean)@$options['headers'];
+        $this->headers = (bool)@$options['headers'];
     }
 
     /**

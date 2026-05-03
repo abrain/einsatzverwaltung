@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   compliance:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -47,7 +47,7 @@ jobs:
         run: cs2pr ./phpcs-report.xml
 
   test-latest:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs:
       - compliance
 
@@ -89,6 +89,9 @@ jobs:
       - name: Run unit tests
         run: composer exec phpunit
 
+      - name: Install SVN
+        run: sudo apt-get --yes install subversion
+
       - name: Set up integration test
         run: ./bin/install-wp-tests.sh wptest_latest wptestuser wptestpass 127.0.0.1:${{ job.services.mysql.ports['3306'] }} latest true
 
@@ -115,7 +118,7 @@ jobs:
 
 
   test-minimum:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs:
       - compliance
 
@@ -147,6 +150,9 @@ jobs:
         run: |
           rm composer.json composer.lock
           composer require --dev --no-progress "phpunit/phpunit:^6" "yoast/phpunit-polyfills:1.1.1" "brain/monkey:2.6.1"
+
+      - name: Install SVN
+        run: sudo apt-get --yes install subversion
 
       - name: Set up integration test
         run: ./bin/install-wp-tests.sh wptest_minimum wptestuser wptestpass 127.0.0.1:${{ job.services.mysql.ports['3306'] }} 5.6 true

@@ -42,7 +42,7 @@
     "phpcompatibility/php-compatibility": "9.3.5",
     "yoast/phpunit-polyfills": "4.0.0",
     "phpcompatibility/phpcompatibility-wp": "2.1.8",
-    "wp-coding-standards/wpcs": "3.3.0",
+    "wp-coding-standards/wpcs": "3.4.1",
     "phpunit/phpunit": "9.6.34"
   }
 }

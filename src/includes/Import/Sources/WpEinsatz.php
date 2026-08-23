@@ -81,10 +81,10 @@ class WpEinsatz extends AbstractSource
     /**
      * @inheritDoc
      */
-    public function getEntries($fields)
+    public function getEntries(array $requestedFields)
     {
         global $wpdb; /** @var wpdb $wpdb */
-        $queryFields = (null === $fields ? '*' : implode(',', array_merge(array('ID'), $fields)));
+        $queryFields = (empty($requestedFields) ? '*' : implode(',', array_merge(array('ID'), $requestedFields)));
         $query = sprintf('SELECT %s FROM %s ORDER BY Datum', $queryFields, $this->tablename);
         $entries = $wpdb->get_results($query, ARRAY_A);
 
@@ -124,9 +124,9 @@ class WpEinsatz extends AbstractSource
      * Gibt die Spaltennamen der wp-einsatz-Tabelle zurück
      * (ohne ID, Nr_Jahr und Nr_Monat)
      *
-     * @return array Die Spaltennamen
+     * @return string[] Die Spaltennamen
      */
-    public function getFields()
+    public function getFields(): array
     {
         if (!empty($this->cachedFields)) {
             return $this->cachedFields;

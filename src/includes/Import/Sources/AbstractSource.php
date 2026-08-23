@@ -110,17 +110,19 @@ abstract class AbstractSource
     /**
      * Gibt die Einsatzberichte der Importquelle zurück
      *
-     * @param array $fields Felder der Importquelle, die abgefragt werden sollen. Ist dieser Parameter null, werden alle
+     * @param string[] $requestedFields Felder der Importquelle, die abgefragt werden sollen. Ist das Array leer, werden alle
      * Felder abgefragt.
      *
-     * @return array
+     * @return array|false
      */
-    abstract public function getEntries($fields);
+    abstract public function getEntries(array $requestedFields);
 
     /**
-     * @return array
+     * Returns the names of the fields available in the source.
+     *
+     * @return string[]
      */
-    abstract public function getFields();
+    abstract public function getFields(): array;
 
     /**
      * Gibt die erste Action der Importquelle zurück
@@ -149,7 +151,7 @@ abstract class AbstractSource
      * @param string $field Bezeichner des Felds
      * @return string Eindeutiger Name bestehend aus Bezeichnern der Importquelle und des Felds
      */
-    public function getInputName($field)
+    public function getInputName(string $field): string
     {
         $fieldId = array_search($field, $this->getFields());
         return $this->getIdentifier() . '-field' . $fieldId;

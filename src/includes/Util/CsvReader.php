@@ -3,10 +3,12 @@ namespace abrain\Einsatzverwaltung\Util;
 
 use abrain\Einsatzverwaltung\Exceptions\FileReadException;
 use function array_key_exists;
-use function fclose;
+use function fclose; // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- Used for temp file
 use function feof;
 use function fgetcsv;
-use function fopen;
+use function fopen; // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen -- Used for temp file
+use function rewind;
+use function fwrite; // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fwrite -- Used for temp file
 use function sprintf;
 
 /**
@@ -55,12 +57,7 @@ class CsvReader
      */
     public function getLines(int $numLines, array $requestedColumnIndices = [], int $offset = 0, array $fieldMap = []): array
     {
-        $handle = fopen($this->filePath, 'r');
-        if ($handle === false) {
-            // translators: 1: file path
-            $message = sprintf(__('Could not open file %s', 'einsatzverwaltung'), $this->filePath);
-            throw new FileReadException($message);
-        }
+        $handle = $this->openFile();
 
         try {
             // If an offset is defined, some lines should be skipped
@@ -71,6 +68,7 @@ class CsvReader
 
             $lines = $this->readLines($handle, $numLines, $requestedColumnIndices);
         } finally {
+            // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- Used for temp file
             fclose($handle);
         }
 
@@ -89,6 +87,44 @@ class CsvReader
         }
 
         return $lines;
+    }
+
+    /**
+     * Read file with the WP_Filesystem methods and copy the contents into an in-memory stream.
+     *
+     * @throws FileReadException
+     */
+    private function openFile()
+    {
+        global $wp_filesystem;
+        if (empty($wp_filesystem)) {
+            require_once ABSPATH . 'wp-admin/includes/file.php';
+            WP_Filesystem();
+        }
+
+        if (!$wp_filesystem->exists($this->filePath) || !$wp_filesystem->is_readable($this->filePath)) {
+            throw new FileReadException(sprintf(
+                // translators: 1: file path
+                __('Could not open file %s', 'einsatzverwaltung'),
+                $this->filePath
+            ));
+        }
+
+        $content = $wp_filesystem->get_contents($this->filePath);
+        if ($content === false) {
+            throw new FileReadException(sprintf(
+                // translators: 1: file path
+                __('Could not read file %s', 'einsatzverwaltung'),
+                $this->filePath
+            ));
+        }
+
+        $handle = fopen('php://temp/', 'r+');
+        // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fwrite -- Used for temp file
+        fwrite($handle, $content);
+        rewind($handle);
+
+        return $handle;
     }
 
     /**

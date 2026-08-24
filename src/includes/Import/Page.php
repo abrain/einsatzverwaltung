@@ -255,7 +255,7 @@ class Page extends AdminPage
         }
 
         // Einsätze zählen
-        $entries = $this->currentSource->getEntries(null);
+        $entries = $this->currentSource->getEntries([]);
         if (empty($entries)) {
             $this->printWarning('Es wurden keine Eins&auml;tze gefunden.');
             return;

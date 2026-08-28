@@ -2,8 +2,8 @@
 namespace abrain\Einsatzverwaltung\Import;
 
 use abrain\Einsatzverwaltung\Data;
+use abrain\Einsatzverwaltung\Exceptions\ImportCheckException;
 use abrain\Einsatzverwaltung\Exceptions\ImportException;
-use abrain\Einsatzverwaltung\Exceptions\ImportPreparationException;
 use abrain\Einsatzverwaltung\Import\Sources\AbstractSource;
 use abrain\Einsatzverwaltung\Model\IncidentReport;
 use abrain\Einsatzverwaltung\ReportNumberController;
@@ -62,7 +62,7 @@ class Helper
      *     @type array  $unmatchableFields Felder, die nicht als Importziel auswählbar sein sollen
      * }
      */
-    private function dropdownEigeneFelder($args)
+    private function dropdownEigeneFelder(array $args)
     {
         $defaults = array(
             'name' => null,
@@ -111,7 +111,7 @@ class Helper
      * @param array $mapping
      * @param array $sourceEntry
      * @param array $insertArgs
-     * @throws ImportPreparationException
+     * @throws ImportCheckException
      */
     public function mapEntryToInsertArgs($mapping, $sourceEntry, &$insertArgs)
     {
@@ -152,7 +152,7 @@ class Helper
      * @param string $terms
      *
      * @return string[]|int[]
-     * @throws ImportPreparationException
+     * @throws ImportCheckException
      */
     public function getTaxInputList(string $taxonomy, string $terms): array
     {
@@ -177,13 +177,14 @@ class Helper
      *
      * @param string $termName
      * @param string $taxonomy
+     *
      * @return int
-     * @throws ImportPreparationException
+     * @throws ImportCheckException
      */
-    public function getTermId($termName, $taxonomy)
+    public function getTermId(string $termName, string $taxonomy): int
     {
         if (is_taxonomy_hierarchical($taxonomy) === false) {
-            throw new ImportPreparationException("Die Taxonomie $taxonomy ist nicht hierarchisch!");
+            throw new ImportCheckException("Die Taxonomie $taxonomy ist nicht hierarchisch!");
         }
 
         $termName = trim($termName);
@@ -198,7 +199,7 @@ class Helper
         $newterm = wp_insert_term($termName, $taxonomy);
 
         if (is_wp_error($newterm)) {
-            throw new ImportPreparationException(sprintf(
+            throw new ImportCheckException(sprintf(
                 "Konnte %s '%s' nicht anlegen: %s",
                 $this->taxonomies[$taxonomy]['label'],
                 $termName,
@@ -217,7 +218,7 @@ class Helper
      * @param array $mapping Zuordnung zwischen zu importieren Feldern und denen der Einsatzverwaltung
      * @param ImportStatus $importStatus
      * @throws ImportException
-     * @throws ImportPreparationException
+     * @throws ImportCheckException
      */
     public function import($source, $mapping, $importStatus)
     {
@@ -239,13 +240,13 @@ class Helper
      * @param string $dateTimeFormat
      * @param string $postStatus
      * @param DateTime $alarmzeit
-     * @throws ImportPreparationException
+     * @throws ImportCheckException
      */
     public function prepareArgsForInsertPost(&$insertArgs, $dateTimeFormat, $postStatus, $alarmzeit)
     {
         // Datum des Einsatzes prüfen
         if (false === $alarmzeit) {
-            throw new ImportPreparationException(sprintf(
+            throw new ImportCheckException(sprintf(
                 'Die Alarmzeit %s konnte mit dem angegebenen Format %s nicht eingelesen werden',
                 esc_html($insertArgs['post_date']),
                 esc_html($dateTimeFormat)
@@ -269,7 +270,7 @@ class Helper
         ) {
             $endDate = DateTime::createFromFormat($dateTimeFormat, $insertArgs['meta_input']['einsatz_einsatzende']);
             if (false === $endDate) {
-                throw new ImportPreparationException(sprintf(
+                throw new ImportCheckException(sprintf(
                     'Das Einsatzende %s konnte mit dem angegebenen Format %s nicht eingelesen werden',
                     esc_html($insertArgs['meta_input']['einsatz_einsatzende']),
                     esc_html($dateTimeFormat)
@@ -317,13 +318,13 @@ class Helper
      * @param array $mapping
      * @param array $preparedInsertArgs
      * @param array $yearsAffected
-     * @throws ImportPreparationException
+     * @throws ImportCheckException
      */
     public function prepareImport($source, $mapping, &$preparedInsertArgs, &$yearsAffected)
     {
         $sourceEntries = $source->getEntries(array_keys($mapping));
         if (empty($sourceEntries)) {
-            throw new ImportPreparationException('Die Importquelle lieferte keine Ergebnisse. Entweder sind dort keine Eins&auml;tze gespeichert oder es gab ein Problem bei der Abfrage.');
+            throw new ImportCheckException('Die Importquelle lieferte keine Ergebnisse. Entweder sind dort keine Eins&auml;tze gespeichert oder es gab ein Problem bei der Abfrage.');
         }
 
         $dateFormat = $source->getDateFormat();
@@ -354,18 +355,20 @@ class Helper
     }
 
     /**
-     * Gibt das Formular für die Zuordnung zwischen zu importieren Feldern und denen von Einsatzverwaltung aus
+     * Gibt das Formular für die Zuordnung zwischen zu importierenden Feldern und denen von Einsatzverwaltung aus
      *
      * @param AbstractSource $source
      * @param array $args {
-     *     @type array  $mapping           Zuordnung von zu importieren Feldern auf Einsatzverwaltungsfelder
-     *     @type array  $next_action       Array der nächsten Action
-     *     @type string $nonce_action      Wert der Nonce
-     *     @type string $action_value      Wert der action-Variable
-     *     @type string submit_button_text Beschriftung für den Button unter dem Formular
+     *     @type array  $mapping            Zuordnung von zu importieren Feldern auf Einsatzverwaltungsfelder
+     *     @type array  $next_action        Array der nächsten Action
+     *     @type string $nonce_action       Wert der Nonce
+     *     @type string $action_value       Wert der action-Variable
+     *     @type string $submit_button_text Beschriftung für den Button unter dem Formular
      * }
+     *
+     * @throws ImportCheckException
      */
-    public function renderMatchForm($source, $args)
+    public function renderMatchForm(AbstractSource $source, array $args)
     {
         $defaults = array(
             'mapping' => array(),
@@ -429,7 +432,7 @@ class Helper
      * @param ImportStatus $importStatus
      * @throws ImportException
      */
-    public function runImport($preparedInsertArgs, $source, $yearsAffected, $importStatus)
+    public function runImport(array $preparedInsertArgs, AbstractSource $source, array $yearsAffected, ImportStatus $importStatus)
     {
         // Für die Dauer des Imports sollen die laufenden Nummern nicht aktuell gehalten werden, da dies die Performance
         // stark beeinträchtigt
@@ -469,7 +472,7 @@ class Helper
      *
      * @return bool True bei bestandener Prüfung, false bei Unstimmigkeiten
      */
-    public function validateMapping($mapping, $source)
+    public function validateMapping(array $mapping, AbstractSource $source): bool
     {
         $valid = true;
 

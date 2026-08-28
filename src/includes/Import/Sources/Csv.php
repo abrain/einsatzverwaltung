@@ -2,6 +2,7 @@
 namespace abrain\Einsatzverwaltung\Import\Sources;
 
 use abrain\Einsatzverwaltung\Exceptions\FileReadException;
+use abrain\Einsatzverwaltung\Exceptions\ImportCheckException;
 use abrain\Einsatzverwaltung\Util\CsvReader;
 use abrain\Einsatzverwaltung\Utilities;
 
@@ -10,10 +11,6 @@ use abrain\Einsatzverwaltung\Utilities;
  */
 class Csv extends AbstractSource
 {
-    /**
-     * @var Utilities
-     */
-    protected $utilities;
     private $dateFormats = array('d.m.Y', 'd.m.y', 'Y-m-d', 'm/d/Y', 'm/d/y');
     private $timeFormats = array('H:i', 'G:i', 'H:i:s', 'G:i:s');
     private $csvFilePath;
@@ -23,13 +20,9 @@ class Csv extends AbstractSource
 
     /**
      * Csv constructor.
-     *
-     * @param Utilities $utilities
      */
-    public function __construct($utilities)
+    public function __construct()
     {
-        $this->utilities = $utilities;
-
         $this->actionOrder = array(
             array(
                 'slug' => 'selectcsvfile',
@@ -53,55 +46,51 @@ class Csv extends AbstractSource
     }
 
     /**
-     * @return boolean True, wenn Voraussetzungen stimmen, ansonsten false
+     * @inheritDoc
      */
-    public function checkPreconditions()
+    public function checkPreconditions(): void
     {
         $this->fileHasHeadlines = (bool) Utilities::getArrayValueIfKey($this->args, 'has_headlines', false);
 
         $delimiter = Utilities::getArrayValueIfKey($this->args, 'delimiter', false);
         if (in_array($delimiter, array(';', ','))) {
             $this->delimiter = $delimiter;
+        } else {
+            throw new ImportCheckException(__('Invalid CSV delimiter given', 'einsatzverwaltung'));
         }
 
         $attachmentId = $this->args['csv_file_id'];
         if (empty($attachmentId)) {
-            $this->utilities->printError('Keine Datei ausgew&auml;hlt');
-            return false;
+            throw new ImportCheckException(__('No file selected', 'einsatzverwaltung'));
         }
 
         if (!is_numeric($attachmentId)) {
-            $this->utilities->printError('Attachment ID ist keine Zahl');
-            return false;
+            throw new ImportCheckException(__('The attachment ID is not a number', 'einsatzverwaltung'));
         }
 
         $csvFilePath = get_attached_file($attachmentId);
         if (empty($csvFilePath)) {
-            $this->utilities->printError(sprintf('Konnte Attachment mit ID %d nicht finden', $attachmentId));
-            return false;
+            // translators: 1: the attachment ID
+            throw new ImportCheckException(sprintf(__('Could not find attachment with ID %d.', 'einsatzverwaltung'), $attachmentId));
         }
 
         $this->csvFilePath = $csvFilePath;
         if (!file_exists($csvFilePath)) {
-            $this->utilities->printError('Datei existiert nicht');
-            return false;
+            throw new ImportCheckException(__('File does not exist', 'einsatzverwaltung'));
         }
 
+        $csvReader = new CsvReader($csvFilePath, $this->delimiter, $this->enclosure);
         try {
-            $csvReader = new CsvReader($csvFilePath, $this->delimiter, $this->enclosure);
             $csvReader->getLines(1);
         } catch (FileReadException $e) {
-            $this->utilities->printError($e->getMessage());
-            return false;
+            throw new ImportCheckException($e->getMessage());
         }
-
-        return true;
     }
 
     /**
      * @inheritDoc
      */
-    public function echoExtraFormFields($nextAction)
+    public function echoExtraFormFields(array $nextAction)
     {
         echo '<h3>Datums- und Zeitformat</h3>';
         $dateExample = strtotime('December 31st 5:29 am');
@@ -126,9 +115,9 @@ class Csv extends AbstractSource
     }
 
     /**
-     * @return string
+     * @inheritDoc
      */
-    public function getDateFormat()
+    public function getDateFormat(): string
     {
         if (!array_key_exists('import_date_format', $this->args)) {
             $fallbackDateFormat = $this->dateFormats[0];
@@ -139,11 +128,9 @@ class Csv extends AbstractSource
     }
 
     /**
-     * Gibt die Beschreibung der Importquelle zurück
-     *
-     * @return string Beschreibung der Importquelle
+     * @inheritDoc
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return 'Importiert Einsatzberichte aus einer CSV-Datei.';
     }
@@ -151,7 +138,7 @@ class Csv extends AbstractSource
     /**
      * @inheritDoc
      */
-    public function getEntries(array $requestedFields)
+    public function getEntries(array $requestedFields): array
     {
         $fields = $this->getFields();
         $fieldMap = array();
@@ -160,8 +147,7 @@ class Csv extends AbstractSource
             $fieldIndex = array_search($requestedField, $fields);
             if ($fieldIndex === false) {
                 // translators: 1: field name
-                $this->utilities->printError(sprintf(__('The requested field %1$s is not available in the source.', 'einsatzverwaltung'), $requestedField));
-                return false;
+                throw new ImportCheckException(sprintf(__('The requested field %1$s is not available in the source.', 'einsatzverwaltung'), $requestedField));
             }
             $fieldMap[$fieldIndex] = $requestedField;
             $requestedColumnIndices[] = $fieldIndex;
@@ -171,12 +157,7 @@ class Csv extends AbstractSource
         try {
             $lines = $csvReader->getLines(0, $requestedColumnIndices, 0, $fieldMap);
         } catch (FileReadException $e) {
-            $this->utilities->printError($e->getMessage());
-            return false;
-        }
-
-        if (empty($lines)) {
-            return false;
+            throw new ImportCheckException($e->getMessage());
         }
 
         if ($this->fileHasHeadlines) {
@@ -200,7 +181,7 @@ class Csv extends AbstractSource
             $lines = $csvReader->getLines(1);
             $fields = $lines[0];
         } catch (FileReadException $e) {
-            $this->utilities->printError($e->getMessage());
+            throw new ImportCheckException($e->getMessage());
         }
 
         if (empty($fields)) {
@@ -225,7 +206,7 @@ class Csv extends AbstractSource
      *
      * @return string Eindeutiger Bezeichner der Importquelle
      */
-    public function getIdentifier()
+    public function getIdentifier(): string
     {
         return 'evw_csv';
     }
@@ -235,7 +216,7 @@ class Csv extends AbstractSource
      *
      * @return string Name der Importquelle
      */
-    public function getName()
+    public function getName(): string
     {
         return 'CSV';
     }
@@ -243,7 +224,7 @@ class Csv extends AbstractSource
     /**
      * @return string
      */
-    public function getTimeFormat()
+    public function getTimeFormat(): string
     {
         if (!array_key_exists('import_time_format', $this->args)) {
             $fallbackTimeFormat = $this->timeFormats[0];

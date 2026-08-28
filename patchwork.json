@@ -1,6 +1,7 @@
 {
   "redefinable-internals": [
     "feof",
-    "fgetcsv"
+    "fgetcsv",
+    "file_exists"
   ]
 }

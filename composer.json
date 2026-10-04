@@ -34,7 +34,7 @@
     "ext-json": "*"
   },
   "require-dev": {
-    "phpmd/phpmd": "2.15.0",
+    "phpmd/phpmd": "3.0.0",
     "brain/monkey": "2.7.0",
     "friendsofphp/php-cs-fixer": "3.95.25",
     "php-cs-fixer/phpunit-constraint-isidenticalstring": "1.8.0",

@@ -16,6 +16,12 @@ class WpEinsatz extends AbstractSource
      */
     public function __construct()
     {
+        parent::__construct(
+            'evw_wpe',
+            'wp-einsatz',
+            __('Imports entries from the WordPress plugin wp-einsatz.', 'einsatzverwaltung')
+        );
+
         global $wpdb;
         $this->tablename = $wpdb->prefix . 'einsaetze';
 
@@ -26,14 +32,14 @@ class WpEinsatz extends AbstractSource
         $this->actionOrder = array(
             array(
                 'slug' => 'analysis',
-                'name' => 'Analyse',
-                'button_text' => 'Datenbank analysieren',
+                'name' => __('Analysis', 'einsatzverwaltung'),
+                'button_text' => __('Analyze database', 'einsatzverwaltung'),
                 'args' => array()
             ),
             array(
                 'slug' => 'import',
-                'name' => 'Import',
-                'button_text' => 'Import starten',
+                'name' => __('Import', 'einsatzverwaltung'),
+                'button_text' => __('Start import', 'einsatzverwaltung'),
                 'args' => array()
             )
         );
@@ -75,14 +81,6 @@ class WpEinsatz extends AbstractSource
     /**
      * @inheritDoc
      */
-    public function getDescription(): string
-    {
-        return 'Importiert Einsätze aus dem WordPress-Plugin wp-einsatz.';
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function getEntries(array $requestedFields = []): array
     {
         global $wpdb; /** @var wpdb $wpdb */
@@ -95,22 +93,6 @@ class WpEinsatz extends AbstractSource
         }
 
         return $entries;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getIdentifier(): string
-    {
-        return 'evw_wpe';
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getName(): string
-    {
-        return 'wp-einsatz';
     }
 
     /**

@@ -11,14 +11,33 @@ abstract class AbstractSource
     protected $actionOrder = array();
     protected $args = array();
     protected $autoMatchFields = array();
+    /**
+     * @var string
+     */
+    private $description;
+    /**
+     * @var string
+     */
+    private $identifier;
     protected $internalFields = array();
+    /**
+     * @var string
+     */
+    private $name;
     protected $problematicFields = array();
     protected $cachedFields;
 
     /**
-     * AbstractSource constructor.
+     * @param string $identifier
+     * @param string $name
+     * @param string $description
      */
-    abstract public function __construct();
+    public function __construct(string $identifier, string $name, string $description)
+    {
+        $this->identifier = $identifier;
+        $this->name = $name;
+        $this->description = $description;
+    }
 
     /**
      * @return void
@@ -56,7 +75,10 @@ abstract class AbstractSource
      *
      * @return string Beschreibung der Importquelle
      */
-    abstract public function getDescription(): string;
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
 
     /**
      * @param $action
@@ -141,7 +163,10 @@ abstract class AbstractSource
      *
      * @return string Eindeutiger Bezeichner der Importquelle
      */
-    abstract public function getIdentifier(): string;
+    public function getIdentifier(): string
+    {
+        return $this->identifier;
+    }
 
     /**
      * Gibt den Wert für das name-Attribut eines Formularelements zurück
@@ -162,7 +187,10 @@ abstract class AbstractSource
      *
      * @return string Name der Importquelle
      */
-    abstract public function getName(): string;
+    public function getName(): string
+    {
+        return $this->name;
+    }
 
     /**
      * Gibt die nächste Action der Importquelle zurück

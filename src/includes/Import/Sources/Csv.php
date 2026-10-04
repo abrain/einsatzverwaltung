@@ -23,6 +23,12 @@ class Csv extends AbstractSource
      */
     public function __construct()
     {
+        parent::__construct(
+            'evw_csv',
+            'CSV',
+            __('Imports incident reports from a CSV file.', 'einsatzverwaltung')
+        );
+
         $this->actionOrder = array(
             array(
                 'slug' => 'selectcsvfile',
@@ -130,14 +136,6 @@ class Csv extends AbstractSource
     /**
      * @inheritDoc
      */
-    public function getDescription(): string
-    {
-        return 'Importiert Einsatzberichte aus einer CSV-Datei.';
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function getEntries(array $requestedFields = []): array
     {
         $fields = $this->getFields();
@@ -199,26 +197,6 @@ class Csv extends AbstractSource
         $this->cachedFields = $fields;
 
         return $fields;
-    }
-
-    /**
-     * Gibt den eindeutigen Bezeichner der Importquelle zurück
-     *
-     * @return string Eindeutiger Bezeichner der Importquelle
-     */
-    public function getIdentifier(): string
-    {
-        return 'evw_csv';
-    }
-
-    /**
-     * Gibt den Namen der Importquelle zurück
-     *
-     * @return string Name der Importquelle
-     */
-    public function getName(): string
-    {
-        return 'CSV';
     }
 
     /**

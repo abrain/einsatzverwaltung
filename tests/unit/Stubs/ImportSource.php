@@ -10,6 +10,7 @@ class ImportSource extends AbstractSource
 
     public function __construct(array $fields = [], array $autoMatchFields = [], array $internalFields = [])
     {
+        parent::__construct('stub', 'Stub', 'lorem ipsum');
         $this->fields = $fields;
         $this->autoMatchFields = $autoMatchFields;
         $this->internalFields = $internalFields;
@@ -20,14 +21,6 @@ class ImportSource extends AbstractSource
      */
     public function checkPreconditions(): void
     {
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getDescription(): string
-    {
-        return 'lorem ipsum';
     }
 
     /**
@@ -52,22 +45,6 @@ class ImportSource extends AbstractSource
     public function getFields(): array
     {
         return $this->fields;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getIdentifier(): string
-    {
-        return 'stub';
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getName(): string
-    {
-        return 'Stub';
     }
 
     /**

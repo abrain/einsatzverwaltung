@@ -1,35 +1,49 @@
 <?php
 namespace abrain\Einsatzverwaltung\Import\Sources;
 
-use abrain\Einsatzverwaltung\Utilities;
+use abrain\Einsatzverwaltung\Exceptions\ImportCheckException;
 
 /**
  * Abstraktion für Importquellen
  */
 abstract class AbstractSource
 {
-    /**
-     * @var Utilities
-     */
-    protected $utilities;
     protected $actionOrder = array();
     protected $args = array();
     protected $autoMatchFields = array();
+    /**
+     * @var string
+     */
+    private $description;
+    /**
+     * @var string
+     */
+    private $identifier;
     protected $internalFields = array();
+    /**
+     * @var string
+     */
+    private $name;
     protected $problematicFields = array();
     protected $cachedFields;
 
     /**
-     * AbstractSource constructor.
-     *
-     * @param Utilities $utilities
+     * @param string $identifier
+     * @param string $name
+     * @param string $description
      */
-    abstract public function __construct($utilities);
+    public function __construct(string $identifier, string $name, string $description)
+    {
+        $this->identifier = $identifier;
+        $this->name = $name;
+        $this->description = $description;
+    }
 
     /**
-     * @return boolean True, wenn Voraussetzungen stimmen, ansonsten false
+     * @return void
+     * @throws ImportCheckException
      */
-    abstract public function checkPreconditions();
+    abstract public function checkPreconditions(): void;
 
     /**
      * Generiert für Argumente, die in der nächsten Action wieder gebraucht werden, Felder, die in das Formular
@@ -37,7 +51,7 @@ abstract class AbstractSource
      *
      * @param array $nextAction Die nächste Action
      */
-    public function echoExtraFormFields($nextAction)
+    public function echoExtraFormFields(array $nextAction)
     {
         if (empty($nextAction)) {
             return;
@@ -61,13 +75,16 @@ abstract class AbstractSource
      *
      * @return string Beschreibung der Importquelle
      */
-    abstract public function getDescription();
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
 
     /**
      * @param $action
      * @return string
      */
-    public function getActionAttribute($action)
+    public function getActionAttribute($action): string
     {
         return $this->getIdentifier() . ':' . $action;
     }
@@ -79,7 +96,7 @@ abstract class AbstractSource
      *
      * @return array|bool Das Array der Action oder false, wenn es keines für $slug gibt
      */
-    public function getAction($slug)
+    public function getAction(string $slug)
     {
         if (empty($slug)) {
             return false;
@@ -97,7 +114,7 @@ abstract class AbstractSource
     /**
      * @return array
      */
-    public function getAutoMatchFields()
+    public function getAutoMatchFields(): array
     {
         return $this->autoMatchFields;
     }
@@ -105,22 +122,27 @@ abstract class AbstractSource
     /**
      * @return string
      */
-    abstract public function getDateFormat();
+    abstract public function getDateFormat(): string;
 
     /**
      * Gibt die Einsatzberichte der Importquelle zurück
      *
-     * @param array $fields Felder der Importquelle, die abgefragt werden sollen. Ist dieser Parameter null, werden alle
+     * @param string[] $requestedFields Felder der Importquelle, die abgefragt werden sollen. Ist das Array leer, werden alle
      * Felder abgefragt.
      *
      * @return array
+     * @throws ImportCheckException
      */
-    abstract public function getEntries($fields);
+    abstract public function getEntries(array $requestedFields = []): array;
 
     /**
-     * @return array
+     * Returns the names of the fields available in the source.
+     *
+     * @throws ImportCheckException
+     *
+     * @return string[]
      */
-    abstract public function getFields();
+    abstract public function getFields(): array;
 
     /**
      * Gibt die erste Action der Importquelle zurück
@@ -141,46 +163,23 @@ abstract class AbstractSource
      *
      * @return string Eindeutiger Bezeichner der Importquelle
      */
-    abstract public function getIdentifier();
+    public function getIdentifier(): string
+    {
+        return $this->identifier;
+    }
 
     /**
      * Gibt den Wert für das name-Attribut eines Formularelements zurück
      *
      * @param string $field Bezeichner des Felds
+     *
      * @return string Eindeutiger Name bestehend aus Bezeichnern der Importquelle und des Felds
+     * @throws ImportCheckException
      */
-    public function getInputName($field)
+    public function getInputName(string $field): string
     {
         $fieldId = array_search($field, $this->getFields());
         return $this->getIdentifier() . '-field' . $fieldId;
-    }
-
-    /**
-     * @param array $sourceFields Felder der Importquelle
-     * @param array $ownFields Felder der Einsatzverwaltung
-     *
-     * @return array
-     */
-    public function getMapping($sourceFields, $ownFields)
-    {
-        $mapping = array();
-        foreach ($sourceFields as $sourceField) {
-            $index = $this->getInputName($sourceField);
-            if (array_key_exists($index, $_POST)) {
-                $ownField = $_POST[$index];
-                if (!empty($ownField) && is_string($ownField) && $ownField != '-') {
-                    if (array_key_exists($ownField, $ownFields)) {
-                        $mapping[$sourceField] = $ownField;
-                    } else {
-                        $this->utilities->printWarning("Unbekanntes Feld: $ownField");
-                    }
-                }
-            }
-        }
-        foreach ($this->autoMatchFields as $sourceFieldAuto => $ownFieldAuto) {
-            $mapping[$sourceFieldAuto] = $ownFieldAuto;
-        }
-        return $mapping;
     }
 
     /**
@@ -188,7 +187,10 @@ abstract class AbstractSource
      *
      * @return string Name der Importquelle
      */
-    abstract public function getName();
+    public function getName(): string
+    {
+        return $this->name;
+    }
 
     /**
      * Gibt die nächste Action der Importquelle zurück
@@ -197,7 +199,7 @@ abstract class AbstractSource
      *
      * @return array|bool Ein Array, das die nächste Action beschreibt, oder false, wenn es keine weitere gibt
      */
-    public function getNextAction($currentAction)
+    public function getNextAction(array $currentAction)
     {
         if (empty($this->actionOrder)) {
             return false;
@@ -215,7 +217,7 @@ abstract class AbstractSource
     /**
      * @return array
      */
-    public function getProblematicFields()
+    public function getProblematicFields(): array
     {
         return $this->problematicFields;
     }
@@ -223,12 +225,12 @@ abstract class AbstractSource
     /**
      * @return string
      */
-    abstract public function getTimeFormat();
+    abstract public function getTimeFormat(): string;
 
     /**
      * @return array Felder, die nicht als Importziel angeboten werden sollen
      */
-    public function getUnmatchableFields()
+    public function getUnmatchableFields(): array
     {
         return array_merge(array_values($this->autoMatchFields), $this->internalFields);
     }
@@ -236,7 +238,7 @@ abstract class AbstractSource
     /**
      * @return bool
      */
-    public function isPublishReports()
+    public function isPublishReports(): bool
     {
         if (!array_key_exists('import_publish_reports', $this->args)) {
             return false;

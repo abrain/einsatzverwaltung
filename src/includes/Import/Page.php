@@ -298,12 +298,15 @@ class Page extends AdminPage
             return;
         }
 
-        // Mapping einlesen
-        $mapping = $this->currentSource->getMapping($sourceFields, IncidentReport::getFields());
+        // Get the mapping of the source fields to our internal fields
+        $mappingHelper = new MappingHelper();
+        try {
+            $mapping = $mappingHelper->getMapping($this->currentSource, IncidentReport::getFields());
+            $mappingHelper->validateMapping($mapping, $this->currentSource);
+        } catch (ImportCheckException $e) {
+            $this->printError(sprintf("Fehler bei der Zuordnung: %s", $e->getMessage()));
 
-        // Prüfen, ob mehrere Felder das gleiche Zielfeld haben
-        if (!$this->helper->validateMapping($mapping, $this->currentSource)) {
-            // Und gleich nochmal...
+            // Repeat the mapping
             $this->nextAction = $this->currentAction;
 
             $this->helper->renderMatchForm($this->currentSource, array(

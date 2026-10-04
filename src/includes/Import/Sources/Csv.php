@@ -138,7 +138,7 @@ class Csv extends AbstractSource
     /**
      * @inheritDoc
      */
-    public function getEntries(array $requestedFields): array
+    public function getEntries(array $requestedFields = []): array
     {
         $fields = $this->getFields();
         $fieldMap = array();

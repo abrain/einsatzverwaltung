@@ -111,7 +111,7 @@ abstract class AbstractSource
      * @return array
      * @throws ImportCheckException
      */
-    abstract public function getEntries(array $requestedFields): array;
+    abstract public function getEntries(array $requestedFields = []): array;
 
     /**
      * Returns the names of the fields available in the source.

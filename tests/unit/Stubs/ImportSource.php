@@ -41,7 +41,7 @@ class ImportSource extends AbstractSource
     /**
      * @inheritDoc
      */
-    public function getEntries(array $requestedFields): array
+    public function getEntries(array $requestedFields = []): array
     {
         return [];
     }

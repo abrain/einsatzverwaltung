@@ -1,13 +1,11 @@
 <?php
 namespace abrain\Einsatzverwaltung\Exceptions;
 
-use Exception;
-
 /**
- * Class ImportPreparationException
+ * Class FileReadException
  * @package abrain\Einsatzverwaltung\Exceptions
  */
-class ImportPreparationException extends Exception
+class FileReadException extends \Exception
 {
 
 }

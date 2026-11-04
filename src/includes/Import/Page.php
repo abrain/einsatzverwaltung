@@ -4,7 +4,7 @@ namespace abrain\Einsatzverwaltung\Import;
 use abrain\Einsatzverwaltung\AdminPage;
 use abrain\Einsatzverwaltung\Data;
 use abrain\Einsatzverwaltung\Exceptions\ImportException;
-use abrain\Einsatzverwaltung\Exceptions\ImportPreparationException;
+use abrain\Einsatzverwaltung\Exceptions\ImportCheckException;
 use abrain\Einsatzverwaltung\Import\Sources\AbstractSource;
 use abrain\Einsatzverwaltung\Import\Sources\Csv;
 use abrain\Einsatzverwaltung\Import\Sources\WpEinsatz;
@@ -171,9 +171,17 @@ class Page extends AdminPage
 
         // TODO gemeinsame Prüfungen auslagern
         if ('analysis' == $aktion) {
-            $this->analysisPage();
+            try {
+                $this->analysisPage();
+            } catch (ImportCheckException $e) {
+                $this->printError($e->getMessage());
+            }
         } elseif ('import' == $aktion) {
-            $this->importPage();
+            try {
+                $this->importPage();
+            } catch (ImportCheckException $e) {
+                $this->printError($e->getMessage());
+            }
         } elseif ('selectcsvfile' == $aktion) {
             if (false === $this->nextAction) {
                 $this->printError('Keine Nachfolgeaktion gefunden!');
@@ -228,11 +236,12 @@ class Page extends AdminPage
         }
     }
 
+    /**
+     * @throws ImportCheckException
+     */
     private function analysisPage()
     {
-        if (!$this->currentSource->checkPreconditions()) {
-            return;
-        }
+        $this->currentSource->checkPreconditions();
 
         $felder = $this->currentSource->getFields();
         if (empty($felder)) {
@@ -255,7 +264,7 @@ class Page extends AdminPage
         }
 
         // Einsätze zählen
-        $entries = $this->currentSource->getEntries(null);
+        $entries = $this->currentSource->getEntries();
         if (empty($entries)) {
             $this->printWarning('Es wurden keine Eins&auml;tze gefunden.');
             return;
@@ -276,11 +285,12 @@ class Page extends AdminPage
         ));
     }
 
+    /**
+     * @throws ImportCheckException
+     */
     private function importPage()
     {
-        if (!$this->currentSource->checkPreconditions()) {
-            return;
-        }
+        $this->currentSource->checkPreconditions();
 
         $sourceFields = $this->currentSource->getFields();
         if (empty($sourceFields)) {
@@ -288,12 +298,15 @@ class Page extends AdminPage
             return;
         }
 
-        // Mapping einlesen
-        $mapping = $this->currentSource->getMapping($sourceFields, IncidentReport::getFields());
+        // Get the mapping of the source fields to our internal fields
+        $mappingHelper = new MappingHelper();
+        try {
+            $mapping = $mappingHelper->getMapping($this->currentSource, IncidentReport::getFields());
+            $mappingHelper->validateMapping($mapping, $this->currentSource);
+        } catch (ImportCheckException $e) {
+            $this->printError(sprintf("Fehler bei der Zuordnung: %s", $e->getMessage()));
 
-        // Prüfen, ob mehrere Felder das gleiche Zielfeld haben
-        if (!$this->helper->validateMapping($mapping, $this->currentSource)) {
-            // Und gleich nochmal...
+            // Repeat the mapping
             $this->nextAction = $this->currentAction;
 
             $this->helper->renderMatchForm($this->currentSource, array(
@@ -318,7 +331,7 @@ class Page extends AdminPage
             }
             $this->printInfo(sprintf('Erfolgreich importiert: %1$d von %2$d', $importStatus->currentStep, $importStatus->totalSteps));
             return;
-        } catch (ImportPreparationException $e) {
+        } catch (ImportCheckException $e) {
             $importStatus->abort('Importvorbereitung abgebrochen, Ursache: ' . $e->getMessage());
             return;
         }

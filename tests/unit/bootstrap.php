@@ -15,6 +15,8 @@ date_default_timezone_set('UTC');
 require __DIR__ . '/../../vendor/autoload.php';
 require __DIR__ . '/constants.php';
 require __DIR__ . '/UnitTestCase.php';
+require __DIR__ . '/../../src/includes/Import/Sources/AbstractSource.php';
+require __DIR__ . '/Stubs/ImportSource.php';
 require __DIR__ . '/Stubs/WPRESTServerStub.php';
 
 spl_autoload_register(function ($class) {

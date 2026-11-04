@@ -2,7 +2,7 @@
 namespace abrain\Einsatzverwaltung\Import;
 
 use abrain\Einsatzverwaltung\Core;
-use abrain\Einsatzverwaltung\Exceptions\ImportPreparationException;
+use abrain\Einsatzverwaltung\Exceptions\ImportCheckException;
 use DateTime;
 use WP_UnitTestCase;
 
@@ -52,7 +52,7 @@ class HelperTest extends WP_UnitTestCase
         $input = 'term1, term78, term99';
         try {
             $result = self::$helper->getTaxInputList('nohierarchy', $input);
-        } catch (ImportPreparationException $e) {
+        } catch (ImportCheckException $e) {
             $this->fail($e->getMessage());
             return;
         }
@@ -79,7 +79,7 @@ class HelperTest extends WP_UnitTestCase
         $input = implode(',', $terms);
         try {
             $returnedIds = self::$helper->getTaxInputList('hierarchy', $input);
-        } catch (ImportPreparationException $e) {
+        } catch (ImportCheckException $e) {
             $this->fail($e->getMessage());
             return;
         }
@@ -108,7 +108,7 @@ class HelperTest extends WP_UnitTestCase
 
         try {
             $returnedTermId = self::$helper->getTermId($termName, 'hierarchy');
-        } catch (ImportPreparationException $e) {
+        } catch (ImportCheckException $e) {
             $this->fail($e->getMessage());
             return;
         }
@@ -126,7 +126,7 @@ class HelperTest extends WP_UnitTestCase
 
         try {
             $returnedTermId = self::$helper->getTermId($termName, 'hierarchy');
-        } catch (ImportPreparationException $e) {
+        } catch (ImportCheckException $e) {
             $this->fail($e->getMessage());
             return;
         }
@@ -166,7 +166,7 @@ class HelperTest extends WP_UnitTestCase
 
         try {
             self::$helper->mapEntryToInsertArgs($mapping, $entry, $insertArgs);
-        } catch (ImportPreparationException $e) {
+        } catch (ImportCheckException $e) {
             $this->fail($e->getMessage());
         }
 
@@ -207,7 +207,7 @@ class HelperTest extends WP_UnitTestCase
             $postStatus = 'draft';
             $alarmzeit = DateTime::createFromFormat('d.m.Y H:i', $insertArgs['post_date']);
             self::$helper->prepareArgsForInsertPost($insertArgs, 'Y/m-d H i', $postStatus, $alarmzeit);
-        } catch (ImportPreparationException $e) {
+        } catch (ImportCheckException $e) {
             $this->fail($e->getMessage());
         }
 
@@ -260,7 +260,7 @@ class HelperTest extends WP_UnitTestCase
             $postStatus = 'publish';
             $alarmzeit = DateTime::createFromFormat('d.m.Y H:i', $insertArgs['post_date']);
             self::$helper->prepareArgsForInsertPost($insertArgs, 'Y/m-d H i', $postStatus, $alarmzeit);
-        } catch (ImportPreparationException $e) {
+        } catch (ImportCheckException $e) {
             $this->fail($e->getMessage());
         }
 
@@ -312,7 +312,7 @@ class HelperTest extends WP_UnitTestCase
             $postStatus = 'publish';
             $alarmzeit = DateTime::createFromFormat('d.m.Y H:i', $insertArgs['post_date']);
             self::$helper->prepareArgsForInsertPost($insertArgs, 'Y/m-d H i', $postStatus, $alarmzeit);
-        } catch (ImportPreparationException $e) {
+        } catch (ImportCheckException $e) {
             $this->fail($e->getMessage());
         }
 
